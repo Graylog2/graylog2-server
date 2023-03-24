@@ -16,12 +16,13 @@
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
+import { OrderedMap } from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import useUserDateTime from 'hooks/useUserDateTime';
-import type { UrlQueryFilters, Filters } from 'components/common/EntityFilters/types';
+import type { UrlQueryFilters, Filters, Filter } from 'components/common/EntityFilters/types';
 import type { Attributes, Attribute } from 'stores/PaginationTypes';
 import type { DateTime } from 'util/DateTime';
 import {
@@ -54,22 +55,19 @@ const _collectionsByAttributeId = (attributesMetaData: Attributes) => attributes
   }, {});
 
 const _urlQueryFiltersWithoutTitle = (filters: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) => (
-  Object.entries(filters).reduce((col, [attributeId, filterValues]) => {
+  filters.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedCollection = collectionsByAttributeId?.[attributeId];
 
     if (!relatedCollection) {
       return col;
     }
 
-    return {
-      ...col,
-      [attributeId]: filterValues,
-    };
-  }, {})
+    return col.set(attributeId, filterValues);
+  }, OrderedMap<string, Array<string>>())
 );
 
 const filtersWithoutTitlePayload = (filtersWithoutTitle: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) => ({
-  entities: Object.entries(filtersWithoutTitle).reduce((col, [attributeId, filterValues]) => {
+  entities: filtersWithoutTitle.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedCollection = collectionsByAttributeId[attributeId];
 
     return [
@@ -118,7 +116,7 @@ const _allFiltersWithTitle = (
   attributesMetaData: Attributes,
   formatTime: (dateTime: DateTime) => string,
 ): Filters => (
-  Object.entries(urlQueryFilters).reduce((col, [attributeId, filterValues]) => {
+  urlQueryFilters.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedAttribute = attributesMetaData?.find(({ id }) => id === attributeId);
     const filtersWithTitle = filterValues.map((value) => {
       const title = filterTitle(relatedAttribute, requestedFilterTitles, value, formatTime);
@@ -130,14 +128,11 @@ const _allFiltersWithTitle = (
       });
     });
 
-    return {
-      ...col,
-      [attributeId]: filtersWithTitle,
-    };
-  }, {})
+    return col.set(attributeId, filtersWithTitle);
+  }, OrderedMap<string, Array<Filter>>())
 );
 
-const filtersWithTitleToResponse = (filtersWithTitle: Filters, attributesMetaData: Attributes) => Object.entries(filtersWithTitle).reduce(
+const filtersWithTitleToResponse = (filtersWithTitle: Filters, attributesMetaData: Attributes) => filtersWithTitle.entrySeq().reduce(
   (col, [_attributeId, filters]) => {
     const relatedCollection = attributesMetaData?.find(({ id }) => id === _attributeId)?.related_collection;
 

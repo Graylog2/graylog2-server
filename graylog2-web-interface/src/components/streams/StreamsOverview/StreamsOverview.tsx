@@ -63,7 +63,6 @@ type Props = {
 const StreamsOverview = ({ indexSets }: Props) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [urlQuerySearch, setUrlQuerySearch] = useQueryParam('query', StringParam);
-  console.log({ urlQuerySearch });
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,

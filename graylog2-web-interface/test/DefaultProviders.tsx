@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { defaultTimezone, defaultUser } from 'defaultMockValues';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { QueryParamProvider } from 'use-query-params';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
@@ -50,13 +52,15 @@ type Props = {
   children: React.ReactNode,
 }
 const DefaultProviders = ({ children }: Props) => (
-  <CurrentUserContext.Provider value={defaultUser}>
-    <ThemeProvider theme={theme}>
-      <UserDateTimeProvider tz={defaultTimezone}>
-        {children}
-      </UserDateTimeProvider>
-    </ThemeProvider>
-  </CurrentUserContext.Provider>
+  <QueryParamProvider adapter={ReactRouter6Adapter}>
+    <CurrentUserContext.Provider value={defaultUser}>
+      <ThemeProvider theme={theme}>
+        <UserDateTimeProvider tz={defaultTimezone}>
+          {children}
+        </UserDateTimeProvider>
+      </ThemeProvider>
+    </CurrentUserContext.Provider>
+  </QueryParamProvider>
 );
 
 export default DefaultProviders;

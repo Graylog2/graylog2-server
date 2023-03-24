@@ -16,27 +16,25 @@
  */
 import { useQueryParam, ArrayParam } from 'use-query-params';
 import { useMemo } from 'react';
+import { OrderedMap } from 'immutable';
 
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => void] => {
-  const [urlQueryFilters, setUrlQueryFilters] = useQueryParam('filters', ArrayParam);
+  const [pureUrlQueryFilters, setPureUrlQueryFilters] = useQueryParam('filters', ArrayParam);
 
-  const filtersFromQuery = useMemo(() => (urlQueryFilters ?? []).reduce((col, filter) => {
+  const filtersFromQuery = useMemo(() => (pureUrlQueryFilters ?? []).reduce((col, filter) => {
     const [filterKey, filterValue] = filter.split(/=(.*)/);
 
-    return {
-      ...col,
-      [filterKey]: [...(col[filterKey] ?? []), filterValue],
-    };
-  }, {}), [urlQueryFilters]);
+    return col.set(filterKey, [...(col[filterKey] ?? []), filterValue]);
+  }, OrderedMap<string, Array<string>>()), [pureUrlQueryFilters]);
 
   const setFilterValues = (newFilters: UrlQueryFilters) => {
-    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filters]) => (
+    const newPureUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filters]) => (
       [...col, ...filters.map((value) => `${attributeId}=${value}`)]
     ), []);
 
-    setUrlQueryFilters(newUrlQueryFilters);
+    setPureUrlQueryFilters(newPureUrlQueryFilters);
   };
 
   return [filtersFromQuery, setFilterValues];

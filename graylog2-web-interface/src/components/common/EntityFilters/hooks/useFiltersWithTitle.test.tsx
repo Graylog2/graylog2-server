@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { OrderedMap } from 'immutable';
+import { defaultTimezone } from 'defaultMockValues';
+import * as React from 'react';
 
 import { asMock } from 'helpers/mocking';
 import fetch from 'logic/rest/FetchProvider';
 import { attributes } from 'fixtures/entityListAttributes';
+import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import useFiltersWithTitle from './useFiltersWithTitle';
 
@@ -28,14 +32,20 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve({
 })));
 
 describe('useFiltersWithTitle', () => {
-  const urlQueryFilters = {
+  const urlQueryFilters = OrderedMap({
     index_set_id: ['index_set_id_1'],
     created_at: ['2023-03-23T13:42:50.733+00:00><'],
     disabled: ['false'],
-  };
+  });
+
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <UserDateTimeProvider tz={defaultTimezone}>
+      {children}
+    </UserDateTimeProvider>
+  );
 
   it('fetches titles only for filters related to attributes which have a related collection', async () => {
-    const { waitFor } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes));
+    const { waitFor } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
@@ -46,9 +56,9 @@ describe('useFiltersWithTitle', () => {
 
   it('generates correct filter names for all attribute types', async () => {
     asMock(fetch).mockReturnValue(Promise.resolve({ entities: [{ id: 'index_set_id_1', type: 'index_sets' }] }));
-    const { waitFor, result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes));
+    const { waitFor, result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
 
-    await waitFor(() => expect(result.current.data).toEqual({
+    await waitFor(() => expect(result.current.data).toEqual(OrderedMap({
       index_set_id: [
         {
           id: 'index_set_id_1',
@@ -64,6 +74,6 @@ describe('useFiltersWithTitle', () => {
         },
       ],
       disabled: [{ id: 'false', title: 'Running', value: 'false' }],
-    }));
+    })));
   });
 });

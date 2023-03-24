@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { OrderedMap } from 'immutable';
+
 import FiltersForQueryParams from './FiltersForQueryParams';
 
-const exampleFilters = {
+const exampleFilters = OrderedMap({
   index_set_id: ['index-set-1', 'index-set-2'],
-};
+});
 
 describe('FiltersForQueryParams', () => {
   it('should transform multiple filters', () => {
