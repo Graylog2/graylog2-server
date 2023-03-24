@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
@@ -25,7 +26,6 @@ import { getConfig } from 'components/configurations/helpers';
 import { PluginConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Col, Nav, NavItem, Row } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
-import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 
 const PluginsConfig = () => {
   const [activeSectionKey, setActiveSectionKey] = useState(1);

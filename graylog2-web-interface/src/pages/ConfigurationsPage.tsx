@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import AppConfig from 'util/AppConfig';
+import { isPermitted } from 'util/PermissionsMixin';
+
 import * as React from 'react';
 import { useState } from 'react';
+import ConfigletRow from 'pages/configurations/ConfigletRow';
 
-import AppConfig from 'util/AppConfig';
 import { Col, Nav, NavItem } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
-import { isPermitted } from 'util/PermissionsMixin';
+import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
@@ -30,7 +32,6 @@ import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaults
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
-import ConfigletRow from 'pages/configurations/ConfigletRow';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
@@ -52,7 +53,8 @@ const ConfigurationsPage = () => {
     name: string,
     hide?: boolean,
     SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>,
-    props: ConfigurationSectionProps | {}
+    props: ConfigurationSectionProps | {},
+    showCaret?: boolean,
   }> = [
     {
       name: 'Search',
@@ -132,6 +134,7 @@ const ConfigurationsPage = () => {
     {
       name: 'Plugins',
       SectionComponent: PluginsConfig,
+      showCaret: true,
       props: {},
     },
   ];
@@ -151,10 +154,13 @@ const ConfigurationsPage = () => {
       <ConfigletRow className="content">
         <Col md={2}>
           <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={handleNavSelect}>
-            {configurationSections.map(({ hide, name }, index) => (
+            {configurationSections.map(({ hide, name, showCaret }, index) => (
               !hide && (
               <NavItem key={`nav-${name}`} eventKey={index + 1} title={name}>
                 {name}
+                {showCaret && (isSectionActive(name)
+                  ? <Icon name="caret-right" style={{ marginLeft: 5, verticalAlign: 'middle' }} />
+                  : <Icon name="caret-down" style={{ marginLeft: 5 }} />)}
               </NavItem>
               )
             ))}
