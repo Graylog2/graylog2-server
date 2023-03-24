@@ -61,6 +61,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -371,6 +372,7 @@ public class SupportBundleService {
                             throw new BadRequestException(e);
                         }
                     })
+                    .sorted(Comparator.comparing(BundleFile::fileName).reversed())
                     .collect(Collectors.toList());
         } catch (NoSuchFileException ignored) {
             return List.of();
