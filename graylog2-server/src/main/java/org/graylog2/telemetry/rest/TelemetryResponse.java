@@ -1,7 +1,7 @@
 package org.graylog2.telemetry.rest;
 
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
-import org.graylog2.telemetry.license.TelemetryLicenseStatus;
+import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 
 import java.util.List;
 import java.util.Map;

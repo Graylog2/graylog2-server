@@ -1,4 +1,4 @@
-package org.graylog2.telemetry.license;
+package org.graylog2.telemetry.enterprise;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
