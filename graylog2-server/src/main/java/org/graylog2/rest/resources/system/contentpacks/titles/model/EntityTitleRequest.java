@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings;
+package org.graylog2.rest.resources.system.contentpacks.titles.model;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.bindings.providers.MongoConnectionProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntitiesScanner;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MongoDBModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
-        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
-    }
+import java.util.List;
+
+public record EntityTitleRequest(@JsonProperty("entities") List<EntityIdentifier> entities) {
 }
