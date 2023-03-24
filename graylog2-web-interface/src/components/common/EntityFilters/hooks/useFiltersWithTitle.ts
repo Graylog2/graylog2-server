@@ -152,7 +152,7 @@ const filtersWithTitleToResponse = (filtersWithTitle: Filters, attributesMetaDat
   }, []);
 
 const fetchFilterTitles = (payload: { entities: Array<{ id: string, type: string }> }) => (
-  fetch('POST', URLUtils.qualifyUrl('/system/catalog/entity_titles'), payload)
+  fetch('POST', URLUtils.qualifyUrl('/system/catalog/entities/titles'), payload)
 );
 
 const useFiltersWithTitle = (
