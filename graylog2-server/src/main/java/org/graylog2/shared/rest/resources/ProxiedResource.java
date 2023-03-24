@@ -261,7 +261,7 @@ public abstract class ProxiedResource extends RestResource {
         return nodeId -> {
             try {
                 final Node targetNode = nodeService.byNodeId(nodeId);
-                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), httpRequestHeaders, interfaceClass));
+                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), interfaceClass));
             } catch (NodeNotFoundException e) {
                 LOG.warn("Node <" + nodeId + "> not found while trying to call " + interfaceClass.getName() + " on it.");
                 return Optional.empty();

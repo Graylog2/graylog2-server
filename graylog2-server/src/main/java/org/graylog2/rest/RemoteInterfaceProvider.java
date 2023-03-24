@@ -27,10 +27,7 @@ import org.graylog2.security.realm.SessionAuthenticator;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 
 public class RemoteInterfaceProvider {
     private final ObjectMapper objectMapper;
@@ -43,9 +40,7 @@ public class RemoteInterfaceProvider {
         this.okHttpClient = okHttpClient;
     }
 
-    public <T> T get(Node node, final String authorizationToken, @Nullable MultivaluedMap<String, String> requestHeaders, Class<T> interfaceClass) {
-        final MultivaluedMap<String, String> headers = requestHeaders == null ? new MultivaluedHashMap<>() : requestHeaders;
-
+    public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
         final OkHttpClient okHttpClient = this.okHttpClient.newBuilder()
                 .addInterceptor(chain -> {
                     final Request original = chain.request();
@@ -54,13 +49,9 @@ public class RemoteInterfaceProvider {
                             .header(CsrfProtectionFilter.HEADER_NAME, "Graylog Server")
                             .method(original.method(), original.body());
 
-                    headers.forEach((k, v) -> builder.header(k, String.join(",", v)));
-
-                    if (!headers.containsKey(HttpHeaders.ACCEPT)) {
+                    if (original.headers(HttpHeaders.ACCEPT).isEmpty()) {
                         builder.header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString());
                     }
-                    // Don't confuse OkHttp by passing through the browsers Accept-Encoding header
-                    builder.removeHeader(HttpHeaders.ACCEPT_ENCODING);
 
                     if (authorizationToken != null) {
                         builder
@@ -80,9 +71,6 @@ public class RemoteInterfaceProvider {
                 .build();
 
         return retrofit.create(interfaceClass);
-    }
-    public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
-        return get(node, authorizationToken, null, interfaceClass);
     }
 
     public <T> T get(Node node, Class<T> interfaceClass) {

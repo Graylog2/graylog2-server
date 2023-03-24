@@ -20,6 +20,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Streaming;
@@ -35,6 +36,7 @@ public interface RemoteSupportBundleInterface {
 
     @GET("system/debug/support/logfile/{id}")
     @Streaming
+    @Headers({"Accept: */*"})
     Call<ResponseBody> getLogFile(@Path("id") String id);
 
     @GET("system/debug/support/bundle/list")
@@ -42,6 +44,7 @@ public interface RemoteSupportBundleInterface {
 
     @GET("system/debug/support/bundle/download/{filename}")
     @Streaming
+    @Headers({"Accept: application/octet-stream"})
     Call<ResponseBody> downloadBundle(@Path("filename") String filename);
 
     @DELETE("system/debug/support/bundle/delete/{filename}")
