@@ -85,10 +85,10 @@ public class ClusterLookupTableResourceTest {
         when(nodeService.byNodeId("node_1")).thenReturn(node1);
         when(nodeService.byNodeId("node_2")).thenReturn(node2);
 
-        when(remoteInterfaceProvider.get(node1, "TEST_TOKEN", null, RemoteLookupTableResource.class))
+        when(remoteInterfaceProvider.get(node1, "TEST_TOKEN", RemoteLookupTableResource.class))
                 .thenReturn(remoteLookupTableResource1);
 
-        when(remoteInterfaceProvider.get(node2, "TEST_TOKEN", null, RemoteLookupTableResource.class))
+        when(remoteInterfaceProvider.get(node2, "TEST_TOKEN", RemoteLookupTableResource.class))
                 .thenReturn(remoteLookupTableResource2);
 
         underTest = new ClusterLookupTableResource(nodeService, remoteInterfaceProvider, httpHeaders,
