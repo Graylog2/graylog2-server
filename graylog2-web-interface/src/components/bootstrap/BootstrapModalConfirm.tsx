@@ -18,6 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ModalSubmit from 'components/common/ModalSubmit';
+import StringUtils from 'util/StringUtils';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
@@ -50,7 +51,8 @@ const BootstrapModalConfirm = ({
   return (
     <BootstrapModalWrapper showModal={showModal}
                            onHide={onCancel}
-                           role="alertdialog">
+                           role="alertdialog"
+                           name={StringUtils.getRecursiveChildText(title)}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

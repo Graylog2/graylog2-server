@@ -24,6 +24,7 @@ type Props = {
   bsSize: 'lg'|'large'|'sm'|'small',
   showModal: boolean,
   role: string,
+  name: string,
   onHide: () => void,
   children: React.ReactNode,
 };
@@ -35,13 +36,15 @@ const BootstrapModalWrapper = ({
   bsSize,
   backdrop,
   role,
+  name,
 }: Props) => {
   return (
     <Modal show={showModal}
            onHide={onHide}
            bsSize={bsSize}
            backdrop={backdrop}
-           role={role}>
+           role={role}
+           name={name}>
       {children}
     </Modal>
   );
@@ -59,12 +62,14 @@ BootstrapModalWrapper.propTypes = {
   ]),
   backdrop: PropTypes.oneOf(['static', true, false]),
   role: PropTypes.string,
+  name: PropTypes.string,
 };
 
 BootstrapModalWrapper.defaultProps = {
   bsSize: undefined,
   backdrop: 'static',
   role: 'dialog',
+  name: '',
 };
 
 export default BootstrapModalWrapper;

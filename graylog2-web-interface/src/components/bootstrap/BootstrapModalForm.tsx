@@ -19,6 +19,7 @@ import React, { useRef } from 'react';
 import $ from 'jquery';
 
 import ModalSubmit from 'components/common/ModalSubmit';
+import StringUtils from 'util/StringUtils';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
@@ -81,7 +82,8 @@ const BootstrapModalForm = ({
     <BootstrapModalWrapper bsSize={bsSize}
                            showModal={show}
                            backdrop={backdrop}
-                           onHide={onCancel}>
+                           onHide={onCancel}
+                           name={StringUtils.getRecursiveChildText(title)}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
