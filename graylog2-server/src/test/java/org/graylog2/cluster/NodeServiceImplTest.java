@@ -146,15 +146,14 @@ public class NodeServiceImplTest {
     public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
         nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
         final Node node = nodeService.byNodeId(nodeId);
-        final LocalDateTime lastSeenDate = LocalDateTime.now().minus(-2 * STALE_LEADER_TIMEOUT_MS, ChronoUnit.MILLIS);
-        final int ts = (int) lastSeenDate.toEpochSecond(ZoneOffset.UTC);
-        node.getFields().put("last_seen", ts);
+
+        final long lastSeenMs = System.currentTimeMillis() - 2 * STALE_LEADER_TIMEOUT_MS;
+        node.getFields().put("last_seen", (int)(lastSeenMs / 1000));
         nodeService.save(node);
 
         final Node nodeAfterUpdate = nodeService.byNodeId(nodeId);
-        final DateTime lastSeen = nodeAfterUpdate.getLastSeen();
-        final long timeDiff = Math.abs(ts - (lastSeen.getMillis() / 1000));
-        Assertions.assertThat(timeDiff).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
+        final long lastSeenFromDb = nodeAfterUpdate.getLastSeen().toInstant().getMillis();
+        Assertions.assertThat(lastSeenMs - lastSeenFromDb).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
 
         final Map<String, Node> activeNodes = nodeService.allActive();
 
