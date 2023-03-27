@@ -47,12 +47,14 @@ const BootstrapModalConfirm = ({
   confirmButtonText,
   onCancel,
   onConfirm,
+  ...restProps
 }: Props) => {
   return (
     <BootstrapModalWrapper showModal={showModal}
                            onHide={onCancel}
                            role="alertdialog"
-                           name={StringUtils.getRecursiveChildText(title)}>
+                           data-event-element={StringUtils.getRecursiveChildText(title)}
+                           {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

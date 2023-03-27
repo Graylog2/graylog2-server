@@ -54,26 +54,26 @@ const Body = css`
 `;
 
 const Modal = styled((props) => {
-  const { show, name } = props;
+  const { show, 'data-event-element': eventElement, 'data-app-section': appSection } = props;
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     const telemetryEvent = {
-      appSection: name,
-      eventElement: name,
+      appSection,
+      eventElement,
       eventInfo: {},
     };
 
-    if (show) {
+    if (show && eventElement) {
       sendTelemetry('open', telemetryEvent);
     }
 
     return () => {
-      if (show) {
+      if (show && eventElement) {
         sendTelemetry('close', telemetryEvent);
       }
     };
-  }, [show, name, sendTelemetry]);
+  }, [show, eventElement, appSection, sendTelemetry]);
 
   return <BootstrapModal {...(props || {})} />;
 })`

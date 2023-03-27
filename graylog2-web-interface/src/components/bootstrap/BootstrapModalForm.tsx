@@ -52,6 +52,7 @@ const BootstrapModalForm = ({
   onCancel,
   title,
   children,
+  ...restProps
 }: Props) => {
   const form = useRef(null);
 
@@ -83,7 +84,8 @@ const BootstrapModalForm = ({
                            showModal={show}
                            backdrop={backdrop}
                            onHide={onCancel}
-                           name={StringUtils.getRecursiveChildText(title)}>
+                           data-event-element={StringUtils.getRecursiveChildText(title)}
+                           {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
