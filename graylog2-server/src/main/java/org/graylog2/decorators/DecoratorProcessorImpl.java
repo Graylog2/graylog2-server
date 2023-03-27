@@ -16,6 +16,7 @@
  */
 package org.graylog2.decorators;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.DecorationStats;
@@ -51,6 +52,7 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
         return decorate(searchResponse, searchResponseDecorators);
     }
 
+    @WithSpan
     @Override
     public SearchResponse decorate(SearchResponse searchResponse, List<SearchResponseDecorator> searchResponseDecorators) {
         try {

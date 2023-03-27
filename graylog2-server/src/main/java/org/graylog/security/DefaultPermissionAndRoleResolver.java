@@ -17,7 +17,6 @@
 package org.graylog.security;
 
 import com.google.common.collect.ImmutableSet;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
@@ -68,7 +67,6 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
         return Collections.singleton(principal);
     }
 
-    @WithSpan("DefaultPermissionAndRoleResolver#resolvePermissionsForPrincipal")
     @Override
     public Set<Permission> resolvePermissionsForPrincipal(GRN principal) {
         final Set<GrantDTO> grants = grantService.getForGranteesOrGlobal(resolveGrantees(principal));
@@ -102,7 +100,6 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
         return permissionsBuilder.build();
     }
 
-    @WithSpan("DefaultPermissionAndRoleResolver#resolveRolesForPrincipal")
     @Override
     public Set<String> resolveRolesForPrincipal(GRN principal) {
         return ImmutableSet.of();

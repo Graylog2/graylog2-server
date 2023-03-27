@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
-import io.opentelemetry.api.trace.Tracer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -78,19 +77,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchExecutor searchExecutor;
     private final SearchJobService searchJobService;
     private final EventBus serverEventBus;
-    private Tracer tracer;
 
     @Inject
     public SearchResource(SearchDomain searchDomain,
                           SearchExecutor searchExecutor,
                           SearchJobService searchJobService,
-                          EventBus serverEventBus,
-                          Tracer tracer) {
+                          EventBus serverEventBus) {
         this.searchDomain = searchDomain;
         this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;
         this.serverEventBus = serverEventBus;
-        this.tracer = tracer;
     }
 
     @POST
@@ -99,21 +95,15 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Consumes({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public Response createSearch(@ApiParam SearchDTO searchRequest, @Context SearchUser searchUser) {
-        var span = tracer.spanBuilder("SearchResource#createSearch").startSpan();
+        final Search search = searchRequest.toSearch();
 
-        try (var cs = span.makeCurrent()) {
-            final Search search = searchRequest.toSearch();
-
-            final Search saved = searchDomain.saveForUser(search, searchUser);
-            final SearchDTO result = SearchDTO.fromSearch(saved);
-            if (result == null || result.id() == null) {
-                return Response.serverError().build();
-            }
-            LOG.debug("Created new search object {}", result.id());
-            return Response.created(URI.create(result.id())).entity(result).build();
-        } finally {
-            span.end();
+        final Search saved = searchDomain.saveForUser(search, searchUser);
+        final SearchDTO result = SearchDTO.fromSearch(saved);
+        if (result == null || result.id() == null) {
+            return Response.serverError().build();
         }
+        LOG.debug("Created new search object {}", result.id());
+        return Response.created(URI.create(result.id())).entity(result).build();
     }
 
     @POST
@@ -164,23 +154,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
-        var span = tracer.spanBuilder("SearchResource#executeQuery")
-                .setAttribute("org.graylog.search.id", id)
-                .startSpan();
 
-        try (var cs = span.makeCurrent()) {
-            final SearchJob searchJob = searchExecutor.execute(id, searchUser, executionState);
+        final SearchJob searchJob = searchExecutor.execute(id, searchUser, executionState);
 
-            postAuditEvent(searchJob);
+        postAuditEvent(searchJob);
 
-            final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
+        final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
 
-            return Response.created(URI.create(BASE_PATH + "/status/" + searchJobDTO.id()))
-                    .entity(searchJob)
-                    .build();
-        } finally {
-            span.end();
-        }
+        return Response.created(URI.create(BASE_PATH + "/status/" + searchJobDTO.id()))
+                .entity(searchJob)
+                .build();
     }
 
     @POST

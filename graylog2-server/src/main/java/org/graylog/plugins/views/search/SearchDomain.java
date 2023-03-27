@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search;
 
-import io.opentelemetry.api.trace.Tracer;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.permissions.SearchPermissions;
@@ -39,34 +38,24 @@ public class SearchDomain {
     private final SearchExecutionGuard executionGuard;
     private final ViewService viewService;
     private final Map<String, ViewResolver> viewResolvers;
-    private Tracer tracer;
 
     @Inject
     public SearchDomain(SearchDbService dbService,
                         SearchExecutionGuard executionGuard,
                         ViewService viewService,
-                        Map<String, ViewResolver> viewResolvers,
-                        Tracer tracer) {
+                        Map<String, ViewResolver> viewResolvers) {
         this.dbService = dbService;
         this.executionGuard = executionGuard;
         this.viewService = viewService;
         this.viewResolvers = viewResolvers;
-        this.tracer = tracer;
     }
 
     public Optional<Search> getForUser(String id, SearchUser searchUser) {
-        var span = tracer.spanBuilder("SearchDomain#getForUser")
-                .setAttribute("search-id", id)
-                .startSpan();
-        try (var cs = span.makeCurrent()) {
-            final Optional<Search> search = dbService.get(id);
+        final Optional<Search> search = dbService.get(id);
 
-            search.ifPresent(s -> checkPermission(searchUser, s));
+        search.ifPresent(s -> checkPermission(searchUser, s));
 
-            return search;
-        } finally {
-            span.end();
-        }
+        return search;
     }
 
     private void checkPermission(SearchUser searchUser, Search search) {

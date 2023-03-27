@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -46,21 +46,18 @@ public class SearchExecutor {
     private final QueryEngine queryEngine;
     private final SearchValidation searchValidation;
     private final SearchNormalization searchNormalization;
-    private Tracer tracer;
 
     @Inject
     public SearchExecutor(SearchDomain searchDomain,
                           SearchJobService searchJobService,
                           QueryEngine queryEngine,
                           SearchValidation searchValidation,
-                          SearchNormalization searchNormalization,
-                          Tracer tracer) {
+                          SearchNormalization searchNormalization) {
         this.searchDomain = searchDomain;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.searchValidation = searchValidation;
         this.searchNormalization = searchNormalization;
-        this.tracer = tracer;
     }
 
     public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState) {
@@ -69,41 +66,35 @@ public class SearchExecutor {
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
+    @WithSpan
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        var span = tracer.spanBuilder("SearchExecutor#execute")
-                .setAttribute("org.graylog.search.id", search.id())
-                .startSpan();
-        try (var cs = span.makeCurrent()) {
-            final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
+        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
 
-            final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
 
-            if (hasFatalError(validationErrors)) {
-                return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
-            }
-
-            final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
-
-            final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
-
-            validationErrors.forEach(searchJob::addError);
-
-            try {
-                Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
-            } catch (ExecutionException e) {
-                LOG.error("Error executing search job <{}>", searchJob.getId(), e);
-                throw new InternalServerErrorException("Error executing search job: " + e.getMessage(), e);
-            } catch (TimeoutException e) {
-                throw new InternalServerErrorException("Timeout while executing search job");
-            } catch (Exception e) {
-                LOG.error("Other error", e);
-                throw e;
-            }
-
-            return searchJob;
-        } finally {
-            span.end();
+        if (hasFatalError(validationErrors)) {
+            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
         }
+
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
+
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
+
+        validationErrors.forEach(searchJob::addError);
+
+        try {
+            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException e) {
+            LOG.error("Error executing search job <{}>", searchJob.getId(), e);
+            throw new InternalServerErrorException("Error executing search job: " + e.getMessage(), e);
+        } catch (TimeoutException e) {
+            throw new InternalServerErrorException("Timeout while executing search job");
+        } catch (Exception e) {
+            LOG.error("Other error", e);
+            throw e;
+        }
+
+        return searchJob;
     }
 
     private SearchJob searchJobWithFatalError(SearchJob searchJob, Set<SearchError> validationErrors) {

@@ -186,7 +186,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .map(Optional::get);
     }
 
-    @WithSpan("ESPivot")
+    @WithSpan
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);

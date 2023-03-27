@@ -19,7 +19,7 @@ package org.graylog.storage.elasticsearch7;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
-import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
@@ -55,17 +55,14 @@ public class ElasticsearchClient {
 
     private final RestHighLevelClient client;
     private final boolean compressionEnabled;
-    private Tracer tracer;
     private final ObjectMapper objectMapper;
 
     @Inject
     public ElasticsearchClient(RestHighLevelClient client,
                                @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
-                               Tracer tracer,
                                ObjectMapper objectMapper) {
         this.client = client;
         this.compressionEnabled = compressionEnabled;
-        this.tracer = tracer;
         this.objectMapper = objectMapper;
     }
 
@@ -83,20 +80,14 @@ public class ElasticsearchClient {
     }
 
     public List<MultiSearchResponse.Item> msearch(List<SearchRequest> searchRequests, String errorMessage) {
-        var span = tracer.spanBuilder("ElasticsearchClient#msearch").startSpan();
+        final MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
 
-        try (var cs = span.makeCurrent()) {
-            final MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
+        searchRequests.forEach(multiSearchRequest::add);
 
-            searchRequests.forEach(multiSearchRequest::add);
+        final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
 
-            final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
-
-            return Streams.stream(result)
-                    .collect(Collectors.toList());
-        } finally {
-            span.end();
-        }
+        return Streams.stream(result)
+                .collect(Collectors.toList());
     }
 
     private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
@@ -115,6 +106,7 @@ public class ElasticsearchClient {
         return execute(fn, "An error occurred: ");
     }
 
+    @WithSpan
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {
         try {
             return fn.apply(client, requestOptions());
@@ -123,6 +115,7 @@ public class ElasticsearchClient {
         }
     }
 
+    @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {
             return fn.apply(client, requestOptions());
