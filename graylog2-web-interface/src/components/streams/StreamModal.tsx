@@ -81,7 +81,9 @@ const StreamModal = ({
   return (
     <Modal title={modalTitle}
            onHide={onClose}
-           show>
+           show
+           data-app-section="stream_actions"
+           data-event-element={modalTitle}>
       <Formik<FormValues> initialValues={_initialValues}
                           onSubmit={_onSubmit}
                           validate={validate}>

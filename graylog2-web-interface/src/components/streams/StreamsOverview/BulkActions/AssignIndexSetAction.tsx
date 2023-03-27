@@ -74,7 +74,9 @@ const AssignIndexSetModal = ({
   return (
     <Modal title={modalTitle}
            onHide={toggleShowModal}
-           show>
+           show
+           data-app-section="stream_bulk_actions"
+           data-event-element={modalTitle}>
       <Formik initialValues={{ index_set_id: undefined }}
               onSubmit={onSubmit}
               validate={validate}>

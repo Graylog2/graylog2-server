@@ -134,6 +134,8 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
     };
   };
 
+  const modalTitle = 'Configure Index Set Defaults';
+
   return (
     <div>
       <h2>Index Defaults</h2>
@@ -169,13 +171,18 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
         </IfPermitted>
       </p>
 
-      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+      <Modal show={showModal}
+             onHide={resetConfig}
+             aria-modal="true"
+             aria-labelledby="dialog_label"
+             data-app-section="configurations_index_defaults"
+             data-event-element={modalTitle}>
         <Formik onSubmit={saveConfig} initialValues={currentConfig}>
           {({ values, setFieldValue, isSubmitting }) => {
             return (
               <Form>
                 <Modal.Header closeButton>
-                  <Modal.Title id="dialog_label">Configure Index Set Defaults</Modal.Title>
+                  <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>

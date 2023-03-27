@@ -92,6 +92,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     return availableVendorTypes().filter((t) => t.value === type)[0].label;
   };
 
+  const modalTitle = 'Update Geo-Location Processor Configuration';
+
   return (
     <div>
       <h3>Geo-Location Processor</h3>
@@ -132,13 +134,18 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
           Edit configuration
         </Button>
       </IfPermitted>
-      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+      <Modal show={showModal}
+             onHide={resetConfig}
+             aria-modal="true"
+             aria-labelledby="dialog_label"
+             data-app-section="configurations_geolocation_processor"
+             data-event-element={modalTitle}>
         <Formik onSubmit={handleSubmit} initialValues={curConfig}>
           {({ values, setFieldValue, isSubmitting }) => {
             return (
               <Form>
                 <Modal.Header>
-                  <Modal.Title id="dialog_label">Update Geo-Location Processor Configuration</Modal.Title>
+                  <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                   <Row>

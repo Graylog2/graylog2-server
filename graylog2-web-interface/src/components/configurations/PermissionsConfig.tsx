@@ -60,6 +60,8 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
     setShowModal(false);
   };
 
+  const modalTitle = 'Configure Permissions';
+
   return (
     <div>
       <h2>Permissions Config</h2>
@@ -87,14 +89,19 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal}
+                 onHide={_resetConfig}
+                 aria-modal="true"
+                 aria-labelledby="dialog_label"
+                 data-app-section="configurations_permissions"
+                 data-event-element={modalTitle}>
             <Formik onSubmit={_saveConfig} initialValues={config}>
 
               {({ isSubmitting }) => {
                 return (
                   <Form>
                     <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">Configure Permissions</Modal.Title>
+                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body>

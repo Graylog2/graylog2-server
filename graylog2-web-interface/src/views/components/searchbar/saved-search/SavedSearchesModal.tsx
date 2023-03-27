@@ -29,7 +29,9 @@ type Props = {
 
 const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => (
   <Modal show
-         bsSize="large">
+         bsSize="large"
+         data-app-section="saved_searches"
+         data-event-element="Saved Searches List">
     <Modal.Body>
       <SavedSearchesList deleteSavedSearch={deleteSavedSearch}
                          activeSavedSearchId={activeSavedSearchId}

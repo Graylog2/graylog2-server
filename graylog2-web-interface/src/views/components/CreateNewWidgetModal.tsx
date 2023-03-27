@@ -82,7 +82,9 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
 
   return (
     <Modal onHide={onCancel}
-           show>
+           show
+           data-app-section=""
+           data-event-element={modalTitle}>
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>

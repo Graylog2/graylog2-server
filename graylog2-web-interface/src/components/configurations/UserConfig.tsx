@@ -64,6 +64,8 @@ const UserConfig = ({ config, updateConfig }: Props) => {
     return milliseconds >= 1000;
   };
 
+  const modalTitle = 'Update User Configuration';
+
   return (
     <div>
       <h2>User Configuration</h2>
@@ -91,14 +93,19 @@ const UserConfig = ({ config, updateConfig }: Props) => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal}
+                 onHide={_resetConfig}
+                 aria-modal="true"
+                 aria-labelledby="dialog_label"
+                 data-app-section="configurations_user"
+                 data-event-element={modalTitle}>
             <Formik onSubmit={_saveConfig} initialValues={config}>
 
               {({ isSubmitting, values, setFieldValue }) => {
                 return (
                   <Form>
                     <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">Update User Configuration</Modal.Title>
+                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body>

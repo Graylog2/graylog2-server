@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
+import StringUtils from 'util/StringUtils';
 
 /**
  * Component that displays a confirmation dialog box that the user can
@@ -37,7 +38,10 @@ const ConfirmDialog = ({
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal show={show}
+           onHide={onHide}
+           data-app-section=""
+           data-event-element={StringUtils.getRecursiveChildText(title)}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
