@@ -750,6 +750,10 @@
                 <targetPath>web-interface/assets</targetPath>
             </resource>
             <resource>
+                <directory>${webInterface.path}/target/preflight/build</directory>
+                <targetPath>preflight/assets</targetPath>
+            </resource>
+            <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>**/*.properties</exclude>
@@ -1117,6 +1121,25 @@
                                     <resources>
                                         <resource>
                                             <directory>${webInterface.path}/target/web/build</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/classes/preflight/assets</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${webInterface.path}/target/preflight/build</directory>
                                         </resource>
                                     </resources>
                                 </configuration>
