@@ -51,6 +51,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
   } = useQuery();
 
   return useMemo(() => {
+    if (!urlConfig) return ({ hasUrlConfig: false, configFromUrl: undefined });
     const parsedUrlConfig: EventDefinitionURLConfig = JSON.parse(urlConfig as string);
     const {
       type,
@@ -77,8 +78,8 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
     } : {};
 
     return ({
-      hasUrlConfig: !!urlConfig,
-      configFromUrl: !!urlConfig && {
+      hasUrlConfig: true,
+      configFromUrl: {
         type,
         query: query ?? '',
         streams: streams ?? [],

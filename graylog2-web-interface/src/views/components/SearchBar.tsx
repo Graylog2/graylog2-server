@@ -132,7 +132,8 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({ key: stream.title, value: stream.id })));
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { userTimezone } = useUserDateTime();
-  const { parameters } = useParameters();
+  const { parameters, parameterBindings } = useParameters();
+  console.log({ parameters, parameterBindings });
   const currentQuery = useCurrentQuery();
   const queryFilters = useQueryFilters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
@@ -147,7 +148,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   }
 
   const { query } = currentQuery;
-
+  console.log({ currentQuery });
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   return (
