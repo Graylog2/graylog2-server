@@ -6,6 +6,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.joda.time.Duration;
@@ -34,6 +35,7 @@ public class TelemetryService {
     private final TrafficCounterService trafficCounterService;
     private final ClusterConfigService clusterConfigService;
     private final TelemetryEnterpriseDataProvider enterpriseDataProvider;
+    private final UserService userService;
     private final Set<PluginMetaData> pluginMetaDataSet;
 
 
@@ -41,10 +43,12 @@ public class TelemetryService {
     public TelemetryService(TrafficCounterService trafficCounterService,
                             ClusterConfigService clusterConfigService,
                             TelemetryEnterpriseDataProvider enterpriseDataProvider,
+                            UserService userService,
                             Set<PluginMetaData> pluginMetaDataSet) {
         this.trafficCounterService = trafficCounterService;
         this.clusterConfigService = clusterConfigService;
         this.enterpriseDataProvider = enterpriseDataProvider;
+        this.userService = userService;
         this.pluginMetaDataSet = pluginMetaDataSet;
     }
 
@@ -76,7 +80,11 @@ public class TelemetryService {
     }
 
     private ClusterInfo createClusterInfo(String clusterId, Map<String, SystemOverviewResponse> systemOverviewResponses) {
-        return new ClusterInfo(clusterId, systemOverviewResponses, getAverageLastMonthTraffic());
+        return new ClusterInfo(
+                clusterId,
+                systemOverviewResponses,
+                getAverageLastMonthTraffic(),
+                userService.count());
     }
 
     private PluginInfo createPluginInfo() {

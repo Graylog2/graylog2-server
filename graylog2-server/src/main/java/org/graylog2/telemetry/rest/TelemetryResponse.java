@@ -21,7 +21,8 @@ public record TelemetryResponse(UserInfo currentUser,
 
     public record ClusterInfo(String clusterId,
                               Map<String, SystemOverviewResponse> nodes,
-                              long averageLastMonthTraffic) {
+                              long averageLastMonthTraffic,
+                              long usersCount) {
 
     }
 
