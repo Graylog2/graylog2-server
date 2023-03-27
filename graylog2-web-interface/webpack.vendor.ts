@@ -31,6 +31,9 @@ const supportedBrowsers = require('./supportedBrowsers');
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
+const DEFAULT_API_URL = 'http://localhost:9000';
+const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
+
 // eslint-disable-next-line no-console
 console.error('Building vendor bundle.');
 
@@ -103,10 +106,10 @@ if (TARGET === 'start') {
       historyApiFallback: true,
       proxy: {
         '/api': {
-          target: 'http://localhost:9000',
+          target: apiUrl,
         },
         '/config.js': {
-          target: 'http://localhost:9000',
+          target: apiUrl,
         },
       },
     },
