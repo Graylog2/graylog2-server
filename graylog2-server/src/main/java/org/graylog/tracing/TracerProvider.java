@@ -16,27 +16,21 @@
  */
 package org.graylog.tracing;
 
-import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
-import org.graylog2.plugin.Version;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+/**
+ * Relies on the opentelemetry javaagent to provide an implementation of a tracer. If the javaagent is not present,
+ * this provider will supply a no-op tracer.
+ */
 @Singleton
 public class TracerProvider implements Provider<Tracer> {
-    private OpenTelemetry openTelemetry;
-    private TracingConfiguration configuration;
-
-    @Inject
-    public TracerProvider(OpenTelemetry openTelemetry, TracingConfiguration configuration) {
-        this.openTelemetry = openTelemetry;
-        this.configuration = configuration;
-    }
 
     @Override
     public Tracer get() {
-        return openTelemetry.getTracer(configuration.getInstrumentationScopeName(), Version.CURRENT_CLASSPATH.toString());
+        return GlobalOpenTelemetry.get().getTracer("org.graylog");
     }
 }

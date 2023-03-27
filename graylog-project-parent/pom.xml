@@ -582,12 +582,7 @@
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>${opentelemetry-instrumentation-annotations.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-semconv</artifactId>
-                <version>${opentelemetry-semconv.version}</version>
+                <version>${opentelemetry.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

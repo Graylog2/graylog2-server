@@ -17,13 +17,11 @@
 package org.graylog.tracing;
 
 import com.google.inject.AbstractModule;
-import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 
 public class TracingModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(OpenTelemetry.class).toProvider(OpenTelemetryProvider.class).asEagerSingleton();
         bind(Tracer.class).toProvider(TracerProvider.class).asEagerSingleton();
     }
 }
