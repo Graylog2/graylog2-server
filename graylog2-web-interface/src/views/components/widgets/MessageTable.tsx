@@ -169,7 +169,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
                     </InteractiveContext.Consumer>
                   </th>
                 );
-              })}
+              }).toArray()}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {

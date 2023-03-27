@@ -17,12 +17,14 @@
 package org.graylog2.cluster;
 
 import com.mongodb.DBCollection;
+import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -97,5 +99,22 @@ public class NodeServiceImplTest {
         assertThat(node2.getHostname()).isEqualTo(LOCAL_CANONICAL_HOSTNAME);
         assertThat(node2.getTransportAddress()).isEqualTo(TRANSPORT_URI.toString());
         assertThat(node2.isLeader()).isTrue();
+    }
+
+    @Test
+    public void testMarkAsAlive() throws NodeNotFoundException {
+        assertThat(nodeService.allActive())
+                .describedAs("The collection should be empty")
+                .isEmpty();
+
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        nodeService.markAsAlive(nodeId, false, URI.create("http://10.0.0.1:12901"));
+
+        final Node node = nodeService.byNodeId(nodeId);
+
+        Assertions.assertThat(node.isLeader()).isFalse();
+        Assertions.assertThat(node.getTransportAddress()).isEqualTo("http://10.0.0.1:12901");
+        Assertions.assertThat(node.getLastSeen()).isNotNull().isInstanceOf(DateTime.class);
+
     }
 }

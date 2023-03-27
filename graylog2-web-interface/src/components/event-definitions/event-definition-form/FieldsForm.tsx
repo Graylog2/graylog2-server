@@ -43,7 +43,7 @@ type Props = {
       title?: string,
     }
   },
-  onChange: (name: string, value: any) => void,
+  onChange: (name: string, value: unknown) => void,
 }
 
 const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Props) => {

@@ -33,6 +33,7 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromUrl from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
 
+
 import EventDefinitionForm from './EventDefinitionForm';
 
 const fetchNotifications = () => {
@@ -56,6 +57,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   const notifications = useStore(EventNotificationsStore);
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
+
   const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
   const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
 
@@ -85,7 +87,6 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   useEffect(() => {
     fetchClusterConfig();
     fetchNotifications();
-
     if (hasUrlConfig) {
       const conditionPlugin = getConditionPlugin(configFromUrl.type);
       const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
@@ -119,7 +120,6 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 
         return;
       }
-
       if (body.type && body.type === 'ApiError') {
         if (body.message.includes('org.graylog.events.conditions.Expression')
           || body.message.includes('org.graylog.events.conditions.Expr')

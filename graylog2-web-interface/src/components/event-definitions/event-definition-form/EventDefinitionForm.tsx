@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { SyntheticEvent } from 'react';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import last from 'lodash/last';
@@ -26,7 +27,6 @@ import { ModalSubmit, Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
-import useQuery from 'routing/useQuery';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -36,7 +36,7 @@ import EventDefinitionSummary from './EventDefinitionSummary';
 
 const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 
-const getConditionPlugin = (type) => {
+const getConditionPlugin = (type: string | undefined) => 
   if (type === undefined) {
     return { displayName: null };
   }
@@ -54,14 +54,14 @@ type Props = {
   currentUser: User,
   validation: {
     errors: {
-      config?: any,
+      config?: unknown,
       title?: string,
     }
   },
   entityTypes: {},
   notifications: Array<EventNotification>,
-  defaults: { default_backlog_size: any },
-  onChange: (key: any, value: any) => void,
+  defaults: { default_backlog_size: number },
+  onChange: (key: string, value: unknown) => void,
   onCancel: () => void,
   onSubmit: () => void
 }
@@ -85,7 +85,7 @@ const EventDefinitionForm = ({
     setActiveStep(nextStep);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: SyntheticEvent) => {
     if (event) {
       event.preventDefault();
     }

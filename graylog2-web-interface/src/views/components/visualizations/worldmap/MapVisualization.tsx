@@ -79,7 +79,7 @@ const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, na
   }
 
   const radius = _getBucket(value, radiusSize, min, max, increment);
-  const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v}</dd>]));
+  const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v as React.ReactNode}</dd>]));
 
   return (
     <CircleMarker key={`${name}-${coordinates}`}

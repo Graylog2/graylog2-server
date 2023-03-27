@@ -38,7 +38,7 @@ type Props = {
   eventDefinition: EventDefinition,
   validation: {
     errors: {
-      config?: any,
+      config?: unknown,
       title?: string,
     }
   },
