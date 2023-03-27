@@ -86,6 +86,7 @@ const filterTitle = (
   filterValue: string,
   formatTime: (dateTime: DateTime) => string,
   notPermittedEntities: Array<string> | undefined,
+  isErrorFetchingTitles: boolean,
 ) => {
   if (isDateAttribute(attribute)) {
     const [from, until] = extractRangeFromString(filterValue);
@@ -103,7 +104,7 @@ const filterTitle = (
   }
 
   if (isAttributeWithRelatedCollection(attribute)) {
-    if (notPermittedEntities?.includes(filterValue)) {
+    if (isErrorFetchingTitles || notPermittedEntities?.includes(filterValue)) {
       return filterValue;
     }
 
@@ -121,11 +122,12 @@ const _allFiltersWithTitle = (
   attributesMetaData: Attributes,
   formatTime: (dateTime: DateTime) => string,
   notPermittedEntities: Array<string> | undefined,
+  isErrorFetchingTitles: boolean,
 ): Filters => (
   urlQueryFilters.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedAttribute = attributesMetaData?.find(({ id }) => id === attributeId);
     const filtersWithTitle: Array<Filter> = filterValues.map((value) => {
-      const title = filterTitle(relatedAttribute, requestedFilterTitles, value, formatTime, notPermittedEntities);
+      const title = filterTitle(relatedAttribute, requestedFilterTitles, value, formatTime, notPermittedEntities, isErrorFetchingTitles);
 
       return ({
         title,
@@ -168,7 +170,7 @@ const useFiltersWithTitle = (
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
-  const { data } = useQuery(
+  const { data, isError } = useQuery(
     ['entity_titles', payload],
     () => fetchFilterTitles(payload),
     {
@@ -183,7 +185,7 @@ const useFiltersWithTitle = (
 
   const cachedResponse = queryClient.getQueryData(['entity_titles', payload]);
   const requestedFilterTitles = (cachedResponse ?? data)?.entities;
-  const allFiltersWithTitle = _allFiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime, data?.not_permitted_to_view);
+  const allFiltersWithTitle = _allFiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime, data?.not_permitted_to_view, isError);
 
   const onChange = useCallback((newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => {
     const newURLQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(newUrlQueryFilters, collectionsByAttributeId);

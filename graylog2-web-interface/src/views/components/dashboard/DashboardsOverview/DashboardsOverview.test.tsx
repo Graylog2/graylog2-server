@@ -91,7 +91,7 @@ const loadDashboardsResponse = (count = 1) => {
 
 describe('DashboardsOverview', () => {
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
   });
 
   it('should render empty', async () => {
