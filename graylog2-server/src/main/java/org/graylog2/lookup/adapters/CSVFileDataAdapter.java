@@ -44,7 +44,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -52,6 +51,8 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -212,10 +213,23 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         throw new IllegalStateException(error, e);
                     }
 
-                    if (config.isCaseInsensitiveLookup()) {
-                        newLookupBuilder.put(key.toLowerCase(Locale.ENGLISH), value);
+                    if (!config.isCIDRLookup()) {
+                        if (config.isCaseInsensitiveLookup()) {
+                            newLookupBuilder.put(key.toLowerCase(Locale.ENGLISH), value);
+                        } else {
+                            newLookupBuilder.put(key, value);
+                        }
                     } else {
-                        newLookupBuilder.put(key, value);
+                        Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(key);
+                        if (optSubnet.isPresent()) {
+                            newLookupBuilder.put(key, value);
+                        } else {
+                            // If key in a CIDR lookup adapter is not already a valid CIDR range, check if it is an IP
+                            String cidr = ipAddressToCIDR(key);
+                            if (cidr != null) {
+                                newLookupBuilder.put(cidr, value);
+                            }
+                        }
                     }
                 }
             }
@@ -229,6 +243,21 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         return newLookupBuilder.build();
     }
 
+    private String ipAddressToCIDR(String ip) {
+        String cidr = null;
+        try {
+            InetAddress address = InetAddresses.forString(ip);
+            if (address instanceof Inet4Address) {
+                cidr = f("%s/32", ip);
+            } else if (address instanceof Inet6Address) {
+                cidr = f("%s/128", ip);
+            }
+        } catch (IllegalArgumentException ignored) {
+            LOG.warn("Key <{}> in CIDR lookup CSV data adapter <{}> is not a valid CIDR or IP address. Skipping invalid line.", ip, name);
+        }
+        return cidr;
+    }
+
     private FileInfo getNewFileInfo() {
         return FileInfo.forPath(Paths.get(config.path()));
     }
@@ -240,7 +269,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     public LookupResult doGet(Object key) {
-        if (Boolean.TRUE.equals(config.cidrLookup())) {
+        if (config.isCIDRLookup()) {
             return getResultForCIDRRange(key);
         }
         final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase(Locale.ENGLISH) : String.valueOf(key);
@@ -367,11 +396,14 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         public abstract Optional<Boolean> caseInsensitiveLookup();
 
         @JsonProperty("cidr_lookup")
-        @Nullable
-        public abstract Boolean cidrLookup();
+        public abstract Optional<Boolean> cidrLookup();
 
         public boolean isCaseInsensitiveLookup() {
             return caseInsensitiveLookup().isPresent() && caseInsensitiveLookup().get();
+        }
+
+        public boolean isCIDRLookup() {
+            return cidrLookup().isPresent() && cidrLookup().get();
         }
 
         public static Builder builder() {

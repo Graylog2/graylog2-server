@@ -219,6 +219,9 @@ public class CSVFileDataAdapterTest {
         assertThat(csvFileDataAdapter.doGet("192.168.100.112")).isEqualTo(LookupResult.single("Finance"));
         assertThat(csvFileDataAdapter.doGet("192.168.101.66")).isEqualTo(LookupResult.single("IT"));
         assertThat(csvFileDataAdapter.doGet("192.168.102.205")).isEqualTo(LookupResult.single("HR"));
+        assertThat(csvFileDataAdapter.doGet("8.8.8.8")).isEqualTo(LookupResult.single("Google DNS"));
+        assertThat(csvFileDataAdapter.doGet("2001:db7::")).isEqualTo(LookupResult.single("Single IPv6"));
+        assertThat(csvFileDataAdapter.doGet("2002:0000:0000:1234:abcd:1234:4321:dcba")).isEqualTo(LookupResult.single("IPv6 Range"));
         assertThat(csvFileDataAdapter.doGet("192.168.103.16")).isEqualTo(LookupResult.empty());
         assertThat(csvFileDataAdapter.doGet("not.an.ip.address")).isEqualTo(LookupResult.withError());
     }
