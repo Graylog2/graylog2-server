@@ -27,6 +27,7 @@ import { ModalSubmit, Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
+import useQuery from 'routing/useQuery';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -36,7 +37,7 @@ import EventDefinitionSummary from './EventDefinitionSummary';
 
 const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 
-const getConditionPlugin = (type: string | undefined) => 
+const getConditionPlugin = (type: string | undefined) => {
   if (type === undefined) {
     return { displayName: null };
   }

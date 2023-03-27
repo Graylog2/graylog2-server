@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Immutable from 'immutable';
-
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import type Widget from 'views/logic/widgets/Widget';
 import type { EventDefinitionURLConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
@@ -36,10 +34,8 @@ const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) 
     if (index === valuePath.length - 1) return res;
 
     const [field, value] = Object.entries(path)[0];
-    let curRes = res;
-    curRes = `${res}${res ? ' AND ' : ' '}${field}:${value}`;
 
-    return curRes;
+    return `${res}${res ? ' AND ' : ' '}${field}:${value}`;
   }, '');
 };
 
