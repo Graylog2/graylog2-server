@@ -30,8 +30,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useHandlerContext from 'views/components/useHandlerContext';
 
+type FormRenderer = (props: FormikProps<SearchBarFormValues>) => React.ReactNode;
 type Props = {
-  children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
+  children: FormRenderer | React.ReactNode,
   initialValues: SearchBarFormValues,
   limitDuration: number,
   onSubmit: (values: SearchBarFormValues) => Promise<any>,
@@ -40,7 +41,7 @@ type Props = {
   validateQueryString: (values: SearchBarFormValues) => Promise<QueryValidationState>,
 }
 
-const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
+const _isFunction = (children: Props['children']): children is FormRenderer => isFunction(children);
 
 export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues, userTimezone: string) => ({ timerange: onSubmittingTimerange(timerange, userTimezone), ...rest });
 
