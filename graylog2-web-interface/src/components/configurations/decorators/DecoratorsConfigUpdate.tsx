@@ -77,11 +77,15 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     onCancel();
   }, [decorators, onCancel]);
 
+  const modalTitle = 'Update Default Decorators Configuration';
+
   return (
     <BootstrapModalWrapper showModal={show}
-                           onHide={_onCancel}>
+                           onHide={_onCancel}
+                           data-app-section="configurations_decorators"
+                           data-event-element={modalTitle}>
       <Modal.Header closeButton>
-        <Modal.Title>Update Default Decorators Configuration</Modal.Title>
+        <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>Select the stream for which you want to change the set of default decorators.</p>

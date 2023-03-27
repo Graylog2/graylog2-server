@@ -95,7 +95,9 @@ class ContentPacksList extends React.Component {
     const modal = (
       <BootstrapModalWrapper showModal={this.state.showModal}
                              onHide={closeModal}
-                             bsSize="large">
+                             bsSize="large"
+                             data-app-section="content_pack_install"
+                             data-event-element="Install Content Pack">
         <Modal.Header closeButton>
           <Modal.Title>Install Content Pack</Modal.Title>
         </Modal.Header>
