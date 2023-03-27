@@ -72,6 +72,7 @@ describe('<EntityFilters />', () => {
     asMock(useFiltersWithTitle).mockReturnValue({
       data: undefined,
       onChange: onChangeFiltersWithTitle,
+      isInitialLoading: false,
     });
   });
 
@@ -116,6 +117,7 @@ describe('<EntityFilters />', () => {
       asMock(useFiltersWithTitle).mockReturnValue({
         data: OrderedMap({ disabled: [{ title: 'Running', value: 'false' }] }),
         onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
       });
 
       render(
@@ -194,6 +196,7 @@ describe('<EntityFilters />', () => {
           ],
         }),
         onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
       });
 
       render(
@@ -271,6 +274,7 @@ describe('<EntityFilters />', () => {
           }],
         }),
         onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
       });
 
       render(
@@ -316,6 +320,7 @@ describe('<EntityFilters />', () => {
         disabled: [{ title: 'Running', value: 'false' }],
       }),
       onChange: onChangeFiltersWithTitle,
+      isInitialLoading: false,
     });
 
     render(
@@ -335,6 +340,7 @@ describe('<EntityFilters />', () => {
         disabled: [{ title: 'Running', value: 'false' }],
       }),
       onChange: onChangeFiltersWithTitle,
+      isInitialLoading: false,
     });
 
     render(
