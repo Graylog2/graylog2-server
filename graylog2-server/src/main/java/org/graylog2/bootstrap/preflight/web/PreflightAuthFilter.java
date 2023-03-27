@@ -59,7 +59,7 @@ public class PreflightAuthFilter implements ContainerRequestFilter {
 
         final String encodedUserPassword = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", "");
 
-        String usernameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes(StandardCharsets.UTF_8)));
+        String usernameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 
         final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
         final String username = tokenizer.nextToken();
