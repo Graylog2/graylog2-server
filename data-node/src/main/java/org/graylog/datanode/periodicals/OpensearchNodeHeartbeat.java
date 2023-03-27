@@ -19,6 +19,7 @@ package org.graylog.datanode.periodicals;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.core.MainResponse;
 import org.graylog2.plugin.periodical.Periodical;
@@ -48,7 +49,7 @@ public class OpensearchNodeHeartbeat extends Periodical {
                 final MainResponse health = process.restClient()
                         .info(RequestOptions.DEFAULT);
                 onNodeResponse(process, health);
-            } catch (IOException e) {
+            } catch (IOException | OpenSearchStatusException e) {
                 onRestError(process, e);
             }
         }
@@ -58,7 +59,7 @@ public class OpensearchNodeHeartbeat extends Periodical {
         process.onEvent(ProcessEvent.HEALTH_CHECK_OK);
     }
 
-    private void onRestError(OpensearchProcess process, IOException e) {
+    private void onRestError(OpensearchProcess process, Exception e) {
         process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
         LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.processInfo().pid(), e.getMessage());
     }

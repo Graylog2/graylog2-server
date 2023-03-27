@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Singleton
@@ -83,6 +84,15 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             config.put("plugins.security.ssl.http.enabled", "true");
 
             final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
+
+            Objects.requireNonNull(localConfiguration.getRestApiUsername(),
+                    "rest_api_username has to be configured the usage of secured Opensearch REST api"
+            );
+
+            Objects.requireNonNull(localConfiguration.getRestApiPassword(),
+                    "rest_api_password has to be configured the usage of secured Opensearch REST api"
+            );
+
             configureInitialAdmin(internalUsersFile, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
 
         } else {
@@ -92,6 +102,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
 
         if (Files.exists(transportKeystorePath)) {
+
+            Objects.requireNonNull(localConfiguration.getDatanodeTransportCertificatePassword(),
+                    "transport_certificate_password has to be configured for the keystore " + transportKeystorePath
+            );
 
             KeyStore nodeKeystore = loadKeystore(transportKeystorePath, localConfiguration.getDatanodeTransportCertificatePassword());
             extractCertificates(opensearchConfigDir, "transport", nodeKeystore, localConfiguration.getDatanodeTransportCertificatePassword());
@@ -113,6 +127,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         }
 
         if (Files.exists(httpKeystorePath)) {
+
+            Objects.requireNonNull(localConfiguration.getDatanodeHttpCertificatePassword(),
+                    "http_certificate_password has to be configured for the keystore " + httpKeystorePath
+            );
 
             KeyStore httpKeystore = loadKeystore(httpKeystorePath, localConfiguration.getDatanodeHttpCertificatePassword());
 
@@ -146,16 +164,18 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
     private void configureInitialAdmin(Path internalUsersFile, String adminUsername, String adminPassword) throws IOException {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), Map.class);
-        final Map<String, Object> admin = (Map) map.get("admin");
+        final Map<String, Object> adminUserConfig = (Map) map.get("admin");
 
-        // todo: compute bcrypt hash
+        map.remove("admin");
+        map.put(adminUsername, adminUserConfig);
 
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(12);
         final String hashWithPrefix = passwordAlgorithm.hash(adminPassword);
 
         // remove the prefix and suffix, we need just the hash itself
         final String hash = hashWithPrefix.substring("{bcrypt}".length(), hashWithPrefix.indexOf("{salt}"));
-        admin.put("hash", hash);
+        adminUserConfig.put("hash", hash);
+
         final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
         mapper.writeValue(fos, map);
     }
