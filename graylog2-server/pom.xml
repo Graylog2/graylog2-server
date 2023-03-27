@@ -1076,6 +1076,17 @@
                             </execution>
 
                             <execution>
+                                <id>preflight: yarn run build</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build:preflight</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>yarn run check-production-build</id>
                                 <phase>verify</phase>
                                 <goals>
