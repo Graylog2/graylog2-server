@@ -16,10 +16,10 @@
  */
 import vendorConfig from './webpack.vendor';
 import webpackConfig from './webpack.combined.config';
+import './build-types';
 
 const webpackConfigs = [vendorConfig, ...webpackConfig];
 const pluginNames = webpackConfigs.map((config) => config.name).filter((name) => !['vendor', 'app'].includes(name));
-// @ts-ignore
 global.pluginNames = pluginNames;
 
 export default webpackConfigs;

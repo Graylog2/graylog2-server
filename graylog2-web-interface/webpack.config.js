@@ -52,7 +52,6 @@ const webpackConfig = merge.smart(coreConfig, {
               // implementation to insert at the top of the head tag: https://github.com/webpack-contrib/style-loader#function
               insert: function insertAtTop(element) {
                 const parent = document.querySelector('head');
-                // eslint-disable-next-line no-underscore-dangle
                 // @ts-ignore
                 const lastInsertedElement = window._lastElementInsertedByStyleLoader;
 
@@ -64,7 +63,6 @@ const webpackConfig = merge.smart(coreConfig, {
                   parent.appendChild(element);
                 }
 
-                // eslint-disable-next-line no-underscore-dangle
                 // @ts-ignore
                 window._lastElementInsertedByStyleLoader = element;
               },
@@ -100,7 +98,6 @@ const webpackConfig = merge.smart(coreConfig, {
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
       templateParameters: {
         vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
-        // @ts-ignore
         pluginNames: () => global.pluginNames,
       },
       chunksSortMode: core.sortChunks,
