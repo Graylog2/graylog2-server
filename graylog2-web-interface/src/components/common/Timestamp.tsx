@@ -28,6 +28,7 @@ type Props = {
   format?: DateTimeFormats,
   render?: React.ComponentType<{ value: string, field: string | undefined }>,
   tz?: string,
+  className?: string,
 }
 
 /**
@@ -40,14 +41,14 @@ type Props = {
  * from a UTC time that was used in the server.
  *
  */
-const Timestamp = ({ dateTime: dateTimeProp, field, format, render: Component, tz }: Props) => {
+const Timestamp = ({ dateTime: dateTimeProp, field, format, render: Component, tz, className }: Props) => {
   const { formatTime: formatWithUserTz } = useUserDateTime();
   const dateTime = dateTimeProp ?? new Date();
   const formattedDateTime = tz ? adjustFormat(dateTime, format, tz) : formatWithUserTz(dateTime, format);
   const dateTimeString = adjustFormat(dateTime, 'internal');
 
   return (
-    <time dateTime={dateTimeString} title={dateTimeString}>
+    <time dateTime={dateTimeString} title={dateTimeString} className={className}>
       <Component value={formattedDateTime} field={field} />
     </time>
   );
@@ -83,6 +84,7 @@ Timestamp.defaultProps = {
   format: 'default',
   render: ({ value }) => value,
   tz: undefined,
+  className: undefined,
 };
 
 export default Timestamp;

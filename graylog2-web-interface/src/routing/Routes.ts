@@ -49,11 +49,13 @@ const Routes = {
   STREAMS: '/streams',
   ALERTS: {
     LIST: '/alerts',
+    replay_search: (alertId: string) => `/alerts/${alertId}/replay-search`,
     DEFINITIONS: {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
       edit: (definitionId: string) => `/alerts/definitions/${definitionId}/edit`,
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
+      replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
