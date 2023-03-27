@@ -30,7 +30,7 @@ const Container = styled.div<{ height: number}>`
 `;
 
 type RowProps = {
-  data: Array<object>,
+  data: Array<React.ReactNode>,
   index: number,
   setSize: (index: number, size: number) => void,
   containerWidth: number

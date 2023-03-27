@@ -37,13 +37,13 @@ type Props<Configuration extends object> = {
   titleValue: string,
   typeName?: string,
   values: { [key:string]: any },
-  wrapperComponent: React.ComponentType<{
+  wrapperComponent: React.ComponentType<React.PropsWithChildren<{
     show: boolean,
     title: string | React.ReactNode | null,
     onCancel: () => void,
     onSubmitForm: () => void,
     submitButtonText: string
-  }>,
+  }>>,
   submitButtonText: string,
 }
 
