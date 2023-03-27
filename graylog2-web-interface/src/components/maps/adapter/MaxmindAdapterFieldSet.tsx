@@ -22,14 +22,18 @@ import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { Select, TimeUnitInput } from 'components/common';
 
+export type Config = {
+  path: string,
+  database_type: string,
+  check_interval: number,
+  check_interval_unit: string,
+};
 type MaxmindAdapterFieldSetProps = {
-  config: {
-    [name: string]: string | number;
-  };
+  config: Config;
   updateConfig: (newConfig: object) => void,
   handleFormEvent: (e: { target: { name: string; value?: string } }) => void;
-  validationState: (key: string) => void,
-  validationMessage: (key: string, message: string) => void,
+  validationState: (key: string) => string | undefined,
+  validationMessage: (key: string, message: string) => string | undefined,
 };
 
 const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validationState, validationMessage }: MaxmindAdapterFieldSetProps) => {

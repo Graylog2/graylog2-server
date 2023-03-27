@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.DbEntity;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -41,6 +42,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
 @WithBeanGetter
@@ -48,6 +50,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 // Ignore deprecated "default" message field. Only relevant for Graylog 2.2.0-beta.[12] users.
 // TODO: Remove in Graylog 3.0.0
 @JsonIgnoreProperties({"default"})
+@DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
+          readPermission = INDEXSETS_READ)
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_PREFIX = "index_prefix";
     public static final String FIELD_CREATION_DATE = "creation_date";

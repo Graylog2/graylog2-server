@@ -19,7 +19,7 @@ package org.graylog2.notifications;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
@@ -31,7 +31,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-@CollectionName("notifications")
+import static org.graylog2.notifications.NotificationImpl.FIELD_DETAILS;
+import static org.graylog2.shared.security.RestPermissions.NOTIFICATIONS_READ;
+
+@DbEntity(collection = "notifications",
+          titleField = FIELD_DETAILS + ".title",
+          readPermission = NOTIFICATIONS_READ)
 public class NotificationImpl extends PersistedImpl implements Notification {
     static final String FIELD_TYPE = "type";
     static final String FIELD_KEY = "key";
