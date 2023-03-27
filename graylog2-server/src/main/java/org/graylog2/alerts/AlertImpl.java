@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.database.CollectionName;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
@@ -32,7 +31,6 @@ import java.util.Map;
 
 @AutoValue
 @JsonAutoDetect
-@CollectionName("alerts")
 public abstract class AlertImpl implements Alert {
     static final String FIELD_ID = "_id";
     static final String FIELD_CONDITION_ID = "condition_id";

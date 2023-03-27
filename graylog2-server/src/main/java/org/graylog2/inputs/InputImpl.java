@@ -22,7 +22,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 import org.apache.commons.lang3.EnumUtils;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
@@ -41,8 +41,10 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.base.Strings.emptyToNull;
+import static org.graylog2.shared.security.RestPermissions.INPUTS_READ;
 
-@CollectionName("inputs")
+@DbEntity(collection = "inputs",
+          readPermission = INPUTS_READ)
 public class InputImpl extends PersistedImpl implements Input {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
