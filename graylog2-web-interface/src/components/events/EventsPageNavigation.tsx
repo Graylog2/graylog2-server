@@ -22,8 +22,8 @@ import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
   { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
-  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST, permissions: 'eventdefinitions:read' },
-  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST, permissions: 'eventnotifications:read' },
+  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST},
+  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST},
 ];
 
 const EventsPageNavigation = () => (
