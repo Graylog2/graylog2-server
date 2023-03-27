@@ -1,6 +1,7 @@
 package org.graylog2.telemetry.rest;
 
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 
 import java.util.List;
@@ -9,7 +10,8 @@ import java.util.Map;
 public record TelemetryResponse(UserInfo currentUser,
                                 ClusterInfo clusterInfo,
                                 LicenseInfo licenseInfo,
-                                PluginInfo pluginInfo) {
+                                PluginInfo pluginInfo,
+                                SearchClusterInfo searchClusterInfo) {
 
 
     public record UserInfo(String user,
@@ -20,6 +22,7 @@ public record TelemetryResponse(UserInfo currentUser,
     }
 
     public record ClusterInfo(String clusterId,
+                              int nodesCount,
                               Map<String, SystemOverviewResponse> nodes,
                               long averageLastMonthTraffic,
                               long usersCount) {
@@ -33,5 +36,8 @@ public record TelemetryResponse(UserInfo currentUser,
     public record PluginInfo(boolean isEnterprisePluginInstalled, List<String> installedPlugins) {
     }
 
+    public record SearchClusterInfo(int nodesCount, Map<String, NodeInfo> nodes) {
+
+    }
 
 }

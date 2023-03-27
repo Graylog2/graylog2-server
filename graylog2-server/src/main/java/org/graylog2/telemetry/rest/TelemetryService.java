@@ -1,12 +1,14 @@
 package org.graylog2.telemetry.rest;
 
 import com.google.common.hash.HashCode;
+import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.joda.time.Duration;
@@ -26,6 +28,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.telemetry.rest.TelemetryResponse.ClusterInfo;
 import static org.graylog2.telemetry.rest.TelemetryResponse.LicenseInfo;
 import static org.graylog2.telemetry.rest.TelemetryResponse.PluginInfo;
+import static org.graylog2.telemetry.rest.TelemetryResponse.SearchClusterInfo;
 import static org.graylog2.telemetry.rest.TelemetryResponse.UserInfo;
 
 public class TelemetryService {
@@ -38,18 +41,21 @@ public class TelemetryService {
     private final UserService userService;
     private final Set<PluginMetaData> pluginMetaDataSet;
 
+    private final ClusterAdapter elasticClusterAdapter;
+
 
     @Inject
     public TelemetryService(TrafficCounterService trafficCounterService,
                             ClusterConfigService clusterConfigService,
                             TelemetryEnterpriseDataProvider enterpriseDataProvider,
                             UserService userService,
-                            Set<PluginMetaData> pluginMetaDataSet) {
+                            Set<PluginMetaData> pluginMetaDataSet, ClusterAdapter elasticClusterAdapter) {
         this.trafficCounterService = trafficCounterService;
         this.clusterConfigService = clusterConfigService;
         this.enterpriseDataProvider = enterpriseDataProvider;
         this.userService = userService;
         this.pluginMetaDataSet = pluginMetaDataSet;
+        this.elasticClusterAdapter = elasticClusterAdapter;
     }
 
     public TelemetryResponse createTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) {
@@ -59,7 +65,8 @@ public class TelemetryService {
                 createUserInfo(currentUser, clusterId),
                 createClusterInfo(clusterId, systemOverviewResponses),
                 new LicenseInfo(enterpriseDataProvider.licenseStatus()),
-                createPluginInfo());
+                createPluginInfo(),
+                createSearchClusterInfo());
     }
 
     private UserInfo createUserInfo(User currentUser, String clusterId) {
@@ -82,6 +89,7 @@ public class TelemetryService {
     private ClusterInfo createClusterInfo(String clusterId, Map<String, SystemOverviewResponse> systemOverviewResponses) {
         return new ClusterInfo(
                 clusterId,
+                systemOverviewResponses.size(),
                 systemOverviewResponses,
                 getAverageLastMonthTraffic(),
                 userService.count());
@@ -106,5 +114,10 @@ public class TelemetryService {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(f("%s%s", currentUser.getId(), clusterId).getBytes(StandardCharsets.UTF_8));
         return HashCode.fromBytes(messageDigest.digest()).toString();
+    }
+
+    private SearchClusterInfo createSearchClusterInfo() {
+        Map<String, NodeInfo> nodesInfo = elasticClusterAdapter.nodesInfo();
+        return new SearchClusterInfo(nodesInfo.size(), nodesInfo);
     }
 }
