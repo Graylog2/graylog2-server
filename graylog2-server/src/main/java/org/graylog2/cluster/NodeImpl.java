@@ -60,6 +60,9 @@ public class NodeImpl extends PersistedImpl implements Node {
     @Override
     public DateTime getLastSeen() {
         final Object rawLastSeen = fields.get("last_seen");
+        if (rawLastSeen == null) {
+            throw new IllegalStateException("Last seen timestamp of node is unexpectedly null!");
+        }
         if (rawLastSeen instanceof BSONTimestamp) {
             return new DateTime(((BSONTimestamp) rawLastSeen).getTime() * 1000L, DateTimeZone.UTC);
         }
