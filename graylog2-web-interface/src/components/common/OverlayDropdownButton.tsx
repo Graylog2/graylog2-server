@@ -83,7 +83,7 @@ const OverlayDropdownButton = ({
 OverlayDropdownButton.defaultProps = {
   bsSize: undefined,
   buttonTitle: undefined,
-  closeOnSelect: false,
+  closeOnSelect: true,
   disabled: false,
   dropdownMinWidth: undefined,
   dropdownZIndex: undefined,
