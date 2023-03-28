@@ -20,97 +20,29 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { EsbuildPlugin } = require('esbuild-loader');
 
-const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 const supportedBrowsers = require('./supportedBrowsers');
+const core = require('./webpack/core');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
-const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
-const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
 // eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
+const coreConfig = core.config(TARGET, APP_PATH, ROOT_PATH, ROOT_PATH, supportedBrowsers);
 
-const getCssLoaderOptions = () => {
-  // Development
-  if (TARGET === 'start') {
-    return {
-      modules: {
-        localIdentName: '[name]__[local]--[hash:base64:5]',
-        mode: 'global',
-      },
-    };
-  }
-
-  return {
-    modules: {
-      mode: 'global',
-    },
-  };
-};
-
-const chunksSortMode = (c1, c2) => {
-  // Render the polyfill chunk first
-  if (c1 === 'polyfill') {
-    return -1;
-  }
-
-  if (c2 === 'polyfill') {
-    return 1;
-  }
-
-  if (c1 === 'app') {
-    return 1;
-  }
-
-  if (c2 === 'app') {
-    return -1;
-  }
-
-  return 0;
-};
-
-const webpackConfig = {
+const webpackConfig = merge.smart(coreConfig, {
   name: 'app',
   dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
     polyfill: [path.resolve(APP_PATH, 'polyfill.js')],
   },
-  output: {
-    path: BUILD_PATH,
-    filename: '[name].[chunkhash].js',
-  },
   module: {
     rules: [
-      {
-        test: /\.[jt]s(x)?$/,
-        use: {
-          loader: 'esbuild-loader',
-          options: {
-            target: supportedBrowsers,
-          },
-        },
-        exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet|graylog-web-plugin))|\.node_cache/,
-      },
-      {
-        test: /\.(svg)(\?.+)?$/,
-        type: 'asset/resource',
-      },
-      {
-        test: /\.(woff(2)?|ttf|eot)(\?.+)?$/,
-        type: 'asset/resource',
-      },
-      {
-        test: /\.(png|gif|jpg|jpeg)(\?.+)?$/,
-        type: 'asset',
-      },
       {
         test: /bootstrap\.less$/,
         use: [
@@ -120,7 +52,7 @@ const webpackConfig = {
               // implementation to insert at the top of the head tag: https://github.com/webpack-contrib/style-loader#function
               insert: function insertAtTop(element) {
                 const parent = document.querySelector('head');
-                // eslint-disable-next-line no-underscore-dangle
+                // @ts-ignore
                 const lastInsertedElement = window._lastElementInsertedByStyleLoader;
 
                 if (!lastInsertedElement) {
@@ -131,7 +63,7 @@ const webpackConfig = {
                   parent.appendChild(element);
                 }
 
-                // eslint-disable-next-line no-underscore-dangle
+                // @ts-ignore
                 window._lastElementInsertedByStyleLoader = element;
               },
             },
@@ -148,50 +80,16 @@ const webpackConfig = {
         ],
       },
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
-      {
-        test: /\.css$/,
-        exclude: /(\.lazy|leaflet)\.css$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: getCssLoaderOptions(),
-          },
-        ],
-      },
-      {
-        test: /(\.lazy|leaflet)\.css$/,
-        use: [
-          { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
-          {
-            loader: 'css-loader',
-            options: getCssLoaderOptions(),
-          },
-        ],
-      },
     ],
   },
-  resolve: {
-    // you can now require('file') instead of require('file.coffee')
-    extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
-    modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
-    alias: {
-      theme: path.resolve(APP_PATH, 'theme'),
-      '@graylog/server-api': path.resolve(ROOT_PATH, 'target', 'api'),
-    },
-  },
-  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')] },
-  devtool: 'source-map',
   plugins: [
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
+    new HtmlWebpackPlugin({
+      filename: 'module.json',
+      inject: false,
+      template: path.resolve(ROOT_PATH, 'templates/module.json.template'),
+      excludeChunks: ['config'],
+      chunksSortMode: core.sortChunks,
     }),
-    new UniqueChunkIdPlugin(),
-    new webpack.ids.HashedModuleIdsPlugin({
-      hashFunction: 'sha256',
-      hashDigestLength: 8,
-    }),
-    new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
       title: 'Graylog',
       favicon: path.resolve(ROOT_PATH, 'public/images/favicon.png'),
@@ -200,65 +98,22 @@ const webpackConfig = {
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
       templateParameters: {
         vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
+        pluginNames: () => global.pluginNames,
       },
-      chunksSortMode,
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'module.json',
-      inject: false,
-      template: path.resolve(ROOT_PATH, 'templates/module.json.template'),
-      excludeChunks: ['config'],
-      chunksSortMode,
-    }),
-    new webpack.DefinePlugin({
-      FEATURES: JSON.stringify(process.env.FEATURES),
+      chunksSortMode: core.sortChunks,
     }),
   ],
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minSize: 20000,
-      minRemainingSize: 0,
-      minChunks: 1,
-      maxAsyncRequests: 30,
-      maxInitialRequests: 30,
-      enforceSizeThreshold: 50000,
-      usedExports: true,
-      cacheGroups: {
-        defaultVendors: {
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10,
-          reuseExistingChunk: true,
-        },
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true,
-        },
-      },
-    },
-  },
-};
+});
 
 if (TARGET === 'start') {
   // eslint-disable-next-line no-console
   console.error('Running in development (no HMR) mode');
 
   module.exports = merge(webpackConfig, {
-    mode: 'development',
-    devtool: 'cheap-module-source-map',
-    output: {
-      path: BUILD_PATH,
-      filename: '[name].js',
-      publicPath: '/',
-    },
     plugins: [
       new webpack.DefinePlugin({
-        DEVELOPMENT: true,
         IS_CLOUD: process.env.IS_CLOUD,
       }),
-      new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
-      new webpack.HotModuleReplacementPlugin(),
     ],
   });
 }
@@ -267,21 +122,6 @@ if (TARGET.startsWith('build')) {
   // eslint-disable-next-line no-console
   console.error('Running in production mode');
   process.env.NODE_ENV = 'production';
-
-  module.exports = merge(webpackConfig, {
-    mode: 'production',
-    optimization: {
-      moduleIds: 'deterministic',
-      minimizer: [new EsbuildPlugin({
-        target: supportedBrowsers,
-      })],
-    },
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
-    ],
-  });
 }
 
 if (Object.keys(module.exports).length === 0) {
