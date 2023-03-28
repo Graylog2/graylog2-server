@@ -82,7 +82,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
 };
 
 UnauthorizedErrorPage.propTypes = {
-  description: PropTypes.node,
+  description: PropTypes.element,
   errorDetails: PropTypes.string,
   title: PropTypes.string,
 };
