@@ -33,4 +33,8 @@ public class TracerProvider implements Provider<Tracer> {
     public Tracer get() {
         return GlobalOpenTelemetry.get().getTracer("org.graylog");
     }
+
+    public static Tracer noop() {
+        return io.opentelemetry.api.trace.TracerProvider.noop().get("org.graylog");
+    }
 }

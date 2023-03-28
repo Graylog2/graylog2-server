@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.tuple.Pair;
+import org.graylog.tracing.TracerProvider;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lookup.LookupResult;
@@ -121,7 +122,8 @@ public class LookupTableDecoratorTest {
         when(lookupTableService.newBuilder()).thenReturn(builder);
         when(builder.build()).thenReturn(function);
 
-        final LookupTableDecorator lookupTableDecorator = new LookupTableDecorator(decorator, lookupTableService);
+        final LookupTableDecorator lookupTableDecorator = new LookupTableDecorator(decorator, lookupTableService,
+                TracerProvider.noop());
 
         return Pair.of(lookupTableDecorator, function);
     }
