@@ -60,9 +60,9 @@ const NavDropdown = ({ title, inactiveTitle, badge: Badge, ...props }) => {
 };
 
 NavDropdown.propTypes = {
-  title: PropTypes.node.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   inactiveTitle: PropTypes.string,
-  badge: PropTypes.node,
+  badge: PropTypes.func,
 };
 
 NavDropdown.defaultProps = {
