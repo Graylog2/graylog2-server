@@ -24,9 +24,9 @@ const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => v
   const [pureUrlQueryFilters, setPureUrlQueryFilters] = useQueryParam('filters', ArrayParam);
 
   const filtersFromQuery = useMemo(() => (pureUrlQueryFilters ?? []).reduce((col, filter) => {
-    const [filterKey, filterValue] = filter.split(/=(.*)/);
+    const [attributeId, filterValue] = filter.split(/=(.*)/);
 
-    return col.set(filterKey, [...(col[filterKey] ?? []), filterValue]);
+    return col.set(attributeId, [...(col.get(attributeId) ?? []), filterValue]);
   }, OrderedMap<string, Array<string>>()), [pureUrlQueryFilters]);
 
   const setFilterValues = (newFilters: UrlQueryFilters) => {

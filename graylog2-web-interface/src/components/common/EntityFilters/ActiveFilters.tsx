@@ -62,7 +62,6 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
         </FilterGroup>
       );
     })}
-
   </>
 );
 

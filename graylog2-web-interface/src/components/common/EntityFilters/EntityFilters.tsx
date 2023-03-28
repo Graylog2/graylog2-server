@@ -61,7 +61,7 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
 
   const onChangeFilters = useCallback((newFilters: Filters) => {
     const newUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filterCol]) => (
-      col.set(attributeId, [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)])
+      col.set(attributeId, [...col.get(attributeId) ?? [], ...filterCol.map(({ value }) => value)])
     ), OrderedMap<string, Array<string>>());
 
     onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
