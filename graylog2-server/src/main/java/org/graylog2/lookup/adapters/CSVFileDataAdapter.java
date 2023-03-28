@@ -20,6 +20,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -213,7 +214,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         throw new IllegalStateException(error, e);
                     }
 
-                    if (!config.isCIDRLookup()) {
+                    if (!config.isCidrLookup()) {
                         if (config.isCaseInsensitiveLookup()) {
                             newLookupBuilder.put(key.toLowerCase(Locale.ENGLISH), value);
                         } else {
@@ -269,7 +270,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     public LookupResult doGet(Object key) {
-        if (config.isCIDRLookup()) {
+        if (config.isCidrLookup()) {
             return getResultForCIDRRange(key);
         }
         final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase(Locale.ENGLISH) : String.valueOf(key);
@@ -346,6 +347,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_CSVFileDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public static abstract class Config implements LookupDataAdapterConfiguration {
 
         @Override
@@ -402,7 +404,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return caseInsensitiveLookup().isPresent() && caseInsensitiveLookup().get();
         }
 
-        public boolean isCIDRLookup() {
+        public boolean isCidrLookup() {
             return cidrLookup().isPresent() && cidrLookup().get();
         }
 
