@@ -47,6 +47,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule.source);
   const [description, setDescription] = useState(rule.description);
+  const [startRuleSimulation, setStartRuleSimulation] = useState(false);
   const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
@@ -130,6 +131,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       setRawMessageToSimulate,
       ruleSimulationResult,
       setRuleSimulationResult,
+      startRuleSimulation,
+      setStartRuleSimulation,
     });
   }, [
     description,
@@ -141,6 +144,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     simulateRule,
     rawMessageToSimulate,
     ruleSimulationResult,
+    startRuleSimulation,
   ]);
 
   return (

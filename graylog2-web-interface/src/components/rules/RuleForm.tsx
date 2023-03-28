@@ -57,6 +57,8 @@ const RuleForm = ({ create }: Props) => {
     setRawMessageToSimulate,
     ruleSimulationResult,
     setRuleSimulationResult,
+    startRuleSimulation,
+    setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
 
   const [isDirty, setIsDirty] = useState(false);
@@ -110,6 +112,11 @@ const RuleForm = ({ create }: Props) => {
   const handleResetRuleSimulation = () => {
     setRawMessageToSimulate('');
     setRuleSimulationResult(null);
+    setStartRuleSimulation(false);
+  };
+
+  const handleStartRuleSimulation = () => {
+    setStartRuleSimulation(true);
   };
 
   const handleCancel = () => {
@@ -152,28 +159,38 @@ const RuleForm = ({ create }: Props) => {
         <RuleSimulationFormGroup>
           <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
           <div>
-            <Input id="message"
-                   type="textarea"
-                   placeholder="Rule input"
-                   value={rawMessageToSimulate}
-                   onChange={handleRawMessageChange}
-                   rows={3} />
+            {!startRuleSimulation && (
             <Button bsStyle="info"
                     bsSize="xsmall"
-                    disabled={!rawMessageToSimulate || !ruleSource}
-                    onClick={handleRunRuleSimulation}>
-              Run rule simulation
+                    onClick={handleStartRuleSimulation}>
+              Start rule simulation
             </Button>
-            <ResetButton bsStyle="default"
-                         bsSize="xsmall"
-                         disabled={!rawMessageToSimulate && !ruleSimulationResult}
-                         onClick={handleResetRuleSimulation}>
-              Reset
-            </ResetButton>
-            {ruleSimulationResult && (
+            )}
+            {startRuleSimulation && (
+            <>
+              <Input id="message"
+                     type="textarea"
+                     placeholder="Message string"
+                     value={rawMessageToSimulate}
+                     onChange={handleRawMessageChange}
+                     rows={3} />
+              <Button bsStyle="info"
+                      bsSize="xsmall"
+                      disabled={!rawMessageToSimulate || !ruleSource}
+                      onClick={handleRunRuleSimulation}>
+                Run rule simulation
+              </Button>
+              <ResetButton bsStyle="default"
+                           bsSize="xsmall"
+                           onClick={handleResetRuleSimulation}>
+                Reset
+              </ResetButton>
+              {ruleSimulationResult && (
               <MessageShowContainer>
                 <MessageShow message={ruleSimulationResult} />
               </MessageShowContainer>
+              )}
+            </>
             )}
           </div>
         </RuleSimulationFormGroup>
