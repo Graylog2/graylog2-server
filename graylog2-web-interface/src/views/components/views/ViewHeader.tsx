@@ -41,6 +41,7 @@ const links = {
   },
   {
     label: title || id,
+    dataTestId: 'view-title',
   },
   ],
   [View.Type.Search]: ({ id, title }) => [{
@@ -49,6 +50,7 @@ const links = {
   },
   {
     label: title || id,
+    dataTestId: 'view-title',
   },
   ],
   alert: ({ id }) => {
@@ -59,6 +61,7 @@ const links = {
       },
       {
         label: id,
+        dataTestId: 'alert-id-title',
       },
     ];
   },
@@ -71,6 +74,7 @@ const links = {
       {
         link: Routes.ALERTS.DEFINITIONS.show(id),
         label: title || id,
+        dataTestId: 'event-definition-title',
       },
     ];
   },
@@ -108,9 +112,13 @@ const StyledIcon = styled(Icon)`
 font-size: 0.5rem;
 `;
 
-const CrumbLink = ({ label, link }: { label: string, link: string | undefined}) => (
-  link ? <Link target="_blank" to={link}>{label}</Link> : <span>{label}</span>
+const CrumbLink = ({ label, link, dataTestId }: { label: string, link: string | undefined, dataTestId?: string}) => (
+  link ? <Link target="_blank" to={link} data-testid={dataTestId}>{label}</Link> : <span data-testid={dataTestId}>{label}</span>
 );
+
+CrumbLink.defaultProps = {
+  dataTestId: undefined,
+};
 
 const ViewHeader = () => {
   const view = useView();
@@ -138,12 +146,12 @@ const ViewHeader = () => {
     <Row>
       <Content>
         {
-          breadCrumbs.map(({ label, link }, index) => {
+          breadCrumbs.map(({ label, link, dataTestId }, index) => {
             const theLast = index === breadCrumbs.length - 1;
 
             return (
               <TitleWrapper key={`${label}_${link}`}>
-                <CrumbLink link={link} label={label} />
+                <CrumbLink link={link} label={label} dataTestId={dataTestId} />
                 {!theLast && <StyledIcon name="chevron-right" />}
                 {isSavedView && theLast && (
                   <>
