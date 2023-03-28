@@ -98,7 +98,7 @@ public class TelemetryService {
                 systemOverviewResponses.size(),
                 systemOverviewResponses,
                 getAverageLastMonthTraffic(),
-                userService.count());
+                userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count());
     }
 
     private PluginInfo createPluginInfo() {
