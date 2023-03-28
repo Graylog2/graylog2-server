@@ -41,7 +41,7 @@ const renderBulkActions = (
 );
 
 const DashboardsOverview = () => {
-  const [query, setQuery] = useQueryParam('query', StringParam);
+  const [query, setQuery] = useQueryParam('q', StringParam);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
