@@ -57,7 +57,7 @@ const ValidationError = ({ validationResult, availableGrantees }: Props) => {
               {capitalize(owner?.type)} <i>{owner?.title}</i>
               {key !== pastOwners.size - 1 && ', '}
             </span>
-          ))}
+          )).toArray()}
         </li>
       </List>
     </Container>

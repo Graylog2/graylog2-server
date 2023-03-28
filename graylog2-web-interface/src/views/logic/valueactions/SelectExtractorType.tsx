@@ -21,6 +21,7 @@ import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Select from 'components/common/Select';
 import { BootstrapModalForm } from 'components/bootstrap';
+import type { ActionContexts } from 'views/types';
 
 import type { ActionComponentProps } from '../../components/actions/ActionHandler';
 
@@ -42,6 +43,8 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
   };
 
   static contextType = ActionContext;
+
+  readonly context: ActionContexts;
 
   extractorRoutes = {};
 

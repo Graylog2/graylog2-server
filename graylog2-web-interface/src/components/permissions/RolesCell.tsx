@@ -41,7 +41,7 @@ const RolesCell = ({ roles }: Props) => (
       <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
         {role}
       </Role>
-    ))}
+    )).toArray()}
   </Td>
 );
 

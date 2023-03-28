@@ -22,12 +22,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -41,6 +44,7 @@ import org.graylog2.syslog4j.server.impl.event.FortiGateSyslogEvent;
 import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +54,8 @@ import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -62,7 +66,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Codec(name = "syslog", displayName = "Syslog")
 public class SyslogCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogCodec.class);
-    private static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d{1,3}>[0-9]\\d{0,2}\\s.*", Pattern.DOTALL);
+    public static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d{1,3}>[0-9]\\d{0,2}\\s.*", Pattern.DOTALL);
     private static final Pattern CISCO_WITH_SEQUENCE_NUMBERS_PATTERN = Pattern.compile("<\\d{1,3}>\\d*:\\s.*", Pattern.DOTALL);
     private static final Pattern FORTIGATE_PATTERN = Pattern.compile("<\\d{1,3}>date=.*", Pattern.DOTALL);
 
@@ -70,6 +74,7 @@ public class SyslogCodec extends AbstractCodec {
     static final String CK_ALLOW_OVERRIDE_DATE = "allow_override_date";
     static final String CK_EXPAND_STRUCTURED_DATA = "expand_structured_data";
     static final String CK_STORE_FULL_MESSAGE = "store_full_message";
+    static final String CK_TIMEZONE = "timezone";
 
     private final Timer resolveTime;
     private final Timer decodeTime;
@@ -120,16 +125,18 @@ public class SyslogCodec extends AbstractCodec {
          *  http://open.spotify.com/track/2ZtQKBB8wDTtPPqDZhy7xZ
          *
          */
-
+        String timeZoneConfig = configuration.getString(CK_TIMEZONE);
         final SyslogServerEventIF e;
+        boolean isDefaultTimeZoneSet = StringUtils.isNotBlank(timeZoneConfig) && !DropdownField.NOT_CONFIGURED.equals(timeZoneConfig);
+        DateTimeZone defaultTimeZone = isDefaultTimeZoneSet ? DateTimeZone.forID(timeZoneConfig) : null;
         if (STRUCTURED_SYSLOG_PATTERN.matcher(msg).matches()) {
-            e = new StructuredSyslogServerEvent(msg, remoteAddress);
+            e = new StructuredSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
-            e = new CiscoSyslogServerEvent(msg, remoteAddress);
+            e = new CiscoSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (FORTIGATE_PATTERN.matcher(msg).matches()) {
-            e = new FortiGateSyslogEvent(msg);
+            e = new FortiGateSyslogEvent(msg, defaultTimeZone);
         } else {
-            e = new SyslogServerEvent(msg, remoteAddress);
+            e = new SyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         }
 
         // If the message is a structured one, we do not want the message ID and the structured data in the
@@ -206,7 +213,8 @@ public class SyslogCodec extends AbstractCodec {
 
     private DateTime parseDate(SyslogServerEventIF msg, DateTime receivedTimestamp) throws IllegalStateException {
         // Check if date could be parsed.
-        if (msg.getDate() == null) {
+        Date sysLogDate = msg.getDate();
+        if (sysLogDate == null) {
             if (configuration.getBoolean(CK_ALLOW_OVERRIDE_DATE)) {
                 LOG.debug("Date could not be parsed. Was set to NOW because {} is true.", CK_ALLOW_OVERRIDE_DATE);
                 return receivedTimestamp;
@@ -218,7 +226,7 @@ public class SyslogCodec extends AbstractCodec {
             }
         }
 
-        return new DateTime(msg.getDate());
+        return new DateTime(sysLogDate);
     }
 
     @Nullable
@@ -280,6 +288,14 @@ public class SyslogCodec extends AbstractCodec {
                             "Expand structured data elements by prefixing attributes with their SD-ID?"
                     )
             );
+
+            r.addField(new DropdownField(
+                    CK_TIMEZONE,
+                    "Time Zone",
+                    DropdownField.NOT_CONFIGURED,
+                    DropdownField.ValueTemplates.timeZones(true),
+                    "Default time zone used when no timezone detected",
+                    ConfigurationField.Optional.OPTIONAL));
 
             return r;
         }
