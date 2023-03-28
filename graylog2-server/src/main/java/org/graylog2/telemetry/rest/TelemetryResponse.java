@@ -3,6 +3,7 @@ package org.graylog2.telemetry.rest;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public record TelemetryResponse(UserInfo currentUser,
     }
 
     public record ClusterInfo(String clusterId,
+                              DateTime clusterCreationDate,
                               int nodesCount,
                               Map<String, SystemOverviewResponse> nodes,
                               long averageLastMonthTraffic,

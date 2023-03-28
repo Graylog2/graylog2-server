@@ -46,11 +46,9 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ClusterConfigServiceImpl implements ClusterConfigService {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceImpl.class);
-
     @VisibleForTesting
     static final String COLLECTION_NAME = "cluster_config";
-
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceImpl.class);
     private final JacksonDBCollection<ClusterConfig, String> dbCollection;
     private final NodeId nodeId;
     private final ObjectMapper objectMapper;
@@ -99,7 +97,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
 
     @Override
     public <T> T get(String key, Class<T> type) {
-        ClusterConfig config = dbCollection.findOne(DBQuery.is("type", key));
+        ClusterConfig config = findClusterConfig(key);
 
         if (config == null) {
             LOG.debug("Couldn't find cluster config of type {}", key);
@@ -114,9 +112,18 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         return result;
     }
 
+    private ClusterConfig findClusterConfig(String key) {
+        return dbCollection.findOne(DBQuery.is("type", key));
+    }
+
     @Override
     public <T> T get(Class<T> type) {
         return get(type.getCanonicalName(), type);
+    }
+
+    @Override
+    public ClusterConfig getRaw(Class<?> type) {
+        return findClusterConfig(type.getCanonicalName());
     }
 
     @Override

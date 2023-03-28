@@ -1,6 +1,7 @@
 package org.graylog2.telemetry.rest;
 
 import com.google.common.hash.HashCode;
+import org.graylog2.cluster.ClusterConfig;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -13,6 +14,7 @@ import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +97,7 @@ public class TelemetryService {
     private ClusterInfo createClusterInfo(String clusterId, Map<String, SystemOverviewResponse> systemOverviewResponses) {
         return new ClusterInfo(
                 clusterId,
+                getClusterCreationDate(),
                 systemOverviewResponses.size(),
                 systemOverviewResponses,
                 getAverageLastMonthTraffic(),
@@ -109,6 +112,10 @@ public class TelemetryService {
 
     private String getClusterId() {
         return Optional.ofNullable(clusterConfigService.get(ClusterId.class)).map(ClusterId::clusterId).orElse(null);
+    }
+
+    private DateTime getClusterCreationDate() {
+        return Optional.ofNullable(clusterConfigService.getRaw(ClusterId.class)).map(ClusterConfig::lastUpdated).orElse(null);
     }
 
     private long getAverageLastMonthTraffic() {
