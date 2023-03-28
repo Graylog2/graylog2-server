@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// webpack.vendor.js
 const path = require('path');
 
 const webpack = require('webpack');
@@ -31,6 +30,9 @@ const supportedBrowsers = require('./supportedBrowsers');
 
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
+
+const DEFAULT_API_URL = 'http://localhost:9000';
+const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
 
 // eslint-disable-next-line no-console
 console.error('Building vendor bundle.');
@@ -92,8 +94,30 @@ const webpackConfig = {
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
 
+// eslint-disable-next-line import/no-mutable-exports
+let defaultExport = webpackConfig;
+
+if (TARGET === 'start') {
+  defaultExport = merge(webpackConfig, {
+    devServer: {
+      hot: false,
+      liveReload: true,
+      compress: true,
+      historyApiFallback: true,
+      proxy: {
+        '/api': {
+          target: apiUrl,
+        },
+        '/config.js': {
+          target: apiUrl,
+        },
+      },
+    },
+  });
+}
+
 if (TARGET.startsWith('build')) {
-  module.exports = merge(webpackConfig, {
+  defaultExport = merge(webpackConfig, {
     mode: 'production',
     optimization: {
       concatenateModules: false,
@@ -115,6 +139,6 @@ if (TARGET.startsWith('build')) {
       filename: '[name].[chunkhash].js',
     },
   });
-} else {
-  module.exports = webpackConfig;
 }
+
+export default defaultExport;
