@@ -97,7 +97,7 @@ public class DatanodeContainerizedBackend {
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
-        container.withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
+        container.withFileSystemBind("target/graylog-datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
         customizer.onContainer(container);
         return container;
