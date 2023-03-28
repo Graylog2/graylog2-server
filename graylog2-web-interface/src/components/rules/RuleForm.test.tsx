@@ -84,13 +84,14 @@ describe('RuleForm', () => {
         ruleSourceRef: {},
         usedInPipelines: [],
         rawMessageToSimulate: '',
+        startRuleSimulation: true,
         setRawMessageToSimulate,
       }}>
         <RuleForm create={false} />
       </PipelineRulesContext.Provider>,
     );
 
-    const rawMessageInput = getByPlaceholderText('Rule input');
+    const rawMessageInput = getByPlaceholderText('Message string');
 
     expect(rawMessageInput).toHaveValue('');
 
