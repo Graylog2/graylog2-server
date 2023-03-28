@@ -1,4 +1,4 @@
 type = "c"
-message = "datanode: switch to be able to force single-node type"
+message = "datanode: add conf option to be able to force single-node type"
 
 pull = ["15070"]
