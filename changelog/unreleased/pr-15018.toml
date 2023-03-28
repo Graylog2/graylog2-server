@@ -1,0 +1,4 @@
+type = "c"
+message = "Using database time for node registration and heartbeat"
+
+pull = ["15018"]
