@@ -18,6 +18,7 @@ package org.graylog2.decorators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -131,6 +132,7 @@ public class LookupTableDecorator implements SearchResponseDecorator {
         this.lookupTable = lookupTableService.newBuilder().lookupTable(lookupTableName).build();
     }
 
+    @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
