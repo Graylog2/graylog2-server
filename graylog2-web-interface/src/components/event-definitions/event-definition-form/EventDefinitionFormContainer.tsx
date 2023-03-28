@@ -33,7 +33,6 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromUrl from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
 
-
 import EventDefinitionForm from './EventDefinitionForm';
 
 const fetchNotifications = () => {
@@ -65,7 +64,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
     ConfigurationsActions.listEventsClusterConfig().then((config) => setEventsClusterConfig(config));
   }, []);
 
-  const handleChange = useCallback((key, value) => {
+  const handleChange = useCallback((key: string, value: unknown) => {
     setEventDefinition((curState) => {
       const nextEventDefinition = cloneDeep(curState);
       nextEventDefinition[key] = value;
@@ -87,6 +86,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   useEffect(() => {
     fetchClusterConfig();
     fetchNotifications();
+
     if (hasUrlConfig) {
       const conditionPlugin = getConditionPlugin(configFromUrl.type);
       const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
@@ -120,6 +120,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 
         return;
       }
+
       if (body.type && body.type === 'ApiError') {
         if (body.message.includes('org.graylog.events.conditions.Expression')
           || body.message.includes('org.graylog.events.conditions.Expr')
