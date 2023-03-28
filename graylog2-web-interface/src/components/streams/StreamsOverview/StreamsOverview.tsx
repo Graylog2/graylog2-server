@@ -40,7 +40,9 @@ import {
 import EntityFilters from 'components/common/EntityFilters';
 import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 
+import ExpandedRulesSection from './ExpandedRulesSection';
 import CustomColumnRenderers from './ColumnRenderers';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
@@ -70,7 +72,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: paginatedStreams, isInitialLoading: isInitialLoadingStreams, refetch: refetchStreams } = useStreams({
+  const { data: paginatedStreams, isInitialLoading: isLoadingStreams, refetch: refetchStreams } = useStreams({
     query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
@@ -86,10 +88,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
     [paginatedStreams?.attributes],
   );
 
-  const onPageSizeChange = (newPageSize: number) => {
+  const onPageSizeChange = useCallback((newPageSize: number) => {
     paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
     updateTableLayout({ perPage: newPageSize });
-  };
+  }, [paginationQueryParameter, updateTableLayout]);
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -128,7 +130,22 @@ const StreamsOverview = ({ indexSets }: Props) => {
                  indexSets={indexSets} />
   ), [indexSets]);
 
-  if (isLoadingLayoutPreferences || isInitialLoadingStreams) {
+  const renderExpandedRules = useCallback((stream: Stream) => (
+    <ExpandedRulesSection stream={stream} />
+  ), []);
+  const renderExpandedRulesActions = useCallback((stream: Stream) => (
+    <ExpandedRulesActions stream={stream} />
+  ), []);
+
+  const expandedSectionsRenderer = useMemo(() => ({
+    rules: {
+      title: 'Rules',
+      content: renderExpandedRules,
+      actions: renderExpandedRulesActions,
+    },
+  }), [renderExpandedRules, renderExpandedRulesActions]);
+
+  if (isLoadingLayoutPreferences || isLoadingStreams) {
     return <Spinner />;
   }
 
@@ -160,6 +177,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    onPageSizeChange={onPageSizeChange}
                                    pageSize={layoutConfig.pageSize}
                                    bulkActions={renderBulkActions}
+                                   expandedSectionsRenderer={expandedSectionsRenderer}
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
                                    columnRenderers={columnRenderers}

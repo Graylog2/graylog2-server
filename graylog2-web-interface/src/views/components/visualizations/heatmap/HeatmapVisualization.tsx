@@ -15,7 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { values, merge, fill, find, isEmpty } from 'lodash';
+import values from 'lodash/values';
+import merge from 'lodash/merge';
+import fill from 'lodash/fill';
+import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';

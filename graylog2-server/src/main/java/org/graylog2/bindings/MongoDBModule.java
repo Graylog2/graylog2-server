@@ -19,10 +19,13 @@ package org.graylog2.bindings;
 import com.google.inject.AbstractModule;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
+import org.graylog2.database.dbcatalog.DbEntitiesScanner;
 
 public class MongoDBModule extends AbstractModule {
     @Override
     protected void configure() {
+        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
     }
 }

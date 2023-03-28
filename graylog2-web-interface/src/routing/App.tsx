@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
+import { Outlet } from 'react-router-dom';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
 import { Icon, Spinner } from 'components/common';
@@ -58,7 +58,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
 `);
 
-const App = ({ children }) => (
+const App = () => (
   <CurrentUserContext.Consumer>
     {(currentUser) => {
       if (!currentUser) {
@@ -76,7 +76,7 @@ const App = ({ children }) => (
             <ReportedErrorBoundary>
               <RuntimeErrorBoundary>
                 <PageContent>
-                  {children}
+                  <Outlet />
                 </PageContent>
               </RuntimeErrorBoundary>
             </ReportedErrorBoundary>
@@ -86,12 +86,5 @@ const App = ({ children }) => (
     }}
   </CurrentUserContext.Consumer>
 );
-
-App.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
-};
 
 export default App;

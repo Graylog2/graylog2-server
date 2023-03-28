@@ -21,6 +21,8 @@ import 'helpers/mocking/react-dom_mock';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import { asMock } from 'helpers/mocking';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import RefreshControls from './RefreshControls';
 
@@ -36,7 +38,26 @@ jest.mock('views/stores/RefreshStore', () => ({
   RefreshStore: {},
 }));
 
+jest.mock('hooks/useSearchConfiguration');
+
+const autoRefreshOptions = {
+  PT1S: '1 second',
+  PT2S: '2 second',
+  PT5S: '5 second',
+  PT1M: '1 minute',
+  PT5M: '5 minutes',
+};
+
 describe('RefreshControls', () => {
+  beforeEach(() => {
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: {
+        auto_refresh_timerange_options: autoRefreshOptions,
+        default_auto_refresh_option: 'PT5S',
+      } as unknown as SearchesConfig,
+    });
+  });
+
   describe('rendering', () => {
     it.each`
     enabled      | interval

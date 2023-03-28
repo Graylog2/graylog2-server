@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { upperFirst } from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';

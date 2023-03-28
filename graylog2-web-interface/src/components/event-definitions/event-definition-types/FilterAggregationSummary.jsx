@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import upperFirst from 'lodash/upperFirst';
 
 import { Link } from 'components/common/router';
 import { Alert } from 'components/bootstrap';
@@ -32,32 +33,50 @@ import withStreams from './withStreams';
 import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
+import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
+
+const formatStreamOrId = (streamOrId) => {
+  if (typeof streamOrId === 'string') {
+    return <span key={streamOrId}><em>{streamOrId}</em></span>;
+  }
+
+  return (
+    <span key={streamOrId.id}>
+      <Link to={Routes.stream_search(streamOrId.id)}>{streamOrId.title}</Link>
+    </span>
+  );
+};
+
+const getConditionType = (config) => {
+  const { group_by: groupBy, series, conditions } = config;
+
+  return (isEmpty(groupBy)
+  && (!conditions || isEmpty(conditions) || conditions.expression === null)
+  && isEmpty(series)
+    ? 'filter' : 'aggregation');
+};
+
+const renderQueryParameters = (queryParameters) => {
+  if (queryParameters.some((p) => p.embryonic)) {
+    const undeclaredParameters = queryParameters.filter((p) => p.embryonic)
+      .map((p) => p.name)
+      .join(', ');
+
+    return (
+      <Alert bsStyle="danger">
+        <Icon name="exclamation-triangle" />&nbsp;There are undeclared query parameters: {undeclaredParameters}
+      </Alert>
+    );
+  }
+
+  return <dd>{queryParameters.map((p) => p.name).join(', ')}</dd>;
+};
+
 class FilterAggregationSummary extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
-  };
-
-  getConditionType = (config) => {
-    const { group_by: groupBy, series, conditions } = config;
-
-    return (lodash.isEmpty(groupBy)
-    && (!conditions || lodash.isEmpty(conditions) || conditions.expression === null)
-    && lodash.isEmpty(series)
-      ? 'filter' : 'aggregation');
-  };
-
-  formatStreamOrId = (streamOrId) => {
-    if (typeof streamOrId === 'string') {
-      return <span key={streamOrId}><em>{streamOrId}</em></span>;
-    }
-
-    return (
-      <span key={streamOrId.id}>
-        <Link to={Routes.stream_search(streamOrId.id)}>{streamOrId.title}</Link>
-      </span>
-    );
   };
 
   renderStreams = (streamIds, streamIdsWithMissingPermission) => {
@@ -74,7 +93,7 @@ class FilterAggregationSummary extends React.Component {
     const renderedStreams = streamIds
       .map((id) => streams.find((s) => s.id === id) || id)
       .sort((s1, s2) => naturalSortIgnoreCase(s1.title || s1, s2.title || s2))
-      .map(this.formatStreamOrId);
+      .map(formatStreamOrId);
 
     return (
       <>
@@ -82,22 +101,6 @@ class FilterAggregationSummary extends React.Component {
         {renderedStreams}
       </>
     );
-  };
-
-  renderQueryParameters = (queryParameters) => {
-    if (queryParameters.some((p) => p.embryonic)) {
-      const undeclaredParameters = queryParameters.filter((p) => p.embryonic)
-        .map((p) => p.name)
-        .join(', ');
-
-      return (
-        <Alert bsStyle="danger">
-          <Icon name="exclamation-triangle" />&nbsp;There are undeclared query parameters: {undeclaredParameters}
-        </Alert>
-      );
-    }
-
-    return <dd>{queryParameters.map((p) => p.name).join(', ')}</dd>;
   };
 
   render() {
@@ -114,7 +117,7 @@ class FilterAggregationSummary extends React.Component {
       conditions,
     } = config;
 
-    const conditionType = this.getConditionType(config);
+    const conditionType = getConditionType(config);
 
     const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
@@ -127,10 +130,10 @@ class FilterAggregationSummary extends React.Component {
     return (
       <dl>
         <dt>Type</dt>
-        <dd>{lodash.upperFirst(conditionType)}</dd>
+        <dd>{upperFirst(conditionType)}</dd>
         <dt>Search Query</dt>
         <dd>{query || '*'}</dd>
-        {queryParameters.length > 0 && this.renderQueryParameters(queryParameters)}
+        {queryParameters.length > 0 && renderQueryParameters(queryParameters)}
         <dt>Streams</dt>
         <dd className={styles.streamList}>{this.renderStreams(effectiveStreamIds, streamIdsWithMissingPermission)}</dd>
         <dt>Search within</dt>
@@ -155,6 +158,10 @@ class FilterAggregationSummary extends React.Component {
             </dd>
           </>
         )}
+        <dt>Actions</dt>
+        <dd>
+          <LinkToReplaySearch />
+        </dd>
       </dl>
     );
   }

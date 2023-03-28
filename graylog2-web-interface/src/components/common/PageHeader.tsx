@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 import styled, { css } from 'styled-components';
 
 import { Col, Label, Tooltip } from 'components/bootstrap';
@@ -85,7 +85,7 @@ const LifecycleIndicator = ({
     return null;
   }
 
-  const label = lodash.upperFirst(lifecycle);
+  const label = upperFirst(lifecycle);
   const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
   const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 

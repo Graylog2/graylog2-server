@@ -21,7 +21,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const { EsbuildPlugin } = require('esbuild-loader');
 
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 const supportedBrowsers = require('./supportedBrowsers');
@@ -94,7 +94,6 @@ const webpackConfig = {
         use: {
           loader: 'esbuild-loader',
           options: {
-            loader: 'tsx',
             target: supportedBrowsers,
           },
         },
@@ -215,6 +214,30 @@ const webpackConfig = {
       FEATURES: JSON.stringify(process.env.FEATURES),
     }),
   ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      minSize: 20000,
+      minRemainingSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 30,
+      maxInitialRequests: 30,
+      enforceSizeThreshold: 50000,
+      usedExports: true,
+      cacheGroups: {
+        defaultVendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
 };
 
 if (TARGET === 'start') {
@@ -249,7 +272,7 @@ if (TARGET.startsWith('build')) {
     mode: 'production',
     optimization: {
       moduleIds: 'deterministic',
-      minimizer: [new ESBuildMinifyPlugin({
+      minimizer: [new EsbuildPlugin({
         target: supportedBrowsers,
       })],
     },

@@ -133,6 +133,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.isLeaderNode = isLeaderNode;
     }
 
+    @Override
     public boolean isLeaderNode() {
         return isLeaderNode;
     }

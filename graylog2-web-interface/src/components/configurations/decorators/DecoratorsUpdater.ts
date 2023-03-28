@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { difference, isEqual } from 'lodash';
+import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
 
 import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';

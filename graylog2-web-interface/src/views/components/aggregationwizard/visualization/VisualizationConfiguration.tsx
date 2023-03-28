@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 
 import { Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';

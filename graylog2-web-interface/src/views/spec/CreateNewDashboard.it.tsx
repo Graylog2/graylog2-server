@@ -15,12 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { fireEvent, renderUnwrapped } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
+import DefaultProviders from 'DefaultProviders';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
@@ -81,8 +83,15 @@ jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>
 
 jest.unmock('logic/rest/FetchProvider');
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  createBrowserRouter: jest.fn(),
+}));
+
 const finderTimeout = applyTimeoutMultiplier(15000);
 const testTimeout = applyTimeoutMultiplier(30000);
+
+const setInitialUrl = (url: string) => asMock(createBrowserRouter).mockImplementation((routes) => createMemoryRouter(routes, { initialEntries: [url] }));
 
 describe('Create a new dashboard', () => {
   beforeAll(loadViewsPlugin);
@@ -94,16 +103,20 @@ describe('Create a new dashboard', () => {
   });
 
   const SimpleAppRouter = () => (
-    <CurrentUserProvider>
-      <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
-        <AppRouter />
-      </StreamsContext.Provider>
-    </CurrentUserProvider>
+    <DefaultProviders>
+      <DefaultQueryClientProvider>
+        <CurrentUserProvider>
+          <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
+            <AppRouter />
+          </StreamsContext.Provider>
+        </CurrentUserProvider>
+      </DefaultQueryClientProvider>
+    </DefaultProviders>
   );
 
   it('using Dashboards Page', async () => {
-    const { findByText, findAllByText } = render(<SimpleAppRouter />);
-    history.push(Routes.DASHBOARDS);
+    setInitialUrl(Routes.DASHBOARDS);
+    const { findByText, findAllByText } = renderUnwrapped(<SimpleAppRouter />);
 
     const buttons = await findAllByText('Create new dashboard', {}, { timeout: finderTimeout });
 
@@ -112,9 +125,8 @@ describe('Create a new dashboard', () => {
   }, testTimeout);
 
   it('by going to the new dashboards endpoint', async () => {
-    const { findByText } = render(<SimpleAppRouter />);
-
-    history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
+    setInitialUrl(Routes.pluginRoute('DASHBOARDS_NEW'));
+    const { findByText } = renderUnwrapped(<SimpleAppRouter />);
 
     await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
   }, testTimeout);

@@ -16,39 +16,44 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Icon } from 'components/common';
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import { Link } from 'components/common/router';
 
 type NodeId = string;
 type Props = {
   nodeId: NodeId,
 };
 
+const BreakWord = styled.span`
+  wordBreak: 'break-word';
+`;
+
 const NodeName = ({ nodeId }: Props) => {
-  const nodes = useStore(NodesStore, (state) => state?.nodes ?? {});
-  const node = nodes[nodeId];
+  const node = useStore(NodesStore, (state) => state?.nodes?.[nodeId]);
 
   if (node) {
     const nodeURL = Routes.node(nodeId);
 
     return (
-      <a href={nodeURL}>
+      <Link to={nodeURL}>
         <Icon name="code-branch" />
         &nbsp;
-        <span style={{ wordBreak: 'break-word' }}>
+        <BreakWord>
           {node.short_node_id}
-        </span>&nbsp;/&nbsp;
-        <span style={{ wordBreak: 'break-word' }}>
+        </BreakWord>&nbsp;/&nbsp;
+        <BreakWord>
           {node.hostname}
-        </span>
-      </a>
+        </BreakWord>
+      </Link>
     );
   }
 
-  return <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
+  return <BreakWord>stopped node</BreakWord>;
 };
 
 NodeName.propTypes = {

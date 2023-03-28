@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { isString, trim, truncate as trunc } from 'lodash';
+import isString from 'lodash/isString';
+import trim from 'lodash/trim';
+import trunc from 'lodash/truncate';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
