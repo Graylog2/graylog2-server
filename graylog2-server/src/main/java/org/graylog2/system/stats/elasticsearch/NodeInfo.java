@@ -18,7 +18,7 @@ public abstract class NodeInfo {
     public abstract String version();
 
     @JsonProperty
-    public abstract String os();
+    public abstract Object os();
 
     @JsonProperty
     public abstract Long jvmMemHeapMaxInBytes();
@@ -30,7 +30,7 @@ public abstract class NodeInfo {
     public abstract static class Builder {
         public abstract Builder version(String version);
 
-        public abstract Builder os(String os);
+        public abstract Builder os(Object os);
 
         public abstract Builder jvmMemHeapMaxInBytes(Long jvmMemHeapMaxInBytes);
 

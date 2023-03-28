@@ -36,7 +36,9 @@ public record TelemetryResponse(UserInfo currentUser,
     public record PluginInfo(boolean isEnterprisePluginInstalled, List<String> installedPlugins) {
     }
 
-    public record SearchClusterInfo(int nodesCount, Map<String, NodeInfo> nodes) {
+    public record SearchClusterInfo(int nodesCount,
+                                    String version,
+                                    Map<String, NodeInfo> nodes) {
 
     }
 

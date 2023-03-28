@@ -63,8 +63,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 public class ClusterAdapterES7 implements ClusterAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterES7.class);
     private final ElasticsearchClient client;
@@ -264,18 +262,16 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     @Override
     public Map<String, NodeInfo> nodesInfo() {
         final Request request = new Request("GET", "/_nodes");
-        final JsonNode nodesJson = jsonApi.perform(request,
-                "Couldn't read Elasticsearch cluster stats");
+        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Elasticsearch nodes data!");
 
         return toStream(nodesJson.at("/nodes").fields())
                 .collect(Collectors.toMap(Map.Entry::getKey, o -> createNodeInfo(o.getValue())));
     }
 
     private NodeInfo createNodeInfo(JsonNode nodesJson) {
-        JsonNode osNode = nodesJson.at("/os");
         return NodeInfo.builder()
                 .version(nodesJson.at("/version").asText())
-                .os(f("%s:%s", osNode.at("/pretty_name").asText(), osNode.at("/version").asText()))
+                .os(nodesJson.at("/os"))
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
                 .jvmMemHeapMaxInBytes(nodesJson.at("/jvm/mem/heap_max_in_bytes").asLong())
                 .build();

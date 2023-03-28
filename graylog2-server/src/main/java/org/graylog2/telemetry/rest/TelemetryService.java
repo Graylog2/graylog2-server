@@ -8,6 +8,8 @@ import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
@@ -42,6 +44,7 @@ public class TelemetryService {
     private final Set<PluginMetaData> pluginMetaDataSet;
 
     private final ClusterAdapter elasticClusterAdapter;
+    private final SearchVersion elasticsearchVersion;
 
 
     @Inject
@@ -49,13 +52,16 @@ public class TelemetryService {
                             ClusterConfigService clusterConfigService,
                             TelemetryEnterpriseDataProvider enterpriseDataProvider,
                             UserService userService,
-                            Set<PluginMetaData> pluginMetaDataSet, ClusterAdapter elasticClusterAdapter) {
+                            Set<PluginMetaData> pluginMetaDataSet,
+                            ClusterAdapter elasticClusterAdapter,
+                            @DetectedSearchVersion SearchVersion elasticsearchVersion) {
         this.trafficCounterService = trafficCounterService;
         this.clusterConfigService = clusterConfigService;
         this.enterpriseDataProvider = enterpriseDataProvider;
         this.userService = userService;
         this.pluginMetaDataSet = pluginMetaDataSet;
         this.elasticClusterAdapter = elasticClusterAdapter;
+        this.elasticsearchVersion = elasticsearchVersion;
     }
 
     public TelemetryResponse createTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) {
@@ -118,6 +124,9 @@ public class TelemetryService {
 
     private SearchClusterInfo createSearchClusterInfo() {
         Map<String, NodeInfo> nodesInfo = elasticClusterAdapter.nodesInfo();
-        return new SearchClusterInfo(nodesInfo.size(), nodesInfo);
+        return new SearchClusterInfo(
+                nodesInfo.size(),
+                elasticsearchVersion.toString(),
+                nodesInfo);
     }
 }
