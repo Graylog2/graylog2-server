@@ -163,14 +163,15 @@ const useFiltersWithTitle = (
   enabled: boolean = true,
 ): {
   data: Filters
-  onChange: (newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => void
+  onChange: (newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => void,
+  isInitialLoading: boolean,
 } => {
   const queryClient = useQueryClient();
   const { formatTime } = useUserDateTime();
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
-  const { data, isError } = useQuery(
+  const { data, isInitialLoading } = useQuery(
     ['entity_titles', payload],
     () => fetchFilterTitles(payload),
     {
@@ -197,6 +198,7 @@ const useFiltersWithTitle = (
 
   return ({
     data: allFiltersWithTitle,
+    isInitialLoading,
     onChange,
   });
 };

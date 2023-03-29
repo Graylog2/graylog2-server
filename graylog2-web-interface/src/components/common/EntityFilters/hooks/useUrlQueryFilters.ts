@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQueryParam, ArrayParam } from 'use-query-params';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { OrderedMap } from 'immutable';
 
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
@@ -24,18 +24,18 @@ const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => v
   const [pureUrlQueryFilters, setPureUrlQueryFilters] = useQueryParam('filters', ArrayParam);
 
   const filtersFromQuery = useMemo(() => (pureUrlQueryFilters ?? []).reduce((col, filter) => {
-    const [filterKey, filterValue] = filter.split(/=(.*)/);
+    const [attributeId, filterValue] = filter.split(/=(.*)/);
 
-    return col.set(filterKey, [...(col[filterKey] ?? []), filterValue]);
+    return col.set(attributeId, [...(col.get(attributeId) ?? []), filterValue]);
   }, OrderedMap<string, Array<string>>()), [pureUrlQueryFilters]);
 
-  const setFilterValues = (newFilters: UrlQueryFilters) => {
+  const setFilterValues = useCallback((newFilters: UrlQueryFilters) => {
     const newPureUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filters]) => (
       [...col, ...filters.map((value) => `${attributeId}=${value}`)]
     ), []);
 
     setPureUrlQueryFilters(newPureUrlQueryFilters);
-  };
+  }, [setPureUrlQueryFilters]);
 
   return [filtersFromQuery, setFilterValues];
 };

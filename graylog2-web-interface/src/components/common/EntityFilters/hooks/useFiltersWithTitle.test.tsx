@@ -47,13 +47,15 @@ describe('useFiltersWithTitle', () => {
   it('fetches titles only for filters related to attributes which have a related collection', async () => {
     const { waitFor, result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
 
+    await waitFor(() => expect(result.current.isInitialLoading).toBe(true));
+
+    await waitFor(() => expect(result.current.isInitialLoading).toBe(false));
+
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
-      'http://localhost/system/catalog//entities/titles',
+      'http://localhost/system/catalog/entities/titles',
       { entities: [{ id: 'index_set_id_1', type: 'index_sets' }, { id: 'index_set_id_2', type: 'index_sets' }] },
     ));
-
-    await waitFor(() => expect(result.current.data).not.toBe(null));
   });
 
   it('generates correct filter names for all attribute types', async () => {

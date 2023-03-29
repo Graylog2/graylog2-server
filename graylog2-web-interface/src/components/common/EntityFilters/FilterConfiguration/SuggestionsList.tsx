@@ -92,7 +92,7 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
                        useQueryParameter={false}>
           <StyledListGroup>
             {suggestions.map((suggestion) => {
-              const disabled = !!allActiveFilters?.[attribute.id]?.find(({ value }) => value === suggestion.id);
+              const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === suggestion.id);
 
               const onClick = () => {
                 if (disabled) {

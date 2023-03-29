@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { QueryParamProvider } from 'use-query-params';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -90,6 +92,12 @@ const loadDashboardsResponse = (count = 1) => {
 };
 
 describe('DashboardsOverview', () => {
+  const SUT = () => (
+    <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <DashboardsOverview />
+    </QueryParamProvider>
+  );
+
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
   });
@@ -97,7 +105,7 @@ describe('DashboardsOverview', () => {
   it('should render empty', async () => {
     asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
 
-    render(<DashboardsOverview />);
+    render(<SUT />);
 
     await screen.findByText('No dashboards have been created yet.');
   });
@@ -105,7 +113,7 @@ describe('DashboardsOverview', () => {
   it('should render list', async () => {
     asMock(useDashboards).mockReturnValue(loadDashboardsResponse(3));
 
-    render(<DashboardsOverview />);
+    render(<SUT />);
 
     await screen.findByText('search-title-0');
     await screen.findByText('search-title-1');
