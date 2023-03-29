@@ -26,10 +26,6 @@ import FilterConfiguration from 'components/common/EntityFilters/FilterConfigura
 
 const Container = styled.div`
   display: flex;
-
-  :not(:last-child) {
-    margin-right: 3px;
-  }
 `;
 
 const CenteredButton = styled(Button)`

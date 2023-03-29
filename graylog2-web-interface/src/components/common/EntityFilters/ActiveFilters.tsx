@@ -26,6 +26,8 @@ const FilterGroup = styled.div`
   display: inline-flex;
   align-items: center;
   min-height: ${ROW_MIN_HEIGHT}px;
+  gap: 3px;
+  flex-wrap: wrap;
 `;
 
 const FilterGroupTitle = styled.div`
