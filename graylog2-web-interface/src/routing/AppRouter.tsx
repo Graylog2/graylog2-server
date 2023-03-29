@@ -136,6 +136,12 @@ const AppRouter = () => {
 
   const isCloud = AppConfig.isCloud();
 
+  let enableInputsRoute = true;
+
+  if (AppConfig.isCloud()) {
+    enableInputsRoute = AppConfig.isFeatureEnabled('cloud_inputs');
+  }
+
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
 
@@ -179,7 +185,7 @@ const AppRouter = () => {
               element: <ShowEventNotificationPage />,
             },
 
-            !isCloud && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
+            enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
             !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
             !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
