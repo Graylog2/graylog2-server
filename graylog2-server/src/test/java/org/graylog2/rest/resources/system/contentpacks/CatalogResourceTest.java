@@ -35,6 +35,11 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogIndexResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveRequest;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,13 +49,16 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -65,6 +73,9 @@ public class CatalogResourceTest {
     @Mock
     private EntityFacade<Void> mockEntityFacade;
 
+    @Mock
+    private EntityTitleService entityTitleService;
+
     private ContentPackService contentPackService;
     private CatalogResource catalogResource;
 
@@ -75,7 +86,7 @@ public class CatalogResourceTest {
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
-        catalogResource = new CatalogResource(contentPackService);
+        catalogResource = new CatalogResource(contentPackService, entityTitleService);
     }
 
     @Test
@@ -117,5 +128,20 @@ public class CatalogResourceTest {
         final CatalogResolveResponse catalogResolveResponse = catalogResource.resolveEntities(request);
 
         assertThat(catalogResolveResponse.entities()).containsOnly(entity);
+    }
+
+    @Test
+    public void getTitles() {
+        final EntityTitleRequest request = new EntityTitleRequest(List.of(new EntityIdentifier("id", "x")));
+        final EntitiesTitleResponse expectedResponse = new EntitiesTitleResponse(
+                Set.of(new EntityTitleResponse("id", "x", "Title")),
+                Set.of()
+        );
+        doReturn(expectedResponse)
+                .when(entityTitleService)
+                .getTitles(any(), eq(request));
+
+        final EntitiesTitleResponse actualResponse = catalogResource.getTitles(request);
+        assertEquals(expectedResponse, actualResponse);
     }
 }

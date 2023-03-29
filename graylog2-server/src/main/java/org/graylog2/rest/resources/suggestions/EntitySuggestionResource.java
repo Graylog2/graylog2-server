@@ -52,15 +52,15 @@ public class EntitySuggestionResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a paginated list of suggested entities")
     public EntitySuggestionResponse getPage(@ApiParam(name = "collection")
-                                            @QueryParam("collection") String collection,
+                                                @QueryParam("collection") String collection,
                                             @ApiParam(name = "column")
-                                            @QueryParam("column") String column,
+                                                @QueryParam("column") @DefaultValue("title") String column,
                                             @ApiParam(name = "page")
-                                            @QueryParam("page") @DefaultValue("1") int page,
+                                                @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page")
-                                            @QueryParam("per_page") @DefaultValue("10") int perPage,
+                                                @QueryParam("per_page") @DefaultValue("10") int perPage,
                                             @ApiParam(name = "query")
-                                            @QueryParam("query") @DefaultValue("") String query) {
+                                                @QueryParam("query") @DefaultValue("") String query) {
 
         return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
     }
