@@ -31,7 +31,7 @@ const supportedBrowsers = require('./supportedBrowsers');
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
-const DEFAULT_API_URL = 'http://localhost:9000';
+const DEFAULT_API_URL = 'http://127.0.0.1:9000';
 const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
 
 // eslint-disable-next-line no-console
