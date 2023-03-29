@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
-import type { Filters, ValueFilter } from 'components/common/EntityFilters/types';
+import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import { PaginatedList, NoSearchResult } from 'components/common';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
@@ -53,7 +53,7 @@ const Hint = styled.div(({ theme }) => css`
 type Props = {
   allActiveFilters: Filters | undefined,
   attribute: Attribute,
-  filter: ValueFilter | undefined
+  filter: Filter | undefined
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
   onSubmit: (filter: { title: string, value: string }, closeDropdown: boolean) => void,
 }
@@ -92,7 +92,7 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
                        useQueryParameter={false}>
           <StyledListGroup>
             {suggestions.map((suggestion) => {
-              const disabled = !!allActiveFilters?.[attribute.id]?.find(({ value }) => value === suggestion.id);
+              const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === suggestion.id);
 
               const onClick = () => {
                 if (disabled) {
