@@ -19,8 +19,7 @@ package org.graylog2.decorators;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanBuilder;
-import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -41,8 +40,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.CODE_FUNCTION;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.CODE_NAMESPACE;
 import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_CACHE_NAME;
 import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_CACHE_TYPE;
 import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_DATA_ADAPTER_NAME;
@@ -57,7 +54,6 @@ public class LookupTableDecorator implements SearchResponseDecorator {
     private final String sourceField;
     private final String targetField;
     private final LookupTableService.Function lookupTable;
-    private final Tracer tracer;
 
     public interface Factory extends SearchResponseDecorator.Factory {
         @Override
@@ -119,7 +115,7 @@ public class LookupTableDecorator implements SearchResponseDecorator {
     }
 
     @Inject
-    public LookupTableDecorator(@Assisted Decorator decorator, LookupTableService lookupTableService, Tracer tracer) {
+    public LookupTableDecorator(@Assisted Decorator decorator, LookupTableService lookupTableService) {
         final String sourceField = (String) decorator.config().get(CK_SOURCE_FIELD);
         final String targetField = (String) decorator.config().get(CK_TARGET_FIELD);
         final String lookupTableName = (String) decorator.config().get(CK_LOOKUP_TABLE_NAME);
@@ -141,34 +137,22 @@ public class LookupTableDecorator implements SearchResponseDecorator {
         this.sourceField = sourceField;
         this.targetField = targetField;
         this.lookupTable = lookupTableService.newBuilder().lookupTable(lookupTableName).build();
-        this.tracer = tracer;
     }
 
+    @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
-        final SpanBuilder spanBuilder = tracer.spanBuilder(LookupTableDecorator.class.getSimpleName() + ".apply")
-                .setAttribute(CODE_FUNCTION, "apply")
-                .setAttribute(CODE_NAMESPACE, LookupTableDecorator.class.getName());
 
         final LookupTable table = lookupTable.getTable();
 
         if (table != null) {
-            spanBuilder.setAttribute(LOOKUP_TABLE_NAME, table.name())
+            Span.current().setAttribute(LOOKUP_TABLE_NAME, table.name())
                     .setAttribute(LOOKUP_CACHE_NAME, table.cache().name())
                     .setAttribute(LOOKUP_CACHE_TYPE, table.cache().getConfig().type())
                     .setAttribute(LOOKUP_DATA_ADAPTER_NAME, table.dataAdapter().name())
                     .setAttribute(LOOKUP_DATA_ADAPTER_TYPE, table.dataAdapter().getConfig().type());
         }
 
-        final Span span = spanBuilder.startSpan();
-        try (var ignored = span.makeCurrent()) {
-            return process(searchResponse);
-        } finally {
-            span.end();
-        }
-    }
-
-    private SearchResponse process(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
                     // Do not touch the message if the field does not exist.
