@@ -29,7 +29,7 @@ import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
-import TelemetryInitProvider from 'telemetry/TelemetryInitProvider';
+import TelemetryInitProvider from 'logic/telemetry/TelemetryInitProvider';
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 PluginStore.register(new PluginManifest({}, ThreatIntelBindings));

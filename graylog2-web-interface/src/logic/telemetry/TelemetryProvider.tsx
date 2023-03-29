@@ -19,8 +19,8 @@ import { usePostHog } from 'posthog-js/react';
 import { useQuery } from '@tanstack/react-query';
 
 import { Telemetry } from '@graylog/server-api';
-import type { TelemetryEventType, TelemetryEvent } from 'telemetry/TelemetryContext';
-import TelemetryContext from 'telemetry/TelemetryContext';
+import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
+import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
 const TELEMETRY_CLUSTER_INFO_QUERY_KEY = 'telemetry.cluster.info';
 

@@ -14,24 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import { useContext } from 'react';
 
-import useLocation from 'routing/useLocation';
-import useSendTelemetry from 'telemetry/useSendTelemetry';
+import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
-const NavigationTelemetry = () => {
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
+const useSendTelemetry = () => {
+  const { sendTelemetry } = useContext(TelemetryContext);
 
-  useEffect(() => {
-    if (location.pathname) {
-      sendTelemetry('$pageview', {});
-    }
-  }, [location.pathname, sendTelemetry]);
-
-  return (
-    <div />
-  );
+  return sendTelemetry;
 };
 
-export default NavigationTelemetry;
+export default useSendTelemetry;

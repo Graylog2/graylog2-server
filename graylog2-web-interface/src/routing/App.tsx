@@ -28,7 +28,7 @@ import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
 import 'stylesheets/typeahead.less';
-import NavigationTelemetry from 'telemetry/NavigationTelemetry';
+import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 
 const AppLayout = styled.div`
   display: flex;
