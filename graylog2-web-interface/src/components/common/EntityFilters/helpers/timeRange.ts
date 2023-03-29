@@ -14,21 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-
-import AppRouter from 'routing/AppRouter';
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-import StreamsProvider from 'contexts/StreamsProvider';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
-
-const LoggedInPage = () => (
-  <DefaultQueryClientProvider>
-    <ThemeAndUserProvider>
-      <StreamsProvider>
-        <AppRouter />
-      </StreamsProvider>
-    </ThemeAndUserProvider>
-  </DefaultQueryClientProvider>
-);
-
-export default LoggedInPage;
+export const DATE_SEPARATOR = '><';
+export const extractRangeFromString = (timeRange: string) => timeRange.split(DATE_SEPARATOR);
+// from and until need to be in the user time zone.
+export const timeRangeTitle = (from: string, until: string) => `${from || 'All time'} - ${until || 'Now'}`;

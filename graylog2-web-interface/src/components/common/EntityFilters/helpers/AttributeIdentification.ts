@@ -14,21 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { Attribute } from 'stores/PaginationTypes';
 
-import AppRouter from 'routing/AppRouter';
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-import StreamsProvider from 'contexts/StreamsProvider';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
-
-const LoggedInPage = () => (
-  <DefaultQueryClientProvider>
-    <ThemeAndUserProvider>
-      <StreamsProvider>
-        <AppRouter />
-      </StreamsProvider>
-    </ThemeAndUserProvider>
-  </DefaultQueryClientProvider>
-);
-
-export default LoggedInPage;
+export const isDateAttribute = ({ type }: Attribute) => type === 'DATE';
+export const isAttributeWithFilterOptions = ({ filter_options }: Attribute) => !!filter_options?.length;
+export const isAttributeWithRelatedCollection = ({ related_collection }: Attribute) => !!related_collection;
