@@ -399,6 +399,11 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
         }
 
+        @Override
+        public boolean isCloudCompatible() {
+            return false;
+        }
+
         @AutoValue.Builder
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)
