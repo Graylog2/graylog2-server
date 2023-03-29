@@ -43,6 +43,15 @@ public abstract class SearchVersion {
         public String toString() {
             return this.printName;
         }
+
+        public static Distribution valueOfLabel(String label) {
+            for (Distribution e : values()) {
+                if (e.printName.equals(label)) {
+                    return e;
+                }
+            }
+            return null;
+        }
     }
 
     public abstract Distribution distribution();

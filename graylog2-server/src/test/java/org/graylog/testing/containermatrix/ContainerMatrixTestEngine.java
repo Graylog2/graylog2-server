@@ -104,17 +104,17 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
      *
      * @return
      */
-    private String getVersionOverride() {
+    private static String getVersionOverride() {
         return System.getProperty("graylog.matrix.tests.version.override");
     }
 
-    private boolean versionOverrideExists() {
+    public static boolean versionOverrideExists() {
         return getVersionOverride() != null;
     }
 
     private SearchVersion getSearchVersionOverride() {
         final var split = getVersionOverride().split("-");
-        final var distro = SearchVersion.Distribution.valueOf(split[0]);
+        final var distro = SearchVersion.Distribution.valueOfLabel(split[0]);
         if(SearchVersion.Distribution.ELASTICSEARCH.equals(distro)) {
             return SearchVersion.elasticsearch(split[1]);
         }
@@ -131,13 +131,13 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
      * @param version
      * @return
      */
-    private boolean isCompatible(SearchServer version) {
+    public static boolean isCompatible(SearchServer version) {
         final var split = getVersionOverride().split("-");
-        return version.getSearchVersion().satisfies(SearchVersion.Distribution.valueOf(split[0]), "^" + split[1].charAt(0));
+        return version.getSearchVersion().satisfies(SearchVersion.Distribution.valueOfLabel(split[0]), "^" + split[1].charAt(0));
     }
 
     private Stream<SearchVersion> filterForCompatibleVersionOrDrop(SearchServer[] versions) {
-        return versionOverrideExists() ?  Stream.of(versions).filter(this::isCompatible).findAny().isEmpty() ? Stream.empty() : Stream.of(getSearchVersionOverride()) : Stream.of(versions).map(SearchServer::getSearchVersion);
+        return versionOverrideExists() ? Stream.of(versions).filter(x -> isCompatible(x)).findAny().isEmpty() ? Stream.empty() : Stream.of(getSearchVersionOverride()) : Stream.of(versions).map(SearchServer::getSearchVersion);
     }
 
     private Set<SearchVersion> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
