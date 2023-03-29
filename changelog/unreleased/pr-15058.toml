@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fixed CSV File adapter to only verify file read access"
+
+issues = ["14998"]
+pulls = ["15058"]
+
