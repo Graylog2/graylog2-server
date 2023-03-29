@@ -137,7 +137,11 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     private Stream<SearchVersion> filterForCompatibleVersionOrDrop(SearchServer[] versions) {
-        return versionOverrideExists() ? Stream.of(versions).anyMatch(ContainerMatrixTestEngine::isCompatible) ? Stream.of(getSearchVersionOverride()) : Stream.of(versions).map(SearchServer::getSearchVersion) : Stream.empty();
+        if(versionOverrideExists()) {
+            return Stream.of(versions).anyMatch(ContainerMatrixTestEngine::isCompatible) ? Stream.of(getSearchVersionOverride()) : Stream.empty();
+        } else {
+            return Stream.of(versions).map(SearchServer::getSearchVersion);
+        }
     }
 
     private Set<SearchVersion> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
