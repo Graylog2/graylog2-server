@@ -1,4 +1,20 @@
-package org.graylog2.bootstrap.preflight;
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.bootstrap.preflight.web.resources;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -6,6 +22,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Resources;
+import org.graylog2.bootstrap.preflight.PreflightConstants;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
@@ -14,6 +31,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
@@ -64,12 +82,18 @@ public class PreflightAssetsResource {
                 });
     }
 
+    @Path("/")
+    @Produces(MediaType.TEXT_HTML)
+    @GET
+    public Response index(@Context Request request) {
+        return this.get(request, "index.html");
+    }
+
     @Path("/{filename}")
     @GET
     public Response get(@Context Request request, @PathParam("filename") String filename) {
-        final URL resourceUrl;
         try {
-            resourceUrl = getResourceUri(filename);
+            final URL resourceUrl = getResourceUri(filename);
             return getResponse(request, filename, resourceUrl);
         } catch (IOException | URISyntaxException e) {
             throw new NotFoundException("Couldn't find " + filename, e);
@@ -77,7 +101,7 @@ public class PreflightAssetsResource {
     }
 
     private URL getResourceUri(String filename) throws FileNotFoundException {
-        final URL resourceUrl = this.getClass().getResource(filename);
+        final URL resourceUrl = this.getClass().getResource(PreflightConstants.ASSETS_RESOURCE_DIR + filename);
         if (resourceUrl == null) {
             throw new FileNotFoundException("Resource file " + filename + " not found.");
         }
