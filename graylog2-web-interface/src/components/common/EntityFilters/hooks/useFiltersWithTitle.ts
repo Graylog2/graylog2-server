@@ -171,7 +171,7 @@ const useFiltersWithTitle = (
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
-  const { data, isInitialLoading } = useQuery(
+  const { data, isInitialLoading, isError } = useQuery(
     ['entity_titles', payload],
     () => fetchFilterTitles(payload),
     {
