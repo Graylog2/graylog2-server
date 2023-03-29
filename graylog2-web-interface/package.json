@@ -76,7 +76,7 @@
     "mousetrap": "^1.6.5",
     "numeral": "^2.0.6",
     "plotly.js": "2.20.0",
-    "posthog-js": "^1.50.7",
+    "posthog-js": "^1.51.5",
     "promise-polyfill": "^8.2.0",
     "qs": "^6.3.0",
     "react-ace": "10.1.0",
