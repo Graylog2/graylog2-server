@@ -24,10 +24,9 @@ import AbsoluteDateInput from 'views/components/searchbar/date-time-picker/Absol
 import { ModalSubmit } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';
+import { DATE_SEPARATOR, extractRangeFromString, timeRangeTitle } from 'components/common/EntityFilters/helpers/timeRange';
 
-import type { ValueFilter } from '../types';
-
-const DATE_SEPARATOR = '><';
+import type { Filter } from '../types';
 
 type FormValues = {
   from: string | undefined,
@@ -114,11 +113,11 @@ const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
   );
 };
 
-const useInitialValues = (filter: ValueFilter | undefined) => {
+const useInitialValues = (filter: Filter | undefined) => {
   const { formatTime } = useUserDateTime();
 
   if (filter) {
-    const [from, until] = filter.value.split(DATE_SEPARATOR);
+    const [from, until] = extractRangeFromString(filter.value);
 
     return ({
       from: from ? formatTime(from, 'complete') : undefined,
@@ -162,7 +161,7 @@ const validate = (values: FormValues) => {
 
 type Props = {
   onSubmit: (filter: { title: string, value: string }) => void,
-  filter: ValueFilter | undefined,
+  filter: Filter | undefined,
 }
 
 const DateRangeForm = ({ filter, onSubmit }: Props) => {
@@ -175,7 +174,7 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
     const utcUntil = formValues.until ? toInternalTime(formValues.until) : '';
 
     onSubmit({
-      title: `${formValues.from || 'All time'} - ${formValues.until || 'Now'}`,
+      title: timeRangeTitle(formValues.from, formValues.until),
       value: `${utcFrom}${DATE_SEPARATOR}${utcUntil}`,
     });
   };

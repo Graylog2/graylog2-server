@@ -14,13 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { OrderedMap } from 'immutable';
-
-export type Filter = {
-  value: string,
-  title: string,
-
-}
-
-export type Filters = OrderedMap<string, Array<Filter>>;
-export type UrlQueryFilters = OrderedMap<string, Array<string>>
+export const DATE_SEPARATOR = '><';
+export const extractRangeFromString = (timeRange: string) => timeRange.split(DATE_SEPARATOR);
+// from and until need to be in the user time zone.
+export const timeRangeTitle = (from: string, until: string) => `${from || 'All time'} - ${until || 'Now'}`;

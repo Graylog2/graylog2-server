@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
+import { useQueryParam, StringParam } from 'use-query-params';
 
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
@@ -26,9 +27,6 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import EntityDataTable from 'components/common/EntityDataTable';
-import StreamActions from 'components/streams/StreamsOverview/StreamActions';
-import BulkActions from 'components/streams/StreamsOverview/BulkActions/BulkActions';
-import type { Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
@@ -38,12 +36,13 @@ import {
   ADDITIONAL_ATTRIBUTES,
 } from 'components/streams/StreamsOverview/Constants';
 import EntityFilters from 'components/common/EntityFilters';
-import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
-import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
+import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
+import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
-import ExpandedRulesSection from './ExpandedRulesSection';
 import CustomColumnRenderers from './ColumnRenderers';
+import useTableEventHandlers from './hooks/useTableEventHandlers';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -62,8 +61,8 @@ type Props = {
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
-  const [filters, setFilters] = useState<Filters>();
-  const [query, setQuery] = useState('');
+  const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
+  const [query, setQuery] = useQueryParam('q', StringParam);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -73,12 +72,29 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const { data: paginatedStreams, isInitialLoading: isLoadingStreams, refetch: refetchStreams } = useStreams({
-    query,
+    query: query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
-    filters,
+    filters: urlQueryFilters,
   }, { enabled: !isLoadingLayoutPreferences });
+  const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
+  const {
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onColumnsChange,
+    onSortChange,
+  } = useTableEventHandlers({
+    paginationQueryParameter,
+    updateTableLayout,
+    setQuery,
+  });
+
+  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
+    paginationQueryParameter.resetPage();
+    setUrlQueryFilters(newUrlQueryFilters);
+  }, [paginationQueryParameter, setUrlQueryFilters]);
 
   useRefetchStreamsOnStoreChange(refetchStreams);
 
@@ -87,63 +103,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
     () => ([...(paginatedStreams?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedStreams?.attributes],
   );
-
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter]);
-
-  const onReset = useCallback(() => {
-    onSearch('');
-  }, [onSearch]);
-
-  const onChangeFilters = useCallback((newFilters: Filters) => {
-    setFilters(newFilters);
-    paginationQueryParameter.resetPage();
-  }, [paginationQueryParameter]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const renderStreamActions = useCallback((listItem: Stream) => (
-    <StreamActions stream={listItem}
-                   indexSets={indexSets} />
-  ), [indexSets]);
-
-  const renderBulkActions = useCallback((
-    selectedStreamIds: Array<string>,
-    setSelectedStreamIds: (streamIds: Array<string>) => void,
-  ) => (
-    <BulkActions selectedStreamIds={selectedStreamIds}
-                 setSelectedStreamIds={setSelectedStreamIds}
-                 indexSets={indexSets} />
-  ), [indexSets]);
-
-  const renderExpandedRules = useCallback((stream: Stream) => (
-    <ExpandedRulesSection stream={stream} />
-  ), []);
-  const renderExpandedRulesActions = useCallback((stream: Stream) => (
-    <ExpandedRulesActions stream={stream} />
-  ), []);
-
-  const expandedSectionsRenderer = useMemo(() => ({
-    rules: {
-      title: 'Rules',
-      content: renderExpandedRules,
-      actions: renderExpandedRulesActions,
-    },
-  }), [renderExpandedRules, renderExpandedRulesActions]);
 
   if (isLoadingLayoutPreferences || isLoadingStreams) {
     return <Spinner />;
@@ -157,11 +116,12 @@ const StreamsOverview = ({ indexSets }: Props) => {
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
-                    onReset={onReset}
+                    onReset={onSearchReset}
+                    query={query}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
           <EntityFilters attributes={attributes}
-                         onChangeFilters={onChangeFilters}
-                         activeFilters={filters}
+                         urlQueryFilters={urlQueryFilters}
+                         setUrlQueryFilters={onChangeFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
       </div>
@@ -176,10 +136,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    onSortChange={onSortChange}
                                    onPageSizeChange={onPageSizeChange}
                                    pageSize={layoutConfig.pageSize}
-                                   bulkActions={renderBulkActions}
-                                   expandedSectionsRenderer={expandedSectionsRenderer}
+                                   bulkActions={bulkActions}
+                                   expandedSectionsRenderer={expandedSections}
                                    activeSort={layoutConfig.sort}
-                                   rowActions={renderStreamActions}
+                                   rowActions={entityActions}
                                    columnRenderers={columnRenderers}
                                    columnDefinitions={columnDefinitions}
                                    entityAttributesAreCamelCase={false} />

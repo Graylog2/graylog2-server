@@ -14,13 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { OrderedMap } from 'immutable';
+import type { Attribute } from 'stores/PaginationTypes';
 
-export type Filter = {
-  value: string,
-  title: string,
-
-}
-
-export type Filters = OrderedMap<string, Array<Filter>>;
-export type UrlQueryFilters = OrderedMap<string, Array<string>>
+export const isDateAttribute = ({ type }: Attribute) => type === 'DATE';
+export const isAttributeWithFilterOptions = ({ filter_options }: Attribute) => !!filter_options?.length;
+export const isAttributeWithRelatedCollection = ({ related_collection }: Attribute) => !!related_collection;
