@@ -16,6 +16,7 @@
  */
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
 const path = require('path');
+const merge = require('webpack-merge');
 
 const webpackConfig = require('./webpack.config.js');
 
@@ -114,7 +115,7 @@ module.exports = {
   title: 'Graylog UI documentation',
   webpackConfig: {
     module: webpackConfig.module,
-    resolve: webpackConfig.resolve,
+    resolve: merge.smart({ modules: ['node_modules'] }, webpackConfig.resolve),
     resolveLoader: webpackConfig.resolveLoader,
   },
 };
