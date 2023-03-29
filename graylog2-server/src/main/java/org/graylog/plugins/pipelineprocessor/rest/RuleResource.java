@@ -49,7 +49,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -216,8 +215,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
         Message message = new Message(request.message(), "127.0.0.1", DateTime.now(DateTimeZone.UTC));
-        final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
-        message.addStream(stream);
+//        final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
+//        message.addStream(stream);
 
         pipelineInterpreter.evaluateStage(stage, message, message.getId(),
                 new ArrayList<>(), Collections.emptySet(),
