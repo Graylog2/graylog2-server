@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import Immutable from 'immutable';
+
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import type Widget from 'views/logic/widgets/Widget';
 import type { EventDefinitionURLConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
@@ -115,7 +117,7 @@ const getRestParameterValues = ({ parameters, parameterBindings }) => parameters
   return res;
 }, {});
 
-const transformSearchFiltersToQuery = (filters: FiltersType) => {
+const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => {
   return filters.reduce((res, filter) => {
     let curRes = res;
 
