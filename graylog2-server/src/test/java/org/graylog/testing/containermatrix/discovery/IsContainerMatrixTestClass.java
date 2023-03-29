@@ -86,7 +86,7 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
             if(config.searchVersions().length == 0) {
                 return true;
             } else {
-                return Arrays.stream(config.searchVersions()).anyMatch(x -> ContainerMatrixTestEngine.isCompatible(x));
+                return Arrays.stream(config.searchVersions()).anyMatch(ContainerMatrixTestEngine::isCompatible);
             }
         } else {
             return getSearchServers(config).contains(container.getEsVersion());
