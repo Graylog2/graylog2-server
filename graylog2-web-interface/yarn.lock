@@ -11753,9 +11753,9 @@ react-error-boundary@^3.1.0:
     "@babel/runtime" "^7.12.5"
 
 react-error-boundary@^4.0.1:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-4.0.2.tgz#b73d79b59688ee718cdba1f0296ae231868f7888"
-  integrity sha512-/h21OS80hQ1m/s5UVOp1JKkC8XmUo0rOTRUliGSmWtvswkbbijuQ074K0QLEHwxwwesTt7ksR74/9EHImqWo+A==
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-4.0.3.tgz#f811497c06d53ea1206817ee82c6e5c6a27becd9"
+  integrity sha512-IzNKP/ViHWp2QRDgsDMirEcf0XLsLueN6Wgzm1TVwgbAH+paX8Z42VyKvZcFFRHgd+rPK2P4TLrOrHC/dommew==
   dependencies:
     "@babel/runtime" "^7.12.5"
 
