@@ -35,4 +35,6 @@ public final class GraylogSemanticAttributes {
 
     public static final AttributeKey<String> LOOKUP_DATA_ADAPTER_TYPE =
             stringKey("org.graylog.lookup.data_adapter.type");
+
+    public static final AttributeKey<String> PERIODICAL_TYPE = stringKey("org.graylog.periodical.type");
 }
