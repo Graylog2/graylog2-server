@@ -18,7 +18,7 @@
 import type { PopoverProps } from 'react-bootstrap';
 import React, { useEffect } from 'react';
 
-import useSendTelemetry from 'telemetry/useSendTelemetry';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const withPopoverTelemetry = (Component) => {
   return (props: PopoverProps) => {

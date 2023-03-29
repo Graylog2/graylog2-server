@@ -17,9 +17,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import React, { useEffect } from 'react';
 
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import withModalTelemetry from 'components/common/withModalTelemetry';
 
 const Dialog = css`

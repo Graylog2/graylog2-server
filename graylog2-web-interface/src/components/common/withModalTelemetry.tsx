@@ -18,7 +18,7 @@
 import type { ModalProps } from 'react-bootstrap';
 import React, { useEffect } from 'react';
 
-import useSendTelemetry from 'telemetry/useSendTelemetry';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const withModalTelemetry = (Component) => {
   return (props: ModalProps) => {
