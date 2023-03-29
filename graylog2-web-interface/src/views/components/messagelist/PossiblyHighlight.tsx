@@ -96,13 +96,13 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   const highlights = ranges
     .filter(({ start }) => (start >= 0))
     .filter(({ length }) => (length >= 0))
-    .reduce<[Array<HighlightRange | string | JSX.Element>, number]>(([acc, i], cur, idx) => [
+    .reduce(([acc, i], cur, idx) => [
       [...acc,
         subst(i, Math.max(0, cur.start - i)), // non-highlighted string before this range
         highlight(subst(Math.max(cur.start, i), Math.max(0, cur.length - Math.max(0, i - cur.start))), idx, style), // highlighted string in range
       ],
       cur.start + cur.length,
-    ], [[], 0])[0];
+    ] as [Array<React.ReactNode>, number], [[], 0] as [Array<React.ReactNode>, number])[0];
 
   const lastRange = last(sortBy(ranges, (r) => r.start + r.length));
 

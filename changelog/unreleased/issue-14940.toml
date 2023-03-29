@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix visibility of events and notification definition pages."
+
+issues = ["14940"]
+pulls = ["15052"]

@@ -69,7 +69,7 @@ const OwnersCell = ({ owners }: Props) => {
             {!isLast && ', '}
           </React.Fragment>
         );
-      })}
+      }).toArray()}
     </td>
   );
 };

@@ -19,17 +19,14 @@ import React from 'react';
 import AppRouter from 'routing/AppRouter';
 import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 import StreamsProvider from 'contexts/StreamsProvider';
-import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 const LoggedInPage = () => (
   <DefaultQueryClientProvider>
     <ThemeAndUserProvider>
-      <GlobalContextProviders>
-        <StreamsProvider>
-          <AppRouter />
-        </StreamsProvider>
-      </GlobalContextProviders>
+      <StreamsProvider>
+        <AppRouter />
+      </StreamsProvider>
     </ThemeAndUserProvider>
   </DefaultQueryClientProvider>
 );

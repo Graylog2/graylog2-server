@@ -27,7 +27,7 @@ import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import type { EventDefinition } from 'logic/alerts/types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
