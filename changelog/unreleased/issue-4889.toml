@@ -1,0 +1,7 @@
+type = "c"
+message = "GL will no longer perform a temporary redirect based on the Host header."
+
+issues = ["Graylog2/graylog-plugin-enterprise#4889"]
+pulls = ["15067"]
+
+

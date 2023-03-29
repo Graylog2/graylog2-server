@@ -120,7 +120,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
                                 onDelete={onDelete}
                                 onCapabilityChange={onCapabilityChange} />
             );
-          })}
+          }).toArray()}
         </List>
       ) : (
         <Alert>This {entityTypeTitle || entityType} has no collaborators.</Alert>

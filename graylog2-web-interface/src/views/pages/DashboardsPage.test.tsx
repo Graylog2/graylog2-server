@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import DashboardsPage from './DashboardsPage';
 
@@ -38,7 +40,10 @@ jest.mock('routing/Routes', () => ({
 
 describe('DashboardsPage', () => {
   it('should render header and list', async () => {
-    render(<DashboardsPage />);
+    render(
+      <QueryParamProvider adapter={ReactRouter6Adapter}>
+        <DashboardsPage />
+      </QueryParamProvider>);
 
     await screen.findByRole('heading', { name: /dashboards/i });
     await screen.findByText('No dashboards have been created yet.');

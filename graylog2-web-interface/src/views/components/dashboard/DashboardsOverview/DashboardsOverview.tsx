@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useQueryParam, StringParam } from 'use-query-params';
 
 import type { Sort } from 'stores/PaginationTypes';
 import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
@@ -40,7 +41,7 @@ const renderBulkActions = (
 );
 
 const DashboardsOverview = () => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useQueryParam('q', StringParam);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -64,7 +65,7 @@ const DashboardsOverview = () => {
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
     setQuery(newQuery);
-  }, [paginationQueryParameter]);
+  }, [paginationQueryParameter, setQuery]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });

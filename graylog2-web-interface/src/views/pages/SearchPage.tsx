@@ -34,12 +34,15 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 
+type SearchComponentSlots = { InfoBarSlot: React.ComponentType }
+
 type Props = React.PropsWithChildren<{
   isNew: boolean,
   view: Promise<View>,
   loadNewView?: (history: HistoryFunction) => unknown,
   loadView?: (history: HistoryFunction, viewId: string) => unknown,
   executionState?: SearchExecutionState,
+  SearchComponentSlots?: SearchComponentSlots
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -52,7 +55,7 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState }: Props) => {
+const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState, SearchComponentSlots }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
   useLoadView(viewPromise, isNew);
@@ -80,7 +83,7 @@ const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewV
               <ViewLoaderContext.Provider value={loadView}>
                 {children}
                 <IfUserHasAccessToAnyStream>
-                  <Search />
+                  <Search InfoBarSlot={SearchComponentSlots.InfoBarSlot} />
                 </IfUserHasAccessToAnyStream>
               </ViewLoaderContext.Provider>
             </NewViewLoaderContext.Provider>
@@ -95,6 +98,7 @@ SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
   executionState: SearchExecutionState.empty(),
+  SearchComponentSlots: {},
 };
 
 export default React.memo(SearchPage);
