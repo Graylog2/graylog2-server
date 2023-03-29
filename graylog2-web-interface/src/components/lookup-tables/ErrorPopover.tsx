@@ -29,7 +29,10 @@ type Props = {
 
 const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Props) => {
   const overlay = (
-    <Popover id="error-popover" title={title} className={Styles.overlay}>
+    <Popover id="error-popover"
+             title={title}
+             className={Styles.overlay}
+             data-event-element={title}>
       {errorText}
     </Popover>
   );

@@ -40,7 +40,9 @@ const StatusCell = ({ accountStatus }: Props) => (
     <OverlayTrigger trigger={['hover', 'focus']}
                     placement="right"
                     overlay={(
-                      <Popover id="session-badge-details">
+                      <Popover id="session-badge-details"
+                               data-app-section="session_badge"
+                               data-event-element="Status">
                         {`User is ${accountStatus}`}
                       </Popover>
                     )}

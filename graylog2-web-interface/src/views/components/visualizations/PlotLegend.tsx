@@ -183,7 +183,8 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
                    placement="top"
                    target={colorPickerConfig.target}>
             <Popover id="legend-config"
-                     title={`Configuration for ${colorPickerConfig.name}`}>
+                     title={`Configuration for ${colorPickerConfig.name}`}
+                     data-event-element="Plot Legend">
               <ColorPicker color={colors.get(colorPickerConfig.name)}
                            colors={defaultColors}
                            onChange={(newColor) => _onColorSelect(colorPickerConfig.name, newColor)} />

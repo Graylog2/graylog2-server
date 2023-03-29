@@ -22,13 +22,13 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const withPopoverTelemetry = (Component) => {
   return (props: PopoverProps) => {
-    const { title, 'data-event-element': eventElement, 'data-app-section': appSection }: any = props;
+    const { 'data-event-element': eventElement, 'data-app-section': appSection }: any = props;
     const sendTelemetry = useSendTelemetry();
 
     useEffect(() => {
       const telemetryEvent = {
         appSection,
-        eventElement: eventElement || title,
+        eventElement,
         eventInfo: {},
       };
 
@@ -41,7 +41,7 @@ const withPopoverTelemetry = (Component) => {
           sendTelemetry('close', telemetryEvent);
         }
       };
-    }, [title, eventElement, appSection, sendTelemetry]);
+    }, [eventElement, appSection, sendTelemetry]);
 
     return <Component {...props} />;
   };

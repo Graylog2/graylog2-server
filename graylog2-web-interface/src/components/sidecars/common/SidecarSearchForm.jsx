@@ -23,7 +23,11 @@ import { Popover, Table, Button } from 'components/bootstrap';
 import style from './SidecarSearchForm.css';
 
 const queryHelpPopover = (
-  <Popover id="search-query-help" className={style.popoverWide} title="Search Syntax Help">
+  <Popover id="search-query-help"
+           className={style.popoverWide}
+           title="Search Syntax Help"
+           data-app-section="sidecar_search_query_helper"
+           data-event-element="Available search fields">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>

@@ -26,9 +26,14 @@ class EventKeyHelpPopover extends React.Component {
 
   render() {
     const { id, ...otherProps } = this.props;
+    const title = 'More about Event Keys';
 
     return (
-      <Popover id={id} title="More about Event Keys" {...otherProps}>
+      <Popover id={id}
+               title={title}
+               data-app-section="event_key_helper"
+               data-event-element={title}
+               {...otherProps}>
         <p>
           Event Keys are Fields used to arrange Events into groups. A group is created for each unique Key, so
           Graylog will generate as many Events as unique Keys are found. Example:

@@ -20,7 +20,10 @@ import { Popover, Table, Button } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 
 const userQueryHelperPopover = (
-  <Popover id="user-search-query-help" title="Search Syntax Help">
+  <Popover id="user-search-query-help"
+           title="Search Syntax Help"
+           data-app-section="user_search_query_helper"
+           data-event-element="Available search fields">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
