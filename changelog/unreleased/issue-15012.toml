@@ -2,4 +2,4 @@ type = "fixed"
 message = "Improve performance by avoiding unnecessary attempts to create index for access tokens."
 
 issues = ["15012"]
-pulls = [""]
+pulls = ["15097"]
