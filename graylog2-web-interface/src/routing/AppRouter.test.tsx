@@ -37,6 +37,7 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
+jest.mock('contexts/GlobalContextProviders', () => ({ children }: React.PropsWithChildren<{}>) => children);
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
