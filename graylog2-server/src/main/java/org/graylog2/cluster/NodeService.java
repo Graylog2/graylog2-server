@@ -25,7 +25,7 @@ import java.util.Map;
 public interface NodeService extends PersistedService {
     Node.Type type();
 
-    String registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname);
+    boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname);
 
     Node byNodeId(String nodeId) throws NodeNotFoundException;
 
