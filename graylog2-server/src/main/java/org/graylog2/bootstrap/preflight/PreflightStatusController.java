@@ -17,9 +17,11 @@
 package org.graylog2.bootstrap.preflight;
 
 import org.graylog2.plugin.Version;
+import org.graylog2.plugin.database.ValidationException;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -29,14 +31,21 @@ import javax.ws.rs.core.MediaType;
 public class PreflightStatusController {
 
     private final Version version = Version.CURRENT_CLASSPATH;
+    private final PreflightConfigService preflightConfigService;
 
     @Inject
-    public PreflightStatusController() {
-
+    public PreflightStatusController(PreflightConfigService preflightConfigService) {
+        this.preflightConfigService = preflightConfigService;
     }
 
     @GET
     public ConfigurationStatus status() {
         return new ConfigurationStatus(version.toString());
+    }
+
+    @POST
+    @Path("/finish-config")
+    public PreflightConfig finishConfig() throws ValidationException {
+        return preflightConfigService.saveConfiguration();
     }
 }

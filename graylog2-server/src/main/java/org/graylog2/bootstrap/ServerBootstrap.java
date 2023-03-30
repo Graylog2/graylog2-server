@@ -35,9 +35,12 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
+import org.graylog2.bootstrap.preflight.PreflightConfig;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
@@ -76,18 +79,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
+import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED;
 
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
+    private Optional<PreflightConfig> preflightConfig;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
@@ -152,31 +159,45 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
-        final boolean enablePreflightWeb = this.isFreshInstallation || configuration.enablePreflightWebserver();
-
-        if(enablePreflightWeb) {
-            preflightCheckModules.add(new PreflightWebModule());
+        if(featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED)) {
+            runPreflightWeb(preflightCheckModules);
         }
 
         final Injector preflightInjector = getPreflightInjector(preflightCheckModules);
         final PreflightCheckService preflightCheckService = preflightInjector.getInstance(PreflightCheckService.class);
-
-        if(enablePreflightWeb) {
-            LOG.info("Fresh installation detected, starting configuration webserver");
-            wrapWithPreflightWebServer(preflightInjector, preflightCheckModules, preflightCheckService::runChecks);
-        } else {
-            preflightCheckService.runChecks();
-        }
+        preflightCheckService.runChecks();
     }
 
-    private void wrapWithPreflightWebServer(Injector preflightInjector, List<Module> preflightCheckModules, Runnable runnable) {
+    private void runPreflightWeb(List<Module> preflightCheckModules) {
+        List<Module> modules = new ArrayList<>(preflightCheckModules);
+        modules.add(new PreflightWebModule());
+        modules.add(new MongoDBModule());
+        final Injector preflightInjector = getPreflightInjector(modules);
+
+        final PreflightConfigService preflightConfigService = preflightInjector.getInstance(PreflightConfigService.class);
+
+        final Supplier<Boolean> shouldRun = () -> preflightConfigService.getPersistedConfig().isEmpty() || configuration.enablePreflightWebserver();
+
+        if(!shouldRun.get()) {
+            return;
+        }
+
+        LOG.info("Fresh installation detected, starting configuration webserver");
+
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
-        GuiceInjectorHolder.createInjector(preflightCheckModules);
+        GuiceInjectorHolder.createInjector(modules);
         try {
             serviceManager.startAsync().awaitHealthy();
-            runnable.run();
-            // all checks done. Should we block till the administrator explicitly confirms that the setup is done
-            // and the boot should continue?
+            // wait till the marker document appears
+            while(shouldRun.get()) {
+                try {
+                    LOG.info("Preflight config still in progress, waiting for the marker document");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
         } finally {
             serviceManager.stopAsync().awaitStopped();
             GuiceInjectorHolder.resetInjector();
