@@ -37,4 +37,6 @@ public final class GraylogSemanticAttributes {
             stringKey("org.graylog.lookup.data_adapter.type");
 
     public static final AttributeKey<String> PERIODICAL_TYPE = stringKey("org.graylog.periodical.type");
+
+    public static final AttributeKey<String> SYSTEM_JOB_TYPE = stringKey("org.graylog.system_job.type");
 }
