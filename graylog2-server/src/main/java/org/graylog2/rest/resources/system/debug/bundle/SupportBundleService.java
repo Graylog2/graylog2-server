@@ -31,6 +31,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse;
@@ -38,6 +39,7 @@ import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.ProxiedResource.CallResult;
+import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -249,6 +251,18 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get threadDump from node <{}>", nodeId, e);
+        }
+
+        try (var nodeMetricsFile = new FileOutputStream(nodeDir.resolve("metrics.json").toFile())) {
+            final ProxiedResource.NodeResponse<MetricsSummaryResponse> metrics = proxiedResourceHelper.doNodeApiCall(nodeId,
+                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteMetricsResource.class),
+                    c -> c.byNamespace("org"), Function.identity(), CALL_TIMEOUT.toMillis()
+            );
+            if (metrics.entity().isPresent()) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(nodeMetricsFile, metrics.entity().get());
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get metrics from node <{}>", nodeId, e);
         }
     }
 
