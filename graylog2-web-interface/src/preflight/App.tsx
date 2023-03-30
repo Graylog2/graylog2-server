@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { AppShell } from '@mantine/core';
+import {AppShell, Divider} from '@mantine/core';
 
 import Section from 'preflight/common/Section';
 import Button from 'preflight/common/Button';
 import Navigation from 'preflight/navigation/Navigation';
+import DataNodesOverview from 'preflight/DataNodesOverview';
+import CAConfiguration from 'preflight/CAConfiguration';
 
 const App = () => (
   <AppShell padding="md" header={<Navigation />}>
@@ -29,6 +31,10 @@ const App = () => (
         Through this wizard, you can configure and secure your data nodes.
       </p>
       <Button size="xs">Continue</Button>
+    </Section>
+
+    <Section title="Data Node Certificate Authority Configuration">
+      <DataNodesOverview />
     </Section>
   </AppShell>
 );
