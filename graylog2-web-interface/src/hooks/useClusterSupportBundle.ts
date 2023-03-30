@@ -23,6 +23,11 @@ import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 
+export type BundleFile = {
+  size: number;
+  file_name: string;
+}
+
 const fetchSupportBundleList = async () => {
   return fetch('GET', qualifyUrl(ApiRoutes.ClusterSupportBundleController.list().url));
 };
@@ -32,10 +37,10 @@ const createSupportBundle = async (refetchList: () => Promise<QueryObserverResul
     setLoading(true);
     await fetch('POST', qualifyUrl(ApiRoutes.ClusterSupportBundleController.create().url));
     await refetchList();
-    setLoading(false);
   } catch (errorThrown) {
-    setLoading(false);
     UserNotification.error(`Creating the Support Bundle failed with status: ${errorThrown}`, 'Could not create the Support Bundle.');
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -58,7 +63,7 @@ const downloadSupportBundle = async (filename: string) => {
 
 const useClusterSupportBundle = () => {
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  const { data, refetch } = useQuery(
+  const { data, refetch } = useQuery<BundleFile[]>(
     ['supportBundleList', 'overview'],
     fetchSupportBundleList,
     {

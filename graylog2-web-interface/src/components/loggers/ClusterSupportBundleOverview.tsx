@@ -19,6 +19,7 @@ import styled from 'styled-components';
 
 import { Spinner, ConfirmDialog, NoSearchResult } from 'components/common';
 import { Col, Row, Table, Button } from 'components/bootstrap';
+import type { BundleFile } from 'hooks/useClusterSupportBundle';
 import useClusterSupportBundle from 'hooks/useClusterSupportBundle';
 
 const Header = styled.div`
@@ -52,7 +53,7 @@ const ClusterSupportBundleOverview = () => {
   const { list, isCreating, onCreate, onDelete, onDownload } = useClusterSupportBundle();
   const [bundleNameToDelete, setBundleNameToDelete] = useState<string|null>(null);
 
-  const renderRow = (bundle) => (
+  const renderRow = (bundle: BundleFile) => (
     <tr key={bundle.file_name}>
       <td>
         {bundle.file_name}
