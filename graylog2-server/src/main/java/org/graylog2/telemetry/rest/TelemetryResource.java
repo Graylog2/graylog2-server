@@ -17,8 +17,6 @@
 package org.graylog2.telemetry.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.wnameless.json.flattener.JsonFlattener;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -51,28 +49,22 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class TelemetryResource extends ProxiedResource {
 
     private final TelemetryService telemetryService;
-    private ObjectMapper objectMapper;
 
     protected TelemetryResource(NodeService nodeService,
                                 RemoteInterfaceProvider remoteInterfaceProvider,
                                 @Context HttpHeaders httpHeaders,
                                 @Named("proxiedRequestsExecutorService") ExecutorService executorService,
-                                TelemetryService telemetryService,
-                                ObjectMapper objectMapper
-    ) {
+                                TelemetryService telemetryService) {
         super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
         this.telemetryService = telemetryService;
-        this.objectMapper = objectMapper;
     }
 
     @GET
     @ApiOperation(value = "Get telemetry information.")
-    public String get() {
-        TelemetryResponse telemetryResponse = telemetryService.createTelemetryResponse(getCurrentUser(), getSystemOverviewResponses());
+    public Map<String, Object> get() {
         try {
-            return JsonFlattener.flatten(objectMapper.writeValueAsString(telemetryResponse));
+            return telemetryService.createTelemetryResponse(getCurrentUser(), getSystemOverviewResponses());
         } catch (JsonProcessingException e) {
-            // TODO throw appropriate exception
             throw new RuntimeException(e);
         }
     }

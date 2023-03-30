@@ -16,6 +16,7 @@
  */
 package org.graylog2.telemetry.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.hash.HashCode;
 import org.graylog2.cluster.ClusterConfig;
 import org.graylog2.indexer.cluster.ClusterAdapter;
@@ -39,17 +40,13 @@ import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
-import static org.graylog2.telemetry.rest.TelemetryResponse.ClusterInfo;
-import static org.graylog2.telemetry.rest.TelemetryResponse.LicenseInfo;
-import static org.graylog2.telemetry.rest.TelemetryResponse.PluginInfo;
-import static org.graylog2.telemetry.rest.TelemetryResponse.SearchClusterInfo;
-import static org.graylog2.telemetry.rest.TelemetryResponse.UserInfo;
 
 public class TelemetryService {
 
@@ -63,6 +60,7 @@ public class TelemetryService {
 
     private final ClusterAdapter elasticClusterAdapter;
     private final SearchVersion elasticsearchVersion;
+    private final TelemetryResponseFactory telemetryResponseFactory;
 
 
     @Inject
@@ -72,7 +70,8 @@ public class TelemetryService {
                             UserService userService,
                             Set<PluginMetaData> pluginMetaDataSet,
                             ClusterAdapter elasticClusterAdapter,
-                            @DetectedSearchVersion SearchVersion elasticsearchVersion) {
+                            @DetectedSearchVersion SearchVersion elasticsearchVersion,
+                            TelemetryResponseFactory telemetryResponseFactory) {
         this.trafficCounterService = trafficCounterService;
         this.clusterConfigService = clusterConfigService;
         this.enterpriseDataProvider = enterpriseDataProvider;
@@ -80,26 +79,27 @@ public class TelemetryService {
         this.pluginMetaDataSet = pluginMetaDataSet;
         this.elasticClusterAdapter = elasticClusterAdapter;
         this.elasticsearchVersion = elasticsearchVersion;
+        this.telemetryResponseFactory = telemetryResponseFactory;
     }
 
-    public TelemetryResponse createTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) {
+    public Map<String, Object> createTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) throws JsonProcessingException {
         String clusterId = getClusterId();
-
-        return new TelemetryResponse(
-                createUserInfo(currentUser, clusterId),
-                createClusterInfo(clusterId, systemOverviewResponses),
-                new LicenseInfo(enterpriseDataProvider.licenseStatus()),
-                createPluginInfo(),
-                createSearchClusterInfo());
+        Map<String, Object> telemetryResponse = new LinkedHashMap<>();
+        telemetryResponse.put("current_user", createUserInfo(currentUser, clusterId));
+        telemetryResponse.put("cluster", createClusterInfo(clusterId, systemOverviewResponses));
+        telemetryResponse.put("license", telemetryResponseFactory.createLicenseInfo(enterpriseDataProvider.licenseStatus()));
+        telemetryResponse.put("plugin", createPluginInfo());
+        telemetryResponse.put("search_cluster", createSearchClusterInfo());
+        return telemetryResponse;
     }
 
-    private UserInfo createUserInfo(User currentUser, String clusterId) {
+    private Map<String, Object> createUserInfo(User currentUser, String clusterId) throws JsonProcessingException {
         try {
             if (currentUser == null) {
                 LOG.debug("Couldn't create user telemetry data, because no current user exists!");
                 return null;
             }
-            return new UserInfo(
+            return telemetryResponseFactory.createUserInfo(
                     generateUserHash(currentUser, clusterId),
                     currentUser.isLocalAdmin(),
                     currentUser.getRoleIds().size(),
@@ -110,8 +110,8 @@ public class TelemetryService {
         }
     }
 
-    private ClusterInfo createClusterInfo(String clusterId, Map<String, SystemOverviewResponse> systemOverviewResponses) {
-        return new ClusterInfo(
+    private Map<String, Object> createClusterInfo(String clusterId, Map<String, SystemOverviewResponse> systemOverviewResponses) throws JsonProcessingException {
+        return telemetryResponseFactory.createClusterInfo(
                 clusterId,
                 getClusterCreationDate(),
                 systemOverviewResponses.size(),
@@ -120,10 +120,10 @@ public class TelemetryService {
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count());
     }
 
-    private PluginInfo createPluginInfo() {
+    private Map<String, Object> createPluginInfo() throws JsonProcessingException {
         boolean isEnterprisePluginInstalled = pluginMetaDataSet.stream().anyMatch(p -> "Graylog Enterprise".equals(p.getName()));
         List<String> plugins = pluginMetaDataSet.stream().map(p -> f("%s:%s", p.getName(), p.getVersion())).toList();
-        return new PluginInfo(isEnterprisePluginInstalled, plugins);
+        return telemetryResponseFactory.createPluginInfo(isEnterprisePluginInstalled, plugins);
     }
 
     private String getClusterId() {
@@ -145,9 +145,9 @@ public class TelemetryService {
         return HashCode.fromBytes(messageDigest.digest()).toString();
     }
 
-    private SearchClusterInfo createSearchClusterInfo() {
+    private Map<String, Object> createSearchClusterInfo() throws JsonProcessingException {
         Map<String, NodeInfo> nodesInfo = elasticClusterAdapter.nodesInfo();
-        return new SearchClusterInfo(
+        return telemetryResponseFactory.createSearchClusterInfo(
                 nodesInfo.size(),
                 elasticsearchVersion.toString(),
                 nodesInfo);
