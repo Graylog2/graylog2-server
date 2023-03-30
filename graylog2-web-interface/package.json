@@ -53,7 +53,6 @@
     "@react-hook/resize-observer": "^1.2.5",
     "@reduxjs/toolkit": "^1.9.1",
     "ace-builds": "1.16.0",
-    "bluebird": "^3.4.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
     "buffer": "^6.0.3",
