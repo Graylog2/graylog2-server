@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix overlay problem with data table header and dashboard tabs dropdown."
+
+issues = ["15073"]
+pulls = ["15091"]
