@@ -52,6 +52,21 @@ const ClusterSupportBundleOverview = () => {
   const { list, isCreating, onCreate, onDelete, onDownload } = useClusterSupportBundle();
   const [bundleNameToDelete, setBundleNameToDelete] = useState<string|null>(null);
 
+  const renderRow = (bundle) => (
+    <tr key={bundle.file_name}>
+      <td>
+        {bundle.file_name}
+      </td>
+      <AlignRightCell>
+        {bundle.size}
+      </AlignRightCell>
+      <AlignRightCell>
+        <DownloadButton bsSize="xsmall" bsStyle="info" onClick={() => onDownload(bundle.file_name)}>Download</DownloadButton>
+        <Button bsSize="xsmall" bsStyle="default" onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete</Button>
+      </AlignRightCell>
+    </tr>
+  );
+
   return (
     <div>
       <Row className="content">
@@ -78,20 +93,7 @@ const ClusterSupportBundleOverview = () => {
                 </tr>
               </thead>
               <tbody>
-                {list.map((bundle) => (
-                  <tr key={bundle.file_name}>
-                    <td>
-                      {bundle.file_name}
-                    </td>
-                    <AlignRightCell>
-                      {bundle.size}
-                    </AlignRightCell>
-                    <AlignRightCell>
-                      <DownloadButton bsSize="xsmall" bsStyle="info" onClick={() => onDownload(bundle.file_name)}>Download</DownloadButton>
-                      <Button bsSize="xsmall" bsStyle="default" onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete</Button>
-                    </AlignRightCell>
-                  </tr>
-                ))}
+                {list.map(renderRow)}
               </tbody>
             </Table>
           ) : (
