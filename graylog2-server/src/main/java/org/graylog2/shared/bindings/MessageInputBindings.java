@@ -19,7 +19,7 @@ package org.graylog2.shared.bindings;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.beats.BeatsInputPluginModule;
 import org.graylog2.inputs.codecs.CodecsModule;
-import org.graylog2.inputs.csv.CSVInput;
+import org.graylog2.inputs.textual.CSVInput;
 import org.graylog2.inputs.gelf.amqp.GELFAMQPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.kafka.GELFKafkaInput;
