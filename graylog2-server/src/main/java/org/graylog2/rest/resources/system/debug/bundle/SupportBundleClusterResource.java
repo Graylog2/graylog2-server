@@ -38,12 +38,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -81,12 +84,18 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @ApiOperation(value = "Build a new Support Bundle")
     @Timed
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
-    public Response buildBundle() throws IOException {
-        final NodeResponse<Void> voidNodeResponse = requestOnLeader(RemoteSupportBundleInterface::buildSupportBundle, createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
-        if (voidNodeResponse.isSuccess()) {
-            return Response.accepted().build();
-        }
-        return Response.serverError().build();
+    public void buildBundle(@Suspended AsyncResponse asyncResponse) {
+        processAsync(asyncResponse, () -> {
+                    final NodeResponse<Void> response;
+                    try {
+                        response = requestOnLeader(RemoteSupportBundleInterface::buildSupportBundle,
+                                createRemoteInterfaceProvider(RemoteSupportBundleInterface.class), Duration.ofSeconds(60));
+                    } catch (IOException e) {
+                        return Response.serverError().entity(e.getMessage()).build();
+                    }
+                    return Response.status(response.code()).entity(response.body()).build();
+                }
+        );
     }
 
     @GET

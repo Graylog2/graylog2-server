@@ -368,14 +368,29 @@ public abstract class ProxiedResource extends RestResource {
      */
     protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnLeader(
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
-            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
+            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider, Duration timeout
     ) throws IOException {
         final Node leaderNode = nodeService.allActive().values().stream()
                 .filter(Node::isLeader)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No active leader node found"));
 
-        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity(), getDefaultProxyCallTimeout().toMillis());
+        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity(), timeout.toMillis());
+    }
+
+    /**
+     * Execute the given remote interface function on the leader node.
+     * <p>
+     * This is used to forward an API request to the leader node. It is useful in situations where an API call can only
+     * be executed on the leader node.
+     * <p>
+     * The returned {@link NodeResponse} object is constructed from the remote response's status code and body.
+     */
+    protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnLeader(
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
+            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
+    ) throws IOException {
+        return requestOnLeader(remoteInterfaceFunction, remoteInterfaceProvider, getDefaultProxyCallTimeout());
     }
 
     protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
