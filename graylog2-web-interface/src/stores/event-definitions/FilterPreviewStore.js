@@ -17,7 +17,6 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
 import concat from 'lodash/concat';
-import Bluebird from 'bluebird';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -34,6 +33,10 @@ export const FilterPreviewActions = singletonActions(
     search: { asyncResult: true },
   }),
 );
+
+const delay = (ms) => new Promise((resolve) => {
+  setTimeout(resolve, ms);
+});
 
 export const FilterPreviewStore = singletonStore(
   'core.FilterPreview',
@@ -90,14 +93,14 @@ export const FilterPreviewStore = singletonStore(
     },
 
     trackJobStatus(job, search) {
-      return new Bluebird((resolve) => {
+      return new Promise((resolve) => {
         if (job && job.execution.done) {
-          return resolve(new SearchResult(job));
+          resolve(new SearchResult(job));
+        } else {
+          resolve(delay(250)
+            .then(() => this.jobStatus(job.id))
+            .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
         }
-
-        return resolve(Bluebird.delay(250)
-          .then(() => this.jobStatus(job.id))
-          .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
       });
     },
 
