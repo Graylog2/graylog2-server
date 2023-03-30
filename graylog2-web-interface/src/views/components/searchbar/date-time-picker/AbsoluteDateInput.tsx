@@ -18,12 +18,12 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
 import { Button, Input } from 'components/bootstrap';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const Wrapper = styled.div`
-  margin: 9px 6px;
   width: 100%;
   
   .form-group {
@@ -31,19 +31,29 @@ const Wrapper = styled.div`
   }
 `;
 
-const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
-  const _onSetTimeToNow = () => onChange(DateTime.now().format(DateTime.Formats.TIMESTAMP));
+type Props = {
+  name: string,
+  disabled?: boolean,
+  onChange: (newValue: string) => void,
+  value: string | undefined,
+  hasError?: boolean,
+  className?: string,
+}
+
+const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError, className }: Props) => {
+  const { formatTime } = useUserDateTime();
+  const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));
   const _onChange = (event) => onChange(event.target.value);
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Input type="text"
              id={`date-input-${name}`}
              name={name}
              autoComplete="off"
              disabled={disabled}
              onChange={_onChange}
-             placeholder={DateTime.Formats.DATETIME}
+             placeholder={DATE_TIME_FORMATS.default}
              value={value}
              buttonAfter={(
                <Button disabled={disabled}
@@ -59,18 +69,19 @@ const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
 };
 
 AbsoluteDateInput.propTypes = {
-  name: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  hasError: PropTypes.bool,
+  name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   value: PropTypes.string,
-  hasError: PropTypes.bool,
 };
 
 AbsoluteDateInput.defaultProps = {
+  className: undefined,
   disabled: false,
+  hasError: false,
   onChange: () => {},
   value: '',
-  hasError: false,
 };
 
 export default AbsoluteDateInput;

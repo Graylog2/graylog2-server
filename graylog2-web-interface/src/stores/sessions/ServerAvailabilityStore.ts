@@ -18,7 +18,6 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import { Builder } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type ServerAvailabilityActionsType = {
@@ -33,9 +32,25 @@ export const ServerAvailabilityActions = singletonActions(
   ]),
 ) as unknown as ServerAvailabilityActionsType;
 
-export type ServerAvailabilityStoreState = {
-  server: { up: true } | { up: false, error: string },
+export type ServerError = {
+  message: string,
+  originalError: {
+    method: string,
+    url: string,
+    status: number,
+  },
 };
+export type ServerAvailabilityStoreState = {
+  server: { up: true } | { up: false, error: ServerError },
+};
+
+const ping = (url: string) => window.fetch(url, {
+  method: 'GET',
+  headers: {
+    Accept: 'application/json',
+    'X-Graylog-No-Session-Extension': 'true',
+  },
+});
 
 export const ServerAvailabilityStore = singletonStore(
   'core.ServerAvailability',
@@ -49,11 +64,7 @@ export const ServerAvailabilityStore = singletonStore(
       return { server: this.server };
     },
     ping() {
-      return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ping().url))
-      // Make sure to request JSON to avoid a redirect which breaks in Firefox (see https://github.com/Graylog2/graylog2-server/issues/3312)
-        .setHeader('Accept', 'application/json')
-        .setHeader('X-Graylog-No-Session-Extension', 'true')
-        .build()
+      return ping(URLUtils.qualifyUrl(ApiRoutes.ping().url))
         .then(
           () => ServerAvailabilityActions.reportSuccess(),
           (error) => ServerAvailabilityActions.reportError(error),

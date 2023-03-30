@@ -52,7 +52,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Api(value = "Sidecar/ConfigurationVariables", description = "Manage collector configuration variables")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Sidecar/ConfigurationVariables", description = "Manage collector configuration variables", tags = {CLOUD_VISIBLE})
 @Path("/sidecar/configuration_variables")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -130,7 +132,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
             configurationService.replaceVariableNames(previousConfigurationVariable.fullName(), request.fullName());
         }
         final ConfigurationVariable updatedConfigurationVariable = persistConfigurationVariable(id, request);
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
 
         return Response.ok().entity(updatedConfigurationVariable).build();
     }
@@ -166,7 +168,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         if (deleted == 0) {
             return Response.notModified().build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllConfigurations();
         return Response.accepted().build();
     }
 

@@ -1,0 +1,7 @@
+type = "added"
+message = "Enabling search filter feature (Enterprise)."
+
+pulls = ["13640"]
+details.user = """
+Search filters are a new feature in Graylog that allows creating reusable and shareable query snippets.
+"""

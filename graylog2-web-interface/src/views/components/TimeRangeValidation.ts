@@ -23,24 +23,26 @@ import type {
   RelativeTimeRangeWithEnd,
   AbsoluteTimeRange,
 } from 'views/logic/queries/Query';
-import DateTime from 'logic/datetimes/DateTime';
 import { isTypeAbsolute, isTypeRelativeWithEnd, isTypeKeyword } from 'views/typeGuards/timeRange';
+import type { DateTime } from 'util/DateTime';
+import { isValidDate, toDateObject } from 'util/DateTime';
 
 const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
 const rangeLimitError = 'Range is outside limit duration.';
 const dateLimitError = 'Date is outside limit duration.';
 const timeRangeError = 'The "Until" date must come after the "From" date.';
 
-const exceedsDuration = (timeRange, limitDuration) => {
+const exceedsDuration = (timeRange: TimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
   if (limitDuration === 0) {
     return false;
   }
 
   switch (timeRange?.type) {
     case 'absolute':
-    case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
+    case 'keyword': { // eslint-disable-line padding-line-between-statements
       const durationFrom = timeRange.from;
-      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      const durationLimit = formatTime(toDateObject(new Date()).subtract(Number(limitDuration), 'seconds'), 'complete');
 
       return moment(durationFrom).isBefore(durationLimit);
     }
@@ -50,17 +52,17 @@ const exceedsDuration = (timeRange, limitDuration) => {
   }
 };
 
-const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number) => {
+const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
   let errors: {
     from?: string,
     to?: string,
   } = {};
 
-  if (!DateTime.isValidDateString(timeRange.from)) {
+  if (!isValidDate(timeRange.from)) {
     errors = { ...errors, from: invalidDateFormatError };
   }
 
-  if (!DateTime.isValidDateString(timeRange.to)) {
+  if (!isValidDate(timeRange.to)) {
     errors = { ...errors, to: invalidDateFormatError };
   }
 
@@ -68,7 +70,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
     errors = { ...errors, to: timeRangeError };
   }
 
-  if (exceedsDuration(timeRange, limitDuration)) {
+  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
     errors = { ...errors, from: dateLimitError };
   }
 
@@ -76,7 +78,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
 };
 
 const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, limitDuration: number) => {
-  let errors = {};
+  let errors: { from?: string, to?: string } = {};
 
   if (limitDuration > 0) {
     if (timeRange.from > limitDuration || !timeRange.from) {
@@ -103,32 +105,30 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
   return errors;
 };
 
-const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number) => {
+const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
   let errors: { keyword?: string } = {};
 
-  if (exceedsDuration(timeRange, limitDuration)) {
+  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
     errors = { keyword: rangeLimitError };
   }
 
   return errors;
 };
 
-const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number) => {
-  let errors = {};
-
+const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
   if (isTypeKeyword(timeRange)) {
-    errors = { ...errors, ...validateKeywordTimeRange(timeRange, limitDuration) };
+    return validateKeywordTimeRange(timeRange, limitDuration, formatTime);
   }
 
   if (isTypeRelativeWithEnd(timeRange)) {
-    errors = { ...errors, ...validateRelativeTimeRangeWithEnd(timeRange, limitDuration) };
+    return validateRelativeTimeRangeWithEnd(timeRange, limitDuration);
   }
 
   if (isTypeAbsolute(timeRange)) {
-    errors = { ...errors, ...validateAbsoluteTimeRange(timeRange, limitDuration) };
+    return validateAbsoluteTimeRange(timeRange, limitDuration, formatTime);
   }
 
-  return errors;
+  return {};
 };
 
 export default validateTimeRange;

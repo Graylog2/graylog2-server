@@ -22,11 +22,11 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.plugins.DocumentationRestResourceClasses;
-import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -49,7 +49,6 @@ import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
-@HideOnCloud
 public class DocumentationResource extends RestResource {
 
     private final Generator generator;
@@ -58,7 +57,8 @@ public class DocumentationResource extends RestResource {
     @Inject
     public DocumentationResource(HttpConfiguration httpConfiguration,
                                  ObjectMapper objectMapper,
-                                 DocumentationRestResourceClasses documentationRestResourceClasses) {
+                                 DocumentationRestResourceClasses documentationRestResourceClasses,
+                                 Configuration configuration) {
 
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
 
@@ -76,7 +76,7 @@ public class DocumentationResource extends RestResource {
             }
         }
 
-        this.generator = new Generator(resourceClasses.build(), pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper);
+        this.generator = new Generator(resourceClasses.build(), pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper, configuration.isCloud());
     }
 
     @GET

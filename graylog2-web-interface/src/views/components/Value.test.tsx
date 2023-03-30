@@ -19,22 +19,32 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
-import Value from './Value';
+import OriginalValue from './Value';
 import InteractiveContext from './contexts/InteractiveContext';
 
-jest.mock('hooks/useUserDateTime');
+const Value = (props: React.ComponentProps<typeof OriginalValue>) => (
+  <TestStoreProvider>
+    <OriginalValue {...props} />
+  </TestStoreProvider>
+);
 
 describe('Value', () => {
   const openActionsMenu = (value) => {
     userEvent.click(screen.getByText(value));
   };
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   describe('actions menu title', () => {
     const Component = (props) => <Value {...props} />;
 
     it('renders without type information but no children', async () => {
-      render(<Value field="foo" queryId="someQueryId" value={42} type={FieldType.Unknown} />);
+      render(<Value field="foo" value={42} type={FieldType.Unknown} />);
 
       openActionsMenu('42');
 
@@ -48,10 +58,10 @@ describe('Value', () => {
                         render={({ value }) => `The date ${value}`}
                         type={new FieldType('date', [], [])} />);
 
-      openActionsMenu('The date 2018-10-02 14:45:40');
+      openActionsMenu('The date 2018-10-02 16:45:40.000');
       const title = await screen.findByTestId('value-actions-title');
 
-      expect(title).toHaveTextContent('foo = 2018-10-02 14:45:40');
+      expect(title).toHaveTextContent('foo = 2018-10-02 16:45:40.000');
     });
 
     it('renders numeric timestamps with a custom component', async () => {
@@ -120,12 +130,12 @@ describe('Value', () => {
   it.each`
      interactive | value                     | type                                                         | result
      ${true}     | ${42}                     | ${undefined}                                                 | ${'42'}
-     ${true}     | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 14:45:40'}
+     ${true}     | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 16:45:40.000'}
      ${true}     | ${false}                  | ${new FieldType('boolean', [], [])} | ${'false'}
      ${true}     | ${[23, 'foo']}            | ${FieldType.Unknown}                                         | ${'[23,"foo"]'}                
      ${true}     | ${{ foo: 23 }}            | ${FieldType.Unknown}                                         | ${'{"foo":23}'}
      ${false}    | ${42}                     | ${undefined}                                                 | ${'42'}
-     ${false}    | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 14:45:40'}
+     ${false}    | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    | ${'2018-10-02 16:45:40.000'}
      ${false}    | ${false}                  | ${new FieldType('boolean', [], [])} | ${'false'}
      ${false}    | ${[23, 'foo']}            | ${FieldType.Unknown}                                         | ${'[23,"foo"]'}
      ${false}    | ${{ foo: 23 }}            | ${FieldType.Unknown}                                         | ${'{"foo":23}'}
@@ -178,16 +188,14 @@ describe('Value', () => {
     });
   });
 
-  const verifyReplacementOfEmptyValues = async ({ value }) => {
-    render(<Value type={FieldType.Unknown} field="foo" queryId="someQueryId" value={value} />);
-
-    await screen.findByText(/Empty Value/);
-  };
-
   it.each`
     value
     ${'\u205f'}
     ${''}
     ${' '}
-  `('renders (unicode) spaces as `EmptyValue` component', verifyReplacementOfEmptyValues);
+  `('renders (unicode) spaces as `EmptyValue` component', async ({ value }) => {
+    render(<Value type={FieldType.Unknown} field="foo" value={value} />);
+
+    await screen.findByText(/Empty Value/);
+  });
 });

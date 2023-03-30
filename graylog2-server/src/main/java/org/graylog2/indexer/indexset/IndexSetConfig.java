@@ -24,9 +24,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.DbEntity;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.validation.SizeInBytes;
 import org.joda.time.Duration;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -40,6 +42,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
 @WithBeanGetter
@@ -47,6 +50,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 // Ignore deprecated "default" message field. Only relevant for Graylog 2.2.0-beta.[12] users.
 // TODO: Remove in Graylog 3.0.0
 @JsonIgnoreProperties({"default"})
+@DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
+          readPermission = INDEXSETS_READ)
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_PREFIX = "index_prefix";
     public static final String FIELD_CREATION_DATE = "creation_date";
@@ -56,7 +61,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
-    private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
+    public static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
 
     @JsonProperty("id")
     @Nullable
@@ -85,6 +90,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty(FIELD_INDEX_PREFIX)
     @NotBlank
     @Pattern(regexp = INDEX_PREFIX_REGEX)
+    @SizeInBytes(message = "Index prefix must have a length in bytes between {min} and {max}", min = 1, max = 250)
     public abstract String indexPrefix();
 
     @JsonProperty("index_match_pattern")
@@ -269,6 +275,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     public abstract Builder toBuilder();
 
+    /**
+     * For non-UI originating instances, use {@link IndexSetConfigFactory} instead to create an instance with
+     * appropriate defaults.
+     */
     public static Builder builder() {
         return new AutoValue_IndexSetConfig.Builder()
                 // Index sets are writable by default.

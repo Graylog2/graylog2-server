@@ -1,0 +1,8 @@
+type = "fixed"
+message = "Fix count based index rotation on idle indices."
+
+issues = ["11689"]
+pulls = ["14512"]
+
+contributors = [""]
+

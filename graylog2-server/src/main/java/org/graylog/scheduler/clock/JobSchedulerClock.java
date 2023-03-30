@@ -19,6 +19,9 @@ package org.graylog.scheduler.clock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,11 +36,25 @@ public interface JobSchedulerClock {
     DateTime nowUTC();
 
     /**
+     * Returns the current java.time.Instant.
+     *
+     * @return current time as {@link Instant}
+     */
+    Instant instantNow();
+
+    /**
      * Returns the current time for the give time zone.
      *
      * @return current time
      */
     DateTime now(DateTimeZone zone);
+
+    /**
+     * Returns the current time for the give time zone.
+     *
+     * @return current time
+     */
+    ZonedDateTime now(ZoneId zone);
 
     /**
      * Causes the current execution thread to sleep for the given duration.

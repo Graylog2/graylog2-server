@@ -23,7 +23,7 @@ import { useFormikContext } from 'formik';
 
 import { Icon, Accordion, AccordionItem } from 'components/common';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import DateTime from 'logic/datetimes/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
@@ -77,11 +77,12 @@ const FlexWrap = styled.div`
 
 const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
-  const [activeAccordion, setActiveAccordion] = useState();
+  const { toUserTimezone } = useUserDateTime();
+  const [activeAccordion, setActiveAccordion] = useState<'Timestamp' | 'Calendar' | undefined>();
   const toStartDate = moment(nextTimeRange.from).toDate();
-  const fromStartDate = limitDuration ? DateTime.now().seconds(-limitDuration).toDate() : undefined;
+  const fromStartDate = limitDuration ? toUserTimezone(new Date()).seconds(-limitDuration).toDate() : undefined;
 
-  const handleSelect = (nextKey) => {
+  const handleSelect = (nextKey: 'Timestamp' | 'Calendar' | undefined) => {
     setActiveAccordion(nextKey ?? activeAccordion);
   };
 

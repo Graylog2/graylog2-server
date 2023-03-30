@@ -31,6 +31,7 @@ public enum ValidationTypeDTO {
     INVALID_OPERATOR(ValidationType.INVALID_OPERATOR),
     MISSING_LICENSE(ValidationType.MISSING_LICENSE),
     INVALID_VALUE_TYPE(ValidationType.INVALID_VALUE_TYPE),
+    PARAMETER_NOT_ALLOWED(ValidationType.PARAMETER_NOT_ALLOWED), // if used in search filters
     ;
 
     private final ValidationType internalType;

@@ -22,8 +22,9 @@ import com.google.common.net.HostAndPort;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+import com.mongodb.connection.ServerDescription;
 import org.graylog2.database.MongoConnection;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MongoProbe {
     private static final Logger LOG = LoggerFactory.getLogger(MongoProbe.class);
 
-    private final Mongo mongoClient;
+    private final MongoClient mongoClient;
     private final DB db;
     private final DB adminDb;
     private final BuildInfo buildInfo;
@@ -51,13 +53,13 @@ public class MongoProbe {
     }
 
     @VisibleForTesting
-    MongoProbe(Mongo mongoClient, DB db) {
+    MongoProbe(MongoClient mongoClient, DB db) {
         this(mongoClient, db, mongoClient.getDB("admin"),
                 createBuildInfo(mongoClient.getDB("admin")), createHostInfo(mongoClient.getDB("admin")));
     }
 
     @VisibleForTesting
-    MongoProbe(Mongo mongoClient, DB db, DB adminDB, BuildInfo buildInfo, HostInfo hostInfo) {
+    MongoProbe(MongoClient mongoClient, DB db, DB adminDB, BuildInfo buildInfo, HostInfo hostInfo) {
         this.mongoClient = checkNotNull(mongoClient);
         this.db = checkNotNull(db);
         this.adminDb = checkNotNull(adminDB);
@@ -135,7 +137,10 @@ public class MongoProbe {
     }
 
     public MongoStats mongoStats() {
-        final List<ServerAddress> serverAddresses = mongoClient.getServerAddressList();
+        final List<ServerAddress> serverAddresses = mongoClient.getClusterDescription().getServerDescriptions()
+                .stream()
+                .map(ServerDescription::getAddress)
+                .collect(Collectors.toList());
         final List<HostAndPort> servers = Lists.newArrayListWithCapacity(serverAddresses.size());
         for (ServerAddress serverAddress : serverAddresses) {
             servers.add(HostAndPort.fromParts(serverAddress.getHost(), serverAddress.getPort()));

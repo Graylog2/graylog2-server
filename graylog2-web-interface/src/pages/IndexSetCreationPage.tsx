@@ -16,31 +16,40 @@
  */
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
-import { DocumentationLink } from 'components/support';
-import DateTime from 'logic/datetimes/DateTime';
-import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
-import { IndexSetPropType, IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
-import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
-import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
+import {
+  RetentionStrategyPropType,
+  RotationStrategyPropType,
+} from 'components/indices/Types';
+import type {
+  RetentionStrategy, RotationStrategy, RetentionStrategyContext,
+  RetentionStrategyConfig,
+  RotationStrategyConfig,
+} from 'components/indices/Types';
+import { adjustFormat } from 'util/DateTime';
+import useIndexDefaults from 'pages/useIndexDefaults';
+import useHistory from 'routing/useHistory';
 
 type Props = {
-  indexSet: Partial<IndexSet> | null | undefined,
   retentionStrategies?: Array<RetentionStrategy> | null | undefined,
   rotationStrategies?: Array<RotationStrategy> | null | undefined,
   retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
 }
 
-const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext, indexSet }: Props) => {
+const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
+  const history = useHistory();
+
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
@@ -49,52 +58,68 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   const _saveConfiguration = (indexSetItem: IndexSet) => {
     const copy = indexSetItem;
 
-    copy.creation_date = DateTime.now().toISOString();
+    copy.creation_date = adjustFormat(new Date(), 'internal');
 
-    IndexSetsActions.create(copy).then(() => {
+    return IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
   };
 
+  const { loadingIndexDefaultsConfig, indexDefaultsConfig: config } = useIndexDefaults();
+
   const _isLoading = () => {
-    return !rotationStrategies || !retentionStrategies;
+    return !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
   };
 
   if (_isLoading()) {
     return <Spinner />;
   }
 
-  const defaultIndexSet = {
-    ...indexSet,
-    rotation_strategy_class: rotationStrategies[0].type,
-    rotation_strategy: rotationStrategies[0].default_config,
+  const indexSet: IndexSet = {
+    title: '',
+    description: '',
+    index_prefix: config.index_prefix,
+    writable: true,
+    can_be_default: true,
+    shards: config.shards,
+    replicas: config.replicas,
+    rotation_strategy_class: config.rotation_strategy_class,
+    rotation_strategy: config.rotation_strategy_config as RotationStrategyConfig,
+    retention_strategy_class: config.retention_strategy_class,
+    retention_strategy: config.retention_strategy_config as RetentionStrategyConfig,
+    index_analyzer: config.index_analyzer,
+    index_optimization_max_num_segments: config.index_optimization_max_num_segments,
+    index_optimization_disabled: config.index_optimization_disabled,
+    field_type_refresh_interval: moment.duration(config.field_type_refresh_interval, config.field_type_refresh_interval_unit).asMilliseconds(),
   };
 
   return (
     <DocumentTitle title="Create Index Set">
       <div>
-        <PageHeader title="Create Index Set">
+        <PageHeader title="Create Index Set"
+                    documentationLink={{
+                      title: 'Index model documentation',
+                      path: DocsHelper.PAGES.INDEX_MODEL,
+                    }}
+                    topActions={(
+                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                        <Button bsStyle="info">Index sets overview</Button>
+                      </LinkContainer>
+                    )}>
           <span>
             Create a new index set that will let you configure the retention, sharding, and replication of messages
             coming from one or more streams.
-          </span>
-          <span>
-            You can learn more about the index model in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-          </span>
-          <span>
-            <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-              <Button bsStyle="info">Index sets overview</Button>
-            </LinkContainer>
           </span>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetConfigurationForm indexSet={defaultIndexSet}
+            <IndexSetConfigurationForm indexSet={indexSet}
                                        retentionStrategiesContext={retentionStrategiesContext}
                                        rotationStrategies={rotationStrategies}
                                        retentionStrategies={retentionStrategies}
+                                       submitButtonText="Create index set"
+                                       submitLoadingText="Creating index set..."
                                        create
                                        cancelLink={Routes.SYSTEM.INDICES.LIST}
                                        onUpdate={_saveConfiguration} />
@@ -108,7 +133,6 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 IndexSetCreationPage.propTypes = {
   retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
   rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
-  indexSet: IndexSetPropType,
   retentionStrategiesContext: PropTypes.shape({
     max_index_retention_period: PropTypes.string,
   }),
@@ -117,24 +141,6 @@ IndexSetCreationPage.propTypes = {
 IndexSetCreationPage.defaultProps = {
   retentionStrategies: undefined,
   rotationStrategies: undefined,
-  indexSet: {
-    title: '',
-    description: '',
-    index_prefix: '',
-    writable: true,
-    can_be_default: true,
-    shards: 4,
-    replicas: 0,
-    retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
-    retention_strategy: {
-      max_number_of_indices: 20,
-      type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
-    },
-    index_analyzer: 'standard',
-    index_optimization_max_num_segments: 1,
-    index_optimization_disabled: false,
-    field_type_refresh_interval: 5 * 1000, // 5 seconds
-  },
   retentionStrategiesContext: {
     max_index_retention_period: undefined,
   },

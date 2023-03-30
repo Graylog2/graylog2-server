@@ -18,7 +18,6 @@ package org.graylog2.streams;
 
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -62,26 +61,6 @@ public interface StreamService extends PersistedService {
 
     void resume(Stream stream) throws ValidationException;
 
-    List<StreamRule> getStreamRules(Stream stream) throws NotFoundException;
-
-    List<Stream> loadAllWithConfiguredAlertConditions();
-
-    List<AlertCondition> getAlertConditions(Stream stream);
-
-    AlertCondition getAlertCondition(Stream stream, String conditionId) throws NotFoundException;
-
-    void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException;
-
-    void updateAlertCondition(Stream stream, AlertCondition condition) throws ValidationException;
-
-    void removeAlertCondition(Stream stream, String conditionId);
-
-    @Deprecated
-    void addAlertReceiver(Stream stream, String type, String name);
-
-    @Deprecated
-    void removeAlertReceiver(Stream stream, String type, String name);
-
     void addOutput(Stream stream, Output output);
 
     void addOutputs(ObjectId streamId, Collection<ObjectId> outputIds);
@@ -91,4 +70,6 @@ public interface StreamService extends PersistedService {
     void removeOutputFromAllStreams(Output output);
 
     List<Stream> loadAllWithIndexSet(String indexSetId);
+
+    void addToIndexSet(String indexSetId, Collection<String> streamIds);
 }

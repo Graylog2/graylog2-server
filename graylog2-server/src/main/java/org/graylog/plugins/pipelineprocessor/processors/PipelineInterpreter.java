@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.failure.ProcessingFailureCause;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -58,6 +59,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -71,7 +73,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PipelineInterpreter implements MessageProcessor {
-    private static final Logger log = LoggerFactory.getLogger(PipelineInterpreter.class);
+    private static final RateLimitedLog log = getRateLimitedLog(PipelineInterpreter.class);
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
@@ -372,6 +374,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                        Pipeline pipeline,
                                        EvaluationContext context,
                                        InterpreterListener interpreterListener) {
+        context.setRule(rule);
         rule.markExecution();
         interpreterListener.executeRule(rule, pipeline);
         try {
@@ -392,6 +395,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                       InterpreterListener interpreterListener,
                                       Pipeline pipeline,
                                       EvaluationContext context, Rule rule, Statement statement) {
+        context.setRule(rule);
         statement.evaluate(context);
         if (context.hasEvaluationErrors()) {
             // if the last statement resulted in an error, do not continue to execute this rules
@@ -466,6 +470,14 @@ public class PipelineInterpreter implements MessageProcessor {
         }
     }
 
+    public static RateLimitedLog getRateLimitedLog(Class clazz) {
+        final Logger baseLog = LoggerFactory.getLogger(clazz);
+        return RateLimitedLog
+                .withRateLimit(baseLog)
+                .maxRate(5).every(Duration.ofSeconds(10))
+                .build();
+    }
+
     public static class State {
         private final Logger LOG = LoggerFactory.getLogger(getClass());
         protected static final String STAGE_CACHE_METRIC_SUFFIX = "stage-cache";
@@ -491,7 +503,7 @@ public class PipelineInterpreter implements MessageProcessor {
             cache = CacheBuilder.newBuilder()
                     .concurrencyLevel(processorCount)
                     .recordStats()
-                    .build(new CacheLoader<Set<Pipeline>, StageIterator.Configuration>() {
+                    .build(new CacheLoader<>() {
                         @Override
                         public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) {
                             return new StageIterator.Configuration(pipelines);

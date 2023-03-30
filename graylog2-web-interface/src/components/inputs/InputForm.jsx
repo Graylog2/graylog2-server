@@ -20,6 +20,8 @@ import jQuery from 'jquery';
 
 import { NodeOrGlobalSelect } from 'components/inputs';
 import { ConfigurationForm } from 'components/configurationforms';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import AppConfig from 'util/AppConfig';
 
 class InputForm extends React.Component {
   static propTypes = {
@@ -28,12 +30,26 @@ class InputForm extends React.Component {
     titleValue: PropTypes.string,
     submitAction: PropTypes.func.isRequired,
     values: PropTypes.object,
+    submitButtonText: PropTypes.string.isRequired,
   };
 
-  state = {
-    global: this.props.globalValue !== undefined ? this.props.globalValue : false,
-    node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
+  static defaultProps = {
+    globalValue: undefined,
+    nodeValue: undefined,
+    titleValue: undefined,
+    values: undefined,
   };
+
+  constructor(props) {
+    super(props);
+
+    this.configurationForm = React.createRef();
+
+    this.state = {
+      global: this.props.globalValue !== undefined ? this.props.globalValue : false,
+      node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
+    };
+  }
 
   _handleChange = (field, value) => {
     const state = {};
@@ -43,28 +59,61 @@ class InputForm extends React.Component {
   };
 
   _onSubmit = (data) => {
-    const newData = jQuery.extend(data, { global: this.state.global, node: this.state.node });
-
+    const newData = jQuery.extend(data, {
+      global: AppConfig.isCloud() || this.state.global,
+      node: this.state.node,
+    });
     this.props.submitAction(newData);
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
-    this.configurationForm.open();
+    if (this.configurationForm.current) {
+      this.configurationForm.current.open();
+    }
+  };
+
+  getValues = () => {
+    const { values } = this.props;
+
+    if (values) {
+      return values;
+    }
+
+    if (this.configurationForm.current) {
+      return this.configurationForm.current.getValue().configuration;
+    }
+
+    return {};
+  };
+
+  getTitleValue = () => {
+    const { titleValue } = this.props;
+
+    if (titleValue) {
+      return titleValue;
+    }
+
+    if (this.configurationForm.current) {
+      return this.configurationForm.current.getValue().titleValue;
+    }
+
+    return '';
   };
 
   render() {
-    const values = this.props.values ? this.props.values
-      : (this.configurationForm ? this.configurationForm.getValue().configuration : {});
-    const titleValue = this.props.titleValue ? this.props.titleValue
-      : (this.configurationForm ? this.configurationForm.getValue().titleValue : '');
+    const values = this.getValues();
+    const titleValue = this.getTitleValue();
 
     return (
       <ConfigurationForm {...this.props}
-                         ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                         ref={this.configurationForm}
                          values={values}
                          titleValue={titleValue}
                          submitAction={this._onSubmit}>
-        <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
+        <HideOnCloud>
+          <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
+        </HideOnCloud>
       </ConfigurationForm>
     );
   }

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
@@ -27,6 +28,7 @@ import CollectorRow from './CollectorRow';
 import style from './CollectorList.css';
 
 const CollectorList = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     collectors: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
@@ -38,13 +40,13 @@ const CollectorList = createReactClass({
     onQueryChange: PropTypes.func.isRequired,
     validateCollector: PropTypes.func.isRequired,
   },
-
+  // eslint-disable-next-line react/no-unstable-nested-components
   headerCellFormatter(header) {
     const className = (header === 'Actions' ? style.actionsColumn : '');
 
     return <th className={className}>{header}</th>;
   },
-
+  // eslint-disable-next-line react/no-unstable-nested-components
   collectorFormatter(collector) {
     const { onClone, onDelete, validateCollector } = this.props;
 
@@ -82,10 +84,8 @@ const CollectorList = createReactClass({
             <SearchForm query={query}
                         onSearch={onQueryChange}
                         onReset={onQueryChange}
-                        searchButtonLabel="Find"
                         placeholder="Find collectors"
                         wrapperClass={style.inline}
-                        queryWidth={300}
                         topMargin={0}
                         useLoadingState />
 
@@ -93,7 +93,8 @@ const CollectorList = createReactClass({
                            pageSize={pagination.pageSize}
                            pageSizes={[10, 25]}
                            totalItems={pagination.total}
-                           onChange={onPageChange}>
+                           onChange={onPageChange}
+                           useQueryParameter={false}>
               <div className={style.collectorTable}>
                 <DataTable id="collector-list"
                            className="table-hover"

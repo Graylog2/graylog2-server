@@ -16,12 +16,13 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+import PropTypes from 'prop-types';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
@@ -29,9 +30,17 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import withHistory from 'routing/withHistory';
 
 const CreateContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateContentPackPage',
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    history: PropTypes.object.isRequired,
+  },
+
   mixins: [Reflux.connect(CatalogStore)],
 
   getInitialState() {
@@ -59,6 +68,7 @@ const CreateContentPackPage = createReactClass({
 
   _onSave() {
     const { contentPack } = this.state;
+    const { history } = this.props;
 
     ContentPacksActions.create.triggerPromise(contentPack.toJSON())
       .then(
@@ -101,21 +111,17 @@ const CreateContentPackPage = createReactClass({
     return (
       <DocumentTitle title="Content packs">
         <span>
-          <PageHeader title="Create content packs">
+          <PageHeader title="Create content packs"
+                      topActions={(
+                        <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+                          <Button bsStyle="info">Content Packs</Button>
+                        </LinkContainer>
+                      )}>
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
+              <br />
+              Find more content packs in {' '} <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-
-            <span>
-              Find more content packs in {' '}
-              <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
-            </span>
-
-            <div>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info">Content Packs</Button>
-              </LinkContainer>
-            </div>
           </PageHeader>
           <ContentPackEdit contentPack={contentPack}
                            onGetEntities={this._getEntities}
@@ -131,4 +137,4 @@ const CreateContentPackPage = createReactClass({
   },
 });
 
-export default CreateContentPackPage;
+export default withHistory(CreateContentPackPage);

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import lodash from 'lodash';
+import isFinite from 'lodash/isFinite';
 import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
@@ -112,6 +112,8 @@ class SourceCodeEditor extends React.Component {
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the new value and an event as arguments. */
     onChange: PropTypes.func,
+    /** Function called when the editor loses focus. */
+    onBlur: PropTypes.func,
     /** Specifies if the editor should be in read-only mode. */
     readOnly: PropTypes.bool,
     /** Specifies if the editor should be resizable by the user. */
@@ -132,6 +134,7 @@ class SourceCodeEditor extends React.Component {
     innerRef: undefined,
     mode: 'text',
     onChange: () => {},
+    onBlur: () => {},
     onLoad: () => {},
     readOnly: false,
     resizable: true,
@@ -238,10 +241,11 @@ class SourceCodeEditor extends React.Component {
       innerRef,
       onLoad,
       onChange,
+      onBlur,
       readOnly,
       value,
     } = this.props;
-    const validCssWidth = lodash.isFinite(width) ? width : '100%';
+    const validCssWidth = isFinite(width) ? width : '100%';
     const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
 
     return (
@@ -305,6 +309,7 @@ class SourceCodeEditor extends React.Component {
                        height="100%"
                        onLoad={onLoad}
                        onChange={onChange}
+                       onBlur={onBlur}
                        onSelectionChange={this.handleSelectionChange}
                        readOnly={readOnly}
                        value={value}

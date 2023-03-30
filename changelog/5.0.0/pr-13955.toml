@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Isolate errors in result extraction to search type(s) causing it"
+
+pulls = ["13955"]

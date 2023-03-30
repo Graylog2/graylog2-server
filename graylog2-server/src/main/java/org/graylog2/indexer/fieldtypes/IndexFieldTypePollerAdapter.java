@@ -22,5 +22,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface IndexFieldTypePollerAdapter {
+
+    int MAX_SEARCHES_PER_MULTI_SEARCH = 50;
+
     Optional<Set<FieldTypeDTO>> pollIndex(String indexName, Timer pollTimer);
+
+    boolean maintainsStreamBasedFieldLists();
 }

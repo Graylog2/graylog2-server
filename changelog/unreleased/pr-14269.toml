@@ -1,0 +1,4 @@
+type = "added"
+message = "Added the option to toggle between a linear and a logarithmic axis for area/bar/line/scatter charts."
+
+pulls = ["14269"]

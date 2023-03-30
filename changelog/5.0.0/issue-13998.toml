@@ -1,0 +1,12 @@
+type = "fixed"
+message = "Fix appearing toast errors when creating HTTP JSONPath data adapter and start editing the title."
+
+pulls = ["14004"]
+
+details.user = """
+When a user creates a new adapter and starts to edit the title,
+errors were displayed immediately.
+
+This happened because of the missing URL, now a default URL is used,
+so the new adapter is not immediately invalid.
+"""

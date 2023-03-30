@@ -21,6 +21,12 @@ import styled, { css } from 'styled-components';
 import { Col, Row, HelpBlock } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
+const StyledRow = styled(Row)`
+  :not(:last-child) {
+    margin-bottom: 7px;
+  }
+`;
+
 type Props = {
   label: React.ReactElement | string,
   value: unknown,
@@ -28,11 +34,7 @@ type Props = {
   className?: string,
 };
 
-const ValueCol = styled(Col)`
-  padding-top: 7px;
-`;
-
-const LabelCol = styled(ValueCol)(({ theme }: { theme: DefaultTheme }) => css`
+const LabelCol = styled(Col)(({ theme }: { theme: DefaultTheme }) => css`
   font-weight: bold;
 
   @media (min-width: ${theme.breakpoints.min.md}) {
@@ -62,15 +64,15 @@ const readableValue = (value: Props['value']) => {
 
 /** Displays the provided label and value with the same layout like the FormikFormGroup */
 const ReadOnlyFormGroup = ({ label, value, help, className }: Props) => (
-  <Row className={className}>
+  <StyledRow className={className}>
     <LabelCol sm={3}>
       {label}
     </LabelCol>
-    <ValueCol sm={9}>
+    <Col sm={9} className="read-only-value-col">
       {readableValue(value)}
       {help && <HelpBlock>{help}</HelpBlock>}
-    </ValueCol>
-  </Row>
+    </Col>
+  </StyledRow>
 );
 
 ReadOnlyFormGroup.defaultProps = {

@@ -20,8 +20,6 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { paginatedShares } from 'fixtures/sharedEntities';
 import { reader as assignedRole } from 'fixtures/roles';
-import { alice } from 'fixtures/users';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import User from 'logic/users/User';
 
 import UserDetails from './UserDetails';
@@ -55,20 +53,13 @@ const user = User
   .timezone('Europe/Berlin')
   .build();
 
-describe('<UserDetails />', () => {
-  const currentUser = alice.toBuilder().permissions(Immutable.List(['*'])).build();
-  const SutComponent = (props) => (
-    <CurrentUserContext.Provider value={currentUser}>
-      <UserDetails {...props} />
-    </CurrentUserContext.Provider>
-  );
-
+describe('UserDetails', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('user profile should display profile information', async () => {
-    render(<SutComponent user={user} />);
+    render(<UserDetails user={user} />);
 
     await screen.findByText(user.username);
 
@@ -84,7 +75,7 @@ describe('<UserDetails />', () => {
 
   describe('user settings', () => {
     it('should display timezone', async () => {
-      render(<SutComponent user={user} />);
+      render(<UserDetails user={user} />);
 
       await waitFor(() => {
         if (!user.timezone) throw Error('timezone must be defined for provided user');
@@ -95,26 +86,26 @@ describe('<UserDetails />', () => {
 
     describe('should display session timeout in a readable format', () => {
       it('for seconds', async () => {
-        const test = user.toBuilder().sessionTimeoutMs(10000).build();
-        render(<SutComponent user={test} />);
+        const exampleUser = user.toBuilder().sessionTimeoutMs(10000).build();
+        render(<UserDetails user={exampleUser} />);
 
         await screen.findByText('10 Seconds');
       });
 
       it('for minutes', async () => {
-        render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
+        render(<UserDetails user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
 
         await screen.findByText('10 Minutes');
       });
 
       it('for hours', async () => {
-        render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
+        render(<UserDetails user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
 
         await screen.findByText('10 Hours');
       });
 
       it('for days', async () => {
-        render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
+        render(<UserDetails user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
 
         await screen.findByText('10 Days');
       });
@@ -123,7 +114,7 @@ describe('<UserDetails />', () => {
 
   describe('roles section', () => {
     it('should display assigned roles', async () => {
-      render(<SutComponent user={user} />);
+      render(<UserDetails user={user} />);
 
       await screen.findByText(assignedRole.name);
     });
@@ -131,7 +122,7 @@ describe('<UserDetails />', () => {
 
   describe('teams section', () => {
     it('should display info if license is not present', async () => {
-      render(<SutComponent user={user} />);
+      render(<UserDetails user={user} />);
 
       await screen.findByText(/Enterprise Feature/);
     });

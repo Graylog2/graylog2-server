@@ -33,9 +33,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto> {
-    private static final String COLLECTION_NAME = "scheduler_job_definitions";
+    public static final String COLLECTION_NAME = "scheduler_job_definitions";
 
     private final ObjectMapper objectMapper;
 
@@ -59,6 +60,10 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
     public Optional<JobDefinitionDto> getByConfigField(String configField, Object value) {
         final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
         return Optional.ofNullable(db.findOne(DBQuery.is(field, value)));
+    }
+
+    public List<JobDefinitionDto> getByQuery(DBQuery.Query query) {
+        return StreamEx.of(db.find(query)).collect(Collectors.toList());
     }
 
     /**

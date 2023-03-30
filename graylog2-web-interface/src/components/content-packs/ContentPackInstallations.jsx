@@ -33,21 +33,29 @@ class ContentPackInstallations extends React.Component {
     onUninstall: () => {},
   };
 
-  rowFormatter = (item) => {
-    let showModalRef;
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      showInstallModal: false,
+    };
+  }
+
+  rowFormatter = (item) => {
     const { onUninstall } = this.props;
 
     const closeShowModal = () => {
-      showModalRef.close();
+      this.setState({ showInstallModal: false });
     };
 
     const openShowModal = () => {
-      showModalRef.open();
+      this.setState({ showInstallModal: true });
     };
 
-    const showModal = (
-      <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
+    const installModal = (
+      <BootstrapModalWrapper showModal={this.state.showInstallModal}
+                             onHide={closeShowModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>View Installation</Modal.Title>
         </Modal.Header>
@@ -79,7 +87,7 @@ class ContentPackInstallations extends React.Component {
                       onClick={openShowModal}>
                 View
               </Button>
-              {showModal}
+              {installModal}
             </ButtonToolbar>
           </div>
         </td>
@@ -87,6 +95,7 @@ class ContentPackInstallations extends React.Component {
     );
   };
 
+  // eslint-disable-next-line class-methods-use-this
   headerFormater = (header) => {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
@@ -108,7 +117,8 @@ class ContentPackInstallations extends React.Component {
       <DataTable id="content-packs-versions"
                  headers={headers}
                  headerCellFormatter={this.headerFormater}
-                 sortByKey="comment"
+                 useNumericSort
+                 sortBy={(c) => c.content_pack_revision.toString()}
                  dataRowFormatter={this.rowFormatter}
                  rows={installations}
                  filterKeys={[]} />

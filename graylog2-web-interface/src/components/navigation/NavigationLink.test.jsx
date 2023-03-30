@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount, shallow } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import { appPrefixed } from 'util/URLUtils';
 
@@ -25,30 +25,22 @@ jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path), qualif
 
 describe('NavigationLink', () => {
   it('renders with simple props', () => {
-    const wrapper = mount(<NavigationLink description="Hello there!" path="/hello" />);
+    render(<NavigationLink description="Hello there!" path="/hello" />);
 
-    expect(wrapper.find('LinkContainer')).toHaveProp('to', '/hello');
-    expect(wrapper.find('MenuItem')).toHaveText('Hello there!');
-  });
-
-  it('passes props to LinkContainer', () => {
-    const wrapper = shallow(<NavigationLink description="Hello there!" path="/hello" someProp={42} />);
-
-    expect(wrapper.first()).toHaveProp('someProp', 42);
+    expect(screen.getByText('Hello there!')).toHaveAttribute('href', '/hello');
   });
 
   it('does not prefix URL with app prefix', () => {
     appPrefixed.mockImplementation((path) => `/someprefix${path}`);
-    const wrapper = mount(<NavigationLink description="Hello there!" path="/hello" />);
+    render(<NavigationLink description="Hello there!" path="/hello" />);
 
-    expect(wrapper.find('a').props().href).not.toContain('/someprefix/hello');
+    expect(screen.getByText('Hello there!')).toHaveAttribute('href', '/hello');
     expect(appPrefixed).not.toHaveBeenCalled();
   });
 
-  it('renders with NavItem if toplevel', () => {
-    const wrapper = mount(<NavigationLink description="Hello there!" path="/hello" topLevel />);
+  it('renders with NavItem if toplevel', async () => {
+    render(<NavigationLink description="Hello there!" path="/hello" topLevel />);
 
-    expect(wrapper.find('LinkContainer')).toHaveProp('to', '/hello');
-    expect(wrapper.find('NavItem')).toHaveText('Hello there!');
+    await screen.findByRole('link', { name: /Hello there!/i });
   });
 });

@@ -17,9 +17,11 @@
 package org.junit.jupiter.engine.descriptor;
 
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExecutableInvoker;
 import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
+import org.junit.platform.engine.support.hierarchical.Node;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -28,9 +30,11 @@ import java.util.Optional;
 public class ContainerMatrixExtensionContext extends AbstractExtensionContext<ContainerMatrixEngineDescriptor> {
 
     ContainerMatrixExtensionContext(EngineExecutionListener engineExecutionListener,
-                                    ContainerMatrixEngineDescriptor testDescriptor, JupiterConfiguration configuration) {
+                                    ContainerMatrixEngineDescriptor testDescriptor,
+                                    JupiterConfiguration configuration,
+                                    ExecutableInvoker executableInvoker) {
 
-        super(null, engineExecutionListener, testDescriptor, configuration);
+        super(null, engineExecutionListener, testDescriptor, configuration, executableInvoker);
     }
 
     @Override
@@ -66,5 +70,10 @@ public class ContainerMatrixExtensionContext extends AbstractExtensionContext<Co
     @Override
     public Optional<Throwable> getExecutionException() {
         return Optional.empty();
+    }
+
+    @Override
+    protected Node.ExecutionMode getPlatformExecutionMode() {
+        return Node.ExecutionMode.SAME_THREAD;
     }
 }

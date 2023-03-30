@@ -21,7 +21,7 @@ import type * as Immutable from 'immutable';
 import type Role from 'logic/roles/Role';
 import type { PaginatedUsers } from 'stores/users/UsersStore';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
+import { DataTable, PaginatedList, Spinner, NoSearchResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
@@ -78,7 +78,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
       <p className="description">
         Found {paginatedUsers.pagination.total} synchronized users.
       </p>
-      <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
+      <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })} useQueryParameter={false}>
         <DataTable className="table-hover"
                    customFilter={<SyncedUsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />}
                    dataRowFormatter={_userOverviewItem}
@@ -87,7 +87,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
                    headerCellFormatter={_headerCellFormatter}
                    headers={TABLE_HEADERS}
                    id="synced-users-overview"
-                   noDataText={<EmptyResult>No synchronized users have been found.</EmptyResult>}
+                   noDataText={<NoSearchResult>No synchronized users have been found.</NoSearchResult>}
                    rowClassName="no-bm"
                    rows={users.toJS()}
                    sortByKey="username" />

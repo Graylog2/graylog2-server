@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -27,12 +28,13 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
-public class NoopRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
+public class NoopRetentionStrategy extends AbstractIndexRetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(NoopRetentionStrategy.class);
+    public static final String NAME = "none";
 
     @Inject
-    public NoopRetentionStrategy(Indices indices, ActivityWriter activityWriter) {
-        super(indices, activityWriter);
+    public NoopRetentionStrategy(Indices indices, ActivityWriter activityWriter, JobSchedulerClock clock) {
+        super(indices, activityWriter, clock);
     }
 
     @Override

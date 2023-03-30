@@ -16,44 +16,60 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog.plugins.views.startpage.StartPageService;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.bulk.AuditParams;
+import org.graylog2.rest.bulk.BulkExecutor;
+import org.graylog2.rest.bulk.SequentialBulkExecutor;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
@@ -67,20 +83,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Locale.ENGLISH;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Views")
+@Api(value = "Views", tags = {CLOUD_VISIBLE})
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ViewsResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -92,16 +110,34 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ClusterEventBus clusterEventBus;
     private final SearchDomain searchDomain;
     private final Map<String, ViewResolver> viewResolvers;
+    private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
+    private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
+    private final StartPageService startPageService;
+    private final RecentActivityService recentActivityService;
+    private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
 
     @Inject
     public ViewsResource(ViewService dbService,
+                         StartPageService startPageService,
+                         RecentActivityService recentActivityService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
-                         Map<String, ViewResolver> viewResolvers) {
+                         Map<String, ViewResolver> viewResolvers,
+                         SearchFilterVisibilityChecker searchFilterVisibilityChecker,
+                         ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
+                         AuditEventSender auditEventSender,
+                         ObjectMapper objectMapper) {
         this.dbService = dbService;
+        this.startPageService = startPageService;
+        this.recentActivityService = recentActivityService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
+        this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
+        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
+
+
     }
 
     @GET
@@ -123,6 +159,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                    searchUser,
                     searchQuery,
                     searchUser::canReadView,
                     order,
@@ -149,12 +186,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         // Attempt to resolve the view from optional view resolvers before using the default database lookup.
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
-        ViewDTO view = resolveView(id);
-        if (searchUser.canReadView(view)) {
-            return view;
-        }
-
-        throw viewNotFoundException(id);
+        return resolveView(searchUser, id);
     }
 
     /**
@@ -165,18 +197,29 @@ public class ViewsResource extends RestResource implements PluginRestResource {
      *           up in the database.
      * @return An optional view.
      */
-    private ViewDTO resolveView(String id) {
+    ViewDTO resolveView(SearchUser searchUser, String id) {
         final ViewResolverDecoder decoder = new ViewResolverDecoder(id);
         if (decoder.isResolverViewId()) {
             final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
             if (viewResolver != null) {
-                return viewResolver.get(decoder.getViewId())
-                        .orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
+                ViewDTO view = viewResolver.get(decoder.getViewId()).orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
+                if (searchUser.canReadView(view)) {
+                    return view;
+                } else {
+                    throw viewNotFoundException(id);
+                }
             } else {
                 throw new NotFoundException("Failed to find view resolver: " + decoder.getResolverName());
             }
         } else {
-            return loadView(id);
+            ViewDTO view =  loadViewIncludingFavorite(searchUser, id);
+            if (searchUser.canReadView(view)) {
+                // Only register normal views in LastOpened, for ViewResolvers, a more global solution has to be found because of the catalog
+                startPageService.addLastOpenedFor(view, searchUser);
+                return view;
+            } else {
+                throw viewNotFoundException(id);
+            }
         }
     }
 
@@ -191,25 +234,63 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("User is not allowed to create new dashboards.");
         }
 
-        validateIntegrity(dto, searchUser);
+        validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        return dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        recentActivityService.create(result.id(),result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        return result;
     }
 
-    private void validateIntegrity(ViewDTO dto, SearchUser searchUser) {
+    private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
         final Search search = searchDomain.getForUser(dto.searchId(), searchUser)
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
+        validateSearchProperties(dto, search);
+
+
+        if (!newCreation) {
+            final ViewDTO originalView = dbService.get(dto.id()).orElseThrow(() -> new BadRequestException("Cannot update a view that does not exist : id = " + dto.id()));
+            final String originalViewSearchId = originalView.searchId();
+            final Search originalSearch = searchDomain.getForUser(originalViewSearchId, searchUser)
+                    .orElseThrow(() -> new BadRequestException("Search " + originalViewSearchId + " not available"));
+
+            final Set<UsesSearchFilters> originalSearchFilterUsages = getSearchFiltersUsages(originalView, originalSearch);
+            final Set<String> originalReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(originalSearchFilterUsages);
+            final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(newSearchFilterUsages);
+
+            final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
+                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
+            if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible(originalReferencedSearchFiltersIds)) {
+                throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage(originalReferencedSearchFiltersIds));
+            }
+
+        } else {
+            final Set<UsesSearchFilters> newSearchFilterUsages = getSearchFiltersUsages(dto, search);
+            final Set<String> newReferencedSearchFiltersIds = referencedSearchFiltersHelper.getReferencedSearchFiltersIds(newSearchFilterUsages);
+            final SearchFilterVisibilityCheckStatus searchFilterVisibilityCheckStatus = searchFilterVisibilityChecker.checkSearchFilterVisibility(
+                    filterID -> isPermitted(RestPermissions.SEARCH_FILTERS_READ, filterID), newReferencedSearchFiltersIds);
+            if (!searchFilterVisibilityCheckStatus.allSearchFiltersVisible()) {
+                throw new BadRequestException(searchFilterVisibilityCheckStatus.toMessage());
+            }
+        }
+
+    }
+
+    protected void validateSearchProperties(ViewDTO dto, Search search) {
         final Set<String> searchQueries = search.queries().stream()
                 .map(Query::id)
                 .collect(Collectors.toSet());
 
         final Set<String> stateQueries = dto.state().keySet();
 
-        if(!searchQueries.containsAll(stateQueries)) {
-            final Sets.SetView<String> diff = Sets.difference(searchQueries, stateQueries);
-            throw new BadRequestException("Search queries do not correspond to view/state queries, missing query IDs: " + diff);
+        if (!searchQueries.containsAll(stateQueries)) {
+            final Sets.SetView<String> diff = Sets.difference(stateQueries, searchQueries);
+            final String message = String.format(Locale.ROOT,
+                    "Search queries do not correspond to view/state queries, missing query IDs: %s; search queries: %s; state queries: %s",
+                    diff, searchQueries, stateQueries);
+            throw new BadRequestException(message);
         }
 
         final Set<String> searchTypes = search.queries().stream()
@@ -224,8 +305,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toSet());
 
         if(!searchTypes.containsAll(stateTypes)) {
-            final Sets.SetView<String> diff = Sets.difference(searchTypes, stateTypes);
-            throw new BadRequestException("Search types do not correspond to view/search types, missing searches: " + diff);
+            final Sets.SetView<String> diff = Sets.difference(stateTypes, searchTypes);
+            final String message = String.format(Locale.ROOT,
+                    "Search types do not correspond to view/search types, missing searches %s; search types: %s; state types: %s",
+                    diff, searchTypes, stateTypes);
+            throw new BadRequestException(message);
         }
 
         final Set<String> widgetIds = dto.state().values().stream()
@@ -236,10 +320,22 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final Set<String> widgetPositions = dto.state().values().stream()
                 .flatMap(v -> v.widgetPositions().keySet().stream()).collect(Collectors.toSet());
 
-        if(!widgetPositions.containsAll(widgetIds)) {
-            final Sets.SetView<String> diff = Sets.difference(widgetPositions, widgetIds);
-            throw new BadRequestException("Widget positions don't correspond to widgets, missing widget possitions: " + diff);
+        if (!widgetPositions.containsAll(widgetIds)) {
+            final Sets.SetView<String> diff = Sets.difference(widgetIds, widgetPositions);
+            final String message = String.format(Locale.ROOT,
+                    "Widget positions don't correspond to widgets, missing widget positions %s; widget IDs: %s; widget positions: %s",
+                    diff, widgetIds, widgetPositions);
+            throw new BadRequestException(message);
+
         }
+    }
+
+    private Set<UsesSearchFilters> getSearchFiltersUsages(final ViewDTO view, final Search referencedSearch) {
+        final Set<UsesSearchFilters> searchFilterUsages = new HashSet<>(referencedSearch.queries());
+        if (view.type() == ViewDTO.Type.DASHBOARD) {
+            searchFilterUsages.addAll(view.getAllWidgets());
+        }
+        return searchFilterUsages;
     }
 
     @PUT
@@ -254,9 +350,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("Not allowed to edit " + summarize(updatedDTO) + ".");
         }
 
-        validateIntegrity(updatedDTO, searchUser);
+        validateIntegrity(updatedDTO, searchUser, false);
 
-        return dbService.update(updatedDTO);
+        var result = dbService.update(updatedDTO);
+        recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        return result;
     }
 
     @PUT
@@ -282,7 +380,26 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         dbService.delete(id);
         triggerDeletedEvent(view);
+        recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
         return view;
+    }
+
+    @POST
+    @Path("/bulk_delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Delete a bulk of views", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
+                               @Context final SearchUser searchUser) {
+
+        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(bulkOperationRequest,
+                searchUser,
+                new AuditParams(ViewsAuditEventTypes.VIEW_DELETE, "id", ViewDTO.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
     }
 
     private String summarize(ViewDTO view) {
@@ -300,6 +417,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private ViewDTO loadView(String id) {
         try {
             return dbService.get(id).orElseThrow(() -> viewNotFoundException(id));
+        } catch (IllegalArgumentException ignored) {
+            throw viewNotFoundException(id);
+        }
+    }
+
+    private ViewDTO loadViewIncludingFavorite(SearchUser searchUser, String id) {
+        try {
+            return dbService.get(searchUser, id).orElseThrow(() -> viewNotFoundException(id));
         } catch (IllegalArgumentException ignored) {
             throw viewNotFoundException(id);
         }

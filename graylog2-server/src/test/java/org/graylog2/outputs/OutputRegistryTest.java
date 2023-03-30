@@ -88,7 +88,7 @@ public class OutputRegistryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testThrowExceptionForUnknownOutputType() throws MessageOutputConfigurationException {
+    public void testThrowExceptionForUnknownOutputType() throws Exception {
         registry.launchOutput(output, null);
     }
 

@@ -16,18 +16,18 @@
  */
 import * as React from 'react';
 
-import withPluginEntities from 'views/logic/withPluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-type Props = {
-  queryBarElements: Array<React.ComponentType<{}>>,
+const QueryBarElements = () => {
+  const queryBarElements = usePluginEntities('views.elements.queryBar');
+
+  return (
+    <>
+      {queryBarElements
+        // eslint-disable-next-line react/no-array-index-key
+        .map((Component, idx) => <Component key={idx} />)}
+    </>
+  );
 };
 
-const QueryBarElements = ({ queryBarElements = [] }: Props) => (
-  <>
-    {queryBarElements
-      // eslint-disable-next-line react/no-array-index-key
-      .map((Component, idx) => <Component key={idx} />)}
-  </>
-);
-
-export default withPluginEntities(QueryBarElements, { queryBarElements: 'views.elements.queryBar' });
+export default QueryBarElements;

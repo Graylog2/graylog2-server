@@ -25,6 +25,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
@@ -35,6 +36,7 @@ public abstract class Configuration {
     public static final String FIELD_NAME = "name";
     public static final String FIELD_COLOR = "color";
     public static final String FIELD_TEMPLATE = "template";
+    public static final String FIELD_TAGS = "tags";
 
     @Id
     @ObjectId
@@ -54,30 +56,37 @@ public abstract class Configuration {
     @JsonProperty(FIELD_TEMPLATE)
     public abstract String template();
 
+    @JsonProperty(FIELD_TAGS)
+    public abstract Set<String> tags();
+
     @JsonCreator
     public static Configuration create(@JsonProperty(FIELD_ID) String id,
                                        @JsonProperty(FIELD_COLLECTOR_ID) String collectorId,
                                        @JsonProperty(FIELD_NAME) String name,
                                        @JsonProperty(FIELD_COLOR) String color,
-                                       @JsonProperty(FIELD_TEMPLATE) String template) {
+                                       @JsonProperty(FIELD_TEMPLATE) String template,
+                                       @JsonProperty(FIELD_TAGS) @Nullable Set<String> tags) {
         return builder()
                 .id(id)
                 .collectorId(collectorId)
                 .name(name)
                 .color(color)
                 .template(template)
+                .tags(tags == null ? Set.of() : tags)
                 .build();
     }
 
-    public static Configuration create(String collectorId,
-                                       String name,
-                                       String color,
-                                       String template) {
+    public static Configuration createWithoutId(String collectorId,
+                                                String name,
+                                                String color,
+                                                String template,
+                                                Set<String> tags) {
         return create(new org.bson.types.ObjectId().toHexString(),
                 collectorId,
                 name,
                 color,
-                template);
+                template,
+                tags);
     }
 
     public static Builder builder() {
@@ -97,6 +106,8 @@ public abstract class Configuration {
         public abstract Builder color(String color);
 
         public abstract Builder template(String template);
+
+        public abstract Builder tags(Set<String> tags);
 
         public abstract Configuration build();
     }

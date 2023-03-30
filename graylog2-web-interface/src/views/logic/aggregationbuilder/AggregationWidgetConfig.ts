@@ -20,7 +20,7 @@ import isDeepEqual from 'stores/isDeepEqual';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 
-import Pivot from './Pivot';
+import Pivot, { DateType } from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';
 import SortConfig from './SortConfig';
@@ -114,13 +114,17 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isTimeline() {
-    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === TIMESTAMP_FIELD;
+    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].type === DateType && this.rowPivots[0].fields?.[0] === TIMESTAMP_FIELD;
   }
 
   get isEmpty(): boolean {
     const empty = (arr) => !arr.length;
 
     return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
+  }
+
+  get rollupForBackendQuery(): boolean {
+    return this.columnPivots.length > 0 ? this.rollup : true;
   }
 
   static builder() {
@@ -131,12 +135,12 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .series([])
       .sort([])
       .eventAnnotation(false)
-      .rollup(true);
+      .rollup(false);
   }
 
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map(this._value));
+    return new Builder(Immutable.Map<keyof InternalState, any>(this._value));
   }
 
   toJSON() {
@@ -221,7 +225,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 }
 
-type BuilderState = Immutable.Map<string, any>;
+type BuilderState = Immutable.Map<keyof AggregationWidgetConfig, any>;
 
 class Builder {
   value: BuilderState;
@@ -281,8 +285,7 @@ class Builder {
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
     const filteredSorts = sort.filter((s) => availableSorts
-      .find((availableSort) => (s.field === availableSort.function || s.field === availableSort.field)));
-    const computedRollup = columnPivots.length > 0 ? rollup : true;
+      .find((availableSort) => (s.field === availableSort.function || availableSort.fields?.includes(s.field))));
 
     return new AggregationWidgetConfig(
       columnPivots,
@@ -290,7 +293,7 @@ class Builder {
       series,
       filteredSorts,
       visualization,
-      computedRollup,
+      rollup,
       visualizationConfig,
       formattingSettings,
       eventAnnotation,

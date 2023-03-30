@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
 import { Popover } from 'components/bootstrap';
@@ -27,6 +27,7 @@ import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
+import { ROOT_FONT_SIZE } from 'theme/constants';
 
 import ChartColorContext from './ChartColorContext';
 import styles from './GenericPlot.lazy.css';
@@ -89,6 +90,10 @@ const nonInteractiveLayout = {
   hovermode: false,
 };
 
+const style = { height: '100%', width: '100%' };
+
+const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
+
 class GenericPlot extends React.Component<GenericPlotProps, State> {
   static propTypes = {
     chartData: PropTypes.array.isRequired,
@@ -147,11 +152,15 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
   _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
     .then(this._onCloseColorPopup);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
 
   render() {
     const { chartData, layout, setChartColor, theme } = this.props;
+    const fontSettings = {
+      color: theme.colors.global.textDefault,
+      size: ROOT_FONT_SIZE * theme.fonts.size.small.replace(/rem|em/i, ''),
+      family: theme.fonts.family.body,
+    };
     const defaultLayout = {
       shapes: [],
       autosize: true,
@@ -165,9 +174,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
       },
       legend: {
         orientation: 'h' as const,
-        font: {
-          color: theme.colors.variant.darkest.default,
-        },
+        font: fontSettings,
       },
       hoverlabel: {
         namelength: -1,
@@ -175,39 +182,25 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
       paper_bgcolor: 'transparent',
       plot_bgcolor: 'transparent',
       title: {
-        font: {
-          color: theme.colors.variant.darker.default,
-        },
+        font: fontSettings,
       },
       yaxis: {
         automargin: true,
         gridcolor: theme.colors.variant.lightest.default,
-        tickfont: {
-          color: theme.colors.variant.darkest.default,
-        },
+        tickfont: fontSettings,
         title: {
-          font: {
-            color: theme.colors.variant.darker.default,
-          },
+          font: fontSettings,
         },
       },
       xaxis: {
         automargin: true,
-        tickfont: {
-          color: theme.colors.variant.darkest.default,
-        },
+        tickfont: fontSettings,
         title: {
-          font: {
-            color: theme.colors.variant.darker.default,
-          },
+          font: fontSettings,
         },
       },
     };
     const plotLayout = merge({}, defaultLayout, layout);
-
-    const style = { height: '100%', width: '100%' };
-
-    const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
     const { legendConfig } = this.state;
 

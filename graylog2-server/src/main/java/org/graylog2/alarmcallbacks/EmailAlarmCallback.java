@@ -107,7 +107,7 @@ public class EmailAlarmCallback implements AlarmCallback {
         } catch (TransportConfigurationException e) {
             LOG.warn("Alarm callback has email recipients and is triggered, but email transport is not configured.");
             Notification notification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addDetail("stream_id", stream.getId())
@@ -124,7 +124,7 @@ public class EmailAlarmCallback implements AlarmCallback {
             }
 
             Notification notification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addDetail("stream_id", stream.getId())

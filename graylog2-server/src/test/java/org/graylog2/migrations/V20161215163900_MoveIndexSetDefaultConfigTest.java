@@ -28,6 +28,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.migrations.V20161215163900_MoveIndexSetDefaultConfig.MigrationCompleted;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.junit.Before;
@@ -57,8 +58,7 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
-    @Mock
-    public NodeId nodeId;
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -86,16 +86,16 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
     @Test
     @MongoDBFixtures("V20161215163900_MoveIndexSetDefaultConfigTest.json")
     public void upgrade() throws Exception {
-        final long count = collection.count();
+        final long count = collection.countDocuments();
 
         migration.upgrade();
 
         final MigrationCompleted migrationCompleted = clusterConfigService.get(MigrationCompleted.class);
 
-        assertThat(collection.count())
+        assertThat(collection.countDocuments())
                 .withFailMessage("No document should be deleted by the migration!")
                 .isEqualTo(count);
-        assertThat(collection.count(Filters.exists("default")))
+        assertThat(collection.countDocuments(Filters.exists("default")))
                 .withFailMessage("The migration should have deleted the \"default\" field from the documents!")
                 .isEqualTo(0L);
 
@@ -112,7 +112,7 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
     @MongoDBFixtures("V20161215163900_MoveIndexSetDefaultConfigTest.json")
     public void upgradeWhenMigrationCompleted() throws Exception {
         // Count how many documents with a "default" field are in the database.
-        final long count = collection.count(Filters.exists("default"));
+        final long count = collection.countDocuments(Filters.exists("default"));
 
         assertThat(count)
                 .withFailMessage("There should be at least one document with a \"default\" field in the database")
@@ -124,7 +124,7 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
         // If the MigrationCompleted object has been written to the cluster config, the migration shouldn't do anything
         // and shouldn't touch the database. Thank means we should still have all documents with the "default" field
         // from the seed file in the database.
-        assertThat(collection.count(Filters.exists("default"))).isEqualTo(count);
+        assertThat(collection.countDocuments(Filters.exists("default"))).isEqualTo(count);
     }
 
     @Test

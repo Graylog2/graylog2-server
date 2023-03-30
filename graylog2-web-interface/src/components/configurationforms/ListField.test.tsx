@@ -23,18 +23,21 @@ import { creatableListField, listField } from 'fixtures/configurationforms';
 import ListField from './ListField';
 
 describe('<ListField>', () => {
+  const SUT = (props: Partial<React.ComponentProps<typeof ListField>>) => (
+    <ListField field={listField}
+               onChange={() => {}}
+               title="example_list_field"
+               typeName="list"
+               autoFocus={false}
+               {...props} />
+  );
+
   afterEach(() => {
     jest.resetAllMocks();
   });
 
   it('should render an empty field', () => {
-    const { container } = render(
-      <ListField field={listField}
-                 onChange={() => {}}
-                 title="example_list_field"
-                 typeName="list"
-                 autoFocus={false} />,
-    );
+    render(<SUT />);
 
     const fieldLabel = screen.getByText(listField.human_name, { exact: true });
     const optionalMarker = screen.getByText(/(optional)/);
@@ -43,18 +46,10 @@ describe('<ListField>', () => {
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).toBeInTheDocument();
     expect(select).toBeInTheDocument();
-
-    expect(container).toMatchSnapshot();
   });
 
   it('should display options from attributes', async () => {
-    render(
-      <ListField field={listField}
-                 onChange={() => {}}
-                 title="example_list_field"
-                 typeName="list"
-                 autoFocus={false} />,
-    );
+    render(<SUT />);
 
     const select = screen.getByLabelText(listField.human_name, { exact: false });
 
@@ -68,14 +63,7 @@ describe('<ListField>', () => {
   });
 
   it('should render a field with values', async () => {
-    render(
-      <ListField field={listField}
-                 onChange={() => {}}
-                 title="example_list_field"
-                 typeName="list"
-                 autoFocus={false}
-                 value={['one', 'two']} />,
-    );
+    render(<SUT value={['one', 'two']} />);
 
     expect(screen.getByText('uno')).toBeInTheDocument();
     expect(screen.getByText('dos')).toBeInTheDocument();
@@ -84,13 +72,7 @@ describe('<ListField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    render(
-      <ListField field={listField}
-                 onChange={updateFunction}
-                 title="example_list_field"
-                 typeName="list"
-                 autoFocus={false} />,
-    );
+    render(<SUT onChange={updateFunction} />);
 
     const select = screen.getByLabelText(listField.human_name, { exact: false });
 
@@ -102,12 +84,8 @@ describe('<ListField>', () => {
     const updateFunction = jest.fn();
 
     render(
-      <ListField field={listField}
-                 onChange={updateFunction}
-                 title="example_list_field"
-                 typeName="list"
-                 autoFocus={false}
-                 value={['one']} />,
+      <SUT onChange={updateFunction}
+           value={['one']} />,
     );
 
     const select = screen.getByLabelText(listField.human_name, { exact: false });
@@ -120,11 +98,8 @@ describe('<ListField>', () => {
     const updateFunction = jest.fn();
 
     render(
-      <ListField field={creatableListField}
-                 onChange={updateFunction}
-                 title="example_list_field"
-                 typeName="list"
-                 autoFocus={false} />,
+      <SUT field={creatableListField}
+           onChange={updateFunction} />,
     );
 
     const select = screen.getByLabelText(listField.human_name, { exact: false });

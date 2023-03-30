@@ -31,7 +31,7 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 @JsonPropertyOrder({"execution", "results"})
-abstract class SearchJobDTO {
+public abstract class SearchJobDTO {
     @JsonProperty
     abstract String id();
 
@@ -46,12 +46,12 @@ abstract class SearchJobDTO {
     abstract Set<SearchError> errors();
 
     @JsonProperty
-    abstract Map<String, QueryResult> results();
+    public abstract Map<String, QueryResult> results();
 
     @JsonProperty
     abstract ExecutionInfo execution();
 
-    static SearchJobDTO fromSearchJob(SearchJob searchJob) {
+    public static SearchJobDTO fromSearchJob(SearchJob searchJob) {
         return Builder.create()
                 .id(searchJob.getId())
                 .owner(searchJob.getOwner())

@@ -1,0 +1,9 @@
+type = "removed"
+message = "Removing legacy alerting management pages."
+
+details.user = """
+A while ago we rewrote the alerting UI. Some routes for the old UI were still accessible.
+With this change we are removing the old alerting management pages completely.
+"""
+
+pulls = ["12987"]

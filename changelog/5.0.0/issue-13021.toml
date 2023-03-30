@@ -1,0 +1,6 @@
+type = "changed"
+message = "Index detail shard numbers (segments, open search contexts, and deleted messages) are now formatted."
+contributors = ["@supahgreg"]
+
+issues = []
+pulls = ["13021"]

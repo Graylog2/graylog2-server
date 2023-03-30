@@ -22,10 +22,10 @@ import suppressConsole from 'helpers/suppressConsole';
 import MockStore from 'helpers/mocking/StoreMock';
 import { configuration as mockConfiguration } from 'fixtures/configurations';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 jest.mock('components/configurations/SearchesConfig', () => () => <span>Search Configuration</span>);
 jest.mock('components/configurations/MessageProcessorsConfig', () => () => <span>Message Processors Configuration</span>);
 jest.mock('components/configurations/SidecarConfig');
@@ -43,6 +43,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
     list: jest.fn(() => Promise.resolve()),
     listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
     listPermissionsConfig: jest.fn(() => Promise.resolve()),
+    listUserConfig: jest.fn(() => Promise.resolve()),
   },
 }));
 

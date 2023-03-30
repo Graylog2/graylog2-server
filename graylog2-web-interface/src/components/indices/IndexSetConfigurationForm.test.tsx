@@ -143,6 +143,7 @@ const rotationStrategies = [
       type: 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig',
       rotation_period: 'P1D',
       max_rotation_period: null,
+      rotate_empty_index_set: false,
     },
     json_schema: {
       type: 'object',
@@ -153,6 +154,9 @@ const rotationStrategies = [
         },
         max_rotation_period: {
           type: 'string',
+        },
+        rotate_empty_index_set: {
+          type: 'boolean',
         },
         type: {
           type: 'string',
@@ -204,13 +208,20 @@ describe('IndexSetConfigurationForm', () => {
   const onSave = jest.fn();
   const cancelLink = '/cancelLink';
 
+  const SUT = (props: Partial<React.ComponentProps<typeof IndexSetConfigurationForm>>) => (
+    <IndexSetConfigurationForm indexSet={indexSet}
+                               retentionStrategiesContext={retentionStrategiesContext}
+                               rotationStrategies={rotationStrategies}
+                               retentionStrategies={retentionStrategies}
+                               cancelLink={cancelLink}
+                               onUpdate={onSave}
+                               submitButtonText="Save"
+                               submitLoadingText="Saving..."
+                               {...props} />
+  );
+
   it('Should render IndexSetConfigurationForm', () => {
-    render(<IndexSetConfigurationForm indexSet={indexSet}
-                                      retentionStrategiesContext={retentionStrategiesContext}
-                                      rotationStrategies={rotationStrategies}
-                                      retentionStrategies={retentionStrategies}
-                                      cancelLink={cancelLink}
-                                      onUpdate={onSave} />);
+    render(<SUT />);
 
     const titleText = screen.getByText(/title/i);
 
@@ -218,13 +229,7 @@ describe('IndexSetConfigurationForm', () => {
   });
 
   it('Should render create IndexSetConfigurationForm', () => {
-    render(<IndexSetConfigurationForm indexSet={indexSet}
-                                      retentionStrategiesContext={retentionStrategiesContext}
-                                      rotationStrategies={rotationStrategies}
-                                      retentionStrategies={retentionStrategies}
-                                      create
-                                      cancelLink={cancelLink}
-                                      onUpdate={onSave} />);
+    render(<SUT create />);
 
     const indexPrefix = screen.getByText(/index prefix/i);
 

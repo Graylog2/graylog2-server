@@ -1,0 +1,5 @@
+type = "r"
+message = "Remove unused and dysfunctional `MetricsHistoryResource`."
+
+issues = ["2443"]
+pulls = ["13553"]

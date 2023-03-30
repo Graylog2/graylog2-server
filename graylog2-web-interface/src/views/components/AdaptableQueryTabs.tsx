@@ -17,16 +17,33 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { OrderedSet } from 'immutable';
 
+import UserNotification from 'util/UserNotification';
 import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import { Nav, NavItem, MenuItem } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
+import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
+import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
+import View from 'views/logic/views/View';
+import type { SearchJson } from 'views/logic/search/Search';
+import Search from 'views/logic/search/Search';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
+import { loadDashboard } from 'views/logic/views/Actions';
+import createSearch from 'views/logic/slices/createSearch';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import type { GetState } from 'views/types';
+import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import fetchSearch from 'views/logic/views/fetchSearch';
+import useHistory from 'routing/useHistory';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -36,15 +53,22 @@ interface Props extends QueryTabsProps {
 }
 
 interface TabsTypes {
-  navItems: Array<ReactNode>,
-  menuItems: Array<ReactNode>,
-  lockedItems: Array<ReactNode>
+  navItems: OrderedSet<ReactNode>,
+  menuItems: OrderedSet<ReactNode>,
+  lockedItems: OrderedSet<ReactNode>,
+  queriesList: OrderedSet<{ id: string, title: string }>,
 }
 
 const CLASS_HIDDEN = 'hidden';
 const CLASS_LOCKED = 'locked';
 const CLASS_ACTIVE = 'active';
 const NAV_PADDING = 15;
+
+const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
   &.nav.nav-tabs {
@@ -70,7 +94,6 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
     }
 
     > li.active {
-      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -161,33 +184,83 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
-const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal }: Props) => {
+const _updateDashboardWithNewSearch = (dashboard: View, newSearch: Search) => {
+  const newDashboard = dashboard.toBuilder().search(newSearch).build();
+
+  return ViewManagementActions.update(newDashboard);
+};
+
+const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: string) => async (searchJson: SearchJson) => {
+  const search = Search.fromJSON(searchJson);
+  const newDashboard = CopyPageToDashboard(queryId, activeView, targetDashboard.toBuilder().search(search).build());
+
+  if (!newDashboard || !newDashboard.search) {
+    throw Error('Copying the dashboard page failed.');
+  }
+
+  const newQueryId = newDashboard.search.queries.last().id;
+
+  const newSearch = await createSearch(newDashboard.search);
+
+  await _updateDashboardWithNewSearch(newDashboard, newSearch);
+
+  return [newDashboard, newQueryId] as const;
+};
+
+const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => async (_dispatch: AppDispatch, getState: GetState) => {
+  const view = selectView(getState());
+  const queryId = selectActiveQuery(getState());
+
+  const dashboardJson = await ViewManagementActions.get(selectedDashboardId);
+  const targetDashboard = View.fromJSON(dashboardJson);
+
+  return fetchSearch(dashboardJson.search_id)
+    .then(addPageToDashboard(targetDashboard, view, queryId));
+};
+
+const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove, onSelect, queryTitleEditModal, dashboardId }: Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
+  const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
+  const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const history = useHistory();
+
+  const toggleCopyToDashboardModal = useCallback(() => {
+    setShowCopyToDashboardModal((cur) => !cur);
+  }, []);
+
+  const onCopyToDashboard = useCallback((selectedDashboardId: string) => dispatch(_onCopyToDashboard(selectedDashboardId))
+    .then(([newDashboard, newQueryId]) => loadDashboard(history, newDashboard.id, newQueryId))
+    .catch((error) => {
+      UserNotification.error(`Copying dashboard page failed with error ${error}`);
+    }), [dispatch, history]);
+
+  const openTitleEditModal = useCallback((activeQueryTitle: string) => {
+    if (queryTitleEditModal) {
+      queryTitleEditModal.current.open(activeQueryTitle);
+    }
+  }, [queryTitleEditModal]);
 
   const currentTabs = useMemo((): TabsTypes => {
-    const navItems = [];
-    const menuItems = [];
-    const lockedItems = [];
+    let navItems = OrderedSet<React.ReactNode>();
+    let menuItems = OrderedSet<React.ReactNode>();
+    let lockedItems = OrderedSet<React.ReactNode>();
+    let queriesList = OrderedSet<{ id: string, title: string }>();
 
     queries.keySeq().forEach((id, idx) => {
-      const openTitleEditModal = (activeQueryTitle: string) => {
-        if (queryTitleEditModal) {
-          queryTitleEditModal.current.open(activeQueryTitle);
-        }
-      };
-
       const title = titles.get(id, `Page#${idx + 1}`);
       const tabTitle = (
-        <QueryTitle active={id === selectedQueryId}
+        <QueryTitle active={id === activeQueryId}
                     id={id}
                     onClose={() => onRemove(id)}
                     openEditModal={openTitleEditModal}
+                    openCopyToDashboardModal={toggleCopyToDashboardModal}
                     allowsClosing={queries.size > 1}
                     title={title} />
       );
 
-      navItems.push(lockedTab === id ? null : (
+      navItems = navItems.add(lockedTab === id ? null : (
         <NavItem eventKey={id}
                  key={id}
                  data-tab-id={id}
@@ -199,18 +272,19 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
         </NavItem>
       ));
 
-      menuItems.push(lockedTab === id ? null : (
+      menuItems = menuItems.add(lockedTab === id ? null : (
         <MenuItem eventKey={id}
                   key={id}
                   data-tab-id={id}
                   onClick={() => {
                     setLockedTab(id);
                     onSelect(id);
-                  }}>{tabTitle}
+                  }}>
+          {tabTitle}
         </MenuItem>
       ));
 
-      lockedItems.push(lockedTab !== id ? null : (
+      lockedItems = lockedItems.add(lockedTab !== id ? null : (
         <NavItem eventKey={id}
                  key={id}
                  data-tab-id={id}
@@ -219,42 +293,61 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
           {tabTitle}
         </NavItem>
       ));
+
+      queriesList = queriesList.add({ id, title });
     });
 
-    return { navItems, menuItems, lockedItems };
-  }, [lockedTab, onRemove, onSelect, queries, queryTitleEditModal, selectedQueryId, titles]);
+    return { navItems, menuItems, lockedItems, queriesList };
+  }, [queries, titles, activeQueryId, openTitleEditModal, toggleCopyToDashboardModal, lockedTab, onRemove, onSelect]);
 
   useEffect(() => {
     adjustTabsVisibility(maxWidth, lockedTab, setLockedTab);
-  }, [maxWidth, lockedTab, selectedQueryId]);
+  }, [maxWidth, lockedTab, activeQueryId]);
 
   return (
-    <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
-      {currentTabs.navItems}
+    <Container>
+      <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
+        {currentTabs.navItems}
 
-      <NavDropdown eventKey="more"
-                   title={<Icon name="ellipsis-h" />}
-                   className="query-tabs-more"
-                   id="query-tabs-more"
-                   aria-label="More Dashboard Tabs"
-                   noCaret
-                   pullRight
-                   active={openedMore}
-                   open={openedMore}
-                   onToggle={(isOpened) => setOpenedMore(isOpened)}>
-        {currentTabs.menuItems}
-      </NavDropdown>
+        <NavDropdown eventKey="more"
+                     title={<Icon name="ellipsis-h" />}
+                     className="query-tabs-more"
+                     id="query-tabs-more"
+                     aria-label="More Dashboard Pages"
+                     noCaret
+                     pullRight
+                     active={openedMore}
+                     open={openedMore}
+                     onToggle={(isOpened) => setOpenedMore(isOpened)}>
+          {currentTabs.menuItems}
+        </NavDropdown>
 
-      {currentTabs.lockedItems}
+        {currentTabs.lockedItems}
 
-      <NavItem key="new"
-               eventKey="new"
-               title="Create New Tab"
-               onClick={() => onSelect('new')}
-               className="query-tabs-new">
-        <Icon name="plus" />
-      </NavItem>
-    </StyledQueryNav>
+        <NavItem key="new"
+                 eventKey="new"
+                 title="Create New Page"
+                 onClick={() => onSelect('new')}
+                 className="query-tabs-new">
+          <Icon name="plus" />
+        </NavItem>
+      </StyledQueryNav>
+      <IconButton title="Open pages configuration" name="cog" onClick={() => setShowConfigurationModal(true)} />
+      {showConfigurationModal && (
+        <AdaptableQueryTabsConfiguration show={showConfigurationModal}
+                                         setShow={setShowConfigurationModal}
+                                         queriesList={currentTabs.queriesList}
+                                         activeQueryId={activeQueryId}
+                                         dashboardId={dashboardId} />
+      )}
+      {showCopyToDashboardModal && (
+        <CopyToDashboardForm onSubmit={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
+                             onCancel={toggleCopyToDashboardModal}
+                             activeDashboardId={dashboardId}
+                             submitButtonText="Copy page"
+                             submitLoadingText="Copying page..." />
+      )}
+    </Container>
   );
 };
 
@@ -262,7 +355,7 @@ AdaptableQueryTabs.propTypes = {
   maxWidth: PropTypes.number.isRequired,
   queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   titles: PropTypes.object.isRequired,
-  selectedQueryId: PropTypes.string.isRequired,
+  activeQueryId: PropTypes.string.isRequired,
   onRemove: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   queryTitleEditModal: PropTypes.oneOfType([

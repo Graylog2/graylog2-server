@@ -49,6 +49,7 @@ public abstract class StreamEntity {
     @NotNull
     public abstract List<StreamRuleEntity> streamRules();
 
+    @Deprecated
     @JsonProperty("alert_conditions")
     @NotNull
     public abstract List<StreamAlertConditionEntity> alertConditions();

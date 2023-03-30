@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface Event extends Indexable {
+    @Override
     String getId();
 
     String getEventDefinitionType();
@@ -96,6 +97,10 @@ public interface Event extends Indexable {
 
     void setGroupByFields(Map<String, String> fields);
 
+    void setReplayInfo(EventReplayInfo replayInfo);
+
+    EventReplayInfo getReplayInfo();
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -111,6 +116,7 @@ public interface Event extends Indexable {
         from.timerangeStart().ifPresent(event::setTimerangeStart);
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
         from.originContext().ifPresent(event::setOriginContext);
+        from.replayInfo().ifPresent(event::setReplayInfo);
 
         return event;
     }

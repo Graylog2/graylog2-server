@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 
 import java.io.File;
@@ -76,7 +77,7 @@ public class GenerateApiDefinition {
         }
         final String targetName = args[0];
         final Path targetPath = Paths.get(targetName);
-        
+
         deleteDirectory(targetPath.toFile());
         Files.createDirectories(targetPath);
         log("Generating Swagger definition for API ...");
@@ -84,7 +85,9 @@ public class GenerateApiDefinition {
 
         final Set<Class<?>> resourceClasses = findResources(packageNames);
 
-        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", new ObjectMapper());
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
+        final Generator generator = new Generator(resourceClasses, Collections.emptyMap(), "/plugins", objectMapper, false);
 
         final Map<String, Object> overview = generator.generateOverview();
         writeJsonToFile(targetName + "/api.json", overview);

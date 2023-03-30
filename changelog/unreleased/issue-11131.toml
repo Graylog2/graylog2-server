@@ -1,0 +1,5 @@
+type = "added"
+message = "Provide ability to configure an email attribute for LDAP."
+
+issues = ["11131"]
+pulls = ["14041"]

@@ -157,7 +157,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public void delete(EventDefinitionDto nativeEntity) {
-        eventDefinitionHandler.delete(nativeEntity.id());
+        eventDefinitionHandler.deleteImmutable(nativeEntity.id());
     }
 
     @Override
@@ -172,6 +172,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return eventDefinitionService.streamAll()
+                .filter(ed -> ed.config().isContentPackExportable())
                 .map(this::createExcerpt)
                 .collect(Collectors.toSet());
     }
@@ -209,5 +210,10 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         eventDefinition.resolveForInstallation(entity, parameters, entities, graph);
 
         return ImmutableGraph.copyOf(graph);
+    }
+
+    @Override
+    public boolean usesScopedEntities() {
+        return true;
     }
 }

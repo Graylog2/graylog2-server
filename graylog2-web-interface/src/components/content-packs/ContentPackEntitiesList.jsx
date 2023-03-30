@@ -25,6 +25,18 @@ import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
 import ContentPackEntitiesListStyle from './ContentPackEntitiesList.css';
 
+const EntityIcon = ({ entity }) => {
+  if (!entity.fromServer) {
+    return <span><Icon title="Content Pack" name="archive" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
+  }
+
+  return <span><Icon title="Server" name="server" /></span>;
+};
+
+EntityIcon.propTypes = {
+  entity: PropTypes.object.isRequired,
+};
+
 class ContentPackEntitiesList extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
@@ -45,6 +57,8 @@ class ContentPackEntitiesList extends React.Component {
     super(props);
 
     this.state = {
+      showApplyConfigModal: false,
+      showConfigModal: false,
       filteredEntities: props.contentPack.entities || [],
       filter: undefined,
     };
@@ -75,14 +89,6 @@ class ContentPackEntitiesList extends React.Component {
     this.setState({ filteredEntities: filteredEntities, filter: filter });
   };
 
-  _entityIcon = (entity) => {
-    if (!entity.fromServer) {
-      return <span><Icon title="Content Pack" name="archive" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
-    }
-
-    return <span><Icon title="Server" name="server" /></span>;
-  };
-
   _entityRowFormatter = (entity) => {
     const {
       contentPack,
@@ -92,7 +98,6 @@ class ContentPackEntitiesList extends React.Component {
       readOnly,
     } = this.props;
 
-    let applyModalRef;
     const applyParamComponent = (
       <ContentPackApplyParameter parameters={contentPack.parameters}
                                  entity={entity}
@@ -102,15 +107,17 @@ class ContentPackEntitiesList extends React.Component {
     );
 
     const closeModal = () => {
-      applyModalRef.close();
+      this.setState({ showApplyConfigModal: false });
     };
 
     const open = () => {
-      applyModalRef.open();
+      this.setState({ showApplyConfigModal: true });
     };
 
     const applyModal = (
-      <BootstrapModalWrapper ref={(node) => { applyModalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showApplyConfigModal}
+                             onHide={closeModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
@@ -123,7 +130,6 @@ class ContentPackEntitiesList extends React.Component {
       </BootstrapModalWrapper>
     );
 
-    let showModalRef;
     const entityComponent = (
       <ContentPackEntityConfig appliedParameter={appliedParameter[entity.id]}
                                parameters={contentPack.parameters}
@@ -131,15 +137,17 @@ class ContentPackEntitiesList extends React.Component {
     );
 
     const closeShowModal = () => {
-      showModalRef.close();
+      this.setState({ showConfigModal: false });
     };
 
     const openShowModal = () => {
-      showModalRef.open();
+      this.setState({ showConfigModal: true });
     };
 
     const showModal = (
-      <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showConfigModal}
+                             onHide={closeShowModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Entity Config</Modal.Title>
         </Modal.Header>
@@ -160,7 +168,7 @@ class ContentPackEntitiesList extends React.Component {
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
-        {!readOnly && <td>{this._entityIcon(entity)}</td>}
+        {!readOnly && <td><EntityIcon entity={entity} /></td>}
         {!readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>
@@ -175,8 +183,7 @@ class ContentPackEntitiesList extends React.Component {
               Edit
             </Button>
             )}
-            <Button bsStyle="info"
-                    bsSize="xs"
+            <Button bsSize="xs"
                     onClick={() => { openShowModal(); }}>
               Show
             </Button>
@@ -200,8 +207,7 @@ class ContentPackEntitiesList extends React.Component {
       <div>
         <h2>Entity list</h2>
         <br />
-        <SearchForm searchButtonLabel="Filter"
-                    onSearch={this._filterEntities}
+        <SearchForm onSearch={this._filterEntities}
                     onReset={() => { this._filterEntities(''); }} />
         <DataTable id="entity-list"
                    headers={headers}

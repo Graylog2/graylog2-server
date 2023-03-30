@@ -27,6 +27,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,8 @@ class EncryptedValueTest {
                 ObjectMapperProvider.class.getClassLoader(),
                 Collections.emptySet(),
                 encryptedValueService,
-                GRNRegistry.createWithBuiltinTypes()
+                GRNRegistry.createWithBuiltinTypes(),
+                InputConfigurationBeanDeserializerModifier.withoutConfig()
         ).get();
 
         this.dbService = new TestService(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper));
@@ -203,7 +205,7 @@ class EncryptedValueTest {
         }
 
         @JsonCreator
-        public static TestDTO create(@JsonProperty("id") String id, @JsonProperty("password_value") EncryptedValue passwordValue) {
+        public static TestDTO create(@JsonProperty("id") @Id String id, @JsonProperty("password_value") EncryptedValue passwordValue) {
             return new AutoValue_EncryptedValueTest_TestDTO(id, passwordValue);
         }
     }

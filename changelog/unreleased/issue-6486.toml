@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixes to_date() pipeline conversion function to honor an optional timezone argument."
+
+issues = ["6486"]
+pulls = ["14252"]

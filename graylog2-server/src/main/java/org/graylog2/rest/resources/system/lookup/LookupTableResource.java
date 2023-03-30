@@ -32,6 +32,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -68,6 +69,7 @@ import org.mongojack.DBSort;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -95,12 +97,13 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/system/lookup")
 @Produces("application/json")
 @Consumes("application/json")
-@Api(value = "System/Lookup", description = "Lookup tables")
+@Api(value = "System/Lookup", description = "Lookup tables", tags = {CLOUD_VISIBLE})
 public class LookupTableResource extends RestResource {
     private static final ImmutableSet<String> LUT_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(
             LookupTableDto.FIELD_ID,
@@ -150,6 +153,8 @@ public class LookupTableResource extends RestResource {
     private final SearchQueryParser cacheSearchQueryParser;
     private final LookupTableService lookupTableService;
     private final LookupDataAdapterValidationContext lookupDataAdapterValidationContext;
+    private final Validator validator;
+    private final Configuration configuration;
 
     @Inject
     public LookupTableResource(DBLookupTableService dbTableService, DBDataAdapterService dbDataAdapterService,
@@ -157,7 +162,9 @@ public class LookupTableResource extends RestResource {
                                Map<String, LookupDataAdapter.Factory> dataAdapterTypes,
                                Map<String, LookupDataAdapter.Factory2> dataAdapterTypes2,
                                LookupTableService lookupTableService,
-                               LookupDataAdapterValidationContext lookupDataAdapterValidationContext) {
+                               LookupDataAdapterValidationContext lookupDataAdapterValidationContext,
+                               Validator validator,
+                               Configuration configuration) {
         this.dbTableService = dbTableService;
         this.dbDataAdapterService = dbDataAdapterService;
         this.dbCacheService = dbCacheService;
@@ -166,6 +173,8 @@ public class LookupTableResource extends RestResource {
         this.dataAdapterTypes2 = dataAdapterTypes2;
         this.lookupTableService = lookupTableService;
         this.lookupDataAdapterValidationContext = lookupDataAdapterValidationContext;
+        this.validator = validator;
+        this.configuration = configuration;
         this.lutSearchQueryParser = new SearchQueryParser(LookupTableDto.FIELD_TITLE, LUT_SEARCH_FIELD_MAPPING);
         this.adapterSearchQueryParser = new SearchQueryParser(DataAdapterDto.FIELD_TITLE, ADAPTER_SEARCH_FIELD_MAPPING);
         this.cacheSearchQueryParser = new SearchQueryParser(CacheDto.FIELD_TITLE, CACHE_SEARCH_FIELD_MAPPING);
@@ -326,7 +335,7 @@ public class LookupTableResource extends RestResource {
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
         try {
-            LookupTableDto saved = dbTableService.save(lookupTable.toDto());
+            LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
 
             return LookupTableApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
@@ -342,7 +351,7 @@ public class LookupTableResource extends RestResource {
                                       @Valid @ApiParam LookupTableApi toUpdate) {
         checkLookupTableId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        LookupTableDto saved = dbTableService.save(toUpdate.toDto());
+        LookupTableDto saved = dbTableService.saveAndPostEvent(toUpdate.toDto());
 
         return LookupTableApi.fromDto(saved);
     }
@@ -358,7 +367,7 @@ public class LookupTableResource extends RestResource {
             throw new NotFoundException();
         }
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, lookupTableDto.get().id());
-        dbTableService.delete(idOrName);
+        dbTableService.deleteAndPostEvent(idOrName);
 
         return LookupTableApi.fromDto(lookupTableDto.get());
     }
@@ -368,8 +377,11 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the lookup table config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateTable(@Valid @ApiParam LookupTableApi toValidate) {
+    public ValidationResult validateTable(@ApiParam LookupTableApi toValidate) {
         final ValidationResult validation = new ValidationResult();
+
+        validator.validate(toValidate).stream().forEach(v ->
+                validation.addError(v.getPropertyPath().toString(), v.getMessage()));
 
         final Optional<LookupTableDto> dtoOptional = dbTableService.get(toValidate.name());
         if (dtoOptional.isPresent()) {
@@ -474,7 +486,11 @@ public class LookupTableResource extends RestResource {
 
         final Stream<LookupDataAdapter.Descriptor> stream1 = dataAdapterTypes.values().stream().map(LookupDataAdapter.Factory::getDescriptor);
         final Stream<LookupDataAdapter.Descriptor> stream2 = dataAdapterTypes2.values().stream().map(LookupDataAdapter.Factory2::getDescriptor);
-        return Stream.concat(stream1, stream2)
+        Stream<LookupDataAdapter.Descriptor> descriptorStream = Stream.concat(stream1, stream2);
+        if (configuration.isCloud()) {
+            descriptorStream = descriptorStream.filter(descriptor -> descriptor.defaultConfiguration().isCloudCompatible());
+        }
+        return descriptorStream
                 .collect(Collectors.toMap(LookupDataAdapter.Descriptor::getType, Function.identity()));
 
     }
@@ -546,7 +562,11 @@ public class LookupTableResource extends RestResource {
     public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
         try {
             DataAdapterDto dto = newAdapter.toDto();
-            DataAdapterDto saved = dbDataAdapterService.save(dto);
+            if (configuration.isCloud() && !dto.config().isCloudCompatible()) {
+                throw new BadRequestException(String.format(Locale.ENGLISH,
+                        "The data adapter <%s> is not allowed in the cloud environment!", dto.config().type()));
+            }
+            DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(dto);
 
             return DataAdapterApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
@@ -569,7 +589,7 @@ public class LookupTableResource extends RestResource {
         if (!unused) {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
         }
-        dbDataAdapterService.delete(idOrName);
+        dbDataAdapterService.deleteAndPostEvent(idOrName);
 
         return DataAdapterApi.fromDto(dto);
     }
@@ -582,7 +602,7 @@ public class LookupTableResource extends RestResource {
                                         @Valid @ApiParam DataAdapterApi toUpdate) {
         checkLookupAdapterId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        DataAdapterDto saved = dbDataAdapterService.save(toUpdate.toDto());
+        DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(toUpdate.toDto());
 
         return DataAdapterApi.fromDto(saved);
     }
@@ -592,8 +612,11 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the data adapter config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateAdapter(@Valid @ApiParam DataAdapterApi toValidate) {
+    public ValidationResult validateAdapter(@ApiParam DataAdapterApi toValidate) {
         final ValidationResult validation = new ValidationResult();
+
+        validator.validate(toValidate).stream().forEach(v ->
+                validation.addError(v.getPropertyPath().toString(), v.getMessage()));
 
         final Optional<DataAdapterDto> dtoOptional = dbDataAdapterService.get(toValidate.name());
         if (dtoOptional.isPresent()) {
@@ -700,7 +723,7 @@ public class LookupTableResource extends RestResource {
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public CacheApi createCache(@ApiParam CacheApi newCache) {
         try {
-            final CacheDto saved = dbCacheService.save(newCache.toDto());
+            final CacheDto saved = dbCacheService.saveAndPostEvent(newCache.toDto());
             return CacheApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
@@ -722,7 +745,7 @@ public class LookupTableResource extends RestResource {
         if (!unused) {
             throw new BadRequestException("The cache is still in use, cannot delete.");
         }
-        dbCacheService.delete(idOrName);
+        dbCacheService.deleteAndPostEvent(idOrName);
 
         return CacheApi.fromDto(dto);
     }
@@ -735,7 +758,7 @@ public class LookupTableResource extends RestResource {
                                 @ApiParam CacheApi toUpdate) {
         checkLookupCacheId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        CacheDto saved = dbCacheService.save(toUpdate.toDto());
+        CacheDto saved = dbCacheService.saveAndPostEvent(toUpdate.toDto());
         return CacheApi.fromDto(saved);
     }
 
@@ -744,8 +767,11 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the cache config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateCache(@Valid @ApiParam CacheApi toValidate) {
+    public ValidationResult validateCache(@ApiParam CacheApi toValidate) {
         final ValidationResult validation = new ValidationResult();
+
+        validator.validate(toValidate).stream().forEach(v ->
+                validation.addError(v.getPropertyPath().toString(), v.getMessage()));
 
         final Optional<CacheDto> dtoOptional = dbCacheService.get(toValidate.name());
         if (dtoOptional.isPresent()) {

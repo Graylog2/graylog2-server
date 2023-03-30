@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Reduce logging and add metric for \"Couldn't remove default stream\" warning."
+
+issues = ["graylog-plugin-enterprise#3481"]
+pulls = ["14409"]

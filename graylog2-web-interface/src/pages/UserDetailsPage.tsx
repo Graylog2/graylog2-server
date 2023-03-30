@@ -22,9 +22,8 @@ import { PageHeader, DocumentTitle } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import UserDetails from 'components/users/UserDetails';
-import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
-import DocumentationLink from 'components/support/DocumentationLink';
 import type User from 'logic/users/User';
 
 type Props = {
@@ -53,22 +52,19 @@ const UserDetailsPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`User Details ${loadedUser?.fullName ?? ''}`}>
+      <UsersPageNavigation />
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
-                  subactions={(
+                  actions={(
                     <UserActionLinks userId={userId}
                                      userIsReadOnly={loadedUser?.readOnly ?? false} />
-                  )}>
+                  )}
+                  documentationLink={{
+                    title: 'Permissions documentation',
+                    path: DocsHelper.PAGES.USERS_ROLES,
+                  }}>
         <span>
           Overview of details like profile information, settings, teams and roles.
         </span>
-
-        <span>
-          Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                             text="documentation" />
-        </span>
-
-        <UserOverviewLinks />
       </PageHeader>
 
       <UserDetails user={userId === loadedUser?.id ? loadedUser : undefined} />

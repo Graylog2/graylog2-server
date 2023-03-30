@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Theme Color Generators generates table colors 1`] = `
+{
+  "background": "#fbfbfc",
+  "backgroundAlt": "#f3f4f6",
+  "backgroundHover": "#f7f8f9",
+  "variant": {
+    "active": "#eaecf0",
+    "danger": "#fae1e1",
+    "info": "#e1e8f3",
+    "primary": "#e3e4e7",
+    "success": "#e6eee1",
+    "warning": "#fbf7e2",
+  },
+  "variantHover": {
+    "active": "#d7dce4",
+    "danger": "#f6c5c5",
+    "info": "#c6d3e9",
+    "primary": "#cacdd1",
+    "success": "#cfe0c6",
+    "warning": "#f7f1c9",
+  },
+}
+`;
+
+exports[`Theme Color Generators generates variant colors 1`] = `
+{
+  "dark": {
+    "danger": "#d04a4a",
+    "default": "#8894a7",
+    "info": "#4d7db4",
+    "primary": "#5d6776",
+    "success": "#6f9e4c",
+    "warning": "#d2c558",
+  },
+  "darker": {
+    "danger": "#9e3838",
+    "default": "#67717f",
+    "info": "#3a5f89",
+    "primary": "#464e5a",
+    "success": "#55783a",
+    "warning": "#a09643",
+  },
+  "darkest": {
+    "danger": "#511d1d",
+    "default": "#353a41",
+    "info": "#1e3147",
+    "primary": "#24292e",
+    "success": "#2c3e1e",
+    "warning": "#524d23",
+  },
+  "light": {
+    "danger": "#f08d8d",
+    "default": "#b5bfcd",
+    "info": "#8eadd8",
+    "primary": "#979ea8",
+    "success": "#a3c68e",
+    "warning": "#f2e695",
+  },
+  "lighter": {
+    "danger": "#f6c5c5",
+    "default": "#d7dce4",
+    "info": "#c6d3e9",
+    "primary": "#cacdd1",
+    "success": "#cfe0c6",
+    "warning": "#f7f1c9",
+  },
+  "lightest": {
+    "danger": "#fdf1f1",
+    "default": "#f5f6f8",
+    "info": "#f1f4f9",
+    "primary": "#f2f3f4",
+    "success": "#f3f7f1",
+    "warning": "#fdfbf2",
+  },
+}
+`;

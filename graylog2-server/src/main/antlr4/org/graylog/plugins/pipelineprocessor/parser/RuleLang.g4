@@ -82,6 +82,7 @@ expression
     |   '[' (expression (',' expression)*)* ']'                         # ArrayLiteralExpr
     |   '{' (propAssignment (',' propAssignment)*)* '}'                 # MapLiteralExpr
     |   MessageRef '.' field=expression                                 # MessageRef
+    |   MessageRef                                                      # MessageRef
     |   fieldSet=expression '.' field=expression                        # Nested
     |   array=expression '[' index=expression ']'                       # IndexedAccess
     |   sign=('+'|'-') expr=expression                                  # SignedExpression

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix alert system on low message input"
+
+issues = ["6770"]
+pulls = ["13556"]

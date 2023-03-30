@@ -73,7 +73,7 @@ public class ClusterJournalResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         final RemoteJournalResource remoteJournalResource = remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteJournalResource.class);
         final Response<JournalSummaryResponse> response = remoteJournalResource.get().execute();
         if (response.isSuccessful()) {

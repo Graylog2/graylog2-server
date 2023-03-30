@@ -1,0 +1,5 @@
+type = "changed"
+message = "Display streams overview as a table to improve usability."
+
+issues = ["13887"]
+pulls = ["13930"]

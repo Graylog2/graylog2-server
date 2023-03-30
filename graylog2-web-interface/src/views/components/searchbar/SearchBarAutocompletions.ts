@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { sortBy, uniqBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
+import uniqBy from 'lodash/uniqBy';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type View from 'views/logic/views/View';
 
 import type {
   Editor,
@@ -42,11 +44,14 @@ export type CompleterContext = Readonly<{
   timeRange?: TimeRange | NoTimeRangeOverride,
   streams?: Array<string>,
   fieldTypes?: FieldTypes,
+  userTimezone: string,
+  view: View,
 }>;
 
 export interface Completer {
   getCompletions(context: CompleterContext): Array<CompletionResult> | Promise<Array<CompletionResult>>;
   shouldShowCompletions?: (currentLine: number, lines: Array<Array<Line>>) => boolean;
+  identifierRegexps?: RegExp[];
 }
 
 const onCompleterError = (error: Error) => {
@@ -63,16 +68,27 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
   private readonly fieldTypes: FieldTypes;
 
-  constructor(completers: Array<Completer>, timeRange: TimeRange | NoTimeRangeOverride | undefined, streams: Array<string>, fieldTypes: FieldTypes) {
+  private readonly userTimezone: string;
+
+  private readonly view: View;
+
+  constructor(
+    completers: Array<Completer>,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string>,
+    fieldTypes: FieldTypes,
+    userTimezone: string,
+    view: View,
+  ) {
     this.completers = completers;
     this.timeRange = timeRange;
     this.streams = streams;
     this.fieldTypes = fieldTypes;
+    this.userTimezone = userTimezone;
+    this.view = view;
   }
 
   getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
-    // eslint-disable-next-line no-param-reassign
-    editor.completer.autoSelect = false;
     const tokens = editor.session.getTokens(pos.row);
     const currentToken = editor.session.getTokenAt(pos.row, pos.column);
     const currentTokenIdx = tokens.findIndex((t) => (t === currentToken));
@@ -83,7 +99,18 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       this.completers
         .map(async (completer) => {
           try {
-            return await completer.getCompletions({ currentToken, lastToken, prefix, tokens, currentTokenIdx, timeRange: this.timeRange, streams: this.streams, fieldTypes: this.fieldTypes });
+            return await completer.getCompletions({
+              currentToken,
+              lastToken,
+              prefix,
+              tokens,
+              currentTokenIdx,
+              timeRange: this.timeRange,
+              streams: this.streams,
+              fieldTypes: this.fieldTypes,
+              userTimezone: this.userTimezone,
+              view: this.view,
+            });
           } catch (e) {
             onCompleterError(e);
           }
@@ -109,4 +136,6 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
       return false;
     });
   };
+
+  get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { VisualizationType } from 'views/types';
@@ -101,7 +101,7 @@ const validate = (formValues: WidgetConfigFormValues) => {
     : {};
 };
 
-const VisualizationElement: AggregationElement = {
+const VisualizationElement: AggregationElement<'visualization'> = {
   title: 'Visualization',
   key: 'visualization',
   order: 4,
@@ -110,6 +110,7 @@ const VisualizationElement: AggregationElement = {
   fromConfig,
   toConfig,
   validate,
+  isEmpty: () => false,
 };
 
 export default VisualizationElement;

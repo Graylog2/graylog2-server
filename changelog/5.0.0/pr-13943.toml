@@ -1,0 +1,5 @@
+type = "changed"
+message = "Change default of search window and execution frequency for new event configurations from 1 to 5 minutes."
+
+issues = ["Graylog2/graylog-plugin-enterprise#3740"]
+pulls = ["13943", "Graylog2/graylog-plugin-enterprise#4343"]

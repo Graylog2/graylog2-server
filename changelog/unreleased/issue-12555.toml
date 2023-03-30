@@ -1,0 +1,5 @@
+type = "a"
+message = "Generate an event in the `System Event` stream for every system notification"
+details.user = "Any of the existing event notification types can thus be applied to system notifictions. E.g. to send an email for certain types of notifications."
+issues = ["12555", "14345"]
+pulls = ["13833"]

@@ -20,7 +20,7 @@ import { useState, useEffect } from 'react';
 import withParams from 'routing/withParams';
 import type { Location } from 'routing/withLocation';
 import withLocation from 'routing/withLocation';
-import {} from 'components/authentication/bindings'; // Bind all authentication plugins
+import 'components/authentication/bindings'; // Bind all authentication plugins
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { Spinner } from 'components/common';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';

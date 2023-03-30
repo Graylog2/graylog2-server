@@ -18,15 +18,24 @@ import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
-import {} from 'components/authentication/bindings'; // Bind all authentication plugins
-import history from 'util/History';
+import 'components/authentication/bindings'; // Bind all authentication plugins
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
+import { asMock } from 'helpers/mocking';
+import mockHistory from 'helpers/mocking/mockHistory';
 
 import ServiceSelect from './ServiceSelect';
 
-jest.mock('util/History');
+jest.mock('routing/useHistory');
 
 describe('ServiceSelect', () => {
+  let history;
+
+  beforeEach(() => {
+    history = mockHistory();
+    asMock(useHistory).mockReturnValue(history);
+  });
+
   it('should redirect correctly after selecting LDAP', async () => {
     const { getByLabelText, getByRole } = render(<ServiceSelect />);
 

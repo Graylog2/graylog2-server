@@ -120,7 +120,7 @@ public class ContainerMatrixMethodSelectorResolver implements SelectorResolver {
                         if (exactMatch) {
                             filterable.getDynamicDescendantFilter().allowAll();
                         } else {
-                            filterable.getDynamicDescendantFilter().allow(uniqueId);
+                            filterable.getDynamicDescendantFilter().allowUniqueIdPrefix(uniqueId);
                         }
                     }
                     return Resolution.match(exactMatch ? Match.exact(testDescriptor) : Match.partial(testDescriptor, expansionCallback(testDescriptor)));

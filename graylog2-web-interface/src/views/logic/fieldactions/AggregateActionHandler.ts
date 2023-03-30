@@ -14,18 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetActions } from 'views/stores/WidgetStore';
 import Widget from 'views/logic/widgets/Widget';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import DataTable from 'views/components/datatable/DataTable';
+import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
-import type { FieldActionHandler } from './FieldActionHandler';
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
-const AggregateActionHandler: FieldActionHandler<{ widget?: Widget }> = ({ field, type, contexts: { widget = Widget.empty() } }) => {
+const AggregateActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
+  field,
+  type,
+  contexts: { widget = Widget.empty() },
+}) => (dispatch: AppDispatch) => {
   const newWidgetBuilder = AggregationWidget.builder()
     .newId()
     .config(AggregationWidgetConfig.builder()
@@ -35,7 +40,7 @@ const AggregateActionHandler: FieldActionHandler<{ widget?: Widget }> = ({ field
       .build());
   const newWidget = duplicateCommonWidgetSettings(newWidgetBuilder, widget).build();
 
-  return WidgetActions.create(newWidget);
+  return dispatch(addWidget(newWidget));
 };
 
 export default AggregateActionHandler;

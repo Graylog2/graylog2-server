@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { isString, trim, truncate as trunc } from 'lodash';
+import isString from 'lodash/isString';
+import trim from 'lodash/trim';
+import trunc from 'lodash/truncate';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
@@ -43,7 +45,7 @@ const DecoratorValue = ({ field, value, truncate, render, type }: Props) => {
   if (value && value.href && value.type) {
     const formattedValue = _formatValue(field, value.href, truncate, render, type);
 
-    return <a href={value.href}>{formattedValue}</a>;
+    return <a href={value.href} target="_blank" rel="noreferrer">{formattedValue}</a>;
   }
 
   return _formatValue(field, value, truncate, render, type);

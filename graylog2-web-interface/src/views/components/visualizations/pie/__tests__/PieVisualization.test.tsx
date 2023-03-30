@@ -22,28 +22,34 @@ import * as Immutable from 'immutable';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import { oneRowPivotOneColumnPivot, oneRowPivot } from './fixtures';
 
 import PieVisualization from '../PieVisualization';
 
-jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'query1');
-
 const effectiveTimerange = { type: 'absolute', from: '2022-04-27T12:15:59.633Z', to: '2022-04-27T12:20:59.633Z' } as const;
 const SimplePieVisualization = (props: Pick<React.ComponentProps<typeof PieVisualization>, 'config' | 'data'>) => (
-  <PieVisualization effectiveTimerange={effectiveTimerange}
-                    fields={Immutable.List()}
-                    toggleEdit={() => {}}
-                    height={800}
-                    width={600}
-                    onChange={() => {}}
-                    {...props} />
+  <TestStoreProvider>
+    <PieVisualization effectiveTimerange={effectiveTimerange}
+                      fields={Immutable.List()}
+                      toggleEdit={() => {}}
+                      height={800}
+                      width={600}
+                      onChange={() => {}}
+                      {...props} />
+  </TestStoreProvider>
 );
 
 describe('PieVisualization', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   it('should use correct field in legend for aggregations with one row pivot', async () => {
     const config = AggregationWidgetConfig.builder()
-      .rowPivots([Pivot.create('action', 'string')])
+      .rowPivots([Pivot.create(['action'], 'string')])
       .series([Series.forFunction('count()')])
       .build();
     render(<SimplePieVisualization config={config} data={oneRowPivot} />);
@@ -55,8 +61,8 @@ describe('PieVisualization', () => {
 
   it('should use correct field in legend for aggregations with one row and one column pivot', async () => {
     const config = AggregationWidgetConfig.builder()
-      .columnPivots([Pivot.create('controller', 'string')])
-      .rowPivots([Pivot.create('action', 'string')])
+      .columnPivots([Pivot.create(['controller'], 'string')])
+      .rowPivots([Pivot.create(['action'], 'string')])
       .series([Series.forFunction('count()')])
       .build();
     render(<SimplePieVisualization config={config} data={oneRowPivotOneColumnPivot} />);

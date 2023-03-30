@@ -28,16 +28,17 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
-import org.graylog.plugins.views.search.rest.SearchExecutor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.results.ChunkedResult;
+import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
@@ -56,7 +57,6 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import java.io.IOException;
@@ -90,8 +90,8 @@ public abstract class SearchResource extends RestResource {
         this.searchExecutor = searchExecutor;
     }
 
-    protected SearchResponse search(String query, int limit, String filter, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
-        final Search search = createSearch(query, limit, filter, fieldList, sorting, timeRange);
+    protected SearchResponse search(String query, int limit, int offset, String filter, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final Search search = createSearch(query, limit, offset, filter, fieldList, sorting, timeRange);
 
         final Optional<String> streamId = Searches.extractStreamId(filter);
 
@@ -207,8 +207,8 @@ public abstract class SearchResource extends RestResource {
         return Sort.create(parts[0], Sort.Order.valueOf(parts[1].toUpperCase(Locale.ENGLISH)));
     }
 
-    protected Search createSearch(String queryString, int limit, String filter, List<String> fieldList, Sort sorting, TimeRange timeRange) {
-        final SearchType searchType = createMessageList(sorting, limit, fieldList);
+    protected Search createSearch(String queryString, int limit, int offset, String filter, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final SearchType searchType = createMessageList(sorting, limit, offset, fieldList);
 
         final Query query = Query.builder()
                 .query(ElasticsearchQueryString.of(queryString))
@@ -223,10 +223,11 @@ public abstract class SearchResource extends RestResource {
                 .build();
     }
 
-    private SearchType createMessageList(Sort sorting, int limit, List<String> fieldList) {
+    private SearchType createMessageList(Sort sorting, int limit, int offset, List<String> fieldList) {
         MessageList.Builder messageListBuilder = MessageList.builder()
                 .sort(Collections.singletonList(sorting));
         messageListBuilder = limit > 0 ? messageListBuilder.limit(limit) : messageListBuilder;
+        messageListBuilder = offset > 0 ? messageListBuilder.offset(offset) : messageListBuilder;
         messageListBuilder = fieldList != null && !fieldList.isEmpty() ? messageListBuilder.fields(fieldList) : messageListBuilder;
         return messageListBuilder.build();
     }
@@ -241,7 +242,7 @@ public abstract class SearchResource extends RestResource {
                 .values()
                 .stream()
                 .findFirst()
-                .map(searchTypeResult -> (MessageList.Result)searchTypeResult)
+                .map(searchTypeResult -> (MessageList.Result) searchTypeResult)
                 .orElseThrow(() -> new IllegalStateException("Missing search type result!"));
 
         final long tookMs = queryResult.executionStats().duration();
@@ -249,8 +250,8 @@ public abstract class SearchResource extends RestResource {
         return buildSearchResponse(query, result, fieldList, tookMs, timeRange, decorate, streamId);
     }
 
-    protected ChunkedOutput<ScrollResult.ScrollChunk> buildChunkedOutput(final ScrollResult scroll) {
-        final ChunkedOutput<ScrollResult.ScrollChunk> output = new ChunkedOutput<>(ScrollResult.ScrollChunk.class);
+    protected ChunkedOutput<ResultChunk> buildChunkedOutput(final ChunkedResult scroll) {
+        final ChunkedOutput<ResultChunk> output = new ChunkedOutput<>(ResultChunk.class);
 
         LOG.debug("[{}] Scroll result contains a total of {} messages", scroll.getQueryHash(), scroll.totalHits());
         Runnable scrollIterationAction = createScrollChunkProducer(scroll, output);
@@ -288,18 +289,18 @@ public abstract class SearchResource extends RestResource {
         }
     }
 
-    protected Runnable createScrollChunkProducer(final ScrollResult scroll,
-                                                 final ChunkedOutput<ScrollResult.ScrollChunk> output) {
+    protected Runnable createScrollChunkProducer(final ChunkedResult scroll,
+                                                 final ChunkedOutput<ResultChunk> output) {
         return () -> {
             try {
-                ScrollResult.ScrollChunk chunk = scroll.nextChunk();
+                ResultChunk chunk = scroll.nextChunk();
                 while (chunk != null) {
                     LOG.debug("[{}] Writing scroll chunk with {} messages",
-                        scroll.getQueryHash(),
-                        chunk.getMessages().size());
+                            scroll.getQueryHash(),
+                            chunk.messages().size());
                     if (output.isClosed()) {
                         LOG.debug("[{}] Client connection is closed, client disconnected. Aborting scroll.",
-                            scroll.getQueryHash());
+                                scroll.getQueryHash());
                         scroll.cancel();
                         return;
                     }

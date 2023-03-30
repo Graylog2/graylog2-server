@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { WidgetComponentProps } from 'views/types';
@@ -48,12 +48,20 @@ import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHand
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import EditMessageList from 'views/components/widgets/EditMessageList';
-import { DashboardsPage, ShowViewPage, NewSearchPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
-import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
-import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
+import {
+  DashboardsPage,
+  ShowViewPage,
+  NewSearchPage,
+  NewDashboardPage,
+  StreamSearchPage,
+  EventDefinitionReplaySearchPage,
+  EventReplaySearchPage,
+} from 'views/pages';
+import AddMessageCountActionHandler, { CreateMessageCount } from 'views/logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler, { CreateMessagesWidget } from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
-import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
+import AddCustomAggregation, { CreateCustomAggregation } from 'views/logic/creatoractions/AddCustomAggregation';
 import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -81,6 +89,14 @@ import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
+import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
+import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import ViewHeader from 'views/components/views/ViewHeader';
+import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
+import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
+import Icon from 'components/common/Icon';
+import viewsReducers from 'views/viewsReducers';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -101,6 +117,8 @@ VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizatio
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 VisualizationConfig.registerSubtype(HeatmapVisualization.type, HeatmapVisualizationConfig);
+VisualizationConfig.registerSubtype(DataTable.type, DataTableVisualizationConfig);
+VisualizationConfig.registerSubtype(ScatterVisualization.type, ScatterVisualizationConfig);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
@@ -127,6 +145,8 @@ const exports: PluginExports = {
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
+    { path: Routes.ALERTS.replay_search(':alertId'), component: EventReplaySearchPage, parentComponent: App },
+    { path: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId'), component: EventDefinitionReplaySearchPage, parentComponent: App },
   ],
   enterpriseWidgets: [
     {
@@ -138,6 +158,7 @@ const exports: PluginExports = {
       // TODO: Subtyping needs to be taken into account
       visualizationComponent: MessageList as unknown as React.ComponentType<WidgetComponentProps>,
       editComponent: EditMessageList,
+      hasEditSubmitButton: true,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data[0],
       searchTypes: MessageConfigGenerator,
@@ -151,6 +172,7 @@ const exports: PluginExports = {
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationWizard,
+      hasEditSubmitButton: true,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [
@@ -163,7 +185,7 @@ const exports: PluginExports = {
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
         if (widget.config.rowPivots.length > 0) {
-          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
+          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.flatMap(({ fields }) => fields).join(', ')}`;
         }
 
         if (widget.config.series.length > 0) {
@@ -205,19 +227,19 @@ const exports: PluginExports = {
     {
       type: 'chart',
       title: 'Chart',
-      handler: ChartActionHandler,
+      thunk: ChartActionHandler,
       isEnabled: ({ type }) => type.isNumeric(),
       resetFocus: true,
     },
     {
       type: 'aggregate',
       title: 'Show top values',
-      handler: AggregateActionHandler,
+      thunk: AggregateActionHandler,
       isEnabled: (({
         field,
         type,
         contexts: { analysisDisabledFields },
-      }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      }) => (!isFunction(field) && type.isEnumerable() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
       resetFocus: true,
     },
     {
@@ -228,13 +250,13 @@ const exports: PluginExports = {
         type,
         contexts: { analysisDisabledFields },
       }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
-      handler: FieldStatisticsHandler,
+      thunk: FieldStatisticsHandler,
       resetFocus: false,
     },
     {
       type: 'add-to-table',
       title: 'Add to table',
-      handler: AddToTableActionHandler,
+      thunk: AddToTableActionHandler,
       isEnabled: AddToTableActionHandler.isEnabled,
       isHidden: AddToTableActionHandler.isHidden,
       resetFocus: false,
@@ -242,7 +264,7 @@ const exports: PluginExports = {
     {
       type: 'remove-from-table',
       title: 'Remove from table',
-      handler: RemoveFromTableActionHandler,
+      thunk: RemoveFromTableActionHandler,
       isEnabled: RemoveFromTableActionHandler.isEnabled,
       isHidden: RemoveFromTableActionHandler.isHidden,
       resetFocus: false,
@@ -250,15 +272,22 @@ const exports: PluginExports = {
     {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
-      handler: AddToAllTablesActionHandler,
+      thunk: AddToAllTablesActionHandler,
       isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
-      handler: RemoveFromAllTablesActionHandler,
+      thunk: RemoveFromAllTablesActionHandler,
       isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      resetFocus: false,
+    },
+    {
+      type: 'copy-field-to-clipboard',
+      title: 'Copy field name to clipboard',
+      handler: CopyFieldToClipboard,
+      isEnabled: () => true,
       resetFocus: false,
     },
   ],
@@ -266,21 +295,21 @@ const exports: PluginExports = {
     {
       type: 'exclude',
       title: 'Exclude from results',
-      handler: new ExcludeFromQueryHandler().handle,
+      thunk: ExcludeFromQueryHandler,
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },
     {
       type: 'add-to-query',
       title: 'Add to query',
-      handler: new AddToQueryHandler().handle,
+      thunk: AddToQueryHandler,
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },
     {
       type: 'show-bucket',
       title: 'Show documents for value',
-      handler: ShowDocumentsHandler,
+      thunk: ShowDocumentsHandler,
       isEnabled: ShowDocumentsHandler.isEnabled,
       resetFocus: true,
     },
@@ -294,12 +323,32 @@ const exports: PluginExports = {
     {
       type: 'highlight-value',
       title: 'Highlight this value',
-      handler: HighlightValueHandler,
+      thunk: HighlightValueHandler,
       isEnabled: HighlightValueHandler.isEnabled,
+      resetFocus: false,
+    },
+    {
+      type: 'copy-value-to-clipboard',
+      title: 'Copy value to clipboard',
+      handler: CopyValueToClipboard,
+      isEnabled: () => true,
       resetFocus: false,
     },
   ], ['create-extractor']),
   visualizationTypes: visualizationBindings,
+  widgetCreators: [{
+    title: 'Message Count',
+    func: CreateMessageCount,
+    icon: () => <Icon name="hashtag" />,
+  }, {
+    title: 'Message Table',
+    func: CreateMessagesWidget,
+    icon: () => <Icon name="list" />,
+  }, {
+    title: 'Custom Aggregation',
+    func: CreateCustomAggregation,
+    icon: () => <Icon name="chart-column" />,
+  }],
   creators: [
     {
       type: 'preset',
@@ -314,7 +363,7 @@ const exports: PluginExports = {
     {
       type: 'generic',
       title: 'Aggregation',
-      func: CreateCustomAggregation,
+      func: AddCustomAggregation,
     },
   ],
   'views.completers': [
@@ -328,6 +377,7 @@ const exports: PluginExports = {
   ],
   'views.elements.header': [
     () => <IfSearch><MigrateFieldCharts /></IfSearch>,
+    ViewHeader,
   ],
   'views.export.formats': [
     {
@@ -352,6 +402,7 @@ const exports: PluginExports = {
       sort: 1,
     },
   ],
+  'views.reducers': viewsReducers,
 };
 
 export default exports;

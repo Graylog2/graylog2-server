@@ -16,9 +16,11 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 
-import { MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
+import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
+import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -85,13 +87,13 @@ class EmailNotificationForm extends React.Component {
     config: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    users: PropTypes.array.isRequired,
   };
 
   static defaultConfig = {
     sender: '', // TODO: Default sender should come from the server. The default should be empty or the address configured in the email server settings
     // eslint-disable-next-line no-template-curly-in-string
     subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
+    reply_to: '',
     body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
     html_body_template: DEFAULT_HTML_BODY_TEMPLATE,
     user_recipients: [],
@@ -101,7 +103,7 @@ class EmailNotificationForm extends React.Component {
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     onChange(nextConfig);
@@ -129,12 +131,8 @@ class EmailNotificationForm extends React.Component {
     return (nextValue) => this.propagateChange(key, nextValue === '' ? [] : nextValue.split(','));
   };
 
-  formatUsers = (users) => {
-    return users.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username }));
-  };
-
   render() {
-    const { config, users, validation } = this.props;
+    const { config, validation } = this.props;
 
     return (
       <>
@@ -143,32 +141,41 @@ class EmailNotificationForm extends React.Component {
                label="Subject"
                type="text"
                bsStyle={validation.errors.subject ? 'error' : null}
-               help={lodash.get(validation, 'errors.subject[0]', 'The subject that should be used for the email notification.')}
+               help={get(validation, 'errors.subject[0]', 'The subject that should be used for the email notification.')}
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
+        <Input id="notification-replyto"
+               name="reply_to"
+               label="Reply-To (Optional)"
+               type="text"
+               bsStyle={validation.errors.replyto ? 'error' : null}
+               help={get(validation, 'errors.reply_to[0]', 'The email address that recipients should use for replies.')}
+               value={config.reply_to || ''}
+               onChange={this.handleChange} />
         <HideOnCloud>
           <Input id="notification-sender"
                  name="sender"
                  label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
                  type="text"
                  bsStyle={validation.errors.sender ? 'error' : null}
-                 help={lodash.get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
+                 help={get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
                  value={config.sender || ''}
                  onChange={this.handleChange} />
         </HideOnCloud>
-        <FormGroup controlId="notification-user-recipients"
-                   validationState={validation.errors.recipients ? 'error' : null}>
-          <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
-          <MultiSelect id="notification-user-recipients"
-                       value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
-                       placeholder="Select user(s)..."
-                       options={this.formatUsers(users)}
-                       onChange={this.handleRecipientsChange('user_recipients')} />
-          <HelpBlock>
-            {lodash.get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}
-          </HelpBlock>
-        </FormGroup>
+
+        <IfPermitted permissions="users:list">
+          <FormGroup controlId="notification-user-recipients"
+                     validationState={validation.errors.recipients ? 'error' : null}>
+            <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
+            <UsersSelectField id="notification-user-recipients"
+                              value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
+                              onChange={this.handleRecipientsChange('user_recipients')} />
+            <HelpBlock>
+              {get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}
+            </HelpBlock>
+          </FormGroup>
+        </IfPermitted>
 
         <FormGroup controlId="notification-email-recipients"
                    validationState={validation.errors.recipients ? 'error' : null}>
@@ -181,7 +188,7 @@ class EmailNotificationForm extends React.Component {
                        onChange={this.handleRecipientsChange('email_recipients')}
                        allowCreate />
           <HelpBlock>
-            {lodash.get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
+            {get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
           </HelpBlock>
         </FormGroup>
         <Input id="notification-time-zone"
@@ -201,7 +208,7 @@ class EmailNotificationForm extends React.Component {
                             value={config.body_template || ''}
                             onChange={this.handleBodyTemplateChange} />
           <HelpBlock>
-            {lodash.get(validation, 'errors.body[0]', 'The template that will be used to generate the email body.')}
+            {get(validation, 'errors.body[0]', 'The template that will be used to generate the email body.')}
           </HelpBlock>
         </FormGroup>
         <FormGroup controlId="notification-body-template"
@@ -213,7 +220,7 @@ class EmailNotificationForm extends React.Component {
                             value={config.html_body_template || ''}
                             onChange={this.handleHtmlBodyTemplateChange} />
           <HelpBlock>
-            {lodash.get(validation, 'errors.body[0]', 'The template that will be used to generate the email HTML body.')}
+            {get(validation, 'errors.body[0]', 'The template that will be used to generate the email HTML body.')}
           </HelpBlock>
         </FormGroup>
       </>

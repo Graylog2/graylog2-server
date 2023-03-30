@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import NumberUtils from 'util/NumberUtils';
 import { Col, Row, Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
@@ -43,35 +44,31 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     };
   }, [indexName]);
 
-  if (!index || !index.all_shards) {
-    return <Spinner />;
-  }
-
-  const _onRecalculateIndex = () => {
+  const _onRecalculateIndex = useCallback(() => {
     if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
       IndexRangesActions.recalculateIndex(indexName).then(() => {
         IndicesActions.list(indexSetId);
       });
     }
-  };
+  }, [indexName, indexSetId]);
 
-  const _onCloseIndex = () => {
+  const _onCloseIndex = useCallback(() => {
     if (window.confirm(`Really close index ${indexName}?`)) {
       IndicesActions.close(indexName).then(() => {
         IndicesActions.list(indexSetId);
       });
     }
-  };
+  }, [indexName, indexSetId]);
 
-  const _onDeleteIndex = () => {
+  const _onDeleteIndex = useCallback(() => {
     if (window.confirm(`Really delete index ${indexName}?`)) {
       IndicesActions.delete(indexName).then(() => {
         IndicesActions.list(indexSetId);
       });
     }
-  };
+  }, [indexName, indexSetId]);
 
-  const _formatActionButtons = () => {
+  const actionButtons = useMemo(() => {
     if (isDeflector) {
       return (
         <span>
@@ -88,16 +85,20 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
         <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>Delete index</Button>
       </span>
     );
-  };
+  }, [isDeflector, _onCloseIndex, _onDeleteIndex, _onRecalculateIndex]);
+
+  if (!index || !index.all_shards) {
+    return <Spinner />;
+  }
 
   return (
     <div className="index-info">
       <IndexRangeSummary indexRange={indexRange} />{' '}
 
       <HideOnCloud>
-        {index.all_shards.segments} segments,{' '}
-        {index.all_shards.open_search_contexts} open search contexts,{' '}
-        {index.all_shards.documents.deleted} deleted messages
+        {NumberUtils.formatNumber(index.all_shards.segments)} segments,{' '}
+        {NumberUtils.formatNumber(index.all_shards.open_search_contexts)} open search contexts,{' '}
+        {NumberUtils.formatNumber(index.all_shards.documents.deleted)} deleted messages
         <Row style={{ marginBottom: '10' }}>
           <Col md={4} className="shard-meters">
             <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
@@ -110,7 +111,7 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
       </HideOnCloud>
       <hr style={{ marginBottom: '5', marginTop: '10' }} />
 
-      {_formatActionButtons()}
+      {actionButtons}
     </div>
   );
 };

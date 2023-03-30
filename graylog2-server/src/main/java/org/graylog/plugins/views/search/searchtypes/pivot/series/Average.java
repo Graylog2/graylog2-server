@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
 import java.util.Optional;
 
@@ -37,6 +36,7 @@ public abstract class Average implements SeriesSpec {
     @Override
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract String field();
 
@@ -45,13 +45,17 @@ public abstract class Average implements SeriesSpec {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder extends TypedBuilder<Average, Builder> {
+    public abstract static class Builder extends SeriesSpecBuilder<Average, Builder> {
         @JsonCreator
-        public static Builder create() { return Average.builder(); }
+        public static Builder create() {
+            return Average.builder();
+        }
 
+        @Override
         @JsonProperty
         public abstract Builder id(String id);
 
+        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -59,6 +63,7 @@ public abstract class Average implements SeriesSpec {
         abstract String field();
         abstract Average autoBuild();
 
+        @Override
         public Average build() {
             if (!id().isPresent()) {
                 id(NAME + "(" + field() + ")");

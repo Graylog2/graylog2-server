@@ -25,24 +25,31 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonTypeName(LineVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = LineVisualizationConfigDTO.Builder.class)
-public abstract class LineVisualizationConfigDTO implements VisualizationConfigDTO {
+public abstract class LineVisualizationConfigDTO implements VisualizationConfigDTO, XYVisualizationConfig {
     public static final String NAME = "line";
     private static final String FIELD_INTERPOLATION = "interpolation";
 
     @JsonProperty(FIELD_INTERPOLATION)
     public abstract Interpolation interpolation();
 
+    @JsonProperty(FIELD_AXIS_TYPE)
+    public abstract AxisType axisType();
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_INTERPOLATION)
         public abstract Builder interpolation(Interpolation interpolation);
+
+        @JsonProperty(FIELD_AXIS_TYPE)
+        public abstract Builder axisType(AxisType axisType);
 
         public abstract LineVisualizationConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_LineVisualizationConfigDTO.Builder()
-                    .interpolation(Interpolation.defaultValue());
+                    .interpolation(Interpolation.defaultValue())
+                    .axisType(DEFAULT_AXIS_TYPE);
         }
     }
 }

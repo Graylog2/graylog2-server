@@ -17,15 +17,17 @@
 import * as React from 'react';
 
 import View from 'views/logic/views/View';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import useViewType from 'views/hooks/useViewType';
 
 type Props = {
   children: React.ReactNode,
 };
-const IfSearch = ({ children }: Props) => (
-  <ViewTypeContext.Consumer>
-    {(viewType) => ((viewType === View.Type.Search) ? children : null)}
-  </ViewTypeContext.Consumer>
-);
+
+const IfSearch = ({ children }: Props) => {
+  const viewType = useViewType();
+
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return viewType === View.Type.Search ? <>{children}</> : null;
+};
 
 export default IfSearch;

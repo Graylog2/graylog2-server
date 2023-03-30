@@ -56,7 +56,7 @@ type Props = {
 
 const ErrorPageStyles = createGlobalStyle`
     ${generateStyles()}
-  `;
+`;
 
 const ErrorPage = ({ children, title, description, backgroundImage, displayPageLayout }: Props) => {
   const PageLayoutComponent = displayPageLayout ? PageContentLayout : React.Fragment;

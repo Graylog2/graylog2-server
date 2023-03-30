@@ -29,8 +29,6 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-jest.mock('hooks/useUserDateTime');
-
 describe('TimeRangeInput', () => {
   const defaultTimeRange = { type: 'relative', range: 300 };
 
@@ -84,7 +82,7 @@ describe('TimeRangeInput', () => {
     });
     fireEvent.change(fromValue, { target: { value: 30 } });
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Apply' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith({
       from: 1800,

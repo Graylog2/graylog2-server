@@ -27,26 +27,30 @@ export type ValidationQuery = {
   timeRange?: TimeRange | undefined,
   streams?: Array<string>,
   filter?: ElasticsearchQueryString | string,
+  validation_mode?: 'QUERY' | 'SEARCH_FILTER'
 }
 
 const queryExists = (query: string | ElasticsearchQueryString) => {
   return typeof query === 'object' ? !!query.query_string : !!query;
 };
 
-export const validateQuery = ({
-  queryString,
-  timeRange,
-  streams,
-  filter,
-  ...rest
-}: ValidationQuery): Promise<QueryValidationState> => {
+export const validateQuery = (
+  {
+    queryString,
+    timeRange,
+    streams,
+    filter,
+    ...rest
+  }: ValidationQuery,
+  userTimezone: string,
+): Promise<QueryValidationState> => {
   if (!queryExists(queryString) && !queryExists(filter)) {
     return Promise.resolve({ status: 'OK', explanations: [] });
   }
 
   const payload = {
     query: queryString,
-    timerange: timeRange ? onSubmittingTimerange(timeRange) : undefined,
+    timerange: timeRange ? onSubmittingTimerange(timeRange, userTimezone) : undefined,
     streams,
     filter,
     ...rest,
@@ -73,12 +77,12 @@ export const validateQuery = ({
         beginColumn,
         endColumn,
         relatedProperty,
-      }));
+      } as const));
 
       return ({
         status: result.status,
         explanations,
-      });
+      } as const);
     }
 
     return undefined;
@@ -87,6 +91,7 @@ export const validateQuery = ({
 
     return ({
       status: 'OK',
+      explanations: [],
     });
   });
 };

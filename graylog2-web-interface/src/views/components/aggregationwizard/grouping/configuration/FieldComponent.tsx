@@ -15,69 +15,65 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, useFormikContext } from 'formik';
 import { useContext } from 'react';
+import { useFormikContext } from 'formik';
 
+import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import Input from 'components/bootstrap/Input';
+import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 
-import FieldSelect from '../../FieldSelect';
+const placeholder = (grouping: GroupByFormValues) => {
+  if (!grouping.fields?.length) {
+    return 'Add a field';
+  }
 
-type Props = {
-  index: number,
-  fieldType: string,
+  if (grouping.type === DateType) {
+    return 'Add another date field';
+  }
+
+  return 'Add another field';
 };
 
-const FieldComponent = ({ index, fieldType }: Props) => {
+type Props = {
+  groupingIndex: number,
+};
+
+const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
-  const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
+  const grouping = values.groupBy.groupings[groupingIndex];
+  const activeQueryId = useActiveQueryId();
+  const createSelectPlaceholder = placeholder(grouping);
 
-  const onChangeField = (e, name, onChange) => {
-    const fieldName = e.target.value;
-    const newField = fieldTypes.all.find((field) => field.name === fieldName);
-    const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
-
-    if (fieldType !== newFieldType) {
-      if (newFieldType === 'time') {
-        setFieldValue(`groupBy.groupings.${index}.limit`, undefined, false);
-
-        setFieldValue(`groupBy.groupings.${index}.interval`, {
-          type: 'auto',
-          scaling: 1.0,
-        });
-      }
-
-      if (newFieldType === 'values') {
-        setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
-        setFieldValue(`groupBy.groupings.${index}.limit`, 15);
-      }
-    }
-
-    onChange({
-      target: {
-        name,
-        value: {
-          field: newField.name,
-          type: newFieldType,
-        },
-      },
+  const onChangeSelectedFields = (newFields: Array<string>) => {
+    onGroupingFieldsChange({
+      fieldTypes,
+      activeQueryId,
+      groupingIndex,
+      grouping,
+      newFields,
+      setFieldValue,
     });
   };
 
   return (
-    <Field name={`groupBy.groupings.${index}.field`}>
-      {({ field: { name, value, onChange }, meta: { error } }) => (
-        <FieldSelect id="group-by-field-select"
-                     label="Field"
-                     onChange={(e) => onChangeField(e, name, onChange)}
-                     error={error}
-                     clearable={false}
-                     ariaLabel="Field"
-                     name={name}
-                     value={value.field}
-                     aria-label="Select a field" />
-      )}
-    </Field>
+    <Input id="group-by-field-select"
+           label="Fields"
+           labelClassName="col-sm-3"
+           error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
+           wrapperClassName="col-sm-9">
+      <FieldsConfiguration onChange={onChangeSelectedFields}
+                           selectedFields={grouping.fields}
+                           menuPortalTarget={document.body}
+                           createSelectPlaceholder={createSelectPlaceholder}
+                           qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
+                           testPrefix={`grouping-${groupingIndex}`} />
+    </Input>
   );
 };
 

@@ -60,13 +60,13 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
      */
-    SearchServer[] searchVersions() default {SearchServer.OS1};
+    SearchServer[] searchVersions() default {SearchServer.OS2};
 
     /**
      * matrix rule
      * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
      */
-    MongodbServer[] mongoVersions() default {MongodbServer.MONGO4};
+    MongodbServer[] mongoVersions() default {MongodbServer.MONGO5};
 
     // additional Parameter, gets concatenated for all tests below the above rules
     int[] extraPorts() default {};
@@ -88,4 +88,6 @@ public @interface ContainerMatrixTestsConfiguration {
      */
     boolean defaultImportLicenses = true;
     boolean importLicenses() default defaultImportLicenses;
+
+    boolean withMailServerEnabled() default false;
 }

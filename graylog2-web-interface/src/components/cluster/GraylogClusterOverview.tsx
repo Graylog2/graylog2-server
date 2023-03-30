@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable react/no-find-dom-node */
 
 import * as React from 'react';
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { reduce } from 'lodash';
+import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -27,15 +26,40 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import NumberUtils from 'util/NumberUtils';
 import { useStore } from 'stores/connect';
-import { Col, Row } from 'components/bootstrap';
+import { Col, Row, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { formatTrafficData } from 'util/TrafficUtils';
 import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import TrafficGraph from './TrafficGraph';
+
+const DAYS = [
+  30,
+  90,
+  180,
+  365,
+];
+
+const Wrapper = styled.div`
+  margin-bottom: 5px;
+
+  .control-label {
+    padding-top: 0;
+  }
+
+  .graph-days-select {
+    display: flex;
+    align-items: baseline;
+
+    select {
+      padding-top: 3px;
+      height: 28px;
+    }
+  }
+`;
 
 const StyledDl = styled.dl`
   margin-bottom: 0;
@@ -70,15 +94,23 @@ const ClusterInfo = () => {
 
 const GraylogClusterTrafficGraph = () => {
   const { traffic } = useStore(ClusterTrafficStore);
+  const [graphDays, setGraphDays] = useState(DAYS[0]);
   const [graphWidth, setGraphWidth] = useState(600);
   const eventThrottler = useRef(new EventHandlersThrottler());
   const containerRef = useRef(null);
   const licensePlugin = PluginStore.exports('license');
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
+
+  const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
+    event.preventDefault();
+    const newDays = Number(event.target.value);
+
+    setGraphDays(newDays);
+  };
 
   useEffect(() => {
-    ClusterTrafficActions.getTraffic();
-  }, []);
+    ClusterTrafficActions.getTraffic(graphDays);
+  }, [graphDays]);
 
   useEffect(() => {
     const _resizeGraphs = () => {
@@ -109,7 +141,7 @@ const GraylogClusterTrafficGraph = () => {
   if (traffic) {
     const bytesOut = reduce(traffic.output, (result, value) => result + value);
 
-    sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
+    sumOutput = <small>Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}</small>;
 
     const unixTraffic = formatTrafficData(traffic.output);
 
@@ -121,6 +153,18 @@ const GraylogClusterTrafficGraph = () => {
 
   return (
     <>
+      <Wrapper className="form-inline graph-days pull-right">
+        <Input id="graph-days"
+               type="select"
+               bsSize="small"
+               label="Days"
+               value={graphDays}
+               onChange={onGraphDaysChange}
+               formGroupClassName="graph-days-select">
+          {DAYS.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
+        </Input>
+      </Wrapper>
+
       <StyledH3 ref={containerRef}>Outgoing traffic {sumOutput}</StyledH3>
       {trafficGraph}
     </>

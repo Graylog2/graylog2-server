@@ -17,6 +17,7 @@
 package org.graylog2.shared.email;
 
 import com.google.common.base.Strings;
+import com.google.common.primitives.Ints;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
@@ -30,6 +31,8 @@ import org.graylog2.configuration.EmailConfiguration;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.function.Supplier;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Utility class to create preconfigured {@link Email} instances by applying the settings from
@@ -113,7 +116,12 @@ public class EmailFactory {
         email.setSSLOnConnect(configuration.isUseSsl());
         email.setStartTLSEnabled(configuration.isUseTls());
 
-        email.setFrom(configuration.getFromEmail());
+        if (!isNullOrEmpty(configuration.getFromEmail())) {
+            email.setFrom(configuration.getFromEmail());
+        }
+
+        email.setSocketConnectionTimeout(Ints.saturatedCast(configuration.getSocketConnectionTimeout().toMillis()));
+        email.setSocketTimeout(Ints.saturatedCast(configuration.getSocketTimeout().toMillis()));
 
         return email;
     }

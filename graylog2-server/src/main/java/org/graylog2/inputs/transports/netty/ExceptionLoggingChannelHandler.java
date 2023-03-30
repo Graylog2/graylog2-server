@@ -40,22 +40,19 @@ public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (logger.isTraceEnabled() && "Connection reset by peer".equals(cause.getMessage())) {
-            logger.trace("{} in Input [{}/{}] (channel {})",
+            logger.trace("{} in Input {} (channel {})",
                     cause.getMessage(),
-                    input.getName(),
-                    input.getId(),
+                    input.toIdentifier(),
                     ctx.channel());
         } else if (this.keepAliveEnabled && cause instanceof ReadTimeoutException) {
             if (logger.isTraceEnabled()) {
-                logger.trace("KeepAlive Timeout in input [{}/{}] (channel {})",
-                        input.getName(),
-                        input.getId(),
+                logger.trace("KeepAlive Timeout in input {} (channel {})",
+                        input.toIdentifier(),
                         ctx.channel());
             }
         } else {
-            logger.error("Error in Input [{}/{}] (channel {}) (cause {})",
-                    input.getName(),
-                    input.getId(),
+            logger.error("Error in Input {} (channel {}) (cause {})",
+                    input.toIdentifier(),
                     ctx.channel(),
                     cause);
         }

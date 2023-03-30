@@ -1,0 +1,12 @@
+type = "changed"
+message = "Update jersey from 2.32 to 2.37"
+
+issues = [""]
+pulls = ["13710"]
+
+contributors = [""]
+
+details.user = """
+This is needed for Java 17 support:
+https://github.com/eclipse-ee4j/jersey/pull/4754
+"""

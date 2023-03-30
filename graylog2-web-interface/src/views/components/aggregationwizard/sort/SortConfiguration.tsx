@@ -40,7 +40,7 @@ const formatSeries = (metric: MetricFormValues) => {
   };
 };
 
-const formatGrouping = (grouping: GroupByFormValues) => grouping.field.field;
+const formatGrouping = (grouping: GroupByFormValues) => grouping.fields;
 
 type OptionValue = {
   type: 'metric' | 'groupBy',
@@ -56,14 +56,21 @@ type Option = {
 const Sort = React.memo(({ index }: Props) => {
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const { metrics = [], groupBy: { groupings = [] } = {} } = values;
-  const metricsOptions: Array<OptionValue> = metrics.map(formatSeries)
+  const otherSorts = values?.sort?.filter((_, idx) => index !== idx) ?? [];
+  const hasMetrics = otherSorts.find((s) => s.type === 'metric');
+  const hasGroupings = otherSorts.find((s) => s.type === 'groupBy');
+
+  const metricsOptions: Array<OptionValue> = hasGroupings ? [] : metrics
+    .filter((metric) => metric.function !== 'latest')
+    .map(formatSeries)
     .map(({ field, label }) => ({
       type: 'metric',
       field,
       label,
     }));
-  const rowPivotOptions: Array<OptionValue> = groupings.filter((grouping) => (grouping.direction === 'row'))
-    .map(formatGrouping).map((groupBy) => ({
+  const rowPivotOptions: Array<OptionValue> = (hasGroupings || hasMetrics) ? [] : groupings
+    .filter((grouping) => (grouping.direction === 'row'))
+    .flatMap(formatGrouping).map((groupBy) => ({
       type: 'groupBy',
       field: groupBy,
       label: groupBy,
@@ -78,6 +85,7 @@ const Sort = React.memo(({ index }: Props) => {
   const currentSort = values.sort[index];
   const optionIndex = options.findIndex((option) => (option.type === currentSort.type && option.field === currentSort.field));
   const selectedOption = optionIndex > -1 ? optionIndex : undefined;
+  const invalidSort = selectedOption === undefined && 'field' in currentSort;
 
   return (
     <div data-testid={`sort-element-${index}`}>
@@ -89,10 +97,12 @@ const Sort = React.memo(({ index }: Props) => {
                    error={error}
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9">
-              <Select options={numberIndexedOptions}
+              <Select options={invalidSort ? [{ label: currentSort.field, value: 0 }] : numberIndexedOptions}
+                      disabled={invalidSort}
+                      allowCreate={invalidSort}
                       clearable={false}
                       name={name}
-                      value={selectedOption}
+                      value={invalidSort ? 0 : selectedOption}
                       placeholder="Specify field/metric to be sorted on"
                       aria-label="Select field for sorting"
                       size="small"
@@ -115,6 +125,7 @@ const Sort = React.memo(({ index }: Props) => {
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9">
             <Select options={directionOptions}
+                    disabled={invalidSort}
                     clearable={false}
                     name={name}
                     aria-label="Select direction for sorting"

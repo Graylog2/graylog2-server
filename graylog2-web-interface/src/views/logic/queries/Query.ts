@@ -18,22 +18,13 @@ import * as Immutable from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import generateId from 'logic/generateId';
+import type { FiltersType } from 'views/types';
 
 import type { SearchType } from './SearchType';
 
 export type QueryId = string;
 
 export type FilterType = Immutable.Map<string, any>;
-
-export type SearchFilter = {
-  type: 'referenced' | 'inlineQueryString',
-  id?: string,
-  title?: string,
-  description?: string
-  queryString: string
-}
-
-export type FiltersType = Immutable.List<SearchFilter>
 
 export type SearchTypeList = Array<SearchType>;
 type InternalBuilderState = Immutable.Map<string, any>;
@@ -167,11 +158,9 @@ export default class Query {
     return this._value.searchTypes;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, query, timerange, filter, filters, searchTypes } = this._value;
 
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const builder = Query.builder()
       .id(id)
       .query(query)
@@ -217,7 +206,6 @@ export default class Query {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()

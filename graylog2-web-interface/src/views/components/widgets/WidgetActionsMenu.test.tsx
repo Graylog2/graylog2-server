@@ -22,25 +22,24 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
-import { MockStore } from 'helpers/mocking';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import { DashboardsStore } from 'views/stores/DashboardsStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
-import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import { ViewStore } from 'views/stores/ViewStore';
+import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import createSearch from 'views/logic/slices/createSearch';
+import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
+import useViewType from 'views/hooks/useViewType';
+import fetchSearch from 'views/logic/views/fetchSearch';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -48,35 +47,18 @@ import WidgetContext from '../contexts/WidgetContext';
 import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
-jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
-
+jest.mock('views/components/dashboard/hooks/useDashboards');
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
-
-jest.mock('views/stores/ChartColorRulesStore', () => ({
-  ChartColorRulesStore: {},
-}));
-
 jest.mock('views/logic/views/Actions');
+jest.mock('views/logic/slices/createSearch');
+jest.mock('views/hooks/useViewType');
+jest.mock('views/logic/views/fetchSearch');
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: MockStore(),
-  ViewActions: {
-    create: mockAction(),
-    load: mockAction(),
-  },
+jest.mock('views/logic/slices/widgetActions', () => ({
+  ...jest.requireActual('views/logic/slices/widgetActions'),
+  duplicateWidget: jest.fn(() => async () => {}),
+  removeWidget: jest.fn(() => async () => {}),
 }));
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    remove: jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(),
-}));
-
-jest.mock('views/stores/CurrentViewStateStore', () => ({ CurrentViewStateStore: MockStore(['getInitialState', () => ({})]) }));
 
 const openActionDropdown = async () => {
   const actionToggle = await screen.findByTestId('widgetActionDropDown');
@@ -92,7 +74,10 @@ describe('<WidgetActionsMenu />', () => {
     .config({})
     .build();
 
-  const viewState = ViewState.builder().build();
+  const viewState = ViewState.builder()
+    .widgets(Immutable.List([widget]))
+    .titles(Immutable.Map())
+    .build();
   const query = Query.builder().id('query-id').build();
   const searchSearch = Search.builder().queries([query]).id('search-1').build();
   const search = View.builder()
@@ -102,14 +87,6 @@ describe('<WidgetActionsMenu />', () => {
     .id('search-1')
     .title('search 1')
     .build();
-  const viewStoreState: ViewStoreState = {
-    activeQuery: 'query-id',
-    view: search,
-    isNew: false,
-    dirty: false,
-  };
-
-  asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
 
   const searchDB1 = Search.builder().id('search-1').build();
   const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
@@ -118,17 +95,9 @@ describe('<WidgetActionsMenu />', () => {
   const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
     .build();
   const dashboardList = [dashboard1, dashboard2];
-  const dashboardState = {
-    list: dashboardList,
-    pagination: {
-      total: 2,
-      page: 1,
-      per_page: 10,
-      count: 2,
-    },
-  };
 
   type DummyWidgetProps = {
+    view?: View,
     widget?: WidgetModel,
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
     setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
@@ -140,6 +109,7 @@ describe('<WidgetActionsMenu />', () => {
   }
 
   const DummyWidget = ({
+    view = search,
     widget: propsWidget = widget,
     setWidgetFocusing = () => {},
     setWidgetEditing = () => {},
@@ -148,25 +118,36 @@ describe('<WidgetActionsMenu />', () => {
     focusedWidget,
     ...props
   }: DummyWidgetProps) => (
-    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-      <WidgetFocusContext.Provider value={{
-        setWidgetFocusing,
-        setWidgetEditing,
-        unsetWidgetFocusing,
-        unsetWidgetEditing,
-        focusedWidget,
-      }}>
-        <WidgetContext.Provider value={propsWidget}>
-          <WidgetActionsMenu isFocused={false}
-                             toggleEdit={() => {}}
-                             title="Widget Title"
-                             position={new WidgetPosition(1, 1, 1, 1)}
-                             onPositionsChange={() => {}}
-                             {...props} />
-        </WidgetContext.Provider>
-      </WidgetFocusContext.Provider>
-    </FieldTypesContext.Provider>
+    <TestStoreProvider view={view} initialQuery="query-id">
+      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+        <WidgetFocusContext.Provider value={{
+          setWidgetFocusing,
+          setWidgetEditing,
+          unsetWidgetFocusing,
+          unsetWidgetEditing,
+          focusedWidget,
+        }}>
+          <WidgetContext.Provider value={propsWidget}>
+            <WidgetActionsMenu isFocused={false}
+                               toggleEdit={() => {}}
+                               title="Widget Title"
+                               position={new WidgetPosition(1, 1, 1, 1)}
+                               onPositionsChange={() => {}}
+                               {...props} />
+          </WidgetContext.Provider>
+        </WidgetFocusContext.Provider>
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>
   );
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(createSearch).mockImplementation(async (s) => s);
+  });
 
   it('is updating widget focus context on focus', () => {
     const mockSetWidgetFocusing = jest.fn();
@@ -195,16 +176,11 @@ describe('<WidgetActionsMenu />', () => {
 
     await openActionDropdown();
 
-    const duplicateBtn = screen.getByText('Duplicate');
-
-    WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
-
-    TitlesActions.set = mockAction(jest.fn().mockResolvedValue(Immutable.Map() as TitlesMap));
+    const duplicateBtn = await screen.findByText('Duplicate');
 
     fireEvent.click(duplicateBtn);
 
-    await waitFor(() => expect(WidgetActions.duplicate).toHaveBeenCalled());
-    await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
+    await waitFor(() => expect(duplicateWidget).toHaveBeenCalledWith(widget.id, 'Dummy Widget'));
   });
 
   it('does not display export action if widget is not a message table', async () => {
@@ -239,21 +215,41 @@ describe('<WidgetActionsMenu />', () => {
 
   describe('copy widget to dashboard', () => {
     beforeEach(() => {
-      // @ts-ignore
-      DashboardsStore.getInitialState = jest.fn(() => dashboardState);
+      asMock(useDashboards).mockReturnValue({
+        data: {
+          list: dashboardList,
+          pagination: { total: 2 },
+          attributes: [
+            {
+              id: 'title',
+              title: 'Title',
+              sortable: true,
+            },
+            {
+              id: 'description',
+              title: 'Description',
+              sortable: true,
+            },
+          ],
+        },
+        isInitialLoading: false,
+        refetch: () => {},
+      });
+
       ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
-      SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
-      SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
+      asMock(fetchSearch).mockResolvedValue(searchDB1.toJSON());
 
       asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
         .search(Search.builder().id('search-id').build())
         .id('new-id').type(View.Type.Dashboard)
         .build());
+
+      asMock(useViewType).mockReturnValue(View.Type.Search);
     });
 
-    const renderAndClick = async () => {
-      render(<DummyWidget />);
+    const renderAndClick = async (view: View = search) => {
+      render(<DummyWidget view={view} />);
 
       await openActionDropdown();
 
@@ -263,7 +259,7 @@ describe('<WidgetActionsMenu />', () => {
       const view1ListItem = screen.getByText('view 1');
 
       fireEvent.click(view1ListItem);
-      const selectBtn = screen.getByText('Select');
+      const selectBtn = screen.getByRole('button', { name: /copy widget/i, hidden: true });
 
       fireEvent.click(selectBtn);
     };
@@ -272,21 +268,23 @@ describe('<WidgetActionsMenu />', () => {
       await renderAndClick();
       await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
 
+      await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
+
       expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
     });
 
     it('should get corresponding search to dashboard', async () => {
       await renderAndClick();
-      await waitFor(() => expect(SearchActions.get).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(fetchSearch).toHaveBeenCalledTimes(1));
 
-      expect(SearchActions.get).toHaveBeenCalledWith('search-1');
+      expect(fetchSearch).toHaveBeenCalledWith('search-1');
     });
 
     it('should create new search for dashboard', async () => {
       await renderAndClick();
-      await waitFor(() => expect(SearchActions.create).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(createSearch).toHaveBeenCalledTimes(1));
 
-      expect(SearchActions.create).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
+      expect(createSearch).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
         .build());
     });
 
@@ -296,7 +294,7 @@ describe('<WidgetActionsMenu />', () => {
 
       expect(ViewManagementActions.update).toHaveBeenCalledWith(
         View.builder()
-          .search(Search.builder().id('search-1').build())
+          .search(Search.builder().id('search-id').build())
           .id('new-id').type(View.Type.Dashboard)
           .build(),
       );
@@ -306,7 +304,7 @@ describe('<WidgetActionsMenu />', () => {
       await renderAndClick();
       await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
-      expect(loadDashboard).toHaveBeenCalledWith('view-1');
+      expect(loadDashboard).toHaveBeenCalledWith(expect.anything(), 'new-id');
     });
   });
 
@@ -314,7 +312,6 @@ describe('<WidgetActionsMenu />', () => {
     let oldWindowConfirm;
 
     beforeEach(() => {
-      asMock(WidgetActions.remove).mockClear();
       oldWindowConfirm = window.confirm;
       window.confirm = jest.fn();
     });
@@ -332,7 +329,7 @@ describe('<WidgetActionsMenu />', () => {
 
       fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
-      await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+      await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
     });
 
     it('should not delete widget when no deletion hook is installed and prompt is cancelled', async () => {
@@ -346,7 +343,7 @@ describe('<WidgetActionsMenu />', () => {
 
       await waitFor(() => expect(window.confirm).toHaveBeenCalled());
 
-      expect(WidgetActions.remove).not.toHaveBeenCalled();
+      expect(removeWidget).not.toHaveBeenCalled();
     });
 
     describe('with custom deletion hook', () => {
@@ -376,7 +373,7 @@ describe('<WidgetActionsMenu />', () => {
 
         fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
-        await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+        await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
 
         expect(deletingWidgetHook).toHaveBeenCalled();
       });
@@ -391,7 +388,7 @@ describe('<WidgetActionsMenu />', () => {
 
         fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
-        expect(WidgetActions.remove).not.toHaveBeenCalledWith('widget-id');
+        expect(removeWidget).not.toHaveBeenCalledWith('widget-id');
 
         expect(deletingWidgetHook).toHaveBeenCalled();
       });
@@ -411,7 +408,7 @@ describe('<WidgetActionsMenu />', () => {
         const oldConsoleTrace = console.trace;
         console.trace = jest.fn();
 
-        await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+        await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
 
         expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', e);
 

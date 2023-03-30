@@ -28,6 +28,10 @@ import javax.annotation.Nullable;
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexSummary {
+
+    @JsonProperty("index_name")
+    public abstract String indexName();
+
     @JsonProperty("size")
     @Nullable
     public abstract IndexSizeSummary size();
@@ -46,11 +50,12 @@ public abstract class IndexSummary {
     public abstract boolean isReopened();
 
     @JsonCreator
-    public static IndexSummary create(@JsonProperty("size") @Nullable IndexSizeSummary size,
+    public static IndexSummary create(@JsonProperty("index_name") String indexName,
+                                      @JsonProperty("size") @Nullable IndexSizeSummary size,
                                       @JsonProperty("range") @Nullable IndexRangeSummary range,
                                       @JsonProperty("is_deflector") boolean isDeflector,
                                       @JsonProperty("is_closed") boolean isClosed,
                                       @JsonProperty("is_reopened") boolean isReopened) {
-        return new AutoValue_IndexSummary(size, range, isDeflector, isClosed, isReopened);
+        return new AutoValue_IndexSummary(indexName, size, range, isDeflector, isClosed, isReopened);
     }
 }

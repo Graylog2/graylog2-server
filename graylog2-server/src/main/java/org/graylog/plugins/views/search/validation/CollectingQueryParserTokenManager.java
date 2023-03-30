@@ -16,9 +16,8 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryparser.classic.CharStream;
-import org.apache.lucene.queryparser.classic.FastCharStream;
+import org.apache.lucene.queryparser.charstream.CharStream;
+import org.apache.lucene.queryparser.charstream.FastCharStream;
 import org.apache.lucene.queryparser.classic.QueryParserTokenManager;
 import org.apache.lucene.queryparser.classic.Token;
 

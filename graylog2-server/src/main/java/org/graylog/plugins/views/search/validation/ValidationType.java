@@ -24,4 +24,5 @@ public enum ValidationType {
     INVALID_OPERATOR,
     MISSING_LICENSE,
     INVALID_VALUE_TYPE,
+    PARAMETER_NOT_ALLOWED,
 }

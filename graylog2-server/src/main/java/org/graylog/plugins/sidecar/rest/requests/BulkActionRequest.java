@@ -33,8 +33,8 @@ public abstract class BulkActionRequest {
     public abstract List<String> collectorIds();
 
     @JsonCreator
-    public static BulkActionRequest create(@JsonProperty("sidecar_id") String collectorId,
+    public static BulkActionRequest create(@JsonProperty("sidecar_id") String sidecarId,
                                            @JsonProperty("collector_ids") List<String> collectorIds) {
-        return new AutoValue_BulkActionRequest(collectorId, collectorIds);
+        return new AutoValue_BulkActionRequest(sidecarId, collectorIds);
     }
 }

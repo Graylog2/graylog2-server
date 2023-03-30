@@ -44,4 +44,5 @@ export const simpleEventDefinition = {
     type: 'persist-to-streams-v1',
   }],
   title: 'Event Definition 1',
+  _scope: 'DEFAULT',
 };

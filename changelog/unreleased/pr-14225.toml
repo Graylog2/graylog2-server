@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix output shutdown triggering twice when the ouput is globally deleted."
+
+pulls = ["14225"]

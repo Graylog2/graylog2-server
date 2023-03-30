@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useContext, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 
+import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
 import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -26,7 +27,6 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import generateId from 'logic/generateId';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
@@ -38,16 +38,16 @@ type Props = {
 };
 
 const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
-  const configModal = useRef<BootstrapModalForm>();
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
+  const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
 
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
 
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
@@ -83,11 +83,12 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   }, [setDefaultWhiteListState, urlWhiteListConfig, config, newUrlEntry, urlType]);
 
   const openModal = () => {
-    configModal.current?.open();
+    setShowConfigModal(true);
   };
 
   const closeModal = () => {
-    configModal.current?.close();
+    setShowConfigModal(false);
+    setDefaultWhiteListState(urlWhiteListConfig);
   };
 
   const handleUpdate = (nextConfig, nextIsValid) => {
@@ -109,10 +110,6 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
     }
   };
 
-  const resetConfig = () => {
-    setDefaultWhiteListState(urlWhiteListConfig);
-  };
-
   if (urlWhiteListConfig) {
     const { entries, disabled } = config;
 
@@ -121,13 +118,13 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
         <IfPermitted permissions="urlwhitelist:write">
           <Button bsStyle="info" bsSize="xs" onClick={openModal}>Add to URL Whitelist</Button>
         </IfPermitted>
-        <BootstrapModalForm ref={configModal}
+        <BootstrapModalForm show={showConfigModal}
                             bsSize="lg"
                             title="Update Whitelist Configuration"
+                            onCancel={closeModal}
                             onSubmitForm={saveConfig}
-                            onModalClose={resetConfig}
                             submitButtonDisabled={!isValid}
-                            submitButtonText="Save">
+                            submitButtonText="Update configuration">
           <h3>Whitelist URLs</h3>
           <UrlWhiteListForm key={newUrlEntryId}
                             urls={entries}

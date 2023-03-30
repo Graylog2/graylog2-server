@@ -70,7 +70,7 @@ public class ClusterSystemPluginResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         final RemoteSystemPluginResource remoteSystemPluginResource = remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteSystemPluginResource.class);
         final Response<PluginList> response = remoteSystemPluginResource.list().execute();
         if (response.isSuccessful()) {

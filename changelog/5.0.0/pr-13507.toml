@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix server --dump-default-config command"
+
+issues = [""]
+pulls = ["13507"]

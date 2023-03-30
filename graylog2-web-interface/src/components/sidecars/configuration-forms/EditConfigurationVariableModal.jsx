@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import { debounce, cloneDeep } from 'lodash';
+import debounce from 'lodash/debounce';
+import cloneDeep from 'lodash/cloneDeep';
 import React from 'react';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -50,6 +51,7 @@ class EditConfigurationVariableModal extends React.Component {
     const { name, id, description, content } = this.props;
 
     return {
+      showModal: false,
       error: false,
       validation_errors: {},
       savedName: name,
@@ -69,8 +71,11 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   openModal = () => {
+    this.setState({ ...this._cleanState(), showModal: true });
+  };
+
+  closeModal = () => {
     this.setState(this._cleanState());
-    this.modal.open();
   };
 
   _getId = (prefixIdName) => {
@@ -80,7 +85,7 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   _saved = () => {
-    this.modal.close();
+    this.setState({ showModal: false });
   };
 
   _validateFormData = (nextFormData) => {
@@ -145,7 +150,7 @@ class EditConfigurationVariableModal extends React.Component {
 
   render() {
     const { create } = this.props;
-    const { formData } = this.state;
+    const { formData, showModal } = this.state;
 
     let triggerButtonContent;
 
@@ -163,10 +168,10 @@ class EditConfigurationVariableModal extends React.Component {
                 className={create ? 'pull-right' : ''}>
           {triggerButtonContent}
         </Button>
-        <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
+        <BootstrapModalForm show={showModal}
                             title={<>{create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;</>}
                             onSubmitForm={this._save}
-                            onModalClose={this._cleanState}
+                            onCancel={this.closeModal}
                             submitButtonDisabled={this._hasErrors()}
                             submitButtonText="Save">
           <fieldset>

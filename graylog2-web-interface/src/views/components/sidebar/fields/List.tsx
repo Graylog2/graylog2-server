@@ -20,9 +20,9 @@ import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
-import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ElementDimensions from 'components/common/ElementDimensions';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import ListItem from './ListItem';
 
@@ -37,7 +37,6 @@ type Props = {
   allFields: ImmutableList<FieldTypeMapping>,
   currentGroup: string,
   filter: string | undefined | null,
-  viewMetadata: ViewMetadata,
 };
 
 const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
@@ -56,7 +55,9 @@ const _fieldsToShow = (fields, allFields, currentGroup = 'all'): ImmutableList<F
   }
 };
 
-const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFields, currentGroup }: Props) => {
+const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => {
+  const activeQuery = useActiveQueryId();
+
   if (!activeQueryFields) {
     return <span>No field information available.</span>;
   }

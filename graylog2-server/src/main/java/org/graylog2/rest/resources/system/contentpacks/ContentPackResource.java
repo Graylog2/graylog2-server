@@ -71,8 +71,10 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "System/ContentPacks", description = "Content Packs")
+@Api(value = "System/ContentPacks", description = "Content Packs", tags = {CLOUD_VISIBLE})
 @Path("/system/content_packs")
 @Produces(MediaType.APPLICATION_JSON)
 public class ContentPackResource extends RestResource {

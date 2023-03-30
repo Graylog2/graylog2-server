@@ -1,0 +1,4 @@
+type = "changed"
+message = "Reduce the default connection and read timeouts for email sending from 60 seconds to 10 seconds"
+
+pulls = ["14199"]

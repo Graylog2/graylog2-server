@@ -17,60 +17,157 @@
 import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
+import styled, { css } from 'styled-components';
 
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import type { FieldTypeCategory } from 'views/logic/aggregationbuilder/Pivot';
+import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
+import { defaultCompare } from 'logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
-import { useStore } from 'stores/connect';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import type { Property } from 'views/logic/fieldtypes/FieldType';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+
+const FieldName = styled.span`
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+`;
 
 type Props = {
   ariaLabel?: string,
+  autoFocus?: boolean,
+  className?: string,
   clearable?: boolean,
-  error?: string,
+  excludedFields?: Array<string>,
   id: string,
-  label: string,
+  menuPortalTarget?: HTMLElement,
   name: string,
-  onChange: (changeEvent: { target: { name: string, value: string } }) => void,
+  onChange: (fieldName: string) => void,
+  onMenuClose?: () => void,
+  openMenuOnFocus?: boolean,
+  persistSelection?: boolean,
+  placeholder?: string,
+  properties?: Array<Property>,
+  qualifiedTypeCategory?: FieldTypeCategory,
+  selectRef?: React.Ref<React.ComponentType>,
+  size?: 'normal' | 'small',
   value: string | undefined,
 }
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
-const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel }: Props) => {
-  const { activeQuery } = useStore(ViewMetadataStore);
+const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
+  const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
+
+  return properties
+    .map((property) => fieldProperties.contains(property))
+    .find((result) => result === false) === undefined;
+};
+
+const isFieldQualified = (field: FieldTypeMapping, properties: Array<Property>, qualifiedTypeCategory: FieldTypeCategory | undefined) => {
+  if (properties) {
+    return hasProperty(field, properties);
+  }
+
+  if (qualifiedTypeCategory) {
+    const fieldTypeCategory = field.type.type === 'date' ? DateType : ValuesType;
+
+    return qualifiedTypeCategory === fieldTypeCategory;
+  }
+
+  return true;
+};
+
+const UnqualifiedOption = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.light.default};
+`);
+
+type OptionRendererProps = {
+  label: string,
+  qualified: boolean,
+  type: FieldType,
+};
+
+const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
+  const children = <FieldName><FieldTypeIcon type={type} /> {label}</FieldName>;
+
+  return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
+};
+
+const FieldSelect = ({
+  ariaLabel,
+  autoFocus,
+  className,
+  clearable,
+  excludedFields,
+  id,
+  menuPortalTarget,
+  name,
+  onChange,
+  onMenuClose,
+  openMenuOnFocus,
+  persistSelection,
+  placeholder,
+  properties,
+  qualifiedTypeCategory,
+  selectRef,
+  size,
+  value,
+}: Props) => {
+  const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
-  const fieldTypeOptions = useMemo(() => fieldTypes.queryFields
+  const fieldOptions = useMemo(() => fieldTypes.queryFields
     .get(activeQuery, Immutable.List())
-    .map((fieldType) => ({ label: fieldType.name, value: fieldType.name }))
+    .filter((field) => !excludedFields.includes(field.name))
+    .map((field) => ({
+      label: field.name,
+      value: field.name,
+      type: field.type,
+      qualified: isFieldQualified(field, properties, qualifiedTypeCategory),
+    }))
     .toArray()
-    .sort(sortByLabel),
-  [activeQuery, fieldTypes.queryFields]);
+    .sort(sortByLabel), [activeQuery, excludedFields, fieldTypes.queryFields, properties, qualifiedTypeCategory]);
 
   return (
-    <Input id={id}
-           label={label}
-           error={error}
-           labelClassName="col-sm-3"
-           wrapperClassName="col-sm-9">
-      <Select options={fieldTypeOptions}
-              clearable={clearable}
-              name={name}
-              value={value}
-              aria-label={ariaLabel}
-              size="small"
-              menuPortalTarget={document.body}
-              onChange={(newValue: string) => onChange({ target: { name, value: newValue } })} />
-    </Input>
+    <Select options={fieldOptions}
+            inputId={`select-${id}`}
+            forwardedRef={selectRef}
+            className={className}
+            onMenuClose={onMenuClose}
+            openMenuOnFocus={openMenuOnFocus}
+            persistSelection={persistSelection}
+            clearable={clearable}
+            placeholder={placeholder}
+            name={name}
+            value={value}
+            aria-label={ariaLabel}
+            optionRenderer={OptionRenderer}
+            size={size}
+            autoFocus={autoFocus}
+            menuPortalTarget={menuPortalTarget}
+            onChange={onChange} />
 
   );
 };
 
 FieldSelect.defaultProps = {
-  clearable: false,
-  error: undefined,
   ariaLabel: undefined,
+  autoFocus: undefined,
+  className: undefined,
+  clearable: false,
+  qualifiedTypeCategory: undefined,
+  excludedFields: [],
+  onMenuClose: undefined,
+  openMenuOnFocus: undefined,
+  persistSelection: undefined,
+  placeholder: undefined,
+  properties: undefined,
+  selectRef: undefined,
+  size: 'small',
+  menuPortalTarget: undefined,
 };
 
 export default FieldSelect;

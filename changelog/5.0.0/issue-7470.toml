@@ -1,0 +1,5 @@
+type = "added"
+message = "Reimplement ability to reorder dashboard pages."
+
+issues = ["13744"]
+pulls = ["7470"]

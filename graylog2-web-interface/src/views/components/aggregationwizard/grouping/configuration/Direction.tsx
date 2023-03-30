@@ -29,11 +29,11 @@ div:first-child {
 `;
 
 type Props = {
-  index: number,
+  groupingIndex: number,
 };
 
-const Direction = ({ index }: Props) => (
-  <Field name={`groupBy.groupings.${index}.direction`}>
+const Direction = ({ groupingIndex }: Props) => (
+  <Field name={`groupBy.groupings.${groupingIndex}.direction`}>
     {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
       <Input id="group-by-direction"
              label="Direction"
@@ -41,7 +41,7 @@ const Direction = ({ index }: Props) => (
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9">
         <DirectionOptions>
-          <Input defaultChecked={value === 'row'}
+          <Input checked={value === 'row'}
                  formGroupClassName=""
                  id={name}
                  label="Row"
@@ -49,7 +49,7 @@ const Direction = ({ index }: Props) => (
                  onChange={onChange}
                  type="radio"
                  value="row" />
-          <Input defaultChecked={value === 'column'}
+          <Input checked={value === 'column'}
                  formGroupClassName=""
                  id={name}
                  label="Column"

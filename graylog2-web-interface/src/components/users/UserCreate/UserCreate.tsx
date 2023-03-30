@@ -15,21 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import styled from 'styled-components';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppConfig from 'util/AppConfig';
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem';
 import RolesSelector from 'components/permissions/RolesSelector';
-import { Spinner } from 'components/common';
-import { Alert, Col, Row, Button, ButtonToolbar, Input } from 'components/bootstrap';
-import history from 'util/History';
+import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
+import { UsersActions } from 'stores/users/UsersStore';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
+import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -41,12 +45,22 @@ import UsernameFormGroup from './UsernameFormGroup';
 import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
+import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
+import { Link } from '../../common/router';
+
+const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
+  margin-bottom: 20px;
+  
+  .read-only-value-col {
+    padding-top: 0;
+  }
+`;
 
 const isCloud = AppConfig.isCloud();
 
 const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
 
-const _onSubmit = (formData, roles, setSubmitError) => {
+const _onSubmit = (history: HistoryFunction, formData, roles, setSubmitError) => {
   let data = { ...formData, roles: roles.toJS(), permissions: [] };
   delete data.password_repeat;
 
@@ -64,10 +78,30 @@ const _onSubmit = (formData, roles, setSubmitError) => {
   }, (error) => setSubmitError(error));
 };
 
-const _validate = (values) => {
+const _validateUsername = async (errors: { [name: string]: string }, username: string) => {
+  const newErrors = { ...errors };
+
+  try {
+    await UsersActions.loadByUsername(username);
+    newErrors.username = 'Username is already taken';
+    // eslint-disable-next-line no-empty
+  } catch (error) {
+  }
+
+  return newErrors;
+};
+
+const debounceTimeoutMs = 600;
+const debouncedValidateUsername = debounceWithPromise(_validateUsername, debounceTimeoutMs);
+
+const _validate = async (values) => {
   let errors = {};
 
-  const { password, password_repeat: passwordRepeat } = values;
+  const { password, password_repeat: passwordRepeat, username } = values;
+
+  if (username) {
+    errors = await debouncedValidateUsername(errors, username);
+  }
 
   if (isCloud && oktaUserForm) {
     const { validations: { password: validateCloudPasswords } } = oktaUserForm;
@@ -80,7 +114,7 @@ const _validate = (values) => {
   return errors;
 };
 
-type RequestError = { additional: { res: { text: string }}};
+type RequestError = { additional: { res: { text: string } } };
 
 const PasswordGroup = () => {
   if (isCloud && oktaUserForm) {
@@ -92,7 +126,7 @@ const PasswordGroup = () => {
   return <PasswordFormGroup />;
 };
 
-const UserNameGroup = ({ users }: { users: Immutable.List<User> }) => {
+const UserNameGroup = () => {
   if (isCloud && oktaUserForm) {
     const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
 
@@ -100,7 +134,7 @@ const UserNameGroup = ({ users }: { users: Immutable.List<User> }) => {
   }
 
   return (
-    <UsernameFormGroup users={users} />
+    <UsernameFormGroup />
   );
 };
 
@@ -117,16 +151,17 @@ const EmailGroup = () => {
 };
 
 const UserCreate = () => {
-  const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
-  const [users, setUsers] = useState<Immutable.List<User> | undefined>();
+  const initialRole = {
+    name: 'Reader',
+    description: 'Grants basic permissions for every Graylog user (built-in)',
+    id: '',
+  };
   const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
+  const history = useHistory();
 
-  useEffect(() => {
-    const query = { include_permissions: false, include_sessions: false };
-    UsersDomain.loadUsers(query).then(setUsers);
-  }, []);
+  const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
     setSelectedRoles(selectedRoles.union(roles));
@@ -145,10 +180,6 @@ const UserCreate = () => {
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
-  if (!users) {
-    return <Spinner />;
-  }
-
   const showSubmitError = (errors) => {
     if (isCloud && oktaUserForm) {
       const { extractSubmitError } = oktaUserForm;
@@ -159,10 +190,12 @@ const UserCreate = () => {
     return errors?.additional?.res?.text;
   };
 
+  const onSubmit = (data) => _onSubmit(history, data, user.roles, setSubmitError);
+
   return (
     <Row className="content">
       <Col lg={8}>
-        <Formik onSubmit={(data) => _onSubmit(data, user.roles, setSubmitError)}
+        <Formik onSubmit={onSubmit}
                 validate={_validate}
                 initialValues={{}}>
           {({ isSubmitting, isValid }) => (
@@ -171,12 +204,17 @@ const UserCreate = () => {
                 <Headline>Profile</Headline>
                 <FirstNameFormGroup />
                 <LastNameFormGroup />
-                <UserNameGroup users={users} />
+                <UserNameGroup />
                 <EmailGroup />
               </div>
               <div>
                 <Headline>Settings</Headline>
-                <TimeoutFormGroup />
+                {isGlobalTimeoutEnabled ? (
+                  <GlobalTimeoutMessage label="Sessions Timeout"
+                                        value={<NoSearchResult>User session timeout is not editable because the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link></IfPermitted> is enabled.</NoSearchResult>} />
+                ) : (
+                  <TimeoutFormGroup />
+                )}
                 <TimezoneFormGroup />
                 <ServiceAccountFormGroup />
               </div>
@@ -186,7 +224,7 @@ const UserCreate = () => {
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Assign Roles">
-                  <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
+                  <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} submitOnSelect />
                 </Input>
 
                 <Input id="selected-roles-overview"
@@ -219,15 +257,12 @@ const UserCreate = () => {
               )}
               <Row>
                 <Col md={9} mdOffset={3}>
-                  <ButtonToolbar>
-                    <Button bsStyle="success"
-                            disabled={isSubmitting || !isValid || !hasValidRole}
-                            title="Create User"
-                            type="submit">
-                      Create User
-                    </Button>
-                    <Button type="button" onClick={_handleCancel}>Cancel</Button>
-                  </ButtonToolbar>
+                  <FormSubmit disabledSubmit={!isValid || !hasValidRole}
+                              submitButtonText="Create user"
+                              submitLoadingText="Creating user..."
+                              isSubmitting={isSubmitting}
+                              isAsyncSubmit
+                              onCancel={_handleCancel} />
                 </Col>
               </Row>
             </Form>

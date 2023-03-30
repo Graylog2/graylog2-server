@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.text.Text;
@@ -45,6 +44,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -57,22 +57,19 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
-    private final QueryStringDecorators esQueryDecorators;
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final boolean allowHighlighting;
 
     @Inject
-    public ESMessageList(QueryStringDecorators esQueryDecorators,
-                         LegacyDecoratorProcessor decoratorProcessor,
+    public ESMessageList(LegacyDecoratorProcessor decoratorProcessor,
                          @Named("allow_highlighting") boolean allowHighlighting) {
-        this.esQueryDecorators = esQueryDecorators;
         this.decoratorProcessor = decoratorProcessor;
         this.allowHighlighting = allowHighlighting;
     }
 
     @VisibleForTesting
-    public ESMessageList(QueryStringDecorators esQueryDecorators) {
-        this(esQueryDecorators, new LegacyDecoratorProcessor.Fake(), false);
+    public ESMessageList() {
+        this(new LegacyDecoratorProcessor.Fake(), false);
     }
 
     private static ResultMessage resultMessageFromSearchHit(SearchHit hit) {
@@ -89,44 +86,64 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
 
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit())
                 .from(messageList.offset());
 
-        applyHighlightingIfActivated(searchSourceBuilder, job, query);
+        applyHighlightingIfActivated(searchSourceBuilder, query);
 
-        final Set<String> effectiveStreamIds = messageList.effectiveStreams().isEmpty()
-                ? query.usedStreamIds()
-                : messageList.effectiveStreams();
+        final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
 
         if (!messageList.fields().isEmpty()) {
             searchSourceBuilder.fetchSource(messageList.fields().toArray(new String[0]), new String[0]);
         }
 
-        final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
+        List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
+
+        // Always add gl2_message_id as a second sort order, if sorting by timestamp is requested.
+        // The gl2_message_id contains a sequence nr that represents the order in which messages were received.
+        // If messages have identical timestamps, we can still sort them correctly.
+        final Optional<Sort> timeStampSort = findSort(sorts, Message.FIELD_TIMESTAMP);
+        final Optional<Sort> msgIdSort = findSort(sorts, Message.FIELD_GL2_MESSAGE_ID);
+        if (timeStampSort.isPresent() && msgIdSort.isEmpty()) {
+            sorts = new ArrayList<>(sorts);
+            final Sort newMsgIdSort = Sort.create(Message.FIELD_GL2_MESSAGE_ID, timeStampSort.get().order());
+            sorts.add(sorts.indexOf(timeStampSort.get()) + 1, newMsgIdSort);
+        }
         sorts.forEach(sort -> {
             final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
                     .order(toSortOrder(sort.order()));
+            if (sort.field().equals(Message.FIELD_GL2_MESSAGE_ID)) {
+                fieldSort.unmappedType("keyword"); // old indices might not have a mapping for gl2_message_id
+            }
             final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
             searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
         });
     }
 
+    private static Optional<Sort> findSort(List<Sort> sorts, String search) {
+        return sorts.stream().filter(s -> s.field().equals(search)).findFirst();
+    }
+
     private SortOrder toSortOrder(Sort.Order sortOrder) {
         switch (sortOrder) {
-            case ASC: return SortOrder.ASC;
-            case DESC: return SortOrder.DESC;
-            default: throw new IllegalStateException("Invalid sort order: " + sortOrder);
+            case ASC:
+                return SortOrder.ASC;
+            case DESC:
+                return SortOrder.DESC;
+            default:
+                throw new IllegalStateException("Invalid sort order: " + sortOrder);
         }
     }
-    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
+
+    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, Query query) {
         if (!allowHighlighting) {
             return;
         }
 
-        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(job, query);
+        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(query);
 
         searchSourceBuilder.highlighter(new HighlightBuilder().requireFieldMatch(false)
                 .highlightQuery(highlightQuery)
@@ -135,12 +152,10 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .numOfFragments(0));
     }
 
-    private QueryStringQueryBuilder decoratedHighlightQuery(SearchJob job, Query query) {
-        final String raw = query.query().queryString();
+    private QueryStringQueryBuilder decoratedHighlightQuery(Query query) {
+        final String queryString = query.query().queryString();
 
-        final String decorated = this.esQueryDecorators.decorate(raw, job, query);
-
-        return QueryBuilders.queryStringQuery(decorated);
+        return QueryBuilders.queryStringQuery(queryString);
     }
 
     @Override
@@ -150,14 +165,13 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
 
-        final String undecoratedQueryString = query.query().queryString();
-        final String queryString = this.esQueryDecorators.decorate(undecoratedQueryString, job, query);
+        final String queryString = query.query().queryString();
 
         final DateTime from = query.effectiveTimeRange(searchType).getFrom();
         final DateTime to = query.effectiveTimeRange(searchType).getTo();
 
         final SearchResponse searchResponse = SearchResponse.create(
-                undecoratedQueryString,
+                queryString,
                 queryString,
                 Collections.emptySet(),
                 messages,

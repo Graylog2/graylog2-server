@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -31,12 +31,15 @@ import DataTable from 'views/components/datatable/DataTable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import dataTable from 'views/components/datatable/bindings';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import AggregationWizard from '../AggregationWizard';
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
+  .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
@@ -45,21 +48,9 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({
-    count: { type: 'count', description: 'Count' },
-    min: { type: 'min', description: 'Minimum' },
-    max: { type: 'max', description: 'Maximum' },
-    percentile: { type: 'percentile', description: 'Percentile' },
-  })),
-  listen: jest.fn(),
-}));
+jest.mock('views/hooks/useAggregationFunctions');
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
-}));
-
-jest.mock('hooks/useUserDateTime');
+jest.mock('views/hooks/useActiveQueryId');
 
 const selectEventConfig = { container: document.body };
 
@@ -71,7 +62,7 @@ const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
 };
 
 const submitWidgetConfigForm = async () => {
-  const applyButton = await screen.findByRole('button', { name: 'Update Preview' });
+  const applyButton = await screen.findByRole('button', { name: /update preview/i });
   fireEvent.click(applyButton);
 };
 
@@ -91,12 +82,15 @@ describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard onChange={() => {}}
+                         onSubmit={() => {}}
+                         onCancel={() => {}}
                          config={widgetConfig}
                          editing
                          id="widget-id"
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
+        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
         <>The Visualization</>
       </AggregationWizard>
     </FieldTypesContext.Provider>,
@@ -105,6 +99,10 @@ describe('AggregationWizard', () => {
   beforeAll(() => PluginStore.register(plugin));
 
   afterAll(() => PluginStore.unregister(plugin));
+
+  beforeEach(() => {
+    asMock(useActiveQueryId).mockReturnValue('queryId');
+  });
 
   it('should require metric function when adding a metric element', async () => {
     renderSUT();

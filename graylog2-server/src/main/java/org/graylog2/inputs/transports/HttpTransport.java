@@ -108,11 +108,8 @@ public class HttpTransport extends AbstractTcpTransport {
         handlers.put("decompressor", HttpContentDecompressor::new);
         handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
-
-        if (!enableBulkReceiving) {
-            handlers.put("http-handler", () -> new HttpHandler(enableCors));
-        } else {
-            handlers.put("http-bulk-handler", () -> new HttpHandler(enableCors));
+        handlers.put("http-handler", () -> new HttpHandler(enableCors));
+        if (enableBulkReceiving) {
             handlers.put("http-bulk-newline-decoder",
                     () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize, Delimiters.lineDelimiter()));
         }

@@ -19,6 +19,7 @@ package org.graylog.security.authservice;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -143,7 +144,7 @@ public class ProvisionerService {
         // TODO: Does the timezone need to be configurable per auth service backend?
         user.setTimeZone(rootTimeZone);
         // TODO: Does the session timeout need to be configurable per auth service backend?
-        user.setSessionTimeoutMs(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
+        user.setSessionTimeoutMs(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());
 
         if (user instanceof UserImpl) {
             // Set a placeholder password that doesn't work for authentication

@@ -20,39 +20,14 @@ import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { validationError, validationErrorExplanation } from 'fixtures/queryValidationState';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
+import asMock from 'helpers/mocking/AsMock';
 
-import asMock from '../../../../../test/helpers/mocking/AsMock';
-
-jest.mock('views/stores/QueriesStore', () => ({
-  QueriesActions: {
-    validateQuery: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ search: { parameters: [] } })),
-  },
-}));
-
-const MockSearchExecutionState = new SearchExecutionState();
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateStore: {
-    getInitialState: jest.fn(() => MockSearchExecutionState),
-    listen: () => jest.fn(),
-  },
-}));
-
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('logic/datetimes/DateTime', () => ({}));
 
 type SUTProps = {
   // eslint-disable-next-line react/require-default-props
@@ -144,5 +119,39 @@ describe('QueryValidation', () => {
     rerender(<SUT error={singleValidationError} />);
 
     await waitFor(() => expect(screen.getAllByText('Parse Exception')).toHaveLength(1));
+  });
+
+  it('should deduplicate "unknown field" errors referring to same field name', async () => {
+    const validationErrorForUnknownField: QueryValidationState = {
+      status: 'WARNING',
+      explanations: [{
+        id: 'foo',
+        errorType: 'UNKNOWN_FIELD',
+        beginLine: 1,
+        beginColumn: 2,
+        endLine: 1,
+        endColumn: 16,
+        errorTitle: 'Unknown field',
+        errorMessage: 'Query contains unknown field: TargetFilename',
+        relatedProperty: 'TargetFilename',
+      }, {
+        id: 'bar',
+        errorType: 'UNKNOWN_FIELD',
+        beginLine: 1,
+        beginColumn: 193,
+        endLine: 1,
+        endColumn: 207,
+        errorTitle: 'Unknown field',
+        errorMessage: 'Query contains unknown field: TargetFilename',
+        relatedProperty: 'TargetFilename',
+      }],
+    };
+    render(<SUT error={validationErrorForUnknownField} />);
+
+    await openExplanation();
+
+    const explanations = await screen.findAllByText(/Query contains unknown field: TargetFilename/i);
+
+    expect(explanations.length).toBe(1);
   });
 });

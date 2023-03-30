@@ -48,7 +48,7 @@ const Textarea = styled.textarea(({ $copied, theme }: {$copied: boolean, theme:D
   flex: 1;
   margin: 15px 0 7px;
   border: 1px solid ${$copied ? theme.colors.variant.success : theme.colors.variant.lighter.default};
-  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.075)${$copied && `, 0 0 8px ${chroma(theme.colors.variant.success).alpha(0.4).css()}`};
+  box-shadow: inset 1px 1px 1px rgb(0 0 0 / 7.5%)${$copied && `, 0 0 8px ${chroma(theme.colors.variant.success).alpha(0.4).css()}`};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
   font-family: ${theme.fonts.family.monospace};
   font-size: ${theme.fonts.size.body};
@@ -91,7 +91,6 @@ const StatusMessage = styled.span(({ theme, $visible }: { theme: DefaultTheme, $
 const Scratchpad = () => {
   const clipboard = useRef<ClipboardJS>();
   const textareaRef = useRef<HTMLTextAreaElement>();
-  const confirmationModalRef = useRef<typeof BootstrapModalConfirm>();
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
   const { isScratchpadVisible, setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
   const scratchpadStore = Store.get(localStorageItem) || {};
@@ -101,6 +100,7 @@ const Scratchpad = () => {
   const [position, setPosition] = useState<{ x:number, y:number } | undefined>(scratchpadStore.position || undefined);
   const [statusMessage, setStatusMessage] = useState<string>(STATUS_DEFAULT);
   const [showStatusMessage, setShowStatusMessage] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const writeData = (newData) => {
     const currentStorage = Store.get(localStorageItem);
@@ -148,18 +148,18 @@ const Scratchpad = () => {
   };
 
   const openConfirmClear = () => {
-    confirmationModalRef.current.open();
+    setShowModal(true);
+  };
+
+  const handleCancelClear = () => {
+    setShowModal(false);
   };
 
   const handleClearText = () => {
     setScratchData(DEFAULT_SCRATCHDATA);
     writeData({ value: DEFAULT_SCRATCHDATA });
-    confirmationModalRef.current.close();
+    handleCancelClear();
     updateStatusMessage(STATUS_CLEARED);
-  };
-
-  const handleCancelClear = () => {
-    confirmationModalRef.current.close();
   };
 
   useEffect(() => {
@@ -246,7 +246,7 @@ const Scratchpad = () => {
 
       </ContentArea>
 
-      <BootstrapModalConfirm ref={confirmationModalRef}
+      <BootstrapModalConfirm showModal={showModal}
                              title="Are you sure?"
                              onConfirm={handleClearText}
                              onCancel={handleCancelClear}>

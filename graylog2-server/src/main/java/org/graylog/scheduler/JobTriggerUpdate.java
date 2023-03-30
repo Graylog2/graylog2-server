@@ -52,6 +52,10 @@ public abstract class JobTriggerUpdate {
         return builder().nextTime(trigger.nextTime()).status(JobTriggerStatus.ERROR).build();
     }
 
+    public static JobTriggerUpdate withStatusAndNoNextTime(JobTriggerStatus status) {
+        return builder().nextTime(null).status(status).build();
+    }
+
     public static JobTriggerUpdate withNextTimeAndData(DateTime nextTime, JobTriggerData data) {
         return builder().nextTime(nextTime).data(data).build();
     }

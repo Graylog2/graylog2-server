@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 import org.mongojack.DBUpdate;
@@ -51,10 +52,11 @@ public interface JobSchedule {
      *
      * @param lastExecutionTime the last execution time of a trigger
      * @param lastNextTime      the base time, chosen by the caller (mostly last nextTime)
+     * @param clock
      * @return filled optional with the next execution time, empty optional if there is no next execution time
      */
     @JsonIgnore
-    Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime);
+    Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock);
 
     /**
      * Returns a map with the schedule data. This can be used to update a MongoDB document with schedule
@@ -77,7 +79,7 @@ public interface JobSchedule {
         }
 
         @Override
-        public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime) {
+        public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
             return Optional.empty();
         }
 

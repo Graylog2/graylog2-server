@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix grouping in aggregation builder for fields which only exist in the All Events, All System Events or Processing and Indexing Failures stream."
+
+issues = ["14387"]
+pulls = ["14404"]

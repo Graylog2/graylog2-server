@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.scheduler.JobSchedule;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -36,7 +37,7 @@ public abstract class OnceJobSchedule implements JobSchedule {
 
     @JsonIgnore
     @Override
-    public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime) {
+    public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
         return Optional.empty();
     }
 

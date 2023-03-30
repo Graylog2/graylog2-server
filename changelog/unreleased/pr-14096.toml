@@ -1,0 +1,13 @@
+type = "added"
+message = "Add REST API endpoint for bulk assignment of streams to index sets."
+
+pulls = ["14096"]
+
+details.user = """
+A REST API endpoint has been added supporting a bulk assignment of streams to an index set. This allows e.g. migrating
+a number of streams to a new index set. The endpoint is available as:
+
+PUT /api/streams/indexSet/{index set id}
+
+with a JSON body of an array of stream ids that should be assigned to this index set.
+"""

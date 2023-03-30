@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.validation;
 
-import org.apache.lucene.queryparser.classic.CharStream;
+import org.apache.lucene.queryparser.charstream.CharStream;
 
 import java.io.IOException;
 
@@ -51,18 +51,6 @@ public class LineCountingCharStream implements CharStream {
         final char oneChar = delegate.readChar();
         tokenLineCounter.processChar(oneChar);
         return oneChar;
-    }
-
-    @Deprecated
-    @Override
-    public int getColumn() {
-        return delegate.getColumn();
-    }
-
-    @Deprecated
-    @Override
-    public int getLine() {
-        return delegate.getLine();
     }
 
     @Override

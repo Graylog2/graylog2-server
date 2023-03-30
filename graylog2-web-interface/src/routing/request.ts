@@ -19,10 +19,11 @@ import Qs from 'qs';
 import { Builder } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 
-type Query = { [key: string]: string | number | boolean };
-type Headers = { [key: string]: string | number | boolean };
+type Query = { [key: string]: string | number | boolean | string[] };
+type Headers = { [key: string]: string | number | boolean | string[] };
+type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-const request = (method: string, path: string, body: any, query: Query, headers: Headers) => {
+const request = (method: Methods, path: string, body: any, query: Query, headers: Headers) => {
   const pathWithQueryParameters = Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query)}` : path;
   const builder = new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body);
 

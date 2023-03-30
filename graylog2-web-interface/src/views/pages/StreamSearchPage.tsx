@@ -17,47 +17,28 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import Spinner from 'components/common/Spinner';
-import withParams from 'routing/withParams';
-import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
-import withLocation from 'routing/withLocation';
-import type { Location } from 'routing/withLocation';
 import { loadNewViewForStream } from 'views/logic/views/Actions';
-import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
-import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
+import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
+import useParams from 'routing/useParams';
+import useHistory from 'routing/useHistory';
 
 import SearchPage from './SearchPage';
 
-type Props = {
-  location: Location<RawQuery>,
-  params: {
-    streamId?: string,
-  },
-};
+const StreamSearchPage = () => {
+  const { streamId } = useParams<{ streamId?: string }>();
+  const history = useHistory();
 
-const StreamSearchPage = ({ params: { streamId }, location: { query } }: Props) => {
-  const { timeRange, queryString } = normalizeSearchURLQueryParams(query);
-  const newView = useCreateSavedSearch(streamId, timeRange, queryString);
-  const [loaded, HookComponent] = useLoadView(newView, query);
-
-  const _loadNewView = useCallback(() => {
-    if (streamId) {
-      return loadNewViewForStream(streamId);
-    }
-
+  if (!streamId) {
     throw new Error('No stream id specified!');
-  }, [streamId]);
-
-  if (HookComponent) {
-    return HookComponent;
   }
 
-  if (!loaded) {
-    return <Spinner />;
-  }
+  const { timeRange, queryString } = useSearchURLQueryParams();
+  const newView = useCreateSavedSearch(streamId, timeRange, queryString);
 
-  return <SearchPage loadNewView={_loadNewView} />;
+  const _loadNewView = useCallback(() => loadNewViewForStream(history, streamId), [history, streamId]);
+
+  return <SearchPage loadNewView={_loadNewView} view={newView} isNew />;
 };
 
-export default withParams(withLocation(StreamSearchPage));
+export default StreamSearchPage;

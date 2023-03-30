@@ -17,8 +17,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Button, ButtonGroup, Popover } from 'components/bootstrap';
-import { Icon, OverlayTrigger } from 'components/common';
+import { Button, ButtonGroup } from 'components/bootstrap';
+import { Icon, HoverForHelp } from 'components/common';
 import type { SearchBarControl } from 'views/types';
 
 const Container = styled.div`
@@ -35,25 +35,20 @@ const StyledButtonBar = styled.div`
   justify-content: flex-end;
 `;
 
-const PopoverHelp = ({ onHide }: { onHide: () => void }) => (
-  <OverlayTrigger trigger="click"
-                  placement="bottom"
-                  overlay={(
-                    <Popover>
-                      <span>
-                        <p>
-                          Search filters and parameters are available for the enterprise version.
-                        </p>
-                        <StyledButtonBar>
-                          <Button onClick={() => onHide()} bsSize="xs">
-                            Do not show it again
-                          </Button>
-                        </StyledButtonBar>
-                      </span>
-                    </Popover>
-                  )}>
-    <Icon name="question-circle" />
-  </OverlayTrigger>
+const SearchFilterHelp = styled(HoverForHelp)`
+  margin-left: 5px;
+`;
+
+export const SearchFilterExplanation = () => (
+  <>
+    <p>
+      <i>Search filters</i> contain their own query and extend the main query using the <b>AND</b> operator.
+    </p>
+    <p>
+      Filters can be saved separately and reused in saved searches and dashboards.
+      Updating a saved filter will automatically affect the search results of searches which include the filter.
+    </p>
+  </>
 );
 
 type Props = {
@@ -71,6 +66,17 @@ const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
   return (
     <Container>
       Filters
+      <SearchFilterHelp title="Search Filters" trigger={['click']}>
+        <SearchFilterExplanation />
+        <p>
+          Search filters and parameters are available for the enterprise version.
+        </p>
+        <StyledButtonBar>
+          <Button onClick={onHide} bsSize="xs">
+            Hide controls
+          </Button>
+        </StyledButtonBar>
+      </SearchFilterHelp>
       <StyledButtonGroup>
         <Button disabled bsSize="small">
           <Icon name="plus" />
@@ -79,7 +85,6 @@ const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
           <Icon name="folder" />
         </Button>
       </StyledButtonGroup>
-      <PopoverHelp onHide={onHide} />
     </Container>
   );
 };

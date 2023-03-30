@@ -181,7 +181,7 @@ public abstract class CmdLineTool implements CliCommand {
         return debug;
     }
 
-    protected abstract List<Module> getCommandBindings();
+    protected abstract List<Module> getCommandBindings(FeatureFlags featureFlags);
 
     protected abstract List<Object> getCommandConfigurationBeans();
 
@@ -224,7 +224,7 @@ public abstract class CmdLineTool implements CliCommand {
         // Only restrict ciphers if insecure TLS protocols are explicitly enabled.
         // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
         if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1"))) {
-            disabledAlgorithms.addAll(ImmutableSet.of("CBC", "3DES"));
+            disabledAlgorithms.addAll(ImmutableSet.of("CBC", "3DES", "TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_RSA_WITH_AES_256_GCM_SHA384"));
             Security.setProperty("jdk.tls.disabledAlgorithms", Strings.join(disabledAlgorithms, ", "));
         } else {
             // Remove explicitly enabled legacy TLS protocols from the disabledAlgorithms filter
@@ -254,14 +254,24 @@ public abstract class CmdLineTool implements CliCommand {
 
     @Override
     public void run() {
+        // Setup logger first to ensure we can log any caught Throwable to the configured log file
         final Level logLevel = setupLogger();
+        try {
+            doRun(logLevel);
+        } catch (Throwable e) {
+            LOG.error("Startup error:", e);
+            throw e;
+        }
+    }
+
+    public void doRun(Level logLevel) {
+        // This is holding all our metrics.
+        MetricRegistry metricRegistry = MetricRegistryFactory.create();
+        featureFlags = getFeatureFlags(metricRegistry);
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
         }
-        // This is holding all our metrics.
-        MetricRegistry metricRegistry = MetricRegistryFactory.create();
-        featureFlags = getFeatureFlags(metricRegistry);
 
         installConfigRepositories();
         installCommandConfig();
@@ -459,6 +469,10 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     private void installConfigRepositories() {
+        installConfigRepositories(jadConfig);
+    }
+
+    protected void installConfigRepositories(JadConfig jadConfig) {
         jadConfig.setRepositories(getConfigRepositories(configFile));
     }
 
@@ -482,7 +496,7 @@ public abstract class CmdLineTool implements CliCommand {
         try {
             final ImmutableList.Builder<Module> builder = ImmutableList.builder();
             builder.addAll(getSharedBindingsModules());
-            builder.addAll(getCommandBindings());
+            builder.addAll(getCommandBindings(featureFlags));
             builder.addAll(Arrays.asList(modules));
             builder.add(binder -> {
                 binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);

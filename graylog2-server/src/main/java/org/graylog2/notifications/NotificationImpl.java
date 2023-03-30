@@ -19,7 +19,7 @@ package org.graylog2.notifications;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
@@ -31,15 +31,22 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-@CollectionName("notifications")
+import static org.graylog2.notifications.NotificationImpl.FIELD_DETAILS;
+import static org.graylog2.shared.security.RestPermissions.NOTIFICATIONS_READ;
+
+@DbEntity(collection = "notifications",
+          titleField = FIELD_DETAILS + ".title",
+          readPermission = NOTIFICATIONS_READ)
 public class NotificationImpl extends PersistedImpl implements Notification {
     static final String FIELD_TYPE = "type";
+    static final String FIELD_KEY = "key";
     static final String FIELD_SEVERITY = "severity";
     static final String FIELD_TIMESTAMP = "timestamp";
     static final String FIELD_NODE_ID = "node_id";
     static final String FIELD_DETAILS = "details";
 
     private Type type;
+    private String key;
     private Severity severity;
     private DateTime timestamp;
     private String node_id;
@@ -51,6 +58,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         this.severity = Severity.valueOf(((String) fields.get(FIELD_SEVERITY)).toUpperCase(Locale.ENGLISH));
         this.timestamp = new DateTime(fields.get(FIELD_TIMESTAMP), DateTimeZone.UTC);
         this.node_id = (String) fields.get(FIELD_NODE_ID);
+        this.key = (String) fields.get(FIELD_KEY);
     }
 
     protected NotificationImpl(Map<String, Object> fields) {
@@ -60,16 +68,24 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         this.severity = Severity.valueOf(((String) fields.get(FIELD_SEVERITY)).toUpperCase(Locale.ENGLISH));
         this.timestamp = new DateTime(fields.get(FIELD_TIMESTAMP), DateTimeZone.UTC);
         this.node_id = (String) fields.get(FIELD_NODE_ID);
+        this.key = (String) fields.get(FIELD_KEY);
     }
 
     public NotificationImpl() {
-        super(new HashMap<String, Object>());
+        super(new HashMap<>());
     }
 
     @Override
     public Notification addType(Type type) {
         this.type = type;
         fields.put(FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH));
+        return this;
+    }
+
+    @Override
+    public Notification addKey(String key) {
+        this.key = key;
+        fields.put(FIELD_KEY, key);
         return this;
     }
 
@@ -104,6 +120,11 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     }
 
     @Override
+    public String getKey() {
+        return key;
+    }
+
+    @Override
     public Severity getSeverity() {
         return severity;
     }
@@ -116,8 +137,9 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     @Override
     public Notification addDetail(String key, Object value) {
         Map<String, Object> details;
-        if (fields.get(FIELD_DETAILS) == null)
+        if (fields.get(FIELD_DETAILS) == null) {
             fields.put(FIELD_DETAILS, new HashMap<String, Object>());
+        }
 
         details = (Map<String, Object>) fields.get(FIELD_DETAILS);
         details.put(key, value);
@@ -127,10 +149,16 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     @Override
     public Object getDetail(String key) {
         final Map<String, Object> details = (Map<String, Object>) fields.get(FIELD_DETAILS);
-        if (details == null)
+        if (details == null) {
             return null;
+        }
 
         return details.get(key);
+    }
+
+    @Override
+    public Map<String, Object> getDetails() {
+        return (Map<String, Object>) fields.get(FIELD_DETAILS);
     }
 
     @Override
@@ -143,6 +171,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
 
     @Override
     public Notification addNode(String nodeId) {
+        node_id = nodeId;
         fields.put(FIELD_NODE_ID, nodeId);
         return this;  //To change body of created methods use File | Settings | File Templates.
     }

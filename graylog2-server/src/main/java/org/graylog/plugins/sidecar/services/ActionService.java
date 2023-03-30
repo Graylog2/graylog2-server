@@ -35,9 +35,13 @@ public class ActionService {
     private static final String COLLECTION_NAME = "sidecar_collector_actions";
     private final JacksonDBCollection<CollectorActions, ObjectId> dbCollection;
 
+    private final EtagService etagService;
+
     @Inject
     public ActionService(MongoConnection mongoConnection,
-                         MongoJackObjectMapperProvider mapper){
+                         MongoJackObjectMapperProvider mapper,
+                         EtagService etagService){
+        this.etagService = etagService;
         dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 CollectorActions.class,
@@ -70,7 +74,7 @@ public class ActionService {
     }
 
     public CollectorActions saveAction(CollectorActions collectorActions) {
-        return dbCollection.findAndModify(
+        final CollectorActions actions = dbCollection.findAndModify(
                 DBQuery.is("sidecar_id", collectorActions.sidecarId()),
                 new BasicDBObject(),
                 new BasicDBObject(),
@@ -78,6 +82,8 @@ public class ActionService {
                 collectorActions,
                 true,
                 true);
+        etagService.invalidateRegistration(collectorActions.sidecarId());
+        return actions;
     }
 
     public CollectorActions findActionBySidecar(String sidecarId, boolean remove) {

@@ -20,10 +20,10 @@ import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import type QueryResult from 'views/logic/QueryResult';
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePreferencesContext';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -34,11 +34,9 @@ import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
   children: React.ReactElement,
-  queryId: string,
   results: QueryResult,
   searchPageLayout?: SearchPreferencesLayout,
   sections?: Array<SidebarSection>,
-  viewMetadata: ViewMetadata,
 };
 
 const Container = styled.div`
@@ -77,7 +75,8 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, sections }: Props) => {
+  const queryId = useActiveQueryId();
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(sidebarIsPinned ? initialSectionKey : null);
@@ -96,14 +95,12 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
       {activeSection && !!SectionContent && (
         <ContentColumn closeSidebar={toggleSidebar}
                        searchPageLayout={searchPageLayout}
-                       sectionTitle={activeSection.title}
-                       viewMetadata={viewMetadata}>
+                       sectionTitle={activeSection.title}>
           <SectionContent results={results}
                           queryId={queryId}
                           sidebarChildren={children}
                           sidebarIsPinned={sidebarIsPinned}
-                          toggleSidebar={toggleSidebar}
-                          viewMetadata={viewMetadata} />
+                          toggleSidebar={toggleSidebar} />
         </ContentColumn>
       )}
       {(activeSection && !sidebarIsPinned) && (
@@ -115,16 +112,8 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
 
 Sidebar.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  queryId: PropTypes.string.isRequired,
   results: PropTypes.object,
   sections: PropTypes.arrayOf(PropTypes.object),
-  viewMetadata: PropTypes.shape({
-    activeQuery: PropTypes.string,
-    description: PropTypes.string,
-    id: PropTypes.string,
-    summary: PropTypes.string,
-    title: PropTypes.string,
-  }).isRequired,
 };
 
 Sidebar.defaultProps = {

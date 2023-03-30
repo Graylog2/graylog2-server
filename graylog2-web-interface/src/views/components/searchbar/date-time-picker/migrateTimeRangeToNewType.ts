@@ -19,16 +19,14 @@ import moment from 'moment';
 
 import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
-import DateTime from 'logic/datetimes/DateTime';
 import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { DateTime } from 'util/DateTime';
 
 import {
   classifyFromRange,
   isTypeRelativeClassified,
   normalizeClassifiedRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
-
-const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
 
 const getDefaultAbsoluteFromRange = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => {
   if (isTypeRelativeClassified(oldTimeRange)) {
@@ -47,17 +45,24 @@ const getDefaultAbsoluteToRange = (oldTimeRange: RelativeTimeRangeClassified | A
 };
 
 const migrationStrategies = {
-  absolute: (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => ({
+  absolute: (
+    oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null,
+    formatTime: (dateTime: DateTime, tz: string) => string,
+  ) => ({
     type: 'absolute',
-    from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
-    to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
+    from: formatTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'), 'complete'),
+    to: formatTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'), 'complete'),
   }),
   relative: () => ({ type: 'relative', from: classifyFromRange(DEFAULT_RELATIVE_FROM), to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
   disabled: () => undefined,
 };
 
-const migrateTimeRangeToNewType = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null, type: string): RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null => {
+const migrateTimeRangeToNewType = (
+  oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null,
+  type: string,
+  formatTime: (dateTime: DateTime, tz: string) => string,
+): RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null => {
   const oldType = oldTimeRange && 'type' in oldTimeRange ? oldTimeRange.type : 'disabled';
 
   if (type === oldType) {
@@ -68,7 +73,7 @@ const migrateTimeRangeToNewType = (oldTimeRange: RelativeTimeRangeClassified | A
     throw new Error(`Invalid time range type: ${type}`);
   }
 
-  return migrationStrategies[type](oldTimeRange);
+  return migrationStrategies[type](oldTimeRange, formatTime);
 };
 
 export default migrateTimeRangeToNewType;

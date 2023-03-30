@@ -31,7 +31,8 @@ import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
-import { SOURCE_FIELD } from 'views/Constants';
+import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -51,14 +52,17 @@ const Table = styled.table(({ theme }) => css`
     th {
       font-weight: bold !important;
       font-size: inherit !important;
+      white-space: break-spaces !important;
+      word-break: break-all !important;
     }
 
     th,
     td {
       border: 1px ${theme.colors.gray[80]} solid !important;
       left: 0;
-      padding: 5px;
+      padding: 5px !important;
       position: static;
+      min-width: 0 !important;
     }
   }
 `);
@@ -81,11 +85,15 @@ const TableWrapper = styled.div(({ theme }) => css`
 const TableHead = styled.thead(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
-
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  
   && > tr > th {
     min-width: 50px;
-    min-height: 28px;
+    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
     padding: 0 5px;
+    vertical-align: center;
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;
@@ -101,12 +109,9 @@ type Props = {
   fields: Immutable.List<FieldTypeMapping>,
   messages: Array<BackendMessage>,
   onSortChange: (newSortConfig: SortConfig[]) => Promise<void>,
+  scrollContainerRef: React.MutableRefObject<HTMLDivElement>,
   setLoadingState: (loading: boolean) => void,
 };
-
-const _columnStyle = (fieldName: string) => (fieldName.toLowerCase() === SOURCE_FIELD
-  ? { width: 180 }
-  : {});
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => ((fields
   && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
@@ -133,7 +138,7 @@ const _toggleMessageDetail = (id: string, expandedMessages: Immutable.Set<string
   setExpandedMessages(newSet);
 };
 
-const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, setLoadingState }: Props) => {
+const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, setLoadingState, scrollContainerRef }: Props) => {
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
@@ -141,49 +146,50 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
   const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages), [expandedMessages]);
 
   return (
-    <TableWrapper className="table-responsive" id="sticky-augmentations-container">
-      <Table className="table table-condensed">
-        <TableHead>
-          <tr>
-            {selectedFields.toSeq().map((selectedFieldName) => {
-              return (
-                <th key={selectedFieldName}
-                    style={_columnStyle(selectedFieldName)}>
-                  <Field type={_fieldTypeFor(selectedFieldName, fields)}
-                         name={selectedFieldName}
-                         queryId={activeQueryId}>
-                    {selectedFieldName}
-                  </Field>
-                  <InteractiveContext.Consumer>
-                    {(interactive) => (interactive && (
+    <MessageTableProviders>
+      <TableWrapper className="table-responsive" id="sticky-augmentations-container" ref={scrollContainerRef}>
+        <Table className="table table-condensed">
+          <TableHead>
+            <tr>
+              {selectedFields.toSeq().map((selectedFieldName) => {
+                return (
+                  <th key={selectedFieldName}>
+                    <Field type={_fieldTypeFor(selectedFieldName, fields)}
+                           name={selectedFieldName}
+                           queryId={activeQueryId}>
+                      {selectedFieldName}
+                    </Field>
+                    <InteractiveContext.Consumer>
+                      {(interactive) => (interactive && (
                       <FieldSortIcon fieldName={selectedFieldName}
                                      onSortChange={onSortChange}
                                      setLoadingState={setLoadingState}
                                      config={config} />
-                    ))}
-                  </InteractiveContext.Consumer>
-                </th>
-              );
-            })}
-          </tr>
-        </TableHead>
-        {formattedMessages.map((message) => {
-          const messageKey = `${message.index}-${message.id}`;
+                      ))}
+                    </InteractiveContext.Consumer>
+                  </th>
+                );
+              }).toArray()}
+            </tr>
+          </TableHead>
+          {formattedMessages.map((message) => {
+            const messageKey = `${message.index}-${message.id}`;
 
-          return (
-            <MessageTableEntry fields={fields}
-                               key={messageKey}
-                               message={message}
-                               config={config}
-                               showMessageRow={config?.showMessageRow}
-                               selectedFields={selectedFields}
-                               expanded={expandedMessages.contains(messageKey)}
-                               toggleDetail={toggleDetail}
-                               expandAllRenderAsync={false} />
-          );
-        })}
-      </Table>
-    </TableWrapper>
+            return (
+              <MessageTableEntry fields={fields}
+                                 key={messageKey}
+                                 message={message}
+                                 config={config}
+                                 showMessageRow={config?.showMessageRow}
+                                 selectedFields={selectedFields}
+                                 expanded={expandedMessages.contains(messageKey)}
+                                 toggleDetail={toggleDetail}
+                                 expandAllRenderAsync={false} />
+            );
+          })}
+        </Table>
+      </TableWrapper>
+    </MessageTableProviders>
   );
 };
 

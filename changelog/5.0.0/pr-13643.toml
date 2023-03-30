@@ -1,0 +1,4 @@
+type = "added"
+message = "Show in field select if fields are qualified for metric function."
+
+pulls = ["13643"]

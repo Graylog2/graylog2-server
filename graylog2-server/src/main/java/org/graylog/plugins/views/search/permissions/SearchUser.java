@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
+import org.graylog.security.HasUser;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTimeZone;
@@ -35,7 +36,7 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions {
+public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, HasUser {
     private static final Logger LOG = LoggerFactory.getLogger(SearchUser.class);
     private final User currentUser;
     private final Predicate<String> isPermitted;
@@ -60,6 +61,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return this.currentUser.getName();
     }
 
+    @Override
     public boolean canReadView(ViewLike view) {
         final String viewId = view.id();
 
@@ -98,6 +100,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return isPermitted(ViewsRestPermissions.VIEW_DELETE, view.id());
     }
 
+    @Override
     public boolean canReadStream(String streamId) {
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
@@ -110,6 +113,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return this.isPermittedEntity.test(permission, entityId);
     }
 
+    @Override
     public boolean owns(Search search) {
         return search.owner().map(o -> o.equals(username())).orElse(true);
     }
@@ -123,9 +127,18 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     }
 
     @Override
+    public User getUser() {
+        return currentUser;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         final SearchUser that = (SearchUser) o;
         return Objects.equal(currentUser, that.currentUser);
     }

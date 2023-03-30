@@ -27,8 +27,6 @@ import DataTableEntry from './DataTableEntry';
 
 import EmptyValue from '../EmptyValue';
 
-jest.mock('hooks/useUserDateTime');
-
 const f = (source: string, field: string = source): { field: string, source: string } => ({ field, source });
 const createFields = (fields: Array<string>) => OrderedSet(fields.map((field) => f(field)));
 const fields = createFields(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
@@ -64,18 +62,22 @@ const seriesWithName = (fn, name) => Series.forFunction(fn)
     .build())
   .build();
 
+jest.mock('views/hooks/useActiveQueryId', () => () => 'foobar');
+
 describe('DataTableEntry', () => {
   const SUT = (props) => (
     <table>
-      <DataTableEntry columnPivots={columnPivots}
-                      columnPivotValues={columnPivotValues}
-                      currentView={currentView}
-                      fields={fields}
-                      item={item}
-                      series={series}
-                      types={List([])}
-                      valuePath={valuePath}
-                      {...props} />
+      <tbody>
+        <DataTableEntry columnPivots={columnPivots}
+                        columnPivotValues={columnPivotValues}
+                        currentView={currentView}
+                        fields={fields}
+                        item={item}
+                        series={series}
+                        types={List([])}
+                        valuePath={valuePath}
+                        {...props} />
+      </tbody>
     </table>
   );
 

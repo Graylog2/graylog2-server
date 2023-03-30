@@ -58,6 +58,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParse
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
+import org.graylog.plugins.pipelineprocessor.functions.debug.Debug;
 import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
@@ -82,6 +83,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
@@ -93,6 +95,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
@@ -150,8 +153,11 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -193,6 +199,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static LookupTableService.Function lookupServiceFunction;
     private static LookupTable lookupTable;
 
+    private static Logger loggerMock;
+
     @BeforeClass
     @SuppressForbidden("Allow using default thread factory")
     public static void registerFunctions() {
@@ -210,6 +218,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
         functions.put(RemoveField.NAME, new RemoveField());
+        functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage());
@@ -238,6 +247,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         lookupServiceFunction = new LookupTableService.Function(lookupTableService, "table");
         when(lookupTableService.newBuilder().lookupTable(anyString()).build()).thenReturn(lookupServiceFunction);
 
+        loggerMock = mock(Logger.class);
         // input related functions
         // TODO needs mock
         //functions.put(FromInput.NAME, new FromInput());
@@ -267,6 +277,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
+        functions.put(JsonFlatten.NAME, new JsonFlatten(objectMapper));
         functions.put(SelectJsonPath.NAME, new SelectJsonPath(objectMapper));
 
         functions.put(DateConversion.NAME, new DateConversion());
@@ -334,6 +345,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsIp.NAME, new IsIp());
         functions.put(IsJson.NAME, new IsJson());
         functions.put(IsUrl.NAME, new IsUrl());
+        functions.put(Debug.NAME, new Debug(loggerMock));
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
         final GrokPattern greedyPattern = GrokPattern.create("GREEDY", ".*");
@@ -458,6 +470,41 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+    }
+
+    @Test
+    public void flattenJson() {
+        final String nestedJson = "{\n" +
+                "    \"store\": {\n" +
+                "        \"book\": {\n" +
+                "            \"category\": \"reference\",\n" +
+                "            \"author\": \"Nigel Rees\",\n" +
+                "            \"title\": \"Sayings of the Century\",\n" +
+                "            \"price\": 8.95\n" +
+                "        },\n" +
+                "        \"bicycle\": {\n" +
+                "            \"color\": \"red\",\n" +
+                "            \"price\": 19.95\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"some_array\": [ \"a\", \"b\", \"c\" ],\n" +
+                "    \"app.kubernetes.io_name\": \"hal\"\n" +
+                "}";
+
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = new Message("JSON", "test", Tools.nowUTC());
+        message.addField("nested_json", nestedJson);
+        final Message evaluatedMessage = evaluateRule(rule, message);
+
+        assertThat(evaluatedMessage.getField("message")).isEqualTo("JSON");
+        assertThat(evaluatedMessage.getField("nested_json")).isEqualTo(nestedJson);
+        assertThat(evaluatedMessage.getField("store_book_author")).isEqualTo("Nigel Rees");
+        assertThat(evaluatedMessage.getField("store_bicycle_color")).isEqualTo("red");
+        assertThat(evaluatedMessage.getField("some_array_0")).isEqualTo("a");
+        assertThat(evaluatedMessage.getField("some_array_1")).isEqualTo("b");
+        assertThat(evaluatedMessage.getField("app.kubernetes.io_name")).isEqualTo("hal");
+        assertThat(evaluatedMessage.getField("json_some_array")).isEqualTo("[\"a\",\"b\",\"c\"]");
+        assertThat(evaluatedMessage.getField("ignore_some_array")).isNull();
     }
 
     @Test
@@ -823,6 +870,44 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("field_1")).isFalse();
         assertThat(message.hasField("field_2")).isTrue();
         assertThat(message.hasField("field_b")).isTrue();
+    }
+
+    @Test
+    public void normalizeFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = new Message("some message", "somehost.graylog.org", Tools.nowUTC());
+        final String lcVal = "lcVal";
+        final Integer mcVal = 2;
+        final boolean ucVal = true;
+        in.addField("lower_case", lcVal);
+        in.addField("mIxEd_CaSe", mcVal);
+        in.addField("UPPER_CASE", ucVal);
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.getField("lower_case")).isEqualTo(lcVal);
+        assertThat(message.getField("mixed_case")).isEqualTo(mcVal);
+        assertThat(message.getField("upper_case")).isEqualTo(ucVal);
+        assertThat(message.getField("mIxEd_CaSe")).isNull();
+        assertThat(message.getField("UPPER_CASE")).isNull();
+
+    }
+
+    @Test
+    public void debug() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message in = new Message("some message", "somehost.graylog.org", Tools.nowUTC());
+        in.addField("somefield", "somevalue");
+
+        evaluateRule(rule, in);
+
+        InOrder inOrder = Mockito.inOrder(loggerMock);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "moo");
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "somevalue");
+        inOrder.verify(loggerMock, times(2)).info("PIPELINE DEBUG Message: <{}>", in.toDumpString());
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", (Object) null);
+        inOrder.verify(loggerMock).info("PIPELINE DEBUG: {}", "message converted with to_string: " + in.toString());
     }
 
     @Test
@@ -1192,5 +1277,17 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(e).isInstanceOf(ParseException.class)
                     .hasMessageContaining("Expected type Boolean but found String");
         }
+    }
+
+    @Test
+    public void dateConversion() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        Long utcHour = (Long) message.getField("utcHour");
+        Long manilaHour = (Long) message.getField("manilaHour");
+        assertThat(utcHour).isEqualTo(10);
+        assertThat(manilaHour).isEqualTo(18);
     }
 }

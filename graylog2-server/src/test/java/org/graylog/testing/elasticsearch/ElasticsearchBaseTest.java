@@ -47,7 +47,7 @@ public abstract class ElasticsearchBaseTest {
     }
 
     private void addGraylogDefaultIndexTemplate() {
-        addIndexTemplates(getGraylogDefaultMessageTemplates(elasticsearch().version()));
+        addIndexTemplates(getGraylogDefaultMessageTemplates(searchServer().version()));
     }
 
     private static Map<String, Map<String, Object>> getGraylogDefaultMessageTemplates(SearchVersion version) {
@@ -61,11 +61,11 @@ public abstract class ElasticsearchBaseTest {
         for (Map.Entry<String, Map<String, Object>> template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            elasticsearch().client().putTemplate(templateName, template.getValue());
+            searchServer().client().putTemplate(templateName, template.getValue());
         }
     }
 
-    protected abstract SearchServerInstance elasticsearch();
+    protected abstract SearchServerInstance searchServer();
 
     /**
      * Returns a custom Elasticsearch client with a bunch of utility methods.
@@ -73,7 +73,7 @@ public abstract class ElasticsearchBaseTest {
      * @return the client
      */
     protected Client client() {
-        return elasticsearch().client();
+        return searchServer().client();
     }
 
     /**
@@ -85,10 +85,6 @@ public abstract class ElasticsearchBaseTest {
      * @param resourcePath the fixture resource path
      */
     protected void importFixture(String resourcePath) {
-        elasticsearch().importFixtureResource(resourcePath, getClass());
-    }
-
-    protected SearchVersion elasticsearchVersion() {
-        return elasticsearch().version();
+        searchServer().importFixtureResource(resourcePath, getClass());
     }
 }

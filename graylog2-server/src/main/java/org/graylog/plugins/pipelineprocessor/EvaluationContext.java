@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.shared.utilities.ExceptionUtils.getRootCause;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class EvaluationContext {
 
@@ -57,6 +59,16 @@ public class EvaluationContext {
     private List<Message> createdMessages;
     @Nullable
     private List<EvalError> evalErrors;
+    @Nullable
+    private Rule currentRule;
+
+    public void setRule(Rule rule) {
+        currentRule = rule;
+    }
+
+    public Rule getRule() {
+        return currentRule;
+    }
 
     private EvaluationContext() {
         this(new Message("__dummy", "__dummy", DateTime.parse("2010-07-30T16:03:25Z"))); // first Graylog release
@@ -192,5 +204,12 @@ public class EvaluationContext {
                     .append(throwable.getMessage())
                     .toString();
         }
+    }
+
+    public String pipelineErrorMessage(String msg) {
+        if (currentRule != null) {
+            return f("Rule <%s> %s", currentRule.name(), msg);
+        }
+        return msg;
     }
 }

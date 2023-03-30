@@ -15,16 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { SidecarsActions, SidecarsStore } from 'stores/sidecars/SidecarsStore';
 
-import SidecarList from './SidecarList';
+import SidecarList, { PAGE_SIZES } from './SidecarList';
 
 const SidecarListContainer = createReactClass({
-  displayName: 'SidecarListContainer',
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    paginationQueryParameter: PropTypes.object.isRequired,
+  },
+
   mixins: [Reflux.connect(SidecarsStore)],
 
   componentDidMount() {
@@ -38,7 +45,35 @@ const SidecarListContainer = createReactClass({
     }
   },
 
-  SIDECAR_DATA_REFRESH: 5 * 1000,
+  handleSortChange(field) {
+    return () => {
+      this._reloadSidecars({
+        sortField: field,
+        // eslint-disable-next-line no-nested-ternary
+        order: (this.state.sort.field === field ? (this.state.sort.order === 'asc' ? 'desc' : 'asc') : 'asc'),
+      });
+    };
+  },
+
+  handlePageChange(page, pageSize) {
+    this._reloadSidecars({ page: page, pageSize: pageSize });
+  },
+
+  handleQueryChange(query = '', callback = () => {}) {
+    const { resetPage } = this.props.paginationQueryParameter;
+
+    resetPage();
+
+    this._reloadSidecars({ query: query }).finally(callback);
+  },
+
+  toggleShowInactive() {
+    const { resetPage } = this.props.paginationQueryParameter;
+
+    resetPage();
+
+    this._reloadSidecars({ onlyActive: !this.state.onlyActive });
+  },
 
   _reloadSidecars({ query, page, pageSize, onlyActive, sortField, order }) {
     const effectiveQuery = query === undefined ? this.state.query : query;
@@ -53,44 +88,26 @@ const SidecarListContainer = createReactClass({
       options.order = order || this.state.sort.order;
     }
 
-    if (this.state.pagination) {
-      options.pageSize = pageSize || this.state.pagination.pageSize;
-      options.onlyActive = onlyActive === undefined ? this.state.onlyActive : onlyActive; // Avoid || to handle false values
-      const shouldKeepPage = options.pageSize === this.state.pagination.pageSize
-        && options.onlyActive === this.state.onlyActive
-        && options.query === this.state.query; // Only keep page number when other parameters don't change
-      let effectivePage = 1;
+    const { paginationQueryParameter } = this.props;
 
-      if (shouldKeepPage) {
-        effectivePage = page || this.state.pagination.page;
-      }
+    options.pageSize = pageSize || paginationQueryParameter.pageSize;
+    options.onlyActive = onlyActive === undefined ? this.state.onlyActive : onlyActive; // Avoid || to handle false values
 
-      options.page = effectivePage;
+    const shouldKeepPage = options.pageSize === paginationQueryParameter.pageSize
+      && options.onlyActive === this.state.onlyActive
+      && options.query === this.state.query; // Only keep page number when other parameters don't change
+    let effectivePage = 1;
+
+    if (shouldKeepPage) {
+      effectivePage = page || paginationQueryParameter.page;
     }
+
+    options.page = effectivePage;
 
     return SidecarsActions.listPaginated(options);
   },
 
-  toggleShowInactive() {
-    this._reloadSidecars({ onlyActive: !this.state.onlyActive });
-  },
-
-  handleSortChange(field) {
-    return () => {
-      this._reloadSidecars({
-        sortField: field,
-        order: (this.state.sort.field === field ? (this.state.sort.order === 'asc' ? 'desc' : 'asc') : 'asc'),
-      });
-    };
-  },
-
-  handlePageChange(page, pageSize) {
-    this._reloadSidecars({ page: page, pageSize: pageSize });
-  },
-
-  handleQueryChange(query = '', callback = () => {}) {
-    this._reloadSidecars({ query: query }).finally(callback);
-  },
+  SIDECAR_DATA_REFRESH: 5 * 1000,
 
   render() {
     const { sidecars, onlyActive, pagination, query, sort } = this.state;
@@ -115,4 +132,4 @@ const SidecarListContainer = createReactClass({
   },
 });
 
-export default SidecarListContainer;
+export default withPaginationQueryParameter(SidecarListContainer, { pageSizes: PAGE_SIZES });

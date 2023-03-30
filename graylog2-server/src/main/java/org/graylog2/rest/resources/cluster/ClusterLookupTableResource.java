@@ -46,12 +46,14 @@ import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 /**
  * The primary objective of this API is to provide facilities for managing Lookup Tables on the cluster level.
  * Originally was introduced to perform cluster-wide Cache purging.
  */
 @RequiresAuthentication
-@Api(value = "Cluster/LookupTable")
+@Api(value = "Cluster/LookupTable", tags = {CLOUD_VISIBLE})
 @Path("/cluster/system/lookup")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterLookupTableResource extends ProxiedResource {

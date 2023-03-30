@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing latest aggregation if field is not present in time range."
+
+issues = ["13593"]
+pulls = ["13640"]

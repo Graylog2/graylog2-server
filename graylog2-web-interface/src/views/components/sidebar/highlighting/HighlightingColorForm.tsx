@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { trim } from 'lodash';
+import trim from 'lodash/trim';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
@@ -26,7 +26,7 @@ import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import ColorPreview, { GradientColorPreview } from 'views/components/sidebar/highlighting/ColorPreview';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type Props = {

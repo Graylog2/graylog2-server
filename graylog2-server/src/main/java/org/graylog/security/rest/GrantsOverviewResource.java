@@ -44,7 +44,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Api(value = "Authorization/GrantsOverview", description = "Grants overview")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Authorization/GrantsOverview", description = "Grants overview", tags = {CLOUD_VISIBLE})
 @Path("/authz/grants-overview")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

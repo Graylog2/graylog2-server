@@ -45,6 +45,9 @@ public abstract class ExposedConfiguration {
     @JsonProperty("outputbuffer_processors")
     public abstract int outputBufferProcessors();
 
+    @JsonProperty("output_batch_size")
+    public abstract int outputBatchSize();
+
     @JsonProperty("processor_wait_strategy")
     public abstract String processorWaitStrategy();
 
@@ -97,14 +100,12 @@ public abstract class ExposedConfiguration {
     @JsonProperty("stale_leader_timeout")
     public abstract int staleLeaderTimeout();
 
-    @JsonProperty("gc_warning_threshold")
-    public abstract String gcWarningThreshold();
-
     public static ExposedConfiguration create(Configuration configuration) {
         return create(
                 configuration.getInputbufferProcessors(),
                 configuration.getProcessBufferProcessors(),
                 configuration.getOutputBufferProcessors(),
+                configuration.getOutputBatchSize(),
                 configuration.getProcessorWaitStrategy().getClass().getName(),
                 configuration.getInputBufferWaitStrategy().getClass().getName(),
                 configuration.getInputBufferRingSize(),
@@ -118,8 +119,7 @@ public abstract class ExposedConfiguration {
                 configuration.getStreamProcessingTimeout(),
                 configuration.getStreamProcessingMaxFaults(),
                 configuration.getOutputModuleTimeout(),
-                configuration.getStaleLeaderTimeout(),
-                configuration.getGcWarningThreshold().toString());
+                configuration.getStaleLeaderTimeout());
     }
 
     @JsonCreator
@@ -127,6 +127,7 @@ public abstract class ExposedConfiguration {
             @JsonProperty("inputbuffer_processors") int inputBufferProcessors,
             @JsonProperty("processbuffer_processors") int processBufferProcessors,
             @JsonProperty("outputbuffer_processors") int outputBufferProcessors,
+            @JsonProperty("output_batch_size") int outputBatchSize,
             @JsonProperty("processor_wait_strategy") String processorWaitStrategy,
             @JsonProperty("inputbuffer_wait_strategy") String inputBufferWaitStrategy,
             @JsonProperty("inputbuffer_ring_size") int inputBufferRingSize,
@@ -140,12 +141,12 @@ public abstract class ExposedConfiguration {
             @JsonProperty("stream_processing_timeout") long streamProcessingTimeout,
             @JsonProperty("stream_processing_max_faults") int streamProcessingMaxFaults,
             @JsonProperty("output_module_timeout") long outputModuleTimeout,
-            @JsonProperty("stale_leader_timeout") int staleLeaderTimeout,
-            @JsonProperty("gc_warning_threshold") String gcWarningThreshold) {
+            @JsonProperty("stale_leader_timeout") int staleLeaderTimeout) {
         return new AutoValue_ExposedConfiguration(
                 inputBufferProcessors,
                 processBufferProcessors,
                 outputBufferProcessors,
+                outputBatchSize,
                 processorWaitStrategy,
                 inputBufferWaitStrategy,
                 inputBufferRingSize,
@@ -159,8 +160,7 @@ public abstract class ExposedConfiguration {
                 streamProcessingTimeout,
                 streamProcessingMaxFaults,
                 outputModuleTimeout,
-                staleLeaderTimeout,
-                gcWarningThreshold);
+                staleLeaderTimeout);
     }
 
 }

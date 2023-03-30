@@ -58,8 +58,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "StreamRules", description = "Manage stream rules")
+@Api(value = "StreamRules", description = "Manage stream rules", tags = {CLOUD_VISIBLE})
 @Path("/streams/{streamid}/rules")
 public class StreamRuleResource extends RestResource {
     private final StreamRuleService streamRuleService;

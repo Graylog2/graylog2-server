@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { validateField } from 'util/FormsUtils';
-import history from 'util/History';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import { Select, InputDescription } from 'components/common';
 import { Button } from 'components/bootstrap';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 const ElementsContainer = styled.div`
   display: flex;
@@ -41,7 +43,9 @@ const FormGroup = styled.div`
   flex: 1;
 `;
 
-const _onSubmit = ({ authServiceType }) => {
+type FormState = { authServiceType: string };
+
+const _onSubmit = (history: HistoryFunction, { authServiceType }: FormState) => {
   const createRoute = Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(authServiceType);
   history.push(createRoute);
 };
@@ -50,9 +54,11 @@ const BackendCreateSelect = () => {
   const authServices = PluginStore.exports('authentication.services');
   const sortedAuthServices = authServices.sort((s1, s2) => defaultCompare(s1.displayName, s2.displayName));
   const authServicesOptions = sortedAuthServices.map((service) => ({ label: service.displayName, value: service.name }));
+  const history = useHistory();
+  const onSubmit = useCallback((formState: FormState) => _onSubmit(history, formState), [history]);
 
   return (
-    <Formik onSubmit={_onSubmit} initialValues={{ authServiceType: undefined }}>
+    <Formik onSubmit={onSubmit} initialValues={{ authServiceType: undefined }}>
       {({ isSubmitting, isValid }) => (
         <StyledForm>
           <ElementsContainer>

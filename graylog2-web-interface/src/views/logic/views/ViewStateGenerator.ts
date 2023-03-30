@@ -32,13 +32,28 @@ type Result = {
   positions: { [key: string]: WidgetPosition },
 };
 
-type ViewCreator = (streamId: string | undefined | null) => Promise<Result>;
+type ViewCreator = (streamId: string | string[] | undefined | null) => Promise<Result>;
 type DefaultWidgets = Record<ViewType, ViewCreator>;
 
+type Decorator = { stream: string | null };
+
+export const matchesDecoratorStream = (streamId: string | string[] | undefined | null) => {
+  if (!streamId) {
+    return ({ stream }: Decorator) => stream === null;
+  }
+
+  if (streamId instanceof Array) {
+    return ({ stream }: Decorator) => streamId.includes(stream);
+  }
+
+  return ({ stream }: Decorator) => stream === streamId;
+};
+
 const _defaultWidgets: DefaultWidgets = {
-  [View.Type.Search]: async (streamId: string | undefined | null) => {
+  [View.Type.Search]: async (streamId: string | string[] | undefined | null) => {
     const decorators = await DecoratorsActions.list();
-    const streamDecorators = decorators ? decorators.filter((decorator) => decorator.stream === streamId) : [];
+    const byStreamId = matchesDecoratorStream(streamId);
+    const streamDecorators = decorators ? decorators.filter(byStreamId) : [];
     const histogram = resultHistogram();
     const messageTable = allMessagesTable(undefined, streamDecorators);
     const widgets = [
@@ -60,8 +75,8 @@ const _defaultWidgets: DefaultWidgets = {
 
     return { titles, widgets, positions };
   },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  [View.Type.Dashboard]: async (_streamId: string | undefined | null) => {
+
+  [View.Type.Dashboard]: async (_streamId: string | string[] | undefined | null) => {
     const widgets = [];
     const titles = {};
     const positions = {};
@@ -70,7 +85,7 @@ const _defaultWidgets: DefaultWidgets = {
   },
 };
 
-export default async (type: ViewType, streamId?: string) => {
+export default async (type: ViewType, streamId?: string | string[] | undefined) => {
   const { titles, widgets, positions } = await _defaultWidgets[type](streamId);
 
   return ViewState.create()

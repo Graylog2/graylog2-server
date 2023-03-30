@@ -15,38 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type * as Immutable from 'immutable';
 
-import type User from 'logic/users/User';
 import { FormikFormGroup } from 'components/common';
 
-type Props = {
-  users?: Immutable.List<User>,
-};
-
-const UsernameFormGroup = ({ users }: Props) => {
-  const _validate = (value) => {
-    let error;
-    const usernameExists = users && !!users.some((user) => user.username === value);
-
-    if (usernameExists) {
-      error = 'Username is already taken';
-    }
-
-    return error;
-  };
-
+const UsernameFormGroup = () => {
   return (
     <FormikFormGroup label="Username"
                      name="username"
                      required
-                     validate={_validate}
                      help="Select a unique user name used to log in with." />
   );
-};
-
-UsernameFormGroup.defaultProps = {
-  users: undefined,
 };
 
 export default UsernameFormGroup;

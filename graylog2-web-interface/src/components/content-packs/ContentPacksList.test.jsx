@@ -77,7 +77,8 @@ describe('<ContentPacksList />', () => {
     });
     const wrapper = mount(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
 
-    wrapper.find('a[children="Delete All Versions"]').at(0).simulate('click');
+    const menuItem = wrapper.findWhere((node) => node.type() === 'a' && node.text() === 'Delete All Versions').at(0);
+    menuItem.simulate('click');
 
     expect(deleteFn.mock.calls.length).toBe(1);
   });

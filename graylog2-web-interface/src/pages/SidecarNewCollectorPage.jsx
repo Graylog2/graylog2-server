@@ -15,52 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import createReactClass from 'create-react-class';
 
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import Routes from 'routing/Routes';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import DocsHelper from 'util/DocsHelper';
 
-const SidecarNewCollectorPage = createReactClass({
-  displayName: 'SidecarNewCollectorPage',
+const SidecarNewCollectorPage = () => (
+  <DocumentTitle title="New Log Collector">
+    <SidecarsPageNavigation />
+    <PageHeader title="New Log Collector"
+                documentationLink={{
+                  title: 'Sidecar documentation',
+                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                }}>
+      <span>
+        Some words about log collectors.
+      </span>
+    </PageHeader>
 
-  render() {
-    return (
-      <DocumentTitle title="New Log Collector">
-        <span>
-          <PageHeader title="New Log Collector">
-            <span>
-              Some words about log collectors.
-            </span>
-
-            <span>
-              Read more about the Graylog Sidecar in the documentation.
-            </span>
-
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-                <Button bsStyle="info">Overview</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-                <Button bsStyle="info">Administration</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-                <Button bsStyle="info" className="active">Configuration</Button>
-              </LinkContainer>
-            </ButtonToolbar>
-          </PageHeader>
-
-          <Row className="content">
-            <Col md={6}>
-              <CollectorForm action="create" />
-            </Col>
-          </Row>
-        </span>
-      </DocumentTitle>
-    );
-  },
-});
+    <Row className="content">
+      <Col md={6}>
+        <CollectorForm action="create" />
+      </Col>
+    </Row>
+  </DocumentTitle>
+);
 
 export default SidecarNewCollectorPage;

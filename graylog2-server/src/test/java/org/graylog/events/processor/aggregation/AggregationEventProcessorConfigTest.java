@@ -74,7 +74,8 @@ public class AggregationEventProcessorConfigTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class));
+        this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService,
+                mock(EntityOwnershipService.class), null);
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     }
 

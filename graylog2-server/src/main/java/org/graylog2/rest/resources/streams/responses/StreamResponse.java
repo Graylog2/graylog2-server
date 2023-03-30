@@ -23,8 +23,6 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
-import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
 import javax.annotation.Nullable;
@@ -61,12 +59,6 @@ public abstract class StreamResponse {
     @JsonProperty("rules")
     public abstract Collection<StreamRule> rules();
 
-    @JsonProperty("alert_conditions")
-    public abstract Collection<AlertConditionSummary> alertConditions();
-
-    @JsonProperty("alert_receivers")
-    public abstract AlertReceivers alertReceivers();
-
     @JsonProperty("title")
     public abstract String title();
 
@@ -96,8 +88,6 @@ public abstract class StreamResponse {
                                         @JsonProperty("created_at") String createdAt,
                                         @JsonProperty("disabled") boolean disabled,
                                         @JsonProperty("rules") Collection<StreamRule> rules,
-                                        @JsonProperty("alert_conditions") Collection<AlertConditionSummary> alertConditions,
-                                        @JsonProperty("alert_receivers") AlertReceivers alertReceivers,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("content_pack") @Nullable String contentPack,
                                         @JsonProperty("is_default") @Nullable Boolean isDefault,
@@ -112,8 +102,6 @@ public abstract class StreamResponse {
                 createdAt,
                 disabled,
                 rules,
-                alertConditions,
-                alertReceivers,
                 title,
                 contentPack,
                 firstNonNull(isDefault, false),

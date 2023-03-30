@@ -1,0 +1,13 @@
+type = "fixed"
+message = "Provide query suggestions for numerical fields."
+
+pulls = ["14279"]
+
+details.user = """
+Previous implementation used prefix query, which is only usable for textual fields. This fix adds a scripted query
+that can handle suggestions for numerical fields as well.
+
+Additionally, the timerange is now applied for suggestions as well, limiting the suggestions to requested time range.
+This  should narrow down suggestions and significantly improve response times of suggestions.
+
+"""

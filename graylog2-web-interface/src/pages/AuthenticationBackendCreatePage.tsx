@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import withParams from 'routing/withParams';
-import {} from 'components/authentication/bindings'; // Bind all authentication plugins
+import 'components/authentication/bindings'; // Bind all authentication plugins
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 
 type Props = {

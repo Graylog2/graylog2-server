@@ -15,23 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
-import connect from 'stores/connect';
 import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import type Query from 'views/logic/queries/Query';
 import { createElasticsearchQueryString, filtersToStreamSet } from 'views/logic/queries/Query';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
+import useViewType from 'views/hooks/useViewType';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import DrilldownContext from './DrilldownContext';
-import ViewTypeContext from './ViewTypeContext';
 import type { Drilldown } from './DrilldownContext';
 
 const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride | undefined, currentQuery: Query): Drilldown => {
-  const viewType = useContext(ViewTypeContext);
+  const viewType = useViewType();
 
   if (viewType === View.Type.Dashboard) {
     const { streams, timerange, query } = widget;
@@ -56,11 +54,11 @@ const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride
 type Props = {
   children: React.ReactElement,
   widget: Widget,
-  globalOverride: GlobalOverride | undefined,
-  currentQuery: Query,
 };
 
-const DrilldownContextProvider = ({ children, widget, globalOverride, currentQuery }: Props) => {
+const DrilldownContextProvider = ({ children, widget }: Props) => {
+  const currentQuery = useCurrentQuery();
+  const globalOverride = useGlobalOverride();
   const drillDownContextValue = useDrillDownContextValue(widget, globalOverride, currentQuery);
 
   if (drillDownContextValue) {
@@ -70,10 +68,4 @@ const DrilldownContextProvider = ({ children, widget, globalOverride, currentQue
   return children;
 };
 
-export default connect(
-  DrilldownContextProvider,
-  {
-    currentQuery: CurrentQueryStore,
-    globalOverride: GlobalOverrideStore,
-  },
-);
+export default DrilldownContextProvider;

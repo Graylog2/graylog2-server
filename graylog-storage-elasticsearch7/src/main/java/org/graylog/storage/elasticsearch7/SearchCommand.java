@@ -17,7 +17,7 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.google.auto.value.AutoValue;
-import org.graylog2.indexer.searches.ScrollCommand;
+import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -60,9 +60,9 @@ abstract class SearchCommand {
                 OptionalLong.empty(), true);
     }
 
-    static SearchCommand from(ScrollCommand scrollCommand) {
-        return create(scrollCommand.query(), scrollCommand.streams(), scrollCommand.sorting(),
-                scrollCommand.filter(), scrollCommand.range(), scrollCommand.limit(), scrollCommand.offset(),
-                scrollCommand.batchSize(), scrollCommand.highlight());
+    static SearchCommand from(ChunkCommand chunkCommand) {
+        return create(chunkCommand.query(), chunkCommand.streams(), chunkCommand.sorting(),
+                chunkCommand.filter(), chunkCommand.range(), chunkCommand.limit(), chunkCommand.offset(),
+                chunkCommand.batchSize(), chunkCommand.highlight());
     }
 }

@@ -1,0 +1,5 @@
+type = "added"
+message = "Support configuration of sidecars on Darwin and FreeBSD."
+
+issues = ["Graylog2/collector-sidecar#377"]
+pulls = ["12387"]

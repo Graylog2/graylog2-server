@@ -88,7 +88,7 @@ public class IndexRetentionThread extends Periodical {
 
     private void retentionProblemNotification(String title, String description) {
         final Notification notification = notificationService.buildNow()
-                .addNode(nodeId.toString())
+                .addNode(nodeId.getNodeId())
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.URGENT)
                 .addDetail("title", title)

@@ -17,13 +17,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import { cloneDeep, groupBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import groupBy from 'lodash/groupBy';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
@@ -34,9 +35,12 @@ import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 
 const EditContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'EditContentPackPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
 
@@ -148,6 +152,7 @@ const EditContentPackPage = createReactClass({
 
   _onSave() {
     const { contentPack } = this.state;
+    const { history } = this.props;
 
     ContentPacksActions.create.triggerPromise(contentPack.toJSON())
       .then(
@@ -194,21 +199,18 @@ const EditContentPackPage = createReactClass({
     return (
       <DocumentTitle title="Content packs">
         <span>
-          <PageHeader title="Edit content pack">
+          <PageHeader title="Edit content pack"
+                      topActions={(
+                        <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+                          <Button bsStyle="info">Content Packs</Button>
+                        </LinkContainer>
+                      )}>
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
-            </span>
-
-            <span>
+              <br />
               Find more content packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-
-            <div>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info">Content Packs</Button>
-              </LinkContainer>
-            </div>
           </PageHeader>
           <ContentPackEdit contentPack={contentPack}
                            onGetEntities={this._getEntities}

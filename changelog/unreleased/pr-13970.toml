@@ -1,0 +1,4 @@
+type = "add"
+message = "Replacing getting started guide with start page which lists recently opened and favorite saved searches and dashboards and recent activity."
+
+pulls = ["13970"]

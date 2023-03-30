@@ -38,7 +38,6 @@ export default class LookupTableParameter extends Parameter {
 
   _value2: InternalState;
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static Builder: typeof Builder;
 
   constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, lookupTable: string, key: string) {
@@ -51,7 +50,6 @@ export default class LookupTableParameter extends Parameter {
     return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, lookupTable, key);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { type, name, title, description, dataType, defaultValue, optional } = this._value;
     const { lookupTable, key } = this._value2;
@@ -109,7 +107,6 @@ export default class LookupTableParameter extends Parameter {
     return new LookupTableParameter(name, title, description, data_type, default_value, optional, lookup_table, key);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()

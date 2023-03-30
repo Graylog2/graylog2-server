@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Widget from 'views/logic/widgets/Widget';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import { TIMESTAMP_FIELD } from 'views/Constants';
+import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
-import type { FieldActionHandler } from './FieldActionHandler';
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
 import { FieldTypes } from '../fieldtypes/FieldType';
 
-const ChartActionHandler: FieldActionHandler<{ widget?: Widget }> = ({ field, contexts: { widget: origWidget = Widget.empty() } }) => {
+const ChartActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
+  field,
+  contexts: { widget: origWidget = Widget.empty() },
+}) => (dispatch: AppDispatch) => {
   const series = isFunction(field) ? Series.forFunction(field) : Series.forFunction(`avg(${field})`);
   const config = AggregationWidgetConfig.builder()
     .rowPivots([pivotForField(TIMESTAMP_FIELD, FieldTypes.DATE())])
@@ -41,7 +45,7 @@ const ChartActionHandler: FieldActionHandler<{ widget?: Widget }> = ({ field, co
 
   const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
 
-  return WidgetActions.create(widget);
+  return dispatch(addWidget(widget));
 };
 
 export default ChartActionHandler;

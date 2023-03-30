@@ -24,10 +24,9 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.jackson.TypeReferences;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -39,9 +38,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class JsonUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(JsonUtils.class);
+    private static final RateLimitedLog LOG = getRateLimitedLog(JsonUtils.class);
     private static final String KEY_SEPARATOR = "_";
     private static final String KEY_VALUE_SEPARATOR = ":";
     private static final String LIST_SEPARATOR = ",";
@@ -51,7 +51,7 @@ public class JsonUtils {
     }
 
     public static JsonNode extractJson(
-            String value, ObjectMapper mapper, ExtractFlags extractFlags)
+            String value, ObjectMapper mapper, ExtractFlags extractFlags, boolean stringify)
             throws IOException {
         if (isNullOrEmpty(value)) {
             throw new IOException("null result");
@@ -61,7 +61,11 @@ public class JsonUtils {
         ObjectNode resultRoot = mapper.createObjectNode();
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
             for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, extractFlags)) {
-                resultRoot.put(entry.key(), entry.value().toString());
+                if (stringify) {
+                    resultRoot.put(entry.key(), entry.value().toString());
+                } else {
+                    resultRoot.putPOJO(entry.key(), entry.value());
+                }
             }
         }
         return resultRoot;

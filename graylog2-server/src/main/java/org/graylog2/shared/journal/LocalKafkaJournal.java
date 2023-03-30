@@ -428,9 +428,11 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         try {
             metricRegistry.register(name,
                     (Gauge<Long>) () -> {
-                        if (getCommittedOffset() == DEFAULT_COMMITTED_OFFSET && size() == 0) {
-                            // nothing committed at all
+                        if (size() == 0) {
                             return 0L;
+                        }
+                        if (committedOffset.get() == DEFAULT_COMMITTED_OFFSET) {
+                            return getLogEndOffset() - getLogStartOffset();
                         }
                         return Math.max(0, getLogEndOffset() - 1 - committedOffset.get());
                     });
@@ -998,7 +1000,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 LocalKafkaJournal.this.purgedSegmentsInLastRetention.set(0);
                 return 0;
             }
-            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
+            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<>() {
                 @Override
                 public Object apply(LogSegment segment) {
                     final long segmentAge = JODA_TIME.milliseconds() - segment.lastModified();
@@ -1058,7 +1060,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 return 0;
             }
             final long[] diff = {currentSize - retentionSize};
-            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() { // sigh scala
+            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<>() { // sigh scala
                 @Override
                 public Object apply(LogSegment segment) {
                     if (diff[0] - segment.size() >= 0) {
@@ -1094,7 +1096,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                     JavaConversions.asJavaIterable(kafkaLog.logSegments(committedOffset, Long.MAX_VALUE))
             );
             loggerForCleaner.debug("[cleanup-committed] Keeping segments {}", logSegments);
-            return kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
+            return kafkaLog.deleteOldSegments(new AbstractFunction1<>() {
                 @Override
                 public Object apply(LogSegment segment) {
                     final boolean shouldDelete = !logSegments.contains(segment);

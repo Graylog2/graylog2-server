@@ -47,6 +47,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -73,7 +74,7 @@ public class NotificationFacadeTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    private ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private ObjectMapper objectMapper;
 
     private NotificationFacade facade;
 
@@ -98,20 +99,23 @@ public class NotificationFacadeTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    private MongoJackObjectMapperProvider mapperProvider;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
+        objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 EmailEventNotificationConfig.class,
                 EmailEventNotificationConfigEntity.class,
                 HttpEventNotificationConfigEntity.class,
                 HTTPEventNotificationConfig.class
         );
+        mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+
         jobDefinitionService = mock(DBJobDefinitionService.class);
         stateService = mock(DBEventProcessorStateService.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class));
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), null);
 
         notificationService = new DBNotificationService(mongodb.mongoConnection(), mapperProvider, mock(EntityOwnershipService.class));
         notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());
@@ -159,7 +163,9 @@ public class NotificationFacadeTest {
         final JobDefinitionDto jobDefinitionDto = mock(JobDefinitionDto.class);
 
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
-        final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "kmerz"));
+        final UserImpl kmerzUser = new UserImpl(
+                mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
+                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
         final NativeEntity<NotificationDto> nativeEntity = facade.createNativeEntity(

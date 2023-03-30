@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, DropdownButton, MenuItem, Button } from 'components/bootstrap';
@@ -27,17 +28,12 @@ import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon'
 import CopyCollectorModal from './CopyCollectorModal';
 
 const CollectorRow = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     collector: PropTypes.object.isRequired,
     onClone: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     validateCollector: PropTypes.func.isRequired,
-  },
-
-  handleClone() {
-    const { onClone, collector } = this.props;
-
-    onClone(collector);
   },
 
   handleDelete() {
@@ -58,12 +54,12 @@ const CollectorRow = createReactClass({
           {collector.name}
         </td>
         <td>
-          <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {lodash.upperFirst(collector.node_operating_system)}
+          <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {upperFirst(collector.node_operating_system)}
         </td>
         <td>
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(collector.id)}>
-              <Button bsStyle="info" bsSize="xsmall">Edit</Button>
+              <Button bsSize="xsmall">Edit</Button>
             </LinkContainer>
             <DropdownButton id={`more-actions-${collector.id}`} title="More actions" bsSize="xsmall" pullRight>
               <CopyCollectorModal collector={collector}

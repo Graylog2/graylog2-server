@@ -17,11 +17,11 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
+import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
 import RuleList from 'components/rules/RuleList';
 import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
 import Routes from 'routing/Routes';
@@ -29,7 +29,7 @@ import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { Pagination } from 'stores/PaginationTypes';
 import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
-import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 const Flex = styled.div`
   display: flex;
@@ -56,30 +56,25 @@ const _loadRuleMetricData = (setMetricsConfig) => {
 };
 
 const RulesPage = () => {
+  const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
+  const [query, setQuery] = useState('');
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
   const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
-  const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0, count = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
-  const { page, perPage, query } = pagination;
 
   useEffect(() => {
-    if (isPaginationReady) {
-      _loadData(pagination, setIsDataLoading, setPaginatedRules);
-    }
-  }, [isPaginationReady, pagination]);
+    _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
+  }, [query, page, perPage]);
 
   useEffect(() => {
     _loadRuleMetricData(setMetricsConfig);
   }, []);
 
-  const handlePageChange = (newPage, newPerPage) => {
-    setPagination({ ...pagination, page: newPage, perPage: newPerPage });
-  };
-
   const handleSearch = (nextQuery) => {
-    setPagination({ ...pagination, query: nextQuery, page: DEFAULT_PAGINATION.page });
+    resetPage();
+    setQuery(nextQuery);
   };
 
   const handleDelete = (rule: RuleType) => {
@@ -89,12 +84,12 @@ const RulesPage = () => {
       if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
         RulesActions.delete(rule).then(() => {
           if (count > 1) {
-            _loadData(pagination, setIsDataLoading, setPaginatedRules);
+            _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
 
             return;
           }
 
-          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, pagination.page - 1), perPage, query });
+          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
         });
       }
     };
@@ -113,6 +108,7 @@ const RulesPage = () => {
     return <Button onClick={toggleMetricsConfig}>Debug Metrics</Button>;
   };
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const RulesButtonToolbar = () => (
     <ButtonToolbar className="pull-right">
       <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
@@ -128,7 +124,6 @@ const RulesPage = () => {
     <Flex>
       <SearchForm query={query}
                   onSearch={handleSearch}
-                  queryWidth={400}
                   queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
                   wrapperClass="has-bm"
                   onReset={() => handleSearch('')}
@@ -139,50 +134,35 @@ const RulesPage = () => {
 
   return (
     <DocumentTitle title="Pipeline rules">
-      <span>
-        <PageHeader title="Pipeline Rules" subactions={<RulesButtonToolbar />}>
-          <span>
-            Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
-            Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
-          </span>
+      <PipelinesPageNavigation />
+      <PageHeader title="Pipeline Rules"
+                  actions={<RulesButtonToolbar />}
+                  documentationLink={{
+                    title: 'Pipeline rules documentation',
+                    path: DocsHelper.PAGES.PIPELINE_RULES,
+                  }}>
+        <span>
+          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
+          Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
+        </span>
+      </PageHeader>
 
-          <span>
-            Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                                                             text="documentation" />.
-          </span>
-
-          <span>
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-              <Button bsStyle="info">Manage pipelines</Button>
-            </LinkContainer>
-              &nbsp;
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
-              <Button bsStyle="info">Manage rules</Button>
-            </LinkContainer>
-              &nbsp;
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
-              <Button bsStyle="info">Simulator</Button>
-            </LinkContainer>
-          </span>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              <Row>
-                <Col md={12}>
-                  <PaginatedList onChange={handlePageChange} totalItems={total} activePage={page} pageSize={perPage}>
-                    <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
-                    {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
-                  </PaginatedList>
-                </Col>
-              </Row>
-            )}
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <Row>
+              <Col md={12}>
+                <PaginatedList totalItems={total}>
+                  <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
+                  {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
+                </PaginatedList>
+              </Col>
+            </Row>
+          )}
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

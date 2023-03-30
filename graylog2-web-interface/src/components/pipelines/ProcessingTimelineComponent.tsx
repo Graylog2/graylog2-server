@@ -16,9 +16,9 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer, Link } from 'components/common/router';
 import { Button } from 'components/bootstrap';
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
@@ -30,8 +30,11 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import type { PaginatedPipelines } from 'stores/pipelines/PipelinesStore';
 import { PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
-import useLocationSearchPagination from 'hooks/useLocationSearchPagination';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import PipelineConnectionsList from './PipelineConnectionsList';
 
@@ -58,7 +61,9 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(({ $idle, theme }) => css`
   padding: 20px;
   text-align: center;
   width: 120px;
-  background-color: ${$idle ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10) : theme.colors.global.contentBackground};
+  background-color: ${$idle
+    ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10)
+    : theme.colors.global.contentBackground};
 `);
 
 const PipelineNameTD = styled.td`
@@ -78,7 +83,6 @@ const StreamListTD = styled.td`
 const PipelineFilter = ({ query, onSearch }: { query: string, onSearch: (query: string) => void }) => (
   <SearchForm query={query}
               onSearch={onSearch}
-              queryWidth={400}
               queryHelpComponent={<QueryHelper entityName="Pipeline" />}
               wrapperClass="has-bm"
               onReset={() => onSearch('')}
@@ -99,21 +103,20 @@ const _loadPipelines = (pagination, setLoading, setPaginatedPipelines) => {
 };
 
 const ProcessingTimelineComponent = () => {
+  const currentUser = useCurrentUser();
   const { connections } = useStore(PipelineConnectionsStore);
+  const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
+  const [query, setQuery] = useState('');
   const [streams, setStreams] = useState<Stream[] | undefined>();
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
   const [loading, setLoading] = useState(false);
-  const { list: pipelines = Immutable.List(), pagination: { total = 0, count = 0 } = {} } = paginatedPipelines || {};
-  const { isInitialized: isPaginationReady, pagination, setPagination } = useLocationSearchPagination(DEFAULT_PAGINATION);
-  const { page, query, perPage } = pagination;
+  const { list: pipelines = Immutable.List(), pagination: { total = 0 } = {} } = paginatedPipelines || {};
 
   useEffect(() => {
-    if (isPaginationReady) {
-      _loadPipelines(pagination, setLoading, setPaginatedPipelines);
-      PipelineConnectionsActions.list();
-      StreamsStore.listStreams().then(setStreams);
-    }
-  }, [isPaginationReady, pagination]);
+    _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
+    PipelineConnectionsActions.list();
+    StreamsStore.listStreams().then(setStreams);
+  }, [page, perPage, query]);
 
   const isLoading = !pipelines || !streams || !connections;
 
@@ -121,13 +124,14 @@ const ProcessingTimelineComponent = () => {
     return <Spinner />;
   }
 
-  const handlePaginationChange = (nextPagination) => {
-    setPagination(nextPagination);
+  const handleSearch = (newQuery) => {
+    resetPage();
+    setQuery(newQuery);
   };
 
   const searchFilter = (
     <Header>
-      <PipelineFilter query={query} onSearch={(newQuery) => handlePaginationChange({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />
+      <PipelineFilter query={query} onSearch={handleSearch} />
       {loading && <SpinnerWrapper><Spinner text="" delay={0} /></SpinnerWrapper>}
     </Header>
   );
@@ -167,13 +171,8 @@ const ProcessingTimelineComponent = () => {
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
         PipelinesActions.delete(pipeline.id).then(() => {
-          if (count > 1) {
-            _loadPipelines(pagination, setLoading, setPaginatedPipelines);
-
-            return;
-          }
-
-          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, pagination.page - 1), perPage, query });
+          _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
+          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
         });
       }
     };
@@ -202,11 +201,12 @@ const ProcessingTimelineComponent = () => {
         </StreamListTD>
         <td>{_formatStages(pipeline, stages)}</td>
         <td>
-          <Button bsStyle="primary" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
-          &nbsp;
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
-            <Button bsStyle="info" bsSize="xsmall">Edit</Button>
-          </LinkContainer>
+          <ButtonToolbar>
+            <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
+              <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} bsSize="xsmall">Edit</Button>
+            </LinkContainer>
+            <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:delete')} bsStyle="danger" bsSize="xsmall" onClick={_deletePipeline(pipeline)}>Delete</Button>
+          </ButtonToolbar>
         </td>
       </tr>
     );
@@ -216,9 +216,7 @@ const ProcessingTimelineComponent = () => {
 
   return (
     <div>
-      <StyledPaginatedList onChange={(newPage, newPerPage) => handlePaginationChange({ ...pagination, page: newPage, perPage: newPerPage })}
-                           activePage={page}
-                           totalItems={total}>
+      <StyledPaginatedList totalItems={total}>
         <DataTable id="processing-timeline"
                    className="table-hover"
                    headers={headers}
@@ -227,6 +225,7 @@ const ProcessingTimelineComponent = () => {
                    customFilter={searchFilter}
                    filterKeys={[]}
                    filterLabel="Filter Pipelines"
+                   noDataText="No pipelines have been found"
                    dataRowFormatter={_pipelineFormatter} />
       </StyledPaginatedList>
     </div>

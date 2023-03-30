@@ -34,4 +34,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public interface SearchError {
     @JsonProperty("description")
     String description();
+
+    default boolean fatal() { return false; }
 }

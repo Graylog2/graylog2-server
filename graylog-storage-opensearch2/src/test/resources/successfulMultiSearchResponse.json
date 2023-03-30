@@ -1,0 +1,59 @@
+{
+  "responses": [
+    {
+      "took": 43,
+      "timed_out": false,
+      "_shards": {
+        "total": 104,
+        "successful": 104,
+        "skipped": 92,
+        "failed": 0
+      },
+      "hits": {
+        "total": 2499,
+        "max_score": 0,
+        "hits": []
+      },
+      "aggregations": {
+        "avg#pivot1-series-avg(field1)": {
+          "value": 27220.273504273504
+        },
+        "max#timestamp-max": {
+          "value": null
+        },
+        "min#timestamp-min": {
+          "value": null
+        }
+      },
+      "status": 200
+    },
+    {
+      "took": 40,
+      "timed_out": false,
+      "_shards": {
+        "total": 104,
+        "successful": 104,
+        "skipped": 92,
+        "failed": 0
+      },
+      "hits": {
+        "total": 2499,
+        "max_score": 0,
+        "hits": []
+      },
+      "aggregations": {
+        "max#pivot2-series-max(field2)": {
+          "value": 42
+        },
+        "max#timestamp-max": {
+          "value": null
+        },
+        "min#timestamp-min": {
+          "value": null
+        }
+      },
+      "status": 200
+    }
+  ],
+  "took": 40
+}

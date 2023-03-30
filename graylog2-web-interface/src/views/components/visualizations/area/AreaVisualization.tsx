@@ -75,6 +75,7 @@ const AreaVisualization = makeVisualization(({
 
   return (
     <XYPlot config={config}
+            axisType={visualizationConfig.axisType}
             plotLayout={layout}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}

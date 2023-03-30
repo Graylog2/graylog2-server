@@ -28,7 +28,7 @@ const Wrapper = styled.div(({ theme }) => css`
     margin-bottom: 0;
   }
 
-  div[class^="col-"] {
+  div[class^='col-'] {
     padding-right: 0;
     padding-left: 0;
   }
@@ -38,7 +38,7 @@ const Wrapper = styled.div(({ theme }) => css`
   }
 
   .form-group {
-    margin: 0 0 3px 0;
+    margin: 0 0 3px;
   }
 
   .control-label {
@@ -67,8 +67,11 @@ const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty:
   margin-bottom: 1px;
   min-height: 26px;
   font-weight: bold;
-  position: relative;
-
+  background-color: ${theme.colors.global.contentBackground};
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  
   ::before {
     content: ' ';
     top: 50%;

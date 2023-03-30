@@ -1,0 +1,17 @@
+type = "added"
+message = "Providing plugin API to supply custom query input commands."
+
+pulls = ["14239"]
+
+details.user = """
+A new frontend plugin API is provided that allows plugins to contribute custom commands to the query input. It allows to
+provide two different entities:
+
+  - a command definition (`views.queryInput.commands`) specifying a usage scope, name, mac/windows key bindings as well
+    as a function that is being executed, which gets an `Editor` instance as well as a `CustomCommandContext` object
+  - a context provider (`views.queryInput.commandContextProviders`) which allows a plugin to extend the `CustomCommandContext`
+    object which is supplied
+
+Part of the context is the `usage`, which specifies the scope the query input is currently running in. It can be one of
+`'search_query' | 'widget_query' | 'global_override_query'` currently.
+"""

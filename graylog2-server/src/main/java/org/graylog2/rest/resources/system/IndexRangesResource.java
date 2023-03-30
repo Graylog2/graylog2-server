@@ -61,8 +61,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "System/IndexRanges", description = "Index timeranges")
+@Api(value = "System/IndexRanges", description = "Index timeranges", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/ranges")
 public class IndexRangesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);

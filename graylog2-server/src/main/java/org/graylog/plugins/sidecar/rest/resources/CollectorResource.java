@@ -17,9 +17,9 @@
 package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -76,7 +76,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Api(value = "Sidecar/Collectors", description = "Manage collectors")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Sidecar/Collectors", description = "Manage collectors", tags = {CLOUD_VISIBLE})
 @Path("/sidecar/collectors")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -134,15 +136,15 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List all collectors")
-    public Response listCollectors(@Context HttpHeaders httpHeaders) {
+    public Response listCollectors(@Context HttpHeaders httpHeaders) throws JsonProcessingException {
         String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
         Boolean etagCached = false;
         Response.ResponseBuilder builder = Response.noContent();
 
-        // check if client is up to date with a known valid etag
+        // check if client is up-to-date with a known valid etag
         if (ifNoneMatch != null) {
             EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.isPresent(etag.toString())) {
+            if (etagService.collectorsAreCached(etag.toString())) {
                 etagCached = true;
                 builder = Response.notModified();
                 builder.tag(etag);
@@ -155,12 +157,10 @@ public class CollectorResource extends RestResource implements PluginRestResourc
             CollectorListResponse collectorListResponse = CollectorListResponse.create(result.size(), result);
 
             // add new etag to cache
-            String etagString = collectorsToEtag(collectorListResponse);
-
-            EntityTag collectorsEtag = new EntityTag(etagString);
+            EntityTag collectorsEtag = etagService.buildEntityTagForResponse(collectorListResponse);
             builder = Response.ok(collectorListResponse);
             builder.tag(collectorsEtag);
-            etagService.put(collectorsEtag.toString());
+            etagService.registerCollector(collectorsEtag.toString());
         }
 
         // set cache control
@@ -209,7 +209,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllCollectors();
         return Response.ok().entity(collectorService.save(collector)).build();
     }
 
@@ -228,7 +228,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllCollectors();
         return Response.ok().entity(collectorService.save(collector)).build();
     }
 
@@ -246,8 +246,8 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        etagService.invalidateAll();
         collectorService.save(collector);
+        etagService.invalidateAllCollectors();
         return Response.accepted().build();
     }
 
@@ -270,7 +270,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (deleted == 0) {
             return Response.notModified().build();
         }
-        etagService.invalidateAll();
+        etagService.invalidateAllCollectors();
         return Response.accepted().build();
     }
 
@@ -349,9 +349,4 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         return VALID_PATH_PATTERN.matcher(path).matches();
     }
 
-    private String collectorsToEtag(CollectorListResponse collectors) {
-        return Hashing.md5()
-                .hashInt(collectors.hashCode())  // avoid negative values
-                .toString();
-    }
 }

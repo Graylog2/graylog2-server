@@ -23,6 +23,8 @@ import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -89,5 +91,23 @@ public class EmailConfigurationTest {
         assertThatThrownBy(jadConfig::process)
                 .isInstanceOf(ValidationException.class)
                 .hasMessage("SMTP over SSL (SMTPS) and SMTP with STARTTLS cannot be used at the same time.");
+    }
+
+    @Test
+    public void validateTimeouts() throws ValidationException, RepositoryException {
+        assertThatThrownBy(toConfig("transport_email_socket_connection_timeout", Long.MAX_VALUE + " seconds")::process)
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("exceeds the limit");
+
+        assertThatThrownBy(toConfig("transport_email_socket_timeout", Long.MAX_VALUE + " seconds")::process)
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("exceeds the limit");
+
+        toConfig("transport_email_socket_connection_timeout", "120 seconds").process();
+        toConfig("transport_email_socket_timeout", "120 seconds").process();
+    }
+
+    private JadConfig toConfig(String key, String value) {
+        return new JadConfig(new InMemoryRepository(Map.of(key, value)), new EmailConfiguration());
     }
 }

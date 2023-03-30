@@ -21,11 +21,12 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 type SessionActionsType = {
   login: (username: string, password: string, host: string) => Promise<unknown>,
   logout: () => Promise<unknown>,
-  validate: () => Promise<unknown>,
+  validate: () => CancellablePromise<unknown>,
 }
 export const SessionActions = singletonActions(
   'core.Session',

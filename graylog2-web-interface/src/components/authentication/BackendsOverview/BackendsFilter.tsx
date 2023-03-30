@@ -22,7 +22,7 @@ import { SearchForm } from 'components/common';
 import BackendsQueryHelper from './BackendsQueryHelper';
 
 type Props = {
-  onSearch: (query: string) => void,
+  onSearch: (query: string, resetLoadingStateCb?: () => void) => void,
 };
 
 const Container = styled.div`

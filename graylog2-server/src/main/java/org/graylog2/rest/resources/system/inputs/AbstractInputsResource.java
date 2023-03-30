@@ -46,13 +46,12 @@ public class AbstractInputsResource extends RestResource {
      */
     protected InputSummary getInputSummary(Input input) {
         final InputDescription inputDescription = this.availableInputs.get(input.getType());
-        final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
         final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
         final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) ?
                 input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
-                name,
+                InputDescription.getInputDescriptionName(inputDescription, input.getType()),
                 input.getContentPack(),
                 input.getId(),
                 input.getCreatedAt(),
@@ -73,11 +72,13 @@ public class AbstractInputsResource extends RestResource {
                         HashMap::new,
                         (map, entry) -> {
                             final ConfigurationField field = configurationRequest.getField(entry.getKey());
-                            if (field instanceof TextField) {
-                                final TextField textField = (TextField) field;
-                                if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
-                                        && !Strings.isNullOrEmpty((String) entry.getValue())) {
+                            if (field instanceof TextField && entry.getValue() instanceof String s && !Strings.isNullOrEmpty(s)) {
+                                if (isPassword(field)) {
                                     map.put(entry.getKey(), "<password set>");
+                                    return;
+                                }
+                                if (isEncrypted(field)) {
+                                    map.put(entry.getKey(), "<value hidden>");
                                     return;
                                 }
                             }
@@ -85,5 +86,13 @@ public class AbstractInputsResource extends RestResource {
                         },
                         HashMap::putAll
                 );
+    }
+
+    private static boolean isPassword(ConfigurationField field) {
+        return field.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH));
+    }
+
+    private static boolean isEncrypted(ConfigurationField field) {
+        return field.getAttributes().contains(TextField.Attribute.IS_SENSITIVE.toString().toLowerCase(Locale.ENGLISH));
     }
 }

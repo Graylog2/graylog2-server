@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -149,6 +150,7 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                 .userUniqueIdAttribute(AD_OBJECT_GUID)
                 .userNameAttribute(config.userNameAttribute())
                 .userFullNameAttribute(config.userFullNameAttribute())
+                .emailAttributes(new ArrayList<>())
                 .build();
 
         return ldapConnector.searchUserByPrincipal(connection, searchConfig, authCredentials.username());

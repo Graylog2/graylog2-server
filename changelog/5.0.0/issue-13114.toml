@@ -1,0 +1,6 @@
+type = "changed"
+message = "Switch from 'openjdk' to 'eclipse-temurin' for Graylog Server test image."
+contributors = ["@supahgreg"]
+
+issues = ["13114"]
+pulls = ["13002"]

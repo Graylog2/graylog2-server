@@ -20,6 +20,7 @@ import com.mongodb.client.ListIndexesIterable;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,27 +35,28 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public abstract class MongoLockServiceTest {
 
+    public static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
+    public final NodeId thisNodeId = new SimpleNodeId(THIS_NODE_ID);
+    public final NodeId otherNodeId = new SimpleNodeId("c0c0a000-0000-4000-a000-000000000000");
     private LockService lockService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-        lockService = new MongoLockService(mockNodeId("some-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
+        lockService = new MongoLockService(thisNodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
     }
 
     @Test
     void newLock() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-        final Optional<Lock> lock = lockService.lock("test-resource");
+        final Optional<Lock> lock = lockService.lock("test-resource", null);
 
         assertThat(lock).hasValueSatisfying(l -> {
             assertThat(l.resource()).isEqualTo("test-resource");
-            assertThat(l.lockedBy()).isEqualTo("some-node-id");
+            assertThat(l.lockedBy()).isEqualTo(THIS_NODE_ID);
             assertThat(l.createdAt()).isCloseTo(now, within(10, SECONDS));
             assertThat(l.updatedAt()).isCloseTo(now, within(10, SECONDS));
         });
@@ -62,10 +64,10 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void reentrantLock() {
-        final Lock orig = lockService.lock("test-resource")
+        final Lock orig = lockService.lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
 
-        final Optional<Lock> lock = lockService.lock("test-resource");
+        final Optional<Lock> lock = lockService.lock("test-resource", null);
 
         assertThat(lock).hasValueSatisfying(l -> {
             assertThat(l.resource()).isEqualTo(orig.resource());
@@ -77,10 +79,10 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void alreadyTaken(MongoDBTestService mongodb) {
-        new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource")
+        new MongoLockService(otherNodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
 
-        final Optional<Lock> lock = lockService.lock("test-resource");
+        final Optional<Lock> lock = lockService.lock("test-resource", null);
 
         assertThat(lock).isEmpty();
     }
@@ -88,29 +90,47 @@ public abstract class MongoLockServiceTest {
     @Test
     void unlock(MongoDBTestService mongodb) {
         final MongoLockService otherNodesLockService =
-                new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
+                new MongoLockService(otherNodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
 
-        final Lock orig = otherNodesLockService.lock("test-resource")
+        final Lock orig = otherNodesLockService.lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
-        assertThat(lockService.lock("test-resource")).isEmpty();
+        assertThat(lockService.lock("test-resource", null)).isEmpty();
 
-        final Optional<Lock> deletedLock = otherNodesLockService.unlock("test-resource");
+        final Optional<Lock> deletedLock = otherNodesLockService.unlock("test-resource", null);
         assertThat(deletedLock).hasValueSatisfying(l -> {
             assertThat(l.resource()).isEqualTo(orig.resource());
             assertThat(l.lockedBy()).isEqualTo(orig.lockedBy());
         });
 
-        assertThat(lockService.lock("test-resource")).isNotEmpty();
+        assertThat(lockService.lock("test-resource", null)).isNotEmpty();
+    }
+
+    @Test
+    void unlockWithLock(MongoDBTestService mongodb) {
+        final MongoLockService otherNodesLockService =
+                new MongoLockService(otherNodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
+
+        final Lock orig = otherNodesLockService.lock("test-resource", null)
+                .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
+        assertThat(lockService.lock("test-resource", null)).isEmpty();
+
+        final Optional<Lock> deletedLock = otherNodesLockService.unlock(orig);
+        assertThat(deletedLock).hasValueSatisfying(l -> {
+            assertThat(l.resource()).isEqualTo(orig.resource());
+            assertThat(l.lockedBy()).isEqualTo(orig.lockedBy());
+        });
+
+        assertThat(lockService.lock("test-resource", null)).isNotEmpty();
     }
 
     @Test
     void unlockNonExistentLock() {
-        assertThat(lockService.unlock("test-resource")).isEmpty();
+        assertThat(lockService.unlock("test-resource", null)).isEmpty();
     }
 
     @Test
     void ensureTTLIndex(MongoDBTestService mongodb) {
-        new MongoLockService(mockNodeId("node-id"), mongodb.mongoConnection(), Duration.ofSeconds(72));
+        new MongoLockService(thisNodeId, mongodb.mongoConnection(), Duration.ofSeconds(72));
 
         final ListIndexesIterable<Document> indices = mongodb.mongoCollection(MongoLockService.COLLECTION_NAME).listIndexes();
         boolean found = false;
@@ -127,9 +147,16 @@ public abstract class MongoLockServiceTest {
         assertThat(found).isTrue();
     }
 
-    private NodeId mockNodeId(String id) {
-        NodeId nodeId = mock(NodeId.class);
-        when(nodeId.toString()).thenReturn(id);
-        return nodeId;
+    @Test
+    void lockWithContext() {
+        Optional<Lock> lock = lockService.lock("test-resource", "1234");
+        assertThat(lock).isPresent();
+
+        // other context. lock should be non-reentrant
+        Optional<Lock> lockOther = lockService.lock("test-resource", "9876");
+        assertThat(lockOther).isNotPresent();
+
+        Optional<Lock> lockAgain = lockService.lock("test-resource", "1234");
+        assertThat(lockAgain).isPresent();
     }
 }

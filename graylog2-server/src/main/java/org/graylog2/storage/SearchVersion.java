@@ -81,6 +81,18 @@ public abstract class SearchVersion {
         return create(Distribution.ELASTICSEARCH, Version.forIntegers(major, minor, patch));
     }
 
+    public static SearchVersion opensearch(final String version) {
+        return opensearch(parseVersion(version));
+    }
+
+    public static SearchVersion opensearch(final Version version) {
+        return create(Distribution.OPENSEARCH, version);
+    }
+
+    public static SearchVersion opensearch(final int major, final int minor, final int patch) {
+        return create(Distribution.OPENSEARCH, Version.forIntegers(major, minor, patch));
+    }
+
     public String encode() {
         return String.format(Locale.ROOT, "%s:%s", this.distribution().name().toUpperCase(Locale.ROOT), this.version());
     }

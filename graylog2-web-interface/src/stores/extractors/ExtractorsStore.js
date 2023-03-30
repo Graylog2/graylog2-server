@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import Promise from 'bluebird';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
@@ -39,22 +38,16 @@ export const ExtractorsActions = singletonActions(
 );
 
 function getExtractorDTO(extractor) {
-  const converters = {};
-
-  extractor.converters.forEach((converter) => {
-    converters[converter.type] = converter.config;
-  });
-
   const conditionValue = extractor.condition_type && extractor.condition_type !== 'none' ? extractor.condition_value : '';
 
   return {
     title: extractor.title,
-    cut_or_copy: extractor.cursor_strategy || 'copy',
+    cursor_strategy: extractor.cursor_strategy || 'copy',
     source_field: extractor.source_field,
     target_field: extractor.target_field,
     extractor_type: extractor.type || extractor.extractor_type, // "extractor_type" needed for imports
     extractor_config: extractor.extractor_config,
-    converters: converters,
+    converters: extractor.converters,
     condition_type: extractor.condition_type || 'none',
     condition_value: conditionValue,
     order: extractor.order,
@@ -201,7 +194,9 @@ export const ExtractorsStore = singletonStore(
       const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
       const orderedExtractorsMap = {};
 
-      orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
+      orderedExtractors.forEach((extractor, idx) => {
+        orderedExtractorsMap[idx] = extractor.id;
+      });
 
       const promise = fetch('POST', url, { order: orderedExtractorsMap });
 
@@ -230,13 +225,13 @@ export const ExtractorsStore = singletonStore(
         const promise = this._silentExtractorCreate(inputId, extractor);
 
         promise
-          .then(() => successfulImports++)
-          .catch(() => failedImports++);
+          .then(() => { successfulImports += 1; })
+          .catch(() => { failedImports += 1; });
 
         promises.push(promise);
       });
 
-      Promise.settle(promises).then(() => {
+      Promise.allSettled(promises).then(() => {
         if (failedImports === 0) {
           UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
             'Import operation successful');

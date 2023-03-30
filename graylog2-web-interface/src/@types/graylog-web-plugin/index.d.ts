@@ -20,12 +20,23 @@ interface PluginRoute {
   path: string;
   component: React.ComponentType;
   parentComponent?: React.ComponentType | null;
-  permissions?: string;
+  permissions?: string | Array<string>;
+  requiredFeatureFlag?: string;
 }
 interface PluginNavigation {
   path: string;
   description: string;
+  requiredFeatureFlag?: string;
+  children?: Array<PluginNavigationDropdownItem>
 }
+
+interface PluginNavigationDropdownItem {
+  description: string,
+  path: string,
+  permissions?: string | Array<string>,
+  requiredFeatureFlag?: string,
+}
+
 interface PluginNavigationItems {
   key: string;
   component: React.ComponentType<{ smallScreen?: boolean }>;
@@ -82,6 +93,14 @@ interface InputConfiguration {
   component: React.ComponentType<{}>;
   embeddedComponent?: React.ComponentType<{}>;
 }
+interface ProviderType {
+  type: string;
+  formComponent: React.ComponentType<{
+    onErrorChange: (error?: string) => void;
+    setLoginFormState: (loginFormState: string) => void;
+  }>;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -89,13 +108,14 @@ declare module 'graylog-web-plugin/plugin' {
     globalNotifications?: Array<GlobalNotification>
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
-    globalContextProviders?: Array<React.ComponentType>,
+    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
     routes?: Array<PluginRoute>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
     forwarder?: Array<PluginForwarder>;
-    inputConfiguration?: Array<InputConfiguration>
+    inputConfiguration?: Array<InputConfiguration>;
+    loginProviderType?: Array<ProviderType>;
   }
 
   interface PluginRegistration {

@@ -21,8 +21,8 @@ import { LinkContainer } from 'components/common/router';
 import { NavDropdown, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
-import history from 'util/History';
 import { SessionActions } from 'stores/sessions/SessionStore';
+import useHistory from 'routing/useHistory';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -33,6 +33,7 @@ type Props = {
 };
 
 const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
+  const history = useHistory();
   const route = readOnly
     ? Routes.SYSTEM.USERS.show(userId)
     : Routes.SYSTEM.USERS.edit(userId);
@@ -51,7 +52,7 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
 
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}
-                 aria-label={fullName}
+                 aria-label={`User Menu for ${fullName}`}
                  id="user-menu-dropdown"
                  noCaret>
       <MenuItem header>{fullName}</MenuItem>
@@ -63,7 +64,7 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
       <LinkContainer to={route}>
         <MenuItem>{label}</MenuItem>
       </LinkContainer>
-      <MenuItem onSelect={onLogoutClicked}><Icon name="sign-out-alt" /> Log out</MenuItem>
+      <MenuItem onSelect={onLogoutClicked} icon="sign-out-alt">Log out</MenuItem>
     </NavDropdown>
   );
 };

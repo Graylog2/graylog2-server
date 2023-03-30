@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,14 +44,14 @@ public interface BucketSpec extends PivotSpec {
     String type();
 
     @JsonProperty
-    String field();
+    List<String> fields();
 
     @JsonAutoDetect
     class Fallback implements BucketSpec {
         @JsonProperty
         private String type;
         @JsonProperty
-        private String field;
+        private List<String> fields;
         private Map<String, Object> props = Maps.newHashMap();
 
         @Override
@@ -59,8 +60,8 @@ public interface BucketSpec extends PivotSpec {
         }
 
         @Override
-        public String field() {
-            return field;
+        public List<String> fields() {
+            return fields;
         }
 
         @JsonAnySetter
@@ -83,14 +84,13 @@ public interface BucketSpec extends PivotSpec {
             }
             Fallback fallback = (Fallback) o;
             return Objects.equals(type, fallback.type) &&
-                    Objects.equals(field, fallback.field) &&
+                    Objects.equals(fields, fallback.fields) &&
                     Objects.equals(props, fallback.props);
         }
 
         @Override
         public int hashCode() {
-
-            return Objects.hash(type, field, props);
+            return Objects.hash(type, fields, props);
         }
     }
 }

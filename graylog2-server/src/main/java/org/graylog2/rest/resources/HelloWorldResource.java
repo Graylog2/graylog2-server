@@ -19,7 +19,6 @@ package org.graylog2.rest.resources;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
@@ -32,8 +31,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.net.URI;
 
 import static java.util.Objects.requireNonNull;
 
@@ -58,19 +55,9 @@ public class HelloWorldResource extends RestResource {
         final ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("UNKNOWN"));
         return HelloWorldResponse.create(
             clusterId.clusterId(),
-            nodeId.toString(),
+            nodeId.getNodeId(),
             Version.CURRENT_CLASSPATH.toString(),
             "Manage your logs in the dark and have lasers going and make it look like you're from space!"
         );
-    }
-
-    @GET
-    @Timed
-    @ApiOperation(value = "Redirecting to web console if it runs on same port.")
-    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML})
-    public Response redirectToWebConsole() {
-        return Response
-            .temporaryRedirect(URI.create(HttpConfiguration.PATH_WEB))
-            .build();
     }
 }

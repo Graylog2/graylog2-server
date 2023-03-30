@@ -17,15 +17,17 @@
 import * as React from 'react';
 
 import View from 'views/logic/views/View';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import useViewType from 'views/hooks/useViewType';
 
 type Props = {
   children: React.ReactNode,
 };
-const IfDashboard = ({ children }: Props) => (
-  <ViewTypeContext.Consumer>
-    {(viewType) => ((viewType === View.Type.Dashboard) ? children : null)}
-  </ViewTypeContext.Consumer>
-);
+
+const IfDashboard = ({ children }: Props) => {
+  const viewType = useViewType();
+
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return viewType === View.Type.Dashboard ? <>{children}</> : null;
+};
 
 export default IfDashboard;

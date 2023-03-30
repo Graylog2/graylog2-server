@@ -20,18 +20,10 @@ import styled, { css } from 'styled-components';
 const WidgetWrap = styled.div(({ theme }) => css`
   height: inherit;
   margin: 0;
-  padding: 7px 9px 6px 9px;
+  padding: 7px 9px 6px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
-  .widget-top {
-    position: relative;
-    margin-bottom: -15px;
-    top: -5px;
-    font-size: ${theme.fonts.size.small};
-    line-height: 11px;
-  }
 
   .dc-chart {
     float: none;
@@ -103,23 +95,8 @@ const WidgetWrap = styled.div(({ theme }) => css`
     }
 
     button {
-      padding: 0 5px 0 5px;
+      padding: 0 5px;
     }
-  }
-
-  .not-available {
-    font-size: ${theme.fonts.size.huge};
-  }
-
-  .loading,
-  .not-available {
-    line-height: 100px;
-    text-align: center;
-  }
-
-  .loading .spinner,
-  .not-available .spinner {
-    vertical-align: middle;
   }
 `);
 

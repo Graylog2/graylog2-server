@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.validation;
 
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -134,13 +135,13 @@ class LuceneQueryParserTest {
     @Test
     void testMatchingPositions() {
         assertThatThrownBy(() -> parser.parse("foo:"))
-                .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 4.");
+                .hasMessageContaining("Cannot parse 'foo:': Encountered \"<EOF>\" at line 1, column 3.");
     }
 
     @Test
     void testEmptyQueryNewlines() {
         assertThatThrownBy(() -> parser.parse("\n\n\n"))
-                .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 4, column 0.");
+                .hasMessageContaining("Cannot parse '\n\n\n': Encountered \"<EOF>\" at line 3, column -1.");
     }
 
     @Test
@@ -226,5 +227,27 @@ class LuceneQueryParserTest {
         assertThat(query.allFieldNames())
                 .hasSize(1)
                 .allSatisfy(field -> assertThat(field).isEqualTo("filebeat_@metadata_beat"));
+    }
+
+    @Test
+    void testDateRange() throws ParseException {
+        Assertions.assertThat(parser.parse("otherDate:[now-3d TO now-4d]").terms())
+                .hasSize(2)
+                .extracting(ParsedTerm::value)
+                .contains("now-3d", "now-4d");
+
+        Assertions.assertThat(parser.parse("otherDate:[20020101 TO 20030101]").terms())
+                .hasSize(2)
+                .extracting(ParsedTerm::value)
+                .contains("20020101", "20030101");
+
+        Assertions.assertThat(parser.parse("otherDate:[now-5d TO now-4d]").terms())
+                .extracting(ParsedTerm::value)
+                .contains("now-5d", "now-4d");
+
+        Assertions.assertThat(parser.parse("otherDate:[now TO now+60d]").terms())
+                .extracting(ParsedTerm::value)
+                .contains("now", "now+60d");
+
     }
 }

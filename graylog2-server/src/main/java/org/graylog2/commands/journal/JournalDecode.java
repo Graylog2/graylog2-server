@@ -25,6 +25,7 @@ import com.google.common.collect.Range;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -49,9 +50,9 @@ public class JournalDecode extends AbstractJournalCommand {
     }
 
     @Override
-    protected List<Module> getCommandBindings() {
+    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         return ImmutableList.<Module>builder()
-                .addAll(super.getCommandBindings())
+                .addAll(super.getCommandBindings(featureFlags))
                 .add(new CodecsModule())
                 .add(new ObjectMapperModule(getClass().getClassLoader()))
                 .build();
@@ -107,6 +108,7 @@ public class JournalDecode extends AbstractJournalCommand {
                         new Object[]{raw.getCodecName(), raw.getId(), entry.getOffset()}));
             } else {
                 message.setMessageQueueId(raw.getMessageQueueId());
+                message.setSequenceNr(raw.getSequenceNr());
             }
 
             final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
@@ -117,6 +119,7 @@ public class JournalDecode extends AbstractJournalCommand {
                     .append(" at ").append(raw.getTimestamp()).append('\n')
                     .append(" in format ").append(raw.getCodecName()).append('\n')
                     .append(" at offset ").append(raw.getMessageQueueId()).append('\n')
+                    .append(" seq number ").append(raw.getSequenceNr()).append('\n')
                     .append(" received from remote address ").append(remote).append('\n')
                     .append(" (source field: ").append(message == null ? "unparsed" : message.getSource()).append(')').append('\n');
             if (message != null) {

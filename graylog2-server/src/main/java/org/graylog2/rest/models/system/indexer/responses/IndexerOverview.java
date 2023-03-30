@@ -24,7 +24,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.count.responses.MessageCountResponse;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 
-import java.util.Map;
+import java.util.List;
 
 @AutoValue
 @WithBeanGetter
@@ -40,13 +40,13 @@ public abstract class IndexerOverview {
     public abstract MessageCountResponse messageCountResponse();
 
     @JsonProperty("indices")
-    public abstract Map<String, IndexSummary> indices();
+    public abstract List<IndexSummary> indices();
 
     @JsonCreator
     public static IndexerOverview create(@JsonProperty("deflector_summary") DeflectorSummary deflectorSummary,
                                          @JsonProperty("indexer_cluster") IndexerClusterOverview indexerCluster,
                                          @JsonProperty("counts") MessageCountResponse messageCountResponse,
-                                         @JsonProperty("indices") Map<String, IndexSummary> indices) {
+                                         @JsonProperty("indices") List<IndexSummary> indices) {
         return new AutoValue_IndexerOverview(deflectorSummary, indexerCluster, messageCountResponse, indices);
     }
 }

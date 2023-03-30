@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -25,22 +27,26 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+
 @AutoValue
 @JsonTypeName(Values.NAME)
 @JsonDeserialize(builder = Values.Builder.class)
 public abstract class Values implements BucketSpec {
     public static final String NAME = "values";
-    private static final int DEFAULT_LIMIT = 5;
+    public static final int DEFAULT_LIMIT = 15;
 
     @Override
     public abstract String type();
 
     @Override
     @JsonProperty
-    public abstract String field();
+    public abstract List<String> fields();
 
     @JsonProperty
-    public abstract int limit();
+    public abstract Integer limit();
 
     public static Values.Builder builder() {
         return new AutoValue_Values.Builder()
@@ -54,14 +60,19 @@ public abstract class Values implements BucketSpec {
 
         @JsonCreator
         public static Builder create() {
-            return Values.builder();
+            return Values.builder().limit(DEFAULT_LIMIT);
         }
 
         @JsonProperty
-        public abstract Builder field(String field);
+        public Builder field(String field) {
+            return fields(Collections.singletonList(field));
+        }
 
         @JsonProperty
-        public abstract Builder limit(int limit);
+        public abstract Builder fields(List<String> fields);
+
+        @JsonProperty
+        public abstract Builder limit(Integer limit);
 
     }
 

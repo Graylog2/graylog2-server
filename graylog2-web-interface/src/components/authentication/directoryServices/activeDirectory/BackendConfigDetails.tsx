@@ -35,7 +35,7 @@ const BackendConfigDetails = ({ authenticationBackend, roles }: Props) => {
   const {
     excludedFields: groupSyncExcludedFields = {},
   } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
-  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
+  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true, emailAttributes: true };
 
   return (
     <>

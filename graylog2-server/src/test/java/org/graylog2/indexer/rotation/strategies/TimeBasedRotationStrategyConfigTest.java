@@ -33,18 +33,18 @@ import static org.junit.Assert.assertNull;
 public class TimeBasedRotationStrategyConfigTest {
     @Test
     public void testCreate() throws Exception {
-        final TimeBasedRotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1), null);
+        final TimeBasedRotationStrategyConfig config = TimeBasedRotationStrategyConfig.builder().build();
         assertThat(config.rotationPeriod()).isEqualTo(Period.days(1));
         assertNull(config.maxRotationPeriod());
 
-        final TimeBasedRotationStrategyConfig configWithMaxAge = TimeBasedRotationStrategyConfig.create(Period.days(1), Period.days(99));
+        final TimeBasedRotationStrategyConfig configWithMaxAge = TimeBasedRotationStrategyConfig.builder().maxRotationPeriod(Period.days(99)).build();
         assertThat(configWithMaxAge.rotationPeriod()).isEqualTo(Period.days(1));
         assertThat(configWithMaxAge.maxRotationPeriod()).isEqualTo(Period.days(99));
     }
 
     @Test
     public void testSerialization() throws JsonProcessingException {
-        final RotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(Period.days(1), Period.days(99));
+        final RotationStrategyConfig config = TimeBasedRotationStrategyConfig.builder().maxRotationPeriod(Period.days(99)).build();
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final String json = objectMapper.writeValueAsString(config);
 

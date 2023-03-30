@@ -18,10 +18,10 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type * as Immutable from 'immutable';
 
+import { NoSearchResult } from 'components/common';
 import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
 import SearchForm from 'components/common/SearchForm';
 import Spinner from 'components/common/Spinner';
-import EmptyResult from 'components/common/EmptyResult';
 import type { ListPagination, Pagination } from 'stores/PaginationTypes';
 
 import PaginatedItem from './PaginatedItem';
@@ -89,7 +89,7 @@ const PaginatedItemOverview = ({
     return <Spinner />;
   }
 
-  const emptyResult = <EmptyResult>{noDataText}</EmptyResult>;
+  const emptyResult = <NoSearchResult>{noDataText}</NoSearchResult>;
   let itemList;
 
   if (paginatedList.list && paginatedList.list.size >= 1) {
@@ -107,13 +107,14 @@ const PaginatedItemOverview = ({
                    pageSize={pagination.perPage}
                    totalItems={paginatedList?.pagination?.total ?? 0}
                    pageSizes={pageSizes}
-                   activePage={pagination.page}>
+                   activePage={pagination.page}
+                   useQueryParameter={false}>
       <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
                   label="Filter"
+                  queryWidth={300}
                   wrapperClass="has-bm"
                   placeholder="Enter query to filter"
-                  queryHelpComponent={queryHelper}
-                  searchButtonLabel="Filter" />
+                  queryHelpComponent={queryHelper} />
       <ResultsWrapperComponent isEmptyResult={!itemList}>
         {itemList ?? emptyResult}
       </ResultsWrapperComponent>

@@ -22,6 +22,8 @@ import com.google.auto.value.AutoValue;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import java.util.Set;
+
 @AutoValue
 public abstract class ConfigurationSummary {
     @JsonProperty("id")
@@ -38,12 +40,16 @@ public abstract class ConfigurationSummary {
     @JsonProperty("color")
     public abstract String color();
 
+    @JsonProperty("tags")
+    public abstract Set<String> tags();
+
     @JsonCreator
     public static ConfigurationSummary create(@JsonProperty("id") @Id @ObjectId String id,
                                               @JsonProperty("name") String name,
                                               @JsonProperty("collector_id") String collectorId,
-                                              @JsonProperty("color") String color) {
-        return new AutoValue_ConfigurationSummary(id, name, collectorId, color);
+                                              @JsonProperty("color") String color,
+                                              @JsonProperty("tags") Set<String> tags) {
+        return new AutoValue_ConfigurationSummary(id, name, collectorId, color, tags);
     }
 
     public static ConfigurationSummary create(Configuration configuration) {
@@ -51,7 +57,8 @@ public abstract class ConfigurationSummary {
                 configuration.id(),
                 configuration.name(),
                 configuration.collectorId(),
-                configuration.color());
+                configuration.color(),
+                configuration.tags());
     }
 
 }

@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,6 +70,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@Singleton
 public class UserServiceImpl extends PersistedServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -172,7 +174,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (result.size() > 1) {
             final String msg = "There was more than one matching user for username " + username + ". This should never happen.";
             LOG.error(msg);
-            throw new RuntimeException(msg);
+            throw new DuplicateUserException(msg);
         }
 
         final DBObject userObject = result.get(0);
@@ -180,6 +182,26 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         LOG.debug("Loaded user {}/{} from MongoDB", username, userId);
         return userFactory.create((ObjectId) userId, userObject.toMap());
+    }
+
+
+    @Override
+    public List<User> loadAllByName(final String username) {
+        final DBObject query = new BasicDBObject();
+        query.put(UserImpl.USERNAME, username);
+        return buildUserList(query);
+    }
+
+    private List<User> buildUserList(DBObject query) {
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        final List<User> users = Lists.newArrayList();
+        for (DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+
+        return users;
     }
 
     @Override
@@ -195,7 +217,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             return Optional.ofNullable(userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId()));
         }
 
-        final DBObject query = new BasicDBObject("$or", ImmutableList.of(
+        final DBObject query = new BasicDBObject("$or", List.of(
                 new BasicDBObject(UserImpl.AUTH_SERVICE_UID, authServiceUid),
                 new BasicDBObject(UserImpl.USERNAME, username)
         ));
@@ -208,7 +230,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (result.size() > 1) {
             final String msg = "There was more than one matching user for auth service UID <" + authServiceUid + "> or username <" + username + ">. This should never happen.";
             LOG.error(msg);
-            throw new RuntimeException(msg);
+            throw new DuplicateUserException(msg);
         }
 
         final DBObject userObject = result.get(0);
@@ -228,10 +250,10 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             return 0;
         }
 
-        final ImmutableList.Builder<UserDeletedEvent> deletedUsers = ImmutableList.builder();
+        final ImmutableList.Builder<UserDeletedEvent> deletedUsersBuilder = ImmutableList.builder();
         result.forEach(userObject -> {
             final ObjectId userId = (ObjectId) userObject.get("_id");
-            deletedUsers.add(UserDeletedEvent.create(userId.toHexString(), username));
+            deletedUsersBuilder.add(UserDeletedEvent.create(userId.toHexString(), username));
         });
 
         LOG.debug("Deleting user(s) with username \"{}\"", username);
@@ -241,8 +263,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (deleteCount > 1) {
             LOG.warn("Removed {} users matching username \"{}\".", deleteCount, username);
         }
-        accesstokenService.deleteAllForUser(username);
-        deletedUsers.build().forEach(serverEventBus::post);
+        accesstokenService.deleteAllForUser(username); //TODO: probably should go through listener subscribing to delete event
+        final ImmutableList<UserDeletedEvent> deletedUsers = deletedUsersBuilder.build();
+        deletedUsers.forEach(serverEventBus::post);
         return deleteCount;
     }
 
@@ -255,7 +278,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         DBObject query = new BasicDBObject();
         query.put("_id", new ObjectId(userId));
         final int deleteCount = destroy(query, UserImpl.COLLECTION_NAME);
-        accesstokenService.deleteAllForUser(user.getName());
+        accesstokenService.deleteAllForUser(user.getName()); //TODO: probably should go through listener subscribing to delete event
         serverEventBus.post(UserDeletedEvent.create(userId, user.getName()));
         return deleteCount;
     }
@@ -281,14 +304,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public List<User> loadAll() {
         final DBObject query = new BasicDBObject();
-        final List<DBObject> result = query(UserImpl.class, query);
-
-        final List<User> users = Lists.newArrayList();
-        for (DBObject dbObject : result) {
-            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
-        }
-
-        return users;
+        return buildUserList(query);
     }
 
     @Override
@@ -327,15 +343,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public List<User> loadAllForAuthServiceBackend(String authServiceBackendId) {
         final DBObject query = BasicDBObjectBuilder.start(UserImpl.AUTH_SERVICE_ID, authServiceBackendId).get();
-        final List<DBObject> result = query(UserImpl.class, query);
-
-        final List<User> users = Lists.newArrayList();
-        for (DBObject dbObject : result) {
-            //noinspection unchecked
-            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
-        }
-
-        return users;
+        return buildUserList(query);
     }
 
     @Override
@@ -393,13 +401,13 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public List<WildcardPermission> getWildcardPermissionsForUser(User user) {
         return getPermissionsForUser(user).stream()
-                .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).collect(Collectors.toList());
+                .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).toList();
     }
 
     @Override
     public List<GRNPermission> getGRNPermissionsForUser(User user) {
         return getPermissionsForUser(user).stream()
-                .filter(GRNPermission.class::isInstance).map(GRNPermission.class::cast).collect(Collectors.toList());
+                .filter(GRNPermission.class::isInstance).map(GRNPermission.class::cast).toList();
     }
 
     @Override
@@ -432,6 +440,12 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             } catch (ValidationException e) {
                 LOG.error("Unable to remove role {} from user {}", role.getName(), user);
             }
+        }
+    }
+
+    public static class DuplicateUserException extends RuntimeException {
+        public DuplicateUserException(String s) {
+            super(s);
         }
     }
 }

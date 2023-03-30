@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
-import { chunk } from 'lodash';
+import chunk from 'lodash/chunk';
 
 import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
@@ -31,7 +31,6 @@ import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/E
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -43,9 +42,8 @@ const ColorHint = styled.div(({ color }) => `
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 4fr auto;
-  grid-template-areas: "." ".";
+  grid-template: 4fr auto / 1fr;
+  grid-template-areas: '.' '.';
   height: 100%;
 `;
 
@@ -71,11 +69,12 @@ const LegendCell = styled.div`
 
 const LegendEntry = styled.div`
   display: flex;
+  align-items: center;
 `;
 
 const ValueContainer = styled.div`
   margin-left: 8px;
-  line-height: 12px;
+  line-height: 1;
 `;
 
 type Props = {
@@ -95,12 +94,12 @@ type ColorPickerConfig = {
 const isLabelAFunction = (label: string, series: Series) => series.function === label || series.config.name === label;
 
 const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, neverHide: boolean, isFunction: boolean) => {
-  if (columnPivots.length === 1 && series.length === 1 && !isFunction) {
-    return columnPivots[0].field;
+  if (columnPivots.length === 1 && series.length === 1 && columnPivots[0].fields?.length === 1 && !isFunction) {
+    return columnPivots[0].fields[0];
   }
 
-  if (!neverHide && rowPivots.length === 1) {
-    return rowPivots[0].field;
+  if (!neverHide && rowPivots.length === 1 && rowPivots[0].fields?.length === 1) {
+    return rowPivots[0].fields[0];
   }
 
   return null;
@@ -124,7 +123,6 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { rowPivots, columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
-  const activeQuery = useCurrentQueryId();
   const { colors, setColor } = useContext(ChartColorContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const defaultFieldMapper = useCallback((isFunction: boolean) => legendField(columnPivots, rowPivots, series, !neverHide, isFunction), [columnPivots, neverHide, rowPivots, series]);
@@ -149,7 +147,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
     const isFunction = isLabelAFunction(value, series[0]);
     const field = (fieldMapper ?? defaultFieldMapper)(isFunction);
-    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field} queryId={activeQuery}>{value}</Value> : value;
+    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field}>{value}</Value> : value;
 
     return (
       <LegendCell key={value}>
@@ -164,10 +162,12 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   });
 
   const result = chunk(tableCells, 5).map((cells, index) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <LegendRow key={index}>
-      {cells}
-    </LegendRow>
+
+    (
+      <LegendRow key={index}>
+        {cells}
+      </LegendRow>
+    )
   ));
 
   return (

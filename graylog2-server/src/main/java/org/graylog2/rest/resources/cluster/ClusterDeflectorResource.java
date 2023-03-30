@@ -44,8 +44,10 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Cluster/Deflector", description = "Cluster-wide deflector handling")
+@Api(value = "Cluster/Deflector", description = "Cluster-wide deflector handling", tags = {CLOUD_VISIBLE})
 @Path("/cluster/deflector")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterDeflectorResource extends ProxiedResource {

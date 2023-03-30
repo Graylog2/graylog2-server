@@ -16,9 +16,15 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import Select from 'components/common/Select';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
+
+const Container = styled.div`
+  flex: 1;
+  grid-area: streams;
+`;
 
 type Props = {
   disabled: boolean,
@@ -33,7 +39,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
   const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
 
   return (
-    <div style={{ position: 'relative' }} data-testid="streams-filter" title={placeholder}>
+    <Container data-testid="streams-filter" title={placeholder}>
       <Select placeholder={placeholder}
               disabled={disabled}
               inputProps={{ 'aria-label': placeholder }}
@@ -43,7 +49,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
               options={options}
               multi
               value={selectedStreams} />
-    </div>
+    </Container>
   );
 };
 

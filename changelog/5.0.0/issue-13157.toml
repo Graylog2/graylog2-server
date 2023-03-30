@@ -1,0 +1,5 @@
+type = "c"
+message = "Changed items displayed in the System dropdown menu to match the permissions for the page that they link to."
+
+issues = ["13157"]
+pulls = ["13188"]

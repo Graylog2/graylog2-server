@@ -1,0 +1,17 @@
+type = "changed"
+message = "Rename 'All Messages' stream to 'Default Stream'"
+
+issues = [""]
+pulls = ["13258"]
+
+contributors = [""]
+
+details.user = """
+The "All Messages" Stream has been renamed to "Default Stream"
+Note that the name change is only happening on new installations.
+"""
+
+details.ops = """
+If there are any pipeline rules which lookup the default stream by
+name ("All Messages"), they will not work on new Graylog installations anymore.
+"""

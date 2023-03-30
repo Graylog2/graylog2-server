@@ -15,212 +15,206 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Map } from 'immutable';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
+import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import SearchActions from 'views/actions/SearchActions';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { allMessagesTable } from 'views/logic/Widgets';
+import { createViewWithWidgets } from 'fixtures/searches';
+import useAppDispatch from 'stores/useAppDispatch';
+import { Button } from 'components/bootstrap';
 
-const mockHistoryReplace = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    replace: mockHistoryReplace,
-  }),
+  useNavigate: () => mockNavigate,
   useLocation: jest.fn(() => ({
     pathname: '',
     search: '',
   })),
 }));
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: {
-    getInitialState: jest.fn(() => ({ has: jest.fn((widgetId) => widgetId === 'widget-id') })),
-    listen: jest.fn(),
-  },
-}));
-
-jest.mock('views/actions/SearchActions');
+jest.mock('stores/useAppDispatch');
 
 const emptyLocation = {
   pathname: '',
   search: '',
   hash: '',
   state: undefined,
+  key: '',
 };
 
+const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) => (focusedWidget ? (
+  <span>Focused widget: {JSON.stringify(focusedWidget)}</span>
+) : (
+  <span>No focused widget</span>
+));
+
+jest.mock('views/logic/slices/searchExecutionSlice', () => ({
+  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
+  execute: jest.fn(() => async () => {}),
+}));
+
 describe('WidgetFocusProvider', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
-  const renderSUT = (consume) => render(
-    <WidgetFocusProvider>
-      <WidgetFocusContext.Consumer>
-        {consume}
-      </WidgetFocusContext.Consumer>
-    </WidgetFocusProvider>,
-  );
+  const renderSUT = (consume: (value: WidgetFocusContextType) => JSX.Element) => {
+    const widget = allMessagesTable('widget-id');
+    const view = createViewWithWidgets([widget], {});
 
-  it('should update url on widget focus', () => {
-    let contextValue;
+    return render(
+      <TestStoreProvider view={view}>
+        <WidgetFocusProvider>
+          <WidgetFocusContext.Consumer>
+            {consume}
+          </WidgetFocusContext.Consumer>
+        </WidgetFocusProvider>
+      </TestStoreProvider>,
+    );
+  };
 
-    const consume = (value) => {
-      contextValue = value;
-    };
+  it('should update url on widget focus', async () => {
+    const consume = ({ setWidgetFocusing }: WidgetFocusContextType) => (
+      <Button onClick={() => setWidgetFocusing('widget-id')}>Focus!</Button>
+    );
 
     renderSUT(consume);
 
-    contextValue.setWidgetFocusing('widget-id');
+    const button = await screen.findByRole('button', { name: 'Focus!' });
 
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true');
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
 
-  it('should update url on widget focus close', () => {
+  it('should update url on widget focus close', async () => {
     asMock(useLocation).mockReturnValueOnce({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
 
-    let contextValue;
-
-    const consume = (value) => {
-      contextValue = value;
-    };
+    const consume = ({ unsetWidgetFocusing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetFocusing()}>Unfocus!</Button>
+    );
 
     renderSUT(consume);
 
-    contextValue.unsetWidgetFocusing();
+    const button = await screen.findByRole('button', { name: 'Unfocus!' });
+    fireEvent.click(button);
 
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockNavigate).toHaveBeenLastCalledWith('', { replace: true });
   });
 
-  it('should set widget focus based on url', () => {
+  it('should set widget focus based on url', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
 
-    let contextValue;
+    renderSUT(ShowFocusedWidget);
 
-    const consume = (value) => {
-      contextValue = value;
-    };
+    await screen.findByText(/Focused widget: {"id":"widget-id","editing":false,"focusing":true}/);
+  });
+
+  it('should update url on widget edit', async () => {
+    const consume = ({ setWidgetEditing }: WidgetFocusContextType) => (
+      <Button onClick={() => setWidgetEditing('widget-id')}>Edit!</Button>
+    );
 
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', focusing: true, editing: false });
+    const button = await screen.findByRole('button', { name: 'Edit!' });
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&editing=true', { replace: true });
   });
 
-  it('should update url on widget edit', () => {
-    let contextValue;
-
-    const consume = (value) => {
-      contextValue = value;
-    };
-
-    renderSUT(consume);
-
-    contextValue.setWidgetEditing('widget-id');
-
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&editing=true');
-  });
-
-  it('should update url on widget edit close', () => {
+  it('should update url on widget edit close', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&editing=true',
     });
 
-    let contextValue;
-
-    const consume = (value) => {
-      contextValue = value;
-    };
+    const consume = ({ unsetWidgetEditing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetEditing()}>Cancel Edit!</Button>
+    );
 
     renderSUT(consume);
 
-    contextValue.unsetWidgetEditing();
+    const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
+    fireEvent.click(button);
 
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockNavigate).toHaveBeenCalledWith('', { replace: true });
   });
 
-  it('should set widget edit and focused based on url', () => {
+  it('should set widget edit and focused based on url', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&editing=true',
     });
 
-    let contextValue;
+    renderSUT(ShowFocusedWidget);
 
-    const consume = (value) => {
-      contextValue = value;
-    };
-
-    renderSUT(consume);
-
-    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', editing: true, focusing: true });
+    await screen.findByText(/Focused widget: {"id":"widget-id","editing":true,"focusing":true}/);
   });
 
-  it('should not remove focus query param on widget edit', () => {
+  it('should not remove focus query param on widget edit', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
 
-    let contextValue;
-
-    const consume = (value) => {
-      contextValue = value;
-    };
+    const consume = ({ setWidgetEditing, unsetWidgetEditing }: WidgetFocusContextType) => (
+      <>
+        <Button onClick={() => setWidgetEditing('widget-id')}>Edit</Button>
+        <Button onClick={() => unsetWidgetEditing()}>Cancel</Button>
+      </>
+    );
 
     renderSUT(consume);
 
-    contextValue.setWidgetEditing('widget-id');
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
 
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true&editing=true');
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true&editing=true', { replace: true });
 
-    contextValue.unsetWidgetEditing();
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
 
-    expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true');
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
 
-  it('should not set focused widget from url and cleanup url if the widget does not exist', () => {
-    asMock(WidgetStore.getInitialState).mockReturnValue(Map());
-
+  it('should not set focused widget from url and cleanup url if the widget does not exist', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=not-existing-widget-id',
     });
 
-    let contextValue;
+    renderSUT(ShowFocusedWidget);
 
-    const consume = (value) => {
-      contextValue = value;
-    };
+    await screen.findByText(/No focused widget/);
 
-    renderSUT(consume);
-
-    expect(contextValue.focusedWidget).toBe(undefined);
-
-    expect(mockHistoryReplace).toBeCalledWith('');
+    expect(mockNavigate).toHaveBeenLastCalledWith('', { replace: true });
   });
 
-  it('should not trigger search execution when no focus mode was requested', async () => {
-    asMock(useLocation).mockReturnValue({
-      ...emptyLocation,
-      search: '',
-    });
+  it('does not trigger setting widgets to search initially', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useLocation).mockReturnValue(emptyLocation);
+    renderSUT(jest.fn());
 
-    const consume = jest.fn();
-
-    renderSUT(consume);
-
-    expect(SearchActions.executeWithCurrentState).not.toHaveBeenCalled();
+    expect(dispatch).not.toHaveBeenCalled();
   });
 });

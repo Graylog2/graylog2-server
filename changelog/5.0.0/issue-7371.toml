@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed bug preventing processing of CEF message fields with large integer values."
+
+issues = ["7371"]
+pulls = ["13812"]

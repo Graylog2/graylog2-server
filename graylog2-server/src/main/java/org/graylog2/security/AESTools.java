@@ -17,6 +17,8 @@
 package org.graylog2.security;
 
 import org.apache.shiro.codec.Hex;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.paddings.ISO10126d2Padding;
 import org.cryptomator.siv.SivMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -36,6 +39,9 @@ public class AESTools {
     private static final Logger LOG = LoggerFactory.getLogger(AESTools.class);
 
     private static final SivMode SIV_MODE = new SivMode();
+
+    private static final String CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
+    private static final String CIPHER_NO_PADDING_TRANSFORMATION = "AES/CBC/NoPadding";
 
     /**
      * Encrypt the given plain text value with the given encryption key and salt using AES CBC.
@@ -54,10 +60,10 @@ public class AESTools {
         checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
-            return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
+            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
+            return Hex.encodeToString(cipher.doFinal(plainText.getBytes(UTF_8)));
         } catch (Exception e) {
             LOG.error("Could not encrypt value.", e);
         }
@@ -77,19 +83,52 @@ public class AESTools {
      */
     @Nullable
     public static String decrypt(String cipherText, String encryptionKey, String salt) {
+        try {
+            return tryDecrypt(cipherText, encryptionKey, salt);
+        } catch (Exception ex) {
+            LOG.error("Could not decrypt (legacy) value.", ex);
+            return null;
+        }
+    }
+
+    /**
+     * Decrypt the given cipher text value with the given encryption key and the same salt used for encryption using AES
+     * CBC.
+     * If the supplied encryption key is not of 16, 24 or 32 bytes length, it will be truncated or padded to the next
+     * largest key size before encryption.
+     *
+     * @param cipherText    the hexadecimal cipher text value to decrypt
+     * @param encryptionKey the encryption key
+     * @param salt          the salt used for encrypting this cipherText
+     * @return the decrypted cipher text
+     */
+    public static String tryDecrypt(String cipherText, String encryptionKey, String salt) throws InvalidCipherTextException, GeneralSecurityException {
         checkNotNull(cipherText, "Cipher text must not be null.");
         checkNotNull(encryptionKey, "Encryption key must not be null.");
         checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
-            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
-            return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");
-        } catch (Exception e) {
-            LOG.error("Could not decrypt value.", e);
+            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
+            return new String(cipher.doFinal(Hex.decode(cipherText)), UTF_8);
+        } catch (Exception ignored) {
+            // This is likely a BadPaddingException, but try to decrypt legacy secrets in any case
+            return decryptLegacy(cipherText, encryptionKey, salt);
         }
-        return null;
+    }
+
+    // Decrypt secrets that were created with ISO10126Padding
+    // First decrypt it with a "no padding" transform and then strip the padding manually.
+    // We do this because the ISO10126Padding has been deprecated and is not present
+    // when running in FIPS mode.
+    private static String decryptLegacy(String cipherText, String encryptionKey, String salt) throws GeneralSecurityException, InvalidCipherTextException {
+        Cipher cipher = Cipher.getInstance(CIPHER_NO_PADDING_TRANSFORMATION);
+        SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
+        byte[] decrypted = cipher.doFinal(Hex.decode(cipherText));
+        final int padCount = new ISO10126d2Padding().padCount(decrypted);
+        return new String(Arrays.copyOf(decrypted, decrypted.length - padCount), UTF_8);
     }
 
     /**

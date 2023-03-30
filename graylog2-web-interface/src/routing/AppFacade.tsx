@@ -47,7 +47,7 @@ const AppFacade = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (!server.up) {
+  if (server.up === false) {
     return <ServerUnavailablePage server={server} />;
   }
 

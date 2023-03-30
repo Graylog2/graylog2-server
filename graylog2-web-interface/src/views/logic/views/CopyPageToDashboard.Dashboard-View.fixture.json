@@ -1,0 +1,101 @@
+{
+  "id": "5d03952f7aafdc6c1cdc014c",
+  "type": "DASHBOARD",
+  "title": "GIT data 5",
+  "summary": "",
+  "description": "",
+  "search_id": "5d9b51d6af140aba42e87469",
+  "properties": [],
+  "state": {
+    "f0a1f93c-8400-40de-83ac-94149dbf447c": {
+      "selected_fields": [
+        "source",
+        "message"
+      ],
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "widget": {
+          "8532ff94-2881-42b4-b26d-080d09305e95": "Message Count",
+          "32889f0b-fe5a-4f18-baa0-773869d49af3": "All Messages",
+          "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": "Aggregating stddev(files_changed) by author (copy)"
+        }
+      },
+      "widgets": [
+        {
+          "id": "a8058a41-34ea-4846-83d0-1acc2fbc1d7f",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "stddev(files_changed)": "#8bc34a"
+              }
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "author",
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "stddev(files_changed)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": [
+          "76414720-2191-4fa3-8037-074facf16a56"
+        ]
+      },
+      "positions": {
+        "546b13fe-eae7-4fb8-abb9-e0e3a907c3e6": {
+          "col": 1,
+          "row": 5,
+          "height": 3,
+          "width": "Infinity"
+        },
+        "32889f0b-fe5a-4f18-baa0-773869d49af3": {
+          "col": 1,
+          "row": 10,
+          "height": 6,
+          "width": "Infinity"
+        },
+        "8532ff94-2881-42b4-b26d-080d09305e95": {
+          "col": 1,
+          "row": 8,
+          "height": 2,
+          "width": "Infinity"
+        },
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": "Infinity"
+        }
+      }
+    }
+  },
+  "created_at": "2019-06-14T09:48:10.550Z",
+  "owner": "admin"
+}

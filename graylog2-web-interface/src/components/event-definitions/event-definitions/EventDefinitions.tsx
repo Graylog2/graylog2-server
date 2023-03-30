@@ -30,8 +30,9 @@ import Routes from 'routing/Routes';
 import QueryHelper from 'components/common/QueryHelper';
 
 import styles from './EventDefinitions.css';
-import type { EventDefinition } from './EventDefinitionEntry';
 import EventDefinitionEntry from './EventDefinitionEntry';
+
+import type { EventDefinition } from '../event-definitions-types';
 
 const EmptyContent = () => (
   <Row>
@@ -62,12 +63,14 @@ type Props = {
   },
   query: string,
   onPageChange: (page: number, size: number) => void,
-  onQueryChange: (newQuery: string) => void,
+  onQueryChange: (newQuery?: string) => void,
   onDelete: (eventDefinition: EventDefinition) => void,
   onCopy: (eventDefinition: EventDefinition) => void,
   onEnable: (eventDefinition: EventDefinition) => void,
   onDisable: (eventDefinition: EventDefinition) => void,
 };
+
+export const PAGE_SIZES = [10, 50, 100];
 
 const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }: Props) => {
   if (pagination.grandTotal === 0) {
@@ -75,7 +78,8 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
   }
 
   const items = eventDefinitions.map((definition) => (
-    <EventDefinitionEntry context={context}
+    <EventDefinitionEntry key={definition.id}
+                          context={context}
                           eventDefinition={definition}
                           onDisable={onDisable}
                           onEnable={onEnable}
@@ -89,23 +93,13 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
         <SearchForm query={query}
                     onSearch={onQueryChange}
                     onReset={onQueryChange}
-                    searchButtonLabel="Find"
                     placeholder="Find Event Definitions"
                     wrapperClass={styles.inline}
                     queryHelpComponent={<QueryHelper entityName="event definition" />}
-                    queryWidth={200}
                     topMargin={0}
-                    useLoadingState>
-          <IfPermitted permissions="eventdefinitions:create">
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success" className={styles.createButton}>Create Event Definition</Button>
-            </LinkContainer>
-          </IfPermitted>
-        </SearchForm>
+                    useLoadingState />
 
-        <PaginatedList activePage={pagination.page}
-                       pageSize={pagination.pageSize}
-                       pageSizes={[10, 25, 50]}
+        <PaginatedList pageSizes={PAGE_SIZES}
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <div className={styles.definitionList}>

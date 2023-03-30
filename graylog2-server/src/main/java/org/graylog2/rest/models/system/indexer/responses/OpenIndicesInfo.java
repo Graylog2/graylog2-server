@@ -22,17 +22,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.Map;
+import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
 public abstract class OpenIndicesInfo {
     @JsonProperty
-    public abstract Map<String, IndexInfo> indices();
+    public abstract List<IndexInfo> indices();
 
     @JsonCreator
-    public static OpenIndicesInfo create(@JsonProperty("indices") Map<String, IndexInfo> indices) {
+    public static OpenIndicesInfo create(@JsonProperty("indices") List<IndexInfo> indices) {
         return new AutoValue_OpenIndicesInfo(indices);
     }
 }

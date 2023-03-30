@@ -33,7 +33,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-@Api(value = "System/ClusterTraffic", description = "Cluster traffic stats")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "System/ClusterTraffic", description = "Cluster traffic stats", tags = {CLOUD_VISIBLE})
 @RequiresAuthentication
 @Path("/system/cluster/traffic")
 @Produces(MediaType.APPLICATION_JSON)
@@ -51,11 +53,11 @@ public class TrafficResource extends RestResource {
     public TrafficCounterService.TrafficHistogram get(@ApiParam(name = "days", value = "For how many days the traffic stats should be returned")
                                                       @QueryParam("days") @DefaultValue("30") int days,
                                                       @ApiParam(name = "daily", value = "Whether the traffic should be aggregate to daily values")
-                                                      @QueryParam("daily") @DefaultValue("false") boolean daily) {
-        final TrafficCounterService.TrafficHistogram trafficHistogram =
-                trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(days),
-                        daily ? TrafficCounterService.Interval.DAILY : TrafficCounterService.Interval.HOURLY);
-
-        return trafficHistogram;
+                                                      @QueryParam("daily") @DefaultValue("false") boolean daily,
+                                                      @ApiParam(name = "includeToday", value = "Whether the traffic should include up to the current date/time (in UTC).")
+                                                      @QueryParam("includeToday") @DefaultValue("true") boolean includeToday) {
+        return trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(days),
+                daily ? TrafficCounterService.Interval.DAILY : TrafficCounterService.Interval.HOURLY,
+                includeToday);
     }
 }

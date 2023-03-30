@@ -28,11 +28,17 @@ const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 8px;
 `;
 
-const SharingDisabledPopover = ({ type, description }: Props) => (
-  <StyledHoverForHelp title="Sharing not possible" pullRight={false}>
-    {description || `Only owners of this ${type} are allowed to share it.`}
-  </StyledHoverForHelp>
-);
+const SharingDisabledPopover = ({ type, description }: Props) => {
+  const getReadableType = (_type: string) => {
+    return _type.replaceAll('_', ' ');
+  };
+
+  return (
+    <StyledHoverForHelp title="Sharing not possible" pullRight={false}>
+      {description || `Only owners of this ${getReadableType(type)} are allowed to share it.`}
+    </StyledHoverForHelp>
+  );
+};
 
 SharingDisabledPopover.defaultProps = {
   description: undefined,

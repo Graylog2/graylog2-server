@@ -16,14 +16,16 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { TimeUnitInput } from 'components/common';
-import { Col, Row, Button, Input } from 'components/bootstrap';
+import { TimeUnitInput, FormSubmit } from 'components/common';
+import { Col, Row, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import Routes from 'routing/Routes';
+import withHistory from 'routing/withHistory';
 
 class DataAdapterForm extends React.Component {
   validationCheckTimer = undefined;
@@ -38,6 +40,7 @@ class DataAdapterForm extends React.Component {
     dataAdapter: PropTypes.object,
     validate: PropTypes.func,
     validationErrors: PropTypes.object,
+    history: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -81,7 +84,7 @@ class DataAdapterForm extends React.Component {
 
     const { dataAdapter } = this.props;
 
-    if (_.isEqual(dataAdapter, prevProps.dataAdapter)) {
+    if (isEqual(dataAdapter, prevProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
       return;
     }
@@ -222,6 +225,7 @@ class DataAdapterForm extends React.Component {
     });
   };
 
+  // eslint-disable-next-line
   _sanitizeTitle = (title) => {
     return title.trim().replace(/\W+/g, '-').toLocaleLowerCase();
   };
@@ -252,6 +256,7 @@ class DataAdapterForm extends React.Component {
     return <span>{defaultText}</span>;
   };
 
+  // eslint-disable-next-line
   _renderTitle = (title, typeName, create) => {
     const TagName = create ? 'h3' : 'h2';
 
@@ -260,10 +265,11 @@ class DataAdapterForm extends React.Component {
 
   render() {
     const { dataAdapter, isFormDisabled } = this.state;
-    const { create, type, title } = this.props;
+    const { create, type, title, history } = this.props;
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
     const plugin = adapterPlugins.filter((p) => p.type === type);
+    const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
     let configFieldSet = null;
     let documentationComponent = null;
     let pluginDisplayName = dataAdapter.config.type;
@@ -305,7 +311,9 @@ class DataAdapterForm extends React.Component {
 
     return (
       <>
-        {this._renderTitle(title, pluginDisplayName, create)}
+        <p>
+          {this._renderTitle(title, pluginDisplayName, create)}
+        </p>
         <Row>
           <Col lg={formRowWidth}>
             <form className="form form-horizontal" onSubmit={this._save}>
@@ -360,9 +368,9 @@ class DataAdapterForm extends React.Component {
               <fieldset>
                 <Row>
                   <Col mdOffset={3} md={9}>
-                    <Button type="submit" bsStyle="success" disabled={isFormDisabled}>{create ? 'Create Adapter'
-                      : 'Update Adapter'}
-                    </Button>
+                    <FormSubmit submitButtonText={create ? 'Create adapter' : 'Update adapter'}
+                                disabledSubmit={isFormDisabled}
+                                onCancel={onCancel} />
                   </Col>
                 </Row>
               </fieldset>
@@ -375,4 +383,4 @@ class DataAdapterForm extends React.Component {
   }
 }
 
-export default DataAdapterForm;
+export default withHistory(DataAdapterForm);

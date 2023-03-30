@@ -26,7 +26,8 @@ public class TextField extends AbstractConfigurationField {
 
     public enum Attribute {
         IS_PASSWORD,
-        TEXTAREA
+        TEXTAREA,
+        IS_SENSITIVE
     }
 
     private String defaultValue;
@@ -42,18 +43,19 @@ public class TextField extends AbstractConfigurationField {
     }
 
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, Attribute... attrs) {
-        super(FIELD_TYPE, name, humanName, description, isOptional);
-        this.defaultValue = defaultValue;
-
-        this.attributes = Lists.newArrayList();
-        if (attrs != null) {
-            for (Attribute attribute : attrs) {
-                this.attributes.add(attribute.toString().toLowerCase(Locale.ENGLISH));
-            }
-        }
+        this(name, humanName, defaultValue, description, isOptional, DEFAULT_POSITION, attrs);
     }
+
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, int position, Attribute... attrs) {
-        super(FIELD_TYPE, name, humanName, description, isOptional, position);
+        this(name, humanName, defaultValue, description, isOptional, DEFAULT_IS_ENCRYPTED, position, attrs);
+    }
+
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isEncrypted, Attribute... attrs) {
+        this(name, humanName, defaultValue, description, isOptional, isEncrypted, DEFAULT_POSITION, attrs);
+    }
+
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isEncrypted, int position, Attribute... attrs) {
+        super(FIELD_TYPE, name, humanName, description, isOptional, position, isEncrypted);
         this.defaultValue = defaultValue;
         this.attributes = Lists.newArrayList();
         if (attrs != null) {

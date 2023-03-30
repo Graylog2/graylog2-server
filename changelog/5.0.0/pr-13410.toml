@@ -1,0 +1,11 @@
+type = "c"
+message = "Disable rollup columns by default for new aggregations."
+
+issues = ["11516"]
+
+pulls = ["13410", "13690"]
+
+details.user = """
+For most users, rollup columns are not useful by default. Instead,
+they can be useful in select configurations, so they should be opt-in instead of opt-out.
+"""

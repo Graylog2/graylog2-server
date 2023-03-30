@@ -63,7 +63,7 @@ public class HttpConfiguration {
     private int httpMaxHeaderSize = 8192;
 
     @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpThreadPoolSize = 16;
+    private int httpThreadPoolSize = 64;
 
     @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
     private int httpSelectorRunnersCount = 1;
@@ -82,6 +82,9 @@ public class HttpConfiguration {
 
     @Parameter(value = "http_external_uri")
     private URI httpExternalUri;
+
+    @Parameter(value = "http_allow_embedding")
+    private boolean httpAllowEmbedding = false;
 
     public HostAndPort getHttpBindAddress() {
         return httpBindAddress

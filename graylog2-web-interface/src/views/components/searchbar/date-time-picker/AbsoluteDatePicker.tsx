@@ -20,7 +20,7 @@ import { DateUtils } from 'react-day-picker';
 import moment from 'moment';
 
 import { DatePicker } from 'components/common';
-import DateTime from 'logic/datetimes/DateTime';
+import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 type Props = {
   dateTime: string,
@@ -43,7 +43,7 @@ const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
       years: newDate.years,
       months: newDate.months,
       date: newDate.date,
-    }).format(DateTime.Formats.DATETIME));
+    }).format(DATE_TIME_FORMATS.default));
   };
 
   return (

@@ -15,19 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { Redirect, Router, Route, Switch } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import type { PluginRoute } from 'graylog-web-plugin';
 
 import App from 'routing/App';
 import PageContentLayout from 'components/layout/PageContentLayout';
-import history from 'util/History';
 import AppConfig from 'util/AppConfig';
-import Routes from 'routing/Routes';
+import RoutePaths from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
 import {
-  AlertConditionsPage,
-  AlertNotificationsPage,
-  AlertsPage,
   AuthenticationCreatePage,
   AuthenticationBackendCreatePage,
   AuthenticationBackendDetailsPage,
@@ -43,7 +39,6 @@ import {
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DelegatedSearchPage,
-  EditAlertConditionPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
   EditContentPackPage,
@@ -54,7 +49,7 @@ import {
   EventsPage,
   ExportExtractorsPage,
   ExtractorsPage,
-  GettingStartedPage,
+  WelcomePage,
   GrokPatternsPage,
   ImportExtractorsPage,
   IndexerFailuresPage,
@@ -67,8 +62,6 @@ import {
   LUTCachesPage,
   LUTDataAdaptersPage,
   LUTTablesPage,
-  NewAlertConditionPage,
-  NewAlertNotificationPage,
   NodeInputsPage,
   NodesPage,
   NotFoundPage,
@@ -81,7 +74,6 @@ import {
   RuleDetailsPage,
   RulesPage,
   SecurityPage,
-  ShowAlertPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,
@@ -109,11 +101,17 @@ import {
   UserTokensEditPage,
   UsersOverviewPage,
   ViewEventDefinitionPage,
+  SidecarFailureTrackingPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
+import GlobalContextProviders from 'contexts/GlobalContextProviders';
 
-const renderPluginRoute = ({ path, component: Component, parentComponent }: PluginRoute) => {
+const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return null;
+  }
+
   const ParentComponent = parentComponent ?? React.Fragment;
   const WrappedComponent = () => (
     <ParentComponent>
@@ -121,12 +119,10 @@ const renderPluginRoute = ({ path, component: Component, parentComponent }: Plug
     </ParentComponent>
   );
 
-  return (
-    <Route key={`${path}-${Component.displayName}`}
-           exact
-           path={appPrefixed(path)}
-           render={WrappedComponent} />
-  );
+  return {
+    path: appPrefixed(path),
+    element: <WrappedComponent />,
+  };
 };
 
 const routeHasAppParent = (route: PluginRoute) => route.parentComponent === App;
@@ -140,253 +136,171 @@ const AppRouter = () => {
 
   const isCloud = AppConfig.isCloud();
 
+  const router = createBrowserRouter([
+    ...pluginRoutesWithNullParent,
+
+    {
+      path: RoutePaths.STARTPAGE,
+      element: <GlobalContextProviders><App /></GlobalContextProviders>,
+      children: [
+        { path: RoutePaths.STARTPAGE, element: <StartPage /> },
+        { path: RoutePaths.SEARCH, element: <DelegatedSearchPage /> },
+        ...pluginRoutesWithParent,
+        ...pluginRoutesWithAppParent,
+        {
+          path: '/',
+          element: <PageContentLayout />,
+          children: [
+            { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
+            { path: RoutePaths.WELCOME, element: <WelcomePage /> },
+            { path: RoutePaths.STREAMS, element: <StreamsPage /> },
+            { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
+            !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },
+
+            { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            {
+              path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
+              element: <EditEventDefinitionPage />,
+            },
+            {
+              path: RoutePaths.ALERTS.DEFINITIONS.show(':definitionId'),
+              element: <ViewEventDefinitionPage />,
+            },
+            { path: RoutePaths.ALERTS.NOTIFICATIONS.LIST, element: <EventNotificationsPage /> },
+            { path: RoutePaths.ALERTS.NOTIFICATIONS.CREATE, element: <CreateEventNotificationPage /> },
+            {
+              path: RoutePaths.ALERTS.NOTIFICATIONS.edit(':notificationId'),
+              element: <EditEventNotificationPage />,
+            },
+            {
+              path: RoutePaths.ALERTS.NOTIFICATIONS.show(':notificationId'),
+              element: <ShowEventNotificationPage />,
+            },
+
+            !isCloud && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
+            !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
+            !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
+            !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
+            !isCloud && { path: RoutePaths.new_extractor(':nodeId', ':inputId'), element: <CreateExtractorsPage /> },
+            !isCloud && { path: RoutePaths.edit_extractor(':nodeId', ':inputId', ':extractorId'), element: <EditExtractorsPage /> },
+            !isCloud && { path: RoutePaths.import_extractors(':nodeId', ':inputId'), element: <ImportExtractorsPage /> },
+            !isCloud && { path: RoutePaths.export_extractors(':nodeId', ':inputId'), element: <ExportExtractorsPage /> },
+
+            { path: RoutePaths.SYSTEM.CONFIGURATIONS, element: <ConfigurationsPage /> },
+
+            { path: RoutePaths.SYSTEM.CONTENTPACKS.LIST, element: <ContentPacksPage /> },
+            { path: RoutePaths.SYSTEM.CONTENTPACKS.CREATE, element: <CreateContentPackPage /> },
+            {
+              path: RoutePaths.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev'),
+              element: <EditContentPackPage />,
+            },
+            { path: RoutePaths.SYSTEM.CONTENTPACKS.show(':contentPackId'), element: <ShowContentPackPage /> },
+
+            { path: RoutePaths.SYSTEM.GROKPATTERNS, element: <GrokPatternsPage /> },
+
+            { path: RoutePaths.SYSTEM.INDEX_SETS.CREATE, element: <IndexSetCreationPage /> },
+            { path: RoutePaths.SYSTEM.INDEX_SETS.SHOW(':indexSetId'), element: <IndexSetPage /> },
+            { path: RoutePaths.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId'), element: <IndexSetConfigurationPage /> },
+
+            { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> }
+            ),
+
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: <LUTTablesPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTTablesPage action="create" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName'), element: <LUTTablesPage action="show" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName'), element: <LUTTablesPage action="edit" /> },
+
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: <LUTCachesPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesPage action="create" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName'), element: <LUTCachesPage action="show" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName'), element: <LUTCachesPage action="edit" /> },
+
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW, element: <LUTDataAdaptersPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE, element: <LUTDataAdaptersPage action="create" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName'), element: <LUTDataAdaptersPage action="show" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName'), element: <LUTDataAdaptersPage action="edit" /> },
+
+            { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.RULES, element: <RulesPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.RULE(':ruleId'), element: <RuleDetailsPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.SIMULATOR, element: <SimulatorPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
+
+            !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
+            { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
+
+            !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
+
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE, element: <AuthenticationPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.CREATE, element: <AuthenticationCreatePage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW, element: <AuthenticationOverviewPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId'), element: <AuthenticationBackendDetailsPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId'), element: <AuthenticationBackendEditPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name'), element: <AuthenticationBackendCreatePage /> }
+            ),
+
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW, element: <AuthenticatorsPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT, element: <AuthenticatorsEditPage /> }
+            ),
+
+            { path: RoutePaths.SYSTEM.USERS.OVERVIEW, element: <UsersOverviewPage /> },
+            { path: RoutePaths.SYSTEM.USERS.CREATE, element: <UserCreatePage /> },
+            { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
+            { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
+            { path: RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId'), element: <UserTokensEditPage /> },
+
+            { path: RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW, element: <RolesOverviewPage /> },
+            { path: RoutePaths.SYSTEM.AUTHZROLES.show(':roleId'), element: <RoleDetailsPage /> },
+            { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
+
+            { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
+            { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
+            { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
+            { path: RoutePaths.SYSTEM.ENTERPRISE, element: <EnterprisePage /> },
+            { path: RoutePaths.SECURITY, element: <SecurityPage /> },
+
+            { path: RoutePaths.SYSTEM.SIDECARS.OVERVIEW, element: <SidecarsPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.STATUS(':sidecarId'), element: <SidecarStatusPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.ADMINISTRATION, element: <SidecarAdministrationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.CONFIGURATION, element: <SidecarConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.FAILURE_TRACKING, element: <SidecarFailureTrackingPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.NEW_CONFIGURATION, element: <SidecarNewConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId'), element: <SidecarEditConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
+            ...standardPluginRoutes,
+            { path: '*', element: <NotFoundPage displayPageLayout={false} /> },
+          ].filter((route) => !!route),
+        },
+        { path: RoutePaths.NOTFOUND, element: <NotFoundPage /> },
+      ],
+    },
+  ]);
+
   return (
-    <Router history={history}>
-      <RouterErrorBoundary>
-        <Switch>
-          {pluginRoutesWithNullParent}
-
-          <Route path={Routes.STARTPAGE}>
-            <App>
-              <Switch>
-                <Route exact path={Routes.STARTPAGE} component={StartPage} />
-                <Route exact path={Routes.SEARCH} component={DelegatedSearchPage} />
-                {pluginRoutesWithParent}
-                {pluginRoutesWithAppParent}
-                <Route path="/">
-                  <PageContentLayout>
-                    <Switch>
-                      <Route exact path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
-                      <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
-                      <Route exact path={Routes.GETTING_STARTED} component={GettingStartedPage} />
-                      <Route exact path={Routes.STREAMS} component={StreamsPage} />
-                      <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
-                      {!isCloud && <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
-
-                      <Route exact path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
-                      <Route exact path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
-
-                      <Route exact path={Routes.ALERTS.LIST} component={EventsPage} />
-                      <Route exact path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
-                      <Route exact path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
-                      <Route exact
-                             path={Routes.ALERTS.DEFINITIONS.edit(':definitionId')}
-                             component={EditEventDefinitionPage} />
-                      <Route exact
-                             path={Routes.ALERTS.DEFINITIONS.show(':definitionId')}
-                             component={ViewEventDefinitionPage} />
-                      <Route exact path={Routes.ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
-                      <Route exact path={Routes.ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
-                      <Route exact
-                             path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')}
-                             component={EditEventNotificationPage} />
-                      <Route exact
-                             path={Routes.ALERTS.NOTIFICATIONS.show(':notificationId')}
-                             component={ShowEventNotificationPage} />
-                      <Route exact
-                             path={Routes.show_alert_condition(':streamId', ':conditionId')}
-                             component={EditAlertConditionPage} />
-                      <Route exact path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-
-                      {!isCloud && <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />}
-                      {!isCloud && <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />}
-                      {!isCloud && (
-                      <Route exact path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.local_input_extractors(':nodeId', ':inputId')}
-                             component={ExtractorsPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.new_extractor(':nodeId', ':inputId')}
-                             component={CreateExtractorsPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')}
-                             component={EditExtractorsPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.import_extractors(':nodeId', ':inputId')}
-                             component={ImportExtractorsPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.export_extractors(':nodeId', ':inputId')}
-                             component={ExportExtractorsPage} />
-                      )}
-
-                      <Route exact path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage} />
-
-                      <Route exact path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
-                      <Route exact path={Routes.SYSTEM.CONTENTPACKS.CREATE} component={CreateContentPackPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev')}
-                             component={EditContentPackPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')}
-                             component={ShowContentPackPage} />
-
-                      <Route exact path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
-
-                      <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-                      <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                             component={IndexSetConfigurationPage} />
-
-                      <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
-                      {!isCloud && (
-                      <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
-                      )}
-
-                      <Route exact path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.CREATE}
-                             render={() => <LUTTablesPage action="create" />} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.show(':tableName')}
-                             render={() => <LUTTablesPage action="show" />} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.edit(':tableName')}
-                             render={() => <LUTTablesPage action="edit" />} />
-
-                      <Route exact path={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} component={LUTCachesPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}
-                             render={() => <LUTCachesPage action="create" />} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')}
-                             render={() => <LUTCachesPage action="show" />} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')}
-                             render={() => <LUTCachesPage action="edit" />} />
-
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
-                             component={LUTDataAdaptersPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}
-                             render={() => <LUTDataAdaptersPage action="create" />} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')}
-                             render={() => <LUTDataAdaptersPage action="show" />} />
-                      <Route exact
-                             path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')}
-                             render={() => <LUTDataAdaptersPage action="edit" />} />
-
-                      <Route exact path={Routes.SYSTEM.PIPELINES.OVERVIEW} component={PipelinesOverviewPage} />
-                      <Route exact path={Routes.SYSTEM.PIPELINES.RULES} component={RulesPage} />
-                      <Route exact path={Routes.SYSTEM.PIPELINES.RULE(':ruleId')} component={RuleDetailsPage} />
-                      <Route exact path={Routes.SYSTEM.PIPELINES.SIMULATOR} component={SimulatorPage} />
-                      <Route exact path={Routes.SYSTEM.PIPELINES.PIPELINE(':pipelineId')} component={PipelineDetailsPage} />
-
-                      {!isCloud && <Route exact path={Routes.SYSTEM.LOGGING} component={LoggersPage} />}
-                      <Route exact path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
-                      {!isCloud && <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />}
-                      {!isCloud && <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />}
-
-                      {!isCloud && <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />}
-
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}
-                             component={AuthenticationPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}
-                             component={AuthenticationCreatePage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW}
-                             component={AuthenticationOverviewPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')}
-                             component={AuthenticationBackendDetailsPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')}
-                             component={AuthenticationBackendEditPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')}
-                             component={AuthenticationBackendCreatePage} />
-                      )}
-
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW}
-                             component={AuthenticatorsPage} />
-                      )}
-                      {!isCloud && (
-                      <Route exact
-                             path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT}
-                             component={AuthenticatorsEditPage} />
-                      )}
-
-                      <Route exact path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
-                      <Route exact path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />
-                      <Route exact path={Routes.SYSTEM.USERS.show(':userId')} component={UserDetailsPage} />
-                      <Route exact path={Routes.SYSTEM.USERS.edit(':userId')} component={UserEditPage} />
-                      <Route exact path={Routes.SYSTEM.USERS.TOKENS.edit(':userId')} component={UserTokensEditPage} />
-
-                      <Route exact path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} component={RolesOverviewPage} />
-                      <Route exact path={Routes.SYSTEM.AUTHZROLES.show(':roleId')} component={RoleDetailsPage} />
-                      <Route exact path={Routes.SYSTEM.AUTHZROLES.edit(':roleId')} component={RoleEditPage} />
-
-                      <Route exact path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
-                      <Route exact path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
-                      <Route exact path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
-                      <Route exact path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
-                      <Route exact path={Routes.SECURITY} component={SecurityPage} />
-
-                      <Route exact path={Routes.SYSTEM.SIDECARS.OVERVIEW} component={SidecarsPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.SIDECARS.STATUS(':sidecarId')}
-                             component={SidecarStatusPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.SIDECARS.ADMINISTRATION}
-                             component={SidecarAdministrationPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.SIDECARS.CONFIGURATION}
-                             component={SidecarConfigurationPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}
-                             component={SidecarNewConfigurationPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')}
-                             component={SidecarEditConfigurationPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR}
-                             component={SidecarNewCollectorPage} />
-                      <Route exact
-                             path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
-                             component={SidecarEditCollectorPage} />
-                      {standardPluginRoutes}
-                      <Route path="*" render={() => <NotFoundPage displayPageLayout={false} />} />
-                    </Switch>
-                  </PageContentLayout>
-                </Route>
-                <Route exact path={Routes.NOTFOUND} component={NotFoundPage} />
-              </Switch>
-              <Route exact path={Routes.NOTFOUND} component={NotFoundPage} />
-            </App>
-          </Route>
-        </Switch>
-      </RouterErrorBoundary>
-    </Router>
+    <RouterErrorBoundary>
+      <RouterProvider router={router} />
+    </RouterErrorBoundary>
   );
 };
 

@@ -84,6 +84,12 @@ public class PersistToStreamsStorageHandler implements EventStorageHandler {
                     .build();
         }
 
+        public static Config createWithSystemEventsStream() {
+            return Builder.create()
+                    .streams(ImmutableList.of(Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID))
+                    .build();
+        }
+
         public abstract Builder toBuilder();
 
         @AutoValue.Builder

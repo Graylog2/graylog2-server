@@ -36,6 +36,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
+import org.graylog2.users.UserServiceImpl;
 import org.graylog2.users.UserServiceImplTest;
 
 import javax.annotation.Nullable;
@@ -74,14 +75,7 @@ public class TestUserService extends PersistedServiceImpl implements UserService
     public List<User> loadByIds(Collection<String> ids) {
         final DBObject query = new BasicDBObject("_id", new BasicDBObject("$in", ids));
         final List<DBObject> result = query(UserImpl.class, query);
-
-        final List<User> users = Lists.newArrayList();
-        for (DBObject dbObject : result) {
-            //noinspection unchecked
-            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
-        }
-
-        return users;
+        return buildUserList(query);
     }
 
     @Nullable
@@ -97,13 +91,32 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
         if (result.size() > 1) {
             final String msg = "There was more than one matching user for username " + username + ". This should never happen.";
-            throw new RuntimeException(msg);
+            throw new UserServiceImpl.DuplicateUserException(msg);
         }
 
         final DBObject userObject = result.get(0);
         final Object userId = userObject.get("_id");
 
         return userFactory.create((ObjectId) userId, userObject.toMap());
+    }
+
+    @Override
+    public List<User> loadAllByName(String username) {
+        final DBObject query = new BasicDBObject();
+        query.put(UserImpl.USERNAME, username);
+        return buildUserList(query);
+    }
+
+    private List<User> buildUserList(DBObject query) {
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        final List<User> users = Lists.newArrayList();
+        for (DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+
+        return users;
     }
 
     @Override
@@ -130,13 +143,7 @@ public class TestUserService extends PersistedServiceImpl implements UserService
     public List<User> loadAll() {
         final DBObject query = new BasicDBObject();
         final List<DBObject> result = query(UserImpl.class, query);
-
-        final List<User> users = Lists.newArrayList();
-        for (DBObject dbObject : result) {
-            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
-        }
-
-        return users;
+        return buildUserList(query);
     }
 
     @Override

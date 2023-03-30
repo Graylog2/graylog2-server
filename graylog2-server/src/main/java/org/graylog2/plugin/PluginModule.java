@@ -22,6 +22,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationConfig;
@@ -37,6 +38,7 @@ import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilities;
+import org.graylog.scheduler.rest.JobResourceHandler;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog2.audit.AuditEventType;
@@ -45,6 +47,7 @@ import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.database.entities.EntityScope;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -135,14 +138,14 @@ public abstract class PluginModule extends Graylog2Module {
     // This should be used by plugins that have been built for 3.0.1 or later.
     // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     protected <T extends MessageOutput> void addMessageOutput2(Class<T> messageOutputClass,
-                                                              Class<? extends MessageOutput.Factory2<T>> factory) {
+                                                               Class<? extends MessageOutput.Factory2<T>> factory) {
         installOutput2(outputsMapBinder2(), messageOutputClass, factory);
     }
 
     protected void addRestResource(Class<? extends PluginRestResource> restResourceClass) {
         MapBinder<String, Class<? extends PluginRestResource>> pluginRestResourceMapBinder =
                 MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {},
-                                       new TypeLiteral<Class<? extends PluginRestResource>>() {})
+                                new TypeLiteral<Class<? extends PluginRestResource>>() {})
                         .permitDuplicates();
         pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).toInstance(restResourceClass);
     }
@@ -273,9 +276,9 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addSchedulerJob(String name,
-                                 Class<? extends Job> jobClass,
-                                 Class<? extends Job.Factory> factoryClass,
-                                 Class<? extends JobDefinitionConfig> configClass) {
+                                   Class<? extends Job> jobClass,
+                                   Class<? extends Job.Factory> factoryClass,
+                                   Class<? extends JobDefinitionConfig> configClass) {
         addSchedulerJob(name, jobClass, factoryClass, configClass, null);
     }
 
@@ -302,6 +305,12 @@ public abstract class PluginModule extends Graylog2Module {
         return MapBinder.newMapBinder(binder(), String.class, EventNotification.Factory.class);
     }
 
+    /**
+     * Deprecated. Please use the below version of the method that also accepts the contentPackEntityName and
+     * contentPackEntityClass arguments, so that content pack entities are properly registered.
+     * TODO: Consider removing in Graylog 5.0.
+     */
+    @Deprecated
     protected void addNotificationType(String name,
                                        Class<? extends EventNotificationConfig> notificationClass,
                                        Class<? extends EventNotification> handlerClass,
@@ -309,6 +318,16 @@ public abstract class PluginModule extends Graylog2Module {
         install(new FactoryModuleBuilder().implement(EventNotification.class, handlerClass).build(factoryClass));
         eventNotificationBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(notificationClass, name);
+    }
+
+    protected void addNotificationType(String name,
+                                       Class<? extends EventNotificationConfig> notificationClass,
+                                       Class<? extends EventNotification> handlerClass,
+                                       Class<? extends EventNotification.Factory> factoryClass,
+                                       String contentPackEntityName,
+                                       Class<? extends EventNotificationConfigEntity> contentPackEntityClass) {
+        addNotificationType(name, notificationClass, handlerClass, factoryClass);
+        registerJacksonSubtype(contentPackEntityClass, contentPackEntityName);
     }
 
     protected void addGRNType(GRNType type, Class<? extends GRNDescriptorProvider> descriptorProvider) {
@@ -394,7 +413,21 @@ public abstract class PluginModule extends Graylog2Module {
     protected Multibinder<SchedulerCapabilities> schdulerCapabilitiesBinder() {
         return Multibinder.newSetBinder(binder(), SchedulerCapabilities.class);
     }
+
     protected void addSchedulerCapabilities(Class<? extends SchedulerCapabilities> schedulerCapabilitiesClass) {
         schdulerCapabilitiesBinder().addBinding().to(schedulerCapabilitiesClass);
+    }
+
+    protected MapBinder<String, JobResourceHandler> jobResourceHandlerBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, JobResourceHandler.class);
+    }
+
+    protected void addJobResourceHandler(String jobType, Class<? extends JobResourceHandler> jobResourceHandlerClass) {
+        jobResourceHandlerBinder().addBinding(jobType).to(jobResourceHandlerClass);
+    }
+
+    protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
+        Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
+        scopeBinder.addBinding().to(entityScopeType);
     }
 }

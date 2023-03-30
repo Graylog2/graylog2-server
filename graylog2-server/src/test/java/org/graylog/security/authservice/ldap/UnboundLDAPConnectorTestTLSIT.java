@@ -55,7 +55,7 @@ public class UnboundLDAPConnectorTestTLSIT {
     private static final int DEFAULT_TIMEOUT = 60 * 1000;
 
     @Container
-    private static final OpenLDAPContainer container = OpenLDAPContainer.createWithTLS();
+    private static final OpenLDAPContainer container = OpenLDAPContainer.createWithTLS(LDAPTestUtils.NESTED_GROUPS_LDIF);
 
     private TrustManagerProvider trustManagerProvider;
 

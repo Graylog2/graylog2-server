@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -25,13 +24,7 @@ import joptsimple.internal.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.TestIndexSet;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
-import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
@@ -41,10 +34,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,26 +59,11 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     protected Messages messages;
 
-    private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
-            .id("index-set-1")
-            .title("Index set 1")
-            .description("For testing")
-            .indexPrefix("messages_it")
-            .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
-            .shards(1)
-            .replicas(0)
-            .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
-            .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
-            .indexAnalyzer("standard")
-            .indexTemplateName("template-1")
-            .indexOptimizationMaxNumSegments(1)
-            .indexOptimizationDisabled(false)
-            .build();
-    private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
+    protected static final IndexSet indexSet = new MessagesTestIndexSet();
 
-    protected abstract MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry);
+    protected MessagesAdapter createMessagesAdapter() {
+        return searchServer().adapters().messagesAdapter();
+    }
 
     private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
 
@@ -95,8 +72,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
-        final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class),
+        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(), mock(ProcessingStatusRecorder.class),
                 failureSubmissionService);
     }
 
@@ -152,7 +128,10 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT);
     }
 
-    protected abstract long messageCount(String indexName);
+    protected long messageCount(String indexName) {
+        searchServer().client().refreshNode();
+        return searchServer().adapters().countsAdapter().totalCount(Collections.singletonList(indexName));
+    }
 
     @Test
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {

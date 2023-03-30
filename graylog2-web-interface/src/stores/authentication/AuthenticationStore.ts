@@ -16,7 +16,6 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types/dist/utility-types';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { qualifyUrl } from 'util/URLUtils';
@@ -31,17 +30,17 @@ import type { UserOverviewJSON } from 'logic/users/UserOverview';
 import UserOverview from 'logic/users/UserOverview';
 
 export type AuthenticationBackendCreate = {
-  title: $PropertyType<AuthenticationBackendJSON, 'title'>,
-  description: $PropertyType<AuthenticationBackendJSON, 'description'>,
+  title: AuthenticationBackendJSON['title'],
+  description: AuthenticationBackendJSON['description'],
   config: {
     type: string,
   },
 };
 
 export type AuthenticationBackendUpdate = {
-  id: $PropertyType<AuthenticationBackendJSON, 'id'>,
-  title: $PropertyType<AuthenticationBackendJSON, 'title'>,
-  description: $PropertyType<AuthenticationBackendJSON, 'description'>,
+  id: AuthenticationBackendJSON['id'],
+  title: AuthenticationBackendJSON['title'],
+  description: AuthenticationBackendJSON['description'],
   config: {
     type: string,
   },
@@ -49,7 +48,7 @@ export type AuthenticationBackendUpdate = {
 
 export type PaginatedBackends = PaginatedList<AuthenticationBackend> & {
   context: {
-    activeBackend: AuthenticationBackend | undefined | null,
+    activeBackend: AuthenticationBackendJSON | undefined | null,
   },
 };
 
@@ -100,13 +99,13 @@ export type LoadActiveResponse = LoadResponse & {
 
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
-  delete: (authBackendId: $PropertyType<AuthenticationBackend, 'id'> | undefined | null, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  delete: (authBackendId: AuthenticationBackend['id'] | undefined | null, authBackendTitle: AuthenticationBackend['title']) => Promise<void>,
   load: (id: string) => Promise<LoadResponse>,
   loadActive: () => Promise<LoadActiveResponse>,
   loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,
   loadUsersPaginated: (authBackendId: string, pagination: Pagination) => Promise<PaginatedUsers>,
   loadActiveBackendType: () => Promise<string | undefined>,
-  setActiveBackend: (authBackendId: $PropertyType<AuthenticationBackend, 'id'> | undefined | null, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  setActiveBackend: (authBackendId: AuthenticationBackend['id'] | undefined | null, authBackendTitle: AuthenticationBackend['title']) => Promise<void>,
   testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
   testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,
   update: (id: string, AuthenticationBackendUpdate) => Promise<LoadResponse>,
@@ -184,7 +183,7 @@ export const AuthenticationStore = singletonStore(
       return promise;
     },
 
-    update(backendId: null | undefined | $PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<LoadResponse> {
+    update(backendId: null | undefined | AuthenticationBackend['id'], payload: AuthenticationBackendUpdate): Promise<LoadResponse> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.update(backendId).url);
       const promise = fetch('PUT', url, payload).then((result) => (result ? {
         backend: AuthenticationBackend.fromJSON(result.backend),
@@ -195,7 +194,7 @@ export const AuthenticationStore = singletonStore(
       return promise;
     },
 
-    delete(backendId: null | undefined | $PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
+    delete(backendId: null | undefined | AuthenticationBackend['id']): Promise<void> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.delete(backendId).url);
       const promise = fetch('DELETE', url);
       AuthenticationActions.delete.promise(promise);
@@ -219,7 +218,7 @@ export const AuthenticationStore = singletonStore(
       return promise;
     },
 
-    setActiveBackend(backendId: null | undefined | $PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
+    setActiveBackend(backendId: null | undefined | AuthenticationBackend['id']): Promise<void> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.updateConfiguration().url);
       const promise = fetch('POST', url, { active_backend: backendId });
       AuthenticationActions.setActiveBackend.promise(promise);
@@ -234,7 +233,7 @@ export const AuthenticationStore = singletonStore(
           context: {
             activeBackend: response.context.active_backend,
           },
-          list: Immutable.List(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
+          list: Immutable.List<AuthenticationBackend>(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
           pagination: {
             page: response.page,
             perPage: response.per_page,
@@ -254,7 +253,7 @@ export const AuthenticationStore = singletonStore(
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedUsersResponse) => ({
-          list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
+          list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
           pagination: {
             page: response.page,
             perPage: response.per_page,
@@ -262,6 +261,7 @@ export const AuthenticationStore = singletonStore(
             count: response.count,
             total: response.total,
           },
+          adminUser: undefined,
         }));
 
       AuthenticationActions.loadUsersPaginated.promise(promise);

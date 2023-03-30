@@ -48,11 +48,11 @@ describe('Theme Color Generators', () => {
     const output = generateGlobalColors('teint', teint.brand, teint.global, teint.variant);
 
     expect(output).toEqual({
-      linkHover: '#410057',
+      linkHover: '#1a609b',
       navigationBackground: '#fff',
-      navigationBoxShadow: 'rgba(243,243,243,0.5)',
+      navigationBoxShadow: 'rgba(245,246,248,0.5)',
       textAlt: '#fff',
-      textDefault: '#1f1f1f',
+      textDefault: '#3e434c',
     });
   });
 
@@ -79,93 +79,24 @@ describe('Theme Color Generators', () => {
     expect(output).toEqual({
       background: '#fff',
       backgroundDisabled: '#dddddd',
-      border: '#a6a6a6',
-      borderFocus: '#7894ce',
-      boxShadow: 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(120,148,206,0.4)',
-      color: '#1f1f1f',
-      colorDisabled: '#9b9b9b',
-      placeholder: '#9b9b9b',
+      border: '#b5bfcd',
+      borderFocus: '#8eadd8',
+      boxShadow: 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(142,173,216,0.4)',
+      color: '#3e434c',
+      colorDisabled: '#a9abaf',
+      placeholder: '#a9abaf',
     });
   });
 
   it('generates table colors', () => {
     const output = generateTableColors('teint', teint.variant);
 
-    expect(output).toEqual({
-      background: '#fafafa',
-      backgroundAlt: '#f0f0f0',
-      backgroundHover: '#f5f5f5',
-      variant: {
-        active: '#e6e6e6',
-        danger: '#eddddd',
-        info: '#dde2f0',
-        primary: '#e4dee7',
-        success: '#ddeddf',
-        warning: '#fff5dd',
-      },
-      variantHover: {
-        active: '#d0d0d0',
-        danger: '#debdbd',
-        info: '#bdc8e4',
-        primary: '#cbbfd1',
-        success: '#bddec2',
-        warning: '#ffecbd',
-      },
-    });
+    expect(output).toMatchSnapshot();
   });
 
   it('generates variant colors', () => {
     const output = generateVariantColors('teint', teint.variant);
 
-    expect(output).toEqual({
-      dark: {
-        danger: '#990606',
-        default: '#737373',
-        info: '#0057a8',
-        primary: '#632275',
-        success: '#009a3a',
-        warning: '#e1b900',
-      },
-      darker: {
-        danger: '#740505',
-        default: '#575757',
-        info: '#00427f',
-        primary: '#4b1a59',
-        success: '#00752c',
-        warning: '#ab8d00',
-      },
-      darkest: {
-        danger: '#3c0202',
-        default: '#2d2d2d',
-        info: '#002242',
-        primary: '#270e2e',
-        success: '#003c17',
-        warning: '#584900',
-      },
-      light: {
-        danger: '#c27878',
-        default: '#a6a6a6',
-        info: '#7894ce',
-        primary: '#9b7ca8',
-        success: '#78c385',
-        warning: '#ffdd78',
-      },
-      lighter: {
-        danger: '#debdbd',
-        default: '#d0d0d0',
-        info: '#bdc8e4',
-        primary: '#cbbfd1',
-        success: '#bddec2',
-        warning: '#ffecbd',
-      },
-      lightest: {
-        danger: '#f7efef',
-        default: '#f3f3f3',
-        info: '#eff2f8',
-        primary: '#f2f0f4',
-        success: '#eff7f0',
-        warning: '#fffaef',
-      },
-    });
+    expect(output).toMatchSnapshot();
   });
 });

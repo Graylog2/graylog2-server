@@ -28,10 +28,13 @@ type ConfigurationsActionsType = {
   listSearchesClusterConfig: () => Promise<unknown>,
   listMessageProcessorsConfig: (configType: any) => Promise<unknown>,
   listEventsClusterConfig: () => Promise<unknown>,
+  listIndexSetsDefaultsClusterConfig: () => Promise<unknown>,
   listWhiteListConfig: (configType: any) => Promise<unknown>,
   listPermissionsConfig: (configType: string) => Promise<unknown>,
+  listUserConfig: (configType: string) => Promise<unknown>,
   update: (configType: any, config: any) => Promise<void>,
   updateWhitelist: (configType: any, config: any) => Promise<void>,
+  updateIndexSetDefaults: (configType: any, config: any) => Promise<void>,
   updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>,
 }
 export const ConfigurationsActions = singletonActions(
@@ -41,10 +44,13 @@ export const ConfigurationsActions = singletonActions(
     listSearchesClusterConfig: { asyncResult: true },
     listMessageProcessorsConfig: { asyncResult: true },
     listEventsClusterConfig: { asyncResult: true },
+    listIndexSetsDefaultsClusterConfig: { asyncResult: true },
     listWhiteListConfig: { asyncResult: true },
     listPermissionsConfig: { asyncResult: true },
+    listUserConfig: { asyncResult: true },
     update: { asyncResult: true },
     updateWhitelist: { asyncResult: true },
+    updateIndexSetDefaults: { asyncResult: true },
     updateMessageProcessorsConfig: { asyncResult: true },
   }),
 );
@@ -65,10 +71,15 @@ export type PermissionsConfigType = {
   allow_sharing_with_everyone: boolean,
   allow_sharing_with_users: boolean,
 }
+export type UserConfigType = {
+  enable_global_session_timeout: boolean,
+  global_session_timeout_interval: string,
+}
 export type ConfigurationsStoreState = {
   configuration: Record<string, any>,
   searchesClusterConfig: SearchesConfig,
   eventsClusterConfig: {},
+  indexSetsDefaultConfig: {},
 };
 
 export const ConfigurationsStore = singletonStore(
@@ -79,6 +90,7 @@ export const ConfigurationsStore = singletonStore(
     configuration: {},
     searchesClusterConfig: {},
     eventsClusterConfig: {},
+    indexSetsDefaultConfig: {},
     getInitialState() {
       return this.getState();
     },
@@ -88,6 +100,7 @@ export const ConfigurationsStore = singletonStore(
         configuration: this.configuration,
         searchesClusterConfig: this.searchesClusterConfig,
         eventsClusterConfig: this.eventsClusterConfig,
+        indexSetsDefaultConfig: this.indexSetsDefaultConfig,
       };
     },
 
@@ -164,6 +177,25 @@ export const ConfigurationsStore = singletonStore(
       ConfigurationsActions.listPermissionsConfig.promise(promise);
     },
 
+    listUserConfig(configType) {
+      const promise = fetch('GET', this._url(`/${configType}`)).then((response: UserConfigType) => {
+        this.configuration = {
+          ...this.configuration,
+          // default values bellow should be the same in backend.
+          [configType]: response || {
+            enable_global_session_timeout: false,
+            global_session_timeout_interval: 'PT1H',
+          },
+        };
+
+        this.propagateChanges();
+
+        return response;
+      });
+
+      ConfigurationsActions.listUserConfig.promise(promise);
+    },
+
     listEventsClusterConfig() {
       const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then((response) => {
         this.eventsClusterConfig = response;
@@ -173,6 +205,35 @@ export const ConfigurationsStore = singletonStore(
       });
 
       ConfigurationsActions.listEventsClusterConfig.promise(promise);
+    },
+
+    listIndexSetsDefaultsClusterConfig() {
+      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexSetsDefaultConfiguration')).then((response) => {
+        this.indexSetsDefaultConfig = response;
+        this.propagateChanges();
+
+        return response;
+      });
+      ConfigurationsActions.listIndexSetsDefaultsClusterConfig.promise(promise);
+    },
+
+    updateIndexSetDefaults(configType, config) {
+      const promise = fetch('PUT', qualifyUrl('/system/indices/index_set_defaults'), config);
+
+      promise.then(
+        () => {
+          this.configuration = { ...this.configuration, [configType]: config };
+          this.propagateChanges();
+          UserNotification.success('Index defaults configuration updated successfully');
+
+          return config;
+        },
+        (error) => {
+          UserNotification.error(error.additional.body.message, 'Index defaults configuration update failed');
+        },
+      );
+
+      ConfigurationsActions.updateIndexSetDefaults.promise(promise);
     },
 
     update(configType, config) {

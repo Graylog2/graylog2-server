@@ -15,81 +15,40 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
-import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import DashboardList from 'views/components/views/DashboardList';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import useDashboards from 'views/logic/dashboards/useDashboards';
-import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
+import DashboardsOverview from 'views/components/dashboard/DashboardsOverview';
 
-import type View from '../logic/views/View';
-
-// eslint-disable-next-line no-alert
-const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
-
-const handleDashboardDelete = async (view: View) => {
-  const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
-
-  const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
-
-  return result === true ? ViewManagementActions.delete(view) : Promise.reject();
-};
-
-type SearchQuery = {
-  query: string,
-  page: number,
-  perPage: number,
-};
-
-const DashboardsPage = () => {
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>({ query: '', page: 1, perPage: 10 });
-  const handleSearch = useCallback((query: string, page: number, perPage: number) => setSearchQuery({ query, page, perPage }), []);
-  const { list, pagination } = useDashboards(searchQuery);
-
-  return (
-    <DocumentTitle title="Dashboards">
+const DashboardsPage = () => (
+  <DocumentTitle title="Dashboards">
+    <PageHeader title="Dashboards"
+                actions={(
+                  <IfPermitted permissions="dashboards:create">
+                    <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+                      <Button bsStyle="success">Create new dashboard</Button>
+                    </LinkContainer>
+                  </IfPermitted>
+                )}
+                documentationLink={{
+                  title: 'Dashboard documentation',
+                  path: DocsHelper.PAGES.DASHBOARDS,
+                }}>
       <span>
-        <PageHeader title="Dashboards">
-          <span>
-            Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
-            chart you create in other parts of Graylog with one click.
-          </span>
-
-          <span>
-            Take a look at the
-            {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial" />{' '}
-            for lots of other useful tips.
-          </span>
-
-          <IfPermitted permissions="dashboards:create">
-            <span>
-              <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
-                <Button bsStyle="success" bsSize="lg">Create new dashboard</Button>
-              </LinkContainer>
-            </span>
-          </IfPermitted>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <DashboardList dashboards={list}
-                           pagination={pagination}
-                           handleSearch={handleSearch}
-                           handleDashboardDelete={handleDashboardDelete} />
-          </Col>
-        </Row>
+        Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
+        chart you create in other parts of Graylog with one click.
       </span>
-    </DocumentTitle>
-  );
-};
+    </PageHeader>
 
-DashboardsPage.propTypes = {};
+    <Row className="content">
+      <Col md={12}>
+        <DashboardsOverview />
+      </Col>
+    </Row>
+  </DocumentTitle>
+);
 
 export default DashboardsPage;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -22,18 +23,30 @@ import Search from 'views/components/Search';
 import { loadNewView as defaultLoadNewView, loadView as defaultLoadView } from 'views/logic/views/Actions';
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
-import { useStore } from 'stores/connect';
-import { DocumentTitle } from 'components/common';
-import viewTitle from 'views/logic/views/ViewTitle';
-import { ViewStore } from 'views/stores/ViewStore';
+import { DocumentTitle, Spinner } from 'components/common';
+import type View from 'views/logic/views/View';
+import useLoadView from 'views/hooks/useLoadView';
+import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
+import useQuery from 'routing/useQuery';
+import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import useViewTitle from 'views/hooks/useViewTitle';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
-type Props = {
-  loadNewView?: () => unknown,
-  loadView?: (string) => unknown,
-};
+type SearchComponentSlots = { InfoBarSlot: React.ComponentType }
+
+type Props = React.PropsWithChildren<{
+  isNew: boolean,
+  view: Promise<View>,
+  loadNewView?: (history: HistoryFunction) => unknown,
+  loadView?: (history: HistoryFunction, viewId: string) => unknown,
+  executionState?: SearchExecutionState,
+  SearchComponentSlots?: SearchComponentSlots
+}>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
-  const title = useStore(ViewStore, ({ view }) => viewTitle(view?.title, view?.type));
+  const title = useViewTitle();
 
   return (
     <DocumentTitle title={title}>
@@ -42,23 +55,50 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
-  <SearchPageTitle>
-    <DashboardPageContextProvider>
-      <NewViewLoaderContext.Provider value={loadNewView}>
-        <ViewLoaderContext.Provider value={loadView}>
-          <IfUserHasAccessToAnyStream>
-            <Search />
-          </IfUserHasAccessToAnyStream>
-        </ViewLoaderContext.Provider>
-      </NewViewLoaderContext.Provider>
-    </DashboardPageContextProvider>
-  </SearchPageTitle>
-);
+const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState, SearchComponentSlots }: Props) => {
+  const query = useQuery();
+  const initialQuery = query?.page as string;
+  useLoadView(viewPromise, isNew);
+  const history = useHistory();
+  const loadNewView = useCallback(() => _loadNewView(history), [_loadNewView, history]);
+  const loadView = useCallback((viewId: string) => _loadView(history, viewId), [_loadView, history]);
+  const result = useProcessHooksForView(viewPromise, initialExecutionState, query);
+
+  if (result.status === 'loading') {
+    return <Spinner />;
+  }
+
+  if (result.status === 'interrupted') {
+    return result.component;
+  }
+
+  const { view, executionState } = result;
+
+  return view
+    ? (
+      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery}>
+        <SearchPageTitle>
+          <DashboardPageContextProvider>
+            <NewViewLoaderContext.Provider value={loadNewView}>
+              <ViewLoaderContext.Provider value={loadView}>
+                {children}
+                <IfUserHasAccessToAnyStream>
+                  <Search InfoBarSlot={SearchComponentSlots.InfoBarSlot} />
+                </IfUserHasAccessToAnyStream>
+              </ViewLoaderContext.Provider>
+            </NewViewLoaderContext.Provider>
+          </DashboardPageContextProvider>
+        </SearchPageTitle>
+      </PluggableStoreProvider>
+    )
+    : <Spinner />;
+};
 
 SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
+  executionState: SearchExecutionState.empty(),
+  SearchComponentSlots: {},
 };
 
 export default React.memo(SearchPage);

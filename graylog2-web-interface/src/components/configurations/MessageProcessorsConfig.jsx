@@ -18,16 +18,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Button, Alert, Table } from 'components/bootstrap';
 import { IfPermitted, SortableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
 
 const MessageProcessorsConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'MessageProcessorsConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,
@@ -50,17 +52,19 @@ const MessageProcessorsConfig = createReactClass({
         disabled_processors: config.disabled_processors,
         processor_order: config.processor_order,
       },
+      showConfigModal: false,
     };
   },
 
   inputs: {},
 
   _openModal() {
-    this.configModal.open();
+    this.setState({ showConfigModal: true });
   },
 
   _closeModal() {
-    this.configModal.close();
+    // Reset to initial state when the modal is closed without saving.
+    this.setState(this.getInitialState());
   },
 
   _saveConfig() {
@@ -72,11 +76,6 @@ const MessageProcessorsConfig = createReactClass({
         this._closeModal();
       });
     }
-  },
-
-  _resetConfig() {
-    // Reset to initial state when the modal is closed without saving.
-    this.setState(this.getInitialState());
   },
 
   _updateSorting(newSorting) {
@@ -113,18 +112,6 @@ const MessageProcessorsConfig = createReactClass({
     return config.disabled_processors.length >= config.processor_order.length;
   },
 
-  _noActiveProcessorWarning() {
-    if (this._hasNoActiveProcessor()) {
-      return (
-        <Alert bsStyle="danger">
-          <strong>ERROR:</strong> No active message processor!
-        </Alert>
-      );
-    }
-
-    return null;
-  },
-
   _summary() {
     const { config } = this.state;
 
@@ -132,12 +119,14 @@ const MessageProcessorsConfig = createReactClass({
       const status = config.disabled_processors.filter((p) => p === processor.class_name).length > 0 ? 'disabled' : 'active';
 
       return (
-        // eslint-disable-next-line react/no-array-index-key
-        <tr key={idx}>
-          <td>{idx + 1}</td>
-          <td>{processor.name}</td>
-          <td>{status}</td>
-        </tr>
+
+        (
+          <tr key={idx}>
+            <td>{idx + 1}</td>
+            <td>{processor.name}</td>
+            <td>{status}</td>
+          </tr>
+        )
       );
     });
   },
@@ -157,16 +146,18 @@ const MessageProcessorsConfig = createReactClass({
       const enabled = config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
 
       return (
-        // eslint-disable-next-line react/no-array-index-key
-        <tr key={idx}>
-          <td>{processor.name}</td>
-          <td>
-            <input ref={(elem) => { this.inputs[processor.class_name] = elem; }}
-                   type="checkbox"
-                   checked={enabled}
-                   onChange={this._toggleStatus(processor.class_name)} />
-          </td>
-        </tr>
+
+        (
+          <tr key={idx}>
+            <td>{processor.name}</td>
+            <td>
+              <input ref={(elem) => { this.inputs[processor.class_name] = elem; }}
+                     type="checkbox"
+                     checked={enabled}
+                     onChange={this._toggleStatus(processor.class_name)} />
+            </td>
+          </tr>
+        )
       );
     });
   },
@@ -191,32 +182,38 @@ const MessageProcessorsConfig = createReactClass({
         </Table>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
+        <BootstrapModalForm show={this.state.showConfigModal}
                             title="Update Message Processors Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
-                            submitButtonText="Save">
-          <h3>Order</h3>
-          <p>Use drag and drop to change the execution order of the message processors.</p>
-          <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
+                            onCancel={this._closeModal}
+                            submitButtonText="Update configuration">
+          <>
+            <h3>Order</h3>
+            <p>Use drag and drop to change the execution order of the message processors.</p>
+            <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
 
-          <h3>Status</h3>
-          <p>Change the checkboxes to change the status of a message processor.</p>
-          <Table striped bordered condensed className="top-margin">
-            <thead>
-              <tr>
-                <th>Processor</th>
-                <th>Enabled</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this._statusForm()}
-            </tbody>
-          </Table>
-          {this._noActiveProcessorWarning()}
+            <h3>Status</h3>
+            <p>Change the checkboxes to change the status of a message processor.</p>
+            <Table striped bordered condensed className="top-margin">
+              <thead>
+                <tr>
+                  <th>Processor</th>
+                  <th>Enabled</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this._statusForm()}
+              </tbody>
+            </Table>
+            {this._hasNoActiveProcessor() && (
+              <Alert bsStyle="danger">
+                <strong>ERROR:</strong> No active message processor!
+              </Alert>
+            )}
+          </>
         </BootstrapModalForm>
       </div>
     );

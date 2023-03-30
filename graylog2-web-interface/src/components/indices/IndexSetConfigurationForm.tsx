@@ -21,25 +21,30 @@ import { Formik, Form, Field } from 'formik';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { FormikFormGroup, FormikInput, Spinner, TimeUnitInput } from 'components/common';
+import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { LinkContainer } from 'components/common/router';
-import { Col, Row, Button, Input } from 'components/bootstrap';
+import { Col, Row, Input } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import withHistory from 'routing/withHistory';
+import type { HistoryFunction } from 'routing/useHistory';
+import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
 
 import type { RetentionStrategyContext } from './Types';
 
 type Props = {
+  cancelLink: string,
+  create?: boolean,
+  history: HistoryFunction,
   indexSet: IndexSet,
-  rotationStrategies: Array<any>,
+  onUpdate: (indexSet: IndexSet) => void,
   retentionStrategies: Array<any>,
   retentionStrategiesContext: RetentionStrategyContext,
-  create: boolean,
-  onUpdate: (indexSet: IndexSet) => void,
-  cancelLink: string,
+  rotationStrategies: Array<any>,
+  submitButtonText: string,
+  submitLoadingText?: string,
 };
 
 type Unit = 'seconds' | 'minutes';
@@ -48,20 +53,20 @@ type State = {
   indexSet: IndexSet,
   fieldTypeRefreshIntervalUnit: Unit,
 };
-const StyledButton = styled(Button)`
-  margin-right:10px;
+const StyledFormSubmit = styled(FormSubmit)`
+  margin-left: 0;
 `;
 
-const _validateIndexPrefix = (value) => {
+const _validateIndexPrefix = (value: string) => {
   let error;
 
-  if (value.length === 0) {
+  if (value?.length === 0) {
     error = 'Invalid index prefix: cannot be empty';
-  } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
+  } else if (value?.indexOf('_') === 0 || value?.indexOf('-') === 0 || value?.indexOf('+') === 0) {
     error = 'Invalid index prefix: must start with a letter or number';
-  } else if (value.toLocaleLowerCase() !== value) {
+  } else if (value?.toLocaleLowerCase() !== value) {
     error = 'Invalid index prefix: must be lower case';
-  } else if (!value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
+  } else if (!value?.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
     error = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
   }
 
@@ -78,7 +83,7 @@ const _getRetentionConfigState = (strategy: string, data: string) => {
 
 class IndexSetConfigurationForm extends React.Component<Props, State> {
   static propTypes = {
-    indexSet: PropTypes.object.isRequired,
+    indexSet: IndexSetPropType.isRequired,
     rotationStrategies: PropTypes.array.isRequired,
     retentionStrategies: PropTypes.array.isRequired,
     retentionStrategiesContext: PropTypes.shape({
@@ -87,6 +92,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     create: PropTypes.bool,
     onUpdate: PropTypes.func.isRequired,
     cancelLink: PropTypes.string.isRequired,
+    submitButtonText: PropTypes.string.isRequired,
+    submitLoadingText: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -103,10 +110,10 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     };
   }
 
-  _saveConfiguration = (values) => {
+  _saveConfiguration = (values: IndexSet) => {
     const { onUpdate } = this.props;
 
-    onUpdate(values);
+    return onUpdate(values);
   };
 
   render() {
@@ -116,6 +123,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
       retentionStrategies,
       create,
       cancelLink,
+      history,
       indexSet: {
         rotation_strategy: indexSetRotationStrategy,
         rotation_strategy_class: indexSetRotationStrategyClass,
@@ -123,6 +131,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
         retention_strategy_class: IndexSetRetentionStrategyClass,
       },
       retentionStrategiesContext,
+      submitButtonText,
+      submitLoadingText,
     } = this.props;
     let rotationConfig;
 
@@ -135,7 +145,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       rotationConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                 key="rotation"
+                                                 name="rotation"
                                                  description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                                  selectPlaceholder="Select rotation strategy"
                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
@@ -158,7 +168,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       retentionConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                 key="retention"
+                                                 name="retention"
                                                  description="Graylog uses a retention strategy to clean up old indices."
                                                  selectPlaceholder="Select retention strategy"
                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
@@ -198,12 +208,14 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
       );
     }
 
+    const onCancel = () => history.push(cancelLink);
+
     return (
       <Row>
         <Col md={8}>
           <Formik onSubmit={this._saveConfiguration}
                   initialValues={indexSet}>
-            {({ isValid, setFieldValue }) => (
+            {({ isValid, setFieldValue, isSubmitting }) => (
               <Form>
                 <Row>
                   <Col md={12}>
@@ -273,23 +285,16 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                     </Field>
                   </Col>
                 </Row>
+                {indexSet.writable && rotationConfig}
+                {indexSet.writable && retentionConfig}
                 <Row>
-                  <Col md={12}>
-                    {indexSet.writable && rotationConfig}
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md={12}>
-                    {indexSet.writable && retentionConfig}
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col md={12}>
-                    <StyledButton type="submit" bsStyle="primary" disabled={!isValid} style={{ marginRight: 10 }}>Save</StyledButton>
-                    <LinkContainer to={cancelLink}>
-                      <Button bsStyle="default">Cancel</Button>
-                    </LinkContainer>
+                  <Col md={9} mdOffset={3}>
+                    <StyledFormSubmit disabledSubmit={!isValid}
+                                      submitButtonText={submitButtonText}
+                                      submitLoadingText={submitLoadingText}
+                                      isSubmitting={isSubmitting}
+                                      isAsyncSubmit
+                                      onCancel={onCancel} />
                   </Col>
                 </Row>
 
@@ -302,4 +307,5 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
   }
 }
 
-export default IndexSetConfigurationForm;
+// @ts-ignore
+export default withHistory(IndexSetConfigurationForm);

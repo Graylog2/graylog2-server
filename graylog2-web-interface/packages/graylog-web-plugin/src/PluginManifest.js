@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const create = (metadata, exports) => {
-  return {
-    metadata: metadata,
-    exports: exports,
-  };
-};
 
-module.exports = create;
+class PluginManifest {
+  constructor(metadata, exports) {
+    this._metadata = metadata;
+    this._exports = exports;
+  }
+
+  get metadata() {
+    return this._metadata;
+  }
+
+  get exports() {
+    return this._exports;
+  }
+}
+
+module.exports = PluginManifest;

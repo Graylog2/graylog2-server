@@ -24,7 +24,7 @@ import type { PermissionsConfigType } from 'src/stores/configurations/Configurat
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
-import { InputDescription } from 'components/common';
+import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
 
 type Props = {
   config: PermissionsConfigType,
@@ -74,15 +74,18 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
             <dd>{config.allow_sharing_with_users ? 'Enabled' : 'Disabled'}</dd>
           </StyledDefList>
 
-          <p>
-            <Button type="button"
-                    bsSize="xs"
-                    bsStyle="info"
-                    onClick={() => {
-                      setShowModal(true);
-                    }}>Configure
-            </Button>
-          </p>
+          <IfPermitted permissions="clusterconfigentry:edit">
+            <p>
+              <Button type="button"
+                      bsSize="xs"
+                      bsStyle="info"
+                      onClick={() => {
+                        setShowModal(true);
+                      }}>
+                Edit configuration
+              </Button>
+            </p>
+          </IfPermitted>
 
           <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
             <Formik onSubmit={_saveConfig} initialValues={config}>
@@ -121,8 +124,11 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                     </Modal.Body>
 
                     <Modal.Footer>
-                      <Button type="button" bsStyle="link" onClick={_resetConfig}>Close</Button>
-                      <Button type="submit" bsStyle="success" disabled={isSubmitting}>{isSubmitting ? 'Saving' : 'Save'}</Button>
+                      <ModalSubmit onCancel={_resetConfig}
+                                   isSubmitting={isSubmitting}
+                                   isAsyncSubmit
+                                   submitLoadingText="Update configuration"
+                                   submitButtonText="Update configuration" />
                     </Modal.Footer>
                   </Form>
                 );

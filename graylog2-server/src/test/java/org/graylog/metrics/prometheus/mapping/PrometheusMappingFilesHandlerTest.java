@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,12 +39,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.metrics.prometheus.mapping.PrometheusMappingFilesHandler.CORE_MAPPING_RESOURCE;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrometheusMappingFilesHandlerTest {
-    @Mock
-    NodeId nodeId;
+
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     @Mock
     MessageInputFactory messageInputFactory;
@@ -81,7 +81,6 @@ class PrometheusMappingFilesHandlerTest {
 
         @Test
         void getMapperConfigs() {
-            when(nodeId.toString()).thenReturn("abc-123");
 
             final List<MapperConfig> mapperConfigs = handler.getMapperConfigs();
 
@@ -92,7 +91,7 @@ class PrometheusMappingFilesHandlerTest {
                     "org.apache.logging.log4j.core.Appender.*",
                     "gl_log_appenders",
                     ImmutableMap.of(
-                            "node", "abc-123",
+                            "node", "5ca1ab1e-0000-4000-a000-000000000000",
                             "status", "${0}"
                     )
             ));
@@ -140,8 +139,6 @@ class PrometheusMappingFilesHandlerTest {
 
         @Test
         void getMapperConfigs() throws Exception {
-            when(nodeId.toString()).thenReturn("abc-123");
-
             final List<MapperConfig> mapperConfigs = handler.getMapperConfigs();
 
             assertThat(mapperConfigs).hasSize(1);
@@ -150,7 +147,7 @@ class PrometheusMappingFilesHandlerTest {
                     "test.pattern",
                     "gl_test",
                     ImmutableMap.of(
-                            "node", "abc-123",
+                            "node", "5ca1ab1e-0000-4000-a000-000000000000",
                             "hello", "world"
                     )
             ));
@@ -172,7 +169,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test.pattern",
                             "gl_test",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world"
                             )
                     ),
@@ -180,7 +177,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test2.pattern",
                             "gl_test2",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world2"
                             )
                     )
@@ -229,8 +226,6 @@ class PrometheusMappingFilesHandlerTest {
 
         @Test
         void getMapperConfigs() throws Exception {
-            when(nodeId.toString()).thenReturn("abc-123");
-
             final List<MapperConfig> mapperConfigs = handler.getMapperConfigs();
 
             assertThat(mapperConfigs.size()).isGreaterThan(1);
@@ -239,7 +234,7 @@ class PrometheusMappingFilesHandlerTest {
                     "test.pattern",
                     "gl_test",
                     ImmutableMap.of(
-                            "node", "abc-123",
+                            "node", "5ca1ab1e-0000-4000-a000-000000000000",
                             "hello", "world"
                     )
             ));
@@ -261,7 +256,7 @@ class PrometheusMappingFilesHandlerTest {
                             "org.apache.logging.log4j.core.Appender.*",
                             "gl_log_appenders",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "status", "${0}"
                             )
                     ),
@@ -269,7 +264,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test.pattern",
                             "gl_test",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world"
                             )
                     ),
@@ -277,7 +272,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test2.pattern",
                             "gl_test2",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world2"
                             )
                     )

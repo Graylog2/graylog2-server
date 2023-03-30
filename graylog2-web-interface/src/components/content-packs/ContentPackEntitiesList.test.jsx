@@ -22,6 +22,10 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
 import Entity from 'logic/content-packs/Entity';
 
+import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
+
+jest.useFakeTimers();
+
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackEntitiesList />', () => {
@@ -89,11 +93,14 @@ describe('<ContentPackEntitiesList />', () => {
     expect(wrapper.find('td[children=\'test\']').exists()).toBe(true);
 
     wrapper.find('input').simulate('change', { target: { value: 'Bad' } });
-    wrapper.find('form').simulate('submit');
+
+    jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+
+    wrapper.update();
 
     expect(wrapper.find('td[children=\'test\']').exists()).toBe(false);
 
-    wrapper.find('button[children=\'Reset\']').simulate('click');
+    wrapper.find('button[title=\'Reset search\']').simulate('click');
 
     expect(wrapper.find('td[children=\'test\']').exists()).toBe(true);
   });

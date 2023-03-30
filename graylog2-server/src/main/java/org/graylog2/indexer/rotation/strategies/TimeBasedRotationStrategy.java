@@ -17,6 +17,8 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.base.MoreObjects;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
@@ -41,6 +43,7 @@ import javax.inject.Singleton;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -58,17 +61,16 @@ import static org.joda.time.DateTimeFieldType.year;
 public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
     public static final String NAME = "time";
+    public static final String OVERRIDE_HINT = "(elasticsearch_max_write_index_age overrides configured period)";
 
-    private final Indices indices;
     private Map<String, DateTime> anchor;
 
     @Inject
     public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
                                      AuditEventSender auditEventSender,
                                      ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
         this.anchor = new ConcurrentHashMap<>();
-        this.indices = requireNonNull(indices, "indices must not be null");
     }
 
     @Override
@@ -78,7 +80,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return TimeBasedRotationStrategyConfig.createDefault(elasticsearchConfiguration.getMaxWriteIndexAge());
+        return TimeBasedRotationStrategyConfig.builder()
+                .maxRotationPeriod(elasticsearchConfiguration.getMaxWriteIndexAge())
+                .build();
     }
 
     /**
@@ -184,21 +188,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         checkState(!isNullOrEmpty(index), "Index name must not be null or empty");
         checkState(!isNullOrEmpty(indexSetId), "Index set ID must not be null or empty");
         checkState(indexSetConfig.rotationStrategy() instanceof TimeBasedRotationStrategyConfig,
-                "Invalid rotation strategy config <"
-                        + indexSetConfig.rotationStrategy().getClass().getCanonicalName()
-                        + "> for index set <" + indexSetId + ">");
+                "Invalid rotation strategy config <%s> for index set <%s>"
+                , indexSetConfig.rotationStrategy().getClass().getCanonicalName(), indexSet);
 
         final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
 
-        Period rotationPeriod = config.rotationPeriod();
-        Period maxPeriod = elasticsearchConfiguration.getMaxWriteIndexAge();
-        boolean overriding = false;
-        if (maxPeriod != null && isLonger(rotationPeriod, maxPeriod)) {
-            log.debug("Max rotation limit {} overrides configured period {}", maxPeriod, rotationPeriod);
-            rotationPeriod = maxPeriod;
-            overriding = true;
-        }
-        final Period normalizedPeriod = rotationPeriod.normalizedStandard();
+        final Pair<Period, Boolean> normalizedRotationPeriod = getNormalizedRotationPeriod(config);
+        final Period normalizedPeriod = normalizedRotationPeriod.getLeft();
+        final boolean overriding = normalizedRotationPeriod.getRight();
 
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (!anchor.containsKey(indexSetId)) {
@@ -209,7 +206,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
             // still not able to figure out the last rotation time, we'll rotate forcibly
             if (!anchor.containsKey(indexSetId)) {
-                return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
+                return createResult(true, "No known previous rotation time, forcing index rotation now.");
             }
         }
 
@@ -219,45 +216,61 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         if (nextRotation.isAfter(now)) {
             final String message = new MessageFormat("Next rotation at {0} {1}", Locale.ENGLISH)
                     .format(new Object[]{nextRotation,
-                            overriding ? "(elasticsearch_max_write_index_age overrides configured period)" : ""});
-            return new SimpleResult(false, message);
+                            overriding ? OVERRIDE_HINT : ""});
+            return createResult(false, message);
         }
 
         // determine new anchor (push it to within less then one period before now) in case we missed one or more periods
+        final DateTime nextAnchor = calculateNextAnchor(currentAnchor, normalizedPeriod, now);
+        anchor.put(indexSetId, nextAnchor);
+
+        if (!config.rotateEmptyIndexSet() && isEmptyIndexSet(indexSet)) {
+            log.debug("Index set {} contains no messages, skipping rotation!", indexSet);
+            final String message = new MessageFormat("Index set contains no messages, skipping rotation! Next rotation at {0} {1}", Locale.ENGLISH)
+                    .format(new Object[]{
+                            nextAnchor,
+                            overriding ? OVERRIDE_HINT : ""});
+            return createResult(false, message);
+        }
+
+        final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1} {2}", Locale.ENGLISH)
+                .format(new Object[]{now,
+                        nextAnchor,
+                        overriding ? OVERRIDE_HINT : ""});
+        return createResult(true, message);
+    }
+
+    private boolean isEmptyIndexSet(IndexSet indexSet) {
+        final Set<String> allIndices = indices.getIndices(indexSet);
+        for (String index : allIndices) {
+            if (indices.numberOfMessages(index) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Pair<Period, Boolean> getNormalizedRotationPeriod(TimeBasedRotationStrategyConfig config) {
+        Period rotationPeriod = config.rotationPeriod();
+        Period maxPeriod = elasticsearchConfiguration.getMaxWriteIndexAge();
+        boolean overriding = false;
+        if (maxPeriod != null && isLonger(rotationPeriod, maxPeriod)) {
+            log.debug("Max rotation limit {} overrides configured period {}", maxPeriod, rotationPeriod);
+            rotationPeriod = maxPeriod;
+            overriding = true;
+        }
+        final Period normalizedPeriod = rotationPeriod.normalizedStandard();
+        return new ImmutablePair<>(normalizedPeriod, overriding);
+    }
+
+    private DateTime calculateNextAnchor(DateTime currentAnchor, Period normalizedPeriod, DateTime now) {
         DateTime tmpAnchor;
         int multiplicator = 0;
         do {
             tmpAnchor = currentAnchor.withPeriodAdded(normalizedPeriod, ++multiplicator);
         } while (tmpAnchor.isBefore(now));
 
-        final DateTime nextAnchor = currentAnchor.withPeriodAdded(normalizedPeriod, multiplicator - 1);
-        anchor.put(indexSetId, nextAnchor);
-        final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1} {2}", Locale.ENGLISH)
-                .format(new Object[]{now,
-                        nextAnchor,
-                        overriding ? "(elasticsearch_max_write_index_age overrides configured period)" : ""});
-        return new SimpleResult(true, message);
-    }
-
-    static class SimpleResult implements AbstractRotationStrategy.Result {
-        private final String message;
-        private final boolean rotate;
-
-        SimpleResult(boolean rotate, String message) {
-            this.message = message;
-            this.rotate = rotate;
-            log.debug("{} because of: {}", rotate ? "Rotating" : "Not rotating", message);
-        }
-
-        @Override
-        public String getDescription() {
-            return message;
-        }
-
-        @Override
-        public boolean shouldRotate() {
-            return rotate;
-        }
+        return currentAnchor.withPeriodAdded(normalizedPeriod, multiplicator - 1);
     }
 
     @Override

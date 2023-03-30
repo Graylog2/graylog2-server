@@ -71,7 +71,8 @@ public class StreamRouterEngineTest {
 
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     private StreamRouterEngine newEngine(List<Stream> streams) {
-        return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics, defaultStreamProvider);
+        return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics,
+                defaultStreamProvider, new MetricRegistry());
     }
 
     @Test

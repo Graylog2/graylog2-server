@@ -22,12 +22,9 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.utils.GelfInputUtils;
-import org.graylog.testing.utils.SearchUtils;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
@@ -47,33 +44,25 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class SearchSyncIT {
     static final int GELF_HTTP_PORT = 12201;
 
-    private final GraylogBackend sut;
-    private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public SearchSyncIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
-        this.requestSpec = requestSpec;
+    public SearchSyncIT(final GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void importMongoFixtures() {
-        this.sut.importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
+        this.api.backend().importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
 
-        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
-
-        // mainly because of the waiting logic
-        final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "search-sync-test");
-        assertThat(isMessagePresent).isTrue();
+        api.gelf().createGelfHttpInput(GELF_HTTP_PORT)
+                .postMessage("{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}");
+        api.search().waitForMessage("search-sync-test");
     }
 
     @ContainerMatrixTest
     void testEmptyBody() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .post("/views/search/sync")
                 .then()
@@ -84,7 +73,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testMinimalisticRequest() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
                 .post("/views/search/sync")
@@ -98,7 +87,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testMinimalisticRequestv2() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
                 .when()
@@ -114,7 +103,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testRequestWithStreamsv2() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
                 .when()
@@ -151,10 +140,24 @@ public class SearchSyncIT {
     }
 
     @ContainerMatrixTest
+    void testRequestStoredSearchWithGlobalOverrideKeepingOnlySingleQuery() throws ExecutionException, RetryException {
+        final String jobId = executeStoredSearch("61977043c1f17d26b45c8a0b", Collections.singletonMap(
+                "global_override", Collections.singletonMap(
+                        "keep_queries", Collections.singleton("f1446410-a082-4871-b3bf-d69aa42d0c97")
+                )
+        ));
+
+        retrieveSearchResults(jobId)
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body("results", not(hasKey("f1446410-a082-4871-b3bf-d69aa42d0c96")))
+                .body("results.f1446410-a082-4871-b3bf-d69aa42d0c97.search_types", hasKey("01c76680-377b-4930-86e2-a55fdb867b58"));
+    }
+
+    @ContainerMatrixTest
     void testThatQueryOrderStaysConsistentInV1() {
         given()
-                .config(sut.withGraylogBackendFailureConfig())
-                .spec(requestSpec)
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.requestSpecification())
                 .accept("application/json")
                 .contentType("application/json")
                 .when()
@@ -172,8 +175,8 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testThatQueryOrderStaysConsistentInV2() {
         given()
-                .config(sut.withGraylogBackendFailureConfig())
-                .spec(requestSpec)
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.requestSpecification())
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
                 .when()
@@ -194,7 +197,7 @@ public class SearchSyncIT {
 
     private String executeStoredSearch(String searchId, Object body) {
         final ValidatableResponse result = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(body)
                 .post("/views/search/{searchId}/execute", searchId)
@@ -215,7 +218,7 @@ public class SearchSyncIT {
                 .build();
 
         return retryer.call(() -> given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/views/search/status/{jobId}", jobId)
                 .then()

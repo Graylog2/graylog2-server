@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed bug preventing installation of Content Packs that reference System Streams."
+
+issues = ["7212"]
+pulls = ["13398"]

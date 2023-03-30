@@ -22,7 +22,7 @@ import { ThemeProvider } from 'styled-components';
 
 import buttonStyles from 'components/bootstrap/styles/buttonStyles';
 import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';

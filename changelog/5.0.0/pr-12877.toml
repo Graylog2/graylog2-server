@@ -1,0 +1,4 @@
+type = "added"
+message = "Adding simple actions to copy field name/value/message fields to clipboard."
+
+pulls = ["12877"]

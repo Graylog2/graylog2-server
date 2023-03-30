@@ -24,18 +24,21 @@ import { dropdownField, requiredDropdownField } from 'fixtures/configurationform
 import DropdownField from './DropdownField';
 
 describe('<DropdownField>', () => {
+  const SUT = (props: Partial<React.ComponentProps<typeof DropdownField>>) => (
+    <DropdownField field={dropdownField}
+                   onChange={() => {}}
+                   title="example_dropdown_field"
+                   typeName="dropdown"
+                   autoFocus={false}
+                   {...props} />
+  );
+
   afterEach(() => {
     jest.resetAllMocks();
   });
 
   it('should render an empty field', () => {
-    const { container } = render(
-      <DropdownField field={dropdownField}
-                     onChange={() => {}}
-                     title="example_dropdown_field"
-                     typeName="dropdown"
-                     autoFocus={false} />,
-    );
+    render(<SUT />);
 
     const fieldLabel = screen.getByText(dropdownField.human_name, { exact: true });
     const optionalMarker = screen.getByText(/(optional)/);
@@ -49,19 +52,10 @@ describe('<DropdownField>', () => {
 
     expect(select).toHaveValue(selectedValue);
     expect(select).not.toBeRequired();
-
-    expect(container).toMatchSnapshot();
   });
 
   it('should render an empty field with placeholder', () => {
-    render(
-      <DropdownField field={dropdownField}
-                     onChange={() => {}}
-                     title="example_dropdown_field"
-                     typeName="dropdown"
-                     autoFocus={false}
-                     addPlaceholder />,
-    );
+    render(<SUT addPlaceholder />);
 
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
@@ -71,12 +65,8 @@ describe('<DropdownField>', () => {
 
   it('should render a required field', () => {
     render(
-      <DropdownField field={requiredDropdownField}
-                     onChange={() => {}}
-                     title="example_dropdown_field"
-                     typeName="dropdown"
-                     autoFocus={false}
-                     addPlaceholder />,
+      <SUT field={requiredDropdownField}
+           addPlaceholder />,
     );
 
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
@@ -87,27 +77,14 @@ describe('<DropdownField>', () => {
   });
 
   it('should display options from attributes', () => {
-    render(
-      <DropdownField field={dropdownField}
-                     onChange={() => {}}
-                     title="example_dropdown_field"
-                     typeName="dropdown"
-                     autoFocus={false} />,
-    );
+    render(<SUT />);
 
     expect(screen.getByText('one')).toBeInTheDocument();
     expect(screen.getByText('two')).toBeInTheDocument();
   });
 
   it('should render a field with a value', async () => {
-    render(
-      <DropdownField field={dropdownField}
-                     onChange={() => {}}
-                     title="example_dropdown_field"
-                     typeName="dropdown"
-                     autoFocus={false}
-                     value="dos" />,
-    );
+    render(<SUT value="dos" />);
 
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
@@ -117,13 +94,7 @@ describe('<DropdownField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    render(
-      <DropdownField field={dropdownField}
-                     onChange={updateFunction}
-                     title="example_dropdown_field"
-                     typeName="dropdown"
-                     autoFocus={false} />,
-    );
+    render(<SUT onChange={updateFunction} />);
 
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 

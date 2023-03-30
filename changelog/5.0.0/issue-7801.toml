@@ -1,0 +1,10 @@
+type = "fixed"
+message = "Fix content pack imports error for event notifications."
+
+issues = ["7801"]
+pulls = ["13171", "graylog-plugin-enterprise-integrations#859", "graylog-plugin-integrations#1129"]
+
+details.user = """
+Fixes an error that would occur when attepting to import a content pack containing an event definitions that have
+a notification assigned.
+"""

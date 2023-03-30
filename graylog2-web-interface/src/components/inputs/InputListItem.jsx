@@ -16,9 +16,11 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
+import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
 import { DropdownButton, MenuItem, Col, Button } from 'components/bootstrap';
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
@@ -30,8 +32,10 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 
 const InputListItem = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'InputListItem',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     input: PropTypes.object.isRequired,
     currentNode: PropTypes.object.isRequired,
@@ -41,6 +45,7 @@ const InputListItem = createReactClass({
   mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
 
   _deleteInput() {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete(this.props.input);
     }
@@ -70,6 +75,8 @@ const InputListItem = createReactClass({
       <span>
         {this.props.input.name}
         &nbsp;
+        ({this.props.input.id})
+        &nbsp;
         <InputStateBadge input={this.props.input} />
       </span>
     );
@@ -80,25 +87,27 @@ const InputListItem = createReactClass({
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
                        to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
-          <Button bsStyle="info">Show received messages</Button>
+          <Button>Show received messages</Button>
         </LinkContainer>,
       );
     }
 
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
-      let extractorRoute;
+      if (!AppConfig.isCloud()) {
+        let extractorRoute;
 
-      if (this.props.input.global) {
-        extractorRoute = Routes.global_input_extractors(this.props.input.id);
-      } else {
-        extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+        if (this.props.input.global) {
+          extractorRoute = Routes.global_input_extractors(this.props.input.id);
+        } else {
+          extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+        }
+
+        actions.push(
+          <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
+            <Button>Manage extractors</Button>
+          </LinkContainer>,
+        );
       }
-
-      actions.push(
-        <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
-          <Button bsStyle="info">Manage extractors</Button>
-        </LinkContainer>,
-      );
 
       actions.push(<InputStateControl key={`input-state-control-${this.props.input.id}`} input={this.props.input} />);
     }
@@ -163,6 +172,7 @@ const InputListItem = createReactClass({
                    typeName={input.type}
                    includeTitleField
                    submitAction={this._updateInput}
+                   submitButtonText="Update input"
                    values={input.attributes} />
       ) : null;
 

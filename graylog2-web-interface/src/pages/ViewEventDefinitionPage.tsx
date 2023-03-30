@@ -15,33 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { useStore } from 'stores/connect';
-import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import CurrentUserContext from 'contexts/CurrentUserContext';
-import DocumentationLink from 'components/support/DocumentationLink';
+import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
-import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import useHistory from 'routing/useHistory';
 
-type Props = {
-  params: {
-    definitionId: string,
-  },
-};
-
-const ViewEventDefinitionPage = ({ params }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+const ViewEventDefinitionPage = () => {
+  const params = useParams<{definitionId?: string}>();
+  const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = useState<{ title: string } | undefined>();
   const { all: notifications } = useStore(EventNotificationsStore);
+  const history = useHistory();
 
   useEffect(() => {
     if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`)) {
@@ -65,7 +61,7 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
 
       EventNotificationsActions.listAll();
     }
-  }, [currentUser, params]);
+  }, [currentUser, history, params]);
 
   if (!eventDefinition || !notifications) {
     return (
@@ -73,7 +69,6 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
         <span>
           <PageHeader title="View Event Definition">
             <Spinner text="Loading Event Definition..." />
-            <></>
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -82,41 +77,35 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
-      <span>
-        <PageHeader title={`View "${eventDefinition.title}" Event Definition`}>
-          <span>
-            Event Definitions allow you to create Events from different Conditions and alert on them.
-          </span>
+      <EventsPageNavigation />
+      <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
+                  actions={(
+                    <ButtonToolbar>
+                      <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
+                        <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
+                          <Button bsStyle="success">Edit Event Definition</Button>
+                        </LinkContainer>
+                      </IfPermitted>
+                    </ButtonToolbar>
+                  )}
+                  documentationLink={{
+                    title: 'Alerts documentation',
+                    path: DocsHelper.PAGES.ALERTS,
+                  }}>
+        <span>
+          Event Definitions allow you to create Events from different Conditions and alert on them.
+        </span>
+      </PageHeader>
 
-          <span>
-            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                               text="documentation" />
-          </span>
-
-          <ButtonToolbar>
-            <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info">Alerts & Events</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-              <Button bsStyle="info">Event Definitions</Button>
-            </LinkContainer>
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-              <Button bsStyle="info">Notifications</Button>
-            </LinkContainer>
-          </ButtonToolbar>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            <EventDefinitionSummary eventDefinition={eventDefinition}
-                                    currentUser={currentUser}
-                                    notifications={notifications} />
-          </Col>
-        </Row>
-      </span>
+      <Row className="content">
+        <Col md={12}>
+          <EventDefinitionSummary eventDefinition={eventDefinition}
+                                  currentUser={currentUser}
+                                  notifications={notifications} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };
 
-export default withParams(ViewEventDefinitionPage);
+export default ViewEventDefinitionPage;

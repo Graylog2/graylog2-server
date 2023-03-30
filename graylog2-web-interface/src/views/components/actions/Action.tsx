@@ -17,11 +17,10 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 
-import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ActionHandlerArguments, ActionComponents } from 'views/components/actions/ActionHandler';
+import OverlayDropdown from 'components/common/OverlayDropdown';
 
 import ActionDropdown from './ActionDropdown';
-
-import OverlayDropdown from '../OverlayDropdown';
 
 type Props = {
   children: React.ReactNode,
@@ -33,16 +32,16 @@ type Props = {
 
 const Action = ({ type, handlerArgs, menuContainer, element: Element, children }: Props) => {
   const [open, setOpen] = useState(false);
-  const [overflowingComponents, setOverflowingComponents] = useState({});
+  const [overflowingComponents, setOverflowingComponents] = useState<ActionComponents>({});
 
   const _onMenuToggle = useCallback(() => setOpen(!open), [open]);
   const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
-  const element = <Element active={open} />;
+  const element = <><Element active={open} /><span className="caret" /></>;
 
   return (
     <>
       <OverlayDropdown show={open}
-                       toggle={element}
+                       toggleChild={element}
                        placement="right"
                        onToggle={_onMenuToggle}
                        menuContainer={menuContainer}>

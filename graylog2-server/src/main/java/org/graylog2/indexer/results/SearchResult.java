@@ -31,32 +31,39 @@ public class SearchResult extends IndexQueryResult {
 	private final List<ResultMessage> results;
 	private final Set<String> fields;
     private final Set<IndexRange> usedIndices;
+    private final long tookMs;
 
 	public SearchResult(List<ResultMessage> hits, long totalResults, Set<IndexRange> usedIndices, String originalQuery, String builtQuery, long tookMs) {
-	    super(originalQuery, builtQuery, tookMs);
-	    this.results = hits;
+        super(originalQuery, builtQuery);
+        this.results = hits;
         this.fields = extractFields(hits);
         this.totalResults = totalResults;
         this.usedIndices = usedIndices;
+        this.tookMs = tookMs;
     }
 
     private SearchResult(String query, String originalQuery) {
-        super(query, originalQuery, 0);
+        super(query, originalQuery);
         this.results = Collections.emptyList();
         this.fields = Collections.emptySet();
         this.usedIndices = Collections.emptySet();
         this.totalResults = 0;
+        this.tookMs = 0;
+    }
+
+    public long tookMs() {
+        return tookMs;
     }
 
     public long getTotalResults() {
-		return totalResults;
-	}
+        return totalResults;
+    }
 
-	public List<ResultMessage> getResults() {
-		return results;
-	}
+    public List<ResultMessage> getResults() {
+        return results;
+    }
 
-	public Set<String> getFields() {
+    public Set<String> getFields() {
 		return fields;
 	}
 

@@ -20,6 +20,10 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 public class JobSchedulerSystemClock implements JobSchedulerClock {
@@ -37,8 +41,24 @@ public class JobSchedulerSystemClock implements JobSchedulerClock {
      * {@inheritDoc}
      */
     @Override
+    public Instant instantNow() {
+        return now(ZoneOffset.UTC).toInstant();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public DateTime now(DateTimeZone zone) {
         return DateTime.now(zone);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ZonedDateTime now(ZoneId zone) {
+        return ZonedDateTime.now(zone);
     }
 
     /**

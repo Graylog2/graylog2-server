@@ -15,68 +15,100 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
 
-import mockAction from 'helpers/mocking/MockAction';
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import { DashboardsActions } from 'views/stores/DashboardsStore';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import { asMock } from 'helpers/mocking';
 
 import CopyToDashboardForm from './CopyToDashboardForm';
 
+const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
+  .search(Search.create())
+  .build();
+const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
+  .search(Search.create())
+  .build();
+const dashboardList = [view1, view2];
+
+jest.mock('views/components/dashboard/hooks/useDashboards');
+
 describe('CopyToDashboardForm', () => {
   beforeEach(() => {
-    DashboardsActions.search = mockAction(jest.fn(async () => ({
-      pagination: {
-        total: 0,
-        page: 1,
-        perPage: 10,
-        count: 0,
+    jest.clearAllMocks();
+
+    asMock(useDashboards).mockReturnValue({
+      data: {
+        list: dashboardList,
+        pagination: { total: 2 },
+        attributes: [
+          {
+            id: 'title',
+            title: 'Title',
+            sortable: true,
+          },
+          {
+            id: 'description',
+            title: 'Description',
+            sortable: true,
+          },
+        ],
       },
-      list: [],
-    })));
+      isInitialLoading: false,
+      refetch: () => {},
+    });
   });
 
-  const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
-    .search(Search.create())
-    .build();
-  const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
-    .search(Search.create())
-    .build();
-  const dashboardList = [view1, view2];
-  const dashboardState: DashboardsStoreState = {
-    list: dashboardList,
-    pagination: {
-      total: 2,
-      page: 1,
-      perPage: 10,
-      count: 2,
-    },
+  const SUT = (props: Partial<React.ComponentProps<typeof CopyToDashboardForm>>) => (
+    <CopyToDashboardForm onCancel={() => {}}
+                         onSubmit={() => Promise.resolve()}
+                         submitButtonText="Submit"
+                         submitLoadingText="Submitting..."
+                         {...props} />
+  );
+
+  const submitModal = () => {
+    const submitButton = screen.getByRole('button', { name: /submit/i, hidden: true });
+    fireEvent.click(submitButton);
   };
 
   it('should render the modal minimal', () => {
-    // @ts-ignore
-    const { baseElement } = render(<CopyToDashboardForm />);
+    asMock(useDashboards).mockReturnValue({
+      data: {
+        list: [],
+        pagination: { total: 0 },
+        attributes: [
+          {
+            id: 'title',
+            title: 'Title',
+            sortable: true,
+          },
+          {
+            id: 'description',
+            title: 'Description',
+            sortable: true,
+          },
+        ],
+      },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+
+    const { baseElement } = render(<SUT />);
 
     expect(baseElement).not.toBeNull();
   });
 
   it('should render the modal with entries', () => {
-    const { baseElement } = render(<CopyToDashboardForm dashboards={dashboardState}
-                                                        widgetId="widget-id"
-                                                        onCancel={() => {}}
-                                                        onSubmit={() => {}} />);
+    const { baseElement } = render(<SUT />);
 
     expect(baseElement).not.toBeNull();
   });
 
   it('should handle onCancel', () => {
     const onCancel = jest.fn();
-    const { getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
-                                                      widgetId="widget-id"
-                                                      onCancel={onCancel}
-                                                      onSubmit={() => {}} />);
+    const { getByText } = render(<SUT onCancel={onCancel} />);
     const cancelButton = getByText('Cancel');
 
     fireEvent.click(cancelButton);
@@ -85,52 +117,46 @@ describe('CopyToDashboardForm', () => {
   });
 
   it('should not handle onSubmit without selection', () => {
-    const onSubmit = jest.fn();
-    const { getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
-                                                      widgetId="widget-id"
-                                                      onCancel={() => {}}
-                                                      onSubmit={onSubmit} />);
-    const submitButton = getByText('Select');
+    const onSubmit = jest.fn(() => Promise.resolve());
 
-    fireEvent.click(submitButton);
+    render(<SUT />);
+
+    submitModal();
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('should handle onSubmit with a previous selection', () => {
-    const onSubmit = jest.fn();
-    const { getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
-                                                      widgetId="widget-id"
-                                                      onCancel={() => {}}
-                                                      onSubmit={onSubmit} />);
+  it('should handle onSubmit with a previous selection', async () => {
+    const onSubmit = jest.fn(() => Promise.resolve());
+    const { getByText } = render(<SUT onSubmit={onSubmit} />);
     const firstView = getByText('view 1');
 
     fireEvent.click(firstView);
-    const submitButton = getByText('Select');
+    submitModal();
 
-    fireEvent.click(submitButton);
+    await screen.findByRole('button', { name: /submit/i, hidden: true });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit).toHaveBeenCalledWith('widget-id', 'view-1');
+    expect(onSubmit).toHaveBeenCalledWith('view-1');
   });
 
-  it('should query for all dashboards & specific dashboards', () => {
-    const { getByPlaceholderText, getByText } = render(
-      <CopyToDashboardForm dashboards={dashboardState}
-                           widgetId="widget-id"
-                           onCancel={() => {}}
-                           onSubmit={() => {}} />,
-    );
+  it('should query for all dashboards & specific dashboards', async () => {
+    render(<SUT />);
 
-    expect(DashboardsActions.search).toHaveBeenCalledTimes(1);
+    expect(useDashboards).toHaveBeenCalledTimes(1);
 
-    const searchInput = getByPlaceholderText('Enter search query...');
+    const searchInput = screen.getByPlaceholderText('Enter search query...');
 
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
-    const searchButton = getByText('Search');
 
-    fireEvent.click(searchButton);
-
-    expect(DashboardsActions.search).toHaveBeenCalledWith('view 1', 1, 5);
+    await waitFor(() => expect(useDashboards).toHaveBeenCalledWith({
+      query: 'view 1',
+      page: 1,
+      pageSize: 5,
+      sort: {
+        attributeId: 'title',
+        direction: 'asc',
+      },
+    }));
   });
 });

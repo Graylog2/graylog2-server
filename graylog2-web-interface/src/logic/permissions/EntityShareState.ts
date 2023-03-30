@@ -24,7 +24,7 @@ import type {
   ActiveShareType,
   GRN,
 } from 'logic/permissions/types';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 import Capability from './Capability';
 import Grantee from './Grantee';
@@ -160,7 +160,6 @@ export default class EntityShareState {
     return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities, this._value.activeShares);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const {
       entity,

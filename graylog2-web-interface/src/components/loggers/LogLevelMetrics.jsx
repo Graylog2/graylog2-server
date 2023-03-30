@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
 import numeral from 'numeral';
 
 import { Col } from 'components/bootstrap';
@@ -72,7 +72,7 @@ const LogLevelMetrics = createReactClass({
     return (
       <div className="loglevel-metrics-row">
         <Col md={4}>
-          <h3 className="u-light">Level: {lodash.capitalize(loglevel)}</h3>
+          <h3 className="u-light">Level: {capitalize(loglevel)}</h3>
           {metricsDetails}
         </Col>
       </div>

@@ -26,6 +26,8 @@ import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 @AutoValue
 @JsonAutoDetect
@@ -41,6 +43,11 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
     @JsonCreator
     public static ElasticsearchQueryString of(final String query) {
         return new AutoValue_ElasticsearchQueryString(NAME, query);
+    }
+
+    @NotNull
+    public static ElasticsearchQueryString ofNullable(@Nullable final String query) {
+        return Optional.ofNullable(query).map(ElasticsearchQueryString::of).orElseGet(ElasticsearchQueryString::empty);
     }
 
     @JsonCreator
@@ -66,15 +73,11 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
         final String thisQueryString = Strings.nullToEmpty(this.queryString()).trim();
         final String otherQueryString = Strings.nullToEmpty(other.queryString()).trim();
 
-        final StringBuilder finalStringBuilder = new StringBuilder(thisQueryString);
         if (!thisQueryString.isEmpty() && !otherQueryString.isEmpty()) {
-            finalStringBuilder.append(" AND ");
-        }
-        if (!otherQueryString.isEmpty()) {
-            finalStringBuilder.append(otherQueryString);
+            return ElasticsearchQueryString.of("(" + thisQueryString + ") AND (" + otherQueryString + ")");
         }
 
-        return new AutoValue_ElasticsearchQueryString(NAME, finalStringBuilder.toString());
+        return this.queryString().isEmpty() ? other : this;
     }
 
     @Override

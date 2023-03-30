@@ -196,8 +196,7 @@ public class UnboundLDAPConnector {
         final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
                 .add("userPrincipalName") // TODO: This is ActiveDirectory specific - Do we need this here?
                 .add("userAccountControl")
-                .add("mail")
-                .add("rfc822Mailbox")
+                .addAll(config.emailAttributes())
                 .add(config.userUniqueIdAttribute())
                 .add(config.userNameAttribute())
                 .add(config.userFullNameAttribute())
@@ -288,12 +287,16 @@ public class UnboundLDAPConnector {
 
     public LDAPUser createLDAPUser(UnboundLDAPConfig config, LDAPEntry ldapEntry) {
         final String username = ldapEntry.nonBlankAttribute(config.userNameAttribute());
+        final String emailValue = config.emailAttributes().stream()
+                .filter(attr -> ldapEntry.firstAttributeValue(attr).isPresent())
+                .map(attr -> ldapEntry.nonBlankAttribute(attr))
+                .findFirst().orElse("unknown@unknown.invalid");
         return LDAPUser.builder()
                 .base64UniqueId(ldapEntry.base64UniqueId())
                 .accountIsEnabled(findAccountIsEnabled(ldapEntry))
                 .username(username)
                 .fullName(ldapEntry.firstAttributeValue(config.userFullNameAttribute()).orElse(username))
-                .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("unknown@unknown.invalid")))
+                .email(emailValue)
                 .entry(ldapEntry)
                 .build();
     }

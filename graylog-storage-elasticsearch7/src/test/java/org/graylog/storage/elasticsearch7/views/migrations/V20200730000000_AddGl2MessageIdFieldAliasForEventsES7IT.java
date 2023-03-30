@@ -26,6 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Mapp
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.elasticsearch;
     }
 
@@ -55,6 +56,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
     }
 
     @Test
+    @SkipDefaultIndexTemplate
     public void addsFieldAliasForMatchingIndices() {
         createIndicesWithIdMapping("aaa_0", "aaa_1", "bbb_0");
 
@@ -64,6 +66,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
     }
 
     @Test
+    @SkipDefaultIndexTemplate
     public void doesNotAddFieldAliasForNonMatchingIndices() {
         createIndicesWithIdMapping("aaa_0", "aaa_1", "bbb_0");
 
@@ -73,6 +76,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
     }
 
     @Test
+    @SkipDefaultIndexTemplate
     public void addingFieldAliasesIsIdempotent() {
         createIndicesWithIdMapping("aaa_0", "bbb_0");
 

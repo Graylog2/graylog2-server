@@ -64,6 +64,9 @@ public abstract class ValidationRequestDTO {
     @JsonProperty
     public abstract ImmutableMap<String, Parameter.Binding> parameterBindings();
 
+    @JsonProperty
+    public abstract ValidationModeDTO validationMode();
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -95,11 +98,15 @@ public abstract class ValidationRequestDTO {
             return this;
         }
 
+        @JsonProperty
+        public abstract Builder validationMode(ValidationModeDTO mode);
+
         public abstract ValidationRequestDTO build();
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_ValidationRequestDTO.Builder();
+            return new AutoValue_ValidationRequestDTO.Builder()
+                    .validationMode(ValidationModeDTO.QUERY);
         }
     }
 }

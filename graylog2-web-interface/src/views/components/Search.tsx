@@ -16,19 +16,14 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useContext, useMemo } from 'react';
-import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
-import connect, { useStore } from 'stores/connect';
+import { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
-import { SearchStore, SearchActions } from 'views/stores/SearchStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -37,11 +32,9 @@ import QueryBar from 'views/components/QueryBar';
 import { FieldsOverview } from 'views/components/sidebar';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
-import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import IfSearch from 'views/components/search/IfSearch';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
@@ -50,10 +43,14 @@ import HighlightingRulesProvider from 'views/components/contexts/HighlightingRul
 import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { RefluxActions } from 'stores/StoreTypes';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
+import useView from 'views/hooks/useView';
+import useAppDispatch from 'stores/useAppDispatch';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import useAppSelector from 'stores/useAppSelector';
+import { RefreshActions } from 'views/stores/RefreshStore';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -64,9 +61,9 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : css`
+` : css`
     flex: 1;
-  `;
+`;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
@@ -84,31 +81,19 @@ const SearchArea = styled(PageContentLayout)(() => {
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
     `}
-  `;
+`;
 });
 
-const ConnectedSidebar = connect(
-  Sidebar,
-  { viewMetadata: ViewMetadataStore, searches: SearchStore },
-  ({ viewMetadata, searches }) => ({
-    viewMetadata,
-    queryId: viewMetadata.activeQuery,
-    results: searches?.result?.forId(viewMetadata.activeQuery),
-  }),
-);
+const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results'>) => {
+  const results = useAppSelector(selectCurrentQueryResults);
 
-const _refreshSearch = (executionState: SearchExecutionState) => {
-  const { view } = ViewStore.getInitialState();
-
-  return SearchMetadataActions.parseSearch(view.search).then(() => {
-    return SearchActions.execute(executionState).then(() => {});
-  });
+  return <Sidebar results={results} {...props} />;
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const { view } = useStore(ViewStore);
+  const view = useView();
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const contextValue = useMemo(() => ({
     view,
     analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
@@ -124,26 +109,26 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
-  useEffect(() => {
-    let storeListenersUnsubscribes = Immutable.List<() => void>();
-
-    refresh().finally(() => {
-      storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(refresh))
-        .push(ViewActions.search.completed.listen(refresh));
-    });
-
-    // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
-  }, [refresh]);
+const useAutoRefresh = (refresh: () => Promise<unknown>) => {
+  useEffect(() => RefreshActions.refresh.listen(() => {
+    RefreshActions.refresh.promise(refresh());
+  }), [refresh]);
 };
 
-const Search = () => {
-  const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState()), []);
+type Props = {
+  InfoBarSlot?: React.ComponentType,
+}
+
+const Search = ({ InfoBarSlot }: Props) => {
+  const dispatch = useAppDispatch();
+  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
-  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);
+  useEffect(() => {
+    refreshSearch();
+  }, [refreshSearch]);
+
+  useAutoRefresh(refreshSearch);
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -162,7 +147,7 @@ const Search = () => {
               editing: false,
             },
           }) => (
-            <CurrentViewTypeProvider>
+            <>
               <IfInteractive>
                 <IfDashboard>
                   <WindowLeaveMessage />
@@ -185,6 +170,7 @@ const Search = () => {
                             <SearchArea>
                               <IfInteractive>
                                 <HeaderElements />
+                                {InfoBarSlot && <InfoBarSlot />}
                                 <IfDashboard>
                                   {!editingWidget && <DashboardSearchBar />}
                                 </IfDashboard>
@@ -209,12 +195,16 @@ const Search = () => {
                   </SearchPagePreferencesProvider>
                 )}
               </InteractiveContext.Consumer>
-            </CurrentViewTypeProvider>
+            </>
           )}
         </WidgetFocusContext.Consumer>
       </WidgetFocusProvider>
     </>
   );
+};
+
+Search.defaultProps = {
+  InfoBarSlot: undefined,
 };
 
 export default Search;

@@ -29,6 +29,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
+import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -40,8 +41,10 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -54,18 +57,19 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
-public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity> {
-    public static final String FIELD_ID = "id";
+public abstract class EventDefinitionDto extends ScopedEntity implements EventDefinition, ContentPackable<EventDefinitionEntity> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_NOTIFICATIONS = "notifications";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
-    private static final String FIELD_CONFIG = "config";
+    public static final String FIELD_CONFIG = "config";
     private static final String FIELD_FIELD_SPEC = "field_spec";
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
+    private static final String FIELD_SCHEDULERCTX = "scheduler";
+    private static final String UPDATED_AT = "updated_at";
 
     @Override
     @Id
@@ -81,6 +85,11 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @Override
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
+
+    @Override
+    @Nullable
+    @JsonProperty(UPDATED_AT)
+    public abstract DateTime updatedAt();
 
     @Override
     @JsonProperty(FIELD_PRIORITY)
@@ -113,6 +122,11 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @Override
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
+
+    @Override
+    @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
+    @Nullable
+    public abstract EventDefinitionContextService.SchedulerCtx schedulerCtx();
 
     public static Builder builder() {
         return Builder.create();
@@ -150,7 +164,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder extends ScopedEntity.AbstractBuilder<Builder>  {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionDto.Builder()
@@ -159,6 +173,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     .storage(ImmutableList.of());
         }
 
+        @Override
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)
@@ -169,6 +184,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
 
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
+
+        @JsonProperty(UPDATED_AT)
+        public abstract Builder updatedAt(DateTime updatedAt);
 
         @JsonProperty(FIELD_PRIORITY)
         public abstract Builder priority(int priority);
@@ -194,12 +212,19 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
 
+        @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
+        public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
             final EventDefinitionDto dto = autoBuild();
-            final PersistToStreamsStorageHandler.Config withDefaultEventsStream = PersistToStreamsStorageHandler.Config.createWithDefaultEventsStream();
+            final PersistToStreamsStorageHandler.Config withSystemEventsStream = PersistToStreamsStorageHandler.Config.createWithSystemEventsStream();
+            if (dto.storage().stream().anyMatch(withSystemEventsStream::equals)) {
+                return dto;
+            }
 
+            final PersistToStreamsStorageHandler.Config withDefaultEventsStream = PersistToStreamsStorageHandler.Config.createWithDefaultEventsStream();
             if (dto.storage().stream().noneMatch(withDefaultEventsStream::equals)) {
                 final List<EventStorageHandler.Config> handlersWithoutPersistToStreams = dto.storage().stream()
                         // We don't allow custom persist-to-streams handlers at the moment
@@ -207,7 +232,6 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                         .collect(Collectors.toList());
 
                 return dto.toBuilder()
-                        // Right now we always want to persist events into the default events stream
                         .storage(ImmutableList.<EventStorageHandler.Config>builder()
                                 .addAll(handlersWithoutPersistToStreams)
                                 .add(withDefaultEventsStream)
@@ -219,26 +243,29 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         }
     }
 
+    @Override
     public EventDefinitionEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final EventProcessorConfig config = config();
         final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity(entityDescriptorIds);
         final ImmutableList<EventNotificationHandlerConfigEntity> notificationList = ImmutableList.copyOf(
-            notifications().stream()
-                .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
-                .collect(Collectors.toList()));
+                notifications().stream()
+                        .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
+                        .collect(Collectors.toList()));
 
         return EventDefinitionEntity.builder()
-            .title(ValueReference.of(title()))
-            .description(ValueReference.of(description()))
-            .priority(ValueReference.of(priority()))
-            .alert(ValueReference.of(alert()))
-            .config(eventProcessorConfigEntity)
-            .notifications(notificationList)
-            .notificationSettings(notificationSettings())
-            .fieldSpec(fieldSpec())
-            .keySpec(keySpec())
-            .storage(storage())
-            .build();
+                .scope(ValueReference.of(scope()))
+                .updatedAt(updatedAt())
+                .title(ValueReference.of(title()))
+                .description(ValueReference.of(description()))
+                .priority(ValueReference.of(priority()))
+                .alert(ValueReference.of(alert()))
+                .config(eventProcessorConfigEntity)
+                .notifications(notificationList)
+                .notificationSettings(notificationSettings())
+                .fieldSpec(fieldSpec())
+                .keySpec(keySpec())
+                .storage(storage())
+                .build();
     }
 
     @Override

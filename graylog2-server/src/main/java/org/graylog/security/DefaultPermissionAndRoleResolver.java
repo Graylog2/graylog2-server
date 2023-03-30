@@ -62,7 +62,7 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
         }
     }
 
-    protected Set<GRN> resolveGrantees(GRN principal) {
+    public Set<GRN> resolveGrantees(GRN principal) {
         return Collections.singleton(principal);
     }
 

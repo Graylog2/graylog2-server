@@ -27,36 +27,42 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class IndexLookup {
     private final IndexRangeService indexRangeService;
     private final StreamService streamService;
-
-    //this is only here for mocking purposes
-    BiFunction<IndexRange, Set<Stream>, Boolean> indexRangeContainsOneOfStreams = this::indexRangeContainsOneOfStreams;
+    private final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams;
 
     @Inject
-    public IndexLookup(IndexRangeService indexRangeService, StreamService streamService) {
+    public IndexLookup(final IndexRangeService indexRangeService,
+                       final StreamService streamService) {
         this.indexRangeService = indexRangeService;
         this.streamService = streamService;
+        this.indexRangeContainsOneOfStreams = new IndexRangeContainsOneOfStreams();
     }
 
-    public Set<String> indexNamesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
-        if (streamIds.isEmpty())
-            return Collections.emptySet();
+    IndexLookup(final IndexRangeService indexRangeService,
+                final StreamService streamService,
+                final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams) {
+        this.indexRangeService = indexRangeService;
+        this.streamService = streamService;
+        this.indexRangeContainsOneOfStreams = indexRangeContainsOneOfStreams;
+    }
 
-        Set<Stream> usedStreams = streamService.loadByIds(streamIds);
-        SortedSet<IndexRange> candidateIndices = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
+    public Set<String> indexNamesForStreamsInTimeRange(final Set<String> streamIds,
+                                                       final TimeRange timeRange) {
+        if (streamIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        final Set<Stream> usedStreams = streamService.loadByIds(streamIds);
+        final SortedSet<IndexRange> candidateIndices = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
 
         return candidateIndices.stream()
-                .filter(i -> indexRangeContainsOneOfStreams.apply(i, usedStreams))
+                .filter(i -> indexRangeContainsOneOfStreams.test(i, usedStreams))
                 .map(IndexRange::indexName)
                 .collect(Collectors.toSet());
     }
 
-    private boolean indexRangeContainsOneOfStreams(IndexRange indexRange, Set<Stream> streams) {
-        return new IndexRangeContainsOneOfStreams(streams).test(indexRange);
-    }
 }

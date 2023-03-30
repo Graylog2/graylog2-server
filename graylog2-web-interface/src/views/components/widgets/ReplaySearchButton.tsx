@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import styled from 'styled-components';
 
-import { IconButton } from 'components/common';
+import { IconButton, Icon } from 'components/common';
 import SearchLink from 'components/search/SearchLink';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
-import DrilldownContext from '../contexts/DrilldownContext';
-
 const NeutralLink = styled.a`
+  display: inline-flex;
+  align-items: center;
   color: inherit;
   text-decoration: none;
 
@@ -33,22 +33,51 @@ const NeutralLink = styled.a`
   }
 `;
 
-const buildSearchLink = (timerange, query, streams) => SearchLink.builder()
-  .query(createElasticsearchQueryString(query))
+const StyledIcon = styled(Icon)`
+  margin-left: 6px;
+`;
+
+const buildSearchLink = (
+  timerange: TimeRange,
+  queryString: string,
+  streams: Array<string>,
+) => SearchLink.builder()
+  .query(createElasticsearchQueryString(queryString))
   .timerange(timerange)
   .streams(streams)
   .build()
   .toURL();
 
-const ReplaySearchButton = () => {
-  const { query, timerange, streams } = useContext(DrilldownContext);
-  const searchLink = buildSearchLink(timerange, query.query_string, streams);
+type Props = {
+  queryString?: string | undefined,
+  timerange?: TimeRange | undefined,
+  streams?: string[] | undefined,
+  children?: React.ReactNode,
+};
 
-  return (
-    <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
-      <IconButton name="play" focusable={false} />
-    </NeutralLink>
-  );
+export const ReplaySearchButtonComponent = ({ searchLink, children }: { children?: React.ReactNode, searchLink: string }) => (
+  <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
+    {children
+      ? <>{children} <StyledIcon name="play" /></>
+      : <IconButton name="play" focusable={false} />}
+  </NeutralLink>
+);
+
+const ReplaySearchButton = ({ queryString, timerange, streams, children }: Props) => {
+  const searchLink = buildSearchLink(timerange, queryString, streams);
+
+  return <ReplaySearchButtonComponent searchLink={searchLink}>{children}</ReplaySearchButtonComponent>;
+};
+
+ReplaySearchButton.defaultProps = {
+  queryString: undefined,
+  timerange: undefined,
+  streams: undefined,
+  children: undefined,
+};
+
+ReplaySearchButtonComponent.defaultProps = {
+  children: undefined,
 };
 
 export default ReplaySearchButton;

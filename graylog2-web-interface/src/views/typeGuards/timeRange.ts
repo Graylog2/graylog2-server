@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import type {
   TimeRange,

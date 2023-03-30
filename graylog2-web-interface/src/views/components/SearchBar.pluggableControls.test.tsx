@@ -21,37 +21,24 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
-import { SearchActions } from 'views/stores/SearchStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormikInput from 'components/common/FormikInput';
 import Query from 'views/logic/queries/Query';
+import viewsReducers from 'views/viewsReducers';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { createSearch } from 'fixtures/searches';
+import View from 'views/logic/views/View';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
-import SearchBar from './SearchBar';
-
-const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
+import OriginalSearchBar from './SearchBar';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
 
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({ search: { parameters: [] } })],
-  ),
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(
-    ['get', () => mockCurrentUser],
-    ['getInitialState', () => mockCurrentUser],
-  ),
-}));
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   ['listStreams', () => ({ then: jest.fn() })],
@@ -65,7 +52,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => (
+jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
   <div>Saved Search Controls</div>
 )));
 
@@ -75,16 +62,27 @@ const mockCurrentQuery = Query.builder()
   .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
   .build();
 
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => mockCurrentQuery]),
-}));
-
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
   status: 'OK',
   explanations: [],
 })));
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+
+const SearchBar = () => {
+  const view = createSearch();
+  const { search } = view;
+  const viewWithQuery = createSearch()
+    .toBuilder()
+    .search(search.toBuilder().queries([mockCurrentQuery]).build())
+    .build();
+
+  return (
+    <TestStoreProvider view={viewWithQuery} initialQuery={mockCurrentQuery.id}>
+      <OriginalSearchBar />
+    </TestStoreProvider>
+  );
+};
 
 describe('SearchBar pluggable controls', () => {
   const PluggableSearchBarControl = () => {
@@ -95,7 +93,7 @@ describe('SearchBar pluggable controls', () => {
     );
   };
 
-  const mockOnSubmitFromPlugin = jest.fn((_values, _entity) => Promise.resolve(_entity));
+  const mockOnSubmitFromPlugin = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -126,11 +124,11 @@ describe('SearchBar pluggable controls', () => {
           placement: 'right',
         }),
       ],
+      'views.reducers': viewsReducers,
     }));
   });
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
   });
 
@@ -161,6 +159,7 @@ describe('SearchBar pluggable controls', () => {
         streams: [],
         timerange: { from: 300, type: 'relative' },
       },
+      expect.any(Function),
       mockCurrentQuery,
     ));
   }, testTimeout);
@@ -175,6 +174,10 @@ describe('SearchBar pluggable controls', () => {
         streams: [],
         timerange: { from: 300, type: 'relative' },
       },
+      {
+        view: expect.objectContaining({ type: View.Type.Dashboard }),
+        executionState: SearchExecutionState.empty(),
+      },
     ));
   });
 
@@ -186,6 +189,6 @@ describe('SearchBar pluggable controls', () => {
       queryString: '*',
       streams: [],
       timeRange: { from: 300, type: 'relative' },
-    }));
+    }, 'Europe/Berlin'));
   });
 });

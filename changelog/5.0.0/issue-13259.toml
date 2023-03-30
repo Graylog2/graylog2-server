@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Do not toggle message details in message table widget, when selecting text."
+
+issues = ["13259"]
+pulls = ["13263"]

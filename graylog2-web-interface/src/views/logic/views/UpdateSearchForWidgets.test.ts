@@ -14,21 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import * as Immutable from 'immutable';
 
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 
 import Parameter from '../parameters/Parameter';
 import ValueParameter from '../parameters/ValueParameter';
-
-const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
@@ -47,6 +42,7 @@ jest.mock('../SearchType', () => jest.fn(() => ({
 })));
 
 const searchView = () => {
+  const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
   const viewFixture = View.fromJSON(readFixture('./UpdateSearchForWidgets.View.fixture.json'));
   const searchFixture = Search.fromJSON(readFixture('./UpdateSearchForWidgets.Search.fixture.json'));
 

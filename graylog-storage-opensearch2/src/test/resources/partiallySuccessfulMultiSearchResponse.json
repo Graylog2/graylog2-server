@@ -1,0 +1,59 @@
+{
+  "responses": [
+    {
+      "took": 43,
+      "timed_out": false,
+      "_shards": {
+        "total": 104,
+        "successful": 92,
+        "skipped": 92,
+        "failed": 12,
+        "failures": [
+          {
+            "shard": 0,
+            "index": "graylog2_31",
+            "node": "OUf4rbYVRsmUxNE-9r5Jbw",
+            "reason": {
+              "type": "illegal_argument_exception",
+              "reason": "Expected numeric type on field [field1], but got [keyword]"
+            }
+          }
+        ]
+      },
+      "hits": {
+        "total": 2499,
+        "max_score": 0,
+        "hits": []
+      },
+      "status": 200
+    },
+    {
+      "took": 40,
+      "timed_out": false,
+      "_shards": {
+        "total": 104,
+        "successful": 104,
+        "skipped": 92,
+        "failed": 0
+      },
+      "hits": {
+        "total": 2499,
+        "max_score": 0,
+        "hits": []
+      },
+      "aggregations": {
+        "max#pivot2-series-max(field2)": {
+          "value": 42
+        },
+        "max#timestamp-max": {
+          "value": null
+        },
+        "min#timestamp-min": {
+          "value": null
+        }
+      },
+      "status": 200
+    }
+  ],
+  "took": 40
+}

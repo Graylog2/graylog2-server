@@ -50,6 +50,7 @@ public class JobTriggerUpdatesTest {
     public void scheduleNextExecution() {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder().interval(31).unit(TimeUnit.SECONDS).build())
                 .build();
 
@@ -62,6 +63,7 @@ public class JobTriggerUpdatesTest {
     public void scheduleNextExecutionWithData() {
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
                 .schedule(IntervalJobSchedule.builder().interval(5).unit(TimeUnit.MINUTES).build())
                 .build();
 

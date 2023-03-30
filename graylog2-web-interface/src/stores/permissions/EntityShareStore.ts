@@ -50,7 +50,7 @@ const formatPaginatedSharesResponse = ({
   query,
   total,
 }) => ({
-  list: Immutable.List(entities.map((se) => SharedEntity.fromJSON(se))),
+  list: Immutable.List<SharedEntity>(entities.map((se) => SharedEntity.fromJSON(se))),
   context: {
     granteeCapabilities: context.grantee_capabilities,
   },

@@ -17,6 +17,7 @@
 export type PromiseProvider = (...args: any[]) => Promise<any>;
 type ExtractResultType<R extends PromiseProvider> = ExtractTypeFromPromise<ReturnType<R>>;
 type ExtractTypeFromPromise<P> = P extends Promise<infer R> ? R : P;
+type SyncAction = (...args: any[]) => void;
 
 export type ListenableAction<R extends PromiseProvider> = R & {
   triggerPromise: R;
@@ -28,7 +29,12 @@ export type ListenableAction<R extends PromiseProvider> = R & {
   promise: (promise: ReturnType<R>) => void;
 };
 
+export type SyncListenableAction<R extends SyncAction> = R & {
+  listen: (cb: () => any) => () => void;
+};
+
 export type RefluxActions<A extends { [key: string]: PromiseProvider }> = { [P in keyof A]: ListenableAction<A[P]> };
+export type SyncRefluxActions<A extends { [key: string]: SyncAction }> = { [P in keyof A]: SyncListenableAction<A[P]> };
 
 export type Store<State> = {
   listen: (cb: (state: State) => unknown) => () => void;

@@ -25,7 +25,7 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonTypeName(BarVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = BarVisualizationConfigDTO.Builder.class)
-public abstract class BarVisualizationConfigDTO implements VisualizationConfigDTO {
+public abstract class BarVisualizationConfigDTO implements VisualizationConfigDTO, XYVisualizationConfig {
     public static final String NAME = "bar";
     private static final String FIELD_BAR_MODE = "barmode";
 
@@ -39,17 +39,24 @@ public abstract class BarVisualizationConfigDTO implements VisualizationConfigDT
     @JsonProperty
     public abstract BarMode barmode();
 
+    @JsonProperty(FIELD_AXIS_TYPE)
+    public abstract AxisType axisType();
+
     @AutoValue.Builder
     public abstract static class Builder {
 
         @JsonProperty(FIELD_BAR_MODE)
         public abstract Builder barmode(BarMode barMode);
 
+        @JsonProperty(FIELD_AXIS_TYPE)
+        public abstract Builder axisType(AxisType axisType);
+
         public abstract BarVisualizationConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_BarVisualizationConfigDTO.Builder();
+            return new AutoValue_BarVisualizationConfigDTO.Builder()
+                    .axisType(DEFAULT_AXIS_TYPE);
         }
     }
 }

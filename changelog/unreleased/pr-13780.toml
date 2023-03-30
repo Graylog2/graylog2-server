@@ -1,0 +1,4 @@
+type = "changed"
+message = "Refreshed and modernized look of login dialog."
+
+pulls = ["13780"]

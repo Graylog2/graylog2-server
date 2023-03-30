@@ -18,7 +18,6 @@ import React from 'react';
 import { screen, render, act } from 'wrappedTestingLibrary';
 
 import { adminUser, bob } from 'fixtures/users';
-import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import UserEdit from './UserEdit';
 
@@ -34,18 +33,13 @@ describe('<UserEdit />', () => {
     jest.clearAllMocks();
   });
 
-  const currentUser = adminUser.toBuilder()
+  const user = adminUser.toBuilder()
     .readOnly(false)
     .external(false)
     .build();
-  const SimpleUserEdit = (props) => (
-    <CurrentUserContext.Provider value={currentUser}>
-      <UserEdit {...props} />
-    </CurrentUserContext.Provider>
-  );
 
   it('should display loading indicator, if no user is provided', async () => {
-    render(<SimpleUserEdit user={undefined} />);
+    render(<UserEdit user={undefined} />);
 
     act(() => {
       jest.advanceTimersByTime(200);
@@ -55,18 +49,18 @@ describe('<UserEdit />', () => {
   });
 
   it('should not allow editing a readOnly user', () => {
-    const readOnlyUser = currentUser.toBuilder()
+    const readOnlyUser = user.toBuilder()
       .readOnly(true)
       .fullName('Full name')
       .build();
-    render(<SimpleUserEdit user={readOnlyUser} />);
+    render(<UserEdit user={readOnlyUser} />);
 
     expect(screen.getByText(`The selected user ${readOnlyUser.fullName} can't be edited.`)).toBeInTheDocument();
     expect(screen.queryByText('Profile')).not.toBeInTheDocument();
   });
 
   it('should display profile, settings and password section', () => {
-    render(<SimpleUserEdit user={currentUser} />);
+    render(<UserEdit user={user} />);
 
     expect(screen.getByText('ProfileSection')).toBeInTheDocument();
     expect(screen.getByText('SettingsSection')).toBeInTheDocument();
@@ -76,7 +70,7 @@ describe('<UserEdit />', () => {
 
   describe('external user', () => {
     it('should not render profile section for external user', () => {
-      render(<SimpleUserEdit user={bob} />);
+      render(<UserEdit user={bob} />);
 
       expect(bob.external).toBeTruthy();
       expect(screen.queryByLabelText('Full Name')).not.toBeInTheDocument();

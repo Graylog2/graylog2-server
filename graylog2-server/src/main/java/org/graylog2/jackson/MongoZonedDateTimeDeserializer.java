@@ -26,13 +26,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Date;
+import java.util.Locale;
 
 public final class MongoZonedDateTimeDeserializer extends StdScalarDeserializer<ZonedDateTime> {
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
             .append(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
             .appendOffset("+HHmm", "Z")
-            .toFormatter();
+            .toFormatter(Locale.US);
 
     public MongoZonedDateTimeDeserializer() {
         super(ZonedDateTime.class);

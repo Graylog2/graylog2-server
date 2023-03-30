@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
@@ -24,6 +24,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
+import type FetchError from 'logic/errors/FetchError';
 
 export type RuleType = {
   id?: string,
@@ -75,7 +76,7 @@ type RulesActionsType = {
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
   updateMetricsConfig: () => Promise<unknown>,
-  listPaginated: (pagination: Pagination) => Promise<unknown>,
+  listPaginated: (pagination: Pagination) => Promise<PaginatedRules>,
 };
 
 export const RulesActions = singletonActions(
@@ -138,7 +139,7 @@ export const RulesStore = singletonStore(
     },
 
     list() {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Fetching rules failed with status: ${error.message}`,
           'Could not retrieve processing rules');
       };
@@ -164,12 +165,13 @@ export const RulesStore = singletonStore(
             perPage: response.per_page,
             query: response.query,
           },
-        }),
-        (error) => {
-          if (!error.additional || error.additional.status !== 404) {
-            UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
-          }
-        });
+        }));
+
+      promise.catch((error: FetchError) => {
+        if (!error.additional || error.additional.status !== 404) {
+          UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
+        }
+      });
 
       RulesActions.listPaginated.promise(promise);
 
@@ -177,7 +179,7 @@ export const RulesStore = singletonStore(
     },
 
     get(ruleId) {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Fetching rule "${ruleId}" failed with status: ${error.message}`,
           `Could not retrieve processing rule "${ruleId}"`);
       };
@@ -192,7 +194,7 @@ export const RulesStore = singletonStore(
     },
 
     save(ruleSource: RuleType) {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
           `Could not save processing rule "${ruleSource.title}"`);
       };
@@ -244,7 +246,7 @@ export const RulesStore = singletonStore(
       return promise;
     },
     delete(rule) {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Deleting rule "${rule.title}" failed with status: ${error.message}`,
           `Could not delete processing rule "${rule.title}"`);
       };

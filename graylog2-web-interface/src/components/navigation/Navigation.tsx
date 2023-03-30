@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginNavigationDropdownItem, PluginNavigation } from 'graylog-web-plugin';
+import type * as Immutable from 'immutable';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
 import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav, NavItem, NavDropdown } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 
@@ -58,34 +58,40 @@ function pluginMenuItemExists(description: string): boolean {
   return !!pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 }
 
-const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
-  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
-
-  if (permissions) {
-    return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
+const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatureFlag }: PluginNavigationDropdownItem, currentUserPermissions: Immutable.List<string>, topLevel = false) => {
+  if (permissions && !isPermitted(currentUserPermissions, permissions)) {
+    return null;
   }
 
-  return link;
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return null;
+  }
+
+  return <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
 };
 
-const formatPluginRoute = (pluginRoute, permissions, pathname) => {
+const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions: Immutable.List<string>, pathname: string) => {
+  if (pluginRoute.requiredFeatureFlag && !AppConfig.isFeatureEnabled(pluginRoute.requiredFeatureFlag)) {
+    return null;
+  }
+
   if (pluginRoute.children) {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
-    const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+    const isEmpty = !pluginRoute.children.some((child) => isPermitted(currentUserPermissions, child.permissions) && (child.requiredFeatureFlag ? AppConfig.isFeatureEnabled(child.requiredFeatureFlag) : true));
 
     if (isEmpty) {
       return null;
     }
 
     return (
-      <NavDropdown key={title} title={title} id="enterprise-dropdown">
-        {pluginRoute.children.map((child) => formatSinglePluginRoute(child, false))}
+      <NavDropdown key={title} title={title} id="enterprise-dropdown" inactiveTitle={pluginRoute.description}>
+        {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
     );
   }
 
-  return formatSinglePluginRoute(pluginRoute, true);
+  return formatSinglePluginRoute(pluginRoute, currentUserPermissions, true);
 };
 
 type Props = {
@@ -93,7 +99,7 @@ type Props = {
 };
 
 const Navigation = React.memo(({ pathname }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
@@ -121,14 +127,14 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
-    .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, pathname));
+    .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname));
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (
-    <StyledNavbar fluid fixedTop>
+    <StyledNavbar fluid fixedTop collapseOnSelect>
       <Navbar.Header>
         <Navbar.Brand>
-          <LinkContainer to={Routes.STARTPAGE}>
+          <LinkContainer relativeActive to={Routes.STARTPAGE}>
             <NavigationBrand />
           </LinkContainer>
         </Navbar.Brand>
@@ -136,22 +142,21 @@ const Navigation = React.memo(({ pathname }: Props) => {
         <DevelopmentHeaderBadge smallScreen />
         {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
       </Navbar.Header>
-
       <Navbar.Collapse>
-        <Nav navbar>
-          <LinkContainer to={Routes.SEARCH}>
+        <Nav className="navbar-main">
+          <LinkContainer relativeActive to={Routes.SEARCH}>
             <NavItem to="search">Search</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.STREAMS}>
+          <LinkContainer relativeActive to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.ALERTS.LIST}>
+          <LinkContainer relativeActive to={Routes.ALERTS.LIST}>
             <NavItem>Alerts</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.DASHBOARDS}>
+          <LinkContainer relativeActive to={Routes.DASHBOARDS}>
             <NavItem>Dashboards</NavItem>
           </LinkContainer>
 
@@ -162,7 +167,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
         <NotificationBadge />
 
-        <Nav navbar pullRight className="header-meta-nav">
+        <Nav pullRight className="header-meta-nav">
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (
@@ -178,7 +183,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <ScratchpadToggle />
 
-          <HelpMenu active={_isActive(pathname, Routes.GETTING_STARTED)} />
+          <HelpMenu active={_isActive(pathname, Routes.WELCOME)} />
 
           <UserMenu fullName={fullName} readOnly={readOnly} userId={userId} />
         </Nav>

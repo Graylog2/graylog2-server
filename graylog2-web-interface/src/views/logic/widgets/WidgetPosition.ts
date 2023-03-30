@@ -16,6 +16,8 @@
  */
 import { Map } from 'immutable';
 
+import { singleton } from 'logic/singleton';
+
 type State = {
   col: number,
   row: number,
@@ -30,7 +32,7 @@ export type WidgetPositionJSON = {
   width: number | 'Infinity',
 };
 
-export default class WidgetPosition {
+class WidgetPosition {
   _value: State;
 
   constructor(col: number, row: number, height: number, width: number) {
@@ -88,6 +90,14 @@ export default class WidgetPosition {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
+
+  equals(other: any) {
+    if (other instanceof WidgetPosition) {
+      return this.col === other.col && this.row === other.row && this.height === other.height && this.width === other.width;
+    }
+
+    return false;
+  }
 }
 
 class Builder {
@@ -127,3 +137,9 @@ class Builder {
     return new WidgetPosition(col, row, height, width);
   }
 }
+
+const SingletonWidgetPosition = singleton('views.logic.widgets.WidgetPosition', () => WidgetPosition);
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type SingletonWidgetPosition = InstanceType<typeof WidgetPosition>;
+
+export default SingletonWidgetPosition;

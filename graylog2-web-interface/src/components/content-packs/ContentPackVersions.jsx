@@ -19,7 +19,7 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { DataTable } from 'components/common';
+import { DataTable, ModalSubmit } from 'components/common';
 import { BootstrapModalWrapper, Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/bootstrap';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
@@ -44,7 +44,10 @@ class ContentPackVersions extends React.Component {
     super(props);
     const { contentPackRevisions } = this.props;
 
-    this.state = { selectedVersion: contentPackRevisions.latestRevision };
+    this.state = {
+      showModal: false,
+      selectedVersion: contentPackRevisions.latestRevision,
+    };
 
     this.onChange = this.onChange.bind(this);
     this.rowFormatter = this.rowFormatter.bind(this);
@@ -61,6 +64,7 @@ class ContentPackVersions extends React.Component {
     onChange(event.target.value);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   headerFormatter = (header) => {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
@@ -93,7 +97,7 @@ class ContentPackVersions extends React.Component {
         <td className="text-right">
           <ButtonToolbar className="pull-right">
             <Button bsStyle="success" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
-            <DropdownButton id={`action-${pack.rev}`} bsStyle="info" title="Actions" bsSize="small">
+            <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
               <MenuItem onClick={openFunc}>Install</MenuItem>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
                 <MenuItem>Create New From Revision</MenuItem>
@@ -110,26 +114,27 @@ class ContentPackVersions extends React.Component {
   }
 
   _installModal(item) {
-    let modalRef;
     let installRef;
 
     const { onInstall: onInstallProp } = this.props;
 
     const closeModal = () => {
-      modalRef.close();
+      this.setState({ showModal: false });
     };
 
     const open = () => {
-      modalRef.open();
+      this.setState({ showModal: true });
     };
 
     const onInstall = () => {
       installRef.onInstall();
-      modalRef.close();
+      closeModal();
     };
 
     const modal = (
-      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showModal}
+                             onHide={closeModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Install</Modal.Title>
         </Modal.Header>
@@ -139,12 +144,10 @@ class ContentPackVersions extends React.Component {
                               onInstall={onInstallProp} />
         </Modal.Body>
         <Modal.Footer>
-          <div className="pull-right">
-            <ButtonToolbar>
-              <Button bsStyle="primary" onClick={onInstall}>Install</Button>
-              <Button onClick={closeModal}>Close</Button>
-            </ButtonToolbar>
-          </div>
+          <ModalSubmit onSubmit={onInstall}
+                       submitButtonType="button"
+                       onCancel={closeModal}
+                       submitButtonText="Install" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -160,6 +163,7 @@ class ContentPackVersions extends React.Component {
       <DataTable id="content-packs-versions"
                  headers={headers}
                  headerCellFormatter={this.headerFormatter}
+                 useNumericSort
                  sortBy={(c) => c.rev.toString()}
                  dataRowFormatter={this.rowFormatter}
                  rows={contentPacks}

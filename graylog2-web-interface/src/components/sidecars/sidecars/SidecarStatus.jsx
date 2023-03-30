@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import isNumber from 'lodash/isNumber';
 
 import { Col, Row, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -28,15 +30,17 @@ import SidecarStatusFileList from './SidecarStatusFileList';
 import VerboseMessageModal from './VerboseMessageModal';
 
 const SidecarStatus = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     sidecar: PropTypes.object.isRequired,
     collectors: PropTypes.array.isRequired,
   },
 
   getInitialState() {
-    return { collectorName: '', collectorVerbose: '' };
+    return { collectorName: '', collectorVerbose: '', showVerboseModal: false };
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatNodeDetails(details) {
     if (!details) {
       return <p>Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
@@ -47,13 +51,13 @@ const SidecarStatus = createReactClass({
     return (
       <dl className={`${commonStyles.deflist} ${commonStyles.topMargin}`}>
         <dt>IP Address</dt>
-        <dd>{lodash.defaultTo(details.ip, 'Not available')}</dd>
+        <dd>{defaultTo(details.ip, 'Not available')}</dd>
         <dt>Operating System</dt>
-        <dd>{lodash.defaultTo(details.operating_system, 'Not available')}</dd>
+        <dd>{defaultTo(details.operating_system, 'Not available')}</dd>
         <dt>CPU Idle</dt>
-        <dd>{lodash.isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available'}</dd>
+        <dd>{isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available'}</dd>
         <dt>Load</dt>
-        <dd>{lodash.defaultTo(metrics.load_1, 'Not available')}</dd>
+        <dd>{defaultTo(metrics.load_1, 'Not available')}</dd>
         <dt>Volumes &gt; 75% full</dt>
         {metrics.disks_75 === undefined
           ? <dd>Not available</dd>
@@ -62,6 +66,7 @@ const SidecarStatus = createReactClass({
     );
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatCollectorStatus(details, collectors) {
     if (!details || !collectors) {
       return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
@@ -136,8 +141,11 @@ const SidecarStatus = createReactClass({
   },
 
   _onShowVerbose(name, verbose) {
-    this.setState({ collectorName: name, collectorVerbose: verbose });
-    this.modal.open();
+    this.setState({ collectorName: name, collectorVerbose: verbose, showVerboseModal: true });
+  },
+
+  _onHideVerbose() {
+    this.setState({ showVerboseModal: false });
   },
 
   render() {
@@ -170,7 +178,8 @@ const SidecarStatus = createReactClass({
             </div>
           </Col>
         </Row>
-        <VerboseMessageModal ref={(c) => { this.modal = c; }}
+        <VerboseMessageModal showModal={this.state.showVerboseModal}
+                             onHide={this._onHideVerbose}
                              collectorName={this.state.collectorName}
                              collectorVerbose={this.state.collectorVerbose} />
       </div>

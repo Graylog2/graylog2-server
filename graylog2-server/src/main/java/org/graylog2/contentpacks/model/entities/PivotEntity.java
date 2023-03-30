@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -89,6 +90,12 @@ public abstract class PivotEntity implements SearchTypeEntity {
     @JsonProperty(FIELD_SEARCH_FILTERS)
     public abstract List<UsedSearchFilter> filters();
 
+    @JsonProperty("row_limit")
+    public abstract OptionalInt rowLimit();
+
+    @JsonProperty("column_limit")
+    public abstract OptionalInt columnLimit();
+
     public abstract Builder toBuilder();
 
     @Override
@@ -131,6 +138,12 @@ public abstract class PivotEntity implements SearchTypeEntity {
         @JsonProperty("column_groups")
         public abstract Builder columnGroups(List<BucketSpec> columnGroups);
 
+        @JsonProperty("row_limit")
+        public abstract Builder rowLimit(int rowLimit);
+
+        @JsonProperty("column_limit")
+        public abstract Builder columnLimit(int columnLimit);
+
         @JsonProperty
         public abstract Builder series(List<SeriesSpec> series);
 
@@ -147,7 +160,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
         @JsonSubTypes({
                 @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
                 @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),

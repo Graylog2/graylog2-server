@@ -1,0 +1,5 @@
+type = "added"
+message = "Added validation for field value types. It will detect the correct type of the field and warn if user enters a value of different data type."
+
+issues = ["11973"]
+pulls = ["12088"]

@@ -16,12 +16,14 @@
  */
 import * as React from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { compact, camelCase, mapKeys, mapValues } from 'lodash';
+import compact from 'lodash/compact';
+import camelCase from 'lodash/camelCase';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
 import type { $PropertyType } from 'utility-types';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 
-import history from 'util/History';
 import { validateField } from 'util/FormsUtils';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { Row, Col, Alert } from 'components/bootstrap';
@@ -34,6 +36,8 @@ import Wizard from 'components/common/Wizard';
 import type FetchError from 'logic/errors/FetchError';
 import type { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 import type { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';
 import BackendWizardContext from './BackendWizardContext';
@@ -108,6 +112,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     userUniqueIdAttribute,
     userFullNameAttribute,
     userNameAttribute,
+    emailAttributes,
     userSearchBase,
     userSearchPattern,
     verifyCertificates,
@@ -127,6 +132,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
       system_user_password: _passwordPayload(backendId, systemUserPassword),
       transport_security: transportSecurity,
       type: serviceType,
+      email_attributes: emailAttributes,
       user_full_name_attribute: userFullNameAttribute,
       user_name_attribute: userNameAttribute,
       user_search_base: userSearchBase,
@@ -173,6 +179,7 @@ const _onSubmitAll = (
   getSubmitPayload,
   validateSteps,
   shouldUpdateGroupSync,
+  history: HistoryFunction,
 ) => {
   const formValues = getUpdatedFormsValues();
   const invalidStepKeys = validateSteps(formValues, {});
@@ -244,6 +251,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     formValues: initialValues,
     invalidStepKeys: [],
   });
+  const history = useHistory();
 
   const formRefs = {
     [SERVER_CONFIG_KEY]: useRef<FormikProps<WizardFormValues>>(null),
@@ -320,6 +328,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     _getSubmitPayload,
     _validateSteps,
     shouldUpdateGroupSync,
+    history,
   );
 
   const steps = wizardSteps({

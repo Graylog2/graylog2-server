@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Stoppable;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class MessageInput implements Stoppable {
     private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
@@ -65,6 +67,7 @@ public abstract class MessageInput implements Stoppable {
     @SuppressWarnings("StaticNonFinalField")
     private static int defaultRecvBufferSize = 1024 * 1024;
 
+    private final AtomicLong sequenceNr;
     private final MetricRegistry metricRegistry;
     private final Transport transport;
     private final MetricRegistry localRegistry;
@@ -122,6 +125,7 @@ public abstract class MessageInput implements Stoppable {
         incomingMessages = localRegistry.meter("incomingMessages");
         globalIncomingMessages = metricRegistry.counter(GlobalMetricNames.INPUT_THROUGHPUT);
         emptyMessages = localRegistry.counter("emptyMessages");
+        sequenceNr = new AtomicLong(0);
     }
 
     public static int getDefaultRecvBufferSize() {
@@ -150,16 +154,23 @@ public abstract class MessageInput implements Stoppable {
         cr.check(getConfiguration());
     }
 
-    public void launch(final InputBuffer buffer) throws MisfireException {
+    public void launch(final InputBuffer buffer, InputFailureRecorder inputFailureRecorder) throws MisfireException {
         this.inputBuffer = buffer;
         try {
+            launch(buffer); // call this for inputs that still overload the one argument launch method
+
             transport.setMessageAggregator(codec.getAggregator());
 
-            transport.launch(this);
+            transport.launch(this, inputFailureRecorder);
         } catch (Exception e) {
             inputBuffer = null;
             throw new MisfireException(e);
         }
+    }
+
+    @Deprecated
+    public void launch(final InputBuffer buffer) throws MisfireException {
+        // kept for backwards compat with inputs that overload this method
     }
 
     @Override
@@ -372,11 +383,10 @@ public abstract class MessageInput implements Stoppable {
     public void processRawMessage(RawMessage rawMessage) {
         final int payloadLength = rawMessage.getPayload().length;
         if (payloadLength == 0) {
-            LOG.debug("Discarding empty message {} from input [{}/{}] (remote address {}). Turn logger org.graylog2.plugin.journal.RawMessage to TRACE to see originating stack trace.",
-                      rawMessage.getId(),
-                      getTitle(),
-                      getId(),
-                      rawMessage.getRemoteAddress() == null ? "unknown" : rawMessage.getRemoteAddress());
+            LOG.debug("Discarding empty message {} from input {} (remote address {}). Turn logger org.graylog2.plugin.journal.RawMessage to TRACE to see originating stack trace.",
+                    rawMessage.getId(),
+                    toIdentifier(),
+                    rawMessage.getRemoteAddress() == null ? "unknown" : rawMessage.getRemoteAddress());
             emptyMessages.inc();
             return;
         }
@@ -385,6 +395,8 @@ public abstract class MessageInput implements Stoppable {
         rawMessage.setCodecName(codec.getName());
         rawMessage.setCodecConfig(codecConfig);
         rawMessage.addSourceNode(getId(), serverStatus.getNodeId());
+        // Wrap at unsigned int maximum
+        rawMessage.setSequenceNr((int) sequenceNr.getAndUpdate(i -> i == 0xFFFF_FFFFL ? 0 : i + 1));
 
         inputBuffer.insert(rawMessage);
 
@@ -404,6 +416,14 @@ public abstract class MessageInput implements Stoppable {
 
     public void setNodeId(String nodeId) {
         this.nodeId = nodeId;
+    }
+
+    public boolean isCloudCompatible() {
+        return descriptor.isCloudCompatible();
+    }
+
+    public boolean isForwarderCompatible() {
+        return descriptor.isForwarderCompatible();
     }
 
     public interface Factory<M> {
@@ -443,13 +463,21 @@ public abstract class MessageInput implements Stoppable {
         }
     }
 
-    public static class Descriptor extends AbstractDescriptor {
+    public static abstract class Descriptor extends AbstractDescriptor {
         public Descriptor() {
             super();
         }
 
         protected Descriptor(String name, boolean exclusive, String linkToDocs) {
             super(name, exclusive, linkToDocs);
+        }
+
+        public boolean isCloudCompatible() {
+            return false;
+        }
+
+        public boolean isForwarderCompatible() {
+            return true;
         }
     }
 
@@ -460,5 +488,9 @@ public abstract class MessageInput implements Stoppable {
                 .add("type", getType())
                 .add("nodeId", getNodeId())
                 .toString();
+    }
+
+    public String toIdentifier() {
+        return "[" + getName() + "/" + getTitle() + "/" + getId() + "]";
     }
 }

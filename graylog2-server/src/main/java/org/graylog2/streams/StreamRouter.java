@@ -65,6 +65,10 @@ public class StreamRouter {
         serverEventBus.register(this);
     }
 
+    public RouterEngineInfo getRouterEngineInfo() {
+        return new RouterEngineInfo(routerEngine.get().getFingerprint());
+    }
+
     @Subscribe
     @SuppressWarnings("unused")
     public void handleStreamsUpdate(StreamsChangedEvent event) {

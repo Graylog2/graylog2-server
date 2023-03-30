@@ -17,104 +17,195 @@
 package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.apis.Streams;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.utils.GelfInputUtils;
-import org.graylog.testing.utils.SearchUtils;
-import org.hamcrest.Matchers;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.Map;
+import java.util.Set;
+
 import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM)
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST})
 public class SuggestionResourceIT {
+    private final GraylogApis api;
 
-    static final int GELF_HTTP_PORT = 12201;
+    private String stream1Id;
+    private String stream2Id;
 
-    private final GraylogBackend sut;
-    private final RequestSpecification requestSpec;
-
-    public SuggestionResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
-        this.requestSpec = requestSpec;
+    public SuggestionResourceIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void init() {
-        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#1\", \"host\":\"example.org\", \"facility\":\"junit\"}",
-                requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#2\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#1");
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#2");
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#3");
+
+        final String defaultIndexSetId = api.indices().defaultIndexSetId();
+        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
+        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+
+        api.gelf().createGelfHttpInput()
+                .postMessage(
+                        """
+                                {"short_message":"SuggestionResourceIT#1",
+                                 "host":"example.org",
+                                  "facility":"junit",
+                                  "_target_stream": "stream1",
+                                  "http_response_code": 200
+                                  }""")
+                .postMessage(
+                        """
+                                {"short_message":"SuggestionResourceIT#2",
+                                 "host":"example.org",
+                                  "facility":"test",
+                                  "_target_stream": "stream1",
+                                  "http_response_code": 200
+                                  }""")
+                .postMessage(
+                        """
+                                {"short_message":"SuggestionResourceIT#3",
+                                "host":"example.org",
+                                 "facility":"test",
+                                  "_target_stream": "stream1",
+                                  "http_response_code": 201
+                                  }""")
+                .postMessage(
+                        """
+                                {"short_message":"SuggestionResourceIT#4",
+                                 "host":"foreign.org",
+                                 "facility":"test",
+                                 "_target_stream": "stream2",
+                                 "http_response_code": 404
+                                 }""")
+                .postMessage(
+                        """
+                                {"short_message":"SuggestionResourceIT#5",
+                                 "host":"something-else.org",
+                                 "foo":"bar",
+                                 }""");
+
+        api.search().waitForMessages(
+                "SuggestionResourceIT#1",
+                "SuggestionResourceIT#2",
+                "SuggestionResourceIT#3",
+                "SuggestionResourceIT#4",
+                "SuggestionResourceIT#5"
+        );
     }
 
     @ContainerMatrixTest
     void testMinimalRequest() {
-        final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+        given()
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"\"}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("test"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(3));
+    }
+
+    @ContainerMatrixTest
+    void testNumericalValueSuggestion() {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(
+                        """
+                        { "field":"http_response_code", "input":"20"}
+                        """)
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("200"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
+    }
+
+    @ContainerMatrixTest
+    void testSuggestionsAreLimitedToStream() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(Map.of(
+                        "field", "source",
+                        "input", "",
+                        "streams", Set.of(stream1Id)
+                ))
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("example.org"))
+                .body("suggestions.occurrence[0]", equalTo(3));
+
+        final ValidatableResponse validatableResponse2 = given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(Map.of(
+                        "field", "source",
+                        "input", "",
+                        "streams", Set.of(stream2Id)
+                ))
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("foreign.org"))
+                .body("suggestions.occurrence[0]", equalTo(1));
     }
 
     @ContainerMatrixTest
     void testInvalidField() {
-        final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+        given()
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"message\", \"input\":\"foo\"}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        // error types and messages are different for each ES version, so let's just check that there is an error in the response
-        validatableResponse.assertThat().body("error", notNullValue());
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                // error types and messages are different for each ES version, so let's just check that there is an error in the response
+                .body("error", notNullValue());
     }
 
     @ContainerMatrixTest
     void testSizeOtherDocsCount() {
-        final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+        given()
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"\", \"size\":1}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
-        validatableResponse.assertThat().body("sum_other_docs_count", greaterThanOrEqualTo(1));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("test"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2))
+                .body("sum_other_docs_count", greaterThanOrEqualTo(1));
     }
 
     @ContainerMatrixTest
     void testTypoCorrection() {
-        final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+        given()
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"tets\"}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("test"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
     }
 
 }

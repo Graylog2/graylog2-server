@@ -31,12 +31,12 @@ import org.graylog.plugins.views.search.errors.SearchTypeError;
 @SuppressWarnings("unchecked")
 public interface SearchTypeHandler<S extends SearchType, Q, R> {
 
-    default void generateQueryPart(SearchJob job, Query query, SearchType searchType, Q queryContext) {
+    default void generateQueryPart(Query query, SearchType searchType, Q queryContext) {
         // We need to typecast manually here, because '? extends SearchType' and 'SearchType' are never compatible
         // and thus the compiler won't accept the types at their call sites
         // This allows us to get proper types in the implementing classes instead of having to cast there.
         try {
-            doGenerateQueryPart(job, query, (S) searchType, queryContext);
+            doGenerateQueryPart(query, (S) searchType, queryContext);
         } catch (SearchException e) {
             // these already have a specific error, so we don't need to handle them specially
             throw e;
@@ -45,11 +45,17 @@ public interface SearchTypeHandler<S extends SearchType, Q, R> {
         }
     }
 
-    void doGenerateQueryPart(SearchJob job, Query query, S searchType, Q queryContext);
+    void doGenerateQueryPart(Query query, S searchType, Q queryContext);
 
     default SearchType.Result extractResult(SearchJob job, Query query, SearchType searchType, R queryResult, Q queryContext) {
         // see above for the reason for typecasting
-        return doExtractResultImpl(job, query, (S) searchType, queryResult, queryContext);
+        try {
+            return doExtractResultImpl(job, query, (S) searchType, queryResult, queryContext);
+        } catch (SearchException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new SearchException(new SearchTypeError(query, searchType.id(), t), t);
+        }
     }
 
     SearchType.Result doExtractResultImpl(SearchJob job, Query query, S searchType, R queryResult, Q queryContext);

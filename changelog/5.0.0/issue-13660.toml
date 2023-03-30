@@ -1,0 +1,5 @@
+type = "changed"
+message = "Pre-flight check requires at least MongoDB 5.0"
+
+issues = ["13660"]
+pulls = ["13778"]

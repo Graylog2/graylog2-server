@@ -1,0 +1,9 @@
+type = "changed"
+message = "Improve the way we display the navigation for subareas of a page."
+
+details.user = """
+Unifies the way we display page navigations by displaying tabs below the main navigation.
+Before, these links were displayed as buttons in the right top corner of the page header.
+"""
+
+pulls = ["13677"]

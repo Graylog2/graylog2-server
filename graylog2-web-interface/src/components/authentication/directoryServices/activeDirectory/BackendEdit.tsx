@@ -44,7 +44,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     initialValues: initialGroupSyncValues = {},
   } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
   const help = { ...HELP, ...groupSyncHelp };
-  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
+  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true, emailAttributes: true };
   let initialValues = prepareInitialWizardValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {

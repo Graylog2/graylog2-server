@@ -52,7 +52,7 @@ const validateSorts = (values: WidgetConfigFormValues) => {
       sortError.direction = 'Direction is required.';
     }
 
-    const timeRowExists = !!values.groupBy?.groupings.find((g) => g.direction === 'row' && g.field.type === 'time');
+    const timeRowExists = !!values.groupBy?.groupings.find((g) => g.direction === 'row' && g.type === 'time');
     const nonDataTableVisExists = values.visualization && values.visualization.type !== 'table';
 
     if (timeRowExists && nonDataTableVisExists) {
@@ -92,7 +92,7 @@ const formValueTypeToConfigType = (type: 'groupBy' | 'metric') => {
   }
 };
 
-const SortElement: AggregationElement = {
+const SortElement: AggregationElement<'sort'> = {
   title: 'Sort',
   key: 'sort',
   order: 3,
@@ -119,6 +119,7 @@ const SortElement: AggregationElement = {
     sort: formValues.sort.filter((_value, i) => index !== i),
   })),
   validate: validateSorts,
+  isEmpty: (formValues: WidgetConfigFormValues['sort']) => (formValues ?? []).length === 0,
 };
 
 export default SortElement;

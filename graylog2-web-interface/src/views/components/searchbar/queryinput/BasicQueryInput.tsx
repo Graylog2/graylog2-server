@@ -34,6 +34,7 @@ export type BaseProps = {
   value: string,
   warning?: QueryValidationState,
   wrapEnabled?: boolean,
+  inputId?: string,
 };
 
 type EnabledInputProps = BaseProps & {
@@ -51,7 +52,7 @@ const isDisabledInput = (props: Props): props is DisabledInputProps => props.dis
 
 const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
   const markerClassName = 'ace_marker';
-  const createMarkers = (explanations = [], className = '') => explanations.map(({
+  const createMarkers = (explanations: QueryValidationState['explanations'] = [], className: string = '') => explanations.map(({
     beginLine,
     beginColumn,
     endLine,
@@ -73,7 +74,7 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
 
 // Basic query input component which is being implemented by the `QueryInput` component.
 // This is just a very basic query input which can be implemented for example to display a read only query.
-const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
+const BasicQueryInput = forwardRef<{ editor: Editor }, Props>((props, ref) => {
   const {
     className,
     disabled,
@@ -85,16 +86,22 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     warning,
     wrapEnabled,
     onLoad,
+    inputId,
   } = props;
   const theme = useTheme();
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
   const _onLoad = useCallback((editor) => {
     if (editor) {
-      editor.renderer.setScrollMargin(6, 5);
+      editor.renderer.setScrollMargin(7, 6);
       editor.renderer.setPadding(12);
+
+      if (inputId) {
+        editor.textInput.getElement().setAttribute('id', inputId);
+      }
+
       onLoad?.(editor);
     }
-  }, [onLoad]);
+  }, [inputId, onLoad]);
   const editorProps = useMemo(() => ({ $blockScrolling: Infinity, selectionStyle: 'line' }), []);
   const setOptions = useMemo(() => ({ indentedSoftWrap: false }), []);
 
@@ -104,7 +111,7 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
     className,
     disabled,
     editorProps,
-    fontSize: theme.fonts.size.large,
+    fontSize: theme.fonts.size.small,
     highlightActiveLine: false,
     markers,
     maxLines,
@@ -154,6 +161,7 @@ BasicQueryInput.propTypes = {
   enableAutocompletion: PropTypes.bool,
   error: PropTypes.any,
   height: PropTypes.number,
+  inputId: PropTypes.string,
   maxLines: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
@@ -171,6 +179,7 @@ BasicQueryInput.defaultProps = {
   enableAutocompletion: false,
   error: undefined,
   height: undefined,
+  inputId: undefined,
   maxLines: 4,
   onBlur: undefined,
   onChange: undefined,

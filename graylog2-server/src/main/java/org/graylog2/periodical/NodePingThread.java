@@ -65,8 +65,7 @@ public class NodePingThread extends Periodical {
     public synchronized void doRun() {
         final boolean isLeader = leaderElectionService.isLeader();
         try {
-            Node node = nodeService.byNodeId(serverStatus.getNodeId());
-            nodeService.markAsAlive(node, isLeader, httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API));
+            nodeService.markAsAlive(serverStatus.getNodeId(), isLeader, httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API));
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             nodeService.registerServer(serverStatus.getNodeId().toString(),

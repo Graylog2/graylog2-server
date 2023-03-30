@@ -14,20 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 
-export default () => WidgetActions.create(
-  MessagesWidget.builder()
-    .newId()
-    .config(
-      MessagesWidgetConfig.builder()
-        .fields(DEFAULT_MESSAGE_FIELDS)
-        .showMessageRow(true)
-        .showSummary(true)
-        .build(),
-    ).build(),
-);
+export const CreateMessagesWidget = () => MessagesWidget.builder()
+  .newId()
+  .config(
+    MessagesWidgetConfig.builder()
+      .fields(DEFAULT_MESSAGE_FIELDS)
+      .showMessageRow(true)
+      .showSummary(true)
+      .build(),
+  ).build();
+
+export default () => (dispatch: AppDispatch) => dispatch(addWidget(CreateMessagesWidget()));

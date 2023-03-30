@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class ContentPackInstallationPersistenceService {
-    private static final String COLLECTION_NAME = "content_packs_installations";
+    public static final String COLLECTION_NAME = "content_packs_installations";
 
     private final JacksonDBCollection<ContentPackInstallation, ObjectId> dbCollection;
 

@@ -16,11 +16,15 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import naturalSort from 'javascript-natural-sort';
 
-import { Alert, Col, Row } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import { Col, Row } from 'components/bootstrap';
+import { Spinner, NoEntitiesExist } from 'components/common';
 import Output from 'components/outputs/Output';
+
+const sortByTitle = (output1, output2) => {
+  return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
+};
 
 class OutputList extends React.Component {
   static propTypes = {
@@ -31,10 +35,6 @@ class OutputList extends React.Component {
     onUpdate: PropTypes.func.isRequired,
     getTypeDefinition: PropTypes.func.isRequired,
     types: PropTypes.object.isRequired,
-  };
-
-  _sortByTitle = (output1, output2) => {
-    return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
   };
 
   _formatOutput = (output) => {
@@ -59,16 +59,23 @@ class OutputList extends React.Component {
       return (
         <Row className="content">
           <Col md={12}>
-            <Alert bsStyle="info">No outputs configured.</Alert>
+            <NoEntitiesExist>
+              No outputs configured.
+            </NoEntitiesExist>
           </Col>
         </Row>
       );
     }
 
-    const outputs = this.props.outputs.sort(this._sortByTitle).map(this._formatOutput);
+    const outputs = this.props.outputs.sort(sortByTitle).map(this._formatOutput);
 
     return <div>{outputs}</div>;
   }
 }
+
+OutputList.defaultProps = {
+  streamId: '',
+  outputs: [],
+};
 
 export default OutputList;

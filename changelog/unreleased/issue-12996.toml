@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fixes `too_long_http_line_exception`/`HTTP/1.1 413 FULL head` problem when Graylog Event Processor operates on huge number of indices"
+
+issues = ["12996","13675"]
+pulls = ["13790","graylog-plugin-enterprise#4252","13718","13722", "graylog-plugin-enterprise#4213"]

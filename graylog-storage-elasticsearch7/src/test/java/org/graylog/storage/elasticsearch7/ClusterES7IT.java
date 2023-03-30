@@ -35,7 +35,7 @@ public class ClusterES7IT extends ClusterIT {
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     @Override
-    protected SearchServerInstance elasticsearch() {
+    protected SearchServerInstance searchServer() {
         return this.elasticsearch;
     }
 

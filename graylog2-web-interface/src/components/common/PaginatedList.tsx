@@ -14,82 +14,71 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
+import usePaginationQueryParameter, { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 
 import Pagination from './Pagination';
 import PageSizeSelect from './PageSizeSelect';
 
-const DEFAULT_PAGE_SIZES = [10, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
-  activePage?: number,
   children: React.ReactNode,
   className?: string,
   hideFirstAndLastPageLinks?: boolean
   hidePreviousAndNextPageLinks?: boolean
-  onChange: (currentPage: number, pageSize: number) => void,
-  pageSize?: number,
+  onChange?: (currentPage: number, pageSize: number) => void,
   pageSizes?: Array<number>,
   showPageSizeSelect?: boolean,
   totalItems: number,
 };
 
-/**
- * Wrapper component around an element that renders pagination
- * controls and provides a callback when the page or page size change.
- * You still need to fetch or filter the data yourself to ensure that
- * the selected page is displayed on screen.
- */
-const PaginatedList = ({
-  activePage,
+const ListBase = ({
   children,
   className,
+  currentPage,
+  currentPageSize,
   hideFirstAndLastPageLinks,
   hidePreviousAndNextPageLinks,
   onChange,
-  pageSize: propsPageSize,
   pageSizes,
+  setPagination,
   showPageSizeSelect,
   totalItems,
-}: Props) => {
-  const initialPage = activePage > 0 ? activePage : INITIAL_PAGE;
-  const [pageSize, setPageSize] = useState(propsPageSize);
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
+}: Required<Props> & {
+  currentPageSize: number,
+  currentPage: number;
+  setPagination: (newPagination: { page: number, pageSize: number }) => void
+}) => {
+  const numberPages = useMemo(() => (
+    currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
+  ), [currentPageSize, totalItems]);
+
+  const _onChangePageSize = useCallback((newPageSize: number) => {
+    setPagination({ page: INITIAL_PAGE, pageSize: newPageSize });
+    if (onChange) onChange(INITIAL_PAGE, newPageSize);
+  }, [onChange, setPagination]);
+
+  const _onChangePage = useCallback((pageNum: number) => {
+    setPagination({ page: pageNum, pageSize: currentPageSize });
+    if (onChange) onChange(pageNum, currentPageSize);
+  }, [setPagination, currentPageSize, onChange]);
 
   useEffect(() => {
-    if (activePage > 0) {
-      setCurrentPage(activePage);
-    }
-  }, [activePage]);
-
-  useEffect(() => {
-    setPageSize(propsPageSize);
-  }, [propsPageSize]);
-
-  const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
-    event.preventDefault();
-    const newPageSize = Number(event.target.value);
-
-    setCurrentPage(INITIAL_PAGE);
-    setPageSize(newPageSize);
-    onChange(INITIAL_PAGE, newPageSize);
-  };
-
-  const _onChangePage = (pageNum: number) => {
-    setCurrentPage(pageNum);
-    onChange(pageNum, pageSize);
-  };
+    if (numberPages > 0 && currentPage > numberPages) _onChangePage(numberPages);
+  }, [currentPage, numberPages, _onChangePage]);
 
   return (
     <>
       {showPageSizeSelect && (
-        <PageSizeSelect pageSizes={pageSizes} pageSize={pageSize} onChange={_onChangePageSize} />
+        <PageSizeSelect pageSizes={pageSizes}
+                        pageSize={currentPageSize}
+                        showLabel
+                        onChange={_onChangePageSize}
+                        className="pull-right" />
       )}
 
       {children}
@@ -107,38 +96,102 @@ const PaginatedList = ({
   );
 };
 
-PaginatedList.propTypes = {
-  /** The active page number. If not specified the active page number will be tracked internally. */
-  activePage: PropTypes.number,
-  /** React element containing items of the current selected page. */
-  children: PropTypes.node.isRequired,
-  /**
-   * Function that will be called when the page changes.
-   * It receives the current page and the page size as arguments.
-   */
-  onChange: PropTypes.func.isRequired,
-  /** boolean flag to hide first and last page links */
-  hideFirstAndLastPageLinks: PropTypes.bool,
-  /**  boolean flag to hide previous and next page links */
-  hidePreviousAndNextPageLinks: PropTypes.bool,
-  /** Number of items per page. */
-  pageSize: PropTypes.number,
-  /** Array of different items per page that are allowed. */
-  pageSizes: PropTypes.arrayOf(PropTypes.number),
-  /** Whether to show the page size selector or not. */
-  showPageSizeSelect: PropTypes.bool,
-  /** Total amount of items in all pages. */
-  totalItems: PropTypes.number.isRequired,
+const ListBasedOnQueryParams = ({
+  pageSizes,
+  ...props
+}: Required<Props> & { pageSize: number }) => {
+  const { page: currentPage, pageSize: currentPageSize, setPagination } = usePaginationQueryParameter(pageSizes, props.pageSize, props.showPageSizeSelect);
+
+  return <ListBase {...props} currentPage={currentPage} currentPageSize={currentPageSize} setPagination={setPagination} pageSizes={pageSizes} />;
+};
+
+const ListWithOwnState = ({
+  activePage,
+  pageSize: propPageSize,
+  ...props
+}: Required<Props> & { activePage: number, pageSize: number }) => {
+  const [{ page: currentPage, pageSize: currentPageSize }, setPagination] = React.useState({
+    page: Math.max(activePage, INITIAL_PAGE),
+    pageSize: propPageSize,
+  });
+
+  useEffect(() => {
+    if (activePage > 0 && activePage !== currentPage) {
+      setPagination((cur) => ({ ...cur, page: activePage }));
+    }
+  }, [activePage, currentPage]);
+
+  return (
+    <ListBase {...props}
+              currentPage={currentPage}
+              currentPageSize={currentPageSize}
+              setPagination={setPagination} />
+  );
+};
+
+/**
+ * Wrapper component around an element that renders pagination
+ * controls and provides a callback when the page or page size change.
+ * You still need to fetch or filter the data yourself to ensure that
+ * the selected page is displayed on screen.
+ */
+const PaginatedList = ({
+  activePage,
+  children,
+  className,
+  hideFirstAndLastPageLinks,
+  hidePreviousAndNextPageLinks,
+  onChange,
+  pageSize,
+  pageSizes,
+  showPageSizeSelect,
+  totalItems,
+  useQueryParameter,
+}: Props & {
+  activePage?: number,
+  pageSize?: number,
+  useQueryParameter?: boolean,
+}) => {
+  if (useQueryParameter) {
+    return (
+      <ListBasedOnQueryParams className={className}
+                              hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+                              hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+                              onChange={onChange}
+                              pageSizes={pageSizes}
+                              pageSize={pageSize}
+                              showPageSizeSelect={showPageSizeSelect}
+                              totalItems={totalItems}>
+        {children}
+      </ListBasedOnQueryParams>
+    );
+  }
+
+  return (
+    <ListWithOwnState className={className}
+                      hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+                      hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+                      onChange={onChange}
+                      pageSizes={pageSizes}
+                      pageSize={pageSize}
+                      showPageSizeSelect={showPageSizeSelect}
+                      totalItems={totalItems}
+                      activePage={activePage}>
+      {children}
+    </ListWithOwnState>
+  );
 };
 
 PaginatedList.defaultProps = {
-  activePage: 0,
+  activePage: 1,
   className: undefined,
   hideFirstAndLastPageLinks: false,
   hidePreviousAndNextPageLinks: false,
-  pageSize: DEFAULT_PAGE_SIZES[0],
   pageSizes: DEFAULT_PAGE_SIZES,
+  pageSize: DEFAULT_PAGE_SIZES[0],
   showPageSizeSelect: true,
+  onChange: undefined,
+  useQueryParameter: true,
 };
 
 export default PaginatedList;

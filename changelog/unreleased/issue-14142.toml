@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix CIDR parsing of IP in query validation"
+
+issues = ["14142"]
+pulls = ["14204"]

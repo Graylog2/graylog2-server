@@ -20,18 +20,17 @@ import styled, { css } from 'styled-components';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { Message } from 'views/components/messagelist/Types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import MessageFieldRow from 'views/components/messagelist/MessageFieldRow';
 
 const TableRow = styled.tr(({ theme }) => css`
   && {
-    margin-bottom: 5px;
     cursor: pointer;
   
     td {
       border-top: 0;
       padding-top: 0;
-      padding-bottom: 5px;
+      padding-bottom: 4px;
       font-family: ${theme.fonts.family.monospace};
       color: ${theme.colors.variant.dark.info};
     }

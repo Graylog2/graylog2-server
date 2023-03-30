@@ -40,10 +40,9 @@ import javax.inject.Inject;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -80,9 +79,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
 
         final String nameFormat = "outputbuffer-processor-executor-%d";
         final int corePoolSize = configuration.getOutputBufferProcessorThreadsCorePoolSize();
-        final int maxPoolSize = configuration.getOutputBufferProcessorThreadsMaxPoolSize();
-        final int keepAliveTime = configuration.getOutputBufferProcessorKeepAliveTime();
-        this.executor = executorService(metricRegistry, nameFormat, corePoolSize, maxPoolSize, keepAliveTime);
+        this.executor = executorService(metricRegistry, nameFormat, corePoolSize);
 
         this.incomingMessages = metricRegistry.meter(INCOMING_MESSAGES_METRICNAME);
         this.outputThroughput = metricRegistry.counter(GlobalMetricNames.OUTPUT_THROUGHPUT);
@@ -90,11 +87,10 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry, final String nameFormat,
-                                            final int corePoolSize, final int maxPoolSize, final int keepAliveTime) {
+                                            final int corePoolSize) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(nameFormat).build();
         return new InstrumentedExecutorService(
-                new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
-                        new LinkedBlockingQueue<Runnable>(), threadFactory),
+                Executors.newFixedThreadPool(corePoolSize, threadFactory),
                 metricRegistry,
                 name(this.getClass(), "executor-service"));
     }
@@ -127,7 +123,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
             LOG.debug("Skipping null message.");
             return;
         }
-        LOG.debug("Processing message <{}> from OutputBuffer.", msg.getId());
+        LOG.trace("Processing message <{}> from OutputBuffer.", msg.getId());
 
         final Set<MessageOutput> messageOutputs = outputRouter.getStreamOutputsForMessage(msg);
         msg.recordCounter(serverStatus, "matched-outputs", messageOutputs.size());

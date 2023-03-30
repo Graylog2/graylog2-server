@@ -54,7 +54,7 @@ const EditButton = ({ authenticationBackend }: { authenticationBackend: Authenti
 
   return (
     <LinkContainer to={link}>
-      <Button bsStyle="info" bsSize="xs" type="button">
+      <Button bsSize="xs" type="button">
         Edit
       </Button>
     </LinkContainer>
@@ -92,17 +92,17 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
       <StyledButtonToolbar>
         {isActive ? (
           <>
+            <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_deactivateBackend} bsStyle="warning" bsSize="xs" type="button">
               Deactivate
             </Button>
-            <EditButton authenticationBackend={authenticationBackend} />
           </>
         ) : (
           <>
+            <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_activateBackend} bsStyle="warning" bsSize="xs" type="button">
               Activate
             </Button>
-            <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_deleteBackend} bsStyle="danger" bsSize="xs" type="button">
               Delete
             </Button>

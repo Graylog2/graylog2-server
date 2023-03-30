@@ -15,22 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { RELATIVE_ALL_TIME } from 'views/Constants';
-import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import type { DateTimeFormats } from 'util/DateTime';
+import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 
-const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
-
-export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
+export const onSubmittingTimerange = (timerange: TimeRange, userTz: string): TimeRange => {
   const { type } = timerange;
 
   switch (timerange.type) {
     case 'absolute':
       return {
         type: timerange.type,
-        from: DateTime.parseFromString(timerange.from).toISOString(),
-        to: DateTime.parseFromString(timerange.to).toISOString(),
+        from: adjustFormat(toUTCFromTz(timerange.from, userTz), 'internal'),
+        to: adjustFormat(toUTCFromTz(timerange.to, userTz), 'internal'),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {
@@ -62,15 +61,15 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
   }
 };
 
-export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValues['timerange'] => {
+export const onInitializingTimerange = (timerange: TimeRange, formatTime: (dateTime: string, format: DateTimeFormats) => string): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 
   switch (timerange.type) {
     case 'absolute':
       return {
         type: timerange.type,
-        from: formatDatetime(DateTime.parseFromString(timerange.from)),
-        to: formatDatetime(DateTime.parseFromString(timerange.to)),
+        from: formatTime(timerange.from, 'complete'),
+        to: formatTime(timerange.to, 'complete'),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {

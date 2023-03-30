@@ -1,0 +1,148 @@
+{
+    "description": "This content pack is part of the [Graylog Threat Intel Plugin](http://github.com/graylog-labs/graylog-plugin-threatintel).\n\n*Please do not delete it manually if you consider to use the Threat Intel Plugin's functions. It contains important resources required by the plugin.*\n\nThis is the lookup table for the TOR (The Onion Router) Exit Node List, listing Exit Nodes of the TOR Network . This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually.",
+    "entities": [
+        {
+            "data": {
+                "configuration": {
+                    "type": {
+                        "@type": "string",
+                        "@value": "torexitnode"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the data adapter for the TOR (The Onion Router) Exit Node List, listing Exit Nodes of the TOR Network . This adapter is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "tor-exit-node"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Tor Exit Node"
+                }
+            },
+            "id": "5ac762873d274666e34eca87",
+            "type": {
+                "name": "lookup_adapter",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "configuration": {
+                    "type": {
+                        "@type": "string",
+                        "@value": "none"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "Certain downloaded lists do not require caching because they are in memory already and use this no-op cache."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "threat-intel-uncached-adapters"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Threat Intel Uncached Adapters"
+                }
+            },
+            "id": "5ac762873d274666e34eca80",
+            "type": {
+                "name": "lookup_cache",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "cache_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca80"
+                },
+                "data_adapter_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca87"
+                },
+                "default_multi_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_multi_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "default_single_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_single_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the lookup table for the TOR (The Onion Router) Exit Node List, listing Exit Nodes of the TOR Network . This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "tor-exit-node-list"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Tor Exit Node List"
+                }
+            },
+            "id": "5ac762873d274666e34eca8c",
+            "type": {
+                "name": "lookup_table",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        }
+    ],
+    "id": "9350a70a-8453-f516-7041-517b4df0b832",
+    "name": "Tor Exit Node List - Threat Intel Plugin",
+    "parameters": [],
+    "rev": 1,
+    "summary": "The Tor Exit Node List Lookup Table of the Threat Intel Plugin",
+    "url": "https://github.com/Graylog2/graylog2-server",
+    "v": "1",
+    "vendor": "Graylog <hello@graylog.com>"
+}

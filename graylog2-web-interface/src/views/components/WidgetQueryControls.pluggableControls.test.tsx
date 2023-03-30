@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import WrappingContainer from 'WrappingContainer';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
@@ -25,6 +24,12 @@ import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
+import type Search from 'views/logic/search/Search';
+import View from 'views/logic/views/View';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import WidgetContext from './contexts/WidgetContext';
 import WidgetQueryControls from './WidgetQueryControls';
@@ -33,7 +38,6 @@ import FormikInput from '../../components/common/FormikInput';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
-jest.mock('hooks/useUserDateTime');
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
@@ -41,28 +45,6 @@ jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mo
 jest.mock('views/components/searchbar/queryinput/BasicQueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    update: jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideActions: {
-    resetTimeRange: jest.fn(() => Promise.resolve()),
-    resetQuery: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({ search: { parameters: [] } })],
-  ),
-  SearchActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -76,16 +58,6 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   })]),
 }));
 
-jest.mock('stores/connect', () => {
-  const originalModule = jest.requireActual('stores/connect');
-
-  return {
-    __esModule: true,
-    ...originalModule,
-    default: (x) => x,
-  };
-});
-
 jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');
 
@@ -97,8 +69,14 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
   explanations: [],
 })));
 
+jest.mock('views/hooks/useGlobalOverride');
+
+jest.mock('views/logic/slices/createSearch', () => (s: Search) => s);
+
 describe('WidgetQueryControls pluggable controls', () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   const config = {
     relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
@@ -124,11 +102,15 @@ describe('WidgetQueryControls pluggable controls', () => {
     );
   };
 
-  const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
+  const mockOnSubmit = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, {
+      'views.reducers': [
+        { key: 'view', reducer: viewSliceReducer },
+        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+      ],
       'views.components.searchBar': [
         () => ({
           id: 'pluggable-search-bar-control',
@@ -154,11 +136,11 @@ describe('WidgetQueryControls pluggable controls', () => {
   });
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <WrappingContainer>
+    <TestStoreProvider>
       <WidgetContext.Provider value={widget}>
         {children}
       </WidgetContext.Provider>
-    </WrappingContainer>
+    </TestStoreProvider>
   );
 
   const renderSUT = (props = {}) => render(
@@ -192,9 +174,10 @@ describe('WidgetQueryControls pluggable controls', () => {
       {
         pluggableControl: 'Initial Value2',
         queryString: '',
-        streams: [],
+        streams: undefined,
         timerange: { from: 300, type: 'relative' },
       },
+      expect.any(Function),
       widget,
     ));
   }, testTimeout);
@@ -202,12 +185,18 @@ describe('WidgetQueryControls pluggable controls', () => {
   it('should register validation handler', async () => {
     renderSUT();
 
-    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value',
-      queryString: '',
-      streams: [],
-      timerange: { from: 300, type: 'relative' },
-    }));
+    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value',
+        queryString: '',
+        streams: undefined,
+        timerange: { from: 300, type: 'relative' },
+      },
+      {
+        view: expect.objectContaining({ type: View.Type.Dashboard }),
+        executionState: SearchExecutionState.empty(),
+      },
+    ));
   });
 
   it('should extend query validation payload', async () => {
@@ -216,8 +205,8 @@ describe('WidgetQueryControls pluggable controls', () => {
     await waitFor(() => expect(validateQuery).toHaveBeenCalledWith({
       customKey: 'Initial Value',
       queryString: '',
-      streams: [],
+      streams: undefined,
       timeRange: { from: 300, type: 'relative' },
-    }));
+    }, 'Europe/Berlin'));
   });
 });

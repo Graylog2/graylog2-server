@@ -19,7 +19,10 @@ package org.graylog2.rest.resources.system.indices;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
+import com.fasterxml.jackson.module.jsonSchema.types.StringSchema;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,13 +46,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "System/Indices/Retention", description = "Index retention strategy settings")
+@Api(value = "System/Indices/Retention", description = "Index retention strategy settings", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/retention")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -111,6 +117,20 @@ public class RetentionStrategyResource extends RestResource {
             throw new InternalServerErrorException("Couldn't generate JSON schema for retention strategy " + strategyName, e);
         }
 
-        return RetentionStrategyDescription.create(strategyName, defaultConfig, visitor.finalSchema());
+        JsonSchema jsonSchema = visitor.finalSchema();
+        removeDeactivatedStrategiesActions(jsonSchema);
+
+        return RetentionStrategyDescription.create(strategyName, defaultConfig, jsonSchema);
+    }
+
+    private void removeDeactivatedStrategiesActions(JsonSchema schema) {
+        Map<String, JsonSchema> properties = ((ObjectSchema) schema).getProperties();
+        JsonSchema indexAction = properties.get("index_action");
+
+        if (Objects.nonNull(indexAction)) {
+            Set<String> actionEnums = ((StringSchema) indexAction).getEnums();
+            Set<String> disabledRetentionStrategies = elasticsearchConfiguration.getDisabledRetentionStrategies();
+            disabledRetentionStrategies.stream().map(s -> s.toUpperCase(Locale.ENGLISH)).toList().forEach(actionEnums::remove);
+        }
     }
 }

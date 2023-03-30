@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix concatenation of query strings in export."
+
+issues = ["14268"]
+pulls = ["14284"]

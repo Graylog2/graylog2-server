@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import qs from 'qs';
 
 const useQuery = () => {
   const { search } = useLocation();
 
-  return qs.parse(search, { ignoreQueryPrefix: true });
+  return useMemo(() => qs.parse(search, { ignoreQueryPrefix: true }), [search]);
 };
 
 export default useQuery;

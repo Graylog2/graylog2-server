@@ -29,7 +29,7 @@ import org.apache.shiro.authz.permission.AllPermission;
 import org.bson.types.ObjectId;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.Configuration;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.ObjectIdStringFunction;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.StringObjectIdFunction;
@@ -37,6 +37,7 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.LimitedOptionalStringValidator;
 import org.graylog2.database.validators.LimitedStringValidator;
 import org.graylog2.database.validators.ListValidator;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.security.PasswordAlgorithm;
@@ -58,19 +59,24 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.nullToEmpty;
+import static org.graylog2.shared.security.RestPermissions.USERS_READ;
+import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.USERNAME;
 
-@CollectionName(UserImpl.COLLECTION_NAME)
+@DbEntity(collection = COLLECTION_NAME,
+          titleField = USERNAME,
+          readPermission = USERS_READ)
 public class UserImpl extends PersistedImpl implements User {
 
     public static final String FULL_NAME_FORMAT = "%s %s";
 
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
     private final Permissions permissions;
+    protected final ClusterConfigService clusterConfigService;
 
     public interface Factory {
         UserImpl create(final Map<String, Object> fields);
@@ -101,6 +107,7 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String TIMEZONE = "timezone";
     public static final String EXTERNAL_USER = "external_user";
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
+    public static final String GLOBAL_SESSION_TIMEOUT = "global_session_timeout_interval";
     public static final String STARTPAGE = "startpage";
     public static final String ROLES = "roles";
     public static final String ACCOUNT_STATUS = "account_status";
@@ -111,25 +118,27 @@ public class UserImpl extends PersistedImpl implements User {
     public static final int MAX_FIRST_LAST_NAME_LENGTH = 100;
     public static final int MAX_FULL_NAME_LENGTH = 200;
 
-    public static final long DEFAULT_SESSION_TIMEOUT_MS = TimeUnit.HOURS.toMillis(8);
-
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
+                    ClusterConfigService clusterConfigService,
                     @Assisted final Map<String, Object> fields) {
         super(fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
+                    ClusterConfigService clusterConfigService,
                     @Assisted final ObjectId id,
                     @Assisted final Map<String, Object> fields) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -287,11 +296,16 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public long getSessionTimeoutMs() {
+        final UserConfiguration config = clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+        if (config.enableGlobalSessionTimeout()) {
+            return config.globalSessionTimeoutInterval().toMillis();
+        }
+
         final Object o = fields.get(SESSION_TIMEOUT);
         if (o != null && o instanceof Long) {
             return (Long) o;
         }
-        return DEFAULT_SESSION_TIMEOUT_MS;
+        return UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis();
     }
 
     @Override
@@ -458,8 +472,9 @@ public class UserImpl extends PersistedImpl implements User {
         @AssistedInject
         LocalAdminUser(PasswordAlgorithmFactory passwordAlgorithmFactory,
                        Configuration configuration,
+                       ClusterConfigService clusterConfigService,
                        @Assisted String adminRoleObjectId) {
-            super(passwordAlgorithmFactory, null, null, Collections.<String, Object>emptyMap());
+            super(passwordAlgorithmFactory, null, clusterConfigService, Collections.<String, Object>emptyMap());
             this.configuration = configuration;
             this.roles = ImmutableSet.of(adminRoleObjectId);
         }
@@ -511,7 +526,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public long getSessionTimeoutMs() {
-            return DEFAULT_SESSION_TIMEOUT_MS;
+            return UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis();
         }
 
         @Override

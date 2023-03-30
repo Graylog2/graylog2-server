@@ -16,11 +16,10 @@
  */
 package org.graylog.testing.completebackend;
 
-import io.restassured.RestAssured;
-import io.restassured.config.FailureConfig;
-import io.restassured.config.RestAssuredConfig;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.testcontainers.containers.Network;
+
+import java.util.Optional;
 
 public interface GraylogBackend {
     String uri();
@@ -39,15 +38,5 @@ public interface GraylogBackend {
 
     String getLogs();
 
-    default RestAssuredConfig withGraylogBackendFailureConfig() {
-        return RestAssured.config().failureConfig(FailureConfig.failureConfig().with().failureListeners(
-                (reqSpec, respSpec, resp) -> {
-                    if (resp.statusCode() >= 500) {
-                        System.out.println("------------------------ Output from graylog docker container start ------------------------");
-                        System.out.println(this.getLogs());
-                        System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
-                    }
-                })
-        );
-    }
+    Optional<MailServerInstance> getEmailServerInstance();
 }

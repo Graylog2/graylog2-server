@@ -19,6 +19,7 @@ package org.graylog2.cluster.leader;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.graylog2.Configuration;
+import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.periodical.NodePingThread;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Duration;
+import java.util.Optional;
 
 @Singleton
 public class AutomaticLeaderElectionService extends AbstractExecutionThreadService implements LeaderElectionService {
@@ -43,6 +45,8 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
 
     private volatile boolean isLeader = false;
     private Thread executionThread;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private Optional<Lock> optionalLock;
 
     @Inject
     public AutomaticLeaderElectionService(Configuration configuration,
@@ -54,6 +58,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
         this.lockService = lockService;
         this.eventBus = eventBus;
         this.nodePingThread = nodePingThread;
+        this.optionalLock = Optional.empty();
     }
 
     @Override
@@ -70,7 +75,7 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
     @Override
     protected void shutDown() {
         isLeader = false;
-        lockService.unlock(RESOURCE_NAME).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
+        optionalLock.flatMap(lockService::unlock).ifPresent(l -> log.info("Gave up leader lock on shutdown"));
     }
 
     @Override
@@ -93,7 +98,8 @@ public class AutomaticLeaderElectionService extends AbstractExecutionThreadServi
         final boolean wasLeader = isLeader;
 
         try {
-            isLeader = lockService.lock(RESOURCE_NAME).isPresent();
+            optionalLock = lockService.lock(RESOURCE_NAME, null);
+            isLeader = optionalLock.isPresent();
         } catch (Exception e) {
             log.error("Unable to acquire/renew leader lock.", e);
 

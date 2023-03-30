@@ -1,0 +1,4 @@
+type = "changed"
+message = "Start `JSON path value from HTTP API` input on leader node only, if `Global` option was selected in input configuration."
+
+issues = ["14074"]

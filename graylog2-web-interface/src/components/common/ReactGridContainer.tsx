@@ -15,17 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css, withTheme } from 'styled-components';
 import { Responsive, WidthProvider } from 'react-grid-layout';
+import type { ItemCallback } from 'react-grid-layout';
 
 import { themePropTypes } from 'theme';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import type { WidgetPositions } from 'views/types';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
@@ -81,7 +83,7 @@ const BREAKPOINTS = {
   xs: COLUMN_WIDTH * COLUMNS.xs,
 };
 
-const _gridClass = (locked, isResizable, draggableHandle, propsClassName) => {
+const _gridClass = (locked: boolean, isResizable: boolean, draggableHandle: string, propsClassName: string) => {
   const className = `${propsClassName}`;
 
   if (locked || !isResizable) {
@@ -95,20 +97,30 @@ const _gridClass = (locked, isResizable, draggableHandle, propsClassName) => {
   return `${className} unlocked`;
 };
 
-const _onLayoutChange = (newLayout, onPositionsChange) => {
-  const newPositions = [];
+type Position = {
+  id: string,
+  col: number,
+  row: number,
+  height: number,
+  width: number
+};
 
-  newLayout.forEach((widget) => {
-    newPositions.push({
-      id: widget.i,
-      col: widget.x + 1,
-      row: widget.y + 1,
-      height: widget.h,
-      width: widget.w,
+const _onLayoutChange = (newLayout: Layout, callback: (newPositions: Position[]) => void) => {
+  const newPositions: Position[] = [];
+
+  newLayout
+    .filter(({ i }) => !i.startsWith('gap'))
+    .forEach((widget) => {
+      newPositions.push({
+        id: widget.i,
+        col: widget.x + 1,
+        row: widget.y + 1,
+        height: widget.h,
+        width: widget.w,
+      });
     });
-  });
 
-  onPositionsChange(newPositions);
+  return callback(newPositions);
 };
 
 type Props = {
@@ -127,13 +139,14 @@ type Props = {
   locked?: boolean,
   measureBeforeMount?: boolean,
   onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void,
+  onSyncLayout?: (newPositions: Array<WidgetPositionJSON>) => void,
   positions: { [widgetId: string]: WidgetPosition },
   rowHeight?: number,
   theme: DefaultTheme,
   width?: number,
 }
 
-const computeLayout = (positions = {}) => {
+const computeLayout = (positions: WidgetPositions = {}) => {
   return Object.keys(positions).map((id) => {
     const { col, row, height, width } = positions[id];
 
@@ -145,6 +158,20 @@ const computeLayout = (positions = {}) => {
       w: width || 1,
     };
   });
+};
+
+type Layout = { i: string, x: number, y: number, h: number, w: number }[];
+
+const removeGaps = (_layout: Layout) => {
+  const gapIndices = [];
+
+  _layout.forEach((item, idx) => {
+    if (item.i.startsWith('gap')) {
+      gapIndices.push(idx);
+    }
+  });
+
+  gapIndices.reverse().forEach((idx) => _layout.splice(idx, 1));
 };
 
 /**
@@ -162,15 +189,17 @@ const ReactGridContainer = ({
   locked,
   measureBeforeMount,
   onPositionsChange,
+  onSyncLayout: _onSyncLayout,
   positions,
   rowHeight,
   theme,
   width,
 }: Props) => {
   const cellMargin = theme.spacings.px.xs;
-  const onLayoutChange = useCallback((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
+  const onLayoutChange = useCallback<ItemCallback>((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
+  const onSyncLayout = useCallback((layout: Layout) => _onLayoutChange(layout, _onSyncLayout), [_onSyncLayout]);
   const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
-  const layout = computeLayout(positions);
+  const layout = useMemo(() => computeLayout(positions), [positions]);
 
   // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
   // https://github.com/STRML/react-grid-layout/issues/371
@@ -189,8 +218,11 @@ const ReactGridContainer = ({
       // Do not allow dragging from elements inside a `.actions` css class. This is
       // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
                                    draggableCancel=".actions"
+                                   onDragStart={removeGaps}
                                    onDragStop={onLayoutChange}
+                                   onResizeStart={removeGaps}
                                    onResizeStop={onLayoutChange}
+                                   onLayoutChange={onSyncLayout}
       // While CSS transform improves the paint performance,
       // it currently results in bug when using `react-sticky-el` inside a grid item.
                                    useCSSTransforms={false}
@@ -298,6 +330,7 @@ ReactGridContainer.defaultProps = {
   rowHeight: ROW_HEIGHT,
   draggableHandle: undefined,
   width: undefined,
+  onSyncLayout: () => {},
 };
 
 export default withTheme(ReactGridContainer);

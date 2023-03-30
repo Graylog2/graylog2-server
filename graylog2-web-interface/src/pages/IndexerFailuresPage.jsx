@@ -15,30 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import numeral from 'numeral';
 import moment from 'moment';
 
 import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
-import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { IndexerFailuresStore } from 'stores/indexers/IndexerFailuresStore';
 
 class IndexerFailuresPage extends React.Component {
-  state = {};
+  static propTypes = {
+    paginationQueryParameter: PropTypes.object.isRequired,
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {};
+  }
 
   componentDidMount() {
     IndexerFailuresStore.count(moment().subtract(10, 'years')).then((response) => {
       this.setState({ total: response.count });
     });
 
-    this.loadData(1, this.defaultPageSize);
+    this.loadData();
   }
 
-  defaultPageSize = 50;
-
-  loadData = (page, size) => {
+  loadData = (page = this.props.paginationQueryParameter.page, size = this.props.paginationQueryParameter.pageSize) => {
     IndexerFailuresStore.list(size, (page - 1) * size).then((response) => {
       this.setState({ failures: response.failures });
     });
@@ -56,16 +63,17 @@ class IndexerFailuresPage extends React.Component {
     return (
       <DocumentTitle title="Indexer failures">
         <span>
-          <PageHeader title="Indexer failures">
+          <PageHeader title="Indexer failures"
+                      documentationLink={{
+                        title: 'Indexer failures documentation',
+                        path: DocsHelper.PAGES.INDEXER_FAILURES,
+                      }}>
             <span>
               This is a list of message index attempts that failed. A failure means that a message you sent to Graylog was{' '}
               properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to a size{' '}
               of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
-            </span>
-
-            <span>
-              Collection containing a total of {numeral(this.state.total).format('0,0')} indexer failures. Read more about
-              this topic in the <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="documentation" />.
+              <br />
+              Collection containing a total of {numeral(this.state.total).format('0,0')} indexer failures.
             </span>
           </PageHeader>
           <Row className="content">
@@ -81,4 +89,4 @@ class IndexerFailuresPage extends React.Component {
   }
 }
 
-export default IndexerFailuresPage;
+export default withPaginationQueryParameter(IndexerFailuresPage);

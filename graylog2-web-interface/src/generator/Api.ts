@@ -54,7 +54,7 @@ type ContentType = 'application/json';
 export interface Operation {
   summary: string;
   nickname: string;
-  path: string;
+  path?: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   parameters: Array<Parameter>;
   type: Type;
@@ -68,7 +68,7 @@ export interface Route {
 
 export interface Api {
   name: string;
-  description: string;
+  description?: string;
   models: Record<string, Model>;
   routes: Array<Route>;
 }

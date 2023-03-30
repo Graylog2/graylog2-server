@@ -22,6 +22,16 @@ import { Jumbotron as BootstrapJumbotron } from 'react-bootstrap';
 export const StyledJumbotron = styled(BootstrapJumbotron)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
   background-color: ${theme.colors.global.contentBackground};
+  
+  h2 {
+    font-weight: bold;
+  }
+
+  p {
+    margin-bottom: 9px;
+    font-size: 20px;
+    font-weight: normal;
+  }
 `);
 
 const Jumbotron = forwardRef((props, ref) => {

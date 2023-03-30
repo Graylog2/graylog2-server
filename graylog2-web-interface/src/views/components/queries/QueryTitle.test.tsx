@@ -15,23 +15,36 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import mockAction from 'helpers/mocking/MockAction';
-import { QueriesActions } from 'views/stores/QueriesStore';
-import { ViewActions } from 'views/stores/ViewStore';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { asMock } from 'helpers/mocking';
+import createSearch from 'views/logic/slices/createSearch';
+import useAppSelector from 'stores/useAppSelector';
+import { selectViewStates } from 'views/logic/slices/viewSelectors';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import QueryTitle from './QueryTitle';
 
-jest.mock('views/stores/QueriesStore', () => ({ QueriesActions: {} }));
-jest.mock('views/stores/ViewStore', () => ({ ViewActions: {} }));
+jest.mock('views/logic/slices/createSearch');
+
+const QueryCount = () => {
+  const queries = useAppSelector(selectViewStates);
+  const activeQuery = useActiveQueryId();
+
+  return (
+    <>
+      <span>Query count: {queries.size}</span>
+      <span>Active query: {activeQuery}</span>
+    </>
+  );
+};
 
 describe('QueryTitle', () => {
   beforeEach(() => {
-    QueriesActions.duplicate = mockAction(jest.fn(() => Promise.resolve(Immutable.OrderedMap())));
-    ViewActions.selectQuery = mockAction(jest.fn((queryId) => Promise.resolve(queryId)));
+    asMock(createSearch).mockImplementation(async (s) => s);
   });
 
   const clickQueryAction = async (name: string) => {
@@ -44,34 +57,39 @@ describe('QueryTitle', () => {
     userEvent.click(menuItem);
   };
 
+  const SUT = (props: Partial<React.ComponentProps<typeof QueryTitle>>) => (
+    <TestStoreProvider>
+      <QueryTitle active
+                  id="query-id-1"
+                  openEditModal={() => {}}
+                  onClose={() => Promise.resolve()}
+                  title="Foo"
+                  openCopyToDashboardModal={() => {}}
+                  {...props} />
+      <QueryCount />
+    </TestStoreProvider>
+  );
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   describe('duplicate action', () => {
     it('triggers duplication of query', async () => {
-      render(
-        <QueryTitle active
-                    id="deadbeef"
-                    openEditModal={() => {}}
-                    onClose={() => Promise.resolve()}
-                    title="Foo" />,
-      );
+      render(<SUT />);
 
       await clickQueryAction('Duplicate');
 
-      await waitFor(() => expect(QueriesActions.duplicate).toHaveBeenCalled());
+      await screen.findByText(/query count: 2/i);
     });
 
     it('does not explicitly select new query after duplicating it', async () => {
       // Selecting the new query after duplication has become unnecessary, as `ViewStore#createQuery` does it already
-      render(
-        <QueryTitle active
-                    id="deadbeef"
-                    openEditModal={() => {}}
-                    onClose={() => Promise.resolve()}
-                    title="Foo" />,
-      );
+      render(<SUT />);
 
       await clickQueryAction('Duplicate');
 
-      expect(ViewActions.selectQuery).not.toHaveBeenCalled();
+      await screen.findByText(/active query: query-id-1/i);
     });
   });
 
@@ -79,13 +97,7 @@ describe('QueryTitle', () => {
     it('opens edit modal', async () => {
       const openEditModalFn = jest.fn();
 
-      render(
-        <QueryTitle active
-                    id="deadbeef"
-                    openEditModal={openEditModalFn}
-                    onClose={() => Promise.resolve()}
-                    title="Foo" />,
-      );
+      render(<SUT openEditModal={openEditModalFn} />);
 
       await clickQueryAction('Edit Title');
 

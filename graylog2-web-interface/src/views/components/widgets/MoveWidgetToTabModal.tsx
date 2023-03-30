@@ -19,11 +19,10 @@ import React, { useState, useCallback } from 'react';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
-import { useStore } from 'stores/connect';
 import QueryTitle from 'views/logic/queries/QueryTitle';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import type View from 'views/logic/views/View';
+import useQueryIds from 'views/hooks/useQueryIds';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 type Props = {
   view: View,
@@ -45,10 +44,11 @@ const _tabList = (view: View, queryIds): Array<TabEntry> => {
 const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => {
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
-  const { id: activeQuery } = useStore(CurrentQueryStore);
-  const queryIds = useStore(QueryIdsStore);
+  const activeQuery = useActiveQueryId();
+  const queryIds = useQueryIds();
   const onKeepCopy = useCallback((e) => setKeepCopy(e.target.checked), [setKeepCopy]);
-  const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy), [widgetId, selectedTab, keepCopy]);
+  const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy),
+    [onSubmit, widgetId, selectedTab, keepCopy]);
 
   const list = _tabList(view, queryIds.toArray()).filter(({ id }) => id !== activeQuery);
 
@@ -67,6 +67,7 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
     <BootstrapModalForm show
                         onCancel={onCancel}
                         submitButtonDisabled={!selectedTab}
+                        submitButtonText={`${keepCopy ? 'Copy' : 'Move'} widget`}
                         onSubmitForm={submit}
                         title="Choose Target Page">
       {renderResult}

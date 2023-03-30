@@ -58,6 +58,7 @@ public class EventImpl implements Event {
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
+    private EventReplayInfo replayInfo;
 
     EventImpl(String eventId,
               DateTime eventTimestamp,
@@ -279,6 +280,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public EventReplayInfo getReplayInfo() {
+        return replayInfo;
+    }
+
+    @Override
+    public void setReplayInfo(EventReplayInfo replayInfo) {
+        this.replayInfo = replayInfo;
+    }
+
+    @Override
     public EventDto toDto() {
         final Map<String, String> fields = this.fields.entrySet()
                 .stream()
@@ -309,6 +320,7 @@ public class EventImpl implements Event {
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
+                .replayInfo(getReplayInfo())
                 .build();
     }
 
@@ -337,8 +349,12 @@ public class EventImpl implements Event {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EventImpl event = (EventImpl) o;
         return priority == event.priority &&
                 alert == event.alert &&
@@ -356,14 +372,15 @@ public class EventImpl implements Event {
                 Objects.equals(source, event.source) &&
                 Objects.equals(keyTuple, event.keyTuple) &&
                 Objects.equals(fields, event.fields) &&
-                Objects.equals(groupByFields, event.groupByFields);
+                Objects.equals(groupByFields, event.groupByFields) &&
+                Objects.equals(replayInfo, event.replayInfo);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
-                keyTuple, priority, alert, fields, groupByFields);
+                keyTuple, priority, alert, fields, groupByFields, replayInfo);
     }
 
     @Override
@@ -386,6 +403,7 @@ public class EventImpl implements Event {
                 .add("alert", alert)
                 .add("fields", fields)
                 .add("groupByFields", groupByFields)
+                .add("replayInfo", replayInfo)
                 .toString();
     }
 

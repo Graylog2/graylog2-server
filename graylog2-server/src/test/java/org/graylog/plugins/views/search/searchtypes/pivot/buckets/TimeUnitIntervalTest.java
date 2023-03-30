@@ -36,7 +36,7 @@ public class TimeUnitIntervalTest {
     }
 
     public static class InvalidTimeUnits {
-        public static final String INVALID_TIME_UNIT_MESSAGE = "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwM].";
+        public static final String INVALID_TIME_UNIT_MESSAGE = "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwMy].";
 
         @Test
         public void doesNotAllowInvalidTimeUnit() {
@@ -85,7 +85,9 @@ public class TimeUnitIntervalTest {
                     {"4w", "28d"},
                     {"1M", "1M"},
                     {"2M", "60d"},
-                    {"4M", "120d"}
+                    {"4M", "120d"},
+                    {"1y", "365d"},
+                    {"4y", "1460d"}
             });
         }
 

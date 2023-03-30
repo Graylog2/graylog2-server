@@ -76,14 +76,14 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
     return undefined;
   }
 
-  const copyHooks = PluginStore.exports('views.hooks.copyWidgetToDashboard') || [];
+  const copyHooks = PluginStore.exports('views.hooks.copyWidgetToDashboard');
 
   const queryMap: Map<QueryId, Query> = Map(search.search.queries.map((q) => [q.id, q]));
   const match: [Widget, QueryId] | undefined | null = FindWidgetAndQueryIdInView(widgetId, search);
 
   if (match) {
     const [widget, queryId] = match;
-    const { timerange, query, filter = Map() } = queryMap.get(queryId);
+    const { timerange, query, filter = Map(), filters } = queryMap.get(queryId);
     const { widgetPositions } = search.state.get(queryId);
     const oldPositions = widgetPositions[widgetId];
     const title = search.state.get(queryId).titles.get(TitleTypes.Widget).get(widgetId);
@@ -99,11 +99,12 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .timerange(timerange)
       .query(query)
       .streams(streams)
+      .filters(filters)
       .build();
 
     const updatedView = UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions, title));
 
-    return copyHooks.reduce((previousDashboard, copyHook) => copyHook(widgetId, search, previousDashboard), updatedView);
+    return copyHooks.reduce((previousDashboard, copyHook) => copyHook(search, previousDashboard), updatedView);
   }
 
   return undefined;

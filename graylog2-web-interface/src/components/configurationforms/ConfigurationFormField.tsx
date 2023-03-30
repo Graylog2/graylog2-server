@@ -21,22 +21,24 @@ import PropTypes from 'prop-types';
 import {
   BooleanField,
   DropdownField,
+  EncryptedInlineBinaryField,
   ListField,
   NumberField,
   TextField,
 } from 'components/configurationforms';
-import type { ConfigurationField } from 'components/configurationforms/types';
+import type { ConfigurationField, FieldValue, EncryptedFieldValue } from 'components/configurationforms/types';
 
 type Props = {
   typeName: string,
   configField: ConfigurationField,
   configKey: string,
-  configValue: string | number | boolean | void,
+  configValue: FieldValue | EncryptedFieldValue<FieldValue>,
+  dirty: boolean,
   autoFocus: boolean,
-  onChange: () => void,
+  onChange: (field: string, value: FieldValue | EncryptedFieldValue<FieldValue>) => void,
 };
 
-const ConfigurationFormField = ({ typeName, configField, configKey, configValue, autoFocus, onChange }: Props) => {
+const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
   const elementKey = `${typeName}-${configKey}`;
 
   switch (configField.type) {
@@ -46,7 +48,8 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    typeName={typeName}
                    title={configKey}
                    field={configField}
-                   value={configValue}
+                   value={configValue as string | EncryptedFieldValue<string>}
+                   dirty={dirty}
                    onChange={onChange}
                    autoFocus={autoFocus} />
       );
@@ -56,7 +59,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                      typeName={typeName}
                      title={configKey}
                      field={configField}
-                     value={configValue}
+                     value={configValue as number}
                      onChange={onChange}
                      autoFocus={autoFocus} />
       );
@@ -66,7 +69,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                       typeName={typeName}
                       title={configKey}
                       field={configField}
-                      value={configValue}
+                      value={configValue as boolean}
                       onChange={onChange}
                       autoFocus={autoFocus} />
       );
@@ -76,7 +79,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                        typeName={typeName}
                        title={configKey}
                        field={configField}
-                       value={configValue}
+                       value={configValue as string}
                        onChange={onChange}
                        autoFocus={autoFocus}
                        addPlaceholder />
@@ -87,10 +90,26 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    typeName={typeName}
                    title={configKey}
                    field={configField}
-                   value={configValue}
+                   value={configValue as Array<string> | string}
                    onChange={onChange}
                    autoFocus={autoFocus} />
       );
+    case 'inline_binary':
+      if (configField.is_encrypted) {
+        return (
+          <EncryptedInlineBinaryField key={elementKey}
+                                      typeName={typeName}
+                                      title={configKey}
+                                      field={configField}
+                                      value={configValue as EncryptedFieldValue<string>}
+                                      dirty={dirty}
+                                      onChange={onChange}
+                                      autoFocus={autoFocus} />
+        );
+      }
+
+      return null;
+
     default:
       return null;
   }
@@ -103,11 +122,13 @@ ConfigurationFormField.propTypes = {
   configValue: PropTypes.any,
   autoFocus: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+  dirty: PropTypes.bool,
 };
 
 ConfigurationFormField.defaultProps = {
   configValue: undefined,
   autoFocus: false,
+  dirty: false,
 };
 
 export default ConfigurationFormField;

@@ -32,6 +32,7 @@ import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -94,13 +95,15 @@ public class LocalKafkaJournalTest {
         final File nodeId = temporaryFolder.newFile("node-id");
         Files.write(nodeId.toPath(), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
 
-        final Configuration configuration = new Configuration() {
+        final var nodeIdProvider = new FilePersistedNodeIdProvider(nodeId.getAbsolutePath());
+        final var configuration =
+                new Configuration() {
             @Override
             public String getNodeIdFile() {
                 return nodeId.getAbsolutePath();
             }
         };
-        serverStatus = new ServerStatus(configuration, EnumSet.of(ServerStatus.Capability.SERVER), new EventBus("KafkaJournalTest"), NullAuditEventSender::new);
+        serverStatus = new ServerStatus(configuration, EnumSet.of(ServerStatus.Capability.SERVER), new EventBus("KafkaJournalTest"), NullAuditEventSender::new, nodeIdProvider.get());
     }
 
     @After

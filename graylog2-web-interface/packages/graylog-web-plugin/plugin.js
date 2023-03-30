@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  PluginManifest: require('./lib/PluginManifest'),
-  PluginStore: require('./lib/PluginStore'),
-}
+
+export { default as PluginManifest } from './src/PluginManifest';
+export { default as PluginStore } from './src/PluginStore';

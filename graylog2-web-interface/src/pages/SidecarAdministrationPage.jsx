@@ -17,47 +17,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LinkContainer } from 'components/common/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
-import Routes from 'routing/Routes';
-import DocumentationLink from 'components/support/DocumentationLink';
 import CollectorsAdministrationContainer from 'components/sidecars/administration/CollectorsAdministrationContainer';
+import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import withLocation from 'routing/withLocation';
 
 const SidecarAdministrationPage = ({ location: { query: { node_id: nodeId } } }) => (
   <DocumentTitle title="Collectors Administration">
-    <span>
-      <PageHeader title="Collectors Administration">
-        <span>
-          The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
-        </span>
+    <SidecarsPageNavigation />
+    <PageHeader title="Collectors Administration"
+                documentationLink={{
+                  title: 'Sidecar documentation',
+                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                }}>
+      <span>
+        The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
+      </span>
+    </PageHeader>
 
-        <span>
-          Read more about collectors and how to set them up in the
-          {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_SIDECAR} text="Graylog documentation" />.
-        </span>
-
-        <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-            <Button bsStyle="info">Overview</Button>
-          </LinkContainer>
-          <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-            <Button bsStyle="info">Administration</Button>
-          </LinkContainer>
-          <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-            <Button bsStyle="info">Configuration</Button>
-          </LinkContainer>
-        </ButtonToolbar>
-      </PageHeader>
-
-      <Row className="content">
-        <Col md={12}>
-          <CollectorsAdministrationContainer nodeId={nodeId} />
-        </Col>
-      </Row>
-    </span>
+    <Row className="content">
+      <Col md={12}>
+        <CollectorsAdministrationContainer nodeId={nodeId} />
+      </Col>
+    </Row>
   </DocumentTitle>
 );
 

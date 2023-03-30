@@ -21,8 +21,6 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import DelegatedSearchPage from 'pages/DelegatedSearchPage';
 
-jest.mock('c3', () => ({ default: jest.fn() }));
-
 test('Renders other component if registered', () => {
   const SimpleComponent = () => <div>Hello!</div>;
 

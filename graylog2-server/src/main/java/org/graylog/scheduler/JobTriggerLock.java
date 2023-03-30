@@ -30,6 +30,8 @@ import javax.annotation.Nullable;
 @JsonDeserialize(builder = JobTriggerLock.Builder.class)
 public abstract class JobTriggerLock {
     static final String FIELD_OWNER = "owner";
+
+    static final String FIELD_LAST_OWNER = "last_owner";
     static final String FIELD_LAST_LOCK_TIME = "last_lock_time";
     static final String FIELD_CLOCK = "clock";
     static final String FIELD_PROGRESS = "progress";
@@ -37,6 +39,10 @@ public abstract class JobTriggerLock {
     @JsonProperty(FIELD_OWNER)
     @Nullable
     public abstract String owner();
+
+    @JsonProperty(FIELD_LAST_OWNER)
+    @Nullable
+    public abstract String lastOwner();
 
     @JsonProperty(FIELD_LAST_LOCK_TIME)
     @Nullable
@@ -69,6 +75,9 @@ public abstract class JobTriggerLock {
 
         @JsonProperty(FIELD_OWNER)
         public abstract Builder owner(@Nullable String owner);
+
+        @JsonProperty(FIELD_LAST_OWNER)
+        public abstract Builder lastOwner(@Nullable String lastOwner);
 
         @JsonProperty(FIELD_LAST_LOCK_TIME)
         public abstract Builder lastLockTime(@Nullable DateTime lastLockTime);

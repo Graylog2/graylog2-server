@@ -18,12 +18,14 @@ import type * as React from 'react';
 
 import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
 import type Widget from 'views/logic/widgets/Widget';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import type { GetState } from 'views/types';
 
 export type Contexts = {
   widgetFocusContext: WidgetFocusContextType,
 };
 
-export type WidgetAction = (w: Widget, contexts: Contexts) => unknown;
+export type WidgetAction = (w: Widget, contexts: Contexts) => (dispatch: AppDispatch, getState: GetState) => Promise<unknown>;
 
 export type WidgetActionType = {
   type: string,

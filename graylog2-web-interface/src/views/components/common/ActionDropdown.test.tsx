@@ -16,12 +16,17 @@
  */
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
+import type { ReactWrapper } from 'enzyme';
 
 import { MenuItem } from 'components/bootstrap';
 
 import ActionDropdown from './ActionDropdown';
 
 describe('ActionDropdown', () => {
+  const findLink = (wrapper: ReactWrapper, text: string) => wrapper.findWhere((node) => {
+    return node.type() === 'a' && node.text() === text;
+  });
+
   it('opens menu when trigger element is clicked', () => {
     const wrapper = mount((
       <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
@@ -67,7 +72,7 @@ describe('ActionDropdown', () => {
 
     trigger.simulate('click');
 
-    const menuItem = wrapper.find('a[children="Foo"]');
+    const menuItem = findLink(wrapper, 'Foo');
 
     menuItem.simulate('click');
 
@@ -88,7 +93,7 @@ describe('ActionDropdown', () => {
 
     trigger.simulate('click');
 
-    const menuItem = wrapper.find('a[children="Foo"]');
+    const menuItem = findLink(wrapper, 'Foo');
 
     menuItem.simulate('click');
 
@@ -110,7 +115,7 @@ describe('ActionDropdown', () => {
 
     trigger.simulate('click');
 
-    const menuItem = wrapper.find('a[children="Foo"]');
+    const menuItem = findLink(wrapper, 'Foo');
 
     menuItem.simulate('click');
 

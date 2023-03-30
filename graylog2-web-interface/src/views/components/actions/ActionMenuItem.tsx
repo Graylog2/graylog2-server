@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
 import type { ActionContexts } from 'views/types';
@@ -26,13 +26,14 @@ import type {
   ActionDefinition,
   ActionHandlerArguments,
   ExternalLinkAction,
-  HandlerAction,
+  HandlerAction, SetActionComponents, ActionComponents,
 } from 'views/components/actions/ActionHandler';
 import {
   createHandlerFor,
   isExternalLinkAction,
 } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
+import useAppDispatch from 'stores/useAppDispatch';
 
 const StyledMenuItem = styled(MenuItem)`
   && > a {
@@ -50,8 +51,8 @@ type Props = {
   action: ActionDefinition,
   handlerArgs: ActionHandlerArguments,
   onMenuToggle: () => void,
-  overflowingComponents: React.ReactNode,
-  setOverflowingComponents: (components: React.ReactNode) => void,
+  overflowingComponents: ActionComponents,
+  setOverflowingComponents: (components: ActionComponents) => void,
   type: 'field' | 'value',
 }
 
@@ -77,6 +78,7 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handle
     }
   }
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{action.title}</>;
 };
 
@@ -95,7 +97,7 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
     rel: 'noopener noreferrer',
   };
 
-  const onSelect = () => {
+  const onSelect = useCallback(() => {
     const { resetFocus = false } = action;
 
     if (resetFocus) {
@@ -103,7 +105,7 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
     }
 
     onMenuToggle();
-  };
+  }, [action, onMenuToggle, unsetWidgetFocusing]);
 
   return (
     <StyledMenuItem disabled={disabled}
@@ -124,14 +126,15 @@ type ActionHandlerItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'over
 
 const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
+  const dispatch = useAppDispatch();
 
-  const setActionComponents = (fn) => {
+  const setActionComponents: SetActionComponents = useCallback((fn) => {
     setOverflowingComponents(fn(overflowingComponents));
-  };
+  }, [overflowingComponents, setOverflowingComponents]);
 
-  const handler = createHandlerFor(action, setActionComponents);
+  const handler = useMemo(() => createHandlerFor(dispatch, action, setActionComponents), [action, dispatch, setActionComponents]);
 
-  const onSelect = () => {
+  const onSelect = useCallback(() => {
     const { resetFocus = false } = action;
 
     if (resetFocus) {
@@ -141,7 +144,7 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
     onMenuToggle();
 
     handler(handlerArgs);
-  };
+  }, [action, handler, handlerArgs, onMenuToggle, unsetWidgetFocusing]);
 
   const { field } = handlerArgs;
 
@@ -156,7 +159,8 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
 
 const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle }: Props) => {
   const { isEnabled = () => true } = action;
-  const actionDisabled = !isEnabled(handlerArgs);
+  const dispatch = useAppDispatch();
+  const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
   const { field } = handlerArgs;
 
   if (isExternalLinkAction(action)) {

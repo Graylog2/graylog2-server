@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fixes sorting exception on aggregations by removing 'latest' metrics from the list of possible sorts."
+
+issues = ["12908"]
+pulls = ["14027"]

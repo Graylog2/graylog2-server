@@ -22,9 +22,9 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
-import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -50,7 +50,7 @@ const LineVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
-  const { interpolation = 'linear' } = visualizationConfig;
+  const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
     type,
     name,
@@ -69,11 +69,12 @@ const LineVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
+  const layout = shapes ? { shapes } : {};
 
   return (
     <XYPlot config={config}
             plotLayout={layout}
+            axisType={axisType}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             height={height}

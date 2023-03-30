@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useRef, useCallback, useEffect } from 'react';
+import { useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css, keyframes } from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
-import { delay } from 'lodash';
+import delay from 'lodash/delay';
 import { useFormikContext } from 'formik';
 
 import { Popover } from 'components/bootstrap';
@@ -30,10 +30,9 @@ import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const Container = styled.div`
-  margin-right: 5px;
   margin-left: 5px;
   width: 25px;
   min-height: 34px;
@@ -42,7 +41,7 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => `
+const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => css`
   padding: 0;
   background: transparent;
   border: 0;
@@ -51,7 +50,7 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => `
+const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => css`
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);
@@ -156,18 +155,45 @@ const getErrorDocumentationLink = (errorType: string) => {
   }
 };
 
+type QueryForm = {
+  queryString: QueryValidationState,
+};
+
+type Explanations = QueryValidationState['explanations'];
+
+const deduplicateExplanations = (explanations: Explanations | undefined): Explanations => {
+  if (explanations === null || explanations.length === 0) {
+    return [];
+  }
+
+  const [deduplicated] = explanations.reduce(([prevExplanations, seen]: [Explanations, Array<string>], cur) => {
+    if (cur.errorType === 'UNKNOWN_FIELD') {
+      if (cur.relatedProperty !== undefined && !seen.includes(cur.relatedProperty)) {
+        return [[...prevExplanations, cur], [...seen, cur.relatedProperty]];
+      }
+
+      return [prevExplanations, seen];
+    }
+
+    return [[...prevExplanations, cur], seen];
+  }, [[], []]);
+
+  return deduplicated;
+};
+
 const QueryValidation = () => {
   const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
   const explanationTriggerRef = useRef(undefined);
-  const { errors: { queryString: queryStringErrors } } = useFormikContext();
+  const { errors: { queryString: queryStringErrors } } = useFormikContext<QueryForm>();
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
-  const { status, explanations } = validationState ?? {};
+  const { status, explanations = [] } = validationState ?? { explanations: [] };
+  const deduplicatedExplanations = useMemo(() => deduplicateExplanations(explanations), [explanations]);
   const hasExplanations = validationState && validationState?.status !== 'OK';
 
   return (
@@ -187,33 +213,32 @@ const QueryValidation = () => {
                              text={<Icon name="lightbulb" />} />
         )}
       </Container>
-
       {hasExplanations && showExplanation && (
-        <Overlay show
-                 containerPadding={10}
-                 placement="bottom"
-                 target={explanationTriggerRef.current}
-                 shouldUpdatePosition
-                 transition={Transition}>
-          <StyledPopover id="query-validation-error-explanation"
-                         title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
-                         $shaking={shakingPopover}>
-            <div role="alert">
-              {explanations.map(({ errorType, errorTitle, errorMessage, id }) => (
-                <Explanation key={id}>
-                  <span><b>{errorTitle}</b>: {errorMessage}</span>
-                  <DocumentationLink page={getErrorDocumentationLink(errorType)}
-                                     title={`${errorTitle} documentation`}
-                                     text={<DocumentationIcon name="lightbulb" />} />
-                </Explanation>
-              ))}
-              {plugableValidationExplanation?.map((PlugableExplanation, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <PlugableExplanation validationState={validationState} key={index} />),
-              )}
-            </div>
-          </StyledPopover>
-        </Overlay>
+      <Overlay show
+               containerPadding={10}
+               placement="bottom"
+               target={explanationTriggerRef.current}
+               shouldUpdatePosition
+               transition={Transition}>
+        <StyledPopover id="query-validation-error-explanation"
+                       title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
+                       $shaking={shakingPopover}>
+          <div role="alert">
+            {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
+              <Explanation key={id}>
+                <span><b>{errorTitle}</b>: {errorMessage}</span>
+                <DocumentationLink page={getErrorDocumentationLink(errorType)}
+                                   title={`${errorTitle} documentation`}
+                                   text={<DocumentationIcon name="lightbulb" />} />
+              </Explanation>
+            ))}
+            {plugableValidationExplanation?.map((PlugableExplanation, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              (<PlugableExplanation validationState={validationState} key={index} />)),
+            )}
+          </div>
+        </StyledPopover>
+      </Overlay>
       )}
     </>
   );

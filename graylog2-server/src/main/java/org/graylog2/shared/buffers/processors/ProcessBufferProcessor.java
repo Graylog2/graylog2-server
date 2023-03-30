@@ -58,6 +58,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final OutputBuffer outputBuffer;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final ULID ulid;
+    private final MessageULIDGenerator messageULIDGenerator;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
     private final FailureSubmissionService failureSubmissionService;
@@ -69,6 +70,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   OutputBuffer outputBuffer,
                                   ProcessingStatusRecorder processingStatusRecorder,
                                   ULID ulid,
+                                  MessageULIDGenerator messageULIDGenerator,
                                   @Assisted DecodingProcessor decodingProcessor,
                                   @DefaultStream Provider<Stream> defaultStreamProvider,
                                   FailureSubmissionService failureSubmissionService) {
@@ -76,6 +78,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
         this.ulid = ulid;
+        this.messageULIDGenerator = messageULIDGenerator;
         this.decodingProcessor = decodingProcessor;
         this.defaultStreamProvider = defaultStreamProvider;
         this.failureSubmissionService = failureSubmissionService;
@@ -161,10 +164,11 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         for (Message message : messages) {
             message.ensureValidTimestamp();
 
+            // If a message is received via the Cluster-to-Cluster Forwarder, it already has this field set
             if (!message.hasField(Message.FIELD_GL2_MESSAGE_ID) || isNullOrEmpty(message.getFieldAs(String.class, Message.FIELD_GL2_MESSAGE_ID))) {
                 // Set the message ID once all message processors have finished
                 // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
-                message.addField(Message.FIELD_GL2_MESSAGE_ID, ulid.nextULID());
+                message.addField(Message.FIELD_GL2_MESSAGE_ID, messageULIDGenerator.createULID(message));
             }
 
             // The processing time should only be set once all message processors have finished

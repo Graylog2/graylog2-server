@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { groupBy } from 'lodash';
+import React, { useEffect, useState } from 'react';
+import groupBy from 'lodash/groupBy';
 
 import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
@@ -32,21 +32,19 @@ import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators
 import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
-import type BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
-
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState<Array<Stream> | undefined>();
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [decorators, setDecorators] = useState<Array<Decorator> | undefined>();
   const [types, setTypes] = useState();
-  const configModal = useRef<BootstrapModalWrapper>();
+  const [showConfigModal, setShowConfigModal] = useState(false);
 
   useEffect(() => { StreamsActions.listStreams().then(setStreams); }, [setStreams]);
   useEffect(() => { DecoratorsActions.available().then(setTypes); }, [setTypes]);
   useEffect(() => { DecoratorsActions.list().then(setDecorators); }, [setDecorators]);
 
-  const openModal = useCallback(() => configModal.current && configModal.current.open(), [configModal]);
-  const closeModal = useCallback(() => configModal.current && configModal.current.close(), [configModal]);
+  const openModal = () => setShowConfigModal(true);
+  const closeModal = () => setShowConfigModal(false);
 
   if (!streams || !decorators || !types) {
     return <Spinner />;
@@ -77,9 +75,9 @@ const DecoratorsConfig = () => {
       <StreamSelect streams={streamOptions} onChange={setCurrentStream} value={currentStream} />
       <DecoratorList decorators={readOnlyDecoratorItems} disableDragging />
       <IfPermitted permissions="decorators:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Update</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
-      <DecoratorsConfigUpdate ref={configModal}
+      <DecoratorsConfigUpdate show={showConfigModal}
                               streams={streams}
                               decorators={decorators}
                               onCancel={closeModal}

@@ -15,23 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import type * as Immutable from 'immutable';
 
 import type { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import type TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
-import { useStore } from 'stores/connect';
-import { TitlesStore } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import TitleTypes from 'views/stores/TitleTypes';
+import useViewType from 'views/hooks/useViewType';
+import type WidgetType from 'views/logic/widgets/Widget';
+import useWidget from 'views/hooks/useWidget';
+import useActiveViewState from 'views/hooks/useActiveViewState';
 
 import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
@@ -40,22 +38,26 @@ import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextP
 
 type Props = {
   editing: boolean,
-  fields: Immutable.List<TFieldTypeMapping>,
   onPositionsChange: (position: BackendWidgetPosition) => void,
   position: WidgetPosition,
   widgetId: string,
 };
 
+const useTitle = (widget: WidgetType) => {
+  const activeViewState = useActiveViewState();
+
+  return activeViewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string;
+};
+
 const WidgetComponent = ({
   editing,
-  fields,
   onPositionsChange = () => undefined,
   position,
   widgetId,
 }: Props) => {
-  const widget = useStore(WidgetStore, (state) => state.get(widgetId));
-  const viewType = useContext(ViewTypeContext);
-  const title = useStore(TitlesStore, (titles) => titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
+  const widget = useWidget(widgetId);
+  const viewType = useViewType();
+  const title = useTitle(widget);
   const additionalContext = useMemo(() => ({ widget }), [widget]);
 
   const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
@@ -67,7 +69,6 @@ const WidgetComponent = ({
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
               <Widget editing={editing}
-                      fields={fields}
                       id={widget.id}
                       onPositionsChange={onPositionsChange}
                       position={position}
@@ -83,7 +84,6 @@ const WidgetComponent = ({
 
 WidgetComponent.propTypes = {
   editing: PropTypes.bool.isRequired,
-  fields: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
   position: PropTypes.shape(Position).isRequired,
 };

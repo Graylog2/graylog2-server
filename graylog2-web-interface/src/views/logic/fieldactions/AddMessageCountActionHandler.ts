@@ -14,27 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetActions } from 'views/stores/WidgetStore';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import type { ActionHandler } from 'views/components/actions/ActionHandler';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
-const AddMessageCountActionHandler: ActionHandler<{}> = async () => {
+export const CreateMessageCount = () => {
   const series = Series.forFunction('count()')
     .toBuilder()
     .config(new SeriesConfig('Message Count'))
     .build();
 
-  WidgetActions.create(AggregationWidget.builder()
+  return AggregationWidget.builder()
     .newId()
     .config(AggregationWidgetConfig.builder()
       .series([series])
       .visualization(NumberVisualization.type)
       .build())
-    .build());
+    .build();
 };
+
+const AddMessageCountActionHandler = () => (dispatch: AppDispatch) => dispatch(addWidget(CreateMessageCount()));
 
 export default AddMessageCountActionHandler;

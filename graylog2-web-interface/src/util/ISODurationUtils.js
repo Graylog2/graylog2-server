@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import moment from 'moment';
-import {} from 'moment-duration-format';
+import 'moment-duration-format';
 
 const ISODurationUtils = {
   isValidDuration(duration, validator) {

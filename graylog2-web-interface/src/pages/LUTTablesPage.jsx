@@ -20,13 +20,28 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
-import history from 'util/History';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
+import { LookupTableView, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
+import withHistory from 'routing/withHistory';
+
+const _saved = (history) => {
+  // reset detail state
+  history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+};
+
+const _isCreating = ({ action }) => {
+  return action === 'create';
+};
+
+const _validateTable = (table) => {
+  LookupTablesActions.validate(table);
+};
 
 class LUTTablesPage extends React.Component {
   errorStatesTimer = undefined;
@@ -47,7 +62,10 @@ class LUTTablesPage extends React.Component {
   }
 
   componentWillUnmount() {
+    const { page, pageSize } = this.props.paginationQueryParameter;
+
     clearInterval(this.errorStatesTimer);
+    LookupTablesActions.searchPaginated(page, pageSize);
   }
 
   _startErrorStatesTimer = () => {
@@ -79,30 +97,18 @@ class LUTTablesPage extends React.Component {
 
   _loadData = (props) => {
     const { pagination } = this.props;
+    const { page, pageSize } = this.props.paginationQueryParameter;
 
     this._stopErrorStatesTimer();
 
     if (props.params && props.params.tableName) {
       LookupTablesActions.get(props.params.tableName);
-    } else if (this._isCreating(props)) {
+    } else if (_isCreating(props)) {
       // nothing to do, the intermediate data container will take care of loading the caches and adapters
     } else {
-      LookupTablesActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
+      LookupTablesActions.searchPaginated(page, pageSize, pagination.query);
       this._startErrorStatesTimer();
     }
-  };
-
-  _saved = () => {
-    // reset detail state
-    history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
-  };
-
-  _isCreating = ({ action }) => {
-    return action === 'create';
-  };
-
-  _validateTable = (table) => {
-    LookupTablesActions.validate(table);
   };
 
   render() {
@@ -117,10 +123,12 @@ class LUTTablesPage extends React.Component {
       dataAdapters,
       pagination,
       errorStates,
+      history,
     } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
+    const saved = () => _saved(history);
 
     if (isShowing || isEditing) {
       if (!table) {
@@ -132,23 +140,23 @@ class LUTTablesPage extends React.Component {
               <h2>Lookup Table</h2>
               <LookupTableForm table={table}
                                create={false}
-                               saved={this._saved}
-                               validate={this._validateTable}
+                               saved={saved}
+                               validate={_validateTable}
                                validationErrors={validationErrors} />
             </Col>
           </Row>
         );
       } else {
         content = (
-          <LookupTable dataAdapter={dataAdapter}
-                       cache={cache}
-                       table={table} />
+          <LookupTableView dataAdapter={dataAdapter}
+                           cache={cache}
+                           table={table} />
         );
       }
-    } else if (this._isCreating(this.props)) {
+    } else if (_isCreating(this.props)) {
       content = (
-        <LookupTableCreate saved={this._saved}
-                           validate={this._validateTable}
+        <LookupTableCreate saved={saved}
+                           validate={_validateTable}
                            validationErrors={validationErrors} />
       );
     } else if (!tables) {
@@ -165,27 +173,17 @@ class LUTTablesPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables">
-        <span>
-          <PageHeader title="Lookup Tables">
-            <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
-            {null}
-            <span>
-              <ButtonToolbar>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info">Lookup Tables</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                  <Button bsStyle="info">Caches</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                  <Button bsStyle="info">Data Adapters</Button>
-                </LinkContainer>
-              </ButtonToolbar>
-            </span>
-          </PageHeader>
+        <LUTPageNavigation />
+        <PageHeader title="Lookup Tables"
+                    actions={(
+                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
+                      </LinkContainer>
+                      )}>
+          <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
+        </PageHeader>
 
-          {content}
-        </span>
+        {content}
       </DocumentTitle>
     );
   }
@@ -200,9 +198,11 @@ LUTTablesPage.propTypes = {
   caches: PropTypes.object,
   dataAdapters: PropTypes.object,
   pagination: PropTypes.object,
+  history: PropTypes.object.isRequired,
   location: PropTypes.object,
   errorStates: PropTypes.object,
   action: PropTypes.string,
+  paginationQueryParameter: PropTypes.object.isRequired,
 };
 
 LUTTablesPage.defaultProps = {
@@ -219,7 +219,7 @@ LUTTablesPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withParams(withLocation(LUTTablesPage)), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
+export default connect(withHistory(withParams(withLocation(withPaginationQueryParameter(LUTTablesPage)))), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
   ...otherProps,
   ...lookupTableStore,
 }));

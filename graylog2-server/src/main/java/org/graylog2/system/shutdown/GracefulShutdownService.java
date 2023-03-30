@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -126,10 +126,10 @@ public class GracefulShutdownService extends AbstractIdleService {
     }
 
     private ExecutorService executorService(final int maxThreads) {
-        return new ThreadPoolExecutor(0,
+        return new ThreadPoolExecutor(maxThreads,
                 maxThreads,
                 60L, TimeUnit.SECONDS,
-                new SynchronousQueue<>(),
+                new LinkedBlockingQueue<>(),
                 new ThreadFactoryBuilder()
                         .setNameFormat("graceful-shutdown-service-%d")
                         .setUncaughtExceptionHandler((t, e) -> LOG.error("Uncaught exception in <{}>", t, e))

@@ -225,11 +225,11 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         return config.rowPivots().stream().map(rowPivot -> {
             if (rowPivot.type().matches("time")) {
                 return Time.builder()
-                        .field(rowPivot.field())
+                        .fields(rowPivot.fields())
                         .interval(AutoInterval.create()).build();
             } else {
                 return Values.builder()
-                        .field(rowPivot.field())
+                        .fields(rowPivot.fields())
                         .build();
             }
         }).collect(Collectors.toList());

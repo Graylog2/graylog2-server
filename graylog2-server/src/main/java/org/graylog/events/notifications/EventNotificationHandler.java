@@ -33,7 +33,6 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +85,7 @@ public class EventNotificationHandler {
                 }
                 try {
                     final JobTriggerDto trigger = jobTriggerService.create(JobTriggerDto.builder()
+                            .jobDefinitionType(EventNotificationExecutionJob.TYPE_NAME)
                             .jobDefinitionId(jobDefinition.get().id())
                             .schedule(OnceJobSchedule.create())
                             .data(notificationConfig.toJobTriggerData(event.toDto()))

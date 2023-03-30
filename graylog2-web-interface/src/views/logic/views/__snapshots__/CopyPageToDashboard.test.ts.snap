@@ -1,0 +1,94 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`copyPageToDashboard should copy a page to a dashboard 1`] = `
+{
+  "created_at": 2020-01-01T00:00:00.000Z,
+  "description": "Foo",
+  "id": "foo",
+  "owner": "admin",
+  "properties": Immutable.List [],
+  "search_id": "new-search-id",
+  "state": Immutable.Map {
+    "dead-beef": {
+      "formatting": {
+        "highlighting": [],
+      },
+      "positions": Immutable.Map {
+        "undefined": {
+          "col": 1,
+          "height": 2,
+          "row": 8,
+          "width": "Infinity",
+        },
+        "dead-beef": {
+          "col": 1,
+          "height": 4,
+          "row": 1,
+          "width": "Infinity",
+        },
+      },
+      "selected_fields": [
+        "source",
+        "message",
+      ],
+      "titles": Immutable.Map {
+        "widget": Immutable.Map {
+          undefined: "All Messages",
+          "dead-beef": "Aggregating stddev(files_changed) by author (copy)",
+        },
+      },
+      "widget_mapping": Immutable.Map {
+        "dead-beef": Immutable.Set [
+          "dead-beef",
+        ],
+      },
+      "widgets": Immutable.List [
+        {
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "stddev(files_changed)": "#8bc34a",
+              },
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "config": {
+                  "limit": 15,
+                },
+                "field": "author",
+                "type": "values",
+              },
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null,
+                },
+                "function": "stddev(files_changed)",
+              },
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "filters": Immutable.List [],
+          "id": "dead-beef",
+          "query": {
+            "query_string": "",
+            "type": "elasticsearch",
+          },
+          "streams": [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+      ],
+    },
+  },
+  "summary": "summary",
+  "title": "Foo",
+  "type": "DASHBOARD",
+}
+`;

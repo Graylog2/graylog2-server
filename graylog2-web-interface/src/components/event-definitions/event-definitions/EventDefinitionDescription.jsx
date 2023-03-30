@@ -17,8 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {} from 'moment-duration-format';
-import lodash from 'lodash';
+import 'moment-duration-format';
+import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
 import { Button, Col, Row } from 'components/bootstrap';
@@ -108,7 +108,7 @@ class EventDefinitionDescription extends React.Component {
       return null;
     }
 
-    const scheduleCtx = lodash.get(context, `scheduler.${definition.id}`, null);
+    const scheduleCtx = get(context, `scheduler.${definition.id}`, null);
 
     if (!scheduleCtx.is_scheduled) {
       return (<p>Event definition is not scheduled, no details available.</p>);
@@ -116,7 +116,7 @@ class EventDefinitionDescription extends React.Component {
 
     let timerange = null;
 
-    if (lodash.get(scheduleCtx, 'data.type', null) === 'event-processor-execution-v1') {
+    if (get(scheduleCtx, 'data.type', null) === 'event-processor-execution-v1') {
       const from = scheduleCtx.data.timerange_from;
       const to = scheduleCtx.data.timerange_to;
 

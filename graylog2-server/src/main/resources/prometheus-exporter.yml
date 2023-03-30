@@ -23,6 +23,9 @@ metric_mappings:
       - "stream"
       - "stream_rule"
 
+  - metric_name: "stream_router_cannot_remove_default"
+    match_pattern: "org.graylog2.streams.StreamRouterEngine.cannotRemoveDefault"
+
   - metric_name: "enterprise_forwarder_journal_written_bytes"
     match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.buffer.ForwarderJournallingMessageHandler.*.writtenBytes"
     wildcard_extract_labels:
@@ -1239,3 +1242,14 @@ metric_mappings:
     additional_labels:
       success: "false"
       type: "graylog"
+
+  - metric_name: "illuminate_status"
+    match_pattern: "org.graylog.plugins.illuminate.status.IlluminateStatusService.*.*"
+    wildcard_extract_labels:
+      - "type"
+      - "enabled"
+
+  - metric_name: "http_proxied_requests_executor"
+    match_pattern: "org.graylog2.shared.bindings.providers.ProxiedRequestsExecutorService.http-proxied-requests-executor.*"
+    wildcard_extract_labels:
+      - "type"

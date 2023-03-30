@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -27,16 +26,8 @@ import Series from 'views/logic/aggregationbuilder/Series';
 
 import ChartColorContext from './ChartColorContext';
 
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(
-    ['getInitialState', () => {
-      return {
-        activeQuery: 'active-query-id',
-      };
-    },
-    ],
-  ),
-}));
+jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
+jest.mock('stores/useAppDispatch');
 
 const colors = ColorMapper.create();
 const setColor = jest.fn();
@@ -45,7 +36,7 @@ const chartData = [
   { name: 'name2' },
   { name: 'name3' },
 ];
-const columnPivots = [Pivot.create('field1', 'unknown')];
+const columnPivots = [Pivot.create(['field1'], 'unknown')];
 const config = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).columnPivots(columnPivots).build();
 
 // eslint-disable-next-line react/require-default-props
@@ -87,7 +78,7 @@ describe('PlotLegend', () => {
     const color = screen.getByTitle('#b71c1c');
     fireEvent.click(color);
 
-    await waitFor(() => expect(setColor).toBeCalledWith('name1', '#b71c1c'));
+    await waitFor(() => expect(setColor).toHaveBeenCalledWith('name1', '#b71c1c'));
   });
 
   it('should open the value context menu', async () => {

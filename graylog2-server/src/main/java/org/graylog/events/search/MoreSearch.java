@@ -104,9 +104,9 @@ public class MoreSearch {
                     .collect(Collectors.toSet());
         } else {
             final Set<Stream> streams = loadStreams(streamIds);
-            final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams = new IndexRangeContainsOneOfStreams(streams);
+            final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams = new IndexRangeContainsOneOfStreams();
             return indexRanges.stream()
-                    .filter(indexRangeContainsOneOfStreams)
+                    .filter(ir -> indexRangeContainsOneOfStreams.test(ir, streams))
                     .map(IndexRange::indexName)
                     .collect(Collectors.toSet());
         }
@@ -130,8 +130,6 @@ public class MoreSearch {
      * @param resultCallback the callback that gets executed for each batch
      */
     public void scrollQuery(String queryString, Set<String> streams, Set<Parameter> queryParameters, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException {
-        final String scrollTime = "1m"; // TODO: Does scroll time need to be configurable?
-
         final Set<String> affectedIndices = getAffectedIndices(streams, timeRange);
 
         try {
@@ -144,7 +142,7 @@ public class MoreSearch {
             throw e;
         }
 
-        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
+        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, batchSize, resultCallback::call);
     }
 
     public Set<Stream> loadStreams(Set<String> streamIds) {

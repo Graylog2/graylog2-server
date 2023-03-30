@@ -22,6 +22,7 @@ import { Alert, Col, Row, Button } from 'components/bootstrap';
 import { IfPermitted, Spinner, Icon } from 'components/common';
 import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 const NodeRow = styled.div(({ theme }) => css`
   border-bottom: 1px solid ${theme.colors.gray[80]};
@@ -61,7 +62,7 @@ const NodeRow = styled.div(({ theme }) => css`
   }
 `);
 
-const NodeRowInfo = styled.div`
+const NodeRowInfo = styled(ButtonToolbar)`
   position: relative;
   top: 2px;
 
@@ -164,7 +165,6 @@ class Output extends React.Component {
     if (streamId) {
       deleteFromStreamButton = (
         <IfPermitted permissions="stream_outputs:delete">
-          {' '}
           <Button bsStyle="info" onClick={this._onDeleteFromStream}>
             Delete from stream
           </Button>
@@ -186,7 +186,7 @@ class Output extends React.Component {
               Type: {output.type}
             </Col>
             <Col md={6}>
-              <NodeRowInfo className="text-right">
+              <NodeRowInfo className="text-right pull-right">
                 <IfPermitted permissions="outputs:edit">
                   <EditOutputButton disabled={this._typeNotAvailable()}
                                     output={output}
@@ -195,8 +195,7 @@ class Output extends React.Component {
                 </IfPermitted>
                 {deleteFromStreamButton}
                 <IfPermitted permissions="outputs:terminate">
-                  {' '}
-                  <Button bsStyle="primary" onClick={this._onDeleteGlobally}>
+                  <Button bsStyle="danger" onClick={this._onDeleteGlobally}>
                     Delete globally
                   </Button>
                 </IfPermitted>

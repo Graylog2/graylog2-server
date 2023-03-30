@@ -34,7 +34,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-@Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Search/Export", description = "Creating/Managing Export Jobs.", tags = {CLOUD_VISIBLE})
 @Path("/views/export")
 @RequiresAuthentication
 public class ExportJobsResource extends RestResource {

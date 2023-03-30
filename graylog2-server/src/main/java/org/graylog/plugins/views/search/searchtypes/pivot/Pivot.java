@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -28,6 +29,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -42,6 +44,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -95,6 +98,21 @@ public abstract class Pivot implements SearchType {
         return this;
     }
 
+    @Override
+    public SearchType withQuery(BackendQuery query) {
+        return toBuilder().query(query).build();
+    }
+
+    @Override
+    public SearchType withFilter(Filter filter) {
+        return toBuilder().filter(filter).build();
+    }
+
+    @Override
+    public SearchType withFilters(List<UsedSearchFilter> filters) {
+        return toBuilder().filters(filters).build();
+    }
+
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
@@ -129,14 +147,30 @@ public abstract class Pivot implements SearchType {
         @JsonProperty("row_groups")
         public abstract Builder rowGroups(List<BucketSpec> rowGroups);
 
+        public Builder rowGroups(BucketSpec... rowGroups) {
+            return rowGroups(List.of(rowGroups));
+        }
+
         @JsonProperty("column_groups")
         public abstract Builder columnGroups(List<BucketSpec> columnGroups);
+
+        public Builder columnGroups(BucketSpec... columnGroups) {
+            return columnGroups(List.of(columnGroups));
+        }
 
         @JsonProperty
         public abstract Builder series(List<SeriesSpec> series);
 
+        public Builder series(SeriesSpec... series) {
+            return series(List.of(series));
+        }
+
         @JsonProperty
         public abstract Builder sort(List<SortSpec> sort);
+
+        public Builder sort(SortSpec... sort) {
+            return sort(List.of(sort));
+        }
 
         @JsonProperty
         public abstract Builder rollup(boolean rollup);
@@ -148,7 +182,7 @@ public abstract class Pivot implements SearchType {
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
         @JsonSubTypes({
                 @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
                 @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
@@ -178,7 +212,7 @@ public abstract class Pivot implements SearchType {
 
     @Override
     public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        return PivotEntity.builder()
+        PivotEntity.Builder builder = PivotEntity.builder()
                 .sort(sort())
                 .streams(mappedStreams(entityDescriptorIds))
                 .timerange(timerange().orElse(null))
@@ -191,7 +225,7 @@ public abstract class Pivot implements SearchType {
                 .name(name().orElse(null))
                 .rollup(rollup())
                 .series(series())
-                .type(type())
-                .build();
+                .type(type());
+        return builder.build();
     }
 }

@@ -25,12 +25,12 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.searches.ScrollCommand;
+import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
@@ -80,8 +80,8 @@ public class SearchesAdapterES7 implements SearchesAdapter {
     }
 
     @Override
-    public ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields) {
-        return scroll(ScrollCommand.builder()
+    public ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields) {
+        return scroll(ChunkCommand.builder()
                 .indices(indexWildcards)
                 .sorting(sorting)
                 .filter(filter)
@@ -94,8 +94,8 @@ public class SearchesAdapterES7 implements SearchesAdapter {
     }
 
     @Override
-    public ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize) {
-        return scroll(ScrollCommand.builder()
+    public ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize) {
+        return scroll(ChunkCommand.builder()
                 .indices(indexWildcards)
                 .sorting(sorting)
                 .filter(filter)
@@ -105,8 +105,8 @@ public class SearchesAdapterES7 implements SearchesAdapter {
     }
 
     @Override
-    public ScrollResult scroll(ScrollCommand scrollCommand) {
-        return scroll.scroll(scrollCommand);
+    public ChunkedResult scroll(ChunkCommand chunkCommand) {
+        return scroll.retrieveChunkedResult(chunkCommand);
     }
 
     @Override

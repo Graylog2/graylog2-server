@@ -20,11 +20,11 @@ import { render } from 'wrappedTestingLibrary';
 import moment from 'moment';
 
 import { DATE_TIME_FORMATS } from 'util/DateTime';
-import { alice } from 'fixtures/users';
+import { adminUser } from 'fixtures/users';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
-import CurrentUserContext from 'contexts/CurrentUserContext';
-import type User from 'logic/users/User';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { asMock } from 'helpers/mocking';
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
@@ -32,26 +32,25 @@ jest.useFakeTimers()
   // @ts-expect-error
   .setSystemTime(mockedUnixTime);
 
+jest.mock('hooks/useCurrentUser');
+
 describe('DateTimeProvider', () => {
-  const user = alice.toBuilder().timezone('Europe/Berlin').build();
   const invalidDate = '2020-00-00T04:00:00.000Z';
   const expectErrorForInvalidDate = () => expect(console.error).toHaveBeenCalledWith(`Date time ${invalidDate} is not valid.`);
 
-  const renderSUT = (currentUser: User = user, tzOverride = undefined) => {
+  const renderSUT = (tzOverride = undefined) => {
     let contextValue;
 
     render(
-      <CurrentUserContext.Provider value={currentUser}>
-        <UserDateTimeProvider tz={tzOverride}>
-          <UserDateTimeContext.Consumer>
-            {(value) => {
-              contextValue = value;
+      <UserDateTimeProvider tz={tzOverride}>
+        <UserDateTimeContext.Consumer>
+          {(value) => {
+            contextValue = value;
 
-              return <div />;
-            }}
-          </UserDateTimeContext.Consumer>
-        </UserDateTimeProvider>,
-      </CurrentUserContext.Provider>,
+            return <div />;
+          }}
+        </UserDateTimeContext.Consumer>
+      </UserDateTimeProvider>,
     );
 
     return contextValue;
@@ -61,6 +60,7 @@ describe('DateTimeProvider', () => {
 
   beforeEach(() => {
     console.error = jest.fn();
+    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().timezone('Europe/Berlin').build());
   });
 
   afterEach(() => {
@@ -75,7 +75,7 @@ describe('DateTimeProvider', () => {
     });
 
     it('respect timezone override', () => {
-      const { userTimezone } = renderSUT(undefined, 'America/Los_Angeles');
+      const { userTimezone } = renderSUT('America/Los_Angeles');
 
       expect(userTimezone).toBe('America/Los_Angeles');
     });
@@ -95,7 +95,7 @@ describe('DateTimeProvider', () => {
     });
 
     it('respect timezone override', () => {
-      const { formatTime } = renderSUT(undefined, 'America/Los_Angeles');
+      const { formatTime } = renderSUT('America/Los_Angeles');
 
       expect(formatTime('2021-03-27T14:32:31.894Z')).toBe('2021-03-27 07:32:31');
     });
@@ -117,7 +117,7 @@ describe('DateTimeProvider', () => {
     });
 
     it('respect timezone override', () => {
-      const { toUserTimezone } = renderSUT(undefined, 'America/Los_Angeles');
+      const { toUserTimezone } = renderSUT('America/Los_Angeles');
       const result = toUserTimezone('2021-03-27T14:32:31.894Z');
 
       expect(moment.isMoment(result)).toBe(true);

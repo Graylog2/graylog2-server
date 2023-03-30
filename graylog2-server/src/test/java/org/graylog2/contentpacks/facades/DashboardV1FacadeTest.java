@@ -101,9 +101,10 @@ public class DashboardV1FacadeTest {
 
     public static class TestViewService extends ViewService {
         protected TestViewService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mapper,
+                                  MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                                  ObjectMapper mapper,
                                   ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mapper, clusterConfigService,
+            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService,
                     dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class));
         }
     }
@@ -139,10 +140,11 @@ public class DashboardV1FacadeTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
         searchDbService = new ViewFacadeTest.TestSearchDBService(mongoConnection, mapper);
-        viewService = new ViewFacadeTest.TestViewService(mongoConnection, mapper, null);
-        viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper);
+        viewService = new ViewFacadeTest.TestViewService(mongoConnection, mapper, objectMapper,null);
+        viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, objectMapper);
         userService = mock(UserService.class);
-        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
+                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
         final DashboardWidgetConverter dashboardWidgetConverter = new DashboardWidgetConverter();
         final EntityConverter entityConverter = new EntityConverter(dashboardWidgetConverter);

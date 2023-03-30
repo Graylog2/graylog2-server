@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionFieldType;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -29,9 +30,11 @@ import org.graylog.plugins.views.search.rest.suggestions.SuggestionEntryDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsErrorDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsRequestDTO;
+import org.graylog.plugins.views.search.validation.FieldTypeValidationImpl;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -46,8 +49,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "Search/Suggestions")
+@Api(value = "Search/Suggestions", tags = {CLOUD_VISIBLE})
 @Path("/search/suggest")
 public class SuggestionsResource extends RestResource implements PluginRestResource {
 
@@ -55,10 +60,13 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     private final PermittedStreams permittedStreams;
     private final QuerySuggestionsService querySuggestionsService;
 
+    private final MappedFieldTypesService mappedFieldTypesService;
+
     @Inject
-    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService) {
+    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService, MappedFieldTypesService mappedFieldTypesService) {
         this.permittedStreams = permittedStreams;
         this.querySuggestionsService = querySuggestionsService;
+        this.mappedFieldTypesService = mappedFieldTypesService;
     }
 
     @POST
@@ -68,12 +76,17 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     public SuggestionsDTO suggestFieldValue(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
                                             @Context SearchUser searchUser) {
 
+        final Set<String> streams = adaptStreams(suggestionsRequest.streams(), searchUser);
+        final TimeRange timerange = Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange());
+        final String fieldName = suggestionsRequest.field();
+
         final SuggestionRequest req = SuggestionRequest.builder()
-                .field(suggestionsRequest.field())
+                .field(fieldName)
+                .fieldType(getFieldType(streams, timerange, fieldName))
                 .input(suggestionsRequest.input())
-                .streams(adaptStreams(suggestionsRequest.streams(), searchUser))
+                .streams(streams)
                 .size(Math.min(suggestionsRequest.size(), SUGGESTIONS_COUNT_MAX))
-                .timerange(Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange()))
+                .timerange(timerange)
                 .build();
 
         SuggestionResponse res = querySuggestionsService.suggest(req);
@@ -99,14 +112,19 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     }
 
     private RelativeRange defaultTimeRange() {
-        try {
-            return RelativeRange.create(300);
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException(e);
-        }
+        return RelativeRange.create(300);
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
-        return permittedStreams.load(searchUser::canReadStream);
+        return permittedStreams.load(searchUser);
+    }
+
+    private SuggestionFieldType getFieldType(Set<String> streams, TimeRange timerange, final String fieldName) {
+        final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
+        return fieldTypes.stream().filter(f -> f.name().equals(fieldName))
+                .findFirst()
+                .map(MappedFieldTypeDTO::type)
+                .map(SuggestionFieldType::fromFieldType)
+                .orElse(SuggestionFieldType.OTHER);
     }
 }

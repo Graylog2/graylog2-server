@@ -51,7 +51,9 @@ interface ExtraConfigSettings {
 interface ExtraConfigWidget extends VisualizationConfig, ExtraConfigSettings {}
 
 const fromConfig = (config: ExtraConfigWidget): ExtraConfigSettings => ({ ...config });
-const createVisualizationConfig = (config: ExtraConfigSettings) => ({ ...config }) as ExtraConfigWidget;
+const createVisualizationConfig = (config: ExtraConfigSettings) => (({
+  ...config,
+}) as ExtraConfigWidget);
 const toConfig = (config: ExtraConfigSettings): ExtraConfigWidget => createVisualizationConfig(config);
 
 const visualizationPlugin: PluginRegistration = {
@@ -109,7 +111,7 @@ const visualizationPlugin: PluginRegistration = {
 };
 
 const selectEventConfig = { container: document.body };
-const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: 'Update Preview' });
+const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const expectSubmitButtonToBeDisabled = async () => {
   const submitButton = await findWidgetConfigSubmitButton();

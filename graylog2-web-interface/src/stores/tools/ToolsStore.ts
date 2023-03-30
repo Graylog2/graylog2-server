@@ -20,7 +20,6 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import DateTime from 'logic/datetimes/DateTime';
 
 type NaturalDateResponse = {
   from: string,
@@ -29,9 +28,8 @@ type NaturalDateResponse = {
 };
 
 const ToolsStore = {
-  testNaturalDate(keyword: string): Promise<NaturalDateResponse> {
-    const timezone = DateTime.getUserTimezone();
-    const { url } = ApiRoutes.ToolsApiController.naturalDateTest(encodeURIComponent(keyword), encodeURIComponent(timezone));
+  testNaturalDate(keyword: string, userTimezone: string): Promise<NaturalDateResponse> {
+    const { url } = ApiRoutes.ToolsApiController.naturalDateTest(encodeURIComponent(keyword), encodeURIComponent(userTimezone));
     const promise = fetch('GET', qualifyUrl(url));
 
     promise.catch((errorThrown) => {

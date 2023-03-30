@@ -28,7 +28,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
-import org.graylog.storage.elasticsearch7.errors.ResponseError;
+import org.graylog.storage.errors.ResponseError;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;

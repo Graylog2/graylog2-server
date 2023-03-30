@@ -18,26 +18,21 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.junit.Rule;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+import org.mockito.Mockito;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -46,32 +41,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({MockitoExtension.class})
-@MockitoSettings(strictness = Strictness.WARN)
 public class SearchResourceTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Mock
-    private SearchDomain searchDomain;
-
-    @Mock
-    private SearchJobService searchJobService;
 
     private final SearchUser searchUser = TestSearchUser.builder().build();
+    private final SearchJobService searchJobService = Mockito.mock(SearchJobService.class);
+    private final EventBus eventBus = Mockito.mock(EventBus.class);
+    private final SearchExecutor searchExecutor = Mockito.mock(SearchExecutor.class);
 
-    @Mock
-    private EventBus eventBus;
-
-    @Mock
-    private SearchExecutor searchExecutor;
-
-    private SearchResource searchResource;
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
-    }
 
     @Test
     public void testBuilderGeneratesSearchId() {
@@ -82,60 +58,53 @@ public class SearchResourceTest {
 
     @Test
     public void getSearchLoadsSearch() {
-        final Search search = mockExistingSearch();
+        final Query query = Query.builder()
+                .id("queryId")
+                .searchTypes(Collections.emptySet())
+                .filter(StreamFilter.anyIdOf("streamId"))
+                .build();
 
-        final SearchDTO returnedSearch = this.searchResource.getSearch(search.id(), searchUser);
+        final Search search = Search.builder()
+                .id("deadbeef")
+                .parameters(ImmutableSet.of())
+                .queries(ImmutableSet.of(query))
+                .build();
+
+        final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final SearchDTO returnedSearch = resource.getSearch(search.id(), searchUser);
 
         assertThat(returnedSearch.id()).isEqualTo(search.id());
     }
 
     @Test
     public void getSearchThrowsNotFoundIfSearchDoesntExist() {
-        when(searchDomain.getForUser(any(), any())).thenReturn(Optional.empty());
-
+        final SearchDomain searchDomain = mockSearchDomain(Optional.empty());
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> this.searchResource.getSearch("god", searchUser))
+                .isThrownBy(() -> resource.getSearch("god", searchUser))
                 .withMessageContaining("god");
     }
 
     @Test
     public void allowCreatingNewSearchWithoutId() {
         final SearchDTO search = SearchDTO.Builder.create().id(null).build();
+
+        final SearchDomain searchDomain = mock(SearchDomain.class);
         when(searchDomain.saveForUser(any(), any())).thenReturn(search.toSearch());
 
-        this.searchResource.createSearch(search, searchUser);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final Response response = resource.createSearch(search, searchUser);
+
+        Assertions.assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
     }
 
-    private Search mockNewSearch() {
-        final Search search = mock(Search.class);
-
-        when(search.addStreamsToQueriesWithoutStreams(any())).thenReturn(search);
-
-        final String streamId = "streamId";
-
-        final Query query = mock(Query.class);
-        when(query.id()).thenReturn("queryId");
-        when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
-        when(query.searchTypes()).thenReturn(ImmutableSet.of());
-        when(search.queries()).thenReturn(ImmutableSet.of(query));
-
-        return search;
-    }
-
-    private Search mockExistingSearch() {
-
-        final Search search = mockNewSearch();
-
-        final String searchId = "deadbeef";
-        when(search.id()).thenReturn(searchId);
-        when(search.parameters()).thenReturn(ImmutableSet.of());
-
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(searchDomain.getForUser(eq(search.id()), any())).thenReturn(Optional.of(search));
-
-        final SearchJob searchJob = mock(SearchJob.class);
-        when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
-
-        return search;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private SearchDomain mockSearchDomain(Optional<Search> search) {
+        final SearchDomain searchDomain = mock(SearchDomain.class);
+        search.ifPresentOrElse(
+                s -> when(searchDomain.getForUser(eq(s.id()), any())).thenReturn(search),
+                () -> when(searchDomain.getForUser(any(), any())).thenReturn(Optional.empty()));
+        return searchDomain;
     }
 }

@@ -3,7 +3,7 @@
     "PaginatedResponse": {
       "type": "object",
       "properties": {},
-      "additionalProperties": {
+      "additional_properties": {
         "type": "any"
       }
     },

@@ -17,22 +17,27 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
-import SearchActions from 'views/actions/SearchActions';
-import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 import type ViewState from 'views/logic/views/ViewState';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
+import View from 'views/logic/views/View';
+import Search from 'views/logic/search/Search';
+import createSearch from 'views/logic/slices/createSearch';
+import { updateViewState } from 'views/logic/slices/viewSlice';
+import Query from 'views/logic/queries/Query';
 
 import { mockFieldCharts, viewState as mockViewState } from './MigrateFieldCharts.fixtures';
 
-import MigrateFieldCharts from '../MigrateFieldCharts';
+import OriginalMigrateFieldCharts from '../MigrateFieldCharts';
 
-const mockStoreGet = (fieldChart = {}, migrated = false) => (key) => {
+const mockStoreGet = (fieldChart = {}, migrated = false) => (key: string) => {
   switch (key) {
     case 'pinned-field-charts-migrated':
       return migrated;
@@ -48,34 +53,17 @@ jest.mock('logic/local-storage/Store', () => ({
   set: jest.fn(),
 }));
 
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesActions: {
-    update: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('views/logic/slices/searchExecutionSlice', () => ({
+  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
+  execute: jest.fn(() => async () => {}),
 }));
 
-jest.mock('views/actions/SearchActions', () => ({
-  executeWithCurrentState: jest.fn(() => Promise.resolve()),
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  updateViewState: jest.fn(() => async () => {}),
 }));
 
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(
-    ['getInitialState', () => {
-      return {
-        state: mockViewState(),
-        activeQuery: 'active-query-id',
-      };
-    },
-    ],
-  ),
-}));
-
-jest.mock('views/logic/Widgets', () => ({
-  widgetDefinition: () => ({
-    defaultHeight: 4,
-    defaultWidth: 4,
-  }),
-}));
+jest.mock('views/logic/slices/createSearch');
 
 const getNewWidget = (actionMock) => {
   const viewState = asMock(actionMock).mock.calls[0][1] as ViewState;
@@ -88,6 +76,24 @@ const getNewWidgetConfig = (actionMock) => {
   return getNewWidget(actionMock).config;
 };
 
+const MigrateFieldCharts = () => {
+  const search = Search.builder()
+    .newId()
+    .queries([Query.builder().id('query1').build()])
+    .build();
+  const view = View.builder()
+    .type(View.Type.Search)
+    .state({ query1: mockViewState() })
+    .search(search)
+    .build();
+
+  return (
+    <TestStoreProvider view={view} initialQuery="query1">
+      <OriginalMigrateFieldCharts />
+    </TestStoreProvider>
+  );
+};
+
 const renderAndMigrate = () => {
   const { queryByText, getByText } = render(<MigrateFieldCharts />);
   const migrateButton = getByText('Migrate');
@@ -98,6 +104,14 @@ const renderAndMigrate = () => {
 };
 
 describe('MigrateFieldCharts', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
+  beforeEach(() => {
+    asMock(createSearch).mockImplementation(async (s) => s);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -120,7 +134,7 @@ describe('MigrateFieldCharts', () => {
     it('execute search, when finished', async () => {
       Store.get.mockImplementation(mockStoreGet());
       renderAndMigrate();
-      await waitFor(() => expect(SearchActions.executeWithCurrentState).toHaveBeenCalled());
+      await waitFor(() => expect(execute).toHaveBeenCalled());
     });
 
     it('hide alert, when finished', async () => {
@@ -143,11 +157,10 @@ describe('MigrateFieldCharts', () => {
 
       Store.get.mockImplementation(mockStoreGet());
       renderAndMigrate();
-      const actionMock = asMock(ViewStatesActions.update);
 
-      await waitFor(() => expect(actionMock.mock.calls[0][1].widgets.size).toEqual(3));
+      await waitFor(() => expect(asMock(updateViewState).mock.calls[0][1].widgets.size).toEqual(3));
 
-      expect(getNewWidgetPos(actionMock)).toEqual(expWidgetPos);
+      expect(getNewWidgetPos(updateViewState)).toEqual(expWidgetPos);
     });
 
     it('create row pivot with interval unit months, if field chart interval is quarter', async () => {
@@ -155,7 +168,7 @@ describe('MigrateFieldCharts', () => {
 
       Store.get.mockImplementation(mockStoreGet({ interval: 'quarter' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).rowPivots[0].config).toEqual(expPivotConfig));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).rowPivots[0].config).toEqual(expPivotConfig));
     });
 
     it('create row pivot with interval unit months, if field chart interval is month', async () => {
@@ -163,21 +176,21 @@ describe('MigrateFieldCharts', () => {
 
       Store.get.mockImplementation(mockStoreGet({ interval: 'month' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).rowPivots[0].config).toEqual(expPivotConfig));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).rowPivots[0].config).toEqual(expPivotConfig));
 
-      expect(getNewWidgetConfig(ViewStatesActions.update).rowPivots[0].config).toEqual(expPivotConfig);
+      expect(getNewWidgetConfig(updateViewState).rowPivots[0].config).toEqual(expPivotConfig);
     });
 
     it('set visualization to scatter, if field chart visualization is scatter', async () => {
       Store.get.mockImplementation(mockStoreGet({ renderer: 'scatterplot' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualization).toEqual('scatter'));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).visualization).toEqual('scatter'));
     });
 
     it('set visualization to line, if field chart visualization is line', async () => {
       Store.get.mockImplementation(mockStoreGet({ renderer: 'line' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualization).toEqual('line'));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).visualization).toEqual('line'));
     });
 
     it('create visualization config with interpolation spline, if field chart interpolation is bundle', async () => {
@@ -185,7 +198,7 @@ describe('MigrateFieldCharts', () => {
 
       Store.get.mockImplementation(mockStoreGet({ interpolation: 'bundle' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualizationConfig).toEqual(expVisualizationConfg));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).visualizationConfig).toEqual(expVisualizationConfg));
     });
 
     it('create visualization config with interpolation linear, if field chart interpolation is linear', async () => {
@@ -193,15 +206,15 @@ describe('MigrateFieldCharts', () => {
 
       Store.get.mockImplementation(mockStoreGet({ interpolation: 'linear' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualizationConfig).toEqual(expVisualizationConfg));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).visualizationConfig).toEqual(expVisualizationConfg));
     });
 
     it('create area visualization config, if field chart visualization is area', async () => {
-      const expVisualizationConfg = new AreaVisualizationConfig('linear');
+      const expVisualizationConfg = AreaVisualizationConfig.create('linear');
 
       Store.get.mockImplementation(mockStoreGet({ renderer: 'area' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualizationConfig).toEqual(expVisualizationConfg));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).visualizationConfig).toEqual(expVisualizationConfg));
     });
 
     it('create line visualization config, if field chart visualization is line', async () => {
@@ -209,15 +222,15 @@ describe('MigrateFieldCharts', () => {
 
       Store.get.mockImplementation(mockStoreGet({ renderer: 'line' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualizationConfig).toEqual(expVisualizationConfg));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).visualizationConfig).toEqual(expVisualizationConfg));
     });
 
     it('create no visualization config, if field chart visualization is not line or area', async () => {
       Store.get.mockImplementation(mockStoreGet({ renderer: 'bar' }));
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualizationConfig).toEqual(undefined));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).visualizationConfig).toEqual(undefined));
 
-      expect(getNewWidgetConfig(ViewStatesActions.update).visualization).toEqual('bar');
+      expect(getNewWidgetConfig(updateViewState).visualization).toEqual('bar');
     });
 
     it('create series config based on field chart series and field', async () => {
@@ -225,7 +238,7 @@ describe('MigrateFieldCharts', () => {
       const newSeries = [new Series('count(messageCount)')];
 
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).series).toEqual(newSeries));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).series).toEqual(newSeries));
     });
 
     it('create series config with sum, if field chart series is total', async () => {
@@ -233,7 +246,7 @@ describe('MigrateFieldCharts', () => {
       const newSeries = [new Series('sum(level)')];
 
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).series).toEqual(newSeries));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).series).toEqual(newSeries));
     });
 
     it('create series config with avg, if field chart series is mean', async () => {
@@ -241,7 +254,7 @@ describe('MigrateFieldCharts', () => {
       const newSeries = [new Series('avg(level)')];
 
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).series).toEqual(newSeries));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).series).toEqual(newSeries));
     });
 
     it('create series config with car, if field chart series is cardinality', async () => {
@@ -249,7 +262,7 @@ describe('MigrateFieldCharts', () => {
       const newSeries = [new Series('card(level)')];
 
       renderAndMigrate();
-      await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).series).toEqual(newSeries));
+      await waitFor(() => expect(getNewWidgetConfig(updateViewState).series).toEqual(newSeries));
     });
   });
 });

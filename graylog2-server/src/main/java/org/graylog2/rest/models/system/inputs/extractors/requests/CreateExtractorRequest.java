@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 import java.util.Map;
 
 @JsonAutoDetect
@@ -32,8 +33,8 @@ public abstract class CreateExtractorRequest {
     @JsonProperty
     public abstract String title();
 
-    @JsonProperty("cut_or_copy")
-    public abstract String cutOrCopy();
+    @JsonProperty("cursor_strategy")
+    public abstract String cursorStrategy();
 
     @JsonProperty("source_field")
     public abstract String sourceField();
@@ -48,7 +49,7 @@ public abstract class CreateExtractorRequest {
     public abstract Map<String, Object> extractorConfig();
 
     @JsonProperty
-    public abstract Map<String, Map<String, Object>> converters();
+    public abstract List<Map<String, Object>> converters();
 
     @JsonProperty("condition_type")
     public abstract String conditionType();
@@ -61,15 +62,15 @@ public abstract class CreateExtractorRequest {
 
     @JsonCreator
     public static CreateExtractorRequest create(@JsonProperty("title") @NotEmpty String title,
-                                                @JsonProperty("cut_or_copy") String cutOrCopy,
+                                                @JsonProperty("cursor_strategy") String cursorStrategy,
                                                 @JsonProperty("source_field") @NotEmpty String sourceField,
                                                 @JsonProperty("target_field") @NotEmpty String targetField,
                                                 @JsonProperty("extractor_type") @NotEmpty String extractorType,
                                                 @JsonProperty("extractor_config") Map<String, Object> extractorConfig,
-                                                @JsonProperty("converters") Map<String, Map<String, Object>> converters,
+                                                @JsonProperty("converters") List<Map<String, Object>> converters,
                                                 @JsonProperty("condition_type") String conditionType,
                                                 @JsonProperty("condition_value") String conditionValue,
                                                 @JsonProperty("order") long order) {
-        return new AutoValue_CreateExtractorRequest(title, cutOrCopy, sourceField, targetField, extractorType, extractorConfig, converters, conditionType, conditionValue, order);
+        return new AutoValue_CreateExtractorRequest(title, cursorStrategy, sourceField, targetField, extractorType, extractorConfig, converters, conditionType, conditionValue, order);
     }
 }

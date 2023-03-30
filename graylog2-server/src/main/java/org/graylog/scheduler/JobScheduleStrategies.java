@@ -50,7 +50,7 @@ public class JobScheduleStrategies {
         final DateTime lastNextTime = trigger.nextTime();
         final DateTime lastExecutionTime = trigger.lock().lastLockTime();
 
-        return trigger.schedule().calculateNextTime(lastExecutionTime, lastNextTime);
+        return trigger.schedule().calculateNextTime(lastExecutionTime, lastNextTime, clock);
     }
 
     /**
@@ -70,7 +70,7 @@ public class JobScheduleStrategies {
 
         // This is using nextTime to make sure we take the runtime into account and schedule at
         // exactly after the last nextTime.
-        final Optional<DateTime> optionalNextTime = schedule.calculateNextTime(lastExecutionTime, lastNextTime);
+        final Optional<DateTime> optionalNextTime = schedule.calculateNextTime(lastExecutionTime, lastNextTime, clock);
 
         if (!optionalNextTime.isPresent()) {
             return Optional.empty();
@@ -84,7 +84,7 @@ public class JobScheduleStrategies {
         //       advance, should probably use a different helper method.
         while (!nextTime.isAfter(now)) {
             LOG.debug("New nextTime <{}> is in the past, re-calculating again", nextTime);
-            nextTime = schedule.calculateNextTime(lastExecutionTime, nextTime).orElse(null);
+            nextTime = schedule.calculateNextTime(lastExecutionTime, nextTime, clock).orElse(null);
             if (nextTime == null) {
                 return Optional.empty();
             }

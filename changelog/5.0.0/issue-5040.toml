@@ -1,0 +1,13 @@
+type = "changed"
+message = "Fresh Graylog Installations will have a new default message processor order"
+
+issues = ["5040"]
+pulls = ["13081"]
+
+contributors = [""]
+
+details.user = """
+In new Graylog installations, the Message Filter Chain will run before the Pipeline Processor.
+This enables the more intuitive stream rules to assign messages to streams, before they
+are passed to the pipeline interpreter.
+"""

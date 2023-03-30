@@ -24,6 +24,9 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
+import com.mongodb.client.AggregateIterable;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPack;
@@ -33,7 +36,6 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.streams.StreamService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.mongojack.DBCursor;
@@ -48,7 +50,7 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -61,17 +63,20 @@ public class ContentPackPersistenceService {
     private final JacksonDBCollection<ContentPack, ObjectId> dbCollection;
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackPersistenceService.class);
     private final StreamService streamService;
+    private final MongoConnection mongoConnection;
 
     @Inject
     public ContentPackPersistenceService(final MongoJackObjectMapperProvider mapperProvider,
                                          final MongoConnection mongoConnection, final StreamService streamService) {
         this(JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                ContentPack.class, ObjectId.class, mapperProvider.get()), streamService);
+                ContentPack.class, ObjectId.class, mapperProvider.get()), streamService, mongoConnection);
     }
 
-    ContentPackPersistenceService(final JacksonDBCollection<ContentPack, ObjectId> dbCollection, final StreamService streamService) {
+    ContentPackPersistenceService(final JacksonDBCollection<ContentPack, ObjectId> dbCollection, final StreamService streamService,
+                                  MongoConnection mongoConnection) {
         this.dbCollection = dbCollection;
         this.streamService = streamService;
+        this.mongoConnection = mongoConnection;
 
         try {
             dbCollection.createIndex(new BasicDBObject(Identified.FIELD_META_ID, 1).append(Revisioned.FIELD_META_REVISION, 1), new BasicDBObject("unique", true));
@@ -172,5 +177,9 @@ public class ContentPackPersistenceService {
         final DBQuery.Query query = DBQuery.is(Identified.FIELD_META_ID, id).is(Revisioned.FIELD_META_REVISION, revision);
         final WriteResult<ContentPack, ObjectId> writeResult = dbCollection.remove(query);
         return writeResult.getN();
+    }
+
+    public AggregateIterable<Document> aggregate(List<Bson> aggregates) {
+        return mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME).aggregate(aggregates);
     }
 }

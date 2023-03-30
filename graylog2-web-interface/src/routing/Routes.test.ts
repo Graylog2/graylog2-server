@@ -94,7 +94,7 @@ describe('Routes', () => {
     });
 
     it('returns correct route for getting started page', () => {
-      expect(Routes.GETTING_STARTED).toMatch('/gettingstarted');
+      expect(Routes.WELCOME).toMatch('/welcome');
     });
 
     it('returns a route from function', () => {

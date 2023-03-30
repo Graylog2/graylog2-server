@@ -42,7 +42,7 @@ public class MetricUtilsTest {
 
         final MetricRegistry metricRegistry = new MetricRegistry();
 
-        final Gauge<Long> longGauge = new Gauge<Long>() {
+        final Gauge<Long> longGauge = new Gauge<>() {
             @Override
             public Long getValue() {
                 return 0L;
@@ -60,7 +60,10 @@ public class MetricUtilsTest {
 
         assertThatExceptionOfType(ClassCastException.class)
                 .describedAs("Registering a metric with a different metric type fails on using it")
-                .isThrownBy(() -> MetricUtils.safelyRegister(metricRegistry, "somename", new Counter()));
+                .isThrownBy(() -> {
+                    // assignment has to be done to raise the exception
+                    Counter c = MetricUtils.safelyRegister(metricRegistry, "somename", new Counter());
+                });
     }
 
     @Test
@@ -89,7 +92,7 @@ public class MetricUtilsTest {
 
     @Test
     public void mapSupportsGauge() {
-        final Gauge<Integer> gauge = new Gauge<Integer>() {
+        final Gauge<Integer> gauge = new Gauge<>() {
             @Override
             public Integer getValue() {
                 return 23;

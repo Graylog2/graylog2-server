@@ -23,6 +23,7 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -54,8 +55,9 @@ public class InputEventListenerTest {
     private InputRegistry inputRegistry;
     @Mock
     private InputService inputService;
-    @Mock
-    private NodeId nodeId;
+    public static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
+    public static final String OTHER_NODE_ID = "c0c0a000-0000-4000-a000-000000000000";
+    private final NodeId nodeId = new SimpleNodeId(THIS_NODE_ID);
     private InputEventListener listener;
     @Mock
     private LeaderElectionService leaderElectionService;
@@ -77,7 +79,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(inputId));
 
-        verifyZeroInteractions(inputLauncher, inputRegistry, nodeId);
+        verifyZeroInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
@@ -111,8 +113,7 @@ public class InputEventListenerTest {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
         when(inputService.find(inputId)).thenReturn(input);
-        when(nodeId.toString()).thenReturn("node-id");
-        when(input.getNodeId()).thenReturn("other-node-id");
+        when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(true);
 
         final MessageInput messageInput = mock(MessageInput.class);
@@ -128,8 +129,7 @@ public class InputEventListenerTest {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
         when(inputService.find(inputId)).thenReturn(input);
-        when(nodeId.toString()).thenReturn("node-id");
-        when(input.getNodeId()).thenReturn("other-node-id");
+        when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
@@ -145,8 +145,7 @@ public class InputEventListenerTest {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
         when(inputService.find(inputId)).thenReturn(input);
-        when(nodeId.toString()).thenReturn("node-id");
-        when(input.getNodeId()).thenReturn("node-id");
+        when(input.getNodeId()).thenReturn(THIS_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
@@ -164,7 +163,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(inputId));
 
-        verifyZeroInteractions(inputLauncher, inputRegistry, nodeId);
+        verifyZeroInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
@@ -201,8 +200,7 @@ public class InputEventListenerTest {
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
-        when(nodeId.toString()).thenReturn("node-id");
-        when(input.getNodeId()).thenReturn("other-node-id");
+        when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(true);
 
         final MessageInput messageInput = mock(MessageInput.class);
@@ -220,8 +218,7 @@ public class InputEventListenerTest {
         @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
         when(inputService.find(inputId)).thenReturn(input);
-        when(nodeId.toString()).thenReturn("node-id");
-        when(input.getNodeId()).thenReturn("other-node-id");
+        when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
@@ -240,8 +237,7 @@ public class InputEventListenerTest {
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
-        when(nodeId.toString()).thenReturn("node-id");
-        when(input.getNodeId()).thenReturn("node-id");
+        when(input.getNodeId()).thenReturn(THIS_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);
@@ -260,8 +256,7 @@ public class InputEventListenerTest {
         when(inputState.getState()).thenReturn(IOState.Type.STOPPED);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
-        when(nodeId.toString()).thenReturn("node-id");
-        when(input.getNodeId()).thenReturn("node-id");
+        when(input.getNodeId()).thenReturn(THIS_NODE_ID);
         when(input.isGlobal()).thenReturn(false);
 
         final MessageInput messageInput = mock(MessageInput.class);

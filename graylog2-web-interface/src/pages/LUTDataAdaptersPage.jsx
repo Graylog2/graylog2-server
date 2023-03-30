@@ -20,14 +20,29 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
-import history from 'util/History';
-import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
+import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
+import withHistory from 'routing/withHistory';
+
+const _saved = (history) => {
+  // reset detail state
+  history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
+};
+
+const _isCreating = ({ action }) => {
+  return action === 'create';
+};
+
+const _validateAdapter = (adapter) => {
+  LookupTableDataAdaptersActions.validate(adapter);
+};
 
 class LUTDataAdaptersPage extends React.Component {
   errorStatesTimer = undefined;
@@ -48,7 +63,10 @@ class LUTDataAdaptersPage extends React.Component {
   }
 
   componentWillUnmount() {
+    const { page, pageSize } = this.props.paginationQueryParameter;
+
     clearInterval(this.errorStatesTimer);
+    LookupTableDataAdaptersActions.searchPaginated(page, pageSize);
   }
 
   _startErrorStatesTimer = () => {
@@ -77,30 +95,18 @@ class LUTDataAdaptersPage extends React.Component {
 
   _loadData = (props) => {
     const { pagination } = props;
+    const { page, pageSize } = this.props.paginationQueryParameter;
 
     this._stopErrorStatesTimer();
 
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
-    } else if (this._isCreating(props)) {
+    } else if (_isCreating(props)) {
       LookupTableDataAdaptersActions.getTypes();
     } else {
-      LookupTableDataAdaptersActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
+      LookupTableDataAdaptersActions.searchPaginated(page, pageSize, pagination.query);
       this._startErrorStatesTimer();
     }
-  };
-
-  _saved = () => {
-    // reset detail state
-    history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
-  };
-
-  _isCreating = ({ action }) => {
-    return action === 'create';
-  };
-
-  _validateAdapter = (adapter) => {
-    LookupTableDataAdaptersActions.validate(adapter);
   };
 
   render() {
@@ -112,6 +118,7 @@ class LUTDataAdaptersPage extends React.Component {
       types,
       dataAdapters,
       pagination,
+      history,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -128,8 +135,8 @@ class LUTDataAdaptersPage extends React.Component {
                                type={dataAdapter.config.type}
                                create={false}
                                title="Data Adapter"
-                               saved={this._saved}
-                               validate={this._validateAdapter}
+                               saved={() => _saved(history)}
+                               validate={_validateAdapter}
                                validationErrors={validationErrors} />
             </Col>
           </Row>
@@ -137,14 +144,14 @@ class LUTDataAdaptersPage extends React.Component {
       } else {
         content = <DataAdapter dataAdapter={dataAdapter} />;
       }
-    } else if (this._isCreating(this.props)) {
+    } else if (_isCreating(this.props)) {
       if (!types) {
         content = <Spinner text="Loading data adapter types" />;
       } else {
         content = (
           <DataAdapterCreate types={types}
-                             saved={this._saved}
-                             validate={this._validateAdapter}
+                             saved={() => _saved(history)}
+                             validate={_validateAdapter}
                              validationErrors={validationErrors} />
         );
       }
@@ -160,27 +167,17 @@ class LUTDataAdaptersPage extends React.Component {
 
     return (
       <DocumentTitle title="Lookup Tables - Data Adapters">
-        <span>
-          <PageHeader title="Data adapters for Lookup Tables">
-            <span>Data adapters provide the actual values for lookup tables</span>
-            {null}
-            <span>
-              <ButtonToolbar>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info">Lookup Tables</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                  <Button bsStyle="info">Caches</Button>
-                </LinkContainer>
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                  <Button bsStyle="info">Data Adapters</Button>
-                </LinkContainer>
-              </ButtonToolbar>
-            </span>
-          </PageHeader>
+        <LUTPageNavigation />
+        <PageHeader title="Data adapters for Lookup Tables"
+                    actions={(
+                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
+                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
+                      </LinkContainer>
+                    )}>
+          <span>Data adapters provide the actual values for lookup tables</span>
+        </PageHeader>
 
-          {content}
-        </span>
+        {content}
       </DocumentTitle>
     );
   }
@@ -195,6 +192,8 @@ LUTDataAdaptersPage.propTypes = {
   dataAdapters: PropTypes.array,
   location: PropTypes.object.isRequired,
   action: PropTypes.string,
+  paginationQueryParameter: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 LUTDataAdaptersPage.defaultProps = {
@@ -207,8 +206,11 @@ LUTDataAdaptersPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withParams(withLocation(LUTDataAdaptersPage)), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
-  ...otherProps,
-  ...dataAdaptersStore,
-  errorStates: lookupTableStore.errorStates,
-}));
+export default connect(
+  withHistory(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage)))),
+  { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+  ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...dataAdaptersStore,
+    errorStates: lookupTableStore.errorStates,
+  }));

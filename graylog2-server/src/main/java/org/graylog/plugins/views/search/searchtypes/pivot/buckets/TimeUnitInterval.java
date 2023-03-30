@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 @JsonDeserialize(builder = TimeUnitInterval.Builder.class)
 public abstract class TimeUnitInterval implements Interval {
     public static final String type = "timeunit";
-    public static final Pattern TIMEUNIT_PATTERN = Pattern.compile("(?<quantity>\\d+)(?<unit>[smhdwM])");
+    public static final Pattern TIMEUNIT_PATTERN = Pattern.compile("(?<quantity>\\d+)(?<unit>[smhdwMy])");
 
     @JsonProperty
     public abstract String type();
@@ -49,7 +49,7 @@ public abstract class TimeUnitInterval implements Interval {
     private DateInterval adjustUnitsLongerThanDays(String timeunit) {
         final Matcher matcher = TIMEUNIT_PATTERN.matcher(timeunit());
         checkArgument(matcher.matches(),
-                "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwM].");
+                "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwMy].");
         final int quantity = Integer.parseInt(matcher.group("quantity"));
         final String unit = matcher.group("unit");
 
@@ -60,6 +60,7 @@ public abstract class TimeUnitInterval implements Interval {
             case "d": return new DateInterval(quantity, unit);
             case "w": return quantity == 1 ? new DateInterval(quantity, unit) : DateInterval.days(7 * quantity);
             case "M": return quantity == 1 ? new DateInterval(quantity, unit) : DateInterval.days(30 * quantity);
+            case "y": return DateInterval.days(365 * quantity);
             default: throw new RuntimeException("Invalid time unit: " + timeunit);
         }
     }
@@ -77,7 +78,7 @@ public abstract class TimeUnitInterval implements Interval {
             final TimeUnitInterval interval = autoBuild();
             final Matcher matcher = TIMEUNIT_PATTERN.matcher(interval.timeunit());
             checkArgument(matcher.matches(),
-                    "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwM].");
+                    "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwMy].");
 
             final int quantity = Integer.parseInt(matcher.group("quantity"), 10);
             checkArgument(quantity > 0,

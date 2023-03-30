@@ -36,6 +36,8 @@ import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -49,6 +51,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import java.util.Collections;
 import java.util.Map;
@@ -74,6 +77,7 @@ public class LookupTableFacadeTest {
         lookupTableService = new DBLookupTableService(
                 mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
+                EntityScopeTestUtil.getEntityScopeService(),
                 clusterEventBus);
 
         facade = new LookupTableFacade(objectMapper, lookupTableService);
@@ -156,6 +160,7 @@ public class LookupTableFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("http-dsv-no-cache"),
                         ValueReference.of("HTTP DSV without Cache"),
                         ValueReference.of("HTTP DSV without Cache"),
@@ -210,6 +215,7 @@ public class LookupTableFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("http-dsv-no-cache"),
                         ValueReference.of("HTTP DSV without Cache"),
                         ValueReference.of("HTTP DSV without Cache"),
@@ -242,6 +248,7 @@ public class LookupTableFacadeTest {
                 .id(ModelId.of("5adf24dd4b900a0fdb4e530d"))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("http-dsv-no-cache"),
                         ValueReference.of("HTTP DSV without Cache"),
                         ValueReference.of("HTTP DSV without Cache"),
@@ -256,6 +263,7 @@ public class LookupTableFacadeTest {
                 .id(ModelId.of("5adf24b24b900a0fdb4e52dd"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
                         ValueReference.of("No-op cache"),
@@ -266,6 +274,7 @@ public class LookupTableFacadeTest {
                 .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("http-dsv"),
                         ValueReference.of("HTTP DSV"),
                         ValueReference.of("HTTP DSV"),
@@ -303,6 +312,7 @@ public class LookupTableFacadeTest {
                 .id(ModelId.of("1"))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
+                        ValueReference.of(DefaultEntityScope.NAME),
                         ValueReference.of("some-name"),
                         ValueReference.of("Title"),
                         ValueReference.of("Description"),

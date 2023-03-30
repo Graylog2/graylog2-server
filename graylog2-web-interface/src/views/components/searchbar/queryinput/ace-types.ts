@@ -20,10 +20,23 @@ export type Token = {
   value: string,
 };
 
+type EventName = 'tokenizerUpdate';
+
+type Tokenizer = {
+  bgTokenizer: {
+    currentLine: number,
+    lines: Array<Array<Line>>,
+  }
+};
+type EventCallback = {
+  tokenizerUpdate: (input: string, tokenizer: Tokenizer) => void,
+};
+
 export type Session = {
   getTokens: (no: number) => Array<Token>,
   getTokenAt: (no: number, idx: number) => Token | undefined | null,
   getValue: () => string,
+  on: <T extends EventName>(event: T, cb: EventCallback[T]) => void,
 };
 
 export type Renderer = {
@@ -37,7 +50,7 @@ export type Command = {
     win: string,
     mac: string,
   },
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   exec: (editor: Editor) => void,
 };
 
@@ -58,11 +71,14 @@ export type Completer = {
 export type Editor = {
   commands: Commands,
   completer: Completer,
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   completers: Array<AutoCompleter>,
+  execCommand: (command: string) => void,
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
+  getValue: () => string,
+  setValue: (newValue: string) => void,
 };
 
 export type CompletionResult = {
@@ -70,6 +86,7 @@ export type CompletionResult = {
   value: string,
   score: number,
   meta: any,
+  caption?: string,
 };
 
 export type ResultsCallback = (obj: null, results: Array<CompletionResult>) => void;
@@ -88,5 +105,5 @@ export type Line = {
 
 export interface AutoCompleter {
   getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
-  shouldShowCompletions(currentLine, lines): boolean;
+  shouldShowCompletions(currentLine: number, lines: Array<Array<Line>>): boolean;
 }

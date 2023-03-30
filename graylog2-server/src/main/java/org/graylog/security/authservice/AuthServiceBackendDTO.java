@@ -40,8 +40,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @WithBeanGetter
 public abstract class AuthServiceBackendDTO {
     private static final String FIELD_ID = "id";
-    private static final String FIELD_TITLE = "title";
-    private static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_DEFAULT_ROLES = "default_roles";
     private static final String FIELD_CONFIG = "config";
 

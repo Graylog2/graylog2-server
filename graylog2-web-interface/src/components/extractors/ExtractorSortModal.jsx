@@ -17,14 +17,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
+import { Row, Col, Modal, BootstrapModalWrapper } from 'components/bootstrap';
 import SortableList from 'components/common/SortableList';
 import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { ModalSubmit } from 'components/common/index';
 
 class ExtractorSortModal extends React.Component {
   static propTypes = {
     input: PropTypes.object.isRequired,
     extractors: PropTypes.array.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onSort: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -35,18 +38,10 @@ class ExtractorSortModal extends React.Component {
     };
   }
 
-  open = () => {
-    this.modal.open();
-  };
-
-  close = () => {
-    this.modal.close();
-  };
-
   _cancel = () => {
-    const { extractors } = this.props;
+    const { extractors, onClose } = this.props;
 
-    this.close();
+    onClose();
 
     this.setState({
       sortedExtractors: extractors,
@@ -59,17 +54,18 @@ class ExtractorSortModal extends React.Component {
     });
   };
 
-  _saveSorting = () => {
-    const { input } = this.props;
+  _saveSorting = async () => {
+    const { input, onClose, onSort } = this.props;
     const { sortedExtractors } = this.state;
 
     if (!sortedExtractors) {
-      this.close();
+      onClose();
     }
 
-    const promise = ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
+    await ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
 
-    promise.then(() => this.close());
+    onSort();
+    onClose();
   };
 
   render() {
@@ -77,7 +73,8 @@ class ExtractorSortModal extends React.Component {
     const { input } = this.props;
 
     return (
-      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }} onHide={this._cancel}>
+      <BootstrapModalWrapper showModal
+                             onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>
             <span>Sort extractors for <em>{input.title}</em></span>
@@ -92,8 +89,7 @@ class ExtractorSortModal extends React.Component {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this._cancel}>Close</Button>
-          <Button type="button" bsStyle="info" onClick={this._saveSorting}>Save</Button>
+          <ModalSubmit onCancel={this._cancel} onSubmit={this._saveSorting} submitButtonText="Update sort" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

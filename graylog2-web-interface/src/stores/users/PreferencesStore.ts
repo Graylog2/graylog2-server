@@ -84,7 +84,7 @@ export const PreferencesStore = singletonStore(
     listenables: [PreferencesActions],
     URL: qualifyUrl('/users/'),
 
-    saveUserPreferences(userName: string, preferences: PreferencesUpdateMap, callback: (preferences: PreferencesUpdateMap) => void = () => {}, displaySuccessNotification = true): void {
+    saveUserPreferences(userName: string, preferences: PreferencesUpdateMap, callback: (preferences: PreferencesUpdateMap) => void = () => {}, displaySuccessNotification = true) {
       const convertedPreferences = convertPreferences(preferences);
       const url = `${this.URL + encodeURIComponent(userName)}/preferences`;
       const promise = fetch('PUT', url, { preferences: convertedPreferences })
@@ -103,7 +103,7 @@ export const PreferencesStore = singletonStore(
 
       return promise;
     },
-    loadUserPreferences(userName: string, callback: (preferences: PreferencesMap) => void = () => {}): void {
+    loadUserPreferences(userName: string, callback: (preferences: PreferencesMap) => void = () => {}) {
       const url = this.URL + encodeURIComponent(userName);
 
       const failCallback = (errorThrown) => {

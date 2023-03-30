@@ -53,7 +53,7 @@ const setUpServer = () => {
   const app = express();
 
   app.use(formidableMiddleware());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-console
+  // eslint-disable-next-line no-console
   app.use((err, _req, _res, _next) => console.error(err));
 
   app.get('/test1', (_req, res) => {
@@ -115,7 +115,7 @@ describe('FetchProvider', () => {
 
   beforeAll(() => {
     server = setUpServer();
-    // eslint-disable-next-line global-require
+
     window.fetch = nodeFetch;
 
     // @ts-ignore Types do not match actual result for some reason
@@ -132,11 +132,11 @@ describe('FetchProvider', () => {
   });
 
   it.each([
-    ['GET with json', 'GET', 'test1', { text: 'test' }],
-    ['POST with json', 'POST', 'test2', { text: 'test' }],
-    ['POST with text', 'POST', 'test3', 'uuid-beef-feed'],
-    ['POST without content', 'POST', 'test4', null],
-    ['DELETE without content and status 204', 'DELETE', 'test5', null],
+    ['GET with json', 'GET' as const, 'test1', { text: 'test' }],
+    ['POST with json', 'POST' as const, 'test2', { text: 'test' }],
+    ['POST with text', 'POST' as const, 'test3', 'uuid-beef-feed'],
+    ['POST without content', 'POST' as const, 'test4', null],
+    ['DELETE without content and status 204', 'DELETE' as const, 'test5', null],
   ])('should receive a %s', async (_text, method, url, expectedResponse) => {
     return fetch(method, `${baseUrl}/${url}`).then((response) => {
       expect(response).toStrictEqual(expectedResponse);
@@ -170,7 +170,7 @@ describe('FetchProvider', () => {
   it('extracts the error message from a failed request', async () => {
     await expect(fetch('POST', `${baseUrl}/errorWithMessage`))
       .rejects
-      .toThrowError('There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!');
+      .toThrow('There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!');
   });
 
   it('handles error properly when endpoint is not reachable', async () => {

@@ -14,88 +14,119 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 
-import { Modal, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import connect from 'stores/connect';
-import { PaginatedList, SearchForm } from 'components/common';
-import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
+import { Modal, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { PaginatedList, SearchForm, ModalSubmit, Spinner } from 'components/common';
+import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import type { SearchParams } from 'stores/PaginationTypes';
 
 type Props = {
+  activeDashboardId?: string,
   onCancel: () => void,
-  onSubmit: (widgetId: string, selectedDashboard: string | undefined | null) => void,
-  widgetId: string,
-  dashboards: DashboardsStoreState,
+  onSubmit: (selectedDashboardId: string | undefined | null) => Promise<void>,
+  submitButtonText: string,
+  submitLoadingText: string,
 };
 
-const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagination }, onSubmit }: Props) => {
+const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadingText, activeDashboardId }: Props) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
-  const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
-
-  const handleSearch = useCallback((query) => {
-    setPaginationState({
-      ...paginationState,
-      query,
-    });
-
-    setSelectedDashboard(null);
-  }, [paginationState, setSelectedDashboard, setPaginationState]);
-
-  const handleSearchReset = useCallback(() => handleSearch(''), [handleSearch]);
-
-  const handlePageChange = useCallback((page: number, perPage: number) => {
-    setPaginationState({
-      ...paginationState,
-      page,
-      perPage,
-    });
-
-    setSelectedDashboard(null);
-  }, [paginationState, setSelectedDashboard, setPaginationState]);
+  const isMounted = useRef<boolean>();
 
   useEffect(() => {
-    DashboardsActions.search(paginationState.query, paginationState.page, paginationState.perPage);
-  }, [paginationState]);
+    isMounted.current = true;
 
-  const dashboardList = list.map((dashboard) => {
-    return (
-      <ListGroupItem active={selectedDashboard === dashboard.id}
-                     onClick={() => setSelectedDashboard(dashboard.id)}
-                     header={dashboard.title}
-                     key={dashboard.id}>
-        {dashboard.summary}
-      </ListGroupItem>
-    );
+    return () => { isMounted.current = false; };
+  }, []);
+
+  const [searchParams, setSearchParams] = useState<SearchParams>({
+    page: 1,
+    pageSize: 5,
+    query: '',
+    sort: {
+      attributeId: 'title',
+      direction: 'asc',
+    },
   });
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards } = useDashboards(searchParams);
 
-  const renderResult = list && list.length > 0
-    ? <ListGroup>{dashboardList}</ListGroup>
-    : <span>No dashboards found</span>;
+  useEffect(() => {
+    setSelectedDashboard(null);
+  }, [searchParams]);
+
+  const handleSearch = useCallback(
+    (newQuery: string) => setSearchParams((cur) => ({ ...cur, query: newQuery, page: 1 })),
+    [],
+  );
+  const handleSearchReset = useCallback(() => handleSearch(''), [handleSearch]);
+  const handlePageChange = useCallback((newPage: number, newPageSize: number) => setSearchParams(
+    (cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
+  [],
+  );
+
+  const handleSubmit = () => {
+    setIsSubmitting(true);
+
+    onSubmit(selectedDashboard).then(() => {
+      if (isMounted.current) {
+        setIsSubmitting(false);
+      }
+    });
+  };
 
   return (
     <Modal show>
       <Modal.Body>
-        <SearchForm onSearch={handleSearch}
-                    onReset={handleSearchReset} />
-        <PaginatedList onChange={handlePageChange}
-                       activePage={paginationState.page}
-                       totalItems={pagination.total}
-                       pageSize={paginationState.perPage}
-                       pageSizes={[5, 10, 15]}>
-          {renderResult}
-        </PaginatedList>
+        {isLoadingDashboards && <Spinner />}
+        {!isLoadingDashboards && (
+          <PaginatedList onChange={handlePageChange}
+                         activePage={searchParams.page}
+                         totalItems={paginatedDashboards.pagination.total}
+                         pageSize={searchParams.pageSize}
+                         pageSizes={[5, 10, 15]}
+                         useQueryParameter={false}>
+            <div style={{ marginBottom: '5px' }}>
+              <SearchForm onSearch={handleSearch}
+                          onReset={handleSearchReset} />
+            </div>
+            {paginatedDashboards.list.length ? (
+              <ListGroup>
+                {paginatedDashboards.list.map((dashboard) => {
+                  const isActiveDashboard = activeDashboardId === dashboard.id;
+
+                  return (
+                    <ListGroupItem active={selectedDashboard === dashboard.id}
+                                   onClick={isActiveDashboard ? undefined : () => setSelectedDashboard(dashboard.id)}
+                                   header={dashboard.title}
+                                   disabled={isActiveDashboard}
+                                   key={dashboard.id}>
+                      {dashboard.summary}
+                    </ListGroupItem>
+                  );
+                })}
+              </ListGroup>
+            ) : <span>No dashboards found</span>}
+          </PaginatedList>
+        )}
+
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="primary"
-                disabled={selectedDashboard === null}
-                onClick={() => onSubmit(widgetId, selectedDashboard)}>
-          Select
-        </Button>
-        <Button onClick={onCancel}>Cancel</Button>
+        <ModalSubmit submitButtonText={submitButtonText}
+                     submitLoadingText={submitLoadingText}
+                     isAsyncSubmit
+                     isSubmitting={isSubmitting}
+                     disabledSubmit={!selectedDashboard}
+                     submitButtonType="button"
+                     onSubmit={handleSubmit}
+                     onCancel={onCancel} />
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default connect(CopyToDashboardForm, { dashboards: DashboardsStore });
+CopyToDashboardForm.defaultProps = {
+  activeDashboardId: undefined,
+};
+
+export default CopyToDashboardForm;

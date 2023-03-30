@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -27,8 +28,10 @@ import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
 const ShowMetricsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ShowMetricsPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     location: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
@@ -36,6 +39,7 @@ const ShowMetricsPage = createReactClass({
 
   mixins: [Reflux.connect(NodesStore), Reflux.connect(MetricsStore), Reflux.listenTo(NodesStore, '_getMetrics')],
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   _getMetrics() {
     MetricsActions.names();
   },
@@ -70,9 +74,9 @@ const ShowMetricsPage = createReactClass({
           <PageHeader title={title}>
             <span>
               All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
-              all metrics via JMX, too.
+              all metrics via JMX, too.<br />
+              This node is reporting a total of {(names || []).length} metrics.
             </span>
-            <span>This node is reporting a total of {(names || []).length} metrics.</span>
           </PageHeader>
 
           <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} error={error} />

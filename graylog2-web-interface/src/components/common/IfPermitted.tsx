@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 
 /**
@@ -41,7 +40,7 @@ const _checkPermissions = (permissions, anyPermissions, currentUser) => {
 };
 
 const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
 
   if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
     return (

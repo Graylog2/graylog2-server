@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -62,15 +63,20 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_STATE = "state";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
+    public static final String FIELD_FAVORITE = "favorite";
 
-    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
+    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
+    public static final ImmutableSet<String> STRING_SORT_FIELDS = ImmutableSet.of(FIELD_TITLE, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
+    public static final String SECONDARY_SORT = FIELD_TITLE;
 
+    @Override
     @ObjectId
     @Id
     @Nullable
     @JsonProperty(FIELD_ID)
     public abstract String id();
 
+    @Override
     @JsonProperty(FIELD_TYPE)
     public abstract Type type();
 
@@ -104,6 +110,10 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
+    @JsonProperty(FIELD_FAVORITE)
+    @MongoIgnore
+    public abstract boolean favorite();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -132,6 +142,24 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                 .flatMap(q -> q.widgets().stream())
                 .filter(w -> w.id().equals(widgetId))
                 .findFirst();
+    }
+
+    @JsonIgnore
+    public Set<WidgetDTO> getAllWidgets() {
+        return this.state()
+                .values()
+                .stream()
+                .flatMap(q -> q.widgets().stream())
+                .collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Optional<String> queryIdOfWidget(final String widgetId) {
+        return state().entrySet().stream()
+                .filter(entry -> entry.getValue().widgets().stream().map(WidgetDTO::id).collect(Collectors.toSet()).contains(widgetId))
+                .map(Map.Entry::getKey)
+                .findFirst();
+
     }
 
     @AutoValue.Builder
@@ -176,6 +204,10 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
+        @JsonProperty(FIELD_FAVORITE)
+        @MongoIgnore
+        public abstract Builder favorite(boolean favorite);
+
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
@@ -184,7 +216,8 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                     .description("")
                     .properties(ImmutableSet.of())
                     .requires(Collections.emptyMap())
-                    .createdAt(DateTime.now(DateTimeZone.UTC));
+                    .createdAt(DateTime.now(DateTimeZone.UTC))
+                    .favorite(false);
         }
 
         public abstract ViewDTO build();

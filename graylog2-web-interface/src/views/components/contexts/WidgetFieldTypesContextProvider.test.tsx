@@ -29,7 +29,7 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 
 import FieldTypesContext from './FieldTypesContext';
 
-jest.mock('views/logic/fieldtypes/useFieldTypes');
+jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 jest.mock('views/logic/queries/useCurrentQuery');
 
 describe('WidgetFieldTypesContextProvider', () => {

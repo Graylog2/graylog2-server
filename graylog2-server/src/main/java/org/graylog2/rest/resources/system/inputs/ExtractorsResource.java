@@ -326,19 +326,19 @@ public class ExtractorsResource extends RestResource {
                 metrics);
     }
 
-    private List<Converter> loadConverters(Map<String, Map<String, Object>> requestConverters) {
+    private List<Converter> loadConverters(List<Map<String, Object>> list) {
         List<Converter> converters = Lists.newArrayList();
-
-        for (Map.Entry<String, Map<String, Object>> c : requestConverters.entrySet()) {
+        for (Map<String, Object> map : list) {
             try {
-                converters.add(converterFactory.create(Converter.Type.valueOf(c.getKey().toUpperCase(Locale.ENGLISH)), c.getValue()));
+                final String type = map.get("type").toString().toUpperCase(Locale.ENGLISH);
+                final Map<String, Object> config = (Map<String, Object>) map.get("config");
+                converters.add(converterFactory.create(Converter.Type.valueOf(type), config));
             } catch (ConverterFactory.NoSuchConverterException e) {
-                LOG.warn("No such converter [" + c.getKey() + "]. Skipping.", e);
+                LOG.warn("No such converter [" + map.get("type") + "]. Skipping.", e);
             } catch (ConfigurationException e) {
-                LOG.warn("Missing configuration for [" + c.getKey() + "]. Skipping.", e);
+                LOG.warn("Missing configuration for [" + map.get("type") + "]. Skipping.", e);
             }
         }
-
         return converters;
     }
 
@@ -349,7 +349,7 @@ public class ExtractorsResource extends RestResource {
                     id,
                     cer.title(),
                     cer.order(),
-                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase(Locale.ENGLISH)),
+                    Extractor.CursorStrategy.valueOf(cer.cursorStrategy().toUpperCase(Locale.ENGLISH)),
                     Extractor.Type.valueOf(cer.extractorType().toUpperCase(Locale.ENGLISH)),
                     cer.sourceField(),
                     cer.targetField(),

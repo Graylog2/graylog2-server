@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import { useCallback, useEffect } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 
-import connect from 'stores/connect';
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
 import { Icon, Pluralize } from 'components/common';
-import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
+import { RefreshActions } from 'views/stores/RefreshStore';
+import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
+  justify-content: flex-end;
 
   > .btn-group {
     .btn:first-child {
@@ -34,92 +36,52 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = styled.span`
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-`;
+const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: { refreshConfigEnabled: boolean, naturalInterval: React.ReactNode }) => {
+  const buttonText = refreshConfigEnabled ? <>Every {naturalInterval}</> : 'Not updating';
 
-type RefreshConfig = {
-  interval: number,
-  enabled: boolean,
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{buttonText}</>;
 };
 
-type Props = {
-  refreshConfig: RefreshConfig,
+const _onChange = (interval: number) => {
+  RefreshActions.setInterval(interval);
 };
 
-class RefreshControls extends React.Component<Props> {
-  static propTypes = {
-    refreshConfig: PropTypes.exact({
-      interval: PropTypes.number.isRequired,
-      enabled: PropTypes.bool.isRequired,
-    }).isRequired,
-  };
+const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
-  static INTERVAL_OPTIONS: Array<[string, number]> = [
-    ['1 Second', 1000],
-    ['2 Seconds', 2000],
-    ['5 Seconds', 5000],
-    ['10 Seconds', 10000],
-    ['30 Seconds', 30000],
-    ['1 Minute', 60000],
-    ['5 Minutes', 300000],
-  ];
+const RefreshControls = () => {
+  const refreshConfig = useRefreshConfig();
+  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
 
-  componentWillUnmount(): void {
-    RefreshActions.disable();
-  }
+  useEffect(() => () => RefreshActions.disable(), []);
 
-  _toggleEnable = (): void => {
-    const { refreshConfig } = this.props;
-
+  const _toggleEnable = useCallback(() => {
     if (refreshConfig.enabled) {
       RefreshActions.disable();
     } else {
       RefreshActions.enable();
     }
-  };
+  }, [refreshConfig?.enabled]);
 
-  _onChange = (interval: number): void => {
-    RefreshActions.setInterval(interval);
-  };
+  const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
+    <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>
+  ));
+  const intervalDuration = moment.duration(refreshConfig.interval);
+  const naturalInterval = intervalDuration.asSeconds() < 60
+    ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
+    : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
 
-  _buttonLabel = (refreshConfigEnabled, naturalInterval) => {
-    let buttonText: React.ReactNode = 'Not updating';
+  return (
+    <FlexibleButtonGroup aria-label="Refresh Search Controls">
+      <Button onClick={_toggleEnable} title={refreshConfig.enabled ? 'Pause Refresh' : 'Start Refresh'}>
+        {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
+      </Button>
 
-    if (refreshConfigEnabled) {
-      buttonText = <>Every {naturalInterval}</>;
-    }
+      <DropdownButton title={<ButtonLabel refreshConfigEnabled={refreshConfig.enabled} naturalInterval={naturalInterval} />} id="refresh-options-dropdown">
+        {intervalOptions}
+      </DropdownButton>
+    </FlexibleButtonGroup>
+  );
+};
 
-    return <ButtonLabel>{buttonText}</ButtonLabel>;
-  };
-
-  render() {
-    const { refreshConfig } = this.props;
-    const intervalOptions = RefreshControls.INTERVAL_OPTIONS.map(([label, interval]: [string, number]) => {
-      return <MenuItem key={`RefreshControls-${label}`} onClick={() => this._onChange(interval)}>{label}</MenuItem>;
-    });
-    const intervalDuration = moment.duration(refreshConfig.interval);
-    const naturalInterval = intervalDuration.asSeconds() < 60
-      ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
-      : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
-    const buttonLabel = this._buttonLabel(refreshConfig.enabled, naturalInterval);
-
-    return (
-      <FlexibleButtonGroup aria-label="Refresh Search Controls">
-        <Button onClick={this._toggleEnable}>
-          {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
-        </Button>
-
-        <DropdownButton title={buttonLabel} id="refresh-options-dropdown">
-          {intervalOptions}
-        </DropdownButton>
-      </FlexibleButtonGroup>
-    );
-  }
-}
-
-export default connect(RefreshControls, { refreshConfig: RefreshStore });
+export default RefreshControls;

@@ -57,8 +57,8 @@ public class V20180718155800_AddContentPackIdAndRevTest {
                 .getCollection(ContentPackPersistenceService.COLLECTION_NAME);
         final Bson filter = and(exists(ContentPack.FIELD_META_ID), exists(ContentPack.FIELD_META_REVISION));
 
-        assertThat(collection.count(filter)).isEqualTo(1L);
+        assertThat(collection.countDocuments(filter)).isEqualTo(1L);
         migration.upgrade();
-        assertThat(collection.count(filter)).isEqualTo(2L);
+        assertThat(collection.countDocuments(filter)).isEqualTo(2L);
     }
 }

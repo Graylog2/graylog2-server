@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import asMock from 'helpers/mocking/AsMock';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { TitlesActions } from 'views/stores/TitlesStore';
-import TitleTypes from 'views/stores/TitleTypes';
-import { WidgetActions } from 'views/stores/WidgetStore';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
+import mockDispatch from 'views/test/mockDispatch';
+import { createViewWithWidgets } from 'fixtures/searches';
+import type { RootState } from 'views/types';
+import { addWidget } from 'views/logic/slices/widgetActions';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import { setTitle } from 'views/logic/slices/titlesActions';
 
 import ShowDocumentsHandler from './ShowDocumentsHandler';
 
@@ -28,19 +31,6 @@ import PivotGenerator from '../searchtypes/aggregation/PivotGenerator';
 import { createElasticsearchQueryString } from '../queries/Query';
 import Widget from '../widgets/Widget';
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    create: jest.fn((widget: Widget) => Promise.resolve(widget)),
-  },
-}));
-
-jest.mock('views/stores/TitlesStore', () => ({
-  TitlesActions: {
-    set: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-const queryId = 'someQuery';
 const field = 'foo';
 
 const widgetConfig = AggregationWidgetConfig
@@ -51,83 +41,106 @@ const widgetConfig = AggregationWidgetConfig
   ]);
 const widget: Widget = AggregationWidget.builder().newId().config(widgetConfig).build();
 
+jest.mock('views/logic/slices/widgetActions', () => ({
+  addWidget: jest.fn(async () => {}),
+}));
+
+jest.mock('views/logic/slices/titlesActions', () => ({
+  setTitle: jest.fn(async () => {}),
+}));
+
 describe('ShowDocumentsHandler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('adds a new message widget', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
-      .then(() => {
-        expect(WidgetActions.create).toHaveBeenCalled();
-      });
+  const view = createViewWithWidgets([widget], {});
+  const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
+
+  it('adds a new message widget', async () => {
+    await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } }));
+
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
+      type: MessagesWidget.type,
+      query: expect.objectContaining({
+        query_string: 'bar:42 AND foo:Hello\\!',
+      }),
+    }));
+
+    expect(setTitle).toHaveBeenCalledWith('query-id-1', 'widget', expect.any(String), 'Messages for bar:42 AND foo:Hello\\!');
   });
 
-  it('adds a new message widget for an empty value path', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [] } })
-      .then(() => {
-        expect(WidgetActions.create).toHaveBeenCalled();
+  it('adds a new message widget for an empty value path', async () => {
+    await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [] } }));
 
-        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-
-        expect(newWidget.query).toEqual(createElasticsearchQueryString());
-      });
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({ fields: ['timestamp', 'source'] }),
+      type: MessagesWidget.type,
+      query: expect.objectContaining({
+        query_string: '',
+      }),
+    }));
   });
 
-  it('adds the given value path as widget filter for new message widget', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
-      .then(() => {
-        expect(WidgetActions.create).toHaveBeenCalled();
+  it('adds the given value path as widget filter for new message widget', async () => {
+    await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } }));
 
-        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-
-        expect(newWidget.query).toEqual(createElasticsearchQueryString('foo:Hello\\! AND bar:42'));
-      });
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
+      type: MessagesWidget.type,
+      query: expect.objectContaining({
+        query_string: 'bar:42 AND foo:Hello\\!',
+      }),
+    }));
   });
 
-  it('adds the given value path to an existing widget query', () => {
+  it('adds the given value path to an existing widget query', async () => {
     const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('baz:23')).build();
 
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
-      .then(() => {
-        expect(WidgetActions.create).toHaveBeenCalled();
+    await dispatch(ShowDocumentsHandler({ contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } }));
 
-        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-
-        expect(newWidget.query).toEqual(createElasticsearchQueryString('baz:23 AND foo:Hello\\! AND bar:42'));
-      });
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
+      type: MessagesWidget.type,
+      query: expect.objectContaining({
+        query_string: 'baz:23 AND bar:42 AND foo:Hello\\!',
+      }),
+    }));
   });
 
-  it('sets title for new messages widget', () => {
+  it('sets title for new messages widget', async () => {
     const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('foo:23')).build();
 
-    return ShowDocumentsHandler({ queryId, field: 'hello', value: 'world', type: FieldType.Unknown, contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }] } })
-      .then(() => {
-        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
+    await dispatch(ShowDocumentsHandler({ contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }] } }));
 
-        expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, newWidget.id, 'Messages for hello:world AND bar:42');
-      });
+    expect(setTitle).toHaveBeenCalledWith('query-id-1', 'widget', expect.any(String), 'Messages for bar:42 AND hello:world');
   });
 
-  it('does not include duplicate source/timestamp fields twice', () => {
+  it('does not include duplicate source/timestamp fields twice', async () => {
     const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('foo:23')).build();
 
-    return ShowDocumentsHandler({
-      queryId,
-      field: 'hello',
-      value: 'world',
-      type: FieldType.Unknown,
+    await dispatch(ShowDocumentsHandler({
       contexts: { widget: widgetWithFilter, valuePath: [{ timestamp: 'something' }, { source: 'hopper' }, { hello: 'world' }] },
-    })
-      .then(() => {
-        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
+    }));
 
-        expect(newWidget.config.fields).toEqual(['timestamp', 'source', 'hello']);
-      });
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({ fields: ['timestamp', 'source', 'hello'] }),
+    }));
+  });
+
+  it('creates correct widget query for missing bucket field value', async () => {
+    await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [{ foo: MISSING_BUCKET_NAME }] } }));
+
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      query: expect.objectContaining({
+        query_string: 'NOT _exists_:foo',
+      }),
+    }));
   });
 
   describe('on dashboard', () => {
-    it('duplicates query/timerange/streams/filter of original widget', () => {
+    it('duplicates query/timerange/streams/filter of original widget', async () => {
       const origWidget = Widget.builder()
         .filter('author: "Vanth"')
         .query(createElasticsearchQueryString('foo:42'))
@@ -135,25 +148,22 @@ describe('ShowDocumentsHandler', () => {
         .timerange({ type: 'relative', range: 3600 })
         .build();
 
-      return ShowDocumentsHandler({
-        queryId,
-        field: 'hello',
-        value: 'world',
-        type: FieldType.Unknown,
+      const dashboardView = createViewWithWidgets([origWidget], {});
+      const _dispatch = mockDispatch({ view: { view: dashboardView, activeQuery: 'query-id-1' } } as RootState);
+
+      await _dispatch(ShowDocumentsHandler({
         contexts: {
           widget: origWidget,
           valuePath: [{ bar: 42 }, { hello: 'world' }],
         },
-      }).then(() => {
-        expect(WidgetActions.create).toHaveBeenCalled();
+      }));
 
-        const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
-
-        expect(filter).toEqual('author: "Vanth"');
-        expect(query).toEqual(createElasticsearchQueryString('foo:42 AND hello:world AND bar:42'));
-        expect(streams).toEqual(['stream1', 'stream23']);
-        expect(timerange).toEqual({ type: 'relative', range: 3600 });
-      });
+      expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+        filter: 'author: "Vanth"',
+        streams: ['stream1', 'stream23'],
+        timerange: { type: 'relative', range: 3600 },
+        query: expect.objectContaining({ query_string: 'foo:42 AND bar:42 AND hello:world' }),
+      }));
     });
   });
 });

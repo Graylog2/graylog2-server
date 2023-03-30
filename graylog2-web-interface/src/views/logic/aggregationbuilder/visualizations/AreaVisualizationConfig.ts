@@ -15,29 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
+
+import type { AxisType, XYVisualization } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_INTERPOLATION } from 'views/Constants';
 
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
 
 type InternalState = {
   interpolation: InterpolationMode,
+  axisType: AxisType,
 };
 
 export type AreaVisualizationConfigJSON = {
   interpolation: InterpolationMode,
+  axis_type?: AxisType,
 };
 
-export default class AreaVisualizationConfig extends VisualizationConfig {
+export default class AreaVisualizationConfig extends VisualizationConfig implements XYVisualization {
   private readonly _value: InternalState;
 
-  constructor(interpolation: $PropertyType<InternalState, 'interpolation'>) {
+  constructor(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
     super();
-    this._value = { interpolation };
+    this._value = { interpolation, axisType };
   }
 
   get interpolation() {
     return this._value.interpolation;
+  }
+
+  get axisType() {
+    return this._value.axisType;
   }
 
   toBuilder() {
@@ -45,24 +54,28 @@ export default class AreaVisualizationConfig extends VisualizationConfig {
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(interpolation: $PropertyType<InternalState, 'interpolation'>) {
-    return new AreaVisualizationConfig(interpolation);
+  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
+    return new AreaVisualizationConfig(interpolation, axisType);
   }
 
   static empty() {
-    return new AreaVisualizationConfig('linear');
+    return AreaVisualizationConfig.create(DEFAULT_INTERPOLATION);
   }
 
   toJSON() {
-    const { interpolation } = this._value;
+    const { interpolation, axisType } = this._value;
 
-    return { interpolation };
+    return {
+      interpolation,
+      axis_type: axisType,
+    };
   }
 
-  static fromJSON(_type: string, value: AreaVisualizationConfigJSON = { interpolation: 'linear' }) {
-    const { interpolation = 'linear' } = value;
-
-    return AreaVisualizationConfig.create(interpolation);
+  static fromJSON(_type: string, value: AreaVisualizationConfigJSON) {
+    return AreaVisualizationConfig.create(
+      value?.interpolation ?? DEFAULT_INTERPOLATION,
+      value?.axis_type ?? DEFAULT_AXIS_TYPE,
+    );
   }
 }
 
@@ -75,13 +88,13 @@ class Builder {
     this.value = value;
   }
 
-  interpolation(value: $PropertyType<InternalState, 'interpolation'>) {
+  interpolation(value: InternalState['interpolation']) {
     return new Builder(this.value.set('interpolation', value));
   }
 
   build() {
-    const { interpolation } = this.value.toObject();
+    const { interpolation, axisType } = this.value.toObject();
 
-    return new AreaVisualizationConfig(interpolation);
+    return new AreaVisualizationConfig(interpolation, axisType);
   }
 }

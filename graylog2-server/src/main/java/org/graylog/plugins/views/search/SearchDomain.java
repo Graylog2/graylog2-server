@@ -42,7 +42,8 @@ public class SearchDomain {
     @Inject
     public SearchDomain(SearchDbService dbService,
                         SearchExecutionGuard executionGuard,
-                        ViewService viewService, Map<String, ViewResolver> viewResolvers) {
+                        ViewService viewService,
+                        Map<String, ViewResolver> viewResolvers) {
         this.dbService = dbService;
         this.executionGuard = executionGuard;
         this.viewService = viewService;

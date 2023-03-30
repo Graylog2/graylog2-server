@@ -56,6 +56,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_master")
     private boolean isMaster = true;
 
+    @Parameter(value = "stream_aware_field_types")
+    private boolean streamAwareFieldTypes = false;
+
     /**
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
      * use @{@link javax.inject.Named} injection but the getter isLeader() instead.
@@ -75,14 +78,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
 
-    @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessorThreadsMaxPoolSize = 30;
-
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
-
-    @Parameter(value = "outputbuffer_processor_keep_alive_time", validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessorKeepAliveTime = 5000;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "/etc/graylog/server/node-id";
@@ -146,13 +143,6 @@ public class Configuration extends BaseConfiguration {
     @Deprecated
     private int alertCheckInterval = 60;
 
-    @Parameter(value = "enable_legacy_alerts")
-    @Deprecated
-    private boolean enableLegacyAlerts = false;
-
-    @Parameter(value = "gc_warning_threshold")
-    private Duration gcWarningThreshold = Duration.seconds(1L);
-
     @Parameter(value = "default_message_output_class")
     private String defaultMessageOutputClass = "";
 
@@ -202,6 +192,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "run_migrations")
     private boolean runMigrations = true;
 
+    @Parameter(value = "ignore_migration_failures")
+    private boolean ignoreMigrationFailures = false;
+
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
@@ -213,6 +206,10 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
+
+    public boolean maintainsStreamAwareFieldTypes() {
+        return streamAwareFieldTypes;
+    }
 
     /**
      * @deprecated Use {@link #isLeader()} instead.
@@ -279,14 +276,6 @@ public class Configuration extends BaseConfiguration {
         return outputBufferProcessorThreadsCorePoolSize;
     }
 
-    public int getOutputBufferProcessorThreadsMaxPoolSize() {
-        return outputBufferProcessorThreadsMaxPoolSize;
-    }
-
-    public int getOutputBufferProcessorKeepAliveTime() {
-        return outputBufferProcessorKeepAliveTime;
-    }
-
     public boolean isCloud() {
         return isCloud;
     }
@@ -299,7 +288,14 @@ public class Configuration extends BaseConfiguration {
         return runMigrations;
     }
 
-    @Override
+    public boolean ignoreMigrationFailures() {
+        return ignoreMigrationFailures;
+    }
+
+    public boolean getSkipPreflightChecks() {
+        return skipPreflightChecks;
+    }
+
     public String getNodeIdFile() {
         return nodeIdFile;
     }
@@ -371,15 +367,6 @@ public class Configuration extends BaseConfiguration {
     @Deprecated
     public int getAlertCheckInterval() {
         return alertCheckInterval;
-    }
-
-    @Deprecated
-    public boolean isEnableLegacyAlerts() {
-        return enableLegacyAlerts;
-    }
-
-    public Duration getGcWarningThreshold() {
-        return gcWarningThreshold;
     }
 
     public String getDefaultMessageOutputClass() {

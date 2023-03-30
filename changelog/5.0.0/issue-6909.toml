@@ -1,0 +1,5 @@
+type = "changed"
+message = "Auto focus first suggestion in search query input autocompletion."
+
+issues = ["6909"]
+pulls = ["12991"]

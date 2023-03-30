@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import pull from 'lodash/pull';
 
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -25,21 +25,42 @@ import PaginationURL from 'util/PaginationURL';
 import StreamsActions from 'actions/streams/StreamsActions';
 import { singletonStore } from 'logic/singleton';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { Attributes } from 'stores/PaginationTypes';
 
 export type Stream = {
   id: string,
-  title: string,
+  creator_user_id: string,
+  outputs: any[],
+  matching_type: 'AND' | 'OR',
   description: string,
+  created_at: string,
+  disabled: boolean,
+  rules: StreamRule[],
+  alert_conditions?: any[],
+  alert_receivers?: {
+    emails: Array<string>,
+    users: Array<string>,
+  },
+  title: string,
+  content_pack: any,
   remove_matches_from_default_stream: boolean,
-  isDefaultStream: boolean,
-  creatorUser: string,
-  createdAt: number,
+  index_set_id: string,
+  is_default: boolean,
+  is_editable: boolean,
 };
 
-type StreamRule = {
+export type StreamRuleType = {
+  id: number,
+  short_desc: string,
+  long_desc: string,
+  name: string,
+};
+
+export type StreamRule = {
   id: string,
-  type: string,
+  type: number,
   value: string,
+  field: string,
   inverted: boolean,
   stream_id: string,
   description: string,
@@ -109,22 +130,29 @@ type PaginatedResponse = {
     per_page: number,
   },
   query: string,
-  streams: Array<Stream>,
+  attributes: Attributes,
+  elements: Array<Stream>,
 };
+
+export type MatchData = {
+  matches: boolean,
+  rules: { [id: string]: false },
+}
 
 const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
   listenables: [StreamsActions],
 
   callbacks: [],
 
-  searchPaginated(newPage, newPerPage, newQuery) {
-    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, newPage, newPerPage, newQuery);
+  searchPaginated(newPage, newPerPage, newQuery, additional) {
+    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, newPage, newPerPage, newQuery, additional);
 
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
         const {
-          streams,
+          elements,
           query,
+          attributes,
           pagination: {
             count,
             total,
@@ -134,7 +162,8 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         } = response;
 
         return {
-          streams,
+          elements,
+          attributes,
           pagination: {
             count,
             total,
@@ -143,10 +172,6 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
             query,
           },
         };
-      })
-      .catch((errorThrown) => {
-        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
-          'Could not load streams');
       });
 
     StreamsActions.searchPaginated.promise(promise);
@@ -173,31 +198,10 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         callback(streams);
       });
   },
-  get(streamId: string, callback: ((stream: Stream) => void)): Promise<StreamResponse> {
-    const failCallback = (errorThrown) => {
-      UserNotification.error(`Loading Stream failed with status: ${errorThrown}`,
-        'Could not retrieve Stream');
-    };
-
-    const { url } = ApiRoutes.StreamsApiController.get(streamId);
-
-    const promise = fetch('GET', qualifyUrl(url))
-      .then(callback, failCallback);
-
-    StreamsActions.get.promise(promise);
-
-    return promise;
-  },
-  remove(streamId: string, callback: (() => void)) {
-    const failCallback = (errorThrown) => {
-      UserNotification.error(`Removing Stream failed with status: ${errorThrown}`,
-        'Could not remove Stream');
-    };
-
+  remove(streamId: string) {
     const url = qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
 
     const promise = fetch('DELETE', url)
-      .then(callback, failCallback)
       .then(() => CurrentUserStore.reload()
         .then(this._emitChange.bind(this)));
 
@@ -343,7 +347,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
     this.callbacks.forEach((callback) => callback());
   },
   unregister(callback: Callback) {
-    lodash.pull(this.callbacks, callback);
+    pull(this.callbacks, callback);
   },
 }));
 

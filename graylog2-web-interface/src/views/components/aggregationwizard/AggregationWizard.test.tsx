@@ -26,6 +26,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import DataTable from 'views/components/datatable/DataTable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import dataTable from 'views/components/datatable/bindings';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import viewsReducers from 'views/viewsReducers';
 
 import AggregationWizard from './AggregationWizard';
 
@@ -34,29 +36,30 @@ const widgetConfig = AggregationWidgetConfig
   .visualization(DataTable.type)
   .build();
 
-jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({ count: { type: 'count' }, min: { type: 'min' }, max: { type: 'max' }, percentile: { type: 'percentile' } })),
-  listen: jest.fn(),
-}));
+jest.mock('views/hooks/useAggregationFunctions');
 
 const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
 
-const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable], 'views.reducers': viewsReducers } };
 
 describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
-    <FieldTypesContext.Provider value={fieldTypes}>
-      <AggregationWizard onChange={() => {}}
-                         config={widgetConfig}
-                         editing
-                         id="widget-id"
-                         type="AGGREGATION"
-                         fields={Immutable.List([])}
-                         {...props}>
-        <>The Visualization</>
-      </AggregationWizard>
-    </FieldTypesContext.Provider>,
-  );
+  const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) => render((
+    <TestStoreProvider>
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <AggregationWizard onChange={() => {}}
+                           onSubmit={() => {}}
+                           onCancel={() => {}}
+                           config={widgetConfig}
+                           editing
+                           id="widget-id"
+                           type="AGGREGATION"
+                           fields={Immutable.List([])}
+                           {...props}>
+          <div>The Visualization</div>
+        </AggregationWizard>
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>
+  ));
 
   beforeAll(() => PluginStore.register(plugin));
 
@@ -101,5 +104,21 @@ describe('AggregationWizard', () => {
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
 
     await waitFor(() => within(metricsSection).findByText('Function'));
+  });
+
+  it('should call onSubmit', async () => {
+    const onSubmit = jest.fn();
+    renderSUT({ onSubmit });
+    userEvent.click(await screen.findByRole('button', { name: /update widget/i }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+  });
+
+  it('should call onCancel', async () => {
+    const onCancel = jest.fn();
+    renderSUT({ onCancel });
+    userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+
+    await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1));
   });
 });

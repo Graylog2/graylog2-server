@@ -1,0 +1,4 @@
+type = "f"
+message = "Preventing accidental hiding of columns in message list widget for reporting."
+
+pulls = ["14823"]

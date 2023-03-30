@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Avoid vanishing grouping direction when dragged."
+
+pulls = ["14277"]

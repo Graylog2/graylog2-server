@@ -16,30 +16,20 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Map as MockMap } from 'immutable';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
-import { MockStore } from 'helpers/mocking';
-import QueryBar from 'views/components/QueryBar';
-import { ViewActions } from 'views/stores/ViewStore';
+import { asMock } from 'helpers/mocking';
+import OriginalQueryBar from 'views/components/QueryBar';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
+import useQueryIds from 'views/hooks/useQueryIds';
+import useQueryTitles from 'views/hooks/useQueryTitles';
+import useViewMetadata from 'views/hooks/useViewMetadata';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import useAppDispatch from 'stores/useAppDispatch';
+import { selectQuery, removeQuery } from 'views/logic/slices/viewSlice';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    selectQuery: jest.fn(() => Promise.resolve()),
-    search: jest.fn(() => Promise.resolve()),
-  },
-  ViewStore: MockStore(['getInitialState', () => ({ view: {} })]),
-}));
-
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesActions: {
-    remove: jest.fn(() => Promise.resolve()),
-  },
-  ViewStatesStore: MockStore(['getInitialState', () => MockMap()]),
-}));
 
 const queries = Immutable.OrderedSet(['foo', 'bar', 'baz']);
 const queryTitles = Immutable.Map({
@@ -56,12 +46,37 @@ const viewMetadata = {
   activeQuery: 'bar',
 };
 
+jest.mock('views/hooks/useQueryIds');
+jest.mock('views/hooks/useQueryTitles');
+jest.mock('views/hooks/useViewMetadata');
+jest.mock('stores/useAppDispatch');
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  removeQuery: jest.fn(() => async () => {}),
+  selectQuery: jest.fn(() => async () => {}),
+}));
+
+const QueryBar = () => (
+  <TestStoreProvider>
+    <OriginalQueryBar />
+  </TestStoreProvider>
+);
+
 describe('QueryBar', () => {
   let oldWindowConfirm;
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
     oldWindowConfirm = window.confirm;
     window.confirm = jest.fn(() => true);
+
+    asMock(useQueryIds).mockReturnValue(queries);
+    asMock(useQueryTitles).mockReturnValue(queryTitles);
+    asMock(useViewMetadata).mockReturnValue(viewMetadata);
   });
 
   afterEach(() => {
@@ -69,7 +84,7 @@ describe('QueryBar', () => {
   });
 
   it('renders existing tabs', async () => {
-    render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
+    render(<QueryBar />);
 
     await screen.findByRole('button', { name: 'First Query' });
     await screen.findByRole('button', { name: 'Second Query' });
@@ -77,16 +92,21 @@ describe('QueryBar', () => {
   });
 
   it('allows changing tab', async () => {
-    render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
+    render(<QueryBar />);
 
     const nextTab = await screen.findByRole('button', { name: 'Third Query' });
 
     fireEvent.click(nextTab);
 
-    await waitFor(() => expect(ViewActions.selectQuery).toHaveBeenCalledWith('baz'));
+    await waitFor(() => expect(selectQuery).toHaveBeenCalledWith('baz'));
   });
 
   it('allows closing current tab', async () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     const setDashboard = jest.fn();
 
     render(
@@ -95,7 +115,7 @@ describe('QueryBar', () => {
         unsetDashboardPage: jest.fn(),
         dashboardPage: undefined,
       }}>
-        <QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />
+        <QueryBar />
       </DashboardPageContext.Provider>,
     );
 
@@ -109,8 +129,7 @@ describe('QueryBar', () => {
 
     fireEvent.click(closeButton);
 
-    await waitFor(() => expect(setDashboard).toHaveBeenCalled());
-    await waitFor(() => expect(ViewActions.search).toHaveBeenCalled());
+    await waitFor(() => expect(removeQuery).toHaveBeenCalledWith('bar'));
 
     expect(window.confirm).toHaveBeenCalled();
   });

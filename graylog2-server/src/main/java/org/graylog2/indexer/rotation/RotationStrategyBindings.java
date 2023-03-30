@@ -19,6 +19,7 @@ package org.graylog2.indexer.rotation;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.plugin.PluginModule;
 
@@ -41,6 +42,9 @@ public class RotationStrategyBindings extends PluginModule {
                     break;
                 case TimeBasedRotationStrategy.NAME:
                     addRotationStrategy(TimeBasedRotationStrategy.class);
+                    break;
+                case TimeBasedSizeOptimizingStrategy.NAME:
+                    addRotationStrategy(TimeBasedSizeOptimizingStrategy.class);
                     break;
             }
         }

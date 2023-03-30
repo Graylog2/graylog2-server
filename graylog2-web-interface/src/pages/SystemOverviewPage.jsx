@@ -43,9 +43,7 @@ const SystemOverviewPage = () => {
         <GraylogClusterOverview />
 
         <HideOnCloud>
-          <IfPermitted permissions="indexercluster:read">
-            <IndexerClusterHealth />
-          </IfPermitted>
+          <IndexerClusterHealth />
 
           <IfPermitted permissions="indices:failures">
             <IndexerSystemOverviewComponent />

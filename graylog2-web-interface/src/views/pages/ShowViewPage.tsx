@@ -15,53 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
-import useViewLoader from 'views/logic/views/UseViewLoader';
-import Spinner from 'components/common/Spinner';
-import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
-import ViewLoader from 'views/logic/views/ViewLoader';
-import withLocation from 'routing/withLocation';
-import withParams from 'routing/withParams';
-import type { Location } from 'routing/withLocation';
+import useParams from 'routing/useParams';
+import useFetchView from 'views/hooks/useFetchView';
 
 import SearchPage from './SearchPage';
 
-type Props = {
-  location: Location,
-  params: {
-    viewId?: string,
-  },
-  viewLoader?: ViewLoaderFn,
-};
+const ShowViewPage = ({ children }: React.PropsWithChildren<{}>) => {
+  const { viewId } = useParams<{ viewId?: string }>();
 
-const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: Props) => {
   if (!viewId) {
     throw new Error('No view id specified!');
   }
 
-  const [loaded, HookComponent] = useViewLoader(viewId, query, viewLoader);
+  const view = useFetchView(viewId);
 
-  if (HookComponent) {
-    return HookComponent;
-  }
-
-  if (!loaded) {
-    return <Spinner />;
-  }
-
-  return <SearchPage />;
+  return <SearchPage view={view} isNew={false}>{children}</SearchPage>;
 };
 
-ShowViewPage.propTypes = {
-  params: PropTypes.shape({
-    viewId: PropTypes.string.isRequired,
-  }).isRequired,
-  viewLoader: PropTypes.func,
-};
-
-ShowViewPage.defaultProps = {
-  viewLoader: ViewLoader,
-};
-
-export default withParams(withLocation(ShowViewPage));
+export default ShowViewPage;

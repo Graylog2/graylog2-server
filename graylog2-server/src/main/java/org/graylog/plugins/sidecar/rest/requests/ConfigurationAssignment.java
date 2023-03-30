@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+import java.util.Set;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class ConfigurationAssignment {
@@ -30,9 +33,13 @@ public abstract class ConfigurationAssignment {
     @JsonProperty
     public abstract String configurationId();
 
+    @JsonProperty
+    public abstract Set<String> assignedFromTags();
+
     @JsonCreator
     public static ConfigurationAssignment create(@JsonProperty("collector_id") String collectorId,
-                                                 @JsonProperty("configuration_id") String configurationId) {
-        return new AutoValue_ConfigurationAssignment(collectorId, configurationId);
+                                                 @JsonProperty("configuration_id") String configurationId,
+                                                 @JsonProperty("assigned_from_tags") @Nullable Set<String> assignedFromTags) {
+        return new AutoValue_ConfigurationAssignment(collectorId, configurationId, assignedFromTags == null ? Set.of() : assignedFromTags);
     }
 }

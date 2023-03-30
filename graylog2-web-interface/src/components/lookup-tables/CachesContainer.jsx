@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -23,8 +24,10 @@ import { Spinner } from 'components/common';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 
 const CachesContainer = createReactClass({
+  // eslint-disable-next-line
   displayName: 'CachesContainer',
 
+  // eslint-disable-next-line
   propTypes: {
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),

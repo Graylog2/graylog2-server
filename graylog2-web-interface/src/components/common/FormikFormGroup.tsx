@@ -39,8 +39,9 @@ type Props = {
   maxLength?: number,
   required?: boolean,
   bsSize?: 'large' | 'small' | 'xsmall',
-  validate?: (any) => string | undefined,
+  validate?: (arg: any) => string | undefined,
   rows?: number,
+  autoFocus?: boolean,
 };
 
 /** Displays the FormikInput with a specific layout */
@@ -72,6 +73,7 @@ FormikFormGroup.defaultProps = {
   required: false,
   validate: () => undefined,
   rows: undefined,
+  autoFocus: false,
 };
 
 export default FormikFormGroup;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -23,6 +24,7 @@ import OutputsComponent from 'components/outputs/OutputsComponent';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const SystemOutputsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'SystemOutputsPage',
   mixins: [Reflux.connect(CurrentUserStore)],
 
@@ -33,10 +35,7 @@ const SystemOutputsPage = createReactClass({
           <PageHeader title="Outputs in Cluster">
             <span>
               Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here{' '}
-              <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
-            </span>
-
-            <span>
+              <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong><br />
               You can find output plugins in <a href="https://marketplace.graylog.org/" target="_blank" rel="noreferrer">the Graylog Marketplace</a>.
             </span>
           </PageHeader>

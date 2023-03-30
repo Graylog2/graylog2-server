@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import { Button, Modal } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
+import { Modal } from 'components/bootstrap';
+import { IfPermitted, ModalSubmit } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
@@ -38,7 +38,7 @@ type Props = {
   onSave: (newDecorators: Array<Decorator>) => unknown,
 };
 
-const _updateOrder = (orderedDecorators, decorators, onChange) => {
+const _updateOrder = (orderedDecorators: Array<{ id: string }>, decorators: Array<Decorator>, onChange: (decorators: Array<Decorator>) => void) => {
   const newDecorators = cloneDeep(decorators);
 
   orderedDecorators.forEach((item, idx) => {
@@ -52,15 +52,15 @@ const _updateOrder = (orderedDecorators, decorators, onChange) => {
   onChange(newDecorators);
 };
 
-const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef: React.Ref<BootstrapModalWrapper>) => {
+const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const onCreate = useCallback(
-    ({ stream, ...rest }) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
+    ({ stream, ...rest }: Decorator) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onReorder = useCallback(
-    (orderedDecorators) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
+    (orderedDecorators: Array<{ id: string }>) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onSubmit = useCallback(() => onSave(modifiedDecorators), [onSave, modifiedDecorators]);
@@ -78,8 +78,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   }, [decorators, onCancel]);
 
   return (
-    <BootstrapModalWrapper ref={modalRef}
-                           showModal={show}
+    <BootstrapModalWrapper showModal={show}
                            onHide={_onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>Update Default Decorators Configuration</Modal.Title>
@@ -98,11 +97,10 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
         <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" onClick={_onCancel}>Cancel</Button>
-        <Button bsStyle="primary" onClick={onSubmit}>Save</Button>
+        <ModalSubmit onSubmit={onSubmit} onCancel={_onCancel} submitButtonText="Update configuration" />
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
 };
 
-export default React.forwardRef<BootstrapModalWrapper, Props>(DecoratorsConfigUpdate);
+export default DecoratorsConfigUpdate;

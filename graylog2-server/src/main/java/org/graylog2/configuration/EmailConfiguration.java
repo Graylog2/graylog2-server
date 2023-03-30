@@ -18,11 +18,14 @@ package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import joptsimple.internal.Strings;
+import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import java.net.URI;
+import java.time.Duration;
 
 public class EmailConfiguration {
     @Parameter(value = "transport_email_enabled")
@@ -54,6 +57,16 @@ public class EmailConfiguration {
 
     @Parameter(value = "transport_email_web_interface_url")
     private URI webInterfaceUri;
+
+    @Parameter(value = "transport_email_socket_connection_timeout",
+               converter = JavaDurationConverter.class,
+               validators = MillisecondDurationValidator.class)
+    private Duration socketConnectionTimeout = Duration.ofSeconds(10);
+
+    @Parameter(value = "transport_email_socket_timeout",
+               converter = JavaDurationConverter.class,
+               validators = MillisecondDurationValidator.class)
+    private Duration socketTimeout = Duration.ofSeconds(10);
 
     public boolean isEnabled() {
         return enabled;
@@ -111,4 +124,23 @@ public class EmailConfiguration {
         }
     }
 
+    public Duration getSocketConnectionTimeout() {
+        return socketConnectionTimeout;
+    }
+
+    public Duration getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    public static class MillisecondDurationValidator implements Validator<Duration> {
+        @Override
+        public void validate(String name, Duration value) throws ValidationException {
+            try {
+                final long ignored = value.toNanos();
+            } catch (ArithmeticException e) {
+                throw new ValidationException("Parameter " + name +
+                        " exceeds the limit to allow representation as milliseconds: " + e.getLocalizedMessage());
+            }
+        }
+    }
 }

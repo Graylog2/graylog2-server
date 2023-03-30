@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
@@ -59,18 +60,20 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
     static class TestViewService extends ViewSummaryService {
         TestViewService(MongoConnection mongoConnection,
-                        MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper);
+                        MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                        ObjectMapper mapper) {
+            super(mongoConnection, mongoJackObjectMapperProvider, mapper);
         }
     }
 
     @Before
-    public void setup(MongoJackObjectMapperProvider mapperProvider) {
+    public void setup(MongoJackObjectMapperProvider mapperProvider, ObjectMapper mapper) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
         final ViewSummaryService viewService = new TestViewService(
                 mongodb.mongoConnection(),
-                mapperProvider
+                mapperProvider,
+                mapper
         );
         this.searchDbService = spy(
                 new SearchDbService(

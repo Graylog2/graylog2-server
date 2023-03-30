@@ -17,7 +17,8 @@
 package org.graylog2.shared.bindings;
 
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.Configuration;
+import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.resources.RestResourcesModule;
 import org.graylog2.shared.rest.resources.RestResourcesSharedModule;
 import org.graylog2.shared.security.ShiroSecurityBinding;
@@ -27,7 +28,13 @@ import org.graylog2.web.resources.WebResourcesModule;
 
 import javax.ws.rs.container.DynamicFeature;
 
-public class RestApiBindings extends Graylog2Module {
+public class RestApiBindings extends PluginModule {
+    private final Configuration configuration;
+
+    public RestApiBindings(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
         bindDynamicFeatures();
@@ -37,11 +44,14 @@ public class RestApiBindings extends Graylog2Module {
         jerseyExceptionMapperBinder();
         jerseyAdditionalComponentsBinder();
 
+        // Ensure that we create the binder. We might not have any plugin that registers a JobResourceHandler.
+        jobResourceHandlerBinder();
+
         bind(IndexHtmlGenerator.class).toProvider(IndexHtmlGeneratorProvider.class);
-        
+
         // Install all resource modules
         install(new WebResourcesModule());
-        install(new RestResourcesModule());
+        install(new RestResourcesModule(configuration));
         install(new RestResourcesSharedModule());
     }
 

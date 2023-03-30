@@ -16,6 +16,8 @@
  */
 package org.graylog2.streams;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -45,6 +47,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
  * Stream routing engine to select matching streams for a message.
  *
@@ -52,6 +56,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class StreamRouterEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouterEngine.class);
+    private static final String METER_NAME_CANNOT_REMOVE_DEFAULT = "cannotRemoveDefault";
 
     private final EnumSet<StreamRuleType> ruleTypesNotNeedingFieldPresence = EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.EXACT, StreamRuleType.REGEX, StreamRuleType.ALWAYS_MATCH, StreamRuleType.CONTAINS, StreamRuleType.MATCH_INPUT);
     private final List<Stream> streams;
@@ -63,6 +68,7 @@ public class StreamRouterEngine {
     private final Provider<Stream> defaultStreamProvider;
 
     private final List<Rule> rulesList;
+    private final Counter cannotRemoveDefaultMeter;
 
     public interface Factory {
         StreamRouterEngine create(List<Stream> streams, ExecutorService executorService);
@@ -73,7 +79,8 @@ public class StreamRouterEngine {
                               @Assisted ExecutorService executorService,
                               StreamFaultManager streamFaultManager,
                               StreamMetrics streamMetrics,
-                              @DefaultStream Provider<Stream> defaultStreamProvider) {
+                              @DefaultStream Provider<Stream> defaultStreamProvider,
+                              MetricRegistry metricRegistry) {
         this.streams = streams;
         this.streamFaultManager = streamFaultManager;
         this.streamMetrics = streamMetrics;
@@ -81,6 +88,7 @@ public class StreamRouterEngine {
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
         this.defaultStreamProvider = defaultStreamProvider;
+        this.cannotRemoveDefaultMeter = metricRegistry.counter(name(this.getClass(), METER_NAME_CANNOT_REMOVE_DEFAULT));
 
         final List<Rule> alwaysMatchRules = Lists.newArrayList();
         final List<Rule> presenceRules = Lists.newArrayList();
@@ -221,8 +229,13 @@ public class StreamRouterEngine {
                         LOG.trace("Successfully removed default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
                     }
                 } else {
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn("Couldn't remove default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
+                    // A previously executed message processor (or Illuminate) has likely already removed the
+                    // default stream from the message. Now, the message has matched a stream in the Graylog
+                    // MessageFilterChain, and the matching stream is also set to remove the default stream.
+                    // This is usually from user-defined stream rules, and is generally not a problem.
+                    cannotRemoveDefaultMeter.inc();
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Couldn't remove default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
                     }
                 }
             }

@@ -77,7 +77,7 @@ public class ClusterHealthCheckThread extends Periodical {
         Notification notification = notificationService.buildNow();
         notification.addType(Notification.Type.NO_INPUT_RUNNING);
         notification.addSeverity(Notification.Severity.URGENT);
-        notification.addNode(nodeId.toString());
+        notification.addNode(nodeId.getNodeId());
 
         return notification;
     }

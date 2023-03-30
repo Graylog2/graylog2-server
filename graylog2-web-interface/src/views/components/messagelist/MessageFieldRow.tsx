@@ -27,7 +27,6 @@ import DecoratedValue from './decoration/DecoratedValue';
 import TypeSpecificValue from '../TypeSpecificValue';
 
 export const MessageWrapper = styled.div`
-  line-height: 1.5em;
   white-space: pre-line;
   max-height: 6em; /* show 4 lines: line-height * 4 */
   overflow: hidden;

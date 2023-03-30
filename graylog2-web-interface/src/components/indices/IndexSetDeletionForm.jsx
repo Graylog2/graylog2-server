@@ -16,8 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import naturalSort from 'javascript-natural-sort';
 
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Spinner } from 'components/common';
 import { Alert, Row, Col, Input } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -29,12 +29,15 @@ class IndexSetDeletionForm extends React.Component {
     onDelete: PropTypes.func.isRequired,
   };
 
-  state = {
-    assignedStreams: undefined,
-    deleteIndices: true,
-  };
+  constructor(props) {
+    super(props);
 
-  forms = {};
+    this.state = {
+      showModal: false,
+      assignedStreams: undefined,
+      deleteIndices: true,
+    };
+  }
 
   _onModalOpen = () => {
     StreamsStore.load((streams) => {
@@ -50,16 +53,17 @@ class IndexSetDeletionForm extends React.Component {
     });
   };
 
-  _onRemoveClick = (e) => {
-    this.setState({ deleteIndices: e.target.checked });
-  };
-
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
-    this.forms[`index-set-deletion-modal-${this.props.indexSet.id}`].open();
+    this.setState({ showModal: true }, this._onModalOpen);
   };
 
   close = () => {
-    this.forms[`index-set-deletion-modal-${this.props.indexSet.id}`].close();
+    this.setState({ showModal: false });
+  };
+
+  _onRemoveClick = (e) => {
+    this.setState({ deleteIndices: e.target.checked });
   };
 
   _isLoading = () => {
@@ -137,9 +141,9 @@ class IndexSetDeletionForm extends React.Component {
 
   render() {
     return (
-      <BootstrapModalForm ref={(elem) => { this.forms[`index-set-deletion-modal-${this.props.indexSet.id}`] = elem; }}
+      <BootstrapModalForm show={this.state.showModal}
                           title={`Delete index set "${this.props.indexSet.title}"?`}
-                          onModalOpen={this._onModalOpen}
+                          onCancel={this.close}
                           onSubmitForm={this._onDelete}
                           submitButtonText="Delete"
                           submitButtonDisabled={!this._isDeletable()}>

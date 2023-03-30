@@ -29,6 +29,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -39,9 +40,12 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchT
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Requests;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplatesExistRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
@@ -171,6 +175,35 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
+    public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {
+        Map<String, Object> metaUpdate = new HashMap<>();
+        if (mergeExisting) {
+            final Map<String, Object> oldMetaData = getIndexMetaData(index);
+            metaUpdate.putAll(oldMetaData);
+        }
+        metaUpdate.putAll(metadata);
+        updateIndexMapping(index, "ignored", Map.of("_meta", metaUpdate));
+    }
+
+    @Override
+    public Map<String, Object> getIndexMetaData(@Nonnull String index) {
+        final GetMappingsRequest request = new GetMappingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+
+        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+                "Couldn't read mapping of index " + index);
+
+        final Object metaData = result.mappings().get(index).sourceAsMap().get("_meta");
+        //noinspection rawtypes
+        if (metaData instanceof Map map) {
+            //noinspection unchecked
+            return map;
+        }
+        return Map.of();
+    }
+
+    @Override
     public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
         final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
                 .source(template);
@@ -205,6 +238,13 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
+    public Optional<DateTime> indexClosingDate(String index) {
+        final Map<String, Object> indexMetaData = getIndexMetaData(index);
+        return Optional.ofNullable(indexMetaData.get("closing_date")).filter(Long.class::isInstance).map(Long.class::cast)
+                .map(instant -> new DateTime(instant, DateTimeZone.UTC));
+    }
+
+    @Override
     public void openIndex(String index) {
         final OpenIndexRequest request = new OpenIndexRequest(index);
 
@@ -215,6 +255,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public void setReadOnly(String index) {
         // https://www.elastic.co/guide/en/elasticsearch/reference/7.8/indices-update-settings.html
+        // https://www.elastic.co/guide/en/elasticsearch/reference/7.10/index-modules-blocks.html
         final Map<String, Object> settings = ImmutableMap.of(
                 "index", ImmutableMap.of("blocks",
                         ImmutableMap.of(
@@ -471,10 +512,10 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         }
 
         final Min minAgg = f.getAggregations().get("ts_min");
-        final long minUnixTime = new Double(minAgg.getValue()).longValue();
+        final long minUnixTime = Double.valueOf(minAgg.getValue()).longValue();
         final DateTime min = new DateTime(minUnixTime, DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
-        final long maxUnixTime = new Double(maxAgg.getValue()).longValue();
+        final long maxUnixTime = Double.valueOf(maxAgg.getValue()).longValue();
         final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
@@ -508,6 +549,12 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public boolean isClosed(String index) {
         return indexHasState(index, State.Closed);
+    }
+
+    @Override
+    public void refresh(String... indices) {
+        final RefreshRequest refreshRequest = Requests.refreshRequest(indices);
+        client.execute((c, requestOptions) -> c.indices().refresh(refreshRequest, requestOptions));
     }
 
     private Boolean indexHasState(String index, State open) {

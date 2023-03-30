@@ -22,33 +22,21 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import MockStore from 'helpers/mocking/StoreMock';
-import { SearchActions } from 'views/stores/SearchStore';
-import mockAction from 'helpers/mocking/MockAction';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import FormikInput from 'components/common/FormikInput';
+import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
-import DashboardSearchBar from './DashboardSearchBar';
+import OriginalDashboardSearchBar from './DashboardSearchBar';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
-jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
-jest.mock('hooks/useUserDateTime');
+jest.mock('views/logic/fieldtypes/useFieldTypes');
+jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore(),
-  GlobalOverrideActions: {
-    set: jest.fn().mockResolvedValue({}),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
@@ -61,6 +49,12 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
   status: 'OK',
   explanations: [],
 })));
+
+const DashboardSearchBar = () => (
+  <TestStoreProvider>
+    <OriginalDashboardSearchBar />
+  </TestStoreProvider>
+);
 
 describe('DashboardSearchBar pluggable controls', () => {
   const PluggableSearchBarControl = () => {
@@ -76,6 +70,10 @@ describe('DashboardSearchBar pluggable controls', () => {
 
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, {
+      'views.reducers': [
+        { key: 'view', reducer: viewSliceReducer },
+        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+      ],
       'views.components.searchBar': [
         () => ({
           id: 'pluggable-search-bar-control',
@@ -106,7 +104,6 @@ describe('DashboardSearchBar pluggable controls', () => {
   });
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
   });
 
@@ -131,6 +128,7 @@ describe('DashboardSearchBar pluggable controls', () => {
         queryString: '',
         timerange: undefined,
       },
+      expect.any(Function),
       undefined,
     ));
   }, testTimeout);
@@ -142,6 +140,9 @@ describe('DashboardSearchBar pluggable controls', () => {
       pluggableControl: 'Initial Value',
       queryString: '',
       timerange: {},
+    }, {
+      executionState: SearchExecutionState.empty(),
+      view: expect.objectContaining({ id: 'search-id-1' }),
     }));
   });
 
@@ -152,6 +153,6 @@ describe('DashboardSearchBar pluggable controls', () => {
       customKey: 'Initial Value',
       queryString: '',
       timeRange: undefined,
-    }));
+    }, 'Europe/Berlin'));
   });
 });

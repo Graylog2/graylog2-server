@@ -20,13 +20,13 @@ import styled from 'styled-components';
 import type { EditWidgetComponentProps } from 'views/types';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import type { WidgetConfigFormValues } from './WidgetConfigForm';
+import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from './WidgetConfigForm';
 import WidgetConfigForm from './WidgetConfigForm';
 import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElementDefinitions';
 import VisualizationContainer from './VisualizationContainer';
 
-const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
+const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => [element.key, element]));
 
 const _initialFormValues = (config: AggregationWidgetConfig) => {
   return aggregationElements.reduce((formValues, element) => ({
@@ -41,10 +41,10 @@ const Controls = styled.div`
   max-width: 500px;
   flex: 1.2;
   padding-right: 15px;
-  overflow-y: auto;
 `;
 
 const Section = styled.div`
+  height: 100%;
   margin-bottom: 10px;
 
   :last-child {
@@ -95,14 +95,14 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
-  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => ({})));
+  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => (({}) as WidgetConfigValidationErrors)));
 
   const elementValidationResults = elementValidations.map((validate) => validate(formValues));
 
   return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
-const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
+const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
   const initialFormValues = _initialFormValues(config);
 
   return (
@@ -116,6 +116,8 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
             <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
                                    config={config}
                                    onCreate={onCreateElement}
+                                   onSubmit={onSubmit}
+                                   onCancel={onCancel}
                                    onConfigChange={onChange} />
           </Section>
         </Controls>

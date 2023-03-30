@@ -110,6 +110,24 @@ public class Beats2CodecTest {
     }
 
     @Test
+    public void decodeMessagesHandlesPacketbeatV8Messages() throws Exception {
+        final Message message = codec.decode(messageFromJson("packetbeat-mongodb-v8.json"));
+        assertThat(message).isNotNull();
+        assertThat(message.getSource()).isEqualTo("example.local");
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2022, 11, 7, 9, 26, 10, 579, DateTimeZone.UTC));
+        assertThat(message.getField("beats_type")).isEqualTo("packetbeat");
+        assertThat(message.getField("packetbeat_type")).isEqualTo("mongodb");
+        assertThat(message.getField("packetbeat_status")).isEqualTo("OK");
+        assertThat(message.getField("packetbeat_method")).isEqualTo("msg");
+        assertThat(message.getField("packetbeat_network_bytes")).isEqualTo(557);
+        assertThat(message.getField("packetbeat_network_type")).isEqualTo("ipv4");
+        assertThat(message.getField("packetbeat_source_ip")).isEqualTo("10.0.55.1");
+        assertThat(message.getField("packetbeat_destination_ip")).isEqualTo("10.0.55.2");
+        assertThat(message.getField("packetbeat_destination_port")).isEqualTo(27017);
+        assertThat(message.getField("packetbeat_host_containerized")).isEqualTo(false);
+    }
+
+    @Test
     public void decodeMessagesHandlesTopbeatMessages() throws Exception {
         final Message message = codec.decode(messageFromJson("topbeat-system.json"));
         assertThat(message).isNotNull();

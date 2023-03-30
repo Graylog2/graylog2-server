@@ -19,9 +19,15 @@ package org.graylog2.streams.matchers;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 
+import java.util.Optional;
+
 public class AlwaysMatcher implements StreamRuleMatcher {
     @Override
     public boolean match(Message msg, StreamRule rule) {
-        return true;
+        return Optional.ofNullable(rule.getInverted())
+                // When this rule is inverted, it should never match
+                .map(inverted -> !inverted)
+                // If `inverted` is `null`, we always return `true`
+                .orElse(true);
     }
 }

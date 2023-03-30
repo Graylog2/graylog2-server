@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog2.security.encryption.EncryptedValue;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -170,6 +171,8 @@ public abstract class ValueReference implements Reference {
             return of((String) value);
         } else if (value instanceof Enum) {
             return of((Enum) value);
+        } else if (value instanceof EncryptedValue encryptedValue) {
+            return of(encryptedValue);
         } else {
             return null;
         }
@@ -237,6 +240,16 @@ public abstract class ValueReference implements Reference {
         return ValueReference.builder()
                 .valueType(ValueType.STRING)
                 .value(value.name())
+                .build();
+    }
+
+    public static ValueReference of(@Nonnull EncryptedValue value) {
+        if (!value.isSet()) {
+            return null;
+        }
+        return ValueReference.builder()
+                .valueType(ValueType.STRING)
+                .value("<Encrypted value was replaced with this text for content pack export. Consider adding a parameter for this field.>")
                 .build();
     }
 

@@ -1,0 +1,23 @@
+{
+  "responses": [
+    {
+      "took": 43,
+      "timed_out": false,
+      "_shards": {
+        "total": 104,
+        "successful": 104,
+        "skipped": 92,
+        "failed": 0
+      },
+      "hits": {
+        "total": 2499,
+        "max_score": 0,
+        "hits": []
+      },
+      "aggregations": {
+      },
+      "status": 200
+    }
+  ],
+  "took": 42
+}

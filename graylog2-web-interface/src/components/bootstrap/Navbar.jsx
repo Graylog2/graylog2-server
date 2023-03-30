@@ -27,17 +27,6 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
   margin-bottom: 0;
 
-  .navbar-brand {
-    color: ${theme.colors.variant.default};
-    padding: 12px 15px 0 15px;
-
-    &:hover,
-    &:focus {
-      color: ${theme.colors.variant.dark.default};
-      background-color: transparent;
-    }
-  }
-
   .navbar-text {
     color: ${theme.colors.global.textDefault};
   }
@@ -58,19 +47,19 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       &:hover,
       &:focus {
         color: ${theme.colors.variant.darker.default};
-        background-color: ${theme.colors.variant.lightest.default};
+        background-color: transparent;
       }
     }
 
     > .active > a,
     > .active > .btn-link {
-      color: ${theme.colors.variant.darkest.default};
-      background-color: ${theme.colors.gray[90]};
+      color: ${theme.colors.global.textDefault};
+      background-color: transparent;
       
       &:hover,
       &:focus {
         color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.gray[80]};
+        background-color: transparent;
       }
     }
 
@@ -90,7 +79,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       &:hover,
       &:focus {
         color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.gray[90]};
+        background-color: transparent;
       }
     }
 
@@ -102,7 +91,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &:hover,
         &:focus {
           color: ${theme.colors.variant.darker.default};
-          background-color: ${theme.colors.variant.lightest.default};
+          background-color: transparent;
         }
       }
 
@@ -224,6 +213,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   }
 
   .dropdown-header {
+    margin-top: 4px;
     text-transform: uppercase;
     padding: 0 15px !important;
     font-weight: bold;

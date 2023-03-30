@@ -16,76 +16,134 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.Filters;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.ParsedFilters;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, Terms> {
+public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
+    private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
+    private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
+    private static final String AGG_NAME = "agg";
+    private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
+    private static final BucketOrder defaultOrder = BucketOrder.count(false);
+
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
-        final List<BucketOrder> ordering = orderListForPivot(pivot, valuesSpec, esGeneratedQueryContext);
-        final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
-                .minDocCount(1)
-                .field(valuesSpec.field())
-                .order(ordering.isEmpty() ? Collections.singletonList(BucketOrder.count(false)) : ordering)
-                .size(valuesSpec.limit());
-        record(esGeneratedQueryContext, pivot, valuesSpec, name, Terms.class);
-        return Optional.of(builder);
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
+        final int limit = bucketSpec.limit();
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
+        final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
+                .subAggregation(termsAggregation);
+
+        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
-    private List<BucketOrder> orderListForPivot(Pivot pivot, Values valuesSpec, ESGeneratedQueryContext esGeneratedQueryContext) {
-        return pivot.sort()
-                .stream()
-                .map(sortSpec -> {
-                    if (sortSpec instanceof PivotSort && valuesSpec.field().equals(sortSpec.field())) {
-                        return BucketOrder.key(sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                    }
-                    if (sortSpec instanceof SeriesSort) {
-                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
-                                .stream()
-                                .filter(series -> series.literal().equals(sortSpec.field()))
-                                .findFirst();
-                        return matchingSeriesSpec
-                                .map(seriesSpec -> {
-                                    if (seriesSpec.literal().equals("count()")) {
-                                        return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                                    }
-                                    return BucketOrder.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
-                                })
-                                .orElse(null);
-                    }
+    private FiltersAggregationBuilder createFilter(String name, List<String> fields) {
+        final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        fields.stream()
+                .map(QueryBuilders::existsQuery)
+                .forEach(queryBuilder::filter);
+        return AggregationBuilders.filters(name, queryBuilder)
+                .otherBucket(true);
+    }
 
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+
+    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
+        return valueBuckets.size() > 1
+                ? createScriptedTerms(valueBuckets, ordering, limit)
+                : createSimpleTerms(valueBuckets.get(0), ordering, limit);
+    }
+
+    private TermsAggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
+        return AggregationBuilders.terms(AGG_NAME)
+                .field(field)
+                .order(ordering)
+                .size(limit);
+    }
+
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
+        return AggregationBuilders.terms(AGG_NAME)
+                .script(scriptForPivots(buckets))
+                .size(limit)
+                .order(ordering);
+    }
+
+    private Script scriptForPivots(Collection<String> pivots) {
+        final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
+                .map(bucket -> """
+                        String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
+                        """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
+                .collect(Collectors.toList()));
+        return new Script(scriptSource);
     }
 
     @Override
-    public Stream<Bucket> doHandleResult(Values bucketSpec,
-                                         Terms termsAggregation) {
-        return termsAggregation.getBuckets().stream()
-                .map(entry -> Bucket.create(entry.getKeyAsString(), entry));
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
+        final ImmutableList<String> previousKeys = initialBucket.keys();
+        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
+        final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
+            // This happens when the other bucket is passed for column value extraction
+            return Stream.of(initialBucket);
+        }
+        final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
+        final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpec.fields(), pivot.sort());
+        final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
+                .stream()
+                .map(bucket -> {
+                    final ImmutableList<String> keys = ImmutableList.<String>builder()
+                            .addAll(previousKeys)
+                            .addAll(reorderKeys.apply(splitKeys(bucket.getKeyAsString())))
+                            .build();
+
+                    return PivotBucket.create(keys, bucket, false);
+                });
+
+        return otherBucket.getDocCount() > 0
+                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
+                    ImmutableList.<String>builder()
+                        .addAll(previousKeys)
+                        .addAll(MISSING_BUCKET_KEYS)
+                        .build(),
+                    otherBucket,
+                    true
+                )))
+                : bucketStream;
+    }
+
+    private ImmutableList<String> splitKeys(String keys) {
+        return ImmutableList.copyOf(Splitter.on(KEY_SEPARATOR_CHARACTER).split(keys));
     }
 }

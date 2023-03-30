@@ -29,6 +29,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.colors.global.background};
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
+    font-size: ${theme.fonts.size.body};
+    line-height: 1.25;
     height: 100vh;
   }
 
@@ -47,6 +49,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   hr {
     border-top: 1px solid ${theme.colors.global.background};
+  }
+
+  h1,
+  h2 {
+    font-family: ${theme.fonts.family.navigation};
   }
 
   h1,
@@ -98,9 +105,9 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   /* Remove boostrap outline */
   a:active,
   select:active,
-  input[type="file"]:active,
-  input[type="radio"]:active,
-  input[type="checkbox"]:active,
+  input[type='file']:active,
+  input[type='radio']:active,
+  input[type='checkbox']:active,
   .btn:active {
     outline: none;
     outline-offset: 0;
@@ -113,6 +120,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
     border-color: ${theme.colors.input.border};
+    border-radius: 0;
     font-family: ${theme.fonts.family.body};
 
     &::placeholder {
@@ -123,13 +131,17 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
       border-color: ${theme.colors.input.borderFocus};
       box-shadow: ${theme.colors.input.boxShadow};
     }
-    
+
     &[disabled],
     &[readonly],
     fieldset[disabled] & {
       background-color: ${theme.colors.input.backgroundDisabled};
       color: ${theme.colors.input.colorDisabled};
     }
+  }
+
+  textarea {
+    max-width: 100%;
   }
 
   legend small {
@@ -157,15 +169,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
       margin-top: 3px;
       color: ${theme.colors.gray[50]};
     }
-  }
-
-  .actions-lg .actions-container {
-    margin-top: 10px;
-    padding-left: 50px;
-  }
-
-  .content p.description-tooltips {
-    margin-top: 10px;
   }
 
   .notifications-none {
@@ -477,7 +480,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     display: inline-block;
   }
 
-  .configuration-bundles input[type="file"] {
+  .configuration-bundles input[type='file'] {
     line-height: inherit !important;
   }
 
@@ -495,23 +498,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .message-loader-form input {
     margin-right: 5px;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li a {
-    font-size: ${theme.fonts.size.body};
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li {
-    padding: 2px 2px 2px 0;
-  }
-
-  nav.navbar-fixed-top ul.dropdown-menu li.divider {
-    padding: 0;
   }
 
   table.indexer-failures {
@@ -572,12 +558,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     vertical-align: middle;
     width: auto;
   }
-  
+
   .typeahead-wrapper .tt-menu {
     background-color: ${theme.colors.global.contentBackground};
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     color: ${theme.colors.global.textDefault};
-    
+
     .tt-suggestion:hover,
     .tt-suggestion.tt-cursor {
       color: ${theme.colors.variant.darkest.info};
@@ -589,6 +575,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .form-group-inline {
     display: inline-block;
     margin: 0;
+  }
+
+  .form-control-feedback {
+    line-height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   ul.tag-list,
@@ -636,7 +629,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .tag-remove::before,
   .pill-remove::before {
-    content: "×";
+    content: '×';
   }
 
   .save-button-margin {
@@ -651,6 +644,17 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .ace_editor.ace_autocomplete.ace-queryinput {
     width: 600px !important;
     margin-top: 6px;
+    background-color: ${theme.colors.input.background};
+    color: ${theme.colors.input.color};
+  }
+
+  .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
+    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
+    color: ${theme.colors.input.colorDisabled};
+  }
+
+  .ace_editor.ace_autocomplete .ace_text-layer .ace_completion-highlight {
+    color: ${theme.colors.variant.info};
   }
 
   code {
@@ -663,9 +667,9 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.colors.variant.lightest.default};
     border-color: ${theme.colors.variant.lighter.default};
   }
-  
-  input[type="range"],
-  input[type="range"]:focus {
+
+  input[type='range'],
+  input[type='range']:focus {
     box-shadow: none;
     height: auto;
   }

@@ -32,26 +32,30 @@ type RoutesKeywordTimeRange = {
   keyword: string
 };
 type RoutesTimeRange = RoutesRelativeTimeRange | RoutesAbsoluteTimeRange | RoutesKeywordTimeRange;
+type SearchQueryParams = {
+  q: string,
+  relative?: number,
+  rangetype?: string,
+  from?: string,
+  to?: string,
+  keyword?: string,
+  streams?: string,
+}
 
 const Routes = {
   STARTPAGE: '/',
   NOTFOUND: '/notfound',
   SEARCH: '/search',
   STREAMS: '/streams',
-  LEGACY_ALERTS: {
-    LIST: '/legacy/alerts',
-    CONDITIONS: '/legacy/alerts/conditions',
-    NEW_CONDITION: '/legacy/alerts/conditions/new',
-    NOTIFICATIONS: '/legacy/alerts/notifications',
-    NEW_NOTIFICATION: '/legacy/alerts/notifications/new',
-  },
   ALERTS: {
     LIST: '/alerts',
+    replay_search: (alertId: string) => `/alerts/${alertId}/replay-search`,
     DEFINITIONS: {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
       edit: (definitionId: string) => `/alerts/definitions/${definitionId}/edit`,
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
+      replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
@@ -63,7 +67,8 @@ const Routes = {
   SECURITY: '/security',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
-  GETTING_STARTED: '/gettingstarted',
+  WELCOME: '/welcome',
+  GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
     CONFIGURATIONS: '/system/configurations',
     CONTENTPACKS: {
@@ -105,7 +110,7 @@ const Routes = {
         OVERVIEW: '/system/authentication/services',
         ACTIVE: '/system/authentication/services/active',
         CREATE: '/system/authentication/services/create',
-        createBackend: (name) => `/system/authentication/services/create/${name}`,
+        createBackend: (name: string) => `/system/authentication/services/create/${name}`,
         show: (id: string) => `/system/authentication/services/${id}`,
         edit: (id: string, initialStepKey?: string) => {
           const editUrl = `/system/authentication/services/edit/${id}`;
@@ -165,6 +170,7 @@ const Routes = {
       STATUS: (sidecarId: string) => `/system/sidecars/${sidecarId}/status`,
       ADMINISTRATION: '/system/sidecars/administration',
       CONFIGURATION: '/system/sidecars/configuration',
+      FAILURE_TRACKING: '/system/sidecars/failuretracking',
       NEW_CONFIGURATION: '/system/sidecars/configuration/new',
       EDIT_CONFIGURATION: (configurationId: string) => `/system/sidecars/configuration/edit/${configurationId}`,
       NEW_COLLECTOR: '/system/sidecars/collector/new',
@@ -176,14 +182,33 @@ const Routes = {
     VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
-  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange) => {
+  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
     const route = new URI(Routes.SEARCH);
-    const queryParams = {
+    const queryParams: SearchQueryParams = {
       q: query,
     };
 
     if (rangeType && timeRange) {
-      queryParams[rangeType] = timeRange;
+      queryParams.rangetype = rangeType;
+
+      switch (rangeType) {
+        case 'relative':
+          queryParams.relative = (<RoutesRelativeTimeRange>timeRange).relative;
+          break;
+        case 'absolute':
+          queryParams.from = (<RoutesAbsoluteTimeRange>timeRange).from;
+          queryParams.to = (<RoutesAbsoluteTimeRange>timeRange).to;
+          break;
+        case 'keyword':
+          queryParams.keyword = (<RoutesKeywordTimeRange>timeRange).keyword;
+          break;
+        default:
+          throw new Error(`Invalid range type: ${rangeType}.`);
+      }
+    }
+
+    if (streams) {
+      queryParams.streams = streams.join(',');
     }
 
     route.query(queryParams);
@@ -220,12 +245,10 @@ const Routes = {
   stream_alerts: (streamId: string) => `/alerts/?stream_id=${streamId}`,
 
   legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,
-  show_alert: (alertId: string) => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
-  show_alert_condition: (streamId: string, conditionId: string) => `${Routes.LEGACY_ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
-  new_alert_condition_for_stream: (streamId: string) => `${Routes.LEGACY_ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
-  new_alert_notification_for_stream: (streamId: string) => `${Routes.LEGACY_ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
 
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
+
+  show_saved_search: (searchId: string) => `/search/${searchId}`,
 
   node: (nodeId: string) => `/system/nodes/${nodeId}`,
 
@@ -250,8 +273,8 @@ const Routes = {
   edit_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
   edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
-  getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
+  global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
 } as const;
 
 const prefixUrlWithoutHostname = (url: string, prefix: string) => {

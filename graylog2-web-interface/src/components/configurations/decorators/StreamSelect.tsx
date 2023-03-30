@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import Select from 'components/common/Select';
 import type { Stream } from 'stores/streams/StreamsStore';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 export const DEFAULT_STREAM_ID = '000000000000000000000001';
 export const DEFAULT_SEARCH_ID = 'DEFAULT_SEARCH';

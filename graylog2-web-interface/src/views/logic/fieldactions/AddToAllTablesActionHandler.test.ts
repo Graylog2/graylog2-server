@@ -14,18 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Map } from 'immutable';
+import * as Immutable from 'immutable';
 
-import mockAction from 'helpers/mocking/MockAction';
 import Widget from 'views/logic/widgets/Widget';
 import AddToAllTablesActionHandler from 'views/logic/fieldactions/AddToAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import MessageWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { WidgetStoreState } from 'views/stores/WidgetStore';
-import { WidgetActions, WidgetStore } from 'views/stores/WidgetStore';
+import { updateWidgets } from 'views/logic/slices/widgetActions';
+import mockDispatch from 'views/test/mockDispatch';
+import { createViewWithWidgets } from 'fixtures/searches';
+import type { RootState } from 'views/types';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+
+jest.mock('views/logic/slices/widgetActions', () => ({
+  updateWidgets: jest.fn(),
+}));
 
 describe('AddToAllTablesActionHandler', () => {
-  it('should add a field to all message widgets', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
+  it('should add a field to all message widgets', async () => {
     const messageWidgetConfig = MessageWidgetConfig.builder()
       .fields(['timestamp', 'source'])
       .showMessageRow(true)
@@ -39,7 +49,7 @@ describe('AddToAllTablesActionHandler', () => {
       .newId()
       .type('PIVOT')
       .build();
-    const widgets = Map([[messageWidget.id, messageWidget], [pivotWidget.id, pivotWidget]]);
+    const widgets = [messageWidget, pivotWidget];
 
     const expectedMessageWidgetConfig = MessageWidgetConfig.builder()
       .fields(['timestamp', 'source', 'author'])
@@ -51,18 +61,13 @@ describe('AddToAllTablesActionHandler', () => {
       .config(expectedMessageWidgetConfig)
       .build();
 
-    const expectedWidgets = Map([[expectedMessageWidget.id, expectedMessageWidget], [pivotWidget.id, pivotWidget]]);
+    const expectedWidgets = Immutable.List([expectedMessageWidget, pivotWidget]);
 
-    WidgetStore.getInitialState = jest.fn(() => widgets as WidgetStoreState);
+    const view = createViewWithWidgets(widgets, {});
+    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
 
-    WidgetActions.updateWidgets = mockAction(jest.fn(async (newWidgets) => {
-      expect(newWidgets).toEqual(expectedWidgets);
+    await dispatch(AddToAllTablesActionHandler({ queryId: 'query-id-1', field: 'author', type: FieldTypes.STRING(), contexts: {} }));
 
-      return newWidgets;
-    }));
-
-    AddToAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });
-
-    expect(WidgetActions.updateWidgets).toBeCalled();
+    expect(updateWidgets).toHaveBeenCalledWith(expectedWidgets);
   });
 });

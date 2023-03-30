@@ -31,7 +31,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.users.UserImpl;
+import org.graylog2.users.UserConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +141,7 @@ public class SessionCreator {
             getSessionAttributes(subject).forEach(session::setAttribute);
         } else {
             // set a sane default. really we should be able to load the user from above.
-            session.setTimeout(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
+            session.setTimeout(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());
         }
         session.touch();
 

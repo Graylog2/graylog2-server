@@ -46,7 +46,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-@Api(value = "Search/Metadata")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Search/Metadata", tags = {CLOUD_VISIBLE})
 @Path("/views/search/metadata")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

@@ -193,7 +193,7 @@ public class FormattedEmailAlertSender implements AlertSender {
         final Set<String> recipientsSet = recipients.getEmailRecipients();
         if (recipientsSet.size() == 0) {
             final Notification notification = notificationService.buildNow()
-                .addNode(nodeId.toString())
+                .addNode(nodeId.getNodeId())
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.NORMAL)
                 .addDetail("title", "Stream \"" + stream.getTitle() + "\" is alerted, but no recipients have been defined!")

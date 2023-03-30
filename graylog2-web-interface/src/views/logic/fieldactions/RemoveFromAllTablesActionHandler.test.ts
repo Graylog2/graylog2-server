@@ -14,17 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Map } from 'immutable';
+import * as Immutable from 'immutable';
 
-import mockAction from 'helpers/mocking/MockAction';
 import Widget from 'views/logic/widgets/Widget';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import MessageWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { WidgetActions, WidgetStore } from 'views/stores/WidgetStore';
+import { mockDispatchForView } from 'views/test/mockDispatch';
+import { updateWidgets } from 'views/logic/slices/widgetActions';
+import { createViewWithWidgets } from 'fixtures/searches';
+
+jest.mock('views/logic/slices/widgetActions', () => ({
+  updateWidgets: jest.fn(),
+}));
 
 describe('RemoveFromAllTablesActionHandler', () => {
-  it('should add a field to all message widgets', () => {
+  it('should add a field to all message widgets', async () => {
     const messageWidgetConfig = MessageWidgetConfig.builder()
       .fields(['timestamp', 'source', 'author'])
       .showMessageRow(true)
@@ -38,7 +43,7 @@ describe('RemoveFromAllTablesActionHandler', () => {
       .newId()
       .type('PIVOT')
       .build();
-    const widgets = Map([[messageWidget.id, messageWidget], [pivotWidget.id, pivotWidget]]);
+    const widgets = [messageWidget, pivotWidget];
 
     const expectedMessageWidgetConfig = MessageWidgetConfig.builder()
       .fields(['timestamp', 'source'])
@@ -50,19 +55,12 @@ describe('RemoveFromAllTablesActionHandler', () => {
       .config(expectedMessageWidgetConfig)
       .build();
 
-    const expectedWidgets = Map([[expectedMessageWidget.id, expectedMessageWidget], [pivotWidget.id, pivotWidget]]);
+    const expectedWidgets = Immutable.List([expectedMessageWidget, pivotWidget]);
+    const view = createViewWithWidgets(widgets, {});
+    const dispatch = mockDispatchForView(view);
 
-    // @ts-ignore
-    WidgetStore.getInitialState = jest.fn(() => widgets);
+    await dispatch(RemoveFromAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} }));
 
-    WidgetActions.updateWidgets = mockAction(jest.fn(async (newWidgets) => {
-      expect(newWidgets).toEqual(expectedWidgets);
-
-      return newWidgets;
-    }));
-
-    RemoveFromAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });
-
-    expect(WidgetActions.updateWidgets).toBeCalled();
+    expect(updateWidgets).toHaveBeenCalledWith(expectedWidgets);
   });
 });

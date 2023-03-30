@@ -29,13 +29,12 @@ public class MigrationsModule extends PluginModule {
         // even if there are no plugins registered for this migration.
         Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
 
+        addMigration(V19700101000000_GenerateClusterId.class);
         addMigration(V20151210140600_ElasticsearchConfigMigration.class);
         addMigration(V20161116172100_DefaultIndexSetMigration.class);
         addMigration(V20161116172200_CreateDefaultStreamMigration.class);
         addMigration(V20161122174500_AssignIndexSetsToStreamsMigration.class);
         addMigration(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
-        addMigration(V20161125142400_EmailAlarmCallbackMigration.class);
-        addMigration(V20161125161400_AlertReceiversMigration.class);
         addMigration(V20161215163900_MoveIndexSetDefaultConfig.class);
         addMigration(V20161216123500_DefaultIndexSetMigration.class);
         addMigration(V20170110150100_FixAlertConditionsMigration.class);
@@ -56,6 +55,14 @@ public class MigrationsModule extends PluginModule {
         addMigration(GrantsMetaMigration.class);
         addMigration(V20201103145400_LegacyAuthServiceMigration.class);
         addMigration(V20211221144300_GeoIpResolverConfigMigration.class);
-
+        addMigration(V20220719130704_ImprovedDefaultProcessingOrderMigration.class);
+        addMigration(V20220623125450_AddJobTypeToJobTrigger.class);
+        addMigration(V20220818112023_AddStreamMatcherToProcessingOrderMigration.class);
+        addMigration(V202211021200_CreateDefaultIndexDefaultsConfig.class);
+        addMigration(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
+        addMigration(V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.class);
+        addMigration(V20230220095500_MigrateStartPageObjectReferencesToGRNbyRemoval.class);
+        addMigration(V20230213160000_EncryptedInputConfigMigration.class);
+        addMigration(V20230210102500_UniqueUserMigration.class);
     }
 }

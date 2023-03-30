@@ -16,13 +16,15 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
+import cloneDeep from 'lodash/cloneDeep';
 import moment from 'moment';
 
 import { Button, FormGroup, HelpBlock, BootstrapModalForm } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput } from 'components/common';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 
@@ -30,14 +32,17 @@ const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 const DEFAULT_CATCH_UP_WINDOW = 3600000;
 
 const EventsConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'EventsConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.shape({
       events_search_timeout: PropTypes.number,
       events_notification_retry_period: PropTypes.number,
       events_notification_default_backlog: PropTypes.number,
       events_catchup_window: PropTypes.number,
+      events_notification_tcp_keepalive: PropTypes.bool,
     }),
     updateConfig: PropTypes.func.isRequired,
   },
@@ -49,6 +54,7 @@ const EventsConfig = createReactClass({
         events_notification_retry_period: 300000,
         events_notification_default_backlog: 50,
         events_catchup_window: DEFAULT_CATCH_UP_WINDOW,
+        events_notification_tcp_keepalive: false,
       },
     };
   },
@@ -58,6 +64,7 @@ const EventsConfig = createReactClass({
 
     return {
       config: config,
+      showConfigModal: false,
     };
   },
 
@@ -66,14 +73,10 @@ const EventsConfig = createReactClass({
   },
 
   _openModal() {
-    this.modal.open();
+    this.setState({ showConfigModal: true });
   },
 
   _closeModal() {
-    this.modal.close();
-  },
-
-  _resetConfig() {
     // Reset to initial state when the modal is closed without saving.
     this.setState(this.getInitialState());
   },
@@ -89,7 +92,7 @@ const EventsConfig = createReactClass({
 
   _propagateChanges(key, value) {
     const { config } = this.state;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     this.setState({ config: nextConfig });
@@ -120,7 +123,7 @@ const EventsConfig = createReactClass({
   },
 
   _onBacklogUpdate(event) {
-    const value = FormUtils.getValueFromInput(event.target);
+    const value = getValueFromInput(event.target);
 
     this._propagateChanges('events_notification_default_backlog', value);
   },
@@ -139,16 +142,22 @@ const EventsConfig = createReactClass({
     this._propagateChanges('events_catchup_window', catchupWindowinMs);
   },
 
+  _onNotificationTcpKeepAliveUpdate(event) {
+    const value = getValueFromInput(event.target);
+    this._propagateChanges('events_notification_tcp_keepalive', value);
+  },
+
   _titleCase(str) {
-    return lodash.capitalize(str);
+    return capitalize(str);
   },
 
   render() {
-    const { config } = this.state;
+    const { config, showConfigModal } = this.state;
     const eventsSearchTimeout = extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
     const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
     const eventsCatchupWindow = extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
     const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
+    const eventsNotificationTcpKeepalive = config.events_notification_tcp_keepalive;
 
     return (
       <div>
@@ -163,17 +172,19 @@ const EventsConfig = createReactClass({
           <dd>{eventsNotificationDefaultBacklog}</dd>
           <dt>Catch Up Window:</dt>
           <dd>{eventsCatchupWindow.duration > 0 ? eventsCatchupWindow.duration : 'disabled'} {eventsCatchupWindow.duration > 0 ? this._titleCase(eventsCatchupWindow.unit) : ''}</dd>
+          <dt>TCP keep-alive probes:</dt>
+          <dd>{eventsNotificationTcpKeepalive ? 'enabled' : 'disabled'}</dd>
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+        <BootstrapModalForm show={showConfigModal}
                             title="Update Events System Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
-                            submitButtonText="Save">
+                            onCancel={this._closeModal}
+                            submitButtonText="Update configuration">
           <fieldset>
             <FormGroup controlId="search-timeout-field">
               <TimeUnitInput label="Search Timeout"
@@ -213,7 +224,17 @@ const EventsConfig = createReactClass({
                              enabled={eventsCatchupWindow.duration > 0}
                              units={TIME_UNITS} />
               <HelpBlock>If Event processor execution is behind schedule, queries on older data will be run with this window size to speed up processing.
-                (If the &quot;search within the last&quot; setting of an event definiton is greater, this setting will be ignored)
+                (If the &quot;search within the last&quot; setting of an event definition is greater, this setting will be ignored)
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup controlId="notification-tcp-keepalive-field">
+              <Input id="notification-tcp-keepalive-field"
+                     label="Send TCP keep-alive probes for notification connections"
+                     type="checkbox"
+                     onChange={this._onNotificationTcpKeepAliveUpdate}
+                     checked={eventsNotificationTcpKeepalive} />
+              <HelpBlock>
+                If enabled, http connections for notifications will send TCP keep-alive probes
               </HelpBlock>
             </FormGroup>
           </fieldset>

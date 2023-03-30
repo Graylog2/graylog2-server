@@ -26,7 +26,6 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mongojack.DBQuery;
@@ -56,7 +55,7 @@ public class PaginatedDbServiceTest {
         public String title;
 
         @JsonCreator
-        public TestDTO(@JsonProperty("id") String id, @JsonProperty("title") String title) {
+        public TestDTO(@JsonProperty("id") @Id String id, @JsonProperty("title") String title) {
             this.id = id;
             this.title = title;
         }

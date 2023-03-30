@@ -1,0 +1,5 @@
+type = "added"
+message = "Add a new built-in \"Pipelines Manager\" role."
+
+issues = ["13251"]
+pulls = ["13866"]

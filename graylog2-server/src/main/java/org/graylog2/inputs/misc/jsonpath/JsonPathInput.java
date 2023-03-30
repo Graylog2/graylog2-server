@@ -31,7 +31,7 @@ import javax.inject.Inject;
 
 public class JsonPathInput extends MessageInput {
 
-    private static final String NAME = "JSON path from HTTP API";
+    private static final String NAME = "JSON path value from HTTP API";
 
     @AssistedInject
     public JsonPathInput(@Assisted Configuration configuration,
@@ -59,6 +59,11 @@ public class JsonPathInput extends MessageInput {
         public Descriptor() {
             super(NAME, false, DocsHelper.PAGE_SENDING_JSONPATH.toString());
         }
+
+        @Override
+        public boolean isCloudCompatible() {
+            return true;
+        }
     }
 
 
@@ -67,5 +72,10 @@ public class JsonPathInput extends MessageInput {
         public Config(HttpPollTransport.Factory transport, JsonPathCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
+    }
+
+    @Override
+    public boolean onlyOnePerCluster() {
+        return true;
     }
 }

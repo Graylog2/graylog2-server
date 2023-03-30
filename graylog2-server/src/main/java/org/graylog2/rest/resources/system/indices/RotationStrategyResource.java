@@ -47,8 +47,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "System/Indices/Rotation", description = "Index rotation strategy settings")
+@Api(value = "System/Indices/Rotation", description = "Index rotation strategy settings", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/rotation")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

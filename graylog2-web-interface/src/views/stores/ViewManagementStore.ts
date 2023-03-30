@@ -24,12 +24,10 @@ import type View from 'views/logic/views/View';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'logic/singleton';
-import type { Pagination } from 'stores/PaginationTypes';
+import type { Pagination, Attribute } from 'stores/PaginationTypes';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type SortOrder = 'asc' | 'desc';
-
-export type SortField = 'id' | 'title' | 'created_at';
 
 export type PaginatedViews = {
   pagination: {
@@ -39,6 +37,7 @@ export type PaginatedViews = {
     count: number,
   },
   list: Array<View>,
+  attributes: Array<Attribute>
 };
 
 export type ViewSummary = {
@@ -56,7 +55,7 @@ type ViewManagementActionsType = RefluxActions<{
   delete: (view: View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
   get: (viewId: string) => Promise<ViewJson>,
-  search: (query: string, page?: number, perPage?: number, sortBy?: SortField, sortOrder?: SortOrder) => Promise<PaginatedViews>,
+  search: (query: string, page?: number, perPage?: number, sortBy?: string, sortOrder?: SortOrder) => Promise<PaginatedViews>,
   update: (view: View) => Promise<View>,
 }>;
 

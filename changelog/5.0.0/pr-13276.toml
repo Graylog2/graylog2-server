@@ -1,0 +1,8 @@
+type = "c"
+message = "Java 17"
+
+pulls = ["13276", "graylog-plugin-enterprise#3961", "graylog-plugin-enterprise-integrations#869", "graylog-plugin-collector#205", "graylog-plugin-aws#663", "graylog-plugin-integrations#1153", "13330", "12644"]
+
+details.user = """
+Switch from Java 8 to Java 17.
+"""

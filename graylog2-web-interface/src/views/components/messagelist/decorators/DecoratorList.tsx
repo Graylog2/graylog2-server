@@ -36,7 +36,7 @@ type DecoratorSummary = {
 type Props = {
   decorators: Array<DecoratorSummary>,
   disableDragging?: boolean,
-  onReorder: (ReorderedItems) => unknown,
+  onReorder: (items: ReorderedItems) => unknown,
 };
 
 class DecoratorList extends React.Component<Props> {

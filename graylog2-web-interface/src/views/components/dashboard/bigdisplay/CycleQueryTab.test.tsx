@@ -19,18 +19,33 @@ import { render } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import type { QueryId } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
-import { ViewActions } from 'views/stores/ViewStore';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { asMock } from 'helpers/mocking';
+import useAppDispatch from 'stores/useAppDispatch';
+import { selectQuery } from 'views/logic/slices/viewSlice';
 
-import CycleQueryTab from './CycleQueryTab';
+import OriginalCycleQueryTab from './CycleQueryTab';
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    selectQuery: jest.fn(),
-  },
+type AdditionalProps = {
+  view: View,
+  activeQuery: QueryId,
+};
+
+const CycleQueryTab = ({ view, activeQuery, ...props }: AdditionalProps & React.ComponentProps<typeof OriginalCycleQueryTab>) => (
+  <TestStoreProvider view={view} initialQuery={activeQuery}>
+    <OriginalCycleQueryTab {...props} />
+  </TestStoreProvider>
+);
+
+jest.mock('stores/useAppDispatch');
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  selectQuery: jest.fn(() => async () => {}),
 }));
-
-jest.useFakeTimers();
 
 describe('CycleQueryTab', () => {
   const search = Search.create().toBuilder().queries([
@@ -40,7 +55,18 @@ describe('CycleQueryTab', () => {
   ]).build();
   const view = View.create().toBuilder().search(search).build();
 
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
   it('does not return markup', () => {
     const { container } = render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
@@ -49,60 +75,81 @@ describe('CycleQueryTab', () => {
   });
 
   it('should not switch to anything before interval', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
 
     jest.advanceTimersByTime(900);
 
-    expect(ViewActions.selectQuery).not.toHaveBeenCalled();
+    expect(dispatch).not.toHaveBeenCalled();
   });
 
   it('should switch to next tab after interval', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
 
     jest.advanceTimersByTime(1000);
 
-    expect(ViewActions.selectQuery).toHaveBeenCalledWith('baz');
+    expect(selectQuery).toHaveBeenCalledWith('baz');
   });
 
   it('should switch to first tab if current one is the last', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<CycleQueryTab view={view} activeQuery="baz" interval={1} tabs={[0, 1, 2]} />);
 
     jest.advanceTimersByTime(1000);
 
-    expect(ViewActions.selectQuery).toHaveBeenCalledWith('foo');
+    expect(selectQuery).toHaveBeenCalledWith('foo');
   });
 
   it('should switch to next tab skipping gaps after interval', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<CycleQueryTab view={view} activeQuery="foo" interval={1} tabs={[0, 2]} />);
 
     jest.advanceTimersByTime(1000);
 
-    expect(ViewActions.selectQuery).toHaveBeenCalledWith('baz');
+    expect(selectQuery).toHaveBeenCalledWith('baz');
   });
 
   it('should switch to next tab defaulting to all tabs if `tabs` prop` is left out', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<CycleQueryTab view={view} activeQuery="foo" tabs={[1]} interval={1} />);
 
     jest.advanceTimersByTime(1000);
 
-    expect(ViewActions.selectQuery).toHaveBeenCalledWith('bar');
+    expect(selectQuery).toHaveBeenCalledWith('bar');
   });
 
   it('triggers tab change after the correct interval has passed', async () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<CycleQueryTab view={view} activeQuery="foo" interval={42} />);
 
     jest.advanceTimersByTime(42000);
 
-    expect(ViewActions.selectQuery).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledTimes(1);
   });
 
   it('does not trigger after unmounting', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     const { unmount } = render(<CycleQueryTab view={view} activeQuery="foo" interval={42} />);
 
     unmount();
 
     jest.advanceTimersByTime(42000);
 
-    expect(ViewActions.selectQuery).not.toHaveBeenCalled();
+    expect(dispatch).not.toHaveBeenCalled();
   });
 });

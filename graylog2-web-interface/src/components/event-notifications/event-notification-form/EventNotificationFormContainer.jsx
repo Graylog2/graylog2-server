@@ -16,18 +16,19 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import clone from 'lodash/clone';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { ConfirmLeaveDialog } from 'components/common';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import withHistory from 'routing/withHistory';
 
 import EventNotificationForm from './EventNotificationForm';
 
 // Import built-in Event Notification Types
 
-import {} from '../event-notification-types';
+import '../event-notification-types';
 
 const initialValidation = {
   errors: {},
@@ -46,6 +47,7 @@ class EventNotificationFormContainer extends React.Component {
     /** Controls the ID of the form, so it can be controlled externally */
     formId: PropTypes.string,
     onSubmit: PropTypes.func,
+    history: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -59,6 +61,12 @@ class EventNotificationFormContainer extends React.Component {
     formId: undefined,
     onSubmit: () => {},
   };
+
+  static scrollToFirstError() {
+    if (document.getElementsByClassName('has-error')[0] !== undefined) {
+      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
+    }
+  }
 
   constructor(props) {
     super(props);
@@ -80,18 +88,19 @@ class EventNotificationFormContainer extends React.Component {
 
   handleChange = (key, value) => {
     const { notification } = this.state;
-    const nextNotification = lodash.cloneDeep(notification);
+    const nextNotification = cloneDeep(notification);
 
     nextNotification[key] = value;
     this.setState({ notification: nextNotification, isDirty: true, testResult: initialTestResult });
   };
 
   handleCancel = () => {
+    const { history } = this.props;
     history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
   };
 
   handleSubmit = () => {
-    const { action, embedded, onSubmit } = this.props;
+    const { action, embedded, onSubmit, history } = this.props;
     const { notification } = this.state;
 
     let promise;
@@ -112,6 +121,7 @@ class EventNotificationFormContainer extends React.Component {
 
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
+            EventNotificationFormContainer.scrollToFirstError();
           }
         },
       );
@@ -131,6 +141,7 @@ class EventNotificationFormContainer extends React.Component {
 
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
+            EventNotificationFormContainer.scrollToFirstError();
           }
         },
       );
@@ -143,7 +154,7 @@ class EventNotificationFormContainer extends React.Component {
     const { notification } = this.state;
 
     this.setState({ testResult: { isLoading: true }, validation: initialValidation });
-    const testResult = lodash.clone(initialTestResult);
+    const testResult = clone(initialTestResult);
 
     this.testPromise = EventNotificationsActions.test(notification);
 
@@ -197,4 +208,4 @@ class EventNotificationFormContainer extends React.Component {
   }
 }
 
-export default EventNotificationFormContainer;
+export default withHistory(EventNotificationFormContainer);

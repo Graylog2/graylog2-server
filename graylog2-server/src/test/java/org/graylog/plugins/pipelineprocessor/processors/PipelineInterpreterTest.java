@@ -559,7 +559,7 @@ public class PipelineInterpreterTest {
                             .hasOnlyOneElementSatisfying(pe -> {
                                 assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.RuleConditionEvaluationError);
                                 assertThat(pe.getMessage()).isEqualTo("Error evaluating condition for rule <broken_condition/broken_condition> (pipeline <pipeline/p1>)");
-                                assertThat(pe.getDetails()).isEqualTo("In call to function 'to_double' at 3:4 an exception was thrown: java.lang.String cannot be cast to java.lang.Double");
+                                assertThat(pe.getDetails()).isEqualTo("In call to function 'to_double' at 3:4 an exception was thrown: class java.lang.String cannot be cast to class java.lang.Double (java.lang.String and java.lang.Double are in module java.base of loader 'bootstrap')");
                             });
                 });
     }
@@ -594,7 +594,7 @@ public class PipelineInterpreterTest {
         ));
 
         // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(1))));
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(Long.valueOf(1))));
 
         // then
         assertThat(processed)
@@ -605,13 +605,13 @@ public class PipelineInterpreterTest {
                             .hasOnlyOneElementSatisfying(pe -> {
                                 assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.RuleStatementEvaluationError);
                                 assertThat(pe.getMessage()).isEqualTo("Error evaluating action for rule <broken_statement/broken_statement> (pipeline <pipeline/p1>)");
-                                assertThat(pe.getDetails()).isEqualTo("In call to function 'set_field' at 5:4 an exception was thrown: java.lang.Long cannot be cast to java.lang.Double");
+                                assertThat(pe.getDetails()).isEqualTo("In call to function 'set_field' at 5:4 an exception was thrown: class java.lang.Long cannot be cast to class java.lang.Double (java.lang.Long and java.lang.Double are in module java.base of loader 'bootstrap')");
                             });
                 });
     }
 
     @Test
-    public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() throws Exception {
+    public void process_noEvaluationErrorsResultIntoNoMessageProcessingErrors() {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("valid_rule", "valid_rule",
                 "valid_rule",
@@ -640,14 +640,14 @@ public class PipelineInterpreterTest {
         ));
 
         // when
-        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(new Long(5))));
+        final List<Message> processed = extractMessagesFromMessageCollection(interpreter.process(messageWithNumField(Long.valueOf(5))));
 
         // then
         assertThat(processed)
                 .hasSize(1)
                 .hasOnlyOneElementSatisfying(m -> {
                     assertThat(m.processingErrors()).isEmpty();
-                    assertThat(m.getField("num_sqr")).isEqualTo(new Double(25.0));
+                    assertThat(m.getField("num_sqr")).isEqualTo(Double.valueOf(25.0));
                 });
     }
 

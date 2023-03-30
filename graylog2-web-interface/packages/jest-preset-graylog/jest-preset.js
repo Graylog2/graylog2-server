@@ -27,6 +27,7 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
     require.resolve('./lib/setup-files/mock-moment-timezone.js'),
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
+    require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
     'jest-canvas-mock',
   ],
   setupFilesAfterEnv: [
@@ -44,23 +45,19 @@ module.exports = {
     'jsx',
   ],
   moduleNameMapper: {
-    c3: require.resolve('./lib/mocking/c3_mock.js'),
     '^file-loader(\\?esModule=false)?!(.+)$': '$2',
     '(\\.lazy|leaflet)\\.css$': require.resolve('./lib/mocking/useable-css-proxy.js'),
     '\\.(css|less)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./lib/mocking/fileMock.js'),
+    '^@graylog/server-api(.*)$': '<rootDir>/target/api$1',
   },
   testEnvironment: 'jsdom',
   testPathIgnorePatterns: [
     '.fixtures.[jt]s$',
   ],
   testTimeout: applyTimeoutMultiplier(5000),
-  reporters: [
-    'default',
-    [
-      'jest-junit', {
-        outputDirectory: 'target',
-      },
-    ],
-  ],
+  transform: {
+    '^.+\\.[tj]sx?$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin)/)'],
 };

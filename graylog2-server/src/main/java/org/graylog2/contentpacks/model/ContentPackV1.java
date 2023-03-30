@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @JsonDeserialize(builder = ContentPackV1.Builder.class)
 public abstract class ContentPackV1 implements ContentPack {
     static final String VERSION = "1";
-    static final String FIELD_NAME = "name";
+    public static final String FIELD_NAME = "name";
     static final String FIELD_SUMMARY = "summary";
     static final String FIELD_DESCRIPTION = "description";
     static final String FIELD_VENDOR = "vendor";

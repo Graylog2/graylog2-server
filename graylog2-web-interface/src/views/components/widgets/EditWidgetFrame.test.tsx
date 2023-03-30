@@ -19,28 +19,18 @@ import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { updateWidget } from 'views/logic/slices/widgetActions';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
-import ViewTypeContext from '../contexts/ViewTypeContext';
 import WidgetContext from '../contexts/WidgetContext';
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    update: jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
-  SearchActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -69,6 +59,16 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
+jest.mock('views/logic/slices/searchExecutionSlice', () => ({
+  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
+  execute: jest.fn(() => async () => {}),
+}));
+
+jest.mock('views/logic/slices/widgetActions', () => ({
+  ...jest.requireActual('views/logic/slices/widgetActions'),
+  updateWidget: jest.fn(() => async () => {}),
+}));
+
 describe('EditWidgetFrame', () => {
   describe('on a dashboard', () => {
     const widget = Widget.builder()
@@ -78,16 +78,20 @@ describe('EditWidgetFrame', () => {
       .timerange({ type: 'relative', from: 300 })
       .config({})
       .build();
-    const renderSUT = () => render((
-      <ViewTypeContext.Provider value="DASHBOARD">
+    const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
+      <TestStoreProvider>
         <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
+          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
             Hello World!
             These are some buttons!
           </EditWidgetFrame>
         </WidgetContext.Provider>
-      </ViewTypeContext.Provider>
+      </TestStoreProvider>
     ));
+
+    beforeAll(loadViewsPlugin);
+
+    afterAll(unloadViewsPlugin);
 
     it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();
@@ -96,7 +100,7 @@ describe('EditWidgetFrame', () => {
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
     });
 
     it('changes the widget\'s streams when using stream filter', async () => {
@@ -117,9 +121,34 @@ describe('EditWidgetFrame', () => {
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
         streams: ['5c2e27d6ba33a9681ad62775'],
       })));
+    });
+
+    it('calls onSubmit', async () => {
+      const onSubmit = jest.fn();
+      renderSUT({ onSubmit });
+
+      fireEvent.click(await screen.findByRole('button', { name: /update widget/i }));
+
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    });
+
+    it('calls onCancel', async () => {
+      const onCancel = jest.fn();
+      renderSUT({ onCancel });
+
+      fireEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+
+      await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1));
+    });
+
+    it('does not display submit and cancel button when `displaySubmitActions` is false', async () => {
+      renderSUT({ displaySubmitActions: false });
+
+      expect(screen.queryByRole('button', { name: /update widget/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument();
     });
   });
 });

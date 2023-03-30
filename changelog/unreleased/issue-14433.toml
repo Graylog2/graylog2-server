@@ -1,0 +1,5 @@
+type = "added"
+message = "Add support for encrypted storage of secret input configuration parameters."
+
+issues = ["14433"]
+pulls = ["14459"]

@@ -18,12 +18,15 @@ import type { VisualizationType } from 'views/types';
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
+import type { InterpolationType } from 'views/Constants';
+import { DEFAULT_INTERPOLATION, interpolationTypes } from 'views/Constants';
+import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 type AreaVisualizationConfigFormValues = {
-  interpolation: 'linear' | 'step-after' | 'spline';
+  interpolation: InterpolationType;
+  axisType: AxisType,
 };
-
-const DEFAULT_INTERPOLATION = 'linear';
 
 const validate = hasAtLeastOneMetric('Area chart');
 
@@ -32,14 +35,20 @@ const areaChart: VisualizationType<typeof AreaVisualization.type, AreaVisualizat
   displayName: 'Area Chart',
   component: AreaVisualization,
   config: {
-    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
-    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config?.interpolation }),
-    toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation),
+    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION, axisType: DEFAULT_AXIS_TYPE }),
+    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config?.interpolation, axisType: config?.axisType }),
+    toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation, formValues.axisType),
     fields: [{
       name: 'interpolation',
       title: 'Interpolation',
       type: 'select',
-      options: ['linear', 'step-after', 'spline'],
+      options: interpolationTypes,
+      required: true,
+    }, {
+      name: 'axisType',
+      title: 'Axis Type',
+      type: 'select',
+      options: axisTypes,
       required: true,
     }],
   },

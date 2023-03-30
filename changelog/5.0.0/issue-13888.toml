@@ -1,0 +1,7 @@
+# Entry type according to https://keepachangelog.com/en/1.0.0/
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "fixed"
+message = "The pipeline function flatten_json now respects the original JSON types. An optional parameter is provided for backwards compatibility."
+
+issues = ["13888"]
+pulls = ["13947"]

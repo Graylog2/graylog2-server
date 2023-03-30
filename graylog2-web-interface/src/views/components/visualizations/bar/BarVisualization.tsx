@@ -23,7 +23,7 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-import type BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 
@@ -88,7 +88,7 @@ const BarVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
-  const visualizationConfig = config.visualizationConfig as BarVisualizationConfig;
+  const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
   const _layout: Layout = {};
 
   if (visualizationConfig && visualizationConfig.barmode) {
@@ -115,6 +115,7 @@ const BarVisualization = makeVisualization(({
 
   return (
     <XYPlot config={config}
+            axisType={visualizationConfig.axisType}
             chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to)}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}

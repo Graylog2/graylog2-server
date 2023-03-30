@@ -17,6 +17,7 @@
 package org.graylog.events;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
@@ -39,9 +40,11 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotification;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
+import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorExecutionMetrics;
+import org.graylog.events.processor.EventResolver;
 import org.graylog.events.processor.aggregation.AggregationEventProcessor;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
@@ -49,6 +52,12 @@ import org.graylog.events.processor.aggregation.AggregationSearch;
 import org.graylog.events.processor.aggregation.PivotAggregationSearch;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessor;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
+import org.graylog.events.processor.systemnotification.SystemNotificationRenderResource;
+import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog.events.rest.AvailableEntityTypesResource;
 import org.graylog.events.rest.EventDefinitionsResource;
 import org.graylog.events.rest.EventNotificationsResource;
@@ -77,11 +86,18 @@ public class EventsModule extends PluginModule {
         bind(NotificationGracePeriodService.class).asEagerSingleton();
         bind(EventProcessorExecutionMetrics.class).asEagerSingleton();
         bind(EventNotificationExecutionMetrics.class).asEagerSingleton();
+        bind(SystemNotificationRenderService.class).asEagerSingleton();
+
+        OptionalBinder.newOptionalBinder(binder(), EventResolver.class)
+                .setDefault().to(DefaultEventResolver.class);
+
+        addEntityScope(SystemNotificationEventEntityScope.class);
 
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);
         addSystemRestResource(EventNotificationsResource.class);
         addSystemRestResource(EventsResource.class);
+        addSystemRestResource(SystemNotificationRenderResource.class);
 
         addPeriodical(EventNotificationStatusCleanUp.class);
 
@@ -92,19 +108,18 @@ public class EventsModule extends PluginModule {
         addAuditEventTypes(EventsAuditEventTypes.class);
 
         registerJacksonSubtype(AggregationEventProcessorConfigEntity.class,
-            AggregationEventProcessorConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(HttpEventNotificationConfigEntity.class,
-            HttpEventNotificationConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(EmailEventNotificationConfigEntity.class,
-            EmailEventNotificationConfigEntity.TYPE_NAME);
-        registerJacksonSubtype(LegacyAlarmCallbackEventNotificationConfigEntity.class,
-            LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME);
+                AggregationEventProcessorConfigEntity.TYPE_NAME);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,
                 AggregationEventProcessor.Factory.class,
                 AggregationEventProcessorConfig.class,
                 AggregationEventProcessorParameters.class);
+        addEventProcessor(SystemNotificationEventProcessorConfig.TYPE_NAME,
+                SystemNotificationEventProcessor.class,
+                SystemNotificationEventProcessor.Factory.class,
+                SystemNotificationEventProcessorConfig.class,
+                SystemNotificationEventProcessorParameters.class);
 
         addEventStorageHandler(PersistToStreamsStorageHandler.Config.TYPE_NAME,
                 PersistToStreamsStorageHandler.class,
@@ -134,15 +149,21 @@ public class EventsModule extends PluginModule {
         addNotificationType(EmailEventNotificationConfig.TYPE_NAME,
                 EmailEventNotificationConfig.class,
                 EmailEventNotification.class,
-                EmailEventNotification.Factory.class);
+                EmailEventNotification.Factory.class,
+                EmailEventNotificationConfigEntity.TYPE_NAME,
+                EmailEventNotificationConfigEntity.class);
         addNotificationType(HTTPEventNotificationConfig.TYPE_NAME,
                 HTTPEventNotificationConfig.class,
                 HTTPEventNotification.class,
-                HTTPEventNotification.Factory.class);
+                HTTPEventNotification.Factory.class,
+                HttpEventNotificationConfigEntity.TYPE_NAME,
+                HttpEventNotificationConfigEntity.class);
         addNotificationType(LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME,
                 LegacyAlarmCallbackEventNotificationConfig.class,
                 LegacyAlarmCallbackEventNotification.class,
-                LegacyAlarmCallbackEventNotification.Factory.class);
+                LegacyAlarmCallbackEventNotification.Factory.class,
+                LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME,
+                LegacyAlarmCallbackEventNotificationConfigEntity.class);
 
         addJobSchedulerSchedule(IntervalJobSchedule.TYPE_NAME, IntervalJobSchedule.class);
         addJobSchedulerSchedule(OnceJobSchedule.TYPE_NAME, OnceJobSchedule.class);

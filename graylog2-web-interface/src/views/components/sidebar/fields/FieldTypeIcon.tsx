@@ -16,13 +16,14 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Icon } from 'components/common';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import styles from './FieldTypeIcon.css';
 
-const iconClass = (type) => {
+const iconClass = (type: string) => {
   switch (type) {
     case 'string':
       return 'font';
@@ -44,12 +45,32 @@ const iconClass = (type) => {
   }
 };
 
-const FieldTypeIcon = ({ type }) => {
-  return <Icon name={iconClass(type.type)} className={styles.fieldTypeIcon} />;
+const IconWrapper = styled.div`
+  display: inline-flex;
+  min-width: 20px;
+  justify-content: center;
+  align-items: center;
+  vertical-align: -2px;
+`;
+
+type Props = {
+  type: FieldType,
+  monospace: boolean,
+};
+
+const FieldTypeIcon = ({ type, monospace }: Props) => {
+  const icon = <Icon name={iconClass(type.type)} className={styles.fieldTypeIcon} />;
+
+  return monospace ? <IconWrapper>{icon}</IconWrapper> : icon;
 };
 
 FieldTypeIcon.propTypes = {
   type: PropTypes.instanceOf(FieldType).isRequired,
+  monospace: PropTypes.bool,
+};
+
+FieldTypeIcon.defaultProps = {
+  monospace: true,
 };
 
 export default FieldTypeIcon;

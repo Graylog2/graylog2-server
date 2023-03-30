@@ -43,7 +43,6 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
     .map((widget) => widgetDefinition(widget.type)
       .searchTypes(widget)
       .map((searchType) => ({
-
         id: generateId(),
         timerange: widget.timerange,
         query: widget.query,
@@ -51,6 +50,7 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
         ...searchType,
         widgetId: widget.id,
         ...filterForWidget(widget),
+        filters: widget.filters,
       })))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set<SearchTypeWithWidgetId>())
     .map((searchType) => {

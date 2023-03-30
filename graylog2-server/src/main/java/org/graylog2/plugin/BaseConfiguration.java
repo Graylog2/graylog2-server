@@ -103,7 +103,10 @@ public abstract class BaseConfiguration extends PathConfiguration {
     private String installationSource = "unknown";
 
     @Parameter(value = "proxied_requests_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int proxiedRequestsThreadPoolSize = 32;
+    private int proxiedRequestsThreadPoolSize = 64;
+
+    @Parameter(value = "proxied_requests_default_call_timeout", required = true, validator = PositiveDurationValidator.class)
+    private Duration proxiedRequestsDefaultCallTimeout = Duration.seconds(5);
 
     public int getProcessBufferProcessors() {
         return processBufferProcessors;
@@ -145,9 +148,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
     public int getAsyncEventbusProcessors() {
         return asyncEventbusProcessors;
     }
-
-    public abstract String getNodeIdFile();
-
+    
     public boolean isMessageJournalEnabled() {
         return messageJournalEnabled;
     }

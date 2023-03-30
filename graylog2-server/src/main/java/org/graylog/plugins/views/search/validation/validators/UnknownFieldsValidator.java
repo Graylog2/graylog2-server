@@ -18,26 +18,24 @@ package org.graylog.plugins.views.search.validation.validators;
 
 import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog.plugins.views.search.validation.ParsedQuery;
 import org.graylog.plugins.views.search.validation.ParsedTerm;
 import org.graylog.plugins.views.search.validation.QueryValidator;
 import org.graylog.plugins.views.search.validation.ValidationContext;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
-import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
-import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog.plugins.views.search.validation.validators.util.UnknownFieldsListLimiter;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Singleton
 public class UnknownFieldsValidator implements QueryValidator {
+
+    private final UnknownFieldsListLimiter unknownFieldsListLimiter = new UnknownFieldsListLimiter();
 
     @Override
     public List<ValidationMessage> validate(ValidationContext context) {
@@ -60,9 +58,12 @@ public class UnknownFieldsValidator implements QueryValidator {
                 .map(MappedFieldTypeDTO::name)
                 .collect(Collectors.toSet());
 
-        return context.query().terms().stream()
+        final Map<String, List<ParsedTerm>> groupedByField = context.query().terms().stream()
                 .filter(t -> !t.isDefaultField())
                 .filter(term -> !availableFields.contains(term.getRealFieldName()))
-                .collect(Collectors.toList());
+                .distinct()
+                .collect(Collectors.groupingBy(ParsedTerm::getRealFieldName));
+
+        return unknownFieldsListLimiter.filterElementsContainingUsefulInformation(groupedByField);
     }
 }

@@ -67,7 +67,7 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
         checkState(clusterConfigService.get(DefaultIndexSetCreated.class) != null, "The default index set hasn't been created yet. This is a bug!");
 
         final IndexSetConfig defaultIndexSet= indexSetService.getDefault();
-        migrateIndexSet(defaultIndexSet, elasticsearchConfiguration.getTemplateName());
+        migrateIndexSet(defaultIndexSet, elasticsearchConfiguration.getDefaultIndexTemplateName());
 
         final List<IndexSetConfig> allWithoutDefault = indexSetService.findAll()
                 .stream()

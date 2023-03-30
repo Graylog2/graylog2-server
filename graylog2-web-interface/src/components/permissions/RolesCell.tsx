@@ -28,7 +28,7 @@ const Role = styled(Label)`
   margin-right: 5px;
   margin-bottom: 5px;
   display: inline-block;
-  line-height: 15px;
+  padding: 4px 6px;
 `;
 
 type Props = {
@@ -41,7 +41,7 @@ const RolesCell = ({ roles }: Props) => (
       <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
         {role}
       </Role>
-    ))}
+    )).toArray()}
   </Td>
 );
 

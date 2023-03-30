@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
 
 import { tableCss } from 'components/bootstrap/Table';
@@ -24,16 +24,19 @@ import { tableCss } from 'components/bootstrap/Table';
 import Filter from './Filter';
 import DataTableElement from './DataTableElement';
 
+import NoEntitiesExist from '../NoEntitiesExist';
+
 const StyledTable = styled.table`
   ${tableCss}
 `;
 
+// eslint-disable-next-line react/prop-types
 const NoData = ({ noDataText }) => {
   if (typeof noDataText === 'string') {
     return (
-      <p>
+      <NoEntitiesExist>
         {noDataText}
-      </p>
+      </NoEntitiesExist>
     );
   }
 
@@ -95,6 +98,8 @@ class DataTable extends React.Component {
      * The main reason to disable this is if the table is clipping a dropdown menu or another component in a table edge.
      */
     useResponsiveTable: PropTypes.bool,
+    /** boolean value to set sort numeric  */
+    useNumericSort: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -109,9 +114,11 @@ class DataTable extends React.Component {
     noDataText: 'No data available.',
     rowClassName: '',
     useResponsiveTable: true,
+    // eslint-disable-next-line react/no-unstable-nested-components
     headerCellFormatter: (header) => { return (<th>{header}</th>); },
     sortByKey: undefined,
     sortBy: undefined,
+    useNumericSort: false,
   };
 
   constructor(props) {
@@ -139,16 +146,16 @@ class DataTable extends React.Component {
 
   getFormattedDataRows = () => {
     let i = 0;
-    const { sortByKey, sortBy, dataRowFormatter } = this.props;
+    const { sortByKey, sortBy, dataRowFormatter, useNumericSort } = this.props;
     let sortedDataRows = this._getEffectiveRows();
 
     if (sortByKey) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return a[sortByKey].localeCompare(b[sortByKey]);
+        return a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: useNumericSort });
       });
     } else if (sortBy) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return sortBy(a).localeCompare(sortBy(b));
+        return sortBy(a).localeCompare(sortBy(b), undefined, { numeric: useNumericSort });
       });
     }
 

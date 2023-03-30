@@ -40,3 +40,4 @@ dependency-reduced-pom.xml
 
 **/hs_err_pid*.log
 
+data-node/bin/*

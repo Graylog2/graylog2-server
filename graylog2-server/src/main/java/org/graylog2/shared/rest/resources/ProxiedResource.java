@@ -18,10 +18,13 @@ package org.graylog2.shared.rest.resources;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Stopwatch;
+import okhttp3.ResponseBody;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -29,12 +32,18 @@ import retrofit2.Response;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.ConnectionCallback;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -43,17 +52,26 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class ProxiedResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ProxiedResource.class);
 
-    protected final String authenticationToken;
+    private final String authenticationToken;
     protected final NodeService nodeService;
 
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
     private final ExecutorService executor;
+
+    @Inject
+    @Named("proxied_requests_default_call_timeout")
+    private com.github.joschi.jadconfig.util.Duration defaultProxyCallTimeout;
 
     protected ProxiedResource(@Context HttpHeaders httpHeaders,
                               NodeService nodeService,
@@ -63,6 +81,31 @@ public abstract class ProxiedResource extends RestResource {
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         this.executor = executorService;
         this.authenticationToken = authenticationToken(httpHeaders);
+    }
+
+    protected Duration getDefaultProxyCallTimeout() {
+        return Duration.ofMillis(requireNonNull(defaultProxyCallTimeout, "defaultProxyCallTimeout not injected").toMilliseconds());
+    }
+
+    protected void processAsync(AsyncResponse asyncResponse, Supplier<Object> responseSupplier) {
+        requireNonNull(asyncResponse, "asyncResponse cannot be null");
+        requireNonNull(responseSupplier, "responseSupplier cannot be null");
+
+        asyncResponse.register((ConnectionCallback) disconnected -> LOG.debug("Remote client disconnected"));
+
+        LOG.debug("Schedule async request");
+        executor.submit(() -> {
+            try {
+                LOG.debug("Running async request");
+                var response = responseSupplier.get();
+                LOG.debug("Resuming async response");
+                asyncResponse.resume(response);
+            } catch (Throwable e) {
+                LOG.debug("Async request failed");
+                LOG.debug("Resuming async response with an error", e);
+                asyncResponse.resume(e);
+            }
+        });
     }
 
     public static String authenticationToken(HttpHeaders httpHeaders) {
@@ -83,13 +126,57 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
+     * Gets an authentication token to be used in an Authorization header of forwarded requests by extracting
+     * authentication information from the original request.
+     * <p>
+     * Only extracts an auth token from the request if the request is authenticated. This is to make sure that
+     * forwarded requests will also not be authenticated.
+     * <p>
+     * If the request is authenticated, but not by means of an authentication token, this method will fail with
+     * a {@link NotAuthorizedException} because we can't easily make up a token to use for forwarded requests in that
+     * case.
+     *
+     * @return An authentication token if the request was authenticated and one could be extracted from the original
+     * request. Null otherwise.
+     * @throws NotAuthorizedException if the original request was authenticated, but no authentication token could
+     *                                be created from the request headers.
+     */
+    @Nullable
+    protected String getAuthenticationToken() {
+        if (getSubject().isAuthenticated()) {
+            if (authenticationToken == null) {
+                throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
+            }
+            return authenticationToken;
+        }
+        return null;
+    }
+
+    /**
      * Prefer using {@link ProxiedResource#requestOnAllNodes(Function, Function)} instead.
      * The new method properly handles the case of `No-Content` response and provides
      * detailed report per each node API call.
      */
     @Deprecated
-    protected <RemoteInterfaceType, RemoteCallResponseType> Map<String, Optional<RemoteCallResponseType>> getForAllNodes(Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn, Function<String, Optional<RemoteInterfaceType>> interfaceProvider) {
-        return getForAllNodes(fn, interfaceProvider, Function.identity());
+    protected <RemoteInterfaceType, RemoteCallResponseType> Map<String, Optional<RemoteCallResponseType>> getForAllNodes(
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn,
+            Function<String, Optional<RemoteInterfaceType>> interfaceProvider
+    ) {
+        return getForAllNodes(fn, interfaceProvider, Function.identity(), Duration.ZERO);
+    }
+
+    /**
+     * Prefer using {@link ProxiedResource#requestOnAllNodes(Function, Function)} instead.
+     * The new method properly handles the case of `No-Content` response and provides
+     * detailed report per each node API call.
+     */
+    @Deprecated
+    protected <RemoteInterfaceType, RemoteCallResponseType> Map<String, Optional<RemoteCallResponseType>> getForAllNodes(
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn,
+            Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
+            Duration timeout
+    ) {
+        return getForAllNodes(fn, interfaceProvider, Function.identity(), timeout);
     }
 
     /**
@@ -98,24 +185,49 @@ public abstract class ProxiedResource extends RestResource {
      * detailed report per each node API call.
      */
     @Deprecated
-    protected <RemoteInterfaceType, FinalResponseType, RemoteCallResponseType> Map<String, Optional<FinalResponseType>> getForAllNodes(Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn, Function<String, Optional<RemoteInterfaceType>> interfaceProvider, Function<RemoteCallResponseType, FinalResponseType> transformer) {
+    protected <RemoteInterfaceType, FinalResponseType, RemoteCallResponseType> Map<String, Optional<FinalResponseType>> getForAllNodes(
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn,
+            Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
+            Function<RemoteCallResponseType, FinalResponseType> transformer
+    ) {
+        return getForAllNodes(fn, interfaceProvider, transformer, Duration.ZERO);
+    }
+
+    /**
+     * Prefer using {@link ProxiedResource#requestOnAllNodes(Function, Function, Function)} instead.
+     * The new method properly handles the case of `No-Content` response and provides
+     * detailed report per each node API call.
+     */
+    @Deprecated
+    protected <RemoteInterfaceType, FinalResponseType, RemoteCallResponseType> Map<String, Optional<FinalResponseType>> getForAllNodes(
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn,
+            Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
+            Function<RemoteCallResponseType, FinalResponseType> transformer,
+            Duration timeout) {
+        final long callTimeoutMs = Duration.ZERO.equals(timeout) ? getDefaultProxyCallTimeout().toMillis() : timeout.toMillis();
+
         final Map<String, Future<Optional<FinalResponseType>>> futures = this.nodeService.allActive().keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), node -> interfaceProvider.apply(node)
                         .map(r -> executor.submit(() -> {
                             final Call<RemoteCallResponseType> call = fn.apply(r);
+                            final Stopwatch sw = Stopwatch.createUnstarted();
                             try {
+                                call.timeout().timeout(callTimeoutMs, TimeUnit.MILLISECONDS);
+                                sw.start();
                                 final Response<RemoteCallResponseType> response = call.execute();
                                 if (response.isSuccessful()) {
                                     return Optional.of(transformer.apply(response.body()));
                                 } else {
-                                    LOG.warn("Unable to call {} on node <{}>, result: {}", call.request().url(), node, response.message());
+                                    LOG.warn("Unable to call {} on node <{}>, result: {} (duration: {} ms)",
+                                            call.request().url(), node, response.message(), sw.stop().elapsed().toMillis());
                                     return Optional.<FinalResponseType>empty();
                                 }
                             } catch (IOException e) {
+                                final long elapsedMs = sw.stop().elapsed().toMillis();
                                 if (LOG.isDebugEnabled()) {
-                                    LOG.warn("Unable to call {} on node <{}>", call.request().url(), node, e);
+                                    LOG.warn("Unable to call {} on node <{}> (duration: {} ms)", call.request().url(), node, elapsedMs, e);
                                 } else {
-                                    LOG.warn("Unable to call {} on node <{}>: {}", call.request().url(), node, e.getMessage());
+                                    LOG.warn("Unable to call {} on node <{}>: {} (duration: {} ms)", call.request().url(), node, e.getMessage(), elapsedMs);
                                 }
                                 return Optional.<FinalResponseType>empty();
                             }
@@ -128,9 +240,15 @@ public abstract class ProxiedResource extends RestResource {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     try {
-                        return entry.getValue().get();
+                        // Never block without timeout to avoid saturating the thread pool with waiting futures.
+                        // We double the timeout that we use for the HTTP call here to ensure that the HTTP
+                        // requests times out before we hit the timeout on this Future#get call.
+                        return entry.getValue().get(callTimeoutMs * 2, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException | ExecutionException e) {
                         LOG.debug("Couldn't retrieve future", e);
+                        return Optional.empty();
+                    } catch (TimeoutException e) {
+                        LOG.debug("Upstream timeout for node <{}>", entry.getKey());
                         return Optional.empty();
                     }
                 }));
@@ -140,7 +258,7 @@ public abstract class ProxiedResource extends RestResource {
         return nodeId -> {
             try {
                 final Node targetNode = nodeService.byNodeId(nodeId);
-                return Optional.of(this.remoteInterfaceProvider.get(targetNode, this.authenticationToken, interfaceClass));
+                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), interfaceClass));
             } catch (NodeNotFoundException e) {
                 LOG.warn("Node <" + nodeId + "> not found while trying to call " + interfaceClass.getName() + " on it.");
                 return Optional.empty();
@@ -152,7 +270,23 @@ public abstract class ProxiedResource extends RestResource {
             Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn
     ) {
-        return requestOnAllNodes(interfaceProvider, fn, Function.identity());
+        return requestOnAllNodes(interfaceProvider, fn, Function.identity(), Duration.ZERO);
+    }
+
+    protected <RemoteInterfaceType, RemoteCallResponseType> Map<String, CallResult<RemoteCallResponseType>> requestOnAllNodes(
+            Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn,
+            Duration timeout
+    ) {
+        return requestOnAllNodes(interfaceProvider, fn, Function.identity(), timeout);
+    }
+
+    protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> Map<String, CallResult<FinalResponseType>> requestOnAllNodes(
+            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceCallProvider,
+            Function<RemoteCallResponseType, FinalResponseType> responseTransformer
+    ) {
+        return requestOnAllNodes(remoteInterfaceProvider, remoteInterfaceCallProvider, responseTransformer, Duration.ZERO);
     }
 
     /**
@@ -169,18 +303,23 @@ public abstract class ProxiedResource extends RestResource {
     protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> Map<String, CallResult<FinalResponseType>> requestOnAllNodes(
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceCallProvider,
-            Function<RemoteCallResponseType, FinalResponseType> responseTransformer
+            Function<RemoteCallResponseType, FinalResponseType> responseTransformer,
+            Duration timeout
     ) {
+
+        final long callTimeoutMs = Duration.ZERO.equals(timeout) ? getDefaultProxyCallTimeout().toMillis() : timeout.toMillis();
 
         final Map<String, Future<CallResult<FinalResponseType>>> futures = this.nodeService.allActive().keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), nodeId -> executor.submit(() -> {
+                            final Stopwatch sw = Stopwatch.createStarted();
                             try {
-                                return CallResult.success(doNodeApiCall(nodeId, remoteInterfaceProvider, remoteInterfaceCallProvider, responseTransformer));
+                                return CallResult.success(doNodeApiCall(nodeId, remoteInterfaceProvider, remoteInterfaceCallProvider, responseTransformer, callTimeoutMs));
                             } catch (Exception e) {
+                                final long elapsedMs = sw.stop().elapsed().toMillis();
                                 if (LOG.isDebugEnabled()) {
-                                    LOG.warn("Failed to call API on node {}, cause: {}", nodeId, e.getMessage(), e);
+                                    LOG.warn("Failed to call API on node <{}>, cause: {} (duration: {} ms)", nodeId, e.getMessage(), elapsedMs, e);
                                 } else {
-                                    LOG.warn("Failed to call API on node {}, cause: {}", nodeId, e.getMessage());
+                                    LOG.warn("Failed to call API on node <{}>, cause: {} (duration: {} ms)", nodeId, e.getMessage(), elapsedMs);
                                 }
                                 return CallResult.error(e.getMessage());
                             }
@@ -192,10 +331,16 @@ public abstract class ProxiedResource extends RestResource {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     try {
-                        return entry.getValue().get();
+                        // Never block without timeout to avoid saturating the thread pool with waiting futures.
+                        // We double the timeout that we use for the HTTP call here to ensure that the HTTP
+                        // requests times out before we hit the timeout on this Future#get call.
+                        return entry.getValue().get(callTimeoutMs * 2, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException | ExecutionException e) {
                         LOG.debug("Couldn't retrieve future", e);
                         throw new RuntimeException(e);
+                    } catch (TimeoutException e) {
+                        LOG.debug("Upstream timeout for node <{}>", entry.getKey());
+                        return CallResult.upstreamTimeout(entry.getKey());
                     }
                 }));
     }
@@ -227,24 +372,32 @@ public abstract class ProxiedResource extends RestResource {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No active leader node found"));
 
-        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity());
+        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity(), getDefaultProxyCallTimeout().toMillis());
     }
 
     private <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
             String nodeId,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
-            Function<RemoteCallResponseType, FinalResponseType> transformer
+            Function<RemoteCallResponseType, FinalResponseType> transformer,
+            long callTimeoutMs
     ) throws IOException {
         final RemoteInterfaceType remoteInterfaceType = remoteInterfaceProvider.apply(nodeId)
                 .orElseThrow(() -> new IllegalStateException("Node " + nodeId + " not found"));
-
         final Call<RemoteCallResponseType> call = remoteInterfaceFunction.apply(remoteInterfaceType);
+
+        call.timeout().timeout(callTimeoutMs, TimeUnit.MILLISECONDS);
+
         final Response<RemoteCallResponseType> response = call.execute();
 
-        final byte[] errorBody = response.errorBody() == null ? null : response.errorBody().bytes();
-
-        return NodeResponse.create(response.isSuccessful(), response.code(), transformer.apply(response.body()), errorBody);
+        try (final ResponseBody errorBody = response.errorBody()) {
+            return NodeResponse.create(
+                    response.isSuccessful(),
+                    response.code(),
+                    transformer.apply(response.body()),
+                    errorBody == null ? null : errorBody.bytes()
+            );
+        }
     }
 
     /**
@@ -271,6 +424,11 @@ public abstract class ProxiedResource extends RestResource {
 
         public static <ResponseType> CallResult<ResponseType> error(@Nonnull String serverErrorMessage) {
             return new AutoValue_ProxiedResource_CallResult<>(false, serverErrorMessage, null);
+        }
+
+        public static <ResponseType> CallResult<ResponseType> upstreamTimeout(@Nonnull String nodeId) {
+            final String msg = StringUtils.f("upstream timeout (node=%s)", nodeId);
+            return new AutoValue_ProxiedResource_CallResult<>(true, msg, null);
         }
     }
 

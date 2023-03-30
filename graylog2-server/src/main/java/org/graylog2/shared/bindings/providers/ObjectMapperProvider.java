@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -42,6 +43,8 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.jackson.DeserializationProblemHandlerModule;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
+import org.graylog2.jackson.JodaDurationCompatSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.jackson.SemverDeserializer;
 import org.graylog2.jackson.SemverRequirementDeserializer;
@@ -58,6 +61,7 @@ import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +84,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     private final LoadingCache<DateTimeZone, ObjectMapper> mapperByTimeZone = CacheBuilder.newBuilder()
             .maximumSize(DateTimeZone.getAvailableIDs().size())
             .build(
-                    new CacheLoader<DateTimeZone, ObjectMapper>() {
+                    new CacheLoader<>() {
                         @Override
                         public ObjectMapper load(@Nonnull DateTimeZone key) {
                             return objectMapper.copy().setTimeZone(key.toTimeZone());
@@ -90,30 +94,41 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
     // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider() {
-        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet(), new EncryptedValueService(UUID.randomUUID().toString()), GRNRegistry.createWithBuiltinTypes());
+        this(ObjectMapperProvider.class.getClassLoader(),
+                Collections.emptySet(),
+                new EncryptedValueService(UUID.randomUUID().toString()),
+                GRNRegistry.createWithBuiltinTypes(),
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 
     // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider(ClassLoader classLoader, Set<NamedType> subtypes) {
-        this(classLoader, subtypes, new EncryptedValueService(UUID.randomUUID().toString()), GRNRegistry.createWithBuiltinTypes());
+        this(classLoader,
+                subtypes,
+                new EncryptedValueService(UUID.randomUUID().toString()),
+                GRNRegistry.createWithBuiltinTypes(),
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 
     @Inject
     public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
                                 @JacksonSubTypes Set<NamedType> subtypes,
                                 EncryptedValueService encryptedValueService,
-                                GRNRegistry grnRegistry) {
+                                GRNRegistry grnRegistry,
+                                InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
                 .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)
+                .setDateFormat(new StdDateFormat().withColonInTimeZone(false))
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())
                 .registerModule(new Jdk8Module())
@@ -129,6 +144,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addSerializer(new VersionSerializer())
                         .addSerializer(new SemverSerializer())
                         .addSerializer(new SemverRequirementSerializer())
+                        .addSerializer(Duration.class, new JodaDurationCompatSerializer())
                         .addSerializer(GRN.class, new ToStringSerializer())
                         .addSerializer(EncryptedValue.class, new EncryptedValueSerializer())
                         .addDeserializer(Version.class, new VersionDeserializer())
@@ -136,6 +152,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
                         .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                         .addDeserializer(EncryptedValue.class, new EncryptedValueDeserializer(encryptedValueService))
+                        .setDeserializerModifier(inputConfigurationBeanDeserializerModifier)
                 );
 
         if (subtypes != null) {

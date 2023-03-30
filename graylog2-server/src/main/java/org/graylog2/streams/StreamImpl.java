@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
@@ -41,18 +41,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+
 /**
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  */
-@CollectionName("streams")
+@DbEntity(collection = "streams",
+          readPermission = STREAMS_READ)
 public class StreamImpl extends PersistedImpl implements Stream {
+    public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
     public static final String FIELD_OUTPUTS = "outputs";
     public static final String FIELD_CONTENT_PACK = "content_pack";
-    public static final String FIELD_ALERT_RECEIVERS = "alert_receivers";
     public static final String FIELD_DISABLED = "disabled";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
@@ -176,8 +179,8 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public Map<String, Object> asMap() {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
-        result.remove("_id");
-        result.put("id", ((ObjectId) fields.get("_id")).toHexString());
+        result.remove(FIELD_ID);
+        result.put("id", ((ObjectId) fields.get(FIELD_ID)).toHexString());
         result.remove(FIELD_CREATED_AT);
         result.put(FIELD_CREATED_AT, Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT)));
         result.put(FIELD_RULES, streamRules);
@@ -209,14 +212,6 @@ public class StreamImpl extends PersistedImpl implements Stream {
         }
 
         return Collections.emptyMap();
-    }
-
-    @Override
-    public Map<String, List<String>> getAlertReceivers() {
-        @SuppressWarnings("unchecked")
-        final Map<String, List<String>> alertReceivers =
-                (Map<String, List<String>>) fields.getOrDefault(FIELD_ALERT_RECEIVERS, Collections.emptyMap());
-        return alertReceivers;
     }
 
     @Override

@@ -135,6 +135,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String STREAM_UPDATE = PREFIX + "stream:update";
     public static final String SYSTEM_JOB_START = PREFIX + "system_job:start";
     public static final String SYSTEM_JOB_STOP = PREFIX + "system_job:stop";
+
+    public static final String SYSTEM_JOB_ACKNOWLEDGE = PREFIX + "system_job:acknowledge";
     public static final String SYSTEM_NOTIFICATION_CREATE = PREFIX + "system_notification:create";
     public static final String SYSTEM_NOTIFICATION_DELETE = PREFIX + "system_notification:delete";
     public static final String URL_WHITELIST_UPDATE = PREFIX + "url_whitelist:update";
@@ -260,6 +262,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(STREAM_UPDATE)
             .add(SYSTEM_JOB_START)
             .add(SYSTEM_JOB_STOP)
+            .add(SYSTEM_JOB_ACKNOWLEDGE)
             .add(SYSTEM_NOTIFICATION_CREATE)
             .add(SYSTEM_NOTIFICATION_DELETE)
             .add(URL_WHITELIST_UPDATE)

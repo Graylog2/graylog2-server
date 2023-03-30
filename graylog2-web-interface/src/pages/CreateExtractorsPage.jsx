@@ -16,26 +16,29 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
+import withHistory from 'routing/withHistory';
 
 const CreateExtractorsPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateExtractorsPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
   },
@@ -73,7 +76,7 @@ const CreateExtractorsPage = createReactClass({
 
   _extractorSaved() {
     let url;
-    const { params } = this.props;
+    const { params, history } = this.props;
     const { input } = this.state;
 
     if (input.global) {
@@ -96,15 +99,14 @@ const CreateExtractorsPage = createReactClass({
     return (
       <DocumentTitle title={`New extractor for input ${input.title}`}>
         <div>
-          <PageHeader title={<span>New extractor for input <em>{input.title}</em></span>}>
+          <PageHeader title={<span>New extractor for input <em>{input.title}</em></span>}
+                      documentationLink={{
+                        title: 'Extractors documentation',
+                        path: DocsHelper.PAGES.EXTRACTORS,
+                      }}>
             <span>
               Extractors are applied on every message that is received by an input. Use them to extract and
               transform any text data into fields that allow you easy filtering and analysis later on.
-            </span>
-
-            <span>
-              Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
             </span>
           </PageHeader>
           <EditExtractor action="create"
@@ -118,4 +120,4 @@ const CreateExtractorsPage = createReactClass({
   },
 });
 
-export default withParams(withLocation(CreateExtractorsPage));
+export default withHistory(withParams(withLocation(CreateExtractorsPage)));

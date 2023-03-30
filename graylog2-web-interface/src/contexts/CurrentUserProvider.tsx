@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { useStore } from 'stores/connect';
 import User from 'logic/users/User';

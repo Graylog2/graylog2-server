@@ -56,7 +56,7 @@ public class MetricMatchMapping implements MetricMapping {
         final Map<String, String> labels = new HashMap<>();
 
         // Add nodeId to every metric.
-        labels.put("node", nodeId.toString());
+        labels.put("node", nodeId.getNodeId());
         labels.putAll(config.additionalLabels());
 
         for (int i = 0; i < config.wildcardExtractLabels().size(); i++) {

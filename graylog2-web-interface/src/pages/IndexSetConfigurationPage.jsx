@@ -22,21 +22,18 @@ import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import connect from 'stores/connect';
-import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { IndexSetsActions, IndexSetsStore, IndexSetPropType } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
+import withHistory from 'routing/withHistory';
 
-const _saveConfiguration = (indexSet) => {
-  IndexSetsActions.update(indexSet).then(() => {
-    history.push(Routes.SYSTEM.INDICES.LIST);
-  });
-};
+const _saveConfiguration = (history, indexSet) => IndexSetsActions.update(indexSet).then(() => {
+  history.push(Routes.SYSTEM.INDICES.LIST);
+});
 
 class IndexSetConfigurationPage extends React.Component {
   componentDidMount() {
@@ -46,8 +43,10 @@ class IndexSetConfigurationPage extends React.Component {
   }
 
   _formCancelLink = () => {
-    if (this.props.location.query.from === 'details') {
-      return Routes.SYSTEM.INDEX_SETS.SHOW(this.state.indexSet.id);
+    const { location: { query: { from } }, indexSet } = this.props;
+
+    if (from === 'details') {
+      return Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id);
     }
 
     return Routes.SYSTEM.INDICES.LIST;
@@ -64,24 +63,25 @@ class IndexSetConfigurationPage extends React.Component {
       return <Spinner />;
     }
 
-    const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies } = this.props;
+    const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies, history } = this.props;
+    const saveConfiguration = (newIndexSet) => _saveConfiguration(history, newIndexSet);
 
     return (
       <DocumentTitle title="Configure Index Set">
         <div>
-          <PageHeader title="Configure Index Set">
+          <PageHeader title="Configure Index Set"
+                      documentationLink={{
+                        title: 'Index model documentation',
+                        path: DocsHelper.PAGES.INDEX_MODEL,
+                      }}
+                      topActions={(
+                        <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                          <Button bsStyle="info">Index sets overview</Button>
+                        </LinkContainer>
+                      )}>
             <span>
               Modify the current configuration for this index set, allowing you to customize the retention, sharding,
               and replication of messages coming from one or more streams.
-            </span>
-            <span>
-              You can learn more about the index model in the{' '}
-              <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-            </span>
-            <span>
-              <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                <Button bsStyle="info">Index sets overview</Button>
-              </LinkContainer>
             </span>
           </PageHeader>
 
@@ -91,8 +91,10 @@ class IndexSetConfigurationPage extends React.Component {
                                          retentionStrategiesContext={retentionStrategiesContext}
                                          rotationStrategies={rotationStrategies}
                                          retentionStrategies={retentionStrategies}
+                                         submitButtonText="Update index set"
+                                         submitLoadingText="Updating index set..."
                                          cancelLink={this._formCancelLink()}
-                                         onUpdate={_saveConfiguration} />
+                                         onUpdate={saveConfiguration} />
             </Col>
           </Row>
         </div>
@@ -110,6 +112,7 @@ IndexSetConfigurationPage.propTypes = {
   retentionStrategiesContext: PropTypes.shape({
     max_index_retention_period: PropTypes.string,
   }),
+  history: PropTypes.object.isRequired,
 };
 
 IndexSetConfigurationPage.defaultProps = {
@@ -122,7 +125,7 @@ IndexSetConfigurationPage.defaultProps = {
 };
 
 export default connect(
-  withParams(withLocation(IndexSetConfigurationPage)),
+  withHistory(withParams(withLocation(IndexSetConfigurationPage))),
   {
     indexSets: IndexSetsStore,
     indicesConfigurations: IndicesConfigurationStore,

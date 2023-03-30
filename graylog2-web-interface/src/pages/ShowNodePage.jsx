@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -38,8 +39,10 @@ function clusterOverviewFilter(state) {
 }
 
 const ShowNodePage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ShowNodePage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -99,14 +102,11 @@ const ShowNodePage = createReactClass({
     return (
       <DocumentTitle title={`Node ${node.short_node_id} / ${node.hostname}`}>
         <div>
-          <PageHeader title={title}>
+          <PageHeader title={title} actions={<NodeMaintenanceDropdown node={node} />}>
             <span>
-              This page shows details of a Graylog server node that is active and reachable in your cluster.
-            </span>
-            <span>
+              This page shows details of a Graylog server node that is active and reachable in your cluster.<br />
               {node.is_leader ? <span>This is the leader node.</span> : <span>This is <em>not</em> the leader node.</span>}
             </span>
-            <span><NodeMaintenanceDropdown node={node} /></span>
           </PageHeader>
           <NodeOverview node={node}
                         systemOverview={this.state.systemOverview}

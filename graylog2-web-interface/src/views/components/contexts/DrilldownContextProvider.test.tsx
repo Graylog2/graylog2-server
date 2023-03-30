@@ -18,29 +18,24 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import { StoreMock as mockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
-import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import useViewType from 'views/hooks/useViewType';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import DrilldownContextProvider from './DrilldownContextProvider';
 import DrilldownContext from './DrilldownContext';
-import ViewTypeContext from './ViewTypeContext';
 
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: mockStore(['getInitialState', jest.fn(() => null)]),
-}));
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: mockStore(),
-}));
+jest.mock('views/hooks/useViewType');
+jest.mock('views/logic/queries/useCurrentQuery');
+jest.mock('views/hooks/useGlobalOverride');
 
 describe('DrilldownContextProvider', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Consumer = (_props: { streams: Array<string>, timerange: TimeRange, query: ElasticsearchQueryString }) => null;
 
   const TestComponent = () => {
@@ -64,17 +59,16 @@ describe('DrilldownContextProvider', () => {
     expect(query).toEqual(expectedQuery);
   };
 
-  const renderSUT = (viewType) => mount(
-    <ViewTypeContext.Provider value={viewType}>
-      <DrilldownContextProvider widget={widget}>
-        <TestComponent />
-      </DrilldownContextProvider>
-    </ViewTypeContext.Provider>,
+  const SUT = () => (
+    <DrilldownContextProvider widget={widget}>
+      <TestComponent />
+    </DrilldownContextProvider>
   );
 
   describe('if current view is a dashboard', () => {
     it('passes current query, streams & timerange of widget if global override is not set', () => {
-      const wrapper = renderSUT(View.Type.Dashboard);
+      asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+      const wrapper = mount(<SUT />);
 
       expectDrilldown(['stream1', 'stream2'],
         { type: 'relative', range: 1800 },
@@ -83,13 +77,15 @@ describe('DrilldownContextProvider', () => {
     });
 
     it('passes query & timerange of global override, streams of widget', () => {
-      asMock(GlobalOverrideStore.getInitialState)
+      asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+      asMock(useGlobalOverride)
         .mockReturnValue(GlobalOverride.create(
           { type: 'absolute', from: '2020-01-10T13:23:42.000Z', to: '2020-01-10T14:23:42.000Z' },
           createElasticsearchQueryString('something:"else"'),
         ));
 
-      const wrapper = renderSUT(View.Type.Dashboard);
+      const wrapper = mount(<SUT />);
 
       expectDrilldown(['stream1', 'stream2'],
         { type: 'absolute', from: '2020-01-10T13:23:42.000Z', to: '2020-01-10T14:23:42.000Z' },
@@ -100,7 +96,8 @@ describe('DrilldownContextProvider', () => {
 
   describe('if current view is a search', () => {
     it('passes default values if no current query is present', () => {
-      const wrapper = renderSUT(View.Type.Search);
+      asMock(useViewType).mockReturnValue(View.Type.Search);
+      const wrapper = mount(<SUT />);
 
       expectDrilldown([],
         { type: 'relative', from: 300 },
@@ -115,8 +112,9 @@ describe('DrilldownContextProvider', () => {
         .timerange({ type: 'keyword', keyword: 'last year' })
         .build();
 
-      asMock(CurrentQueryStore.getInitialState).mockReturnValueOnce(query);
-      const wrapper = renderSUT(View.Type.Search);
+      asMock(useCurrentQuery).mockReturnValueOnce(query);
+      asMock(useViewType).mockReturnValue(View.Type.Search);
+      const wrapper = mount(<SUT />);
 
       expectDrilldown(['onestream', 'anotherstream'],
         { type: 'keyword', keyword: 'last year' },

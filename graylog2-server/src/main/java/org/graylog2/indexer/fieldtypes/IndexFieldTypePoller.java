@@ -22,6 +22,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,13 +36,17 @@ public class IndexFieldTypePoller {
     private final Indices indices;
     private final Timer pollTimer;
     private final IndexFieldTypePollerAdapter indexFieldTypePollerAdapter;
+    private final boolean maintainsStreamBasedFieldLists;
 
     @Inject
-    public IndexFieldTypePoller(final Indices indices, final MetricRegistry metricRegistry, IndexFieldTypePollerAdapter indexFieldTypePollerAdapter) {
+    public IndexFieldTypePoller(final Indices indices,
+                                final MetricRegistry metricRegistry,
+                                final IndexFieldTypePollerAdapter indexFieldTypePollerAdapter) {
         this.indices = indices;
 
         this.pollTimer = metricRegistry.timer(name(getClass(), "indexPollTime"));
         this.indexFieldTypePollerAdapter = indexFieldTypePollerAdapter;
+        this.maintainsStreamBasedFieldLists = indexFieldTypePollerAdapter.maintainsStreamBasedFieldLists();
     }
 
     /**
@@ -63,23 +68,35 @@ public class IndexFieldTypePoller {
         return indices.getIndices(indexSet, "open").stream()
                 // We always poll the active write index because the mapping can change for every ingested message.
                 // Other indices will only be polled if we don't have the mapping data already.
-                .filter(indexName -> indexName.equals(activeWriteIndex) || !existingIndexNames.contains(indexName))
+                .filter(indexName -> indexName.equals(activeWriteIndex) || !existingIndexNames.contains(indexName)
+                        || (maintainsStreamBasedFieldLists && missesStreamData(existingIndexTypes, indexName)))
                 .map(indexName -> pollIndex(indexName, indexSet.getConfig().id()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 
+    private boolean missesStreamData(final Collection<IndexFieldTypesDTO> existingIndexTypes, final String indexName) {
+        return existingIndexTypes.stream()
+                .filter(x -> x.indexName().equals(indexName))
+                .anyMatch(x -> !x.hasStreamData());
+    }
+
     /**
      * Returns the index field types for the given index.
      *
-     * @param indexName index name to poll types for
+     * @param indexName  index name to poll types for
      * @param indexSetId index set ID of the given index
      * @return the polled index field type data for the given index
      */
     public Optional<IndexFieldTypesDTO> pollIndex(final String indexName, final String indexSetId) {
         final Optional<Set<FieldTypeDTO>> optionalFields = indexFieldTypePollerAdapter.pollIndex(indexName, pollTimer);
 
-        return optionalFields.map(fields -> IndexFieldTypesDTO.create(indexSetId, indexName, fields));
+        return optionalFields.map(fields -> IndexFieldTypesDTO.builder()
+                .indexSetId(indexSetId)
+                .indexName(indexName)
+                .fields(fields)
+                .hasStreamData(maintainsStreamBasedFieldLists)
+                .build());
     }
 }

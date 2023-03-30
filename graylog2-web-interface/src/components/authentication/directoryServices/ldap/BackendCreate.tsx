@@ -70,6 +70,12 @@ export const HELP = {
   defaultRoles: (
     <span>The default Graylog roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the Graylog web interface</span>
   ),
+  emailAttributes: (
+    <span>
+      Which LDAP attribute to use for the user&apos;s email address, e.g. <code>mail</code>.<br />
+      You can specify multiple attributes, type <kbd>Tab</kbd> or <kbd>Enter</kbd> to accept your value.
+    </span>
+  ),
 };
 
 const INITIAL_VALUES: Partial<WizardFormValues> = {
@@ -78,6 +84,7 @@ const INITIAL_VALUES: Partial<WizardFormValues> = {
   serverPort: 636,
   transportSecurity: 'tls',
   userFullNameAttribute: 'cn',
+  emailAttributes: ['mail', 'rfc822Mailbox'],
   userNameAttribute: 'uid',
   userUniqueIdAttribute: 'entryUUID',
   verifyCertificates: true,

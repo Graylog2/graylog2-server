@@ -68,7 +68,7 @@ public class EmailEventNotification implements EventNotification {
             throw new TemporaryEventNotificationException(e.getMessage());
         } catch (TransportConfigurationException e) {
             Notification systemNotification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addDetail("exception", e.getMessage());
@@ -83,7 +83,7 @@ public class EmailEventNotification implements EventNotification {
             }
 
             final Notification systemNotification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addDetail("exception", exceptionDetail);

@@ -41,17 +41,6 @@ const ApiRoutes = {
   AlarmCallbackHistoryApiController: {
     list: (streamId: string, alertId: string) => { return { url: `/streams/${streamId}/alerts/${alertId}/history` }; },
   },
-  AlertsApiController: {
-    get: (alertId: string) => { return { url: `/streams/alerts/${alertId}` }; },
-    list: (streamId: string, since) => { return { url: `/streams/${streamId}/alerts?since=${since}` }; },
-    listPaginated: (streamId: string, skip, limit, state) => { return { url: `/streams/${streamId}/alerts/paginated?skip=${skip}&limit=${limit}&state=${state}` }; },
-    listAllPaginated: (skip, limit, state) => { return { url: `/streams/alerts/paginated?skip=${skip}&limit=${limit}&state=${state}` }; },
-    listAllStreams: (since) => { return { url: `/streams/alerts?since=${since}` }; },
-  },
-  AlertConditionsApiController: {
-    available: () => { return { url: '/alerts/conditions/types' }; },
-    list: () => { return { url: '/alerts/conditions' }; },
-  },
   AuthenticationController: {
     create: () => ({ url: '/system/authentication/services/backends' }),
     delete: (backendId: string) => ({ url: `/system/authentication/services/backends/${backendId}` }),
@@ -136,10 +125,36 @@ const ApiRoutes = {
     cycle: (indexSetId: string) => { return { url: `/cluster/deflector/${indexSetId}/cycle` }; },
     list: (indexSetId: string) => { return { url: `/system/deflector/${indexSetId}` }; },
   },
+  EntityScopeController: {
+    getScope: () => { return { url: '/entity_scopes' }; },
+  },
   EntityShareController: {
     prepare: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}/prepare` }; },
     update: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
+    entityScopes: () => { return { url: '/entity_scopes' }; },
+  },
+  EventDefinitionsApiController: {
+    list: () => { return { url: '/events/definitions' }; },
+    paginated: () => { return { url: '/events/definitions/paginated' }; },
+    get: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+    create: () => { return { url: '/events/definitions' }; },
+    bulkDelete: () => { return { url: '/events/definitions/bulk_delete' }; },
+    bulkSchedule: () => { return { url: '/events/definitions/bulk_schedule' }; },
+    bulkUnschedule: () => { return { url: '/events/definitions/bulk_unschedule' }; },
+    update: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+    delete: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+  },
+  EventNotificationsApiController: {
+    list: () => { return { url: '/events/notifications' }; },
+    paginated: () => { return { url: '/events/notifications/paginated' }; },
+    get: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
+    create: () => { return { url: '/events/notifications' }; },
+    bulkDelete: () => { return { url: '/events/notifications/bulk_delete' }; },
+    bulkSchedule: () => { return { url: '/events/notifications/bulk_schedule' }; },
+    bulkUnschedule: () => { return { url: '/events/notifications/bulk_unschedule' }; },
+    update: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
+    delete: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
   },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
@@ -213,7 +228,10 @@ const ApiRoutes = {
   },
   NotificationsApiController: {
     delete: (type: string) => { return { url: `/system/notifications/${type}` }; },
+    deleteWithKey: (type: string, key: string) => { return { url: `/system/notifications/${type}/${key}` }; },
     list: () => { return { url: '/system/notifications' }; },
+    getHtmlMessage: (type: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }; },
+    getHtmlMessageWithKey: (type: string, key: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}` }; },
   },
   OutputsApiController: {
     index: () => { return { url: '/system/outputs' }; },
@@ -238,19 +256,13 @@ const ApiRoutes = {
   SessionsApiController: {
     validate: () => { return { url: '/system/sessions' }; },
   },
-  StreamAlertsApiController: {
-    create: (streamId: string) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
-    delete: (streamId: string, alertConditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
-    get: (streamId: string, conditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}` }; },
-    list: (streamId: string) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
-    update: (streamId: string, alertConditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
-    sendDummyAlert: (streamId: string) => { return { url: `/streams/${streamId}/alerts/sendDummyAlert` }; },
-    test: (streamId: string, conditionId: string) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}/test` }; },
-  },
   StreamsApiController: {
     index: () => { return { url: '/streams' }; },
     paginated: () => { return { url: '/streams/paginated' }; },
     get: (streamId: string) => { return { url: `/streams/${streamId}` }; },
+    bulk_delete: () => ({ url: '/streams/bulk_delete' }),
+    bulk_resume: () => ({ url: '/streams/bulk_resume' }),
+    bulk_pause: () => ({ url: '/streams/bulk_pause' }),
     create: () => { return { url: '/streams' }; },
     update: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     cloneStream: (streamId: string) => { return { url: `/streams/${streamId}/clone` }; },
@@ -278,6 +290,7 @@ const ApiRoutes = {
   SystemJobsApiController: {
     list: () => { return { url: '/cluster/jobs' }; },
     getJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
+    acknowledgeJob: (jobId: string) => { return { url: `/system/jobs/acknowledge/${jobId}` }; },
     cancelJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
   },
   SystemMessagesApiController: {

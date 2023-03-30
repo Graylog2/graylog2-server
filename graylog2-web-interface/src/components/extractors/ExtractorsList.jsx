@@ -15,92 +15,96 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
-import naturalSort from 'javascript-natural-sort';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
-import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
+import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
-const ExtractorsList = createReactClass({
-  displayName: 'ExtractorsList',
+const fetchExtractors = (inputId, callback) => {
+  ExtractorsActions.list.triggerPromise(inputId).then((data) => callback(data?.extractors));
+};
 
-  propTypes: {
-    input: PropTypes.object.isRequired,
-    node: PropTypes.object.isRequired,
-  },
+const ExtractorsList = ({ input, node }) => {
+  const [extractors, setExtractors] = useState(null);
+  const [showSortModal, setShowSortModal] = useState(false);
 
-  mixins: [Reflux.connect(ExtractorsStore), Reflux.ListenerMethods],
+  useEffect(() => {
+    fetchExtractors(input.id, setExtractors);
+  }, [input.id]);
 
-  componentDidMount() {
-    ExtractorsActions.list.triggerPromise(this.props.input.id);
-  },
-
-  _formatExtractor(extractor) {
+  const _formatExtractor = (extractor) => {
     return (
       <ExtractorsListItem key={extractor.id}
                           extractor={extractor}
-                          inputId={this.props.input.id}
-                          nodeId={this.props.node.node_id} />
+                          inputId={input.id}
+                          nodeId={node.node_id} />
     );
-  },
+  };
 
-  _isLoading() {
-    return !this.state.extractors;
-  },
+  const _isLoading = () => {
+    return !extractors;
+  };
 
-  _openSortModal() {
-    this.sortModal.open();
-  },
+  const _openSortModal = () => {
+    setShowSortModal(true);
+  };
 
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
+  let sortExtractorsButton;
 
-    let sortExtractorsButton;
-
-    if (this.state.extractors.length > 1) {
-      sortExtractorsButton = (
-        <Button bsSize="xsmall" bsStyle="primary" className="pull-right" onClick={this._openSortModal}>
-          Sort extractors
-        </Button>
-      );
-    }
-
-    const formattedExtractors = this.state.extractors
-      .sort((extractor1, extractor2) => naturalSort(extractor1.order, extractor2.order))
-      .map(this._formatExtractor);
-
-    return (
-      <div>
-        <AddExtractorWizard inputId={this.props.input.id} />
-        <Row className="content extractor-list">
-          <Col md={12}>
-            <Row className="row-sm">
-              <Col md={8}>
-                <h2>Configured extractors</h2>
-              </Col>
-              <Col md={4}>
-                {sortExtractorsButton}
-              </Col>
-            </Row>
-            <EntityList bsNoItemsStyle="info"
-                        noItemsText="This input has no configured extractors."
-                        items={formattedExtractors} />
-          </Col>
-        </Row>
-        <ExtractorsSortModal ref={(sortModal) => { this.sortModal = sortModal; }} input={this.props.input} extractors={this.state.extractors} />
-      </div>
+  if (extractors?.length > 1) {
+    sortExtractorsButton = (
+      <Button bsSize="xsmall" bsStyle="primary" className="pull-right" onClick={_openSortModal}>
+        Sort extractors
+      </Button>
     );
-  },
-});
+  }
+
+  const formattedExtractors = extractors
+    ?.sort((extractor1, extractor2) => extractor1.order - extractor2.order)
+    .map(_formatExtractor);
+
+  if (_isLoading()) {
+    return <Spinner />;
+  }
+
+  return (
+    <div>
+      <AddExtractorWizard inputId={input.id} />
+      <Row className="content extractor-list">
+        <Col md={12}>
+          <Row className="row-sm">
+            <Col md={8}>
+              <h2>Configured extractors</h2>
+            </Col>
+            <Col md={4}>
+              {sortExtractorsButton}
+            </Col>
+          </Row>
+          <EntityList bsNoItemsStyle="info"
+                      noItemsText="This input has no configured extractors."
+                      items={formattedExtractors} />
+        </Col>
+      </Row>
+      {showSortModal && (
+        <ExtractorsSortModal input={input}
+                             extractors={extractors}
+                             onClose={() => setShowSortModal(false)}
+                             onSort={() => fetchExtractors(input.id, setExtractors)} />
+      )}
+    </div>
+  );
+};
+
+ExtractorsList.propTypes = {
+  input: PropTypes.object.isRequired,
+  node: PropTypes.object.isRequired,
+};
 
 export default ExtractorsList;

@@ -24,10 +24,14 @@ const StyledListItem = styled.li(({ theme }) => css`
   display: block;
   padding: 15px 0;
 
+  h2 {
+    font-family: ${theme.fonts.family.body};
+  }
+
   h2 .label {
     margin-left: 5px;
-    line-height: 2;
-    vertical-align: bottom;
+    line-height: 1;
+    vertical-align: baseline;
   }
 
   .item-description {
@@ -43,7 +47,7 @@ const StyledListItem = styled.li(({ theme }) => css`
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.variant.light.info};
+    border-bottom: 1px solid ${theme.colors.gray[90]};
   }
 `);
 
@@ -75,8 +79,7 @@ const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }
             {actionsContainer}
           </div>
           <h2>{title} {wrappedTitleSuffix}</h2>
-          {description
-          && (
+          {description && (
             <div className="item-description">
               <span>{description}</span>
             </div>
@@ -89,9 +92,9 @@ const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }
       </Row>
 
       {contentRow && (
-      <Row className="row-sm">
-        {contentRow}
-      </Row>
+        <Row className="row-sm">
+          {contentRow}
+        </Row>
       )}
     </StyledListItem>
   );

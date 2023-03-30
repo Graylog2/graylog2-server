@@ -51,6 +51,9 @@ class TypeAheadFieldInput extends React.Component {
      * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#custom-events
      */
     onChange: PropTypes.func,
+    onBlur: PropTypes.func,
+    /** Display an error for the input * */
+    error: PropTypes.string,
   };
 
   static defaultProps = {
@@ -58,6 +61,8 @@ class TypeAheadFieldInput extends React.Component {
     autoFocus: false,
     label: undefined,
     onChange: () => {},
+    onBlur: () => {},
+    error: undefined,
   };
 
   componentDidMount() {
@@ -129,12 +134,14 @@ class TypeAheadFieldInput extends React.Component {
   };
 
   render() {
-    const { id, label, valueLink } = this.props;
+    const { id, label, valueLink, error, onBlur } = this.props;
 
     return (
       <Input id={id}
              ref={(fieldInput) => { this.fieldInput = fieldInput; }}
              label={label}
+             onBlur={onBlur}
+             error={error}
              wrapperClassName="typeahead-wrapper"
              defaultValue={valueLink ? valueLink.value : null}
              {...this._getFilteredProps()} />

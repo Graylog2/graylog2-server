@@ -22,6 +22,10 @@ import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 import RuleMetricsConfig from './RuleMetricsConfig';
 
+const handleChange = (nextConfig) => {
+  return RulesActions.updateMetricsConfig(nextConfig);
+};
+
 class RuleMetricsConfigContainer extends React.Component {
   static propTypes = {
     metricsConfig: PropTypes.object,
@@ -37,10 +41,6 @@ class RuleMetricsConfigContainer extends React.Component {
     RulesActions.loadMetricsConfig();
   }
 
-  handleChange = (nextConfig) => {
-    return RulesActions.updateMetricsConfig(nextConfig);
-  };
-
   render() {
     const { metricsConfig, onClose } = this.props;
 
@@ -49,9 +49,8 @@ class RuleMetricsConfigContainer extends React.Component {
     }
 
     return (
-      <RuleMetricsConfig ref={(component) => { this.configComponent = component; }}
-                         config={metricsConfig}
-                         onChange={this.handleChange}
+      <RuleMetricsConfig config={metricsConfig}
+                         onChange={handleChange}
                          onClose={onClose} />
     );
   }

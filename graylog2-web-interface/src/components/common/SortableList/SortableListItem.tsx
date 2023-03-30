@@ -24,6 +24,7 @@ import ListItem from './ListItem';
 import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
 
 type Props<ItemType extends ListItemType> = {
+  alignItemContent?: 'flex-start' | 'center'
   className?: string,
   customListItemRender?: CustomListItemRender<ItemType>,
   customContentRender?: CustomContentRender<ItemType>,
@@ -38,6 +39,7 @@ const StyledListItem = styled(ListItem)(({ $isDragging }: { $isDragging: boolean
 `);
 
 const SortableListItem = <ItemType extends ListItemType>({
+  alignItemContent,
   className,
   customContentRender,
   customListItemRender,
@@ -49,7 +51,8 @@ const SortableListItem = <ItemType extends ListItemType>({
   <Draggable draggableId={item.id} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }, { isDragging }) => {
       const listItem = (
-        <StyledListItem item={item}
+        <StyledListItem alignItemContent={alignItemContent}
+                        item={item}
                         index={index}
                         className={className}
                         ref={innerRef}
@@ -70,6 +73,7 @@ const SortableListItem = <ItemType extends ListItemType>({
   );
 
 SortableListItem.defaultProps = {
+  alignItemContent: undefined,
   className: undefined,
   customContentRender: undefined,
   customListItemRender: undefined,

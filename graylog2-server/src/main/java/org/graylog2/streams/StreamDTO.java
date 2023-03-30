@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.streams.Stream;
@@ -30,6 +31,7 @@ import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Date;
 
 @AutoValue
 @WithBeanGetter
@@ -71,7 +73,7 @@ public abstract class StreamDTO {
     public abstract String description();
 
     @JsonProperty(FIELD_CREATED_AT)
-    public abstract String createdAt();
+    public abstract Date createdAt();
 
     @JsonProperty(FIELD_RULES)
     @Nullable
@@ -82,10 +84,12 @@ public abstract class StreamDTO {
 
     @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
     @Nullable
+    @Deprecated
     public abstract Collection<AlertConditionSummary> alertConditions();
 
     @JsonProperty(FIELD_ALERT_RECEIVERS)
     @Nullable
+    @Deprecated
     public abstract AlertReceivers alertReceivers();
 
     @JsonProperty(FIELD_TITLE)
@@ -142,7 +146,7 @@ public abstract class StreamDTO {
         public abstract Builder description(String description);
 
         @JsonProperty(FIELD_CREATED_AT)
-        public abstract Builder createdAt(String createdAt);
+        public abstract Builder createdAt(Date createdAt);
 
         @JsonProperty(FIELD_CONTENT_PACK)
         public abstract Builder contentPack(String contentPack);
@@ -151,12 +155,14 @@ public abstract class StreamDTO {
         public abstract Builder disabled(boolean disabled);
 
         @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
+        @Deprecated
         public abstract Builder alertConditions(Collection<AlertConditionSummary> alertConditions);
 
         @JsonProperty(FIELD_RULES)
         public abstract Builder rules(Collection<StreamRule> rules);
 
         @JsonProperty(FIELD_ALERT_RECEIVERS)
+        @Deprecated
         public abstract Builder alertReceivers(AlertReceivers receivers);
 
         @JsonProperty(FIELD_TITLE)
@@ -182,5 +188,23 @@ public abstract class StreamDTO {
             isEditable(Stream.streamIsEditable(id()));
             return autoBuild();
         }
+    }
+
+    public static StreamDTO fromDocument(Document document) {
+        return StreamDTO.builder()
+                .id(document.getObjectId(FIELD_ID).toHexString())
+                .title(document.getString(FIELD_TITLE))
+                .description(document.getString(FIELD_DESCRIPTION))
+                .matchingType(document.getString(FIELD_MATCHING_TYPE))
+                .createdAt(document.getDate(FIELD_CREATED_AT))
+                .contentPack(document.getString(FIELD_CONTENT_PACK))
+                .isEditable(document.getBoolean(FIELD_IS_EDITABLE, true))
+                .isDefault(document.getBoolean(FIELD_DEFAULT_STREAM))
+                .disabled(document.getBoolean(FIELD_DISABLED))
+                .removeMatchesFromDefaultStream(document.getBoolean(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM))
+                .creatorUserId(document.getString(FIELD_CREATOR_USER_ID))
+                .indexSetId(document.getString(FIELD_INDEX_SET_ID))
+                .outputs(document.getList(FIELD_OUTPUTS, ObjectId.class))
+                .build();
     }
 }

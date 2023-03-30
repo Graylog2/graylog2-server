@@ -88,6 +88,7 @@ public class Generator {
     private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
 
     public static final String EMULATED_SWAGGER_VERSION = "1.2";
+    public static final String CLOUD_VISIBLE = "cloud";
 
     private static final Map<String, Object> overviewResult = Maps.newHashMap();
 
@@ -95,16 +96,18 @@ public class Generator {
     private final Map<Class<?>, String> pluginMapping;
     private final String pluginPathPrefix;
     private final ObjectMapper mapper;
-
-    public Generator(Set<Class<?>> resourceClasses, Map<Class<?>, String> pluginMapping, String pluginPathPrefix, ObjectMapper mapper) {
+    private final boolean isCloud;
+    public Generator(Set<Class<?>> resourceClasses, Map<Class<?>, String> pluginMapping,
+                     String pluginPathPrefix, ObjectMapper mapper, boolean isCloud) {
         this.resourceClasses = resourceClasses;
         this.pluginMapping = pluginMapping;
         this.pluginPathPrefix = pluginPathPrefix;
         this.mapper = mapper;
+        this.isCloud = isCloud;
     }
 
-    public Generator(Set<Class<?>> resourceClasses, ObjectMapper mapper) {
-        this(resourceClasses, ImmutableMap.of(), "", mapper);
+    public Generator(Set<Class<?>> resourceClasses, ObjectMapper mapper, boolean isCloud) {
+        this(resourceClasses, ImmutableMap.of(), "", mapper, isCloud);
     }
 
     private String prefixedPath(Class<?> resourceClass, @Nullable String resourceAnnotationPath) {
@@ -112,9 +115,9 @@ public class Generator {
         final StringBuilder prefixedPath = new StringBuilder();
 
         if (pluginMapping.containsKey(resourceClass)) {
-            prefixedPath.append(pluginPathPrefix);
-            prefixedPath.append("/");
-            prefixedPath.append(pluginMapping.get(resourceClass));
+            prefixedPath.append(pluginPathPrefix)
+                    .append("/")
+                    .append(pluginMapping.get(resourceClass));
         }
 
         if (!resourcePath.startsWith("/")) {
@@ -140,6 +143,11 @@ public class Generator {
             }
 
             final String prefixedPath = prefixedPath(clazz, path.value());
+            if (isCloud && Arrays.stream(info.tags()).noneMatch(CLOUD_VISIBLE::equalsIgnoreCase)) {
+                LOG.info("Hiding in cloud: {}", prefixedPath);
+                continue;
+            }
+
             final Map<String, Object> apiDescription = Maps.newHashMap();
             apiDescription.put("name", prefixedPath.startsWith(pluginPathPrefix) ? "Plugins/" + info.value() : info.value());
             apiDescription.put("path", prefixedPath);
@@ -147,9 +155,7 @@ public class Generator {
 
             apis.add(apiDescription);
         }
-        Collections.sort(apis, (o1, o2) -> ComparisonChain.start().compare(o1.get("name").toString(), o2.get("name").toString()).result());
-        Map<String, String> info = Maps.newHashMap();
-        info.put("title", "Graylog REST API");
+        apis.sort((o1, o2) -> ComparisonChain.start().compare(o1.get("name").toString(), o2.get("name").toString()).result());
 
         overviewResult.put("apiVersion", ServerVersion.VERSION.toString());
         overviewResult.put("swaggerVersion", EMULATED_SWAGGER_VERSION);
@@ -604,6 +610,8 @@ public class Generator {
 
                 if (annotation instanceof QueryParam) {
                     paramKind = Parameter.Kind.QUERY;
+                    final String annotationValue = ((QueryParam)annotation).value();
+                    param.setName(annotationValue);
                 } else if (annotation instanceof PathParam) {
                     final String annotationValue = ((PathParam)annotation).value();
                     if (!Strings.isNullOrEmpty(annotationValue)) {
@@ -612,8 +620,12 @@ public class Generator {
                     paramKind = Parameter.Kind.PATH;
                 } else if (annotation instanceof HeaderParam) {
                     paramKind = Parameter.Kind.HEADER;
+                    final String annotationValue = ((HeaderParam)annotation).value();
+                    param.setName(annotationValue);
                 } else if (annotation instanceof FormParam) {
                     paramKind = Parameter.Kind.FORM;
+                    final String annotationValue = ((FormParam)annotation).value();
+                    param.setName(annotationValue);
                 }
             }
 
@@ -672,7 +684,7 @@ public class Generator {
         return route;
     }
 
-    private final static Set<String> PRIMITIVES = ImmutableSet.of(
+    private static final Set<String> PRIMITIVES = ImmutableSet.of(
             "boolean",
             "Boolean",
             "Double",

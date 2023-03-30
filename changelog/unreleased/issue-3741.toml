@@ -1,0 +1,7 @@
+type = "fixed"
+message = 'Improve position, visibilty and default of the "Grace Period" option when creating an Alert.'
+
+issues = ["3741"]
+pulls = ["3741"]
+
+

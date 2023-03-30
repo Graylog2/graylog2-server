@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as ts from 'typescript';
-import { chunk } from 'lodash';
+import chunk from 'lodash/chunk';
+import uniq from 'lodash/uniq';
 
 import type { Api, Route, Operation, Parameter, Type, EnumType, TypeLiteral, Model } from 'generator/Api';
 
@@ -33,7 +34,7 @@ const typeMappings = {
   ZonedDateTime: 'string',
 };
 
-const emitNumberOrString = (type) => {
+const emitNumberOrString = (type: string) => {
   switch (type) {
     case 'number':
       return (number: unknown) => ts.factory.createNumericLiteral(number as number);
@@ -43,10 +44,8 @@ const emitNumberOrString = (type) => {
 };
 
 const emitIndexerSignature = (additionalProperties: Type) => (additionalProperties ? [ts.factory.createIndexSignature(
-  undefined,
   [readonlyModifier],
   [ts.factory.createParameterDeclaration(
-    undefined,
     undefined,
     undefined,
     ts.factory.createIdentifier('_key'),
@@ -76,14 +75,12 @@ const cleanName = (name: string) => name.replace(/>/g, '');
 const emitModel = ([name, definition]: [string, Model]) => (definition.type === 'type_literal'
   ? ts.factory.createInterfaceDeclaration(
     undefined,
-    undefined,
     cleanName(name),
     undefined,
     undefined,
     [...emitProps(definition.properties), ...emitIndexerSignature(definition.additionalProperties)],
   )
   : ts.factory.createTypeAliasDeclaration(
-    undefined,
     undefined,
     ts.factory.createIdentifier(name),
     undefined,
@@ -94,11 +91,11 @@ const emitModel = ([name, definition]: [string, Model]) => (definition.type === 
 
 // ==== APIs/Operations ==== //
 // === Types === //
-const emitPromiseResultType = (typeNode) => ts.factory.createTypeReferenceNode('Promise', [typeNode]);
+const emitPromiseResultType = (typeNode: ts.TypeNode) => ts.factory.createTypeReferenceNode('Promise', [typeNode]);
 
 // === Functions === //
 
-const extractVariable = (segment) => segment.replace(/[{}]/g, '').split(':')[0];
+const extractVariable = (segment: string) => segment.replace(/[{}]/g, '').split(':')[0];
 
 const emitTemplateString = (path: string) => {
   const segments = path.split(/({.+?})/);
@@ -129,13 +126,23 @@ const emitTemplateString = (path: string) => {
   );
 };
 
+const cleanVariableName = (name: string) => name.replace(/-(\w?)/g, (substr) => (substr[1] ? substr[1].toUpperCase() : ''));
+
 const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryParameter: Parameter[], rawProduces: string[]) => {
   const produces = rawProduces || [];
   const queryParameters = ts.factory.createObjectLiteralExpression(
     queryParameter.map((q) => ts.factory.createPropertyAssignment(
-      q.name,
-      ts.factory.createIdentifier(q.name),
+      emitString(q.name),
+      ts.factory.createIdentifier(cleanVariableName(q.name)),
     )),
+  );
+
+  const headers = ts.factory.createObjectLiteralExpression(
+    [ts.factory.createPropertyAssignment(
+      emitString('Accept'),
+      ts.factory.createArrayLiteralExpression(produces.map((contentType) => emitString(contentType)), produces.length > 1),
+    )],
+    true,
   );
 
   return ts.factory.createBlock(
@@ -149,13 +156,7 @@ const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryPar
             emitTemplateString(path),
             bodyParameter ? ts.factory.createIdentifier(bodyParameter.name) : ts.factory.createNull(),
             queryParameters,
-            ts.factory.createObjectLiteralExpression(
-              [ts.factory.createPropertyAssignment(
-                'Accept',
-                ts.factory.createArrayLiteralExpression(produces.map((contentType) => emitString(contentType)), produces.length > 1),
-              )],
-              true,
-            ),
+            headers,
           ],
         ),
       ),
@@ -199,7 +200,7 @@ function emitEnumType({ options, name }: EnumType) {
   return ts.factory.createUnionTypeNode(types);
 }
 
-function emitTypeLiteral(type: TypeLiteral) {
+function emitTypeLiteral(type: TypeLiteral): ReturnType<typeof ts.factory.createTypeLiteralNode> {
   const properties = Object.entries(type.properties ?? [])
     .map(([propName, propType]) => ts.factory.createPropertySignature(
       [readonlyModifier],
@@ -218,7 +219,13 @@ const assertUnreachable = (ignored: never, message: string): never => {
   throw new Error(`${message}: ${ignored}`);
 };
 
-function emitType(type: Type) {
+type TypeResult = ReturnType<typeof ts.factory.createArrayTypeNode>
+  | ReturnType<typeof emitEnumType>
+  | ReturnType<typeof emitTypeLiteral>
+  | ReturnType<typeof ts.factory.createTypeReferenceNode>
+  | undefined;
+
+function emitType(type: Type): TypeResult {
   switch (type.type) {
     case 'array':
       return ts.factory.createArrayTypeNode(emitType(type.items));
@@ -243,14 +250,13 @@ const emitFunctionParameter = ({
 }: Parameter) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
-  undefined,
-  cleanParameterName(name),
+  cleanVariableName(cleanParameterName(name)),
   (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
   emitType(type),
-  defaultValue ? emitInitializer(type, defaultValue as string) : undefined,
+  defaultValue ? emitInitializer(type, defaultValue) : undefined,
 );
 
-const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
+const firstNonEmpty = (...strings: string[]) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
 const deriveNameFromParameters = (functionName: string, parameters: Parameter[]) => {
   const joinedParameters = parameters.map(({ name }) => cleanParameterName(name)).join('And');
@@ -294,7 +300,6 @@ const emitRoute = ({
     nodes: [
       jsDoc,
       ts.factory.createFunctionDeclaration(
-        undefined,
         [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
         undefined,
         ts.factory.createIdentifier(functionName),
@@ -334,7 +339,6 @@ const emitApiObject = (routes: Array<Route>) => {
 
 const importDeclaration = ts.factory.createImportDeclaration(
   undefined,
-  undefined,
   ts.factory.createImportClause(false, ts.factory.createIdentifier(REQUEST_FUNCTION_NAME), undefined),
   emitString(REQUEST_FUNCTION_IMPORT),
 );
@@ -347,7 +351,6 @@ function emitSummary(apis: Array<Api>) {
   const packageIndexFile = ts.createSourceFile('index.ts', '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
   const reexports = ts.factory.createNodeArray(apis.map(({ name }) => ts.factory.createExportDeclaration(
     undefined,
-    undefined,
     false,
     ts.factory.createNamespaceExport(ts.factory.createIdentifier(cleanIdentifier(name))),
     emitString(`./${name}`),
@@ -356,9 +359,48 @@ function emitSummary(apis: Array<Api>) {
   return printer.printList(ts.ListFormat.MultiLine, reexports, packageIndexFile);
 }
 
+const referencedTypes = (type: Type): Array<string> => {
+  if (!type) {
+    return [];
+  }
+
+  switch (type.type) {
+    case 'type_reference': return [type.name];
+    case 'type_literal': return type.properties
+      ? [
+        ...Object.values(type.properties).flatMap(referencedTypes),
+        ...referencedTypes(type.additionalProperties),
+      ]
+      : [];
+    case 'enum': return [];
+    case 'array': return referencedTypes(type.items);
+    default: assertUnreachable(type, 'Missing type.');
+  }
+
+  return [];
+};
+
+const isPrimitiveType = (typeName: string) => ['string', 'unknown', 'boolean', 'void', 'number', 'any'].includes(typeName);
+
+const usedModels = ({ models, routes }: Api) => {
+  const typesFromModels = Object.values(models)
+    .flatMap(referencedTypes);
+
+  const routeModels = routes.flatMap((route) => route.operations)
+    .flatMap((operation) => [
+      ...operation.parameters.flatMap((parameter) => referencedTypes(parameter.type)),
+      ...referencedTypes(operation.type),
+    ]);
+
+  return uniq([...typesFromModels, ...routeModels]).filter((typeName) => !isPrimitiveType(typeName));
+};
+
 function emitApi({ name, models, routes }: Api) {
+  const modelsInUse = usedModels({ name, models, routes });
+
   const emittedModels = Object.entries(models)
     .filter(isNotBannedModel)
+    .filter(([modelName]) => modelsInUse.includes(modelName))
     .map(emitModel);
 
   const apiObject = emitApiObject(routes);

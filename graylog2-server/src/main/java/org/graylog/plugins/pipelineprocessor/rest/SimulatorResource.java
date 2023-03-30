@@ -48,7 +48,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Api(value = "Pipelines/Simulator", description = "Simulate pipeline message processor")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Pipelines/Simulator", description = "Simulate pipeline message processor", tags = {CLOUD_VISIBLE})
 @Path("/system/pipelines/simulate")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

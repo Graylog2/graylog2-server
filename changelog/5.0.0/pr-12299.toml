@@ -1,0 +1,14 @@
+type = "added"
+message = "Add config option to set upper limit for index retention period."
+
+pulls = ["12299"]
+
+contributors = [""]
+
+details.user = """
+Adds a new config option `max_index_retention_period` to `graylog.conf`.
+It is used to limit the effective index retention period that a user may
+configure via the UI.
+
+The limit will only be enforced if a time-based rotation strategy is chosen.
+"""

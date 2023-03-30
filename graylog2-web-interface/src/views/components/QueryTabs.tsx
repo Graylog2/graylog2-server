@@ -22,24 +22,23 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
-import type Query from 'views/logic/queries/Query';
-import type { TitlesMap } from 'views/stores/TitleTypes';
-import type ViewState from 'views/logic/views/ViewState';
 import ElementDimensions from 'components/common/ElementDimensions';
+import type ViewState from 'views/logic/views/ViewState';
 
 import QueryTitleEditModal from './queries/QueryTitleEditModal';
 import AdaptableQueryTabs from './AdaptableQueryTabs';
 
 export interface QueryTabsProps {
   onRemove: (queryId: string) => Promise<void | ViewState>,
-  onSelect: (queryId: string) => Promise<Query> | Promise<string>,
-  onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
+  onSelect: (queryId: string) => void,
+  onTitleChange: (queryId: string, newTitle: string) => void,
   queries: Immutable.OrderedSet<QueryId>,
-  selectedQueryId: string,
+  activeQueryId: string,
   titles: Immutable.Map<string, string>,
+  dashboardId: string,
 }
 
-const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }: QueryTabsProps) => {
+const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, activeQueryId, titles, dashboardId }: QueryTabsProps) => {
   const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
 
   return (
@@ -49,8 +48,9 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
           {({ width }) => (width ? (
             <AdaptableQueryTabs maxWidth={width}
                                 queries={queries}
+                                dashboardId={dashboardId}
                                 titles={titles}
-                                selectedQueryId={selectedQueryId}
+                                activeQueryId={activeQueryId}
                                 onRemove={onRemove}
                                 onSelect={onSelect}
                                 queryTitleEditModal={queryTitleEditModal}
@@ -63,7 +63,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
           due to the react bootstrap tabs keybindings.
           The input would always lose the focus when using the arrow keys.
         */}
-        <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
+        <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(activeQueryId, newTitle)}
                              ref={queryTitleEditModal} />
       </Col>
     </Row>
@@ -75,7 +75,7 @@ QueryTabs.propTypes = {
   onSelect: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
   queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
-  selectedQueryId: PropTypes.string.isRequired,
+  activeQueryId: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
 };
 

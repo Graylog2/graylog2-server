@@ -32,7 +32,7 @@ describe('<TimeUnitInput />', () => {
 
     expect(checkbox.prop('checked')).toBe(false);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
-    expect(wrapper.find('li.active a').prop('children')).toBe('seconds');
+    expect(wrapper.find('li.active a')).toHaveText('seconds');
 
     checkbox.simulate('click');
   });
@@ -65,7 +65,7 @@ describe('<TimeUnitInput />', () => {
 
     expect(checkbox.prop('checked')).toBe(true);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
-    expect(wrapper.find('li.active a').prop('children')).toBe('days');
+    expect(wrapper.find('li.active a')).toHaveText('days');
 
     wrapper.find('input[type="number"]').simulate('change', { target: { value: 42, type: 'number' } });
   });

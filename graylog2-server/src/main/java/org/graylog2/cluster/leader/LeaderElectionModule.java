@@ -20,8 +20,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.lock.LockService;
-import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.plugin.PluginModule;
 
 public class LeaderElectionModule extends PluginModule {
@@ -33,6 +31,7 @@ public class LeaderElectionModule extends PluginModule {
 
     @Override
     protected void configure() {
+
         final LeaderElectionMode mode = configuration.getLeaderElectionMode();
 
         switch (mode) {
@@ -43,7 +42,6 @@ public class LeaderElectionModule extends PluginModule {
             case AUTOMATIC:
                 bind(LeaderElectionService.class).to(AutomaticLeaderElectionService.class).in(Scopes.SINGLETON);
                 bind(Service.class).annotatedWith(Names.named("LeaderElectionService")).to(AutomaticLeaderElectionService.class);
-                bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown leader election mode \"" + mode + "\".");

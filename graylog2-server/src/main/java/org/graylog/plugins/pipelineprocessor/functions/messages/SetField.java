@@ -40,6 +40,7 @@ public class SetField extends AbstractFunction<Void> {
     private final ParameterDescriptor<String, String> prefixParam;
     private final ParameterDescriptor<String, String> suffixParam;
     private final ParameterDescriptor<Message, Message> messageParam;
+    private final ParameterDescriptor<Object, Object> defaultParam;
 
     public SetField() {
         fieldParam = string("field").description("The new field name").build();
@@ -47,12 +48,26 @@ public class SetField extends AbstractFunction<Void> {
         prefixParam = string("prefix").optional().description("The prefix for the field name").build();
         suffixParam = string("suffix").optional().description("The suffix for the field name").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
+        defaultParam = object("default").optional().description("Used when value not available").build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
         String field = fieldParam.required(args, context);
-        final Object value = valueParam.required(args, context);
+        Object value = null;
+        try {
+            value = valueParam.required(args, context);
+        } catch (Exception e) {
+            // swallow the exception if there is an available default value;
+            if (!args.isPresent("default")) {
+                throw e;
+            }
+        }
+        finally {
+            if (value == null) {
+                value = defaultParam.optional(args, context).orElse(null);
+            }
+        }
 
         if (!Strings.isNullOrEmpty(field)) {
             final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
@@ -76,11 +91,12 @@ public class SetField extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(fieldParam,
-                           valueParam,
-                           prefixParam,
-                           suffixParam,
-                           messageParam))
-                .description("Sets a new field in a message")
-                .build();
+                        valueParam,
+                        prefixParam,
+                        suffixParam,
+                        messageParam,
+                        defaultParam))
+                        .description("Sets a new field in a message")
+                        .build();
     }
 }

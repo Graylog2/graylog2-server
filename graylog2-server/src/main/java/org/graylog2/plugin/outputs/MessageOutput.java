@@ -68,6 +68,18 @@ public interface MessageOutput extends Stoppable {
     }
 
     boolean isRunning();
+
     void write(Message message) throws Exception;
+
     void write(List<Message> messages) throws Exception;
+
+    /**
+     * Initialize output, if not done in the constructor.
+     * Allows for graceful handling of initialization failures, e.g. because of an insufficient license.
+     * The output-launching code will call this method right after constructing the output instance.
+     *
+     * @throws InsufficientLicenseException if the output could not be initialized due to an insufficient license.
+     */
+    default void initialize() throws Exception {
+    }
 }

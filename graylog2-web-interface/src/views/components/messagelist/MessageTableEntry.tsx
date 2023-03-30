@@ -43,29 +43,30 @@ import HighlightMessageContext from '../contexts/HighlightMessageContext';
 export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
   && {
     border-top: 0;
-  
+
     ${expanded ? `
       border-left: 7px solid ${theme.colors.variant.light.info};
     ` : ''}
-    
+
     ${highlighted ? `
       border-left: 7px solid ${theme.colors.variant.light.success};
     ` : ''}
   }
 `);
 
-const FieldsRow = styled.tr(({ theme }) => `
+const FieldsRow = styled.tr`
   cursor: pointer;
-  
-  td {
+
+  && td {
     min-width: 50px;
     word-break: break-word;
+    padding: 4px 5px 2px;
   }
 
   time {
-    font-size: ${theme.fonts.size.body};
+    line-height: 1;
   }
-`);
+`;
 
 const MessageDetailRow = styled.tr`
   td {
@@ -76,8 +77,8 @@ const MessageDetailRow = styled.tr`
   .row {
     margin-right: 0;
   }
-  
-  div[class*="col-"] {
+
+  div[class*='col-'] {
     padding-right: 0;
   }
 `;
@@ -129,7 +130,11 @@ const MessageTableEntry = ({
   const inputs = Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input]));
 
   const _toggleDetail = () => {
-    toggleDetail(`${message.index}-${message.id}`);
+    const isSelectingText = !!window.getSelection()?.toString();
+
+    if (!isSelectingText) {
+      toggleDetail(`${message.index}-${message.id}`);
+    }
   };
 
   const colSpanFixup = selectedFields.size + 1;
@@ -142,7 +147,7 @@ const MessageTableEntry = ({
             const type = fieldType(selectedFieldName, message, fields);
 
             return (
-              <td key={selectedFieldName}>
+              <td key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
                 {_renderStrong(
                   <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                     <TypeSpecificValue value={message.fields[selectedFieldName]}

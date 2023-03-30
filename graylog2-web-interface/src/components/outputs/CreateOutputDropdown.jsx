@@ -16,53 +16,39 @@
  */
 import React from 'react';
 import $ from 'jquery';
+import PropTypes from 'prop-types';
 
 import { Button } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 
+const formatOutputType = (type, typeName) => {
+  return (<option key={typeName} value={typeName}>{type.name}</option>);
+};
+
 class CreateOutputDropdown extends React.Component {
   PLACEHOLDER = 'placeholder';
 
-  componentDidMount() {
-    this.loadData();
-  }
-
-  loadData = () => {
+  static propTypes = {
+    getTypeDefinition: PropTypes.func.isRequired,
+    types: PropTypes.array.isRequired,
+    onSubmit: PropTypes.func.isRequired,
   };
 
-  render() {
-    const outputTypes = $.map(this.props.types, this._formatOutputType);
+  constructor(props) {
+    super(props);
 
-    return (
-      <div>
-        <div className="form-inline">
-          <select id="input-type" defaultValue={this.PLACEHOLDER} value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
-            <option value={this.PLACEHOLDER} disabled>Select Output Type</option>
-            {outputTypes}
-          </select>
-                    &nbsp;
-          <Button bsStyle="success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</Button>
-        </div>
+    this.configurationForm = React.createRef();
 
-        <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
-                           key="configuration-form-output"
-                           configFields={this.state.typeDefinition}
-                           title="Create new Output"
-                           helpBlock="Select a name of your new output that describes it."
-                           typeName={this.state.typeName}
-                           submitAction={this.props.onSubmit} />
-      </div>
-    );
+    this.state = {
+      typeDefinition: [],
+      typeName: this.PLACEHOLDER,
+    };
   }
 
-  _openModal = (evt) => {
-    if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== '') {
-      this.configurationForm.open();
+  _openModal = () => {
+    if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== '' && this.configurationForm.current) {
+      this.configurationForm.current.open();
     }
-  };
-
-  _formatOutputType = (type, typeName) => {
-    return (<option key={typeName} value={typeName}>{type.name}</option>);
   };
 
   _onTypeChange = (evt) => {
@@ -75,10 +61,31 @@ class CreateOutputDropdown extends React.Component {
     });
   };
 
-  state = {
-    typeDefinition: [],
-    typeName: this.PLACEHOLDER,
-  };
+  render() {
+    const outputTypes = $.map(this.props.types, formatOutputType);
+
+    return (
+      <div>
+        <div className="form-inline">
+          <select id="input-type" defaultValue={this.PLACEHOLDER} value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
+            <option value={this.PLACEHOLDER} disabled>Select Output Type</option>
+            {outputTypes}
+          </select>
+          &nbsp;
+          <Button bsStyle="success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</Button>
+        </div>
+
+        <ConfigurationForm ref={this.configurationForm}
+                           key="configuration-form-output"
+                           configFields={this.state.typeDefinition}
+                           title="Create new Output"
+                           titleHelpText="Select a name of your new output that describes it."
+                           typeName={this.state.typeName}
+                           submitButtonText="Create output"
+                           submitAction={this.props.onSubmit} />
+      </div>
+    );
+  }
 }
 
 export default CreateOutputDropdown;

@@ -29,7 +29,6 @@ import RawMessageLoader from './RawMessageLoader';
 
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
-jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),

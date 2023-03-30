@@ -16,126 +16,144 @@
  */
 import * as Immutable from 'immutable';
 
-import asMock from 'helpers/mocking/AsMock';
-import mockAction from 'helpers/mocking/MockAction';
-import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
-import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
-import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
-import SearchActions from 'views/actions/SearchActions';
-import { ViewStore } from 'views/stores/ViewStore';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
+import { createSearch } from 'fixtures/searches';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { RootState } from 'views/types';
+import mockDispatch from 'views/test/mockDispatch';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
 
 import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
 
-import FieldType from '../fieldtypes/FieldType';
 import GlobalOverride from '../search/GlobalOverride';
 import Query from '../queries/Query';
+import type { ViewType } from '../views/View';
 import View from '../views/View';
 
-jest.mock('views/stores/QueriesStore', () => ({
-  QueriesStore: {
-    getInitialState: jest.fn(),
-    listen: jest.fn(),
-  },
-  QueriesActions: {
-    query: jest.fn(),
-  },
+const createQuery = (queryString: string) => Query.builder()
+  .id('queryId')
+  .query({ type: 'elasticsearch', query_string: queryString })
+  .build();
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  updateQueryString: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('views/stores/ViewStore', () => ({ ViewStore: {} }));
-jest.mock('views/stores/GlobalOverrideStore', () => ({ GlobalOverrideStore: {}, GlobalOverrideActions: {} }));
-jest.mock('views/actions/SearchActions', () => ({}));
-
-const queryWithQueryString = (queryString) => Query.builder().query({ type: 'elasticsearch', query_string: queryString }).build();
-
-const mockQueries = (queryId: string, queryString: string) => Immutable.Map({ [queryId]: queryWithQueryString(queryString) });
-
 describe('ExcludeFromQueryHandler', () => {
-  const view = View.create().toBuilder().type(View.Type.Search).build();
+  const defaultView = createSearch();
 
-  afterEach(() => {
-    jest.resetAllMocks();
-  });
+  const createViewWithQuery = (query: Query, type: ViewType = View.Type.Search) => {
+    const { search } = defaultView;
 
-  beforeEach(() => {
-    ViewStore.listen = jest.fn(() => () => {});
+    return defaultView
+      .toBuilder()
+      .type(type)
+      .search(search.toBuilder().queries([query]).build())
+      .build();
+  };
 
-    ViewStore.getInitialState = jest.fn(() => ({
-      view,
-      activeQuery: 'queryId',
-      dirty: false,
-      isNew: false,
+  const mockRootState = {
+    searchExecution: { executionState: SearchExecutionState.empty() },
+  };
+
+  it('adds exclusion term to query', async () => {
+    const query = createQuery('');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    await dispatch(ExcludeFromQueryHandler({
+      queryId: 'queryId',
+      field: 'something',
+      value: 'other',
     }));
 
-    GlobalOverrideStore.listen = jest.fn(() => () => {});
-    GlobalOverrideStore.getInitialState = jest.fn(() => undefined);
+    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'NOT something:other');
   });
 
-  it('adds exclusion term to query', () => {
-    asMock(QueriesStore.getInitialState).mockReturnValue(mockQueries('queryId', ''));
+  it('replaces `*` query completely', async () => {
+    const query = createQuery('*');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
 
-    const handler = new ExcludeFromQueryHandler();
+    await dispatch(ExcludeFromQueryHandler({
+      queryId: 'queryId',
+      field: 'foo',
+      value: 'bar',
+    }));
 
-    handler.handle({ queryId: 'queryId', field: 'something', value: 'other', type: FieldType.Unknown, contexts: {} });
-
-    expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'NOT something:other');
+    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'NOT foo:bar');
   });
 
-  it('replaces `*` query completely', () => {
-    asMock(QueriesStore.getInitialState).mockReturnValue(mockQueries('queryId', '*'));
+  it('appends negated term to existing query', async () => {
+    const query = createQuery('answer:42');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
 
-    const handler = new ExcludeFromQueryHandler();
+    await dispatch(ExcludeFromQueryHandler({
+      queryId: 'queryId',
+      field: 'do',
+      value: 'panic',
+    }));
 
-    handler.handle({ queryId: 'queryId', field: 'foo', value: 'bar', type: FieldType.Unknown, contexts: {} });
-
-    expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'NOT foo:bar');
+    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT do:panic');
   });
 
-  it('appends negated term to existing query', () => {
-    asMock(QueriesStore.getInitialState).mockReturnValue(mockQueries('queryId', 'answer:42'));
+  it('appends _exists_ fragment for proper field in case of missing bucket in input', async () => {
+    const query = createQuery('answer:42');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
 
-    const handler = new ExcludeFromQueryHandler();
+    await dispatch(ExcludeFromQueryHandler({
+      queryId: 'queryId',
+      field: 'do',
+      value: MISSING_BUCKET_NAME,
+    }));
 
-    handler.handle({ queryId: 'queryId', field: 'do', value: 'panic', type: FieldType.Unknown, contexts: {} });
-
-    expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT do:panic');
+    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND _exists_:do');
   });
 
-  it('escapes special characters in field value', () => {
-    asMock(QueriesStore.getInitialState).mockReturnValue(mockQueries('queryId', '*'));
+  it('escapes special characters in field value', async () => {
+    const query = createQuery('*');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
 
-    const handler = new ExcludeFromQueryHandler();
+    await dispatch(ExcludeFromQueryHandler({
+      queryId: 'queryId',
+      field: 'something',
+      value: 'foo && || : \\ / + - ! ( ) { } [ ] ^ " ~ * ? bar',
+    }));
 
-    handler.handle({ queryId: 'queryId', field: 'something', value: 'foo && || : \\ / + - ! ( ) { } [ ] ^ " ~ * ? bar', type: FieldType.Unknown, contexts: {} });
-
-    expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'NOT something:"foo && || : \\\\ / + - ! ( ) { } [ ] ^ \\" ~ * ? bar"');
+    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'NOT something:"foo && || : \\\\ / + - ! ( ) { } [ ] ^ \\" ~ * ? bar"');
   });
 
   describe('for dashboards', () => {
-    beforeEach(() => {
-      asMock(ViewStore.getInitialState).mockReturnValue({
-        view: View.builder().type(View.Type.Dashboard).build(),
-        activeQuery: 'queryId',
-        dirty: false,
-        isNew: false,
-      });
+    it('retrieves query string from global override', async () => {
+      const query = createQuery('answer:42');
+      const view = createViewWithQuery(query, View.Type.Dashboard);
+      const state = {
+        view: { view },
+        searchExecution: {
+          executionState: SearchExecutionState.create(
+            Immutable.Map(),
+            GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'something' }),
+          ),
+        },
+      } as RootState;
+      const dispatch = mockDispatch(state);
 
-      asMock(GlobalOverrideStore.getInitialState).mockReturnValue(GlobalOverride.empty()
-        .toBuilder()
-        .query({ type: 'elasticsearch', query_string: 'something' })
-        .build());
+      await dispatch(ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'do',
+        value: 'panic',
+      }));
 
-      GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined as GlobalOverrideStoreState)));
-      SearchActions.refresh = mockAction();
-    });
-
-    it('retrieves query string from global override', () => {
-      const handler = new ExcludeFromQueryHandler();
-
-      return handler.handle({ queryId: 'queryId', field: 'do', value: 'panic', type: FieldType.Unknown, contexts: {} })
-        .then(() => {
-          expect(GlobalOverrideActions.query).toHaveBeenCalledWith('something AND NOT do:panic');
-          expect(SearchActions.refresh).toHaveBeenCalled();
-        });
+      expect(updateQueryString).toHaveBeenCalledWith('queryId', 'something AND NOT do:panic');
     });
   });
 });

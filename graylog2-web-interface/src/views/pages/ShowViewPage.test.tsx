@@ -16,59 +16,35 @@
  */
 import * as React from 'react';
 import { List } from 'immutable';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import mockAction from 'helpers/mocking/MockAction';
+import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
 import StreamsContext from 'contexts/StreamsContext';
-import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import ViewDeserializer from 'views/logic/views/ViewDeserializer';
+import useQuery from 'routing/useQuery';
+import useFetchView from 'views/hooks/useFetchView';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
-import type { ViewJson } from 'views/logic/views/View';
-import ErrorsActions from 'actions/errors/ErrorsActions';
-import { SearchExecutionStateActions } from 'views/stores/SearchExecutionStateStore';
+import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import ShowViewPage from './ShowViewPage';
-
-jest.mock('stores/connect', () => (x) => x);
-jest.mock('views/logic/views/ViewDeserializer', () => jest.fn((x) => Promise.resolve(x)));
-
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    get: jest.fn(() => Promise.reject()),
-    update: {
-      completed: {
-        listen: jest.fn(),
-      },
-    },
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    execute: mockAction(),
-  },
-}));
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateActions: {},
-  SearchExecutionStateStore: { listen: jest.fn() },
-}));
 
 jest.mock('actions/errors/ErrorsActions', () => ({
   report: jest.fn(),
 }));
 
 jest.mock('views/components/Search', () => 'extended-search-page');
-jest.mock('routing/withLocation', () => (x) => x);
-jest.mock('routing/withParams', () => (x) => x);
+jest.mock('views/hooks/useFetchView');
+jest.mock('views/hooks/useLoadView');
+jest.mock('views/logic/views/UseProcessHooksForView');
 
-jest.mock('components/common/Spinner', () => () => <span>Spinner</span>);
+jest.mock('routing/useParams');
+jest.mock('routing/useQuery');
 
 describe('ShowViewPage', () => {
-  const viewJson = {
+  const view = View.fromJSON({
     id: 'foo',
     type: 'DASHBOARD',
     title: 'Foo',
@@ -77,109 +53,53 @@ describe('ShowViewPage', () => {
     search_id: 'foosearch',
     properties: List<any>(),
     state: {},
-    dashboard_state: { widgets: [], positions: [] },
     created_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
-  } as ViewJson;
-  const SimpleShowViewPage = (props) => (
+    favorite: false,
+  }).toBuilder()
+    .search(Search.create().toBuilder().parameters([]).build())
+    .build();
+  const SimpleShowViewPage = () => (
     <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
-      <ShowViewPage location={{ query: {} }}
-                    params={{ viewId: 'foo' }}
-                    {...props} />
+      <ShowViewPage />
     </StreamsContext.Provider>
   );
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.resetModules();
+    asMock(useQuery).mockReturnValue({});
+    asMock(useParams).mockReturnValue({ viewId: 'foo' });
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view, executionState: SearchExecutionState.empty() });
+    asMock(useFetchView).mockResolvedValue(view);
   });
 
   it('renders Spinner while loading', async () => {
-    const mockGet = () => new Promise<ViewJson>((resolve) => {
-      setTimeout(resolve, 30000, viewJson);
-    });
-
-    asMock(ViewManagementActions.get).mockImplementation(mockAction(mockGet));
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     render(<SimpleShowViewPage />);
 
-    await screen.findByText('Spinner');
+    await screen.findByText('Loading...');
   });
 
   it('loads view with id passed from props', () => {
-    asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.reject())));
     render(<SimpleShowViewPage />);
 
-    expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
+    expect(useFetchView).toHaveBeenCalledWith('foo');
   });
 
-  it('reports NotFoundError error if loading view returns 404', async () => {
-    const error = new Error('Not found');
+  it('fetches views again if view id prop changes', () => {
+    const { rerender } = render(<SimpleShowViewPage />);
 
-    // @ts-ignore
-    error.status = 404;
-    asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.reject(error))));
+    expect(useFetchView).toHaveBeenCalledWith('foo');
 
-    render(<SimpleShowViewPage />);
+    asMock(useParams).mockReturnValue({ viewId: 'bar' });
 
-    await waitFor(() => {
-      expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
-    });
+    rerender(<SimpleShowViewPage />);
 
-    await waitFor(() => {
-      expect(ErrorsActions.report).toHaveBeenCalledWith({
-        error,
-        type: NotFoundErrorType,
-      });
-    });
-  });
-
-  it('passes loaded view to ViewDeserializer', async () => {
-    asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.resolve(viewJson))));
-    SearchExecutionStateActions.setParameterValues = mockAction();
-    const search = Search.create().toBuilder().parameters([]).build();
-
-    asMock(ViewDeserializer).mockImplementation((response: ViewJson) => {
-      const view = View.fromJSON(response).toBuilder().search(search).build();
-
-      return Promise.resolve(view);
-    });
-
-    render(<SimpleShowViewPage />);
-
-    await waitFor(() => expect(ViewDeserializer).toHaveBeenCalledWith(viewJson, {}));
-  });
-
-  it('calls ViewLoader upon mount', () => {
-    const viewLoader = jest.fn(() => Promise.resolve());
-
-    render(<SimpleShowViewPage viewLoader={viewLoader} />);
-
-    expect(viewLoader).toHaveBeenCalled();
-  });
-
-  it('calls ViewLoader again if view id prop changes', () => {
-    const viewLoader = jest.fn(() => Promise.resolve());
-    const { rerender } = render(<SimpleShowViewPage viewLoader={viewLoader} />);
-
-    expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
-
-    rerender(<SimpleShowViewPage viewLoader={viewLoader} params={{ viewId: 'bar' }} />);
-
-    expect(viewLoader).toHaveBeenCalledWith('bar', [], [], {}, expect.anything(), expect.anything());
-  });
-
-  it('does not call ViewLoader again if view id prop does not change', () => {
-    const viewLoader = jest.fn(() => Promise.resolve());
-    const { rerender } = render(<SimpleShowViewPage viewLoader={viewLoader} />);
-
-    expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
-
-    viewLoader.mockClear();
-
-    rerender(<SimpleShowViewPage viewLoader={viewLoader} params={{ viewId: 'foo' }} />);
-
-    expect(viewLoader).not.toHaveBeenCalled();
+    expect(useFetchView).toHaveBeenCalledWith('bar');
   });
 });

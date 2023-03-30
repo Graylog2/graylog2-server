@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Display current page as active in navigation."
+
+pulls = ["13498"]

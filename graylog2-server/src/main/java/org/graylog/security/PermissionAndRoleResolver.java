@@ -40,4 +40,6 @@ public interface PermissionAndRoleResolver {
      * @return the resolved roleIds
      */
     Set<String> resolveRolesForPrincipal(GRN principal);
+
+    Set<GRN> resolveGrantees(GRN principal);
 }

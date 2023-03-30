@@ -20,8 +20,17 @@ import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+import java.util.Map;
+
 public interface Notification extends Persisted {
+    // Some pre-defined detail keys
+    final String KEY_TITLE = "title";
+    final String KEY_DESCRIPTION = "description";
+
     Notification addType(Type type);
+
+    Notification addKey(String key);
 
     Notification addTimestamp(DateTime timestamp);
 
@@ -33,6 +42,9 @@ public interface Notification extends Persisted {
 
     Type getType();
 
+    @Nullable
+    String getKey();
+
     Severity getSeverity();
 
     String getNodeId();
@@ -40,6 +52,8 @@ public interface Notification extends Persisted {
     Notification addDetail(String key, Object value);
 
     Object getDetail(String key);
+
+    Map<String, Object> getDetails();
 
     Notification addNode(String nodeId);
 
@@ -52,13 +66,14 @@ public interface Notification extends Persisted {
         ES_UNAVAILABLE,
         NO_INPUT_RUNNING,
         INPUT_FAILED_TO_START,
+        INPUT_FAILING,
         INPUT_FAILURE_SHUTDOWN,
         CHECK_SERVER_CLOCKS,
         OUTDATED_VERSION,
         EMAIL_TRANSPORT_CONFIGURATION_INVALID,
         EMAIL_TRANSPORT_FAILED,
         STREAM_PROCESSING_DISABLED,
-        GC_TOO_LONG,
+        @Deprecated GC_TOO_LONG,
         JOURNAL_UTILIZATION_TOO_HIGH,
         JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
         OUTPUT_DISABLED,
@@ -73,7 +88,8 @@ public interface Notification extends Persisted {
         LEGACY_LDAP_CONFIG_MIGRATION,
         MULTI_LEADER,
         NO_LEADER,
-        ARCHIVING_SUMMARY
+        ARCHIVING_SUMMARY,
+        SEARCH_ERROR
     }
 
     enum Severity {

@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import lodash from 'lodash';
+import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import Routes from 'routing/Routes';
 import { Link, LinkContainer } from 'components/common/router';
@@ -26,6 +27,7 @@ import {
   IfPermitted,
   Icon,
   ShareButton,
+  Spinner,
 } from 'components/common';
 import {
   Button,
@@ -33,16 +35,11 @@ import {
   Label,
   MenuItem,
 } from 'components/bootstrap';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
-export type EventDefinition = {
-  id: string,
-  config: {
-    type: string,
-  },
-  title: string,
-};
+import type { EventDefinition } from '../event-definitions-types';
 
 type Props = {
   context: {
@@ -75,7 +72,32 @@ const EventDefinitionEntry = ({
   onCopy,
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
-  const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
+  const isScheduled = get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(eventDefinition);
+
+  const isSystemEventDefinition = (): boolean => {
+    return eventDefinition.config.type === 'system-notifications-v1';
+  };
+
+  const titleSuffix = (): JSX.Element | undefined => {
+    if (isSystemEventDefinition()) {
+      return undefined;
+    }
+
+    const plugin = getConditionPlugin(eventDefinition.config.type);
+
+    const suffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
+
+    if (isScheduled) {
+      return suffix;
+    }
+
+    return <span>{suffix} <Label bsStyle="warning">disabled</Label></span>;
+  };
+
+  const showActions = (): boolean => {
+    return scopePermissions?.is_mutable;
+  };
 
   const handleCopy = () => {
     onCopy(eventDefinition);
@@ -100,41 +122,50 @@ const EventDefinitionEntry = ({
   }
 
   const actions = (
-    <React.Fragment key={`actions-${eventDefinition.id}`}>
-      <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-        <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-          <Button bsStyle="info">
-            <Icon name="edit" /> Edit
-          </Button>
-        </LinkContainer>
-      </IfPermitted>
+    <ButtonToolbar key={`actions-${eventDefinition.id}`}>
+      {showActions() && (
+        <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
+            <Button data-testid="edit-button">
+              <Icon name="edit" /> Edit
+            </Button>
+          </LinkContainer>
+        </IfPermitted>
+      )}
+
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
-      <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+
+      {!isSystemEventDefinition() && (
         <DropdownButton id="more-dropdown" title="More" pullRight>
           <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
           <MenuItem divider />
+
           {toggle}
-          <MenuItem divider />
-          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+
+          {showActions() && (
+            <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+              <MenuItem divider />
+              <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
+            </IfPermitted>
+          )}
         </DropdownButton>
-      </IfPermitted>
-    </React.Fragment>
+      )}
+    </ButtonToolbar>
   );
 
-  const plugin = getConditionPlugin(eventDefinition.config.type);
-  let titleSuffix = <div>{plugin?.displayName ?? eventDefinition.config.type}</div>;
-
-  if (!isScheduled) {
-    titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
-  }
-
   const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>;
+
+  if (loadingScopePermissions) {
+    return (
+      <Spinner text="Loading Event Definitions" />
+    );
+  }
 
   return (
     <>
       <EntityListItem key={`event-definition-${eventDefinition.id}`}
                       title={linkTitle}
-                      titleSuffix={titleSuffix}
+                      titleSuffix={titleSuffix()}
                       description={renderDescription(eventDefinition, context)}
                       actions={actions} />
       {showEntityShareModal && (

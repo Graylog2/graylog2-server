@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class CollectorStatus {
@@ -36,11 +38,16 @@ public abstract class CollectorStatus {
     @JsonProperty("verbose_message")
     public abstract String verboseMessage();
 
+    @JsonProperty("configuration_id")
+    @Nullable
+    public abstract String configurationId();
+
     @JsonCreator
     public static CollectorStatus create(@JsonProperty("collector_id") String collectorId,
                                          @JsonProperty("status") int status,
                                          @JsonProperty("message") String message,
-                                         @JsonProperty("verbose_message") String verboseMessage) {
-        return new AutoValue_CollectorStatus(collectorId, status, message, verboseMessage);
+                                         @JsonProperty("verbose_message") String verboseMessage,
+                                         @JsonProperty("configuration_id") @Nullable String configurationId) {
+        return new AutoValue_CollectorStatus(collectorId, status, message, verboseMessage, configurationId);
     }
 }

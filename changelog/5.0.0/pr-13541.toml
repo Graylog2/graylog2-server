@@ -1,0 +1,5 @@
+type = "s"
+message = "Update Jackson to latest stable version 2.13.4"
+
+issues = ["Graylog2/graylog-plugin-enterprise#3674"]
+pulls = ["13541"]

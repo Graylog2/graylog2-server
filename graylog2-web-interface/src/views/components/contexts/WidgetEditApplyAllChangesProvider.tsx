@@ -17,10 +17,11 @@
 import * as React from 'react';
 import { useContext, useRef, useCallback, useMemo } from 'react';
 
-import { WidgetActions } from 'views/stores/WidgetStore';
 import type Widget from 'views/logic/widgets/Widget';
 import UserNotification from 'util/UserNotification';
 import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
+import useAppDispatch from 'stores/useAppDispatch';
+import { updateWidget } from 'views/logic/slices/widgetActions';
 
 import WidgetEditApplyAllChangesContext from './WidgetEditApplyAllChangesContext';
 
@@ -34,13 +35,14 @@ const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
   const setDisableWidgetEditSubmit = useCallback((disabled: boolean) => setDisabled('widget-edit-apply-all-changes', disabled), [setDisabled]);
   const applySearchControlsChanges = useRef(null);
   const applyElementConfigurationChanges = useRef(null);
+  const dispatch = useAppDispatch();
 
   const bindApplySearchControlsChanges = useCallback((updateWidgetConfig) => {
     applySearchControlsChanges.current = updateWidgetConfig;
   }, []);
 
-  const bindApplyElementConfigurationChanges = useCallback((updateWidget) => {
-    applyElementConfigurationChanges.current = updateWidget;
+  const bindApplyElementConfigurationChanges = useCallback((_updateWidget) => {
+    applyElementConfigurationChanges.current = _updateWidget;
   }, []);
 
   const applyAllWidgetChanges = useCallback(() => {
@@ -68,7 +70,7 @@ const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
     if (hasChanges) {
       setDisableWidgetEditSubmit(true);
 
-      return WidgetActions.update(widget.id, newWidget)
+      return dispatch(updateWidget(widget.id, newWidget))
         .catch((error) => {
           UserNotification.error(`Applying widget changes failed with status: ${error}`);
 
@@ -77,7 +79,7 @@ const WidgetEditApplyAllChangesProvider = ({ children, widget }: Props) => {
     }
 
     return Promise.resolve();
-  }, [widget, setDisableWidgetEditSubmit]);
+  }, [widget, setDisableWidgetEditSubmit, dispatch]);
 
   const contextValue = useMemo(() => ({
     applyAllWidgetChanges,

@@ -17,23 +17,32 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import Store from 'logic/local-storage/Store';
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import PluggableSearchBarControls from './PluggableSearchBarControls';
 
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 jest.mock('hooks/useFeature', () => (key) => key === 'search_filter');
 
+jest.mock('logic/local-storage/Store', () => ({
+  get: jest.fn(),
+  set: jest.fn(),
+}));
+
 describe('PluggableSearchBarControls', () => {
-  const createPluggableSearchBarControl = (overrides = {}) => {
-    return () => ({
-      id: 'example-component',
-      placement: 'right',
-      component: () => <div>Example Component</div>,
-      ...overrides,
-    });
-  };
+  beforeEach(() => {
+    asMock(usePluginEntities).mockReturnValue([]);
+    Store.get.mockReturnValue(false);
+  });
+
+  const createPluggableSearchBarControl = (overrides = {}) => () => ({
+    id: 'example-component',
+    placement: 'right',
+    component: () => <div>Example Component</div>,
+    ...overrides,
+  });
 
   it('should render left search bar controls from plugins', () => {
     const example = createPluggableSearchBarControl({ placement: 'left' });
@@ -65,5 +74,18 @@ describe('PluggableSearchBarControls', () => {
     render(<PluggableSearchBarControls />);
 
     expect(screen.queryByText('Filters')).not.toBeInTheDocument();
+  });
+
+  it('should not render anything when there are no pluggable controls and search filter preview is hidden', () => {
+    Store.get.mockReturnValue(true);
+    const { container } = render(<PluggableSearchBarControls />);
+
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('should not render anything when there are no pluggable controls and `showLeftControls` is `false`', () => {
+    const { container } = render(<PluggableSearchBarControls showLeftControls={false} />);
+
+    expect(container.firstChild).toBeNull();
   });
 });

@@ -15,15 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import type { IconName } from 'components/common/Icon';
-import Icon from 'components/common/Icon';
+import { SortIcon } from 'components/common';
 
 type Props = {
   config: MessagesWidgetConfig,
@@ -34,22 +32,8 @@ type Props = {
 
 type DirectionStrategy = {
   handleSortChange: (changeSort: (direction: Direction) => void) => void,
-  icon: IconName,
-  sortActive: boolean,
   tooltip: (fieldName: string) => string,
 };
-
-const SortIcon = styled.button<{ sortActive: boolean }>(({ sortActive, theme }) => {
-  const color = sortActive ? theme.colors.gray[20] : theme.colors.gray[70];
-
-  return css`
-    border: 0;
-    background: transparent;
-    color: ${color};
-    padding: 5px;
-    cursor: pointer;
-  `;
-});
 
 const _tooltip = (fieldName: string, newDirection: Direction) => {
   return `Sort ${fieldName} ${newDirection.direction}`;
@@ -70,24 +54,18 @@ const _isFieldSortActive = (config: MessagesWidgetConfig, fieldName: string) => 
 };
 
 const DirectionStrategyAsc: DirectionStrategy = {
-  icon: 'sort-amount-down',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Descending),
   handleSortChange: (changeSort) => changeSort(Direction.Descending),
-  sortActive: true,
 };
 
 const DirectionStrategyDesc: DirectionStrategy = {
-  icon: 'sort-amount-up',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Ascending),
   handleSortChange: (changeSort) => changeSort(Direction.Ascending),
-  sortActive: true,
 };
 
 const DirectionStrategyNoSort: DirectionStrategy = {
-  icon: Direction.Descending.equals(defaultSortDirection) ? DirectionStrategyDesc.icon : DirectionStrategyAsc.icon,
   tooltip: (fieldName: string) => _tooltip(fieldName, defaultSortDirection),
   handleSortChange: (changeSort) => changeSort(defaultSortDirection),
-  sortActive: false,
 };
 
 const _directionStrategy = (config: MessagesWidgetConfig, fieldName: string) => {
@@ -105,17 +83,14 @@ const _directionStrategy = (config: MessagesWidgetConfig, fieldName: string) => 
 
 const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Props) => {
   const changeSort = (nextDirection: Direction) => _changeSort(nextDirection, config, fieldName, onSortChange, setLoadingState);
-  const { sortActive, tooltip, handleSortChange, icon }: DirectionStrategy = _directionStrategy(config, fieldName);
+
+  const activeDirection = _isFieldSortActive(config, fieldName) ? config.sort[0].direction.direction : null;
+  const { tooltip, handleSortChange }: DirectionStrategy = _directionStrategy(config, fieldName);
 
   return (
-    <SortIcon sortActive={sortActive}
-              title={tooltip(fieldName)}
-              type="button"
-              aria-label={tooltip(fieldName)}
-              onClick={() => handleSortChange(changeSort)}
-              data-testid="messages-sort-icon">
-      <Icon name={icon} />
-    </SortIcon>
+    <SortIcon activeDirection={activeDirection}
+              onChange={() => handleSortChange(changeSort)}
+              title={tooltip(fieldName)} />
   );
 };
 

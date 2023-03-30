@@ -1,0 +1,72 @@
+{
+  "id": "5d9b51d6af140aba42e87469",
+  "queries": [
+    {
+      "id": "f0a1f93c-8400-40de-83ac-94149dbf447c",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "type": "keyword",
+        "keyword": "Last 2 Years"
+      },
+      "filter": {
+        "type": "or",
+        "filters": [
+          {
+            "type": "stream",
+            "filters": null,
+            "id": "5cdab2293d27467fbe9e8a72",
+            "title": null
+          }
+        ]
+      },
+      "search_types": [
+        {
+          "timerange": null,
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [],
+          "id": "76414720-2191-4fa3-8037-074facf16a56",
+          "series": [
+            {
+              "type": "stddev",
+              "id": "stddev(files_changed)",
+              "field": "files_changed"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "field": "author",
+              "limit": 15
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        }
+      ]
+    }
+  ],
+  "parameters": [
+    {
+      "type": "value-parameter-v1",
+      "name": "project",
+      "title": "Project",
+      "description": "",
+      "data_type": "string",
+      "default_value": "graylog2-server",
+      "optional": false,
+      "binding": {
+        "type": "value",
+        "value": ""
+      }
+    }
+  ]
+}

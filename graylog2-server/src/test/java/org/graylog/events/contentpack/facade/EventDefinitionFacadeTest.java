@@ -38,6 +38,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationFunction;
@@ -62,7 +63,11 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -78,10 +83,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -92,17 +99,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionFacadeTest {
+    public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    private ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private ObjectMapper objectMapper;
 
     private EventDefinitionFacade facade;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    private MongoJackObjectMapperProvider mapperProvider;
 
     @Mock
     private DBEventProcessorStateService stateService;
@@ -115,25 +123,32 @@ public class EventDefinitionFacadeTest {
     @Mock
     private DBEventDefinitionService eventDefinitionService;
     @Mock
+    private DBEventDefinitionService mockEventDefinitionService;
+    @Mock
     private EventDefinitionHandler eventDefinitionHandler;
     @Mock
     private UserService userService;
     @Mock
     private EntityOwnershipService entityOwnershipService;
+    @Mock
+    private EventProcessorConfig mockEventProcessorConfig;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
+        objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 AggregationEventProcessorConfig.class,
                 PersistToStreamsStorageHandler.Config.class,
                 TemplateFieldValueProvider.Config.class,
                 AggregationEventProcessorConfigEntity.class);
+        mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+
         stateService = mock(DBEventProcessorStateService.class);
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, entityOwnershipService);
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES));
         eventDefinitionHandler = new EventDefinitionHandler(
                 eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
@@ -247,7 +262,8 @@ public class EventDefinitionFacadeTest {
         when(jobSchedulerClock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
-        final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "kmerz"));
+        final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
+                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
 
@@ -302,6 +318,19 @@ public class EventDefinitionFacadeTest {
         assertThat(excerpt.title()).isEqualTo("title");
         assertThat(excerpt.id()).isEqualTo(ModelId.of("5d4032513d2746703d1467f6"));
         assertThat(excerpt.type()).isEqualTo(ModelTypes.EVENT_DEFINITION_V1);
+    }
+
+    @Test
+    public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
+        EventDefinitionFacade testFacade = new EventDefinitionFacade(
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
+        EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
+
+        when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);
+        when(mockEventDefinitionService.streamAll()).thenReturn(Stream.of(dto));
+
+        final Set<EntityExcerpt> excerpts = testFacade.listEntityExcerpts();
+        assertThat(excerpts.size()).isEqualTo(0);
     }
 
     @Test
@@ -360,5 +389,21 @@ public class EventDefinitionFacadeTest {
         assertThat(graph).isNotNull();
         Set<Entity> expectedNodes = ImmutableSet.of(eventEntityV1, notificationV1);
         assertThat(graph.nodes()).isEqualTo(expectedNodes);
+    }
+
+    static EventDefinitionDto validEventDefinitionDto(EventProcessorConfig config) {
+        return EventDefinitionDto.builder()
+                .title("Test")
+                .id("id")
+                .description("Test")
+                .priority(1)
+                .config(config)
+                .keySpec(ImmutableList.of())
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.builder()
+                        .gracePeriodMs(60000)
+                        .backlogSize(0)
+                        .build())
+                .build();
     }
 }

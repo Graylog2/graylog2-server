@@ -1,0 +1,16 @@
+type = "changed"
+message = "Disable two TLS ciphers that are considered weak."
+
+issues = ["14428"]
+pulls = ["14592"]
+
+contributors = [""]
+
+details.user = """
+This change removes these two weak ciphers from our default configuration:
+
+ https://ciphersuite.info/cs/TLS_RSA_WITH_AES_128_GCM_SHA256/
+ https://ciphersuite.info/cs/TLS_RSA_WITH_AES_256_GCM_SHA384/
+
+If you need them, add TLSv1.1 to the `enabled_tls_protocols` setting.
+"""

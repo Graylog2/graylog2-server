@@ -28,8 +28,6 @@ jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(['getInitialState', () => ({ nodes: { existingNode: { short_node_id: 'foobar', hostname: 'existing.node' } } })]),
 }));
 
-jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
-
 type ForwarderReceivedByProps = {
   inputId: string,
   forwarderNodeId: string,
@@ -74,7 +72,7 @@ describe('FormatReceivedBy', () => {
         forwarder: [{
           isLocalNode,
           ForwarderReceivedBy,
-          messageLoaders: { ForwarderInputDropdown: () => <></> },
+          messageLoaders: { ForwarderInputDropdown: () => <div /> },
         }],
       },
     };

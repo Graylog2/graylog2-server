@@ -84,7 +84,7 @@ public class Messages {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
                         if (attempt.hasException()) {
-                            LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                            LOG.warn("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
                         } else if (attempt.getAttemptNumber() > 1) {
                             LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
                         }

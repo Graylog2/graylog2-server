@@ -1,0 +1,5 @@
+type = "c"
+message = "Forwarder inputs can be used for the 'match input' stream rule."
+
+issues = ["graylog-plugin-cloud#1066"]
+pulls = ["14240", "graylog-plugin-enterprise#4485"]

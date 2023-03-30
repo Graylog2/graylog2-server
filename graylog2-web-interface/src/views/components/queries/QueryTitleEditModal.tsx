@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
-import type { TitlesMap } from 'views/stores/TitleTypes';
 
 /**
  * Component that allows the user to update a QueryTab title.
@@ -28,16 +27,15 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
  */
 
 type Props = {
-  onTitleChange: (newTitle: string) => Promise<TitlesMap>,
+  onTitleChange: (newTitle: string) => void,
 };
 
 type State = {
   titleDraft: string,
+  showModal: boolean,
 };
 
 class QueryTitleEditModal extends React.Component<Props, State> {
-  modal: BootstrapModalForm = React.createRef();
-
   static propTypes = {
     onTitleChange: PropTypes.func.isRequired,
   };
@@ -46,16 +44,21 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     super(props);
 
     this.state = {
+      showModal: false,
       titleDraft: '',
     };
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = (activeQueryTitle: string) => {
     this.setState({
       titleDraft: activeQueryTitle,
+      showModal: true,
     });
+  };
 
-    this.modal.open();
+  close = () => {
+    this.setState({ showModal: false });
   };
 
   _onDraftSave = () => {
@@ -63,7 +66,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     const { onTitleChange } = this.props;
 
     onTitleChange(titleDraft);
-    this.modal.close();
+    this.close();
   };
 
   _onDraftChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,13 +74,14 @@ class QueryTitleEditModal extends React.Component<Props, State> {
   };
 
   render() {
-    const { titleDraft } = this.state;
+    const { titleDraft, showModal } = this.state;
 
     return (
-      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+      <BootstrapModalForm show={showModal}
                           title="Editing dashboard page title"
                           onSubmitForm={this._onDraftSave}
-                          submitButtonText="Save"
+                          onCancel={this.close}
+                          submitButtonText="Update title"
                           bsSize="large">
         <Input autoFocus
                help="Enter a helpful dashboard page title. It has a maximum length of 40 characters."

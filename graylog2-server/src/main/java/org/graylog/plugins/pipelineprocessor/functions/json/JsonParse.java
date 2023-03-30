@@ -19,21 +19,21 @@ package org.graylog.plugins.pipelineprocessor.functions.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class JsonParse extends AbstractFunction<JsonNode> {
-    private static final Logger log = LoggerFactory.getLogger(JsonParse.class);
+    private static final RateLimitedLog log = getRateLimitedLog(JsonParse.class);
     public static final String NAME = "parse_json";
 
     private final ObjectMapper objectMapper;
@@ -57,11 +57,11 @@ public class JsonParse extends AbstractFunction<JsonNode> {
                 JsonUtils.deleteBelow(node, depth);
             }
             if (node == null) {
-                throw new IOException("null result");
+                throw new IOException(context.pipelineErrorMessage("null result"));
             }
             return node;
         } catch (IOException e) {
-            log.warn("Unable to parse JSON", e);
+            log.warn(context.pipelineErrorMessage("Unable to parse JSON"), e);
         }
         return MissingNode.getInstance();
     }

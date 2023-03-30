@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import type Query from 'views/logic/queries/Query';
+import useAppSelector from 'stores/useAppSelector';
+import { selectCurrentQuery } from 'views/logic/slices/viewSelectors';
 
-const useCurrentQuery = (): Query => useStore(CurrentQueryStore);
+const useCurrentQuery = () => useAppSelector(selectCurrentQuery);
+
 export default useCurrentQuery;

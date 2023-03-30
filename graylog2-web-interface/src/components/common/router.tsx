@@ -16,25 +16,19 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import type { Location } from 'history';
+import { Link, useLocation, useLinkClickHandler } from 'react-router-dom';
 
-import history from 'util/History';
+// list of children which are being used for navigation and should receive the `active` class.
+const NAV_CHILDREN = ['Button', 'NavItem'];
 
-export type HistoryElement = Location;
+const _targetPathname = (target: string) => String(target).split(/[?#]/)[0];
 
-const _targetPathname = (to) => {
-  const target = typeof to?.pathname === 'string' ? to.pathname : to;
-
-  return String(target).split(/[?#]/)[0];
-};
-
-const _setActiveClassName = (pathname, to, currentClassName, displayName) => {
+const _setActiveClassName = (pathname: string, to: string, currentClassName: string, displayName: string, relativeActive: boolean) => {
   const targetPathname = _targetPathname(to);
-  const isActive = targetPathname === pathname;
-  const isButton = displayName === 'Button';
+  const isActive = relativeActive ? pathname.startsWith(targetPathname) : targetPathname === pathname;
+  const isNavComponent = NAV_CHILDREN.includes(displayName);
 
-  return isButton && isActive
+  return isNavComponent && isActive
     ? `active ${currentClassName ?? ''}`
     : currentClassName;
 };
@@ -43,23 +37,31 @@ type ChildrenProps = {
   onClick: (e?: any) => void,
   className: string,
   href: string,
+  disabled: boolean,
 };
 type Props = {
   children: React.ReactElement<ChildrenProps, React.ComponentType>,
   onClick?: () => unknown,
-  to: string,
+  to: string | { pathname: string },
+  // if set the child component will receive the active class
+  // when the part of the URL path matches the `to` prop.
+  relativeActive?: boolean,
 };
 
-const isLeftClickEvent = (e) => (e.button === 0);
+const isLeftClickEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => (e.button === 0);
 
-const isModifiedEvent = (e) => !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
+const isModifiedEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
 
-const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
+const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest }: Props) => {
   const { pathname } = useLocation();
-  const { props: { onClick: childrenOnClick, className }, type: { displayName } } = React.Children.only(children);
-  const childrenClassName = useMemo(() => _setActiveClassName(pathname, to, className, displayName), [pathname, to, className, displayName]);
-  const _onClick = useCallback((e) => {
-    if (!isLeftClickEvent(e) || isModifiedEvent(e)) {
+  const { props: { onClick: childrenOnClick, className, disabled }, type: { displayName } } = React.Children.only(children);
+  const to = (typeof toProp === 'object' && 'pathname' in toProp) ? toProp.pathname : toProp;
+  const childrenClassName = useMemo(() => _setActiveClassName(pathname, to, className, displayName, relativeActive),
+    [pathname, to, className, displayName, relativeActive],
+  );
+  const handleClick = useLinkClickHandler(to);
+  const _onClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isLeftClickEvent(e) || isModifiedEvent(e) || disabled) {
       return;
     }
 
@@ -74,10 +76,22 @@ const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
       onClick();
     }
 
-    history.push(to);
-  }, [childrenOnClick, onClick, to]);
+    if (!disabled) {
+      handleClick(e);
+    }
+  }, [disabled, childrenOnClick, onClick, handleClick]);
 
-  return React.cloneElement(React.Children.only(children), { ...rest, className: childrenClassName, onClick: _onClick, href: to });
+  return React.cloneElement(React.Children.only(children), {
+    ...rest,
+    className: childrenClassName,
+    onClick: _onClick,
+    disabled: !!disabled,
+    href: disabled ? undefined : to,
+  });
+};
+
+LinkContainer.defaultProps = {
+  relativeActive: false,
 };
 
 export {

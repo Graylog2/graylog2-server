@@ -22,7 +22,7 @@ import type { AggregationElement } from './AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 type Props = {
-  aggregationElements: Array<AggregationElement>,
+  aggregationElements: Array<AggregationElement<keyof WidgetConfigFormValues>>,
   formValues: WidgetConfigFormValues,
   onSelect: (elementKey: string) => void,
 }

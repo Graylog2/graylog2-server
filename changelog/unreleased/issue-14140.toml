@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Saved searches can be now sorted by 3 additional fields: owner, description and summary."
+
+issues = ["14140"]
+pulls = ["14355"]

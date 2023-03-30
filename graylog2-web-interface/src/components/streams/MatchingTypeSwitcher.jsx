@@ -39,7 +39,7 @@ const StreamRuleConnector = styled.div(({ theme }) => css`
     margin-bottom: 0;
   }
 
-  input[type=radio] {
+  input[type='radio'] {
     margin-top: 2px;
     margin-bottom: 2px;
   }

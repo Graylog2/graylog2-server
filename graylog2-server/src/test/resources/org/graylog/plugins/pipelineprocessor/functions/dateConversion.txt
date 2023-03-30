@@ -1,0 +1,6 @@
+rule "dateConversion"
+when true
+then
+    set_field ("utcHour", to_long(to_date($message.timestamp).hourOfDay));
+    set_field ("manilaHour", to_long(to_date($message.timestamp, "Asia/Manila").hourOfDay));
+end

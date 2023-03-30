@@ -26,18 +26,18 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 const RolesOverviewPage = () => (
   <DocumentTitle title="Roles Overview">
-    <PageHeader title="Roles Overview">
+    <PageHeader title="Roles Overview"
+                documentationLink={{
+                  title: 'Permissions documentation',
+                  path: DocsHelper.PAGES.USERS_ROLES,
+                }}
+                topActions={(
+                  <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+                    <Button bsStyle="info">Roles Overview</Button>
+                  </LinkContainer>
+                )}>
       <span>Overview of Graylog&apos;s roles. Roles allow granting capabilities to users, like creating dashboards or event definitions.</span>
 
-      <span>
-        Learn more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                           text="documentation" />
-      </span>
-
-      <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-        <Button bsStyle="info">Roles Overview</Button>
-      </LinkContainer>
     </PageHeader>
 
     <Row className="content">

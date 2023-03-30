@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import type { Pagination } from 'stores/PaginationTypes';
 import mockedPermissions from 'logic/permissions/mocked';
 import type { PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
-import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
+import { DataTable, PaginatedList, Spinner, NoSearchResult } from 'components/common';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';
 import SharedEntitiesOverviewItem from './SharedEntitiesOverviewItem';
@@ -83,7 +83,8 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
       </p>
       <StyledPaginatedList activePage={page}
                            totalItems={total}
-                           onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
+                           onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
+                           useQueryParameter={false}>
         <DataTable className="table-hover"
                    customFilter={(
                      <SharedEntitiesFilter onSearch={_handleSearch}
@@ -91,7 +92,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
                    )}
                    dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
                    filterKeys={[]}
-                   noDataText={<EmptyResult>No shared entities have been found.</EmptyResult>}
+                   noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
                    headers={TABLE_HEADERS}
                    id="shared-entities"
                    rowClassName="no-bm"

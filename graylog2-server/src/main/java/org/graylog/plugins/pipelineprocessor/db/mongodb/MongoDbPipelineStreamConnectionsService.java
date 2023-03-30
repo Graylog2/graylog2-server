@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -32,15 +33,15 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+
 public class MongoDbPipelineStreamConnectionsService implements PipelineStreamConnectionsService {
-    private static final Logger log = LoggerFactory.getLogger(MongoDbPipelineStreamConnectionsService.class);
+    private static final RateLimitedLog log = getRateLimitedLog(MongoDbPipelineStreamConnectionsService.class);
 
     private static final String COLLECTION = "pipeline_processor_pipelines_streams";
 

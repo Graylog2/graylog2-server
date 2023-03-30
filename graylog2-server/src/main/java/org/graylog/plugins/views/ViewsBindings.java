@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.favorites.FavoritesResource;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
 import org.graylog.plugins.views.migrations.V20190127111728_MigrateWidgetFormatSettings;
 import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
@@ -39,6 +40,7 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.EngineBindings;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.SearchConfig;
 import org.graylog.plugins.views.search.engine.SearchConfigProvider;
@@ -103,9 +105,11 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationCon
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.DataTableVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.HeatmapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.ScatterVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
@@ -113,12 +117,15 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisual
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog.plugins.views.startpage.StartPageResource;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
 import org.graylog2.contentpacks.facades.DashboardEntityCreator;
 import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.rest.resources.suggestions.EntitySuggestionResource;
 
 import java.util.Set;
 
@@ -133,6 +140,8 @@ public class ViewsBindings extends ViewsModule {
         registerExportBackendProvider();
 
         addSystemRestResource(DashboardsResource.class);
+        addSystemRestResource(StartPageResource.class);
+        addSystemRestResource(FavoritesResource.class);
         addSystemRestResource(FieldTypesResource.class);
         addSystemRestResource(MessagesResource.class);
         addSystemRestResource(ExportJobsResource.class);
@@ -143,7 +152,8 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
         addSystemRestResource(SuggestionsResource.class);
-         addSystemRestResource(QueryValidationResource.class);
+        addSystemRestResource(QueryValidationResource.class);
+        addSystemRestResource(EntitySuggestionResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 
@@ -183,6 +193,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(TimeUnitIntervalDTO.class);
         registerJacksonSubtype(AutoInterval.class);
         registerJacksonSubtype(AutoIntervalDTO.class);
+
+        bind(RecentActivityUpdatesListener.class).asEagerSingleton();
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
@@ -245,6 +257,8 @@ public class ViewsBindings extends ViewsModule {
         // The ViewResolver binder must be explicitly initialized to avoid an initialization error when
         // no values are bound.
         viewResolverBinder();
+
+        install(new EngineBindings());
     }
 
     private void registerExportBackendProvider() {
@@ -273,6 +287,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(LineVisualizationConfigDTO.class);
         registerJacksonSubtype(AreaVisualizationConfigDTO.class);
         registerJacksonSubtype(HeatmapVisualizationConfigDTO.class);
+        registerJacksonSubtype(DataTableVisualizationConfigDTO.class);
+        registerJacksonSubtype(ScatterVisualizationConfigDTO.class);
     }
 
     private void registerParameterSubtypes() {

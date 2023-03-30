@@ -14,26 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
+import type { XYVisualization, AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 import VisualizationConfig from './VisualizationConfig';
+
+export const DEFAULT_BARMODE = 'group';
 
 export type BarMode = 'stack' | 'group' | 'overlay' | 'relative';
 
 export type BarVisualizationConfigType = {
   barmode: BarMode,
+  axisType: AxisType,
 };
 
-export default class BarVisualizationConfig extends VisualizationConfig {
+export type BarVisualizationConfigJson = {
+  barmode: BarMode,
+  axis_type: AxisType,
+};
+
+export default class BarVisualizationConfig extends VisualizationConfig implements XYVisualization {
   _value: BarVisualizationConfigType;
 
-  constructor(barmode: BarMode) {
+  constructor(barmode: BarMode, axisType: AxisType) {
     super();
-    this._value = { barmode };
+    this._value = { barmode, axisType };
   }
 
   get barmode() {
     return this._value.barmode;
+  }
+
+  get axisType() {
+    return this._value.axisType;
   }
 
   get opacity() {
@@ -41,47 +54,59 @@ export default class BarVisualizationConfig extends VisualizationConfig {
   }
 
   toBuilder() {
-    const { barmode } = this._value;
+    const { barmode, axisType } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({ barmode }));
+    return new Builder({ barmode, axisType });
   }
 
-  static create(barmode: BarMode) {
-    return new BarVisualizationConfig(barmode);
+  static create(barmode: BarMode, axisType: AxisType = DEFAULT_AXIS_TYPE) {
+    return new BarVisualizationConfig(barmode, axisType);
+  }
+
+  static empty() {
+    return BarVisualizationConfig.create(DEFAULT_BARMODE);
   }
 
   toJSON() {
-    const { barmode } = this._value;
+    const { barmode, axisType } = this._value;
 
     return {
       barmode,
+      axis_type: axisType,
     };
   }
 
-  static fromJSON(_type: string, value: BarVisualizationConfigType) {
-    const { barmode } = value;
+  static fromJSON(_type: string, value: BarVisualizationConfigJson) {
+    const { barmode, axis_type } = value;
 
-    return BarVisualizationConfig.create(barmode);
+    return BarVisualizationConfig.create(barmode, axis_type);
   }
 }
 
-type InternalBuilderState = Immutable.Map<string, any>;
+type InternalBuilderState = {
+  barmode: BarMode,
+  axisType: AxisType,
+};
 
 class Builder {
-  value: InternalBuilderState;
+  private readonly value: InternalBuilderState;
 
-  constructor(value: InternalBuilderState = Immutable.Map()) {
-    this.value = value;
+  constructor(value: InternalBuilderState) {
+    this.value = Object.freeze({ ...value });
   }
 
   barmode(value: BarMode) {
-    return new Builder(this.value.set('barmode', value));
+    return new Builder({ ...this.value, barmode: value });
+  }
+
+  axisType(value: AxisType) {
+    return new Builder({ ...this.value, axisType: value });
   }
 
   build() {
-    const { barmode } = this.value.toObject();
+    const { barmode, axisType } = this.value;
 
-    return new BarVisualizationConfig(barmode);
+    return new BarVisualizationConfig(barmode, axisType);
   }
 }

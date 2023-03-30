@@ -1,0 +1,5 @@
+type = "added"
+message = "Standardize sort icons for data table and message list."
+
+issues = ["13982"]
+pulls = ["13987"]

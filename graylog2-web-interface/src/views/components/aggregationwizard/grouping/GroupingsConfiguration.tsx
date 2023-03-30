@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { HoverForHelp, SortableList } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
@@ -39,58 +39,83 @@ const RollupColumnsLabel = styled.div`
   align-items: center;
 `;
 
-const RollupHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
+type RollupHoverForHelpProps = {
+  children: React.ReactNode,
+  title: string,
+};
+
+const RollupHoverForHelp = styled((props: RollupHoverForHelpProps) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
-const GroupByConfiguration = () => {
+type GroupingsItemProps = Omit<React.ComponentProps<typeof ElementConfigurationContainer>, 'testIdPrefix' | 'onRemove' | 'elementTitle' | 'children'> & {
+  /* eslint-disable react/no-unused-prop-types */
+  item: { id: string },
+  index: number,
+  /* eslint-enable react/no-unused-prop-types */
+};
+
+const SettingsSeparator = styled.hr(({ theme }) => css`
+  border-style: dashed;
+  border-color: ${theme.colors.variant.lighter.default};
+  margin-top: 5px;
+  margin-bottom: 5px;
+`);
+
+const GroupingsConfiguration = () => {
   const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => () => {
     setValues(GroupingElement.onRemove(index, values));
   }, [setValues, values]);
 
-  const isEmpty = !groupBy?.groupings;
+  const isEmpty = (groupBy?.groupings ?? []).length === 0;
+
+  const GroupingsItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
+    <ElementConfigurationContainer key={`grouping-${item.id}`}
+                                   dragHandleProps={dragHandleProps}
+                                   draggableProps={draggableProps}
+                                   className={className}
+                                   testIdPrefix={`grouping-${index}`}
+                                   onRemove={removeGrouping(index)}
+                                   elementTitle={GroupingElement.title}
+                                   ref={ref}>
+      <GroupingConfiguration index={index} />
+    </ElementConfigurationContainer>
+  ), [removeGrouping]);
 
   return (
     <>
-      {!isEmpty && (
-        <Field name="groupBy.columnRollup">
-          {({ field: { name, onChange, value } }) => (
-            <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
-                                   checked={value}
-                                   disabled={disableColumnRollup}>
-              <RollupColumnsLabel>
-                Rollup Columns
-                <RollupHoverForHelp title="Rollup Columns">
-                  When rollup is enabled, an additional trace totalling individual subtraces will be included.
-                </RollupHoverForHelp>
-              </RollupColumnsLabel>
-            </RollupColumnsCheckbox>
-          )}
-        </Field>
-      )}
       <FieldArray name="groupBy.groupings"
                   validateOnChange={false}
                   render={() => (
                     <SortableList items={groupBy?.groupings}
                                   onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
-                                  customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-                                    <ElementConfigurationContainer key={`grouping-${item.id}`}
-                                                                   dragHandleProps={dragHandleProps}
-                                                                   draggableProps={draggableProps}
-                                                                   className={className}
-                                                                   testIdPrefix={`grouping-${index}`}
-                                                                   onRemove={removeGrouping(index)}
-                                                                   elementTitle={GroupingElement.title}
-                                                                   ref={ref}>
-                                      <GroupingConfiguration index={index} />
-                                    </ElementConfigurationContainer>
-                                  )} />
+                                  customListItemRender={GroupingsItem} />
                   )} />
-
+      {!isEmpty && (
+        <>
+          <SettingsSeparator />
+          <ElementConfigurationContainer elementTitle="Settings">
+            <Field name="groupBy.columnRollup">
+              {({ field: { name, onChange, value } }) => (
+                <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
+                                       checked={value ?? false}
+                                       disabled={disableColumnRollup}>
+                  <RollupColumnsLabel>
+                    Rollup Columns
+                    <RollupHoverForHelp title="Rollup Columns">
+                      When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                    </RollupHoverForHelp>
+                  </RollupColumnsLabel>
+                </RollupColumnsCheckbox>
+              )}
+            </Field>
+          </ElementConfigurationContainer>
+        </>
+      )}
     </>
   );
 };
 
-export default GroupByConfiguration;
+export default GroupingsConfiguration;

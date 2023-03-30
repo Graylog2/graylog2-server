@@ -40,12 +40,12 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
     private static final String BIND_DN = "cn=admin,dc=example,dc=com";
     private static final String BIND_PASSWORD = "admin";
 
-    public static OpenLDAPContainer create() {
-        return new OpenLDAPContainer();
+    public static OpenLDAPContainer create(String customLdifPath) {
+        return new OpenLDAPContainer(customLdifPath);
     }
 
-    public static OpenLDAPContainer createWithTLS() {
-        return new OpenLDAPContainer()
+    public static OpenLDAPContainer createWithTLS(String customLdifPath) {
+        return new OpenLDAPContainer(customLdifPath)
                 .withEnv("LDAP_TLS", "true")
                 .withEnv("LDAP_TLS_VERIFY_CLIENT", "allow")
                 .withEnv("LDAP_TLS_CRT_FILENAME", "server-cert.pem")
@@ -59,7 +59,7 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
                 .withExposedPorts(PORT, TLS_PORT);
     }
 
-    public OpenLDAPContainer() {
+    public OpenLDAPContainer(String customLdifPath) {
         super(IMAGE_NAME);
 
         waitingFor(Wait.forLogMessage(".*slapd starting.*", 1));
@@ -68,7 +68,7 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
         withEnv("LDAP_DOMAIN", "example.com");
         withEnv("LDAP_TLS", "false");
         withFileSystemBind(
-                LDAPTestUtils.getResourcePath(LDAPTestUtils.NESTED_GROUPS_LDIF),
+                LDAPTestUtils.getResourcePath(customLdifPath),
                 "/container/service/slapd/assets/config/bootstrap/ldif/custom/custom.ldif",
                 BindMode.READ_ONLY
         );

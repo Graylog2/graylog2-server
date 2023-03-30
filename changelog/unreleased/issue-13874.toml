@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Clone Action style on Collectors configurations list"
+
+issues = ["13874"]
+pulls = ["13899"]

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Spinner } from 'components/common';
 import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -49,17 +49,13 @@ export default class RuleMetricsConfig extends React.Component {
     onChange(nextConfig).then(this.closeModal);
   };
 
-  openModal = () => {
-    this.modal.open();
-  };
-
   closeModal = () => {
-    this.modal.close();
+    this.props.onClose();
   };
 
   propagateChange = (key, value) => {
     const { config } = this.props;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     this.setState({ nextConfig });
@@ -72,7 +68,7 @@ export default class RuleMetricsConfig extends React.Component {
   };
 
   render() {
-    const { config, onClose } = this.props;
+    const { config } = this.props;
     const { nextConfig } = this.state;
 
     if (!config) {
@@ -80,12 +76,11 @@ export default class RuleMetricsConfig extends React.Component {
     }
 
     return (
-      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+      <BootstrapModalForm show
                           title="Rule Metrics Configuration"
                           onSubmitForm={this.saveConfiguration}
-                          onModalClose={onClose}
-                          show
-                          submitButtonText="Save">
+                          onCancel={this.closeModal}
+                          submitButtonText="Update configuration">
         <Alert bsStyle="warning">
           Rule metrics should only be enabled to debug a performance issue because collecting the
           metrics will slow down message processing and increase memory usage.

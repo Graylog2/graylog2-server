@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.bindings.providers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
@@ -58,5 +59,15 @@ class ObjectMapperProviderTest {
         assertThat(mappers).hasSameSizeAs(availableZones);
     }
 
+    @Test
+    void durationSerialization() throws JsonProcessingException {
+        final ObjectMapperProvider omp = new ObjectMapperProvider();
+        final ObjectMapper objectMapper = omp.get();
 
+        final String javaDuration = objectMapper.writeValueAsString(java.time.Duration.ofSeconds(10));
+        final String jodaDuration = objectMapper.writeValueAsString(org.joda.time.Duration.standardSeconds(10));
+
+        assertThat(javaDuration).isEqualTo("\"PT10S\"");
+        assertThat(jodaDuration).isEqualTo("10000");
+    }
 }

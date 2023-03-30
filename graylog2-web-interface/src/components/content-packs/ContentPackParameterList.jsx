@@ -16,10 +16,10 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 
 import { Badge, Button, Modal, ButtonToolbar } from 'components/bootstrap';
-import { DataTable, SearchForm, Icon } from 'components/common';
+import { DataTable, SearchForm, Icon, ModalSubmit } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 import ObjectUtils from 'util/ObjectUtils';
@@ -47,6 +47,7 @@ class ContentPackParameterList extends React.Component {
     super(props);
 
     this.state = {
+      showModal: false,
       filteredParameters: props.contentPack.parameters || [],
       filter: undefined,
     };
@@ -127,17 +128,17 @@ class ContentPackParameterList extends React.Component {
   };
 
   _parameterModal(parameter) {
-    let modalRef;
     let editParameter;
 
     const { contentPack, onAddParameter } = this.props;
+    const { showModal } = this.state;
 
     const closeModal = () => {
-      modalRef.close();
+      this.setState({ showModal: false });
     };
 
     const openModal = () => {
-      modalRef.open();
+      this.setState({ showModal: true });
     };
 
     const addParameter = () => {
@@ -145,10 +146,13 @@ class ContentPackParameterList extends React.Component {
     };
 
     const size = parameter ? 'xsmall' : 'small';
-    const name = parameter ? 'Edit' : 'Create parameter';
+    const titleName = parameter ? 'Edit parameter' : 'Create parameter';
+    const triggerButtonName = parameter ? 'Edit' : 'Create parameter';
 
     const modal = (
-      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={showModal}
+                             onHide={closeModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
@@ -162,12 +166,9 @@ class ContentPackParameterList extends React.Component {
                                     parameterToEdit={parameter} />
         </Modal.Body>
         <Modal.Footer>
-          <div className="pull-right">
-            <ButtonToolbar>
-              <Button bsStyle="primary" onClick={addParameter}>Save</Button>
-              <Button onClick={closeModal}>Close</Button>
-            </ButtonToolbar>
-          </div>
+          <ModalSubmit onSubmit={addParameter}
+                       onCancel={closeModal}
+                       submitButtonText={titleName} />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -178,7 +179,7 @@ class ContentPackParameterList extends React.Component {
                 bsSize={size}
                 title="Edit Modal"
                 onClick={openModal}>
-          {name}
+          {triggerButtonName}
         </Button>
         {modal}
       </>
@@ -200,8 +201,7 @@ class ContentPackParameterList extends React.Component {
         {!readOnly && this._parameterModal()}
         {!readOnly && (<span><br /><br /></span>)}
         <SearchForm onSearch={this._filterParameters}
-                    onReset={() => { this._filterParameters(''); }}
-                    searchButtonLabel="Filter" />
+                    onReset={() => { this._filterParameters(''); }} />
         <DataTable id="parameter-list"
                    headers={headers}
                    className={ContentPackParameterListStyle.scrollable}

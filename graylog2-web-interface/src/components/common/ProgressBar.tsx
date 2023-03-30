@@ -82,7 +82,6 @@ const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => 
   return css`
     height: 100%;
     font-size: ${theme.fonts.size.small};
-    line-height: 20px;
     text-align: center;
     ${boxShadow('inset 0 -1px 0')}
     transition: width 500ms ease-in-out;
@@ -106,7 +105,7 @@ const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => 
       animation: ${animatedStripes} 2s linear infinite;
     `}
     ${progressBarVariants}
-  `;
+`;
 });
 
 const ProgressBar = ({ bars, className }: ProgressBarProps) => {

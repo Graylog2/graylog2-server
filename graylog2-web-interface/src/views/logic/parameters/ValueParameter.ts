@@ -26,7 +26,6 @@ type InternalBuilderState = Immutable.Map<string, any>;
 export default class ValueParameter extends Parameter {
   static type = 'value-parameter-v1';
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static Builder: typeof Builder;
 
   constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding) {
@@ -37,7 +36,6 @@ export default class ValueParameter extends Parameter {
     return new ValueParameter(name, title, description, dataType, defaultValue, optional, binding);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { type, name, title, description, dataType, defaultValue, optional, binding } = this._value;
 
@@ -66,7 +64,6 @@ export default class ValueParameter extends Parameter {
     return new ValueParameter(name, title, description, data_type, default_value, optional, ParameterBinding.fromJSON(binding));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()

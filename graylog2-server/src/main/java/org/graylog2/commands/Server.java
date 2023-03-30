@@ -32,11 +32,13 @@ import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
+import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
 import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
@@ -69,7 +71,9 @@ import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
+import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.decorators.DecoratorBindings;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
@@ -91,6 +95,7 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.VersionAwareStorageModule;
+import org.graylog2.streams.StreamsModule;
 import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
@@ -126,6 +131,7 @@ public class Server extends ServerBootstrap {
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
+    private final GeoIpProcessorConfig geoIpProcessorConfig = new GeoIpProcessorConfig();
 
     public Server() {
         super("server", configuration);
@@ -143,7 +149,7 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Module> getCommandBindings() {
+    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new VersionAwareStorageModule(),
@@ -159,10 +165,10 @@ public class Server extends ServerBootstrap {
                 new MessageInputBindings(),
                 new MessageOutputBindings(configuration, chainingClassLoader),
                 new RotationStrategyBindings(elasticsearchConfiguration),
-                new RetentionStrategyBindings(),
+                new RetentionStrategyBindings(elasticsearchConfiguration),
                 new PeriodicalBindings(),
                 new ObjectMapperModule(chainingClassLoader),
-                new RestApiBindings(),
+                new RestApiBindings(configuration),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
                 new AuditBindings(),
@@ -182,7 +188,10 @@ public class Server extends ServerBootstrap {
                 new PrometheusMetricsModule(),
                 new ClusterConfigValidatorModule(),
                 new MapWidgetModule(),
-                new SearchFiltersModule()
+                new SearchFiltersModule(),
+                new ScopedEntitiesModule(),
+                new ScriptingApiModule(featureFlags),
+                new StreamsModule()
         );
         return modules.build();
     }
@@ -203,7 +212,8 @@ public class Server extends ServerBootstrap {
                 processingStatusConfig,
                 jobSchedulerConfiguration,
                 prometheusExporterConfiguration,
-                tlsConfiguration);
+                tlsConfiguration,
+                geoIpProcessorConfig);
     }
 
     @Override

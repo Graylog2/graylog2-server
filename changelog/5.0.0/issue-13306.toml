@@ -1,0 +1,11 @@
+type = "fixed"
+message = "Fix performance regression on UDP inputs with newer Java versions"
+
+issues = ["13306"]
+pulls = ["14005"]
+
+contributors = ["@giangi"]
+
+details.user = """
+UDP inputs became slow when running Graylog with a Java version > 8.
+"""

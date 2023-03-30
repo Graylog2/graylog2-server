@@ -1,0 +1,57 @@
+{
+  "processing_status": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "node_id": "abc-123",
+      "node_lifecycle_status": "RUNNING",
+      "updated_at": {
+        "$date": "2019-01-01T03:30:00.000Z"
+      },
+      "receive_times": {
+        "ingest": {
+          "$date": "2019-01-01T03:30:00.000Z"
+        },
+        "post_processing": {
+          "$date": "2019-01-01T03:30:00.000Z"
+        },
+        "post_indexing": {
+          "$date": "2019-01-01T03:30:00.000Z"
+        }
+      },
+      "input_journal": {
+        "uncommitted_entries": 0,
+        "read_messages_1m_rate": 0,
+        "written_messages_1m_rate": 0
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "node_id": "abc-456",
+      "node_lifecycle_status": "RUNNING",
+      "updated_at": {
+        "$date": "2019-01-01T03:30:00.000Z"
+      },
+      "receive_times": {
+        "ingest": {
+          "$date": "2019-01-01T03:30:00.000Z"
+        },
+        "post_processing": {
+          "$date": "2019-01-01T03:30:00.000Z"
+        },
+        "post_indexing": {
+          "$date": "2019-01-01T02:30:00.000Z"
+        }
+      },
+      "process_buffer_usage": 2,
+      "input_journal": {
+        "uncommitted_entries": 0,
+        "read_messages_1m_rate": 0,
+        "written_messages_1m_rate": 0
+      }
+    }
+  ]
+}

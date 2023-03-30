@@ -51,14 +51,15 @@ describe('WidgetErrorBoundary', () => {
     asMock(console.error).mockRestore();
   });
 
-  it('passes own props to its children', () => {
-    const Component = (props) => <div data-testid="child-component-test-id" {...props} />;
-    const { getByTestId } = render((
+  it('passes own props to its children', async () => {
+    // eslint-disable-next-line react/require-default-props
+    const Component = ({ extraProp }: { extraProp?: string }) => <div>{extraProp}</div>;
+    const { findByText } = render((
       <WidgetErrorBoundary extraProp="The extra prop">
         <Component />
       </WidgetErrorBoundary>
     ));
 
-    expect(getByTestId('child-component-test-id')).toHaveAttribute('extraProp', 'The extra prop');
+    await findByText('The extra prop');
   });
 });

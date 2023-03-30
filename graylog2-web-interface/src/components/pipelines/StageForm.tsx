@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { useStore } from 'stores/connect';
 import { Link } from 'components/common/router';
@@ -26,6 +26,8 @@ import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { RulesStore } from 'stores/rules/RulesStore';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
   pipeline: PipelineType,
@@ -35,7 +37,8 @@ type Props = {
 };
 
 const StageForm = ({ pipeline, stage, create, save }: Props) => {
-  const modalRef = useRef<BootstrapModalForm>();
+  const currentUser = useCurrentUser();
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const _initialStageNumber = useMemo(() => (
     create ? Math.max(...pipeline.stages.map((s) => s.stage)) + 1 : stage.stage
@@ -45,9 +48,7 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
   const { rules } = useStore(RulesStore);
 
   const openModal = () => {
-    if (modalRef.current) {
-      modalRef.current.open();
-    }
+    setShowModal(true);
   };
 
   const _onChange = ({ target }) => {
@@ -59,9 +60,7 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
   };
 
   const _closeModal = () => {
-    if (modalRef.current) {
-      modalRef.current.close();
-    }
+    setShowModal(false);
   };
 
   const _onSaved = () => {
@@ -101,14 +100,16 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
 
   return (
     <span>
-      <Button onClick={openModal}
+      <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+              onClick={openModal}
               bsStyle={create ? 'success' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}
       </Button>
-      <BootstrapModalForm ref={modalRef}
+      <BootstrapModalForm show={showModal}
                           title={`${create ? 'Add new' : 'Edit'} stage ${nextStage.stage}`}
                           onSubmitForm={_handleSave}
-                          submitButtonText="Save">
+                          onCancel={_closeModal}
+                          submitButtonText={create ? 'Add stage' : 'Update stage'}>
         <fieldset>
           <Input type="number"
                  id="stage"

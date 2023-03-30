@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, ButtonToolbar } from 'components/bootstrap';
+import { ExternalLinkButton } from 'components/common';
+import { ButtonToolbar } from 'components/bootstrap';
 
 type Props = {
   href: string,
@@ -34,13 +35,12 @@ const ProductLink = ({ href, clusterId, children } : Props) => {
 
   return (
     <ButtonToolbar>
-      <Button type="button"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={hrefWithParam}
-              bsStyle="primary">
+      <ExternalLinkButton target="_blank"
+                          rel="noopener noreferrer"
+                          href={hrefWithParam}
+                          bsStyle="primary">
         {children}
-      </Button>
+      </ExternalLinkButton>
     </ButtonToolbar>
   );
 };

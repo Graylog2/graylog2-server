@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "_id": {
+        "$oid": "5b8e4ef17ad37b64ee87eb57"
+      },
+      "full_name": "test-user",
+      "username": "test-user",
+      "email": "testuser@graylog.org",
+      "password": "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions": [
+      ],
+      "timezone": "UTC",
+      "roles": [
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "5b8e4ef17ad37b64ee87eb58"
+      },
+      "full_name": "test-user",
+      "username": "test-user",
+      "email": "testuser@graylog.org",
+      "password": "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions": [
+      ],
+      "timezone": "UTC",
+      "roles": [
+      ]
+    }
+  ]
+}

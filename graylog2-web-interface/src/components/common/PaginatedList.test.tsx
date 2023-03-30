@@ -15,22 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent, screen } from 'wrappedTestingLibrary';
+import { useLocation } from 'react-router-dom';
+import type { Location } from 'history';
 
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { asMock } from 'helpers/mocking';
 
 import PaginatedList from './PaginatedList';
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(() => ({
+    search: '',
+  })),
+}));
+
 describe('PaginatedList', () => {
   it('should display Pagination', () => {
-    const { getByText } = render(<PaginatedList totalItems={100} onChange={() => {}}><div>The list</div></PaginatedList>);
+    const { getByText } = render(
+      <PaginatedList totalItems={100}
+                     onChange={() => {}}>
+        <div>The list</div>
+      </PaginatedList>,
+    );
 
     expect(getByText('The list')).not.toBeNull();
     expect(getByText('1')).not.toBeNull();
   });
 
   it('should not dived by 0 if pageSize is 0 Pagination', () => {
-    const { getByText } = render(<PaginatedList totalItems={100} pageSize={0} onChange={() => {}}><div>The list</div></PaginatedList>);
+    const { getByText } = render(
+      <PaginatedList totalItems={100}
+                     pageSize={0}
+                     onChange={() => {}}>
+        <div>The list</div>
+      </PaginatedList>,
+    );
 
     expect(getByText('The list')).not.toBeNull();
   });
@@ -49,13 +70,73 @@ describe('PaginatedList', () => {
 
   it('should reset current page on page size change', () => {
     const onChangeStub = jest.fn();
-    const { getByLabelText } = render(<PaginatedList totalItems={200} onChange={onChangeStub} activePage={3}><div>The list</div></PaginatedList>);
+    const { getByRole } = render(
+      <PaginatedList totalItems={200}
+                     onChange={onChangeStub}
+                     activePage={3}>
+        <div>The list</div>
+      </PaginatedList>);
 
-    const pageSizeInput = getByLabelText('Show');
+    fireEvent.click(getByRole('button', {
+      name: /configure page size/i,
+    }));
 
-    fireEvent.change(pageSizeInput, { target: { value: 100 } });
+    fireEvent.click(screen.getByRole('menuitem', { name: /100/ }));
 
-    expect(onChangeStub).toHaveBeenCalledTimes(1);
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
+  });
+
+  describe('with state based on URL query params', () => {
+    it('should set <page> query parameter as active page', async () => {
+      const currentPage = 4;
+
+      asMock(useLocation).mockReturnValue({
+        search: `?page=${currentPage}`,
+      } as Location);
+
+      const { findByTestId } = render(
+        <PaginatedList totalItems={200}
+                       onChange={() => {}}
+                       activePage={3}>
+          <div>The list</div>
+        </PaginatedList>);
+
+      const graylogPagination = await findByTestId('graylog-pagination');
+      const activePageElement = graylogPagination.getElementsByClassName('active');
+
+      expect(activePageElement).not.toBeNull();
+      expect(activePageElement[0].textContent).toContain(`${currentPage}`);
+    });
+  });
+
+  describe('with internal state', () => {
+    it('should update active page, when prop changes', async () => {
+      const { findByTestId, rerender } = render(
+        <PaginatedList totalItems={200}
+                       onChange={() => {}}
+                       activePage={3}
+                       useQueryParameter={false}>
+          <div>The list</div>
+        </PaginatedList>);
+
+      const graylogPagination = await findByTestId('graylog-pagination');
+      const activePageElement = graylogPagination.getElementsByClassName('active');
+
+      expect(activePageElement[0].textContent).toContain('3');
+
+      rerender(
+        <PaginatedList totalItems={200}
+                       onChange={() => {}}
+                       activePage={1}
+                       useQueryParameter={false}>
+          <div>The list</div>
+        </PaginatedList>,
+      );
+
+      await findByTestId('graylog-pagination');
+      const newActivePageElement = graylogPagination.getElementsByClassName('active');
+
+      expect(newActivePageElement[0].textContent).toContain('1');
+    });
   });
 });

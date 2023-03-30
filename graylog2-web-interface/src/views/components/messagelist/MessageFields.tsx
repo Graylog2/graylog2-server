@@ -33,7 +33,7 @@ type Props = {
 };
 
 const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }: { theme: DefaultTheme }) => css`
-  color: ${theme.colors.gray[40]};
+  color: ${theme.colors.global.textDefault};
 
   dd {
     &:not(:last-child) {

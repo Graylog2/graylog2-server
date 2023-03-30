@@ -27,8 +27,10 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
@@ -39,8 +41,10 @@ import org.graylog2.storage.providers.IndexToolsAdapterProvider;
 import org.graylog2.storage.providers.IndicesAdapterProvider;
 import org.graylog2.storage.providers.MessagesAdapterProvider;
 import org.graylog2.storage.providers.MoreSearchAdapterProvider;
+import org.graylog2.storage.providers.MultiChunkResultRetrieverProvider;
 import org.graylog2.storage.providers.NodeAdapterProvider;
 import org.graylog2.storage.providers.SearchesAdapterProvider;
+import org.graylog2.storage.providers.StreamsForFieldRetrieverProvider;
 import org.graylog2.storage.providers.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider;
 import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider;
 
@@ -48,9 +52,11 @@ import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasF
 public class VersionAwareStorageModule extends AbstractModule {
     @Override
     protected void configure() {
+        bind(StreamsForFieldRetriever.class).toProvider(StreamsForFieldRetrieverProvider.class);
         bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
         bind(SearchesAdapter.class).toProvider(SearchesAdapterProvider.class);
+        bind(MultiChunkResultRetriever.class).toProvider(MultiChunkResultRetrieverProvider.class);
         bind(MoreSearchAdapter.class).toProvider(MoreSearchAdapterProvider.class);
         bind(MessagesAdapter.class).toProvider(MessagesAdapterProvider.class);
         bind(ClusterAdapter.class).toProvider(ClusterAdapterProvider.class);

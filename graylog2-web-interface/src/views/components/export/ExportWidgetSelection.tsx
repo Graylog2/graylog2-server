@@ -19,7 +19,7 @@ import type { List } from 'immutable';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type View from 'views/logic/views/View';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import { defaultCompare } from 'logic/DefaultCompare';
 import { Row, Alert } from 'components/bootstrap';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';

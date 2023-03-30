@@ -41,7 +41,9 @@ import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -55,6 +57,7 @@ import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.GrokExtractor;
 import org.graylog2.inputs.extractors.LookupTableExtractor;
+import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.lookup.LookupTableService;
@@ -65,6 +68,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -85,6 +89,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,6 +124,7 @@ public class InputFacadeTest {
     @Mock
     private ServerStatus serverStatus;
 
+
     private InputService inputService;
     private InputFacade facade;
 
@@ -135,7 +141,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
+        inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();
@@ -145,8 +151,12 @@ public class InputFacadeTest {
         final RawUDPInput.Factory rawUDPInputFactory = mock(RawUDPInput.Factory.class);
         final RawUDPInput.Descriptor rawUDPInputDescriptor = mock(RawUDPInput.Descriptor.class);
         when(rawUDPInputFactory.getDescriptor()).thenReturn(rawUDPInputDescriptor);
+        final JsonPathInput.Factory jsonPathInputFactory = mock(JsonPathInput.Factory.class);
+        final JsonPathInput.Descriptor jsonPathInputDescriptor = mock(JsonPathInput.Descriptor.class);
+        when(jsonPathInputFactory.getDescriptor()).thenReturn(jsonPathInputDescriptor);
         inputFactories.put("org.graylog2.inputs.random.FakeHttpMessageInput", fakeHttpMessageInputFactory);
         inputFactories.put("org.graylog2.inputs.raw.udp.RawUDPInput", rawUDPInputFactory);
+        inputFactories.put("org.graylog2.inputs.misc.jsonpath.JsonPathInput", jsonPathInputFactory);
 
         facade = new InputFacade(
                 objectMapper,
@@ -185,6 +195,36 @@ public class InputFacadeTest {
         assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Input Title"));
         assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.raw.udp.RawUDPInput"));
         assertThat(inputEntity.configuration()).isEmpty();
+    }
+
+    @Test
+    public void exportNativeEntityWithEncryptedValues() {
+        final ImmutableMap<String, Object> fields = ImmutableMap.of(
+                MessageInput.FIELD_TITLE, "Input Title",
+                MessageInput.FIELD_TYPE, "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
+                MessageInput.FIELD_CONFIGURATION,
+                Map.of("encrypted_value",
+                        new EncryptedValueService(UUID.randomUUID().toString()).encrypt("secret")));
+        final InputImpl input = new InputImpl(fields);
+        final ImmutableList<Extractor> extractors = ImmutableList.of();
+        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
+        final EntityDescriptor descriptor = EntityDescriptor.create(input.getId(), ModelTypes.INPUT_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportNativeEntity(inputWithExtractors, entityDescriptorIds);
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
+        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
+        assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Input Title"));
+        assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.misc.jsonpath.JsonPathInput"));
+        assertThat(inputEntity.configuration()).hasSize(1).hasEntrySatisfying("encrypted_value", ref -> {
+            assertThat(ref).isInstanceOf(ValueReference.class);
+            assertThat(((ValueReference) ref).valueType()).isEqualTo(ValueType.STRING);
+            assertThat(((ValueReference) ref).asString()).startsWith("<Encrypted value was replaced");
+        });
     }
 
     @Test
@@ -461,6 +501,7 @@ public class InputFacadeTest {
                 .data(objectMapper.convertValue(inputEntity, JsonNode.class))
                 .build();
         final LookupTableEntity whoIsEntity = LookupTableEntity.create(
+                ValueReference.of(DefaultEntityScope.NAME),
                 ValueReference.of("whois"),
                 ValueReference.of("title"),
                 ValueReference.of("description"),
@@ -473,6 +514,7 @@ public class InputFacadeTest {
         );
 
         final LookupTableEntity torNodeEntity = LookupTableEntity.create(
+                ValueReference.of(DefaultEntityScope.NAME),
                 ValueReference.of("tor-exit-node-list"),
                 ValueReference.of("title"),
                 ValueReference.of("description"),

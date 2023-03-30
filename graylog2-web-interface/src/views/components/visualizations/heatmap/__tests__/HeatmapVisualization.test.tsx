@@ -24,7 +24,6 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
-import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 import * as fixtures from './HeatmapVisualization.fixtures';
 
@@ -32,16 +31,10 @@ import HeatmapVisualization from '../HeatmapVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
-const SUT = (props: React.ComponentProps<typeof HeatmapVisualization>) => (
-  <UserDateTimeProvider tz="Europe/Berlin">
-    <HeatmapVisualization {...props} />
-  </UserDateTimeProvider>
-);
-
 describe('HeatmapVisualization', () => {
   it('generates correct props for plot component', () => {
-    const columnPivot = new Pivot('http_status', 'values');
-    const rowPivot = new Pivot('hour', 'values');
+    const columnPivot = Pivot.create(['http_status'], 'values');
+    const rowPivot = Pivot.create(['hour'], 'values');
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
@@ -65,14 +58,14 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(<SUT data={fixtures.validData}
-                               config={config}
-                               effectiveTimerange={effectiveTimerange}
-                               fields={Immutable.List()}
-                               height={1024}
-                               onChange={() => {}}
-                               toggleEdit={() => {}}
-                               width={800} />);
+    const wrapper = mount(<HeatmapVisualization data={fixtures.validData}
+                                                config={config}
+                                                effectiveTimerange={effectiveTimerange}
+                                                fields={Immutable.List()}
+                                                height={1024}
+                                                onChange={() => {}}
+                                                toggleEdit={() => {}}
+                                                width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);
@@ -80,8 +73,8 @@ describe('HeatmapVisualization', () => {
   });
 
   it('generates correct props for plot component with empty data with use smallest value as default', () => {
-    const columnPivot = new Pivot('http_status', 'values');
-    const rowPivot = new Pivot('hour', 'values');
+    const columnPivot = Pivot.create(['http_status'], 'values');
+    const rowPivot = Pivot.create(['hour'], 'values');
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
@@ -110,14 +103,14 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(<SUT data={{ chart: [] }}
-                               config={config}
-                               effectiveTimerange={effectiveTimerange}
-                               fields={Immutable.List()}
-                               height={1024}
-                               onChange={() => {}}
-                               toggleEdit={() => {}}
-                               width={800} />);
+    const wrapper = mount(<HeatmapVisualization data={{ chart: [] }}
+                                                config={config}
+                                                effectiveTimerange={effectiveTimerange}
+                                                fields={Immutable.List()}
+                                                height={1024}
+                                                onChange={() => {}}
+                                                toggleEdit={() => {}}
+                                                width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);

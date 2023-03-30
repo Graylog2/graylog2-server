@@ -14,14 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import isArray from 'lodash/isArray';
+
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
-export default (fieldName: string, type: FieldType) => {
+export default (fieldName: string | Array<string>, type: FieldType) => {
+  const fields = isArray(fieldName) ? fieldName : [fieldName];
+
   switch (type.type) {
     case 'date':
-      return new Pivot(fieldName, 'time', { interval: { type: 'auto', scaling: 1.0 } });
+      return Pivot.create(fields, 'time', { interval: { type: 'auto', scaling: 1.0 } });
     default:
-      return new Pivot(fieldName, 'values', { limit: 15 });
+      return Pivot.create(fields, 'values', { limit: 15 });
   }
 };

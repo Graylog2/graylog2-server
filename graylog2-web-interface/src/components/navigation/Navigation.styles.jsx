@@ -17,6 +17,11 @@
 import styled, { css } from 'styled-components';
 
 import { Navbar } from 'components/bootstrap';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import {
+  hoverIndicatorStyles,
+  activeIndicatorStyles,
+} from 'components/common/NavItemStateIndicator';
 
 const StyledNavbar = styled(Navbar)(({ theme }) => css`
   .dev-badge-wrap > a {
@@ -26,6 +31,35 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
   .dev-badge-wrap .dev-badge {
     margin: 0 10px;
+  }
+
+  &.navbar-default .navbar-main > li {
+    > a {
+      font-family: ${theme.fonts.family.navigation};
+      font-size: ${theme.fonts.size.navigation};
+    }
+
+    &:hover {
+      ${hoverIndicatorStyles(theme)}
+    }
+
+    &.active {
+      ${activeIndicatorStyles(theme)}
+      :hover, :focus {
+        ${activeIndicatorStyles(theme)}
+      }
+    }
+  }
+
+  .dropdown-menu li {
+    &:not(.dropdown-header) {
+      font-family: ${theme.fonts.family.navigation};
+      font-size: ${theme.fonts.size.navigation};
+    }
+
+    a {
+      padding: 6px 20px;
+    }
   }
 
   @media (max-width: 991px) {
@@ -40,7 +74,6 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
       #scratchpad-toggle {
         padding: 10px 15px;
-        line-height: 20px;
         display: block;
         width: 100%;
         text-align: left;
@@ -59,7 +92,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
           content: attr(aria-label);
         }
 
-        [class*="fa-"] {
+        [class*='fa-'] {
           display: none;
         }
       }
@@ -78,7 +111,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     .navbar-collapse {
       width: auto;
       border-top: 1px solid transparent;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%);
 
       &.collapse {
         height: auto !important;
@@ -116,7 +149,11 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
       #scratchpad-toggle,
       .dropdown-toggle {
-        padding: 15px 12px !important;
+        padding: 12px !important;
+        min-height: ${NAV_ITEM_HEIGHT};
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 

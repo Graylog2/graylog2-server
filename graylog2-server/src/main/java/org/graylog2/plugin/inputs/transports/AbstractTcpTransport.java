@@ -80,6 +80,7 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -261,7 +262,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         handlers.put("traffic-counter", () -> throughputCounter);
         handlers.put("connection-counter", () -> connectionCounter);
         if (tlsEnable) {
-            LOG.info("Enabled TLS for input [{}/{}]. key-file=\"{}\" cert-file=\"{}\"", input.getName(), input.getId(), tlsKeyFile, tlsCertFile);
+            LOG.info("Enabled TLS for input {}. key-file=\"{}\" cert-file=\"{}\"", input.toIdentifier(), tlsKeyFile, tlsCertFile);
             handlers.put("tls", getSslHandlerCallable(input));
         }
         handlers.putAll(getCustomChildChannelHandlers(input));
@@ -282,7 +283,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             certFile = tlsCertFile;
             keyFile = tlsKeyFile;
         } else {
-            LOG.warn("TLS key file or certificate file does not exist, creating a self-signed certificate for input [{}/{}].", input.getName(), input.getId());
+            LOG.warn("TLS key file or certificate file does not exist, creating a self-signed certificate for input {}.", input.toIdentifier());
 
             final String tmpDir = System.getProperty("java.io.tmpdir");
             checkState(tmpDir != null, "The temporary directory must not be null!");
@@ -303,7 +304,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                     keyFile = ssc.privateKey();
                 }
             } catch (GeneralSecurityException e) {
-                final String msg = String.format(Locale.ENGLISH, "Problem creating a self-signed certificate for input [%s/%s].", input.getName(), input.getId());
+                final String msg = String.format(Locale.ENGLISH, "Problem creating a self-signed certificate for input %s.", input.toIdentifier());
                 throw new IllegalStateException(msg, e);
             }
         }
@@ -330,7 +331,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     }
 
     private Callable<ChannelHandler> buildSslHandlerCallable(SslProvider tlsProvider, File certFile, File keyFile, String password, ClientAuth clientAuth, File clientAuthCertFile, MessageInput input) {
-        return new Callable<ChannelHandler>() {
+        return new Callable<>() {
             @Override
             public ChannelHandler call() throws Exception {
                 try {
@@ -347,8 +348,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                     if (clientAuthCertFile.exists()) {
                         clientAuthCerts = KeyUtil.loadX509Certificates(clientAuthCertFile.toPath());
                     } else {
-                        LOG.warn("Client auth configured, but no authorized certificates / certificate authorities configured for input [{}/{}]",
-                                input.getName(), input.getId());
+                        LOG.warn("Client auth configured, but no authorized certificates / certificate authorities configured for input {}",
+                                input.toIdentifier());
                         clientAuthCerts = null;
                     }
                 } else {
@@ -380,7 +381,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
     private static Set<String> getSecureCipherSuites() {
         final Set<String> openSslCipherSuites = OpenSsl.availableOpenSslCipherSuites();
-        return openSslCipherSuites.stream().filter(s -> !(s.contains("CBC") || s.contains("AES128-SHA") || s.contains("AES256-SHA") )).collect(Collectors.toSet());
+        final String[] disabledAlgorithms = {".*CBC.*", "AES128-SHA", "AES256-SHA", "ECDHE-RSA-AES128-SHA",
+                "ECDHE-RSA-AES256-SHA", "AES128-GCM-SHA256", "AES256-GCM-SHA384"};
+        return openSslCipherSuites.stream().filter(s -> Arrays.stream(disabledAlgorithms).noneMatch(s::matches)).collect(Collectors.toSet());
     }
 
     @ConfigClass

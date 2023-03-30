@@ -46,6 +46,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Set;
 
@@ -126,6 +127,7 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
                 .userUniqueIdAttribute("entryUUID")
                 .userNameAttribute("uid")
                 .userFullNameAttribute("cn")
+                .emailAttributes(new ArrayList<>())
                 .build();
         final LDAPUser entry = connector.searchUserByPrincipal(connection, searchConfig, "john").orElse(null);
 

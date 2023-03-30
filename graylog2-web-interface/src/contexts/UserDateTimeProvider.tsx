@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import AppConfig from 'util/AppConfig';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { DATE_TIME_FORMATS, getBrowserTimezone, toDateObject } from 'util/DateTime';
 
@@ -63,7 +63,7 @@ const StaticTimezoneProvider = ({ children, tz }: Required<Props>) => {
 };
 
 const CurrentUserDateTimeProvider = ({ children }: Omit<Props, 'tz'>) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
   return (

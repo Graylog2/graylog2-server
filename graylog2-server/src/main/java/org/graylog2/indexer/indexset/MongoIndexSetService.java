@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 public class MongoIndexSetService implements IndexSetService {
-    private static final String COLLECTION_NAME = "index_sets";
+    public static final String COLLECTION_NAME = "index_sets";
 
     private final JacksonDBCollection<IndexSetConfig, ObjectId> collection;
     private final ClusterConfigService clusterConfigService;

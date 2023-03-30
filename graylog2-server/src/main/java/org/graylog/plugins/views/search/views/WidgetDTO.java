@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
 @WithBeanGetter
-public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
+public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSearchFilters {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
@@ -62,6 +63,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
     public abstract String filter();
 
     @JsonProperty(FIELD_SEARCH_FILTERS)
+    @Override
     public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty(FIELD_TIMERANGE)
@@ -79,6 +81,8 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
     public static Builder builder() {
         return Builder.builder();
     }
+
+    public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public static abstract class Builder {

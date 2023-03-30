@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix non-stop loading indicator issue in authentication backends"
+
+issues = ["13023"]
+pulls = ["14283"]

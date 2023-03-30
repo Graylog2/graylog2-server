@@ -17,7 +17,7 @@
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 export const singleRowPivot = {
-  rowPivots: [{ field: 'timestamp', type: 'time', config: { interval: { type: 'auto' } } }],
+  rowPivots: [{ fields: ['timestamp'], type: 'time', config: { interval: { type: 'auto' } } }],
   columnPivots: [],
   input: [
     {
@@ -258,11 +258,11 @@ export const singleRowPivot = {
 };
 
 export const noTimePivots = {
-  rowPivots: [{ field: 'http_method', type: 'values', config: { limit: 15 } }],
+  rowPivots: [{ fields: ['http_method'], type: 'values', config: { limit: 15 } }],
   columnPivots: [
-    { field: 'action', type: 'values', config: { limit: 15 } },
+    { fields: ['action'], type: 'values', config: { limit: 15 } },
     {
-      field: 'controller',
+      fields: ['controller'],
       type: 'values',
       config: { limit: 15 },
     },

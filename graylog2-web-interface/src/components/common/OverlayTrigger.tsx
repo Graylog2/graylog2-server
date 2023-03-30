@@ -27,6 +27,7 @@ type Props = {
   overlay: React.ReactElement,
   placement: 'top' | 'right' | 'bottom' | 'left',
   trigger?: Triggers | Array<Triggers>,
+  className?: string,
   container?: React.ReactElement,
   rootClose?: boolean,
 }
@@ -53,6 +54,7 @@ class OverlayTrigger extends React.Component<Props, State> {
     rootClose: false,
     container: null,
     testId: undefined,
+    className: undefined,
   };
 
   constructor(props) {
@@ -63,13 +65,14 @@ class OverlayTrigger extends React.Component<Props, State> {
     };
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   hide() {
     this.setState({ show: false });
   }
 
   render() {
     let triggerables;
-    const { children, container, placement, overlay, rootClose, trigger, testId, ...overlayProps } = this.props;
+    const { children, container, placement, overlay, rootClose, trigger, testId, className, ...overlayProps } = this.props;
     const { show } = this.state;
 
     const setShow = (isShown: boolean) => this.setState({ show: isShown });
@@ -100,7 +103,7 @@ class OverlayTrigger extends React.Component<Props, State> {
     }
 
     return (
-      <Container ref={() => this.containerRef} data-testid={testId}>
+      <Container ref={() => this.containerRef} data-testid={testId} className={className}>
         <TriggerWrap ref={this.targetRef} className={children.props.className} role="button">
           {React.cloneElement(children, { ...triggerables, className: '' })}
         </TriggerWrap>

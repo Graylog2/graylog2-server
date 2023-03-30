@@ -16,9 +16,14 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import concat from 'lodash/concat';
+import defaultTo from 'lodash/defaultTo';
+import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 
 import * as URLUtils from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
@@ -28,6 +33,7 @@ export const EventDefinitionsActions = singletonActions(
   () => Reflux.createActions({
     listAll: { asyncResult: true },
     listPaginated: { asyncResult: true },
+    searchPaginated: { asyncResult: true },
     get: { asyncResult: true },
     create: { asyncResult: true },
     copy: { asyncResult: true },
@@ -76,7 +82,7 @@ export const EventDefinitionsStore = singletonStore(
 
     eventDefinitionsUrl({ segments = [], query = {} }) {
       const uri = new URI(this.sourceUrl);
-      const nextSegments = lodash.concat(uri.segment(), segments);
+      const nextSegments = concat(uri.segment(), segments);
 
       uri.segmentCoded(nextSegments);
       uri.query(query);
@@ -145,6 +151,38 @@ export const EventDefinitionsStore = singletonStore(
       EventDefinitionsActions.listPaginated.promise(promise);
     },
 
+    searchPaginated(newPage, newPerPage, newQuery, additional) {
+      const url = PaginationURL(`${this.sourceUrl}/paginated`, newPage, newPerPage, newQuery, additional);
+      const promise = fetch('GET', URLUtils.qualifyUrl(url)).then((response) => {
+        const {
+          elements,
+          query,
+          attributes,
+          pagination: {
+            count,
+            total,
+            page,
+            per_page: perPage,
+          },
+        } = response;
+
+        return {
+          elements,
+          attributes,
+          pagination: {
+            count,
+            total,
+            page,
+            perPage,
+            query,
+          },
+        };
+      });
+
+      EventDefinitionsActions.searchPaginated.promise(promise);
+
+      return promise;
+    },
     get(eventDefinitionId) {
       const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
 
@@ -167,12 +205,12 @@ export const EventDefinitionsStore = singletonStore(
     extractSchedulerInfo(eventDefinition) {
     // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
     // the flag from the form.
-      const clonedEventDefinition = lodash.cloneDeep(eventDefinition);
-      const { _is_scheduled } = lodash.pick(clonedEventDefinition.config, ['_is_scheduled']);
+      const clonedEventDefinition = cloneDeep(eventDefinition);
+      const { _is_scheduled } = pick(clonedEventDefinition.config, ['_is_scheduled']);
 
-      clonedEventDefinition.config = lodash.omit(clonedEventDefinition.config, ['_is_scheduled']);
+      clonedEventDefinition.config = omit(clonedEventDefinition.config, ['_is_scheduled']);
 
-      return { eventDefinition: clonedEventDefinition, isScheduled: lodash.defaultTo(_is_scheduled, true) };
+      return { eventDefinition: clonedEventDefinition, isScheduled: defaultTo(_is_scheduled, true) };
     },
 
     create(newEventDefinition) {
@@ -203,8 +241,12 @@ export const EventDefinitionsStore = singletonStore(
       const { eventDefinition } = this.extractSchedulerInfo(eventDefinitionToCopy);
       // Remove the id from the event definition to create a new copy
       delete eventDefinition.id;
+      // Remove the scheduler from the event definition to create a new copy
+      delete eventDefinition.scheduler;
       // Modify the title to indicate a copy
       eventDefinition.title = `COPY-${eventDefinition.title}`;
+      // Set the scope to DEFAULT
+      eventDefinition._scope = 'DEFAULT';
 
       const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: false } }), this.setAlertFlag(eventDefinition));
 
@@ -254,19 +296,6 @@ export const EventDefinitionsStore = singletonStore(
 
     delete(eventDefinition) {
       const promise = fetch('DELETE', this.eventDefinitionsUrl({ segments: [eventDefinition.id] }));
-
-      promise.then(
-        () => {
-          UserNotification.success('Event Definition deleted successfully',
-            `Event Definition "${eventDefinition.title}" was deleted successfully.`);
-
-          this.refresh();
-        },
-        (error) => {
-          UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-            'Could not delete Event Definition');
-        },
-      );
 
       EventDefinitionsActions.delete.promise(promise);
     },

@@ -26,25 +26,30 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import 'components/maps/configurations';
 import type { Store } from 'stores/StoreTypes';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import ConfigletContainer from './configurations/ConfigletContainer';
 import PluginConfigRows from './configurations/PluginConfigRows';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
+import UserConfig from '../components/configurations/UserConfig';
 
 const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig';
 const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
+const INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
+const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
 const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
@@ -55,6 +60,8 @@ const _onUpdate = (configType: string) => {
         return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
       case URL_WHITELIST_CONFIG:
         return ConfigurationsActions.updateWhitelist(configType, config);
+      case INDEX_SETS_DEFAULTS_CONFIG:
+        return ConfigurationsActions.updateIndexSetDefaults(configType, config);
       default:
         return ConfigurationsActions.update(configType, config);
     }
@@ -65,18 +72,20 @@ const ConfigurationsPage = () => {
   const [loaded, setLoaded] = useState(false);
   const pluginSystemConfigs = usePluginEntities('systemConfigurations');
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
-  const permissions = useStore(CurrentUserStore as Store<{ currentUser: { permissions: Array<string> } }>, (state) => state?.currentUser?.permissions);
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     const promises = [
       ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG),
       ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
       ConfigurationsActions.list(SIDECAR_CONFIG),
+      ConfigurationsActions.list(INDEX_SETS_DEFAULTS_CONFIG),
       ConfigurationsActions.list(EVENTS_CONFIG),
       ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
+      ConfigurationsActions.listUserConfig(USER_CONFIG),
     ];
 
-    if (isPermitted(permissions, ['urlwhitelist:read'])) {
+    if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
       promises.push(ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG));
     }
 
@@ -84,7 +93,7 @@ const ConfigurationsPage = () => {
       .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
 
     Promise.allSettled([...promises, ...pluginPromises]).then(() => setLoaded(true));
-  }, [permissions, pluginSystemConfigs]);
+  }, [currentUser.permissions, pluginSystemConfigs]);
 
   let Output = (
     <Col md={12}>
@@ -98,7 +107,9 @@ const ConfigurationsPage = () => {
     const sidecarConfig = _getConfig(SIDECAR_CONFIG, configuration);
     const eventsConfig = _getConfig(EVENTS_CONFIG, configuration);
     const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
+    const indexSetsDefaultsConfig = _getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
     const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
+    const userConfig = _getConfig(USER_CONFIG, configuration);
 
     Output = (
       <>
@@ -126,7 +137,7 @@ const ConfigurationsPage = () => {
                           updateConfig={_onUpdate(EVENTS_CONFIG)} />
           </ConfigletContainer>
         )}
-        {isPermitted(permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
+        {isPermitted(currentUser.permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
           <ConfigletContainer title="URL Whitelist Configuration">
             <UrlWhiteListConfig config={urlWhiteListConfig}
                                 updateConfig={_onUpdate(URL_WHITELIST_CONFIG)} />
@@ -139,6 +150,20 @@ const ConfigurationsPage = () => {
           <ConfigletContainer title="Permissions Configuration">
             <PermissionsConfig config={permissionsConfig}
                                updateConfig={_onUpdate(PERMISSIONS_CONFIG)} />
+          </ConfigletContainer>
+        )}
+        {indexSetsDefaultsConfig && (
+          <HideOnCloud>
+            <ConfigletContainer title="Index Set Default Configuration">
+              <IndexSetsDefaultsConfig initialConfig={indexSetsDefaultsConfig}
+                                       updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
+            </ConfigletContainer>
+          </HideOnCloud>
+        )}
+        {userConfig && (
+          <ConfigletContainer title="User Configuration">
+            <UserConfig config={userConfig}
+                        updateConfig={_onUpdate(USER_CONFIG)} />
           </ConfigletContainer>
         )}
       </>

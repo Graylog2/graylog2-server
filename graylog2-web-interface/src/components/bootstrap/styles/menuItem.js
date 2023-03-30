@@ -21,7 +21,13 @@ const menuItemStyles = css(({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     
+    .dropdown-header {
+      padding: 3px 10px;
+    }
+    
     > li > a {
+      padding: 3px 10px;
+      display: flex;
       color: ${theme.colors.global.textDefault};
 
       :hover,

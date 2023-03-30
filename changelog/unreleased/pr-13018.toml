@@ -1,0 +1,5 @@
+type = "a"
+message = "Add support for configuring Index Set Defaults"
+
+issues = ["graylog-plugin-enterprise#3264", "graylog-plugin-enterprise#3319"]
+pulls = ["13018"]

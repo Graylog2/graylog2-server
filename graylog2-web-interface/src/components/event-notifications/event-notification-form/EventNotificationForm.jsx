@@ -16,11 +16,11 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Select, Spinner } from 'components/common';
-import { Alert, Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
+import { FormSubmit, Select, Spinner } from 'components/common';
+import { Alert, Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
 const getNotificationPlugin = (type) => {
@@ -123,14 +123,14 @@ class EventNotificationForm extends React.Component {
 
     return (
       <Row>
-        <Col md={12}>
+        <Col lg={8}>
           <form onSubmit={this.handleSubmit} id={formId}>
             <Input id="notification-title"
                    name="title"
                    label="Title"
                    type="text"
                    bsStyle={validation.errors.title ? 'error' : null}
-                   help={lodash.get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
+                   help={get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
                    value={notification.title}
                    onChange={this.handleChange}
                    required
@@ -154,7 +154,7 @@ class EventNotificationForm extends React.Component {
                       clearable={false}
                       required />
               <HelpBlock>
-                {lodash.get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}
+                {get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}
               </HelpBlock>
             </FormGroup>
 
@@ -184,10 +184,9 @@ class EventNotificationForm extends React.Component {
             )}
 
             {!embedded && (
-              <ButtonToolbar>
-                <Button bsStyle="primary" type="submit" disabled={!isSubmitEnabled}>{action === 'create' ? 'Create' : 'Update'}</Button>
-                <Button onClick={onCancel}>Cancel</Button>
-              </ButtonToolbar>
+              <FormSubmit disabledSubmit={!isSubmitEnabled}
+                          submitButtonText={`${action === 'create' ? 'Create' : 'Update'} notification`}
+                          onCancel={onCancel} />
             )}
           </form>
         </Col>

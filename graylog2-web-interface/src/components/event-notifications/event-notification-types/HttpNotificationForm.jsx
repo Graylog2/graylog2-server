@@ -16,11 +16,12 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 import styled from 'styled-components';
 
 import { URLWhiteListInput } from 'components/common';
-import { Button, Col, ControlLabel, Input, Row } from 'components/bootstrap';
+import { Button, Checkbox, Col, ControlLabel, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 const StyledButton = styled(Button)`
@@ -42,6 +43,7 @@ class HttpNotificationForm extends React.Component {
     api_key: '',
     api_secret: { keep_value: true },
     basic_auth: { keep_value: true },
+    skip_tls_verification: false,
   };
 
   constructor() {
@@ -59,7 +61,7 @@ class HttpNotificationForm extends React.Component {
 
   componentDidMount() {
     const { config, onChange } = this.props;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig.basic_auth = config.basic_auth?.is_set ? { keep_value: true } : null;
     nextConfig.api_secret = config.api_secret?.is_set ? { keep_value: true } : null;
@@ -72,7 +74,7 @@ class HttpNotificationForm extends React.Component {
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     onChange(nextConfig);
@@ -128,10 +130,16 @@ class HttpNotificationForm extends React.Component {
         <URLWhiteListInput label="URL"
                            onChange={this.handleChange}
                            validationState={validation.errors.url ? 'error' : null}
-                           validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
+                           validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
                            onValidationChange={this.onValidationChange}
                            url={config.url}
                            autofocus={false} />
+        <Checkbox id="skip_tls_verification"
+                  name="skip_tls_verification"
+                  onChange={this.handleChange}
+                  checked={config.skip_tls_verification}>
+          Skip TLS verification
+        </Checkbox>
         <Row>
           <Col md={12}>
             {basic_auth?.keep_value ? (
@@ -165,7 +173,7 @@ class HttpNotificationForm extends React.Component {
                    type="text"
                    onChange={this.handleChange}
                    bsStyle={validation.errors.api_key ? 'error' : null}
-                   help={lodash.get(validation, 'errors.api_key[0]', 'If an API secret is set, an API key must also be set.')}
+                   help={get(validation, 'errors.api_key[0]', 'If an API secret is set, an API key must also be set.')}
                    value={config.api_key} />
           </Col>
         </Row>
@@ -185,7 +193,7 @@ class HttpNotificationForm extends React.Component {
                      type="password"
                      onChange={this.handleSecretInputChange}
                      bsStyle={validation.errors.api_secret ? 'error' : null}
-                     help={lodash.get(validation, 'errors.api_secret[0]', 'If an API key is set, an API secret must also be set.')}
+                     help={get(validation, 'errors.api_secret[0]', 'If an API key is set, an API secret must also be set.')}
                      value={this.state.api_secret || ''}
                      buttonAfter={reset.api_secret ? (
                        <Button type="button" onClick={() => { this.undoResetSecret('api_secret'); }}>

@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const noUnusedVarsOptions = { argsIgnorePattern: '^_' };
+
 module.exports = {
   parser: '@babel/eslint-parser',
   env: {
@@ -24,13 +26,16 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       parser: '@typescript-eslint/parser',
-      plugins: ['@typescript-eslint/eslint-plugin'],
+      plugins: [
+        '@typescript-eslint/eslint-plugin',
+        '@tanstack/query',
+      ],
       rules: {
         'no-undef': 'off',
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
         'no-unused-vars': 'off',
-        '@typescript-eslint/no-unused-vars': ['error'],
+        '@typescript-eslint/no-unused-vars': ['error', noUnusedVarsOptions],
         'no-redeclare': 'off',
         '@typescript-eslint/no-redeclare': ['error'],
         'no-shadow': 'off',
@@ -53,6 +58,7 @@ module.exports = {
       extends: [
         'plugin:jest/recommended',
         'plugin:testing-library/react',
+        'plugin:@tanstack/eslint-plugin-query/recommended',
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
@@ -71,11 +77,13 @@ module.exports = {
     'plugin:import/warnings',
     'plugin:import/react',
     'plugin:jest-formatting/strict',
+    'plugin:graylog/recommended',
   ],
   plugins: [
     'import',
     'react-hooks',
     'jest-formatting',
+    'graylog',
   ],
   rules: {
     'arrow-body-style': 'off',
@@ -94,6 +102,7 @@ module.exports = {
     'max-len': 'off',
     'new-cap': 'off',
     'no-else-return': 'warn',
+    'no-unused-vars': ['error', noUnusedVarsOptions],
     'no-nested-ternary': 'warn',
     'no-restricted-imports': ['error', {
       paths: [{
@@ -105,6 +114,9 @@ module.exports = {
       }, {
         name: 'jest-each',
         message: 'Please use `it.each` instead.',
+      }, {
+        name: 'lodash',
+        message: 'Please use `lodash/<function>` instead for reduced bundle sizes.',
       }],
     }],
     'no-underscore-dangle': 'off',

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Row, Col, HelpBlock, Input } from 'components/bootstrap';
@@ -53,30 +53,28 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
 
-  const getValue = () => {
-    if (sessionTimeoutNever) {
-      return -1;
-    }
-
-    return (value * Number(unit));
-  };
-
-  useEffect(() => {
-    if (typeof onChange === 'function') {
-      onChange(getValue());
-    }
-  }, [value, unit, sessionTimeoutNever]);
-
   const _onClick = (evt) => {
     setSessionTimeoutNever(evt.target.checked);
+
+    if (onChange && evt.target.checked) {
+      onChange(-1);
+    }
   };
 
   const _onChangeValue = (evt) => {
     setValue(evt.target.value);
+
+    if (onChange) {
+      onChange(evt.target.value * Number(unit));
+    }
   };
 
   const _onChangeUnit = (newUnit: string) => {
     setUnit(newUnit);
+
+    if (onChange) {
+      onChange(value * Number(newUnit));
+    }
   };
 
   return (

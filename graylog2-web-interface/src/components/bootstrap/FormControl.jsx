@@ -18,8 +18,14 @@
 import { FormControl as BootstrapFormControl } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
+import { INPUT_BORDER_RADIUS } from 'theme/constants';
+
 const FormControl = styled(BootstrapFormControl)(({ theme }) => css`
-  &.form-control:not([type="range"]) {
+  &.form-control {
+    border-radius: ${INPUT_BORDER_RADIUS};
+  }
+
+  &.form-control:not([type='range']) {
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
     border-color: ${theme.colors.input.border};

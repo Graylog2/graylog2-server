@@ -35,12 +35,12 @@ public class JsonUtilsTest {
 
         // delete all top-level arrays
         String expected = "{\"k0\":\"v0\"}";
-        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE);
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE, false);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
 
         // serialize arrays into valid JSON with escaping; retain empty arrays
         expected = "{\"k0\":\"v0\",\"arr1\":\"[\\\"a1\\\",[\\\"a21\\\",\\\"a22\\\"],[],\\\"a2\\\"]\"}";
-        result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_JSON);
+        result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_JSON, false);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 
@@ -50,17 +50,27 @@ public class JsonUtilsTest {
 
         // flatten objects by concatenating keys
         String expected = "{\"k0\":\"v0\",\"obj1_k1\":\"v1\",\"obj1_obj11_k11\":\"v11\",\"obj1_obj11_obj111_k111\":\"v111\"}";
-        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE);
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_IGNORE, false);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 
     @Test
     public void extractArrayOfObjects() throws IOException {
-        String jsonString = "{\"k0\":\"v0\",\"arr1\":[{\"k11\":\"v11\",\"k12\":\"v12\"},{\"k21\":\"v21\"}]}";
+        String jsonString = "{\"k0\":\"v0\",\"arr1\":[{\"k11\":\"v11\",\"k12\":12},{\"k21\":\"v21\"}]}";
 
         // flatten objects by concatenating keys
-        String expected = "{\"k0\":\"v0\",\"arr1_0_k11\":\"v11\",\"arr1_0_k12\":\"v12\",\"arr1_1_k21\":\"v21\"}";
-        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN);
+        String expected = "{\"k0\":\"v0\",\"arr1_0_k11\":\"v11\",\"arr1_0_k12\":12,\"arr1_1_k21\":\"v21\"}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN, false);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+    }
+
+    @Test
+    public void preserveTypes() throws IOException {
+        String jsonString = "{\"string\":\"s0\",\"arr1\":[{\"int\":1,\"float\":1.2},{\"bool\":true}]}";
+
+        // flatten objects by concatenating keys
+        String expected = "{\"string\":\"s0\",\"arr1_0_int\":1,\"arr1_0_float\":1.2,\"arr1_1_bool\":true}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN, false);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 
@@ -168,5 +178,14 @@ public class JsonUtilsTest {
         node = mapper.readTree(jsonString);
         JsonUtils.deleteBelow(node, 3);
         assertThat(mapper.writeValueAsString(node)).isEqualTo(expected);
+    }
+
+    @Test
+    public void testStringify() throws IOException {
+        String jsonString = "{\"bool\":true,\"arr1\":[{\"int\":1,\"float\":1.2},{\"bool\":true}]}";
+
+        String expected = "{\"bool\":\"true\",\"arr1_0_int\":\"1\",\"arr1_0_float\":\"1.2\",\"arr1_1_bool\":\"true\"}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN, true);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }
 }

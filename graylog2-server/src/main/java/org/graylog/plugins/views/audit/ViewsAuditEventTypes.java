@@ -52,6 +52,11 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
     public static final String EXPORT_JOB = "export_job";
     public static final String EXPORT_JOB_CREATED = PREFIX + EXPORT_JOB + ":created";
 
+    public static final String DYNAMIC_STARTUP_PAGE = "dynamic_startup_page";
+
+    public static final String DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM = PREFIX + DYNAMIC_STARTUP_PAGE + ":addFavoriteItem";
+    public static final String DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM = PREFIX + DYNAMIC_STARTUP_PAGE + ":removeFavoriteItem";
+
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(VIEW_CREATE)
             .add(VIEW_UPDATE)
@@ -71,6 +76,9 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
             .add(MESSAGES_EXPORT_SUCCEEDED)
 
             .add(EXPORT_JOB_CREATED)
+
+            .add(DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
+            .add(DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
 
             .build();
 

@@ -22,6 +22,7 @@ import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -50,7 +51,8 @@ public class SidecarCollectorConfigurationFacadeTest {
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final ConfigurationService configurationService = new ConfigurationService(mongodb.mongoConnection(),
-                mapperProvider, new ConfigurationVariableService(mongodb.mongoConnection(), mapperProvider));
+                mapperProvider, new ConfigurationVariableService(mongodb.mongoConnection(), mapperProvider),
+                new SecureFreemarkerConfigProvider());
 
         facade = new SidecarCollectorConfigurationFacade(objectMapper, configurationService);
     }

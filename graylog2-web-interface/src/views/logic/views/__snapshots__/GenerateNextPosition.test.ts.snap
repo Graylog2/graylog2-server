@@ -2,7 +2,7 @@
 
 exports[`GenerateNextPosition should add a new widget to the first row and column 1`] = `
 Immutable.Map {
-  "foo-1": Object {
+  "foo-1": {
     "col": 1,
     "height": 5,
     "row": 1,
@@ -13,13 +13,13 @@ Immutable.Map {
 
 exports[`GenerateNextPosition should add a new widget to the first row and column to other widgets 1`] = `
 Immutable.Map {
-  "foo-1": Object {
+  "foo-1": {
     "col": 1,
     "height": 5,
     "row": 1,
     "width": 6,
   },
-  "foo": Object {
+  "foo": {
     "col": 1,
     "height": 8,
     "row": 2,

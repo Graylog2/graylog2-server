@@ -92,7 +92,7 @@ public class ClusterLoggersResource extends ProxiedResource {
         @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
         @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) throws NodeNotFoundException, IOException {
         final Node node = this.nodeService.byNodeId(nodeId);
-        final RemoteLoggersResource remoteLoggersResource = this.remoteInterfaceProvider.get(node, this.authenticationToken, RemoteLoggersResource.class);
+        final RemoteLoggersResource remoteLoggersResource = this.remoteInterfaceProvider.get(node, getAuthenticationToken(), RemoteLoggersResource.class);
 
         remoteLoggersResource.setSubsystemLoggerLevel(subsystemTitle, level).execute();
     }

@@ -21,7 +21,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled, { css } from 'styled-components';
 
-import ProgressBar, { Bar } from 'components/common/ProgressBar';
+import ProgressBar from 'components/common/ProgressBar';
 import { Spinner } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
@@ -61,15 +61,13 @@ const Blob = styled.span(({ theme }) => css`
 const StyledProgressBar = styled(ProgressBar)`
   height: 25px;
   margin-bottom: 5px;
-
-  ${Bar} {
-    line-height: 25px;
-  }
 `;
 
 const JvmHeapUsage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'JvmHeapUsage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     nodeId: PropTypes.string.isRequired,
   },

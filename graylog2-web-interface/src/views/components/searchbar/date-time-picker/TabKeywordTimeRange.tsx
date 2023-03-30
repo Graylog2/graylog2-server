@@ -23,10 +23,11 @@ import isEqual from 'lodash/isEqual';
 import { Field, useField } from 'formik';
 
 import { Col, FormControl, FormGroup, Panel, Row } from 'components/bootstrap';
-import DateTime from 'logic/datetimes/DateTime';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import ToolsStore from 'stores/tools/ToolsStore';
+import type { KeywordTimeRange } from 'views/logic/queries/Query';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -43,12 +44,14 @@ const ErrorMessage = styled.span(({ theme }) => css`
   display: block;
 `);
 
-const _parseKeywordPreview = (data) => {
+const _parseKeywordPreview = (data: Pick<KeywordTimeRange, 'from' | 'to' | 'timezone'>, formatTime: (dateTime: string, format: string) => string) => {
   const { timezone } = data;
-  const from = DateTime.fromDateTimeAndTZ(data.from, timezone).toString();
-  const to = DateTime.fromDateTimeAndTZ(data.to, timezone).toString();
 
-  return { from, to, timezone };
+  return {
+    from: formatTime(data.from, 'complete'),
+    to: formatTime(data.to, 'complete'),
+    timezone,
+  };
 };
 
 type Props = {
@@ -58,6 +61,7 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
+  const { formatTime, userTimezone } = useUserDateTime();
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
@@ -66,15 +70,15 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
     setValidatingKeyword(false);
 
-    return setKeywordPreview(_parseKeywordPreview(response));
+    return setKeywordPreview(_parseKeywordPreview(response, formatTime));
   },
-  [setValidatingKeyword]);
+  [setValidatingKeyword, formatTime]);
 
   const _setFailedPreview = useCallback(() => {
-    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: DateTime.getUserTimezone() });
+    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: userTimezone });
 
     return 'Unable to parse keyword.';
-  }, [setKeywordPreview]);
+  }, [userTimezone]);
 
   const _validateKeyword = useCallback((keyword: string) => {
     if (keyword === undefined) {
@@ -88,7 +92,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
 
       return trim(keyword) === ''
         ? Promise.resolve('Keyword must not be empty!')
-        : ToolsStore.testNaturalDate(keyword)
+        : ToolsStore.testNaturalDate(keyword, userTimezone)
           .then((response) => {
             if (mounted.current) _setSuccessfullPreview(response);
           })
@@ -96,7 +100,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     }
 
     return undefined;
-  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword]);
+  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword, userTimezone]);
 
   useEffect(() => {
     return () => {
@@ -110,7 +114,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
 
   useEffect(() => {
     if (nextRangeProps?.value) {
-      const { type, keyword, ...restPreview } = nextRangeProps?.value;
+      const { type, keyword, ...restPreview } = nextRangeProps.value;
 
       if (!isEqual(restPreview, keywordPreview)) {
         nextRangeHelpers.setValue({

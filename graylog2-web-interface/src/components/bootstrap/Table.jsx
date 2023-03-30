@@ -74,7 +74,7 @@ const variantRowStyles = css(({ theme }) => {
 
   return css`
     ${styles}
-  `;
+`;
 });
 
 const tableCss = css(({ theme }) => css`
@@ -129,6 +129,13 @@ const tableCss = css(({ theme }) => css`
   }
 
   ${variantRowStyles}
+  
+  @media print {
+    &.table > thead > tr > th {
+      white-space: break-spaces;
+      word-break: break-all;
+    }
+  }
 `);
 
 const Table = styled(BootstrapTable)`

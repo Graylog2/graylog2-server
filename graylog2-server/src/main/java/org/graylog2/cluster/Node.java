@@ -23,7 +23,7 @@ import org.joda.time.DateTime;
 
 public interface Node extends Persisted {
     enum Type {
-        SERVER
+        SERVER, DATANODE
     }
 
     String getNodeId();

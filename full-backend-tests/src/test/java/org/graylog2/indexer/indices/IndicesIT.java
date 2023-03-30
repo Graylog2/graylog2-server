@@ -16,32 +16,20 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
-import org.graylog.storage.elasticsearch6.IndexingHelper;
-import org.graylog.storage.elasticsearch6.IndicesAdapterES6;
-import org.graylog.storage.elasticsearch6.NodeAdapterES6;
-import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog.storage.elasticsearch7.IndicesAdapterES7;
-import org.graylog.storage.elasticsearch7.NodeAdapterES7;
-import org.graylog.storage.elasticsearch7.cat.CatApi;
-import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
-import org.graylog.storage.elasticsearch7.stats.StatsApi;
-import org.graylog.testing.ContainerMatrixElasticsearchITBaseTest;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -50,7 +38,6 @@ import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
@@ -62,9 +49,10 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterEach;
@@ -84,7 +72,6 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -93,11 +80,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO4)
-public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO5)
+public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
-    private final Set<String> indicesToCleanUp = new HashSet<>();
-
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
             .title("Index set 1")
@@ -116,69 +101,37 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
             .indexOptimizationDisabled(false)
             .build();
     protected static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
-
+    private final Set<String> indicesToCleanUp = new HashSet<>();
+    protected Indices indices;
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
-    protected Indices indices;
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     public IndicesIT(SearchServerInstance elasticsearch) {
         super(elasticsearch);
     }
 
-    protected IndicesAdapter indicesAdapter() {
-        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return new IndicesAdapterES6(jestClient(elasticsearch()),
-                    new ObjectMapperProvider().get(),
-                    new IndexingHelper());
-        } else {
-            final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-            final ElasticsearchClient client = elasticsearchClient();
-            return new IndicesAdapterES7(
-                    client,
-                    new StatsApi(objectMapper, client),
-                    new CatApi(objectMapper, client),
-                    new ClusterStateApi(objectMapper, client)
-            );
-        }
-    }
-
-    protected NodeAdapter createNodeAdapter() {
-        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return new NodeAdapterES6(jestClient(elasticsearch()));
-        } else {
-            final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-            return new NodeAdapterES7(elasticsearchClient(), objectMapper);
-        }
-    }
-
     protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
-        if (elasticsearch().searchServer().equals(SearchServer.ES6)) {
-            return ImmutableMap.of(
-                    "template", indexWildcard,
-                    "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, mapping)
-            );
-        } else {
-            // for ES7 and OS1
-            return ImmutableMap.of(
-                    "template", indexWildcard,
-                    "mappings", mapping
-            );
-        }
+        return ImmutableMap.of(
+                "template", indexWildcard,
+                "mappings", mapping
+        );
+
     }
 
     @BeforeEach
     public void setUp() {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
-        final Node node = new Node(createNodeAdapter());
+        final Node node = new Node(searchServer().adapters().nodeAdapter());
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
                 ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
-                mock(NodeId.class),
+                nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter()
+                searchServer().adapters().indicesAdapter()
         );
     }
 
@@ -431,10 +384,10 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                mock(NodeId.class),
+                nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter());
+                searchServer().adapters().indicesAdapter());
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
 
@@ -463,39 +416,14 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                mock(NodeId.class),
+                nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter());
+                searchServer().adapters().indicesAdapter());
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    public static final class IndicesEventListener {
-        final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
-        final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());
-        final List<IndicesReopenedEvent> indicesReopenedEvents = Collections.synchronizedList(new ArrayList<>());
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleIndicesClosedEvent(IndicesClosedEvent event) {
-            indicesClosedEvents.add(event);
-        }
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleIndicesDeletedEvent(IndicesDeletedEvent event) {
-            indicesDeletedEvents.add(event);
-        }
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleIndicesReopenedEvent(IndicesReopenedEvent event) {
-            indicesReopenedEvents.add(event);
-        }
     }
 
     @ContainerMatrixTest
@@ -521,7 +449,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
         final String index = createRandomIndex("indices_it_");
         String uuid = indices.getIndexId(index);
         assertThat(uuid).isNotEmpty();
-        assert(Base64.isBase64(uuid));
+        assert (Base64.isBase64(uuid));
     }
 
     @ContainerMatrixTest
@@ -541,6 +469,45 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
 
         assertThat(creationDate).hasValueSatisfying(dt ->
                 assertThat(dt.getZone()).isEqualTo(DateTimeZone.UTC));
+    }
+
+    @ContainerMatrixTest
+    public void canStoreAndRetrieveIndexClosingDate() {
+        final String index = createRandomIndex("foo");
+        final DateTime someDate = Tools.nowUTC();
+
+        indices.setClosingDate(index, someDate);
+
+        final Optional<DateTime> closingDate = indices.indexClosingDate(index);
+
+        assertThat(closingDate).hasValueSatisfying(dt -> {
+            assertThat(dt).isEqualTo(someDate);
+            assertThat(dt.getZone()).isEqualTo(DateTimeZone.UTC);
+        });
+    }
+
+    @ContainerMatrixTest
+    public void setClosingDateMergesExistingMetaDataEntries() {
+        final String index = createRandomIndex("foo");
+        client().updateMapping(index, Map.of("_meta", Map.of("existing", "should be kept")));
+
+        indices.setClosingDate(index, Tools.nowUTC());
+
+        final Map<String, Object> mapping = client().getMapping(index);
+        assertThat(mapping.get("_meta")).satisfies(v -> {
+            assertThat(v).isNotNull();
+            //noinspection unchecked
+            assertThat(((Map<String, Object>) v).get("existing")).isEqualTo("should be kept");
+        });
+        final Optional<DateTime> closingDate = indices.indexClosingDate(index);
+        assertThat(closingDate).isNotEmpty();
+    }
+
+    @ContainerMatrixTest
+    public void canHandleMissingIndexClosingDate() {
+        final String index = createRandomIndex("foo");
+        final Optional<DateTime> closingDate = indices.indexClosingDate(index);
+        assertThat(closingDate).isEmpty();
     }
 
     @ContainerMatrixTest
@@ -682,5 +649,30 @@ public class IndicesIT extends ContainerMatrixElasticsearchITBaseTest {
         indices.cycleAlias(deflector, index2, index1);
 
         assertThat(indices.exists(index1)).isTrue();
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static final class IndicesEventListener {
+        final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
+        final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());
+        final List<IndicesReopenedEvent> indicesReopenedEvents = Collections.synchronizedList(new ArrayList<>());
+
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleIndicesClosedEvent(IndicesClosedEvent event) {
+            indicesClosedEvents.add(event);
+        }
+
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleIndicesDeletedEvent(IndicesDeletedEvent event) {
+            indicesDeletedEvents.add(event);
+        }
+
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleIndicesReopenedEvent(IndicesReopenedEvent event) {
+            indicesReopenedEvents.add(event);
+        }
     }
 }

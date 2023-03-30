@@ -124,6 +124,21 @@ public abstract class MessageList implements SearchType {
         return this;
     }
 
+    @Override
+    public SearchType withQuery(BackendQuery query) {
+        return toBuilder().query(query).build();
+    }
+
+    @Override
+    public SearchType withFilter(Filter filter) {
+        return toBuilder().filter(filter).build();
+    }
+
+    @Override
+    public SearchType withFilters(List<UsedSearchFilter> filters) {
+        return toBuilder().filters(filters).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonCreator
@@ -154,7 +169,7 @@ public abstract class MessageList implements SearchType {
         public abstract Builder fields(List<String> fields);
 
         @JsonProperty
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
         @JsonSubTypes({
                 @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
                 @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),

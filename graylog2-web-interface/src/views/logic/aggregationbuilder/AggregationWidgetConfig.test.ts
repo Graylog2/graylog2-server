@@ -19,13 +19,13 @@ import Series from './Series';
 import SortConfig from './SortConfig';
 
 describe('AggregationWidgetConfig', () => {
-  it('enables rollups if no column pivots are present', () => {
+  it('do not enable rollups if no column pivots are present (was default in the past)', () => {
     const config = AggregationWidgetConfig.builder()
       .columnPivots([])
       .rollup(false)
       .build();
 
-    expect(config.rollup).toEqual(true);
+    expect(config.rollup).toEqual(false);
   });
 
   it('filters sorts referencing nonpresent metrics', () => {

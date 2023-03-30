@@ -15,13 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import { validationError } from 'fixtures/queryValidationState';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import QueryInput from './QueryInput';
+
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/actions/QueryValidationActions', () => ({
   displayValidationErrors: jest.fn(),
@@ -40,15 +44,21 @@ describe('QueryInput', () => {
   const getQueryInput = () => screen.getByRole('textbox');
 
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof QueryInput>>) => (
-    <QueryInput value=""
-                name="search-query"
-                onChange={() => Promise.resolve('')}
-                validate={() => Promise.resolve({})}
-                isValidating={false}
-                onExecute={() => {}}
-                completerFactory={() => new Completer()}
-                {...props} />
+    <TestStoreProvider>
+      <QueryInput value=""
+                  name="search-query"
+                  onChange={() => Promise.resolve('')}
+                  validate={() => Promise.resolve({})}
+                  isValidating={false}
+                  onExecute={() => {}}
+                  completerFactory={() => new Completer()}
+                  {...props} />
+    </TestStoreProvider>
   );
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -129,6 +139,30 @@ describe('QueryInput', () => {
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
       expect(onExecute).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('supports custom commands', () => {
+    it('adds custom commands to ace', async () => {
+      const exec = jest.fn();
+      const commands = [{
+        name: 'TestCommand',
+        bindKey: {
+          mac: 'Ctrl+Enter',
+          win: 'Ctrl+Enter',
+        },
+        exec,
+      }];
+
+      render(<SimpleQueryInput commands={commands} />);
+
+      const queryInput = getQueryInput();
+      queryInput.focus();
+      userEvent.type(queryInput, '{ctrl}{enter}');
+
+      await waitFor(() => {
+        expect(exec).toHaveBeenCalled();
+      });
     });
   });
 });

@@ -34,6 +34,7 @@ public abstract class IndexFieldTypesDTO {
     static final String FIELD_INDEX_SET_ID = "index_set_id";
     static final String FIELD_INDEX_NAME = "index_name";
     static final String FIELD_FIELDS = "fields";
+    static final String FIELD_HAS_STREAM_DATA = "has_stream_data";
 
     @Id
     @ObjectId
@@ -50,11 +51,15 @@ public abstract class IndexFieldTypesDTO {
     @JsonProperty(FIELD_FIELDS)
     public abstract ImmutableSet<FieldTypeDTO> fields();
 
+    @JsonProperty(FIELD_HAS_STREAM_DATA)
+    public abstract boolean hasStreamData();
+
     public static IndexFieldTypesDTO create(String indexSetId, String indexName, Set<FieldTypeDTO> fields) {
         return builder()
                 .indexSetId(indexSetId)
                 .indexName(indexName)
                 .fields(fields)
+                .hasStreamData(false)
                 .build();
     }
 
@@ -68,7 +73,7 @@ public abstract class IndexFieldTypesDTO {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_IndexFieldTypesDTO.Builder();
+            return new AutoValue_IndexFieldTypesDTO.Builder().hasStreamData(false);
         }
 
         @Id
@@ -81,6 +86,9 @@ public abstract class IndexFieldTypesDTO {
 
         @JsonProperty(FIELD_INDEX_NAME)
         public abstract Builder indexName(String indexName);
+
+        @JsonProperty(FIELD_HAS_STREAM_DATA)
+        public abstract Builder hasStreamData(boolean hasStreamData);
 
         abstract ImmutableSet.Builder<FieldTypeDTO> fieldsBuilder();
 

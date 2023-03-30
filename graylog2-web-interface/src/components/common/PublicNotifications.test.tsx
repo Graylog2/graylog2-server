@@ -20,7 +20,7 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { Notifications } from 'theme/types';
 import { asMock } from 'helpers/mocking';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import PublicNotifications from './PublicNotifications';
 
@@ -73,7 +73,7 @@ const mockedConfigNotifications = {
   },
 } as Notifications;
 
-jest.mock('views/logic/usePluginEntities');
+jest.mock('hooks/usePluginEntities');
 
 jest.mock('util/AppConfig', () => ({
   publicNotifications: jest.fn(() => mockedConfigNotifications),
@@ -128,6 +128,16 @@ describe('PublicNotifications', () => {
   });
 
   it('should render from AppConfig', () => {
+    render(<PublicNotifications readFromConfig />);
+
+    const alerts = screen.getAllByRole('alert');
+
+    expect(alerts.length).toBe(1);
+  });
+
+  it('should render from AppConfig when no plugins are configured', () => {
+    asMock(usePluginEntities).mockImplementation(() => ([]));
+
     render(<PublicNotifications readFromConfig />);
 
     const alerts = screen.getAllByRole('alert');

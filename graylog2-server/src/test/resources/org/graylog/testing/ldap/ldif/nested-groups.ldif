@@ -43,6 +43,16 @@ cn: Senior Operations
 description: All of senior operations
 member: cn=Jane Doe,ou=People,dc=example,dc=com
 
+dn: cn=QA,ou=Groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+cn: IT
+uniqueMember: cn=Manual Testers,ou=Groups,dc=example,dc=com
+
+dn: cn=Manual Testers,ou=Groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+cn: IT
+uniqueMember: cn=Peter Parker,ou=People,dc=example,dc=com
+
 #### People ##########################################################
 # The password for all accounts is: pass
 dn: cn=Jane Doe,ou=People,dc=example,dc=com
@@ -79,4 +89,13 @@ gn: Bob
 sn: Barker
 mail: bob@example.com
 uid: bob
+userPassword:: e1NTSEF9VUFZMldUVEk3S1BHbjJ6UFRvaFdRMVNZTUswNWVrMHU=
+
+dn: cn=Peter Parker,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Peter Parker
+gn: Peter
+sn: Parker
+mail: peter@example.com
+uid: peter
 userPassword:: e1NTSEF9VUFZMldUVEk3S1BHbjJ6UFRvaFdRMVNZTUswNWVrMHU=

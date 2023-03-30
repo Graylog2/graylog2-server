@@ -25,6 +25,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
+import java.util.Collections;
 import java.util.List;
 
 @AutoValue
@@ -48,7 +49,7 @@ public abstract class DateRangeBucket implements BucketSpec {
 
     @Override
     @JsonProperty
-    public abstract String field();
+    public abstract List<String> fields();
 
     @JsonProperty
     public abstract List<DateRange> ranges();
@@ -69,7 +70,12 @@ public abstract class DateRangeBucket implements BucketSpec {
         }
 
         @JsonProperty
-        public abstract Builder field(String field);
+        public Builder field(String field) {
+            return fields(Collections.singletonList(field));
+        }
+
+        @JsonProperty
+        public abstract Builder fields(List<String> field);
 
         @JsonProperty
         public abstract Builder ranges(List<DateRange> ranges);

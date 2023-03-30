@@ -15,36 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import { fireEvent, renderUnwrapped } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
+import DefaultProviders from 'DefaultProviders';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
-import viewsBindings from 'views/bindings';
 import StreamsContext from 'contexts/StreamsContext';
-import SearchMetadata from 'views/logic/search/SearchMetadata';
-import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
-
-jest.mock('views/stores/DashboardsStore', () => ({
-  DashboardsActions: {
-    search: jest.fn(() => Promise.resolve()),
-  },
-  DashboardsStore: MockStore(
-    ['getInitialState', () => ({
-      listen: [],
-      pagination: {
-        total: 100,
-        page: 1,
-        perPage: 20,
-      },
-    })],
-  ),
-}));
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -60,12 +45,14 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   ),
 }));
 
-jest.mock('views/stores/SearchMetadataStore', () => ({
-  SearchMetadataActions: {
-    parseSearch: jest.fn(),
+jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+  data: {
+    list: [],
+    pagination: { total: 0 },
   },
-  SearchMetadataStore: MockStore(),
 }));
+
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 declare global {
   namespace NodeJS {
@@ -96,33 +83,40 @@ jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>
 
 jest.unmock('logic/rest/FetchProvider');
 
-const viewsPlugin = new PluginManifest({}, viewsBindings);
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  createBrowserRouter: jest.fn(),
+}));
 
 const finderTimeout = applyTimeoutMultiplier(15000);
 const testTimeout = applyTimeoutMultiplier(30000);
 
+const setInitialUrl = (url: string) => asMock(createBrowserRouter).mockImplementation((routes) => createMemoryRouter(routes, { initialEntries: [url] }));
+
 describe('Create a new dashboard', () => {
-  beforeAll(() => PluginStore.register(viewsPlugin));
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    const searchMetadata = SearchMetadata.empty();
-    asMock(SearchMetadataStore.getInitialState).mockReturnValue(searchMetadata);
-    asMock(SearchMetadataActions.parseSearch).mockReturnValue(Promise.resolve(searchMetadata));
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
   });
 
-  afterAll(() => PluginStore.unregister(viewsPlugin));
-
   const SimpleAppRouter = () => (
-    <CurrentUserProvider>
-      <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
-        <AppRouter />
-      </StreamsContext.Provider>
-    </CurrentUserProvider>
+    <DefaultProviders>
+      <DefaultQueryClientProvider>
+        <CurrentUserProvider>
+          <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
+            <AppRouter />
+          </StreamsContext.Provider>
+        </CurrentUserProvider>
+      </DefaultQueryClientProvider>
+    </DefaultProviders>
   );
 
   it('using Dashboards Page', async () => {
-    const { findByText, findAllByText } = render(<SimpleAppRouter />);
-    history.push(Routes.DASHBOARDS);
+    setInitialUrl(Routes.DASHBOARDS);
+    const { findByText, findAllByText } = renderUnwrapped(<SimpleAppRouter />);
 
     const buttons = await findAllByText('Create new dashboard', {}, { timeout: finderTimeout });
 
@@ -131,9 +125,8 @@ describe('Create a new dashboard', () => {
   }, testTimeout);
 
   it('by going to the new dashboards endpoint', async () => {
-    const { findByText } = render(<SimpleAppRouter />);
-
-    history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
+    setInitialUrl(Routes.pluginRoute('DASHBOARDS_NEW'));
+    const { findByText } = renderUnwrapped(<SimpleAppRouter />);
 
     await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
   }, testTimeout);

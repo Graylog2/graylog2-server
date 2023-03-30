@@ -18,15 +18,19 @@ import React, { useEffect } from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import suppressConsole from 'helpers/suppressConsole';
+import { asMock } from 'helpers/mocking';
+import usePluginEntities from 'hooks/usePluginEntities';
 
+import type { OverrideProps } from './WidgetOverrideElements';
 import WidgetOverrideElements from './WidgetOverrideElements';
 
-jest.mock('views/logic/withPluginEntities', () => (x) => x);
+jest.mock('hooks/usePluginEntities');
 
 describe('WidgetOverrideElements', () => {
   it('renders original children if no elements are present', async () => {
+    asMock(usePluginEntities).mockReturnValue([]);
     const { findByText } = render((
-      <WidgetOverrideElements widgetOverrideElements={[]}>
+      <WidgetOverrideElements>
         <span>Hello world!</span>
       </WidgetOverrideElements>
     ));
@@ -35,8 +39,9 @@ describe('WidgetOverrideElements', () => {
   });
 
   it('renders original children if element does not throw', async () => {
+    asMock(usePluginEntities).mockReturnValue([() => null]);
     const { findByText } = render((
-      <WidgetOverrideElements widgetOverrideElements={[() => null]}>
+      <WidgetOverrideElements>
         <span>Hello world!</span>
       </WidgetOverrideElements>
     ));
@@ -50,25 +55,29 @@ describe('WidgetOverrideElements', () => {
         throw new Error('The dungeon collapses, you die!');
       };
 
+      asMock(usePluginEntities).mockReturnValue([throwElement]);
+
       expect(() => render((
-        <WidgetOverrideElements widgetOverrideElements={[throwElement]}>
+        <WidgetOverrideElements>
           <span>Hello world!</span>
         </WidgetOverrideElements>
-      ))).toThrowError('The dungeon collapses, you die!');
+      ))).toThrow('The dungeon collapses, you die!');
     });
   });
 
   it('renders thrown component if element throws one', async () => {
-    const Component = () => <span>I was thrown!</span>;
+    const Component = () => <div>I was thrown!</div>;
 
-    const OverridingElement = ({ override }) => {
+    const OverridingElement = ({ override }: OverrideProps) => {
       useEffect(() => override(Component), [override]);
 
       return null;
     };
 
+    asMock(usePluginEntities).mockReturnValue([OverridingElement]);
+
     const { findByText, queryByText } = render((
-      <WidgetOverrideElements widgetOverrideElements={[OverridingElement]}>
+      <WidgetOverrideElements>
         <span>Hello world!</span>
       </WidgetOverrideElements>
     ));

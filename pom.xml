@@ -23,14 +23,14 @@
         <module>graylog-project-parent</module>
         <module>graylog-plugin-parent</module>
         <module>graylog-plugin-archetype</module>
-        <module>graylog-storage-elasticsearch6</module>
         <module>graylog-storage-elasticsearch7</module>
+        <module>graylog-storage-opensearch2</module>
         <module>distribution</module>
     </modules>
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>4.4.0-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -81,8 +81,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
@@ -95,6 +96,7 @@
         <apache-httpcore.version>4.4.14</apache-httpcore.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
+        <aws-java-sdk-2.version>2.17.77</aws-java-sdk-2.version>
         <bouncycastle.version>1.69</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
@@ -104,19 +106,19 @@
         <commons-validator.version>1.6</commons-validator.version>
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
-        <freemarker.version>2.3.29</freemarker.version>
+        <freemarker.version>2.3.31</freemarker.version>
         <gelfclient.version>1.5.0</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.41.0</grpc.version>
+        <grpc.version>1.48.1</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>31.0.1-jre</guava.version>
         <guice.version>5.0.1</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
         <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
         <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.9.10.20200411</jackson.version>
-        <jadconfig.version>0.13.0</jadconfig.version>
+        <jackson.version>2.13.4.20221013</jackson.version>
+        <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
@@ -126,28 +128,28 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>2.32</jersey.version>
+        <jersey.version>2.37</jersey.version>
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.10.6</joda-time.version>
         <jool.version>0.9.14</jool.version>
-        <json-path.version>2.4.0</json-path.version>
+        <json-path.version>2.7.0</json-path.version>
         <kafka.version>2.7.0</kafka.version>
         <kafka09.version>0.9.0.1-6</kafka09.version>
         <log4j.version>2.17.1</log4j.version>
-        <lucene.version>8.11.2</lucene.version>
+        <lucene.version>9.1.0</lucene.version>
         <metrics.version>4.1.9</metrics.version>
-        <mongodb-driver.version>3.12.1</mongodb-driver.version>
-        <mongojack.version>2.10.1</mongojack.version>
+        <mongodb-driver.version>4.8.1</mongodb-driver.version>
+        <mongojack.version>2.10.1.2</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.60.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.36.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.84.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.54.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
         <okta-sdk.version>8.2.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.5</pkts.version>
         <prometheus-client.version>0.11.0</prometheus-client.version>
-        <protobuf.version>3.11.4</protobuf.version>
+        <protobuf.version>3.17.3</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <scala.version>2.13.4</scala.version>
@@ -158,13 +160,16 @@
         <slf4j.version>1.7.30</slf4j.version>
         <streamex.version>0.7.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
-        <syslog4j.version>0.9.60</syslog4j.version>
+        <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.2.0</ulid.version>
         <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.7</zookeeper.version>
+        <cron-utils.version>9.1.6</cron-utils.version>
+        <asciitable.version>0.3.2</asciitable.version>
+        <commons-net.version>3.6</commons-net.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
@@ -172,15 +177,15 @@
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <assertj-json.version>1.2.0</assertj-json.version>
         <awaitility.version>3.1.3</awaitility.version>
-        <equalsverifier.version>3.4.1</equalsverifier.version>
+        <equalsverifier.version>3.10</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
-        <junit-jupiter.version>5.7.0</junit-jupiter.version>
+        <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <mockito.version>3.4.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.16.0</testcontainers.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v16.13.0</nodejs.version>
@@ -188,8 +193,7 @@
 
         <!-- Plugin versions -->
         <license-maven.version>4.0.rc2</license-maven.version>
-        <!-- Downgraded to 1.3.0 because of this issue: https://github.com/maven-download-plugin/maven-download-plugin/issues/80 -->
-        <download-maven-plugin.version>1.3.0</download-maven-plugin.version>
+        <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
     </properties>
 
     <repositories>
@@ -246,6 +250,26 @@
                 <artifactId>httpcore-nio</artifactId>
                 <version>${apache-httpcore.version}</version>
             </dependency>
+            <!-- Ensure consistent Netty versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
+                <classifier>osx-x86_64</classifier>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
+                <classifier>linux-x86_64</classifier>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -265,12 +289,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -280,7 +299,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.4.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -310,7 +329,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.13.0</version>
+                    <version>3.17.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -335,12 +354,12 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>3.1.9</version>
+                    <version>4.7.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.1</version>
+                    <version>3.3</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
@@ -374,6 +393,22 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <forkCount>1</forkCount>
+                    <skip>false</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -410,7 +445,7 @@
                                     <version>[3.6.0,)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.8</version>
+                                    <version>[17.0,17.99]</version>
                                 </requireJavaVersion>
                                 <requireOS>
                                     <family>unix</family>
@@ -423,14 +458,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
                 <configuration>
+                    <release>17</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <compilerId>javac-with-errorprone</compilerId>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                    <compilerArgs>
-                        <arg>-XepDisableWarningsInGeneratedCode</arg>
-                    </compilerArgs>
                     <annotationProcessors>
                         <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
                     </annotationProcessors>
@@ -439,12 +473,12 @@
                     <dependency>
                         <groupId>org.codehaus.plexus</groupId>
                         <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.8.4</version>
+                        <version>2.11.1</version>
                     </dependency>
                     <dependency>
                         <groupId>com.google.errorprone</groupId>
                         <artifactId>error_prone_core</artifactId>
-                        <version>2.3.1</version>
+                        <version>2.13.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -468,6 +502,17 @@
                     <!-- we don't care about assembling the parent, just run the goal on the project, pretty please -->
                     <ignoreMissingDescriptor>true</ignoreMissingDescriptor>
                     <tarLongFileMode>posix</tarLongFileMode>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>${download-maven-plugin.version}</version>
+                <configuration>
+                    <!-- Avoid metadata problems with the cache directory of older plugin versions. Bump the rev when updating the download-maven-plugin. -->
+                    <cacheDirectory>${settings.localRepository}/.cache/download-maven-plugin-rev1</cacheDirectory>
+                    <followRedirects>true</followRedirects>
+                    <retries>5</retries>
                 </configuration>
             </plugin>
             <plugin>
@@ -538,6 +583,18 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>datanode</id>
+            <activation>
+                <property>
+                    <name>!skip.datanode</name>
+                </property>
+            </activation>
+            <modules>
+                <module>data-node</module>
+                <module>data-node-distribution</module>
+            </modules>
+        </profile>
         <profile>
             <id>release</id>
             <build>

@@ -1,0 +1,5 @@
+type = "f"
+message = "Extend browser support back to Chrome 68."
+
+issues = ["14677"]
+pulls = ["14688"]

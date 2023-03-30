@@ -66,7 +66,7 @@ describe('<Wizard />', () => {
     it('should render step 2 when clicked on step 2', () => {
       const wrapper = mount(<Wizard steps={steps} />);
 
-      wrapper.find('a[children="Title2"]').simulate('click');
+      wrapper.find('div[children="Title2"]').simulate('click');
 
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
@@ -199,7 +199,7 @@ describe('<Wizard />', () => {
     expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
     expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
 
-    wrapper.find('a[children="Title2"]').simulate('click');
+    wrapper.find('div[children="Title2"]').simulate('click');
 
     expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
     expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);

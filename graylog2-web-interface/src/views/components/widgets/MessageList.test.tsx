@@ -15,52 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { AdditionalContext } from 'views/logic/ActionContext';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
-import * as messageList from 'views/components/messagelist';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import CancellablePromise from 'logic/rest/CancellablePromise';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
+import useAppDispatch from 'stores/useAppDispatch';
+import { finishedLoading } from 'views/logic/slices/searchExecutionSlice';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import SearchResult from 'views/logic/SearchResult';
+import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
+import type { SearchErrorResponse } from 'views/logic/SearchError';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
 import type { TRenderCompletionCallback } from './RenderCompletionCallback';
 import RenderCompletionCallback from './RenderCompletionCallback';
 
-const MessageTableEntry = () => (
-  <AdditionalContext.Consumer>
-    {({ message }) => (
-      <tbody>
-        <tr><td>{JSON.stringify(message)}</td></tr>
-      </tbody>
-    )}
-  </AdditionalContext.Consumer>
-);
-
-const mockEffectiveTimeRange = {
+const mockEffectiveTimeRange: AbsoluteTimeRange = {
   from: '2019-11-15T14:40:48.666Z',
   to: '2019-11-29T14:40:48.666Z',
   type: 'absolute',
 };
-
-jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: MockStore(
-    ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })],
-  ),
-}));
 
 jest.mock('stores/inputs/InputsStore', () => ({
   InputsStore: MockStore(),
@@ -71,29 +58,22 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations'),
 }));
 
-const mockReexecuteResult = CancellablePromise.of(Promise.resolve({ result: { errors: [] } }));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({
-      result: {
-        results: {
-          somequery: {
-            searchTypes: {
-              'search-type-id': {
-                effectiveTimerange: mockEffectiveTimeRange,
-              },
-            },
-          },
-        },
-      },
-    })],
-  ),
-  SearchActions: {
-    reexecuteSearchTypes: jest.fn(() => mockReexecuteResult),
-    execute: { completed: { listen: jest.fn() } },
+const searchTypeResults = {
+  'search-type-id': {
+    effectiveTimerange: mockEffectiveTimeRange,
+    type: '',
+    total: 0,
   },
-}));
+};
+
+const dummySearchJobResults = {
+  errors: [],
+  execution: { cancelled: false, completed_exceptionally: false, done: true },
+  id: 'foo',
+  owner: 'me',
+  search_id: 'bar',
+  results: {},
+};
 
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
@@ -101,9 +81,14 @@ jest.mock('views/stores/RefreshStore', () => ({
   },
 }));
 
-jest.mock('views/components/messagelist');
+jest.mock('views/hooks/useActiveQueryId');
+jest.mock('views/components/widgets/useCurrentSearchTypesResults');
+jest.mock('views/components/widgets/reexecuteSearchTypes');
+jest.mock('stores/useAppDispatch');
 
 describe('MessageList', () => {
+  const config = MessagesWidgetConfig.builder().fields([]).build();
+
   const data: MessageListResult = {
     id: 'search-type-id',
     type: 'messages',
@@ -121,144 +106,157 @@ describe('MessageList', () => {
     total: 1,
   };
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
-    // @ts-ignore
-    messageList.MessageTableEntry = MessageTableEntry; // eslint-disable-line no-import-assign
+    asMock(useActiveQueryId).mockReturnValue('somequery');
+    // @ts-expect-error
+    asMock(useCurrentSearchTypesResults).mockReturnValue(searchTypeResults);
+    asMock(InputsStore.getInitialState).mockReturnValue({ inputs: [] });
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  const SimpleMessageList = (props: {
-    config: MessagesWidgetConfig,
-    data: MessageListResult,
-    fields: FieldTypeMappingsList,
-    setLoadingState: () => void,
-  }) => (
-    <MessageList title="Message List"
-                 editing={false}
-                 filter=""
-                 type="messages"
-                 id="message-list"
-                 queryId="deadbeef"
-                 toggleEdit={() => {}}
-                 {...props} />
+  const findTable = () => screen.findByRole('table');
+
+  const clickNextPageButton = () => {
+    const paginationListItem = screen.getByRole('listitem', { name: /next/i });
+
+    const nextPageButton = within(paginationListItem).getByRole('button');
+    userEvent.click(nextPageButton);
+  };
+
+  const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
+    <TestStoreProvider>
+      <MessageList title="Message List"
+                   editing={false}
+                   filter=""
+                   type="messages"
+                   id="message-list"
+                   queryId="deadbeef"
+                   toggleEdit={() => {}}
+                   setLoadingState={() => {}}
+                   data={props.data}
+                   config={props.config}
+                   fields={props.fields}
+                   {...props} />
+    </TestStoreProvider>
   );
 
-  it('should render with and without fields', () => {
+  SimpleMessageList.defaultProps = {
+    config: config,
+    data: data,
+    fields: Immutable.List([]),
+  };
+
+  it('should render width widget fields', async () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 
-    const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
-    const wrapper1 = mount(
-      <SimpleMessageList data={data}
-                         config={config}
-                         fields={Immutable.List(fields)}
-                         setLoadingState={() => {}} />,
+    const configWithFields = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
+
+    render(
+      <SimpleMessageList config={configWithFields}
+                         fields={Immutable.List(fields)} />,
     );
 
-    expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
+    await screen.findByText('file_name');
+    await screen.findByText(TIMESTAMP_FIELD);
+  });
 
+  it('should render when widget has no fields', async () => {
+    const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
 
-    const wrapper2 = mount(
-      <SimpleMessageList data={data}
-                         config={emptyConfig}
-                         fields={Immutable.List(fields)}
-                         setLoadingState={() => {}} />,
+    render(
+      <SimpleMessageList config={emptyConfig}
+                         fields={Immutable.List(fields)} />,
     );
 
-    expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
+    await findTable();
+
+    expect(screen.queryByText('file_name')).not.toBeInTheDocument();
   });
 
   // eslint-disable-next-line jest/expect-expect
-  it('renders also when `inputs` is undefined', () => {
-    InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
-    const config = MessagesWidgetConfig.builder().fields([]).build();
+  it('renders also when `inputs` is undefined', async () => {
+    asMock(InputsStore.getInitialState).mockReturnValue({ inputs: undefined });
 
-    mount(<SimpleMessageList data={data}
-                             fields={Immutable.List([])}
-                             config={config}
-                             setLoadingState={() => {}} />);
+    render(<SimpleMessageList />);
+
+    await findTable();
   });
 
   it('refreshs Inputs list upon mount', () => {
-    const config = MessagesWidgetConfig.builder().fields([]).build();
-    const Component = () => (
-      <SimpleMessageList data={data}
-                         fields={Immutable.List([])}
-                         config={config}
-                         setLoadingState={() => {}} />
-    );
-
-    mount(<Component />);
+    render(<SimpleMessageList />);
 
     expect(InputsActions.list).toHaveBeenCalled();
   });
 
-  it('reexecute query for search type, when using pagination', () => {
+  it('reexecute query for search type, when using pagination', async () => {
+    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
+      result: new SearchResult(dummySearchJobResults),
+      widgetMapping: Immutable.Map(),
+    }));
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
-    const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
-                                             fields={Immutable.List([])}
-                                             config={config}
-                                             setLoadingState={() => {}} />);
 
-    wrapper.find('[aria-label="Next"]').simulate('click');
+    render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
-    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange);
+    clickNextPageButton();
+
+    await waitFor(() => expect(reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange));
   });
 
-  it('disables refresh actions, when using pagination', () => {
-    const config = MessagesWidgetConfig.builder().fields([]).build();
+  it('disables refresh actions, when using pagination', async () => {
+    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
+      result: new SearchResult(dummySearchJobResults),
+      widgetMapping: Immutable.Map(),
+    }));
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
-    const wrapper = mount(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
-                                             fields={Immutable.List([])}
-                                             config={config}
-                                             setLoadingState={() => {}} />);
 
-    wrapper.find('[aria-label="Next"]').simulate('click');
+    render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
-    expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
+    clickNextPageButton();
+
+    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
   });
 
   it('displays error description, when using pagination throws an error', async () => {
-    asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(CancellablePromise.of(Promise.resolve({
-      result: { errors: [{ description: 'Error description' }] },
-    } as SearchExecutionResult)));
+    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
+      result: new SearchResult({
+        ...dummySearchJobResults,
+        errors: [{
+          description: 'Error description',
+        } as SearchErrorResponse],
+      }),
+      widgetMapping: Immutable.Map(),
+    }));
+    asMock(useAppDispatch).mockReturnValue(dispatch);
 
-    const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
-                                             fields={Immutable.List([])}
-                                             config={config}
-                                             setLoadingState={() => {}} />);
 
-    await wrapper.find('[aria-label="Next"]').simulate('click');
-    wrapper.update();
+    render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
 
-    expect(wrapper.find('ErrorWidget').text()).toContain('Error description');
+    clickNextPageButton();
+
+    await screen.findByText('Error description');
   });
 
-  // eslint-disable-next-line jest/expect-expect
-  it('calls render completion callback after first render', () => {
-    const config = MessagesWidgetConfig.builder().fields([]).build();
-    const Component = () => (
-      <SimpleMessageList data={data}
-                         fields={Immutable.List([])}
-                         config={config}
-                         setLoadingState={() => {}} />
+  it('calls render completion callback after first render', async () => {
+    const onRenderComplete: TRenderCompletionCallback = jest.fn();
+
+    render(
+      <RenderCompletionCallback.Provider value={onRenderComplete}>
+        <SimpleMessageList />
+      </RenderCompletionCallback.Provider>,
     );
 
-    return new Promise<void>((resolve) => {
-      const onRenderComplete: TRenderCompletionCallback = jest.fn(() => resolve());
-
-      mount((
-        <RenderCompletionCallback.Provider value={onRenderComplete}>
-          <Component />
-        </RenderCompletionCallback.Provider>
-      ));
-    });
+    await waitFor(() => expect(onRenderComplete).toHaveBeenCalled());
   });
 });

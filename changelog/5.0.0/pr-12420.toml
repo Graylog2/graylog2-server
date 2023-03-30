@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix parsing of invalid search operators in query validation."
+
+pulls = ["12420"]

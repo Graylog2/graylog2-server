@@ -180,7 +180,10 @@ export const LookupTableCachesStore = singletonStore(
       promise.then((response) => {
         this.validationErrors = response.errors;
         this.propagateChanges();
-      }, this._errorHandler('Lookup table cache validation failed', `Could not validate lookup table cache "${cache.name}"`));
+      }, this._errorHandler(
+        'Lookup table cache validation failed',
+        `Could not validate lookup table cache "${cache.name}"`,
+      ));
 
       LookupTableCachesActions.validate.promise(promise);
 

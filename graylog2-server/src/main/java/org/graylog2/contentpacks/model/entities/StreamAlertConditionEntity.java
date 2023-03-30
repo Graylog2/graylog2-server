@@ -28,6 +28,7 @@ import javax.validation.constraints.NotNull;
 
 @AutoValue
 @WithBeanGetter
+@Deprecated
 public abstract class StreamAlertConditionEntity {
     @JsonProperty("type")
     @NotBlank

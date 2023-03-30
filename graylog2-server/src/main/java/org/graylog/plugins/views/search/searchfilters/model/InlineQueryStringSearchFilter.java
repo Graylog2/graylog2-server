@@ -17,21 +17,27 @@
 package org.graylog.plugins.views.search.searchfilters.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER)
 @JsonDeserialize(builder = InlineQueryStringSearchFilter.Builder.class)
-public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter {
+public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter, QueryStringSearchFilter {
 
     @JsonProperty(TITLE_FIELD)
     @Nullable
     public abstract String title();
+
+    @JsonProperty(ID_FIELD)
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public abstract Optional<String> id();
 
     @JsonProperty(DESCRIPTION_FIELD)
     @Nullable
@@ -52,11 +58,21 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter 
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public UsedSearchFilter withQueryString(String queryString) {
+        return toBuilder().queryString(queryString).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
 
         @JsonProperty(TITLE_FIELD)
         public abstract Builder title(String title);
+
+        @JsonProperty(ID_FIELD)
+        public abstract Builder id(@Nullable String id);
 
         @JsonProperty(DESCRIPTION_FIELD)
         public abstract Builder description(String description);

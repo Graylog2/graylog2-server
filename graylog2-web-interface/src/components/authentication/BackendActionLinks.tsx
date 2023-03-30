@@ -29,20 +29,19 @@ type Props = {
 const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}>
-      <Button bsStyle="success" disabled={!finishedLoading || !activeBackend}>
-        View Active Service
+      <Button disabled={!finishedLoading || !activeBackend}>
+        View active service
       </Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(activeBackend?.id)}>
-      <Button bsStyle="success"
-              disabled={!activeBackend || !finishedLoading}
+      <Button disabled={!activeBackend || !finishedLoading}
               type="button">
-        Edit Active Service
+        Edit active service
       </Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}>
       <Button bsStyle="success" type="button">
-        Create Service
+        Create service
       </Button>
     </LinkContainer>
   </ButtonToolbar>

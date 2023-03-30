@@ -1,0 +1,5 @@
+type = "changed"
+message = "Mask custom properties for Kafka inputs on the inputs page to hide sensitive information."
+
+issues = ["13383"]
+pulls = ["13873"]

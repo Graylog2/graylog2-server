@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix \"Unauthorized\" messages in server log when \"Trusted Header Authentication\" is enabled and a user session expires."
+
+issues = ["13721"]
+pulls = ["13735"]

@@ -26,5 +26,5 @@ export type QueryValidationState = {
     beginColumn: number,
     endColumn: number,
     relatedProperty?: string,
-  }> | undefined
-}
+  }>,
+};

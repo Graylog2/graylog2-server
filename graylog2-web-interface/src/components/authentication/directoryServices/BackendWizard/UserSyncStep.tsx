@@ -19,10 +19,11 @@ import type * as Immutable from 'immutable';
 import { useContext } from 'react';
 import type { FormikProps } from 'formik';
 import { Formik, Form, Field } from 'formik';
+import styled from 'styled-components';
 
 import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
-import { Icon, FormikFormGroup, Select } from 'components/common';
+import { Icon, FormikFormGroup, Select, InputList } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
 
 import type { WizardFormValues } from './BackendWizardContext';
@@ -35,6 +36,7 @@ export const FORM_VALIDATION = {
   defaultRoles: { required: true },
   userFullNameAttribute: { required: true },
   userNameAttribute: { required: true },
+  emailAttributes: {},
   userSearchBase: { required: true },
   userSearchPattern: { required: true },
   userUniqueIdAttribute: {},
@@ -50,6 +52,9 @@ type Props = {
   submitAllError: React.ReactNode | null | undefined,
   validateOnMount: boolean,
 };
+const StyledInputList = styled(InputList)`
+  margin: auto 15px;
+`;
 
 const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,8 +70,12 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
     });
   };
 
+  const getInitalFormValues = (values: WizardFormValues) => {
+    return { ...values, ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }) };
+  };
+
   return (
-    <Formik initialValues={stepsState.formValues}
+    <Formik initialValues={getInitalFormValues(stepsState.formValues)}
             initialErrors={backendValidationErrors}
             innerRef={formRef}
             onSubmit={onSubmit}
@@ -96,6 +105,26 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                            placeholder="Name Attribute"
                            validate={validateField(FORM_VALIDATION.userNameAttribute)} />
 
+          {!excludedFields.emailAttributes && (
+          <Field name="emailAttributes" validate={validateField(FORM_VALIDATION.emailAttributes)}>
+            {({ field: { name, value, onChange }, meta: { error } }) => (
+              <Input bsStyle={error ? 'error' : undefined}
+                     help={help.emailAttributes}
+                     error={error ?? backendValidationErrors?.emailAttributes}
+                     id="email-attributes-input"
+                     label="Email Attributes"
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <StyledInputList id="userEmailAttributes"
+                                 placeholder="Email Attributes"
+                                 name={name}
+                                 values={value}
+                                 isClearable
+                                 onChange={onChange} />
+              </Input>
+            )}
+          </Field>
+          )}
           <FormikFormGroup help={help.userFullNameAttribute}
                            label="Full Name Attribute"
                            name="userFullNameAttribute"
@@ -158,7 +187,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                     type="button">
               Finish & Save Identity Service
             </Button>
-            <Button bsStyle="primary"
+            <Button bsStyle="success"
                     disabled={isSubmitting}
                     type="submit">
               Next: Group Synchronization

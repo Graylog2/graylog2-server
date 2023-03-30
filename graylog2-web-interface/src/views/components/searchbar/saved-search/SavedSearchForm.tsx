@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useCallback, useState } from 'react';
 import { Position } from 'react-overlays';
 import styled from 'styled-components';
 
+import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
 import { Portal } from 'components/common';
-import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
+import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import styles from './SavedSearchForm.css';
 
 type Props = {
-  onChangeTitle: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  saveSearch: () => void,
-  saveAsSearch: () => void,
-  disableCreateNew: boolean,
+  saveSearch: (newTitle: string) => void,
+  saveAsSearch: (newTitle: string) => void,
   toggleModal: () => void,
   isCreateNew: boolean,
   value: string,
@@ -46,16 +46,21 @@ const stopEvent = (e) => {
 const SavedSearchForm = (props: Props) => {
   const {
     isCreateNew,
-    disableCreateNew,
-    onChangeTitle,
     saveSearch,
     saveAsSearch,
     toggleModal,
     value,
     target,
   } = props;
-  const disableSaveAs = !value || value === '' || disableCreateNew;
+  const [title, setTitle] = useState(value);
+  const onChangeTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value), []);
+
+  const trimmedTitle = (title ?? '').trim();
+  const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
+  const pluggableSaveViewControls = useSaveViewFormControls();
+  const _saveSearch = useCallback(() => saveSearch(title), [saveSearch, title]);
+  const _saveAsSearch = useCallback(() => saveAsSearch(title), [saveAsSearch, title]);
 
   return (
     <Portal>
@@ -64,35 +69,38 @@ const SavedSearchForm = (props: Props) => {
         <Popover title="Name of search" id="saved-search-popover">
           <StyledForm onSubmit={stopEvent}>
             <FormGroup>
-              <ControlLabel>Title</ControlLabel>
+              <ControlLabel htmlFor="title">Title</ControlLabel>
               <FormControl type="text"
-                           value={value}
+                           value={title}
+                           id="title"
                            placeholder="Enter title"
                            onChange={onChangeTitle} />
             </FormGroup>
-            {!isCreateNew
-            && (
-              <Button bsStyle="primary"
+            {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component && <Component key={id} disabledViewCreation={disableSaveAs} />))}
+            <ButtonToolbar>
+              {!isCreateNew && (
+                <Button bsStyle="primary"
+                        className={styles.button}
+                        type="submit"
+                        bsSize="sm"
+                        onClick={_saveSearch}>
+                  Save
+                </Button>
+              )}
+              <Button disabled={disableSaveAs}
+                      bsStyle="info"
                       className={styles.button}
                       type="submit"
                       bsSize="sm"
-                      onClick={saveSearch}>
-                Save
+                      onClick={_saveAsSearch}>
+                {createNewTitle}
               </Button>
-            )}
-            <Button disabled={disableSaveAs}
-                    bsStyle="info"
-                    className={styles.button}
-                    type="submit"
-                    bsSize="sm"
-                    onClick={saveAsSearch}>
-              {createNewTitle}
-            </Button>
-            <Button className={styles.button}
-                    onClick={toggleModal}
-                    bsSize="sm">
-              Cancel
-            </Button>
+              <Button className={styles.button}
+                      onClick={toggleModal}
+                      bsSize="sm">
+                Cancel
+              </Button>
+            </ButtonToolbar>
           </StyledForm>
         </Popover>
       </Position>

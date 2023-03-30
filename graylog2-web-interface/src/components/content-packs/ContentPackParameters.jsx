@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import lodash from 'lodash';
+import remove from 'lodash/remove';
 
 import { Row, Col, BootstrapModalConfirm } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
@@ -47,10 +47,8 @@ class ContentPackParameters extends React.Component {
     super(props);
 
     this.state = {
-      newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter),
+      showParameterModal: false,
       parameterToDelete: undefined,
-      defaultValueError: undefined,
-      nameError: undefined,
     };
   }
 
@@ -90,7 +88,7 @@ class ContentPackParameters extends React.Component {
   _onParameterClear = (id, configKey) => {
     const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
 
-    lodash.remove(newAppliedParameter[id], (paramMap) => { return paramMap.configKey === configKey; });
+    remove(newAppliedParameter[id], (paramMap) => { return paramMap.configKey === configKey; });
     this.props.onStateChange({ appliedParameter: newAppliedParameter });
   };
 
@@ -100,7 +98,7 @@ class ContentPackParameters extends React.Component {
 
     /* If we delete a parameter we need to remove the reference from appliedParameter */
     Object.keys(newAppliedParameter).forEach((id) => {
-      lodash.remove(newAppliedParameter[id], (paramMap) => { return paramMap.paramName === parameter.name; });
+      remove(newAppliedParameter[id], (paramMap) => { return paramMap.paramName === parameter.name; });
 
       if (newAppliedParameter[id].length <= 0) {
         delete newAppliedParameter[id];
@@ -115,7 +113,7 @@ class ContentPackParameters extends React.Component {
 
   _confirmationModal = () => {
     return (
-      <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
+      <BootstrapModalConfirm showModal={this.state.showParameterModal}
                              title="Confirm deletion"
                              onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
                              onCancel={this._closeConfirmModal}>
@@ -125,13 +123,11 @@ class ContentPackParameters extends React.Component {
   };
 
   _openConfirmModal = (parameter) => {
-    this.setState({ parameterToDelete: parameter });
-    this.modal.open();
+    this.setState({ showParameterModal: true, parameterToDelete: parameter });
   };
 
   _closeConfirmModal = () => {
-    this.setState({ parameterToDelete: undefined });
-    this.modal.close();
+    this.setState({ showParameterModal: false, parameterToDelete: undefined });
   };
 
   render() {

@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -37,7 +37,7 @@ type Props = {
 
 const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
   const actionContext = useContext(ActionContext);
-  const handlerArgs = { queryId, field, type, value, contexts: actionContext };
+  const handlerArgs = useMemo(() => ({ queryId, field, type, value, contexts: actionContext }), [actionContext, field, queryId, type, value]);
   const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
 
   return (

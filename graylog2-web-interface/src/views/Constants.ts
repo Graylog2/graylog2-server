@@ -18,6 +18,8 @@ import chroma from 'chroma-js';
 
 import type { TimeRange, RelativeTimeRangeWithEnd, RelativeTimeRange } from 'views/logic/queries/Query';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import type { ArrayElement } from 'views/types';
+import type { AutoTimeConfig } from 'views/logic/aggregationbuilder/Pivot';
 
 export type SearchBarFormValues = {
   timerange: TimeRange,
@@ -29,6 +31,13 @@ export const FULL_MESSAGE_FIELD = 'full_message';
 export const TIMESTAMP_FIELD = 'timestamp';
 export const MESSAGE_FIELD = 'message';
 export const SOURCE_FIELD = 'source';
+export const MISSING_BUCKET_NAME = '(Empty Value)';
+export const DEFAULT_PIVOT_LIMIT = 15;
+
+export const DEFAULT_PIVOT_INTERVAL: AutoTimeConfig = {
+  type: 'auto',
+  scaling: 1.0,
+};
 
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD];
 
@@ -47,6 +56,10 @@ export const DEFAULT_HIGHLIGHT_COLOR = StaticColor.create('#ffec3d');
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
   .mode('lch')
   .colors(40);
+
+export const DEFAULT_INTERPOLATION = 'linear';
+export const interpolationTypes = ['linear', 'step-after', 'spline'] as const;
+export type InterpolationType = ArrayElement<typeof interpolationTypes>;
 
 export const TimeUnits = {
   seconds: 'Seconds',
@@ -94,3 +107,5 @@ export const availableTimeRangeTypes = [
   { type: 'absolute' as const, name: 'Absolute' },
   { type: 'keyword' as const, name: 'Keyword' },
 ];
+
+export const VISUALIZATION_TABLE_HEADER_HEIGHT = 28;

@@ -14,28 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import memoize from 'lodash/memoize';
+
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
-import Routes from 'routing/Routes';
-import history from 'util/History';
 import CancellablePromise from 'logic/rest/CancellablePromise';
+import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+
+// eslint-disable-next-line global-require
+const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
 
 const reportServerSuccess = () => {
-  // eslint-disable-next-line global-require
-  const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
   ServerAvailabilityActions.reportSuccess();
 };
 
-const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFetchError(error));
+const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
 const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
-  // eslint-disable-next-line global-require
-  const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
+  const { SessionStore, SessionActions } = importSessionStore();
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
   if (SessionStore.isLoggedIn() && error.status === 401) {
@@ -48,8 +49,6 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
-    // eslint-disable-next-line global-require
-    const { ServerAvailabilityActions } = require('stores/sessions/ServerAvailabilityStore');
     ServerAvailabilityActions.reportError(fetchError);
   }
 
@@ -88,11 +87,11 @@ export class Builder {
 
   private accept: string;
 
-  private responseHandler: (response: any) => any;
+  private responseHandler: (response: unknown) => unknown;
 
-  private errorHandler: (error: any) => any;
+  private errorHandler: (error: unknown) => unknown;
 
-  constructor(method, url) {
+  constructor(method: Method, url: string) {
     this.method = method;
     this.url = url.replace(/([^:])\/\//, '$1/');
 
@@ -120,7 +119,7 @@ export class Builder {
 
     this.responseHandler = defaultResponseHandler;
 
-    this.errorHandler = (error) => onServerError(error);
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
@@ -131,7 +130,7 @@ export class Builder {
     this.accept = acceptedMimeType;
 
     this.responseHandler = defaultResponseHandler;
-    this.errorHandler = (error) => onServerError(error);
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
@@ -140,7 +139,7 @@ export class Builder {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
-    this.responseHandler = (resp) => {
+    this.responseHandler = (resp: { ok: boolean, text: () => string }) => {
       if (resp.ok) {
         reportServerSuccess();
 
@@ -150,26 +149,24 @@ export class Builder {
       throw resp;
     };
 
-    this.errorHandler = (error) => onServerError(error);
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
 
   plaintext(body) {
-    const onUnauthorized = () => history.replace(Routes.STARTPAGE);
-
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
 
     this.responseHandler = defaultResponseHandler;
 
-    this.errorHandler = (error) => onServerError(error, onUnauthorized);
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => {});
 
     return this;
   }
@@ -183,7 +180,7 @@ export class Builder {
     return this;
   }
 
-  build() {
+  build(): Promise<any> {
     const headers: RequestHeaders = this.body && this.body.mimeType
       ? { ...this.options, 'Content-Type': this.body.mimeType }
       : this.options;
@@ -192,7 +189,7 @@ export class Builder {
       headers.Accept = this.accept;
     }
 
-    return CancellablePromise.of(window.fetch(this.url, {
+    return CancellablePromise.of<unknown>(window.fetch(this.url, {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
@@ -201,9 +198,8 @@ export class Builder {
   }
 }
 
-function queuePromiseIfNotLoggedin(promise) {
-  // eslint-disable-next-line global-require
-  const { SessionStore, SessionActions } = require('stores/sessions/SessionStore');
+function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<T> {
+  const { SessionStore, SessionActions } = importSessionStore();
 
   if (!SessionStore.isLoggedIn()) {
     return () => CancellablePromise.of(new Promise((resolve, reject) => {
@@ -216,7 +212,9 @@ function queuePromiseIfNotLoggedin(promise) {
   return promise;
 }
 
-export default function fetch(method, url, body?) {
+type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
+
+export default function fetch<T = any>(method: Method, url: string, body?: any): Promise<T> {
   const promise = () => new Builder(method, url)
     .json(body)
     .build();

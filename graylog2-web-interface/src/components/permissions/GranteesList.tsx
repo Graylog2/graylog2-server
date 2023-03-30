@@ -26,6 +26,7 @@ import type { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/per
 import type EntityShareState from 'logic/permissions/EntityShareState';
 import type Grantee from 'logic/permissions/Grantee';
 import type Capability from 'logic/permissions/Capability';
+import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 
 import GranteesListItem from './GranteesListItem';
 
@@ -40,6 +41,7 @@ const List = styled.div(({ theme }) => `
   >:nth-child(even) {
     background: ${theme.colors.table.backgroundAlt};
   };
+
   >:nth-child(odd) {
     background: ${theme.colors.table.background};
   };
@@ -50,7 +52,7 @@ const PaginationWrapper = styled.ul`
   justify-content: center;
 
   .pagination {
-    margin: 10px 0 0 0;
+    margin: 10px 0;
   }
 `;
 
@@ -78,6 +80,7 @@ type Props = {
   }) => Promise<EntityShareState | undefined | null>,
   selectedGrantees: SelectedGrantees,
   title: string,
+  entityTypeTitle?: string | null | undefined,
 };
 
 const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number, currentPage: number) => {
@@ -87,8 +90,8 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
   return selectedGrantees.slice(begin, end);
 };
 
-const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, availableCapabilities, selectedGrantees, className, title }: Props) => {
-  const initialPageSize = PageSizeSelect.defaultPageSizes[0];
+const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, entityTypeTitle, availableCapabilities, selectedGrantees, className, title }: Props) => {
+  const initialPageSize = DEFAULT_PAGE_SIZES[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
   const paginatedGrantees = _paginatedGrantees(selectedGrantees, pageSize, currentPage);
@@ -101,7 +104,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
       <Header>
         <h5>{title}</h5>
         {showPageSizeSelect && (
-          <StyledPageSizeSelect onChange={(event) => setPageSize(Number(event.target.value))} pageSize={pageSize} />
+          <StyledPageSizeSelect onChange={(newPageSize) => setPageSize(newPageSize)} pageSize={pageSize} />
         )}
       </Header>
       {paginatedGrantees.size > 0 ? (
@@ -117,10 +120,10 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
                                 onDelete={onDelete}
                                 onCapabilityChange={onCapabilityChange} />
             );
-          })}
+          }).toArray()}
         </List>
       ) : (
-        <Alert>This {entityType} has no collaborators.</Alert>
+        <Alert>This {entityTypeTitle || entityType} has no collaborators.</Alert>
       )}
       <PaginationWrapper>
         <StyledPagination totalPages={totalPages}
@@ -133,6 +136,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
 
 GranteesList.defaultProps = {
   className: undefined,
+  entityTypeTitle: undefined,
 };
 
 export default GranteesList;

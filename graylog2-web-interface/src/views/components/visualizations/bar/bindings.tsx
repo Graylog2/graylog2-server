@@ -18,14 +18,15 @@ import * as React from 'react';
 
 import type { VisualizationType } from 'views/types';
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
-import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import BarVisualizationConfig, { DEFAULT_BARMODE } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
+import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 type BarVisualizationConfigFormValues = {
   barmode: 'group' | 'stack' | 'relative' | 'overlay',
+  axisType: AxisType,
 };
-
-const DEFAULT_BARMODE = 'group';
 
 const validate = hasAtLeastOneMetric('Bar chart');
 
@@ -34,9 +35,9 @@ const barChart: VisualizationType<typeof BarVisualization.type, BarVisualization
   displayName: 'Bar Chart',
   component: BarVisualization,
   config: {
-    createConfig: () => ({ barmode: DEFAULT_BARMODE }),
-    fromConfig: (config: BarVisualizationConfig | undefined) => ({ barmode: config?.barmode ?? DEFAULT_BARMODE }),
-    toConfig: (formValues: BarVisualizationConfigFormValues) => BarVisualizationConfig.create(formValues.barmode),
+    createConfig: () => ({ barmode: DEFAULT_BARMODE, axisType: DEFAULT_AXIS_TYPE }),
+    fromConfig: (config: BarVisualizationConfig | undefined) => ({ barmode: config?.barmode ?? DEFAULT_BARMODE, axisType: config?.axisType ?? DEFAULT_AXIS_TYPE }),
+    toConfig: (formValues: BarVisualizationConfigFormValues) => BarVisualizationConfig.create(formValues.barmode, formValues.axisType),
     fields: [{
       name: 'barmode',
       title: 'Mode',
@@ -75,6 +76,12 @@ const barChart: VisualizationType<typeof BarVisualization.type, BarVisualization
           </ul>
         );
       },
+    }, {
+      name: 'axisType',
+      title: 'Axis Type',
+      type: 'select',
+      options: axisTypes,
+      required: true,
     }],
   },
   capabilities: ['event-annotations'],

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
+import type { Matcher } from 'wrappedTestingLibrary';
 import { render, within, screen, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
@@ -32,10 +33,16 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import dataTable from 'views/components/datatable/bindings';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import Series from 'views/logic/aggregationbuilder/Series';
+import viewsReducers from 'views/viewsReducers';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 import AggregationWizard from '../AggregationWizard';
 
-const extendedTimeout = applyTimeoutMultiplier(15000);
+jest.mock('views/hooks/useAggregationFunctions');
+
+const extendedTimeout = applyTimeoutMultiplier(30000);
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
@@ -43,63 +50,64 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-const pivot0 = Pivot.create(fieldTypeMapping1.name, 'values', { limit: 15 });
-const pivot1 = Pivot.create(fieldTypeMapping2.name, 'values', { limit: 15 });
+const pivot0 = Pivot.create([fieldTypeMapping1.name], 'values', { limit: 15 });
+const pivot1 = Pivot.create([fieldTypeMapping2.name], 'values', { limit: 15 });
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
   .rowPivots([pivot0, pivot1])
+  .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
 
 const selectEventConfig = { container: document.body };
 
-const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable], 'views.reducers': viewsReducers } };
 
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
 };
 
-const findWidgetConfigFormSubmitButton = async () => {
-  const button = await screen.findByRole('button', { name: 'Update Preview' });
-
-  return button;
-};
+const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await findWidgetConfigFormSubmitButton();
   fireEvent.click(applyButton);
 };
 
-const sortByTookMsDesc = async (sortElementContainerId) => {
+const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string = 'took_ms') => {
   const httpMethodSortContainer = await screen.findByTestId(sortElementContainerId);
   const sortFieldSelect = within(httpMethodSortContainer).getByLabelText('Select field for sorting');
   const sortDirectionSelect = within(httpMethodSortContainer).getByLabelText('Select direction for sorting');
 
   await act(async () => {
     await selectEvent.openMenu(sortFieldSelect);
-    await selectEvent.select(sortFieldSelect, 'took_ms', selectEventConfig);
+    await selectEvent.select(sortFieldSelect, option, selectEventConfig);
     await selectEvent.openMenu(sortDirectionSelect);
     await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
   });
 };
 
-describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
+const renderSUT = (props = {}) => render((
+  <TestStoreProvider>
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard onChange={() => {}}
+                         onSubmit={() => {}}
+                         onCancel={() => {}}
                          config={widgetConfig}
                          editing
                          id="widget-id"
                          type="AGGREGATION"
                          fields={Immutable.List([])}
                          {...props}>
-        <>The Visualization</>
+        <span>The Visualization</span>
       </AggregationWizard>
-    </FieldTypesContext.Provider>,
-  );
+    </FieldTypesContext.Provider>
+  </TestStoreProvider>
+));
 
+describe('AggregationWizard', () => {
   beforeAll(() => PluginStore.register(plugin));
 
   afterAll(() => PluginStore.unregister(plugin));
@@ -163,13 +171,16 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should configure another sort element', async () => {
     const onChangeMock = jest.fn();
+    const series1 = Series.forFunction('count()');
+    const series2 = Series.forFunction('max(took_ms)');
     const config = widgetConfig
       .toBuilder()
-      .sort([new SortConfig('pivot', 'http_method', Direction.Ascending)])
+      .series([series1, series2])
+      .sort([SortConfig.fromSeries(series1)])
       .build();
 
     renderSUT({ config, onChange: onChangeMock });
@@ -177,14 +188,15 @@ describe('AggregationWizard', () => {
     const addSortButton = await screen.findByRole('button', { name: 'Add a Sort' });
     userEvent.click(addSortButton);
 
-    await sortByTookMsDesc('sort-element-1');
+    await sortByTookMsDesc('sort-element-1', 'max(took_ms)');
     await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()
+      .series([series1, series2])
       .sort([
-        new SortConfig('pivot', 'http_method', Direction.Ascending),
-        new SortConfig('pivot', 'took_ms', Direction.Descending),
+        SortConfig.fromSeries(series1),
+        SortConfig.fromSeries(series2),
       ])
       .build();
 
@@ -201,7 +213,7 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
-    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
+    await waitFor(() => expect(applyButton).toBeDisabled());
   });
 
   it('should require direction when creating a sort element', async () => {
@@ -212,7 +224,7 @@ describe('AggregationWizard', () => {
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
-    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
+    await waitFor(() => expect(applyButton).toBeDisabled());
   });
 
   it('should remove all sorts', async () => {

@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Removes ability for users to change Event Definition Condition Type if it is not meant to be changeable."
+
+pulls = ["14110"]

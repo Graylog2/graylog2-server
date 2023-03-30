@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import CurrentUserContext from 'contexts/CurrentUserContext';
 import { createGRN } from 'logic/permissions/GRN';
+import useCurrentUser from 'hooks/useCurrentUser';
 
-type ChildFun = ({ disabled: boolean }) => React.ReactElement;
+type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
 type Props = {
   children: React.ReactNode | ChildFun,
@@ -31,7 +30,7 @@ type Props = {
 };
 
 const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useCurrentUser();
   const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
   const adminPermission = '*';

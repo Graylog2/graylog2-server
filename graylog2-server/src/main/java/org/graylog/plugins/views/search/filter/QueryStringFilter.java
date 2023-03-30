@@ -55,6 +55,10 @@ public abstract class QueryStringFilter implements Filter {
         return toBuilder();
     }
 
+    public QueryStringFilter withQuery(String query) {
+        return toBuilder().query(query).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder implements Filter.Builder {
 

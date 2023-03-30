@@ -108,15 +108,15 @@ public class InputSetupService extends AbstractExecutionThreadService {
         for (IOState<MessageInput> state : inputRegistry.getRunningInputs()) {
             MessageInput input = state.getStoppable();
 
-            LOG.info("Attempting to close input <{}> [{}].", input.getUniqueReadableId(), input.getName());
+            LOG.info("Attempting to close input {}.", input.toIdentifier());
 
             Stopwatch s = Stopwatch.createStarted();
             try {
                 input.stop();
 
-                LOG.info("Input <{}> closed. Took [{}ms]", input.getUniqueReadableId(), s.elapsed(TimeUnit.MILLISECONDS));
+                LOG.info("Input {} closed. Took [{}ms]", input.toIdentifier(), s.elapsed(TimeUnit.MILLISECONDS));
             } catch (Exception e) {
-                LOG.error("Unable to stop input <{}> [{}]: " + e.getMessage(), input.getUniqueReadableId(), input.getName());
+                LOG.error("Unable to stop input {}: {}", input.toIdentifier(), e.getMessage());
             } finally {
                 s.stop();
             }

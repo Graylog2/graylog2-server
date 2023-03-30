@@ -64,10 +64,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 
 @RequiresAuthentication
-@Api(value = "Authorization/Roles", description = "Manage roles")
+@Api(value = "Authorization/Roles", description = "Manage roles", tags = {CLOUD_VISIBLE})
 @Path("/authz/roles")
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthzRolesResource extends RestResource {

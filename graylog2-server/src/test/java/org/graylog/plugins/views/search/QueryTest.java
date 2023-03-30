@@ -35,12 +35,14 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
@@ -50,12 +52,14 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.Period;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -66,8 +70,8 @@ public class QueryTest {
 
     private ObjectMapper objectMapper;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    public void setup() {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(this.getClass().getClassLoader());
 
@@ -98,7 +102,7 @@ public class QueryTest {
     }
 
     @Test
-    public void mergeWithExecutionState() throws Exception {
+    void mergeWithExecutionState() {
         final String messageListId = UUID.randomUUID().toString();
         Query query = Query.builder()
                 .id("abc123")
@@ -126,7 +130,7 @@ public class QueryTest {
     }
 
     @Test
-    public void appliesExecutionStateTimeRangeToGlobalOverride() throws InvalidRangeParametersException {
+    void appliesExecutionStateTimeRangeToGlobalOverride() throws InvalidRangeParametersException {
 
 
         final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
@@ -139,8 +143,9 @@ public class QueryTest {
         assertThat(query.globalOverride()).hasValueSatisfying(go ->
                 assertThat(go.timerange()).contains(relativeRange(60)));
     }
+
     @Test
-    public void appliesExecutionStateQueryToGlobalOverride() {
+    void appliesExecutionStateQueryToGlobalOverride() {
 
         final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
                 .query(ElasticsearchQueryString.of("NACKEN"))
@@ -151,8 +156,9 @@ public class QueryTest {
         assertThat(query.globalOverride()).hasValueSatisfying(go ->
                 assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN")));
     }
+
     @Test
-    public void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() throws InvalidRangeParametersException {
+    void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() throws InvalidRangeParametersException {
 
         final ExecutionStateGlobalOverride executionState = ExecutionStateGlobalOverride.builder()
                 .timerange(RelativeRange.create(60))
@@ -167,8 +173,9 @@ public class QueryTest {
             assertThat(go.query()).contains(ElasticsearchQueryString.of("NACKEN"));
         });
     }
+
     @Test
-    public void doesNotAddGlobalOverrideIfNeitherTimeRangeNorQueryArePresent() {
+    void doesNotAddGlobalOverrideIfNeitherTimeRangeNorQueryArePresent() {
 
         final ExecutionStateGlobalOverride.Builder executionState = ExecutionStateGlobalOverride.builder();
         executionState.searchTypesBuilder().put("some-id",
@@ -180,13 +187,13 @@ public class QueryTest {
     }
 
     @Test
-    public void builderGeneratesQueryId() {
+    void builderGeneratesQueryId() {
         final Query build = Query.builder().timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty()).build();
         assertThat(build.id()).isNotNull();
     }
 
     @Test
-    public void builderGeneratesDefaultQueryAndRange() {
+    void builderGeneratesDefaultQueryAndRange() {
         final Query build = Query.builder().build();
         final BackendQuery query = build.query();
         assertThat(query.queryString()).isEqualTo("");
@@ -208,7 +215,7 @@ public class QueryTest {
      * Test that json parser recognizes full query with its type and query string value as an object (backwards compatibility)
      */
     @Test
-    public void testFullQueryWithType() throws IOException {
+    void testFullQueryWithType() throws IOException {
         final Query query = objectMapper.readValue(getClass().getResourceAsStream("/org/graylog/plugins/views/search/query/full-query.json"), Query.class);
         final ElasticsearchQueryString queryString = (ElasticsearchQueryString) query.query();
         assertThat(queryString.queryString()).isEqualTo("some-full-query");
@@ -218,20 +225,20 @@ public class QueryTest {
      * Test that json parser recognizes query that's just a string, not object
      */
     @Test
-    public void testSimpleQuery() throws IOException {
+    void testSimpleQuery() throws IOException {
         final Query query = objectMapper.readValue(getClass().getResourceAsStream("/org/graylog/plugins/views/search/query/simple-query.json"), Query.class);
         final ElasticsearchQueryString queryString = (ElasticsearchQueryString) query.query();
         assertThat(queryString.queryString()).isEqualTo("some-simple-query");
     }
 
     @Test
-    public void testSerializeQuery() throws JsonProcessingException {
+    void testSerializeQuery() throws JsonProcessingException {
         final String value = objectMapper.writeValueAsString(ElasticsearchQueryString.of("foo:bar"));
         assertThat(value).isEqualTo("{\"type\":\"elasticsearch\",\"query_string\":\"foo:bar\"}");
     }
 
     @Test
-    public void testHasReferencedSearchFiltersReturnsFalseOnEmptySearchFilters() {
+    void testHasReferencedSearchFiltersReturnsFalseOnEmptySearchFilters() {
         Query query = Query.builder()
                 .filters(Collections.emptyList())
                 .build();
@@ -241,7 +248,7 @@ public class QueryTest {
     }
 
     @Test
-    public void testHasReferencedSearchFiltersReturnsFalseWhenNoReferencedSearchFilters() {
+    void testHasReferencedSearchFiltersReturnsFalseWhenNoReferencedSearchFilters() {
         Query query = Query.builder()
                 .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").build()))
                 .build();
@@ -251,7 +258,7 @@ public class QueryTest {
     }
 
     @Test
-    public void testHasReferencedSearchFiltersReturnsTrueWhenReferencedSearchFilterPresent() {
+    void testHasReferencedSearchFiltersReturnsTrueWhenReferencedSearchFilterPresent() {
         Query query = Query.builder()
                 .filters(ImmutableList.of(
                         InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").build(),
@@ -263,7 +270,7 @@ public class QueryTest {
     }
 
     @Test
-    public void testSavesEmptySearchFiltersCollectionInContentPack() {
+    void testSavesEmptySearchFiltersCollectionInContentPack() {
         Query noFiltersQuery = Query.builder().build();
         assertThat(noFiltersQuery.toContentPackEntity(EntityDescriptorIds.empty()).filters())
                 .isNotNull()
@@ -271,7 +278,7 @@ public class QueryTest {
     }
 
     @Test
-    public void testSavesSearchFiltersCollectionInContentPack() {
+    void testSavesSearchFiltersCollectionInContentPack() {
         final ImmutableList<UsedSearchFilter> originalSearchFilters = ImmutableList.of(
                 InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").build(),
                 ReferencedQueryStringSearchFilter.create("007")
@@ -280,5 +287,60 @@ public class QueryTest {
         assertThat(queryWithFilters.toContentPackEntity(EntityDescriptorIds.empty()).filters())
                 .isNotNull()
                 .isEqualTo(originalSearchFilters);
+    }
+
+    @Test
+    void collectsStreamIdsForPermissionsCheckFromFiltersAndSearchTypes() {
+        Query query = Query.builder()
+                .id("Test query")
+                .query(ElasticsearchQueryString.of("*"))
+                .searchTypes(
+                        Set.of(
+                                MessageList.builder().streams(Set.of("a", "b")).build(),
+                                EventList.builder().streams(Set.of("b", "c")).build()
+                        )
+                )
+                .build();
+        query = query.addStreamsToFilter(Set.of("x", "y"));
+
+        assertThat(query.streamIdsForPermissionsCheck())
+                .isNotNull()
+                .hasSize(5)
+                .contains("a", "b", "c", "x", "y");
+    }
+
+    @Test
+    void prefersGlobalOverrideIfPresentWhileApplyingExecutionState() {
+        final ExecutionStateGlobalOverride executionStateGlobalOverride = ExecutionStateGlobalOverride.builder().query(ElasticsearchQueryString.of("global")).build();
+        final ExecutionState.Builder builder = ExecutionState.builder()
+                .setGlobalOverride(executionStateGlobalOverride)
+                .withParameterBindings(Map.of());
+        builder.queriesBuilder().put("query1", ExecutionStateGlobalOverride.builder().query(ElasticsearchQueryString.of("query")).build());
+        ExecutionState executionState = builder.build();
+
+
+        Query query = Query.builder().id("query1").build();
+
+        query = query.applyExecutionState(executionState);
+
+        assertThat(query.query().queryString())
+                .isEqualTo("global");
+    }
+
+    @Test
+    void appliesProperQueryExecutionStateIfEmptyGlobalOverride() {
+        final ExecutionState.Builder builder = ExecutionState.builder()
+                .setGlobalOverride(ExecutionStateGlobalOverride.empty())
+                .withParameterBindings(Map.of());
+        builder.queriesBuilder().put("query1", ExecutionStateGlobalOverride.builder().query(ElasticsearchQueryString.of("query")).build());
+        builder.queriesBuilder().put("query2", ExecutionStateGlobalOverride.builder().query(ElasticsearchQueryString.of("1+1=2")).build());
+        ExecutionState executionState = builder.build();
+
+        Query query = Query.builder().id("query1").build();
+
+        query = query.applyExecutionState(executionState);
+
+        assertThat(query.query().queryString())
+                .isEqualTo("query");
     }
 }

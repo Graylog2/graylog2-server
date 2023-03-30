@@ -17,28 +17,40 @@
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { MessagesActions } from 'stores/messages/MessagesStore';
+import { FormSubmit } from 'components/common';
+import useHistory from 'routing/useHistory';
 
 import { Button } from '../bootstrap';
+
+const StyledFormSubmit = styled(FormSubmit)`
+  margin-top: 10px;
+`;
 
 type LoadMessageFormProps = {
   loadMessage: (e: React.FormEvent) => void,
   children: React.ReactNode,
   loading: boolean,
 };
-const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProps) => (
-  <div>
-    <form className="form-inline message-loader-form" onSubmit={loadMessage}>
-      {children}
-      <Button bsStyle="info"
-              disabled={loading}
-              type="submit">
-        {loading ? 'Loading message...' : 'Load message'}
-      </Button>
-    </form>
-  </div>
-);
+
+const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProps) => {
+  const history = useHistory();
+
+  return (
+    <div>
+      <form className="form-inline message-loader-form" onSubmit={loadMessage}>
+        {children}
+        <StyledFormSubmit submitButtonText="Load message"
+                          isSubmitting={loading}
+                          submitLoadingText="Loading message..."
+                          isAsyncSubmit
+                          onCancel={() => history.goBack()} />
+      </form>
+    </div>
+  );
+};
 
 type Props = {
   hidden: boolean,

@@ -71,13 +71,9 @@ class SidecarRow extends React.Component {
     return (
       <SidecarTR inactive={!sidecar.active}>
         <td className={style.sidecarName}>
-          {sidecar.active
-            ? (
-              <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-                {sidecar.node_name}
-              </Link>
-            )
-            : sidecar.node_name}
+          <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
+            {sidecar.node_name}
+          </Link>
         </td>
         <td>
           <StatusIndicator status={sidecarStatus.status}
@@ -106,7 +102,7 @@ class SidecarRow extends React.Component {
             <LinkContainer to={`${Routes.SYSTEM.SIDECARS.ADMINISTRATION}?node_id=${sidecar.node_id}`}>
               <Button bsSize="xsmall" bsStyle="info">Manage sidecar</Button>
             </LinkContainer>
-            <LinkContainer to={Routes.search_with_query(`gl2_source_collector:${sidecar.node_id}`, 'relative', 604800)}>
+            <LinkContainer to={Routes.search_with_query(`gl2_source_collector:${sidecar.node_id}`, 'relative', { relative: 604800 })}>
               <Button bsSize="xsmall" bsStyle="info">Show messages</Button>
             </LinkContainer>
           </ButtonToolbar>

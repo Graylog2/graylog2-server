@@ -46,22 +46,6 @@ public class MongoDbConfigurationTest {
     }
 
     @Test
-    public void testGetThreadsAllowedToBlockMultiplier() throws RepositoryException, ValidationException {
-        MongoDbConfiguration configuration = new MongoDbConfiguration();
-        new JadConfig(new InMemoryRepository(singletonMap("mongodb_threads_allowed_to_block_multiplier", "12345")), configuration).process();
-
-        assertEquals(12345, configuration.getThreadsAllowedToBlockMultiplier());
-    }
-
-    @Test
-    public void testGetThreadsAllowedToBlockMultiplierDefault() throws RepositoryException, ValidationException {
-        MongoDbConfiguration configuration = new MongoDbConfiguration();
-        new JadConfig(new InMemoryRepository(), configuration).process();
-
-        assertEquals(5, configuration.getThreadsAllowedToBlockMultiplier());
-    }
-
-    @Test
     public void validateSucceedsIfUriIsMissing() throws RepositoryException, ValidationException {
         MongoDbConfiguration configuration = new MongoDbConfiguration();
         new JadConfig(new InMemoryRepository(Collections.emptyMap()), configuration).process();

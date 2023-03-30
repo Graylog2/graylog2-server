@@ -1,0 +1,4 @@
+type = "s"
+message = "Update to freemarker 2.3.31 and use a more secure default configuration."
+
+pulls = ["14354"]

@@ -15,21 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
-import type { ActionHandler } from 'views/components/actions/ActionHandler';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import type { RootState } from 'views/types';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
+import { selectCurrentQueryString } from 'views/logic/slices/viewSelectors';
 
-import QueryManipulationHandler from './QueryManipulationHandler';
+const formatNewQuery = (oldQuery: string, field: string, value: any) => {
+  const fieldPredicate = value === MISSING_BUCKET_NAME
+    ? `_exists_:${field}`
+    : `NOT ${field}:${escape(value)}`;
 
-export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
-  formatNewQuery = (oldQuery: string, field: string, value: any) => {
-    const fieldPredicate = `NOT ${field}:${escape(value)}`;
+  return addToQuery(oldQuery, fieldPredicate);
+};
 
-    return addToQuery(oldQuery, fieldPredicate);
-  };
+type Args = {
+  queryId: string,
+  field: string,
+  value?: string,
+};
 
-  handle: ActionHandler<{}> = ({ queryId, field, value }) => {
-    const oldQuery = this.currentQueryString(queryId);
-    const newQuery = this.formatNewQuery(oldQuery, field, value);
+const ExcludeFromQueryHandler = ({ queryId, field, value }: Args) => (dispatch: AppDispatch, getState: () => RootState) => {
+  const oldQuery = selectCurrentQueryString(queryId)(getState());
+  const newQuery = formatNewQuery(oldQuery, field, value);
 
-    return this.updateQueryString(queryId, newQuery);
-  };
-}
+  return dispatch(updateQueryString(queryId, newQuery));
+};
+
+export default ExcludeFromQueryHandler;

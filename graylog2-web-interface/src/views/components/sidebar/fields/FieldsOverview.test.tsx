@@ -19,18 +19,12 @@ import { mount } from 'wrappedEnzyme';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import { asMock } from 'helpers/mocking';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import FieldsOverview from './FieldsOverview';
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: {
-    getInitialState: () => ({
-      activeQuery: 'aQueryId',
-      id: 'aViewId',
-    }),
-    listen: jest.fn(),
-  },
-}));
+jest.mock('views/hooks/useActiveQueryId');
 
 describe('<FieldsOverview />', () => {
   const fieldTypesStoreState = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
@@ -39,6 +33,10 @@ describe('<FieldsOverview />', () => {
       <FieldsOverview />
     </FieldTypesContext.Provider>
   );
+
+  beforeEach(() => {
+    asMock(useActiveQueryId).mockReturnValue('aQueryId');
+  });
 
   it('should render a FieldsOverview', () => {
     const wrapper = mount(<SimpleFieldsOverview />);

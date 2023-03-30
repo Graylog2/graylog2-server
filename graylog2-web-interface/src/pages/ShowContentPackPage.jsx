@@ -16,13 +16,13 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar, BootstrapModalConfirm } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -32,13 +32,17 @@ import ContentPackInstallations from 'components/content-packs/ContentPackInstal
 import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
 import withParams from 'routing/withParams';
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
+import withHistory from 'routing/withHistory';
 
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const ShowContentPackPage = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ShowContentPackPage',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
 
@@ -46,6 +50,7 @@ const ShowContentPackPage = createReactClass({
 
   getInitialState() {
     return {
+      showModal: false,
       selectedVersion: undefined,
       uninstallEntities: undefined,
       uninstallContentPackId: undefined,
@@ -63,6 +68,7 @@ const ShowContentPackPage = createReactClass({
         UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
       }
 
+      const { history } = this.props;
       history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
     });
 
@@ -84,6 +90,7 @@ const ShowContentPackPage = createReactClass({
             UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
           }
 
+          const { history } = this.props;
           history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
         });
       }, (error) => {
@@ -104,21 +111,19 @@ const ShowContentPackPage = createReactClass({
     });
 
     this.setState({
+      showModal: true,
       uninstallContentPackId: contentPackId,
       uninstallInstallId: installId,
     });
-
-    this.modal.open();
   },
 
   _clearUninstall() {
     this.setState({
+      showModal: false,
       uninstallContentPackId: undefined,
       uninstallInstallId: undefined,
       uninstallEntities: undefined,
     });
-
-    this.modal.close();
   },
 
   _uninstallContentPackRev() {
@@ -153,21 +158,20 @@ const ShowContentPackPage = createReactClass({
     return (
       <DocumentTitle title="Content packs">
         <span>
-          <PageHeader title="Content packs">
+          <PageHeader title="Content packs"
+                      topActions={(
+                        <ButtonToolbar>
+                          <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+                            <Button bsStyle="info">Content Packs</Button>
+                          </LinkContainer>
+                        </ButtonToolbar>
+                      )}>
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
-            </span>
-
-            <span>
+              <br />
               Find more content packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
-
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info">Content Packs</Button>
-              </LinkContainer>
-            </ButtonToolbar>
           </PageHeader>
 
           <Row>
@@ -199,7 +203,7 @@ const ShowContentPackPage = createReactClass({
             </Col>
           </Row>
         </span>
-        <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
+        <BootstrapModalConfirm showModal={this.state.showModal}
                                title="Do you really want to uninstall this Content Pack?"
                                onConfirm={this._uninstallContentPackRev}
                                onCancel={this._clearUninstall}>
@@ -210,4 +214,4 @@ const ShowContentPackPage = createReactClass({
   },
 });
 
-export default withParams(ShowContentPackPage);
+export default withHistory(withParams(ShowContentPackPage));

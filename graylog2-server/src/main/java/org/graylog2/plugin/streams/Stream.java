@@ -97,8 +97,6 @@ public interface Stream extends Persisted {
 
     Boolean isPaused();
 
-    Map<String, List<String>> getAlertReceivers();
-
     Map<String, Object> asMap(List<StreamRule> streamRules);
 
     List<StreamRule> getStreamRules();

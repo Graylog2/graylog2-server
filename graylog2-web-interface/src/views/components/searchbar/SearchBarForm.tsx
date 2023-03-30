@@ -16,21 +16,23 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validate from 'views/components/searchbar/validate';
-import usePluginEntities from 'views/logic/usePluginEntities';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useUserDateTime from 'hooks/useUserDateTime';
+import useHandlerContext from 'views/components/useHandlerContext';
 
+type FormRenderer = (props: FormikProps<SearchBarFormValues>) => React.ReactNode;
 type Props = {
-  children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
+  children: FormRenderer | React.ReactNode,
   initialValues: SearchBarFormValues,
   limitDuration: number,
   onSubmit: (values: SearchBarFormValues) => Promise<any>,
@@ -39,34 +41,32 @@ type Props = {
   validateQueryString: (values: SearchBarFormValues) => Promise<QueryValidationState>,
 }
 
-const StyledForm = styled(Form)`
-  height: 100%;
-`;
+const _isFunction = (children: Props['children']): children is FormRenderer => isFunction(children);
 
-const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
-
-export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues) => ({ timerange: onSubmittingTimerange(timerange), ...rest });
+export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues, userTimezone: string) => ({ timerange: onSubmittingTimerange(timerange, userTimezone), ...rest });
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
   const [enableReinitialize, setEnableReinitialize] = useState(true);
+  const { formatTime, userTimezone } = useUserDateTime();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
   const _onSubmit = useCallback((values: SearchBarFormValues) => {
     setEnableReinitialize(false);
 
-    return onSubmit(normalizeSearchBarFormValues(values)).finally(() => setEnableReinitialize(true));
-  }, [onSubmit]);
+    return onSubmit(normalizeSearchBarFormValues(values, userTimezone)).finally(() => setEnableReinitialize(true));
+  }, [onSubmit, userTimezone]);
   const _initialValues = useMemo(() => {
     const { timerange, ...rest } = initialValues;
 
     return ({
       ...rest,
-      timerange: onInitializingTimerange(timerange),
+      timerange: onInitializingTimerange(timerange, formatTime),
     });
-  }, [initialValues]);
+  }, [formatTime, initialValues]);
 
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls]);
+  const handlerContext = useHandlerContext();
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}
@@ -77,9 +77,9 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
                                  validateOnBlur={false}
                                  validateOnMount={validateOnMount}>
       {(...args) => (
-        <StyledForm>
+        <Form>
           {_isFunction(children) ? children(...args) : children}
-        </StyledForm>
+        </Form>
       )}
     </Formik>
   );

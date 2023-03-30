@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -83,11 +84,10 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
+import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayDeque;
@@ -102,6 +102,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.google.common.collect.ImmutableSortedSet.orderedBy;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class PipelineRuleParser {
 
@@ -114,7 +115,8 @@ public class PipelineRuleParser {
         this.functionRegistry = functionRegistry;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(PipelineRuleParser.class);
+    private static final RateLimitedLog log = getRateLimitedLog(PipelineRuleParser.class);
+
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
     public Rule parseRule(String rule, boolean silent) throws ParseException {
@@ -814,8 +816,9 @@ public class PipelineRuleParser {
         @Override
         public void exitMessageRef(RuleLangParser.MessageRefContext ctx) {
             final MessageRefExpression expr = (MessageRefExpression) parseContext.expressions().get(ctx);
-            if (!expr.getFieldExpr().getType().equals(String.class)) {
-                parseContext.addError(new IncompatibleType(ctx, String.class, expr.getFieldExpr().getType()));
+            final Class type = expr.getFieldExpr().getType();
+            if (!type.equals(String.class) && !type.equals(Message.class)) {
+                parseContext.addError(new IncompatibleType(ctx, String.class, type));
             }
         }
 

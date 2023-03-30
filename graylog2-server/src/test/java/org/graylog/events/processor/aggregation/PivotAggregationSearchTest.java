@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
@@ -54,11 +55,14 @@ public class PivotAggregationSearchTest {
     private EventDefinition eventDefinition;
     @Mock
     private MoreSearch moreSearch;
+    @Mock
+    private NotificationService notificationService;
 
     private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of);
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
+        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
@@ -68,8 +72,8 @@ public class PivotAggregationSearchTest {
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount, seriesCard))
                 .conditions(null)
-                .searchWithinMs(30000)
-                .executeEveryMs(30000)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
                 .build();
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .streams(Collections.emptySet())
@@ -86,7 +90,8 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                permittedStreams);
+                permittedStreams,
+                notificationService);
 
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
@@ -154,6 +159,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithoutGroupBy() throws Exception {
+        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesCountNoField = AggregationSeries.create("abc123", AggregationFunction.COUNT, "");
@@ -182,7 +188,8 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                permittedStreams);
+                permittedStreams,
+                notificationService);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -226,6 +233,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithNullValues() throws Exception {
+        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesAvg = AggregationSeries.create("abc123", AggregationFunction.AVG, "some_field");
@@ -235,8 +243,8 @@ public class PivotAggregationSearchTest {
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount, seriesAvg))
                 .conditions(null)
-                .searchWithinMs(30000)
-                .executeEveryMs(30000)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
                 .build();
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .streams(Collections.emptySet())
@@ -253,7 +261,8 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                permittedStreams);
+                permittedStreams,
+                notificationService);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")

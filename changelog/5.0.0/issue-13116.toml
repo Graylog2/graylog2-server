@@ -1,0 +1,5 @@
+type = "added"
+message = "Show title of dashboards and saved searches on page."
+
+issues = ["13116"]
+pulls = ["13491"]
