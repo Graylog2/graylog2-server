@@ -82,7 +82,7 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     }
 
     private boolean isMatchingSearchServer(ContainerMatrixTestsConfiguration config) {
-        if(ContainerMatrixTestEngine.versionOverrideExists()) {
+        if(ContainerMatrixTestEngine.searchVersionOverrideExists()) {
             if(config.searchVersions().length == 0) {
                 return true;
             } else {

@@ -104,16 +104,16 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
      *
      * @return
      */
-    private static String getVersionOverride() {
-        return System.getProperty("graylog.matrix.tests.version.override");
+    private static String getSearchVersionOverride() {
+        return System.getProperty("graylog.matrix.tests.search.version.override");
     }
 
-    public static boolean versionOverrideExists() {
-        return getVersionOverride() != null;
+    public static boolean searchVersionOverrideExists() {
+        return getSearchVersionOverride() != null;
     }
 
-    private SearchVersion getSearchVersionOverride() {
-        final var split = getVersionOverride().split("-");
+    private SearchVersion getSearchVersionFromProperty() {
+        final var split = getSearchVersionOverride().split("-");
         final var distro = SearchVersion.Distribution.valueOfLabel(split[0]);
         if(SearchVersion.Distribution.ELASTICSEARCH.equals(distro)) {
             return SearchVersion.elasticsearch(split[1]);
@@ -122,7 +122,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     private Stream<SearchVersion> defaultOrOverride() {
-        return versionOverrideExists() ? Stream.of(getSearchVersionOverride()) : Stream.of(SearchServer.DEFAULT_VERSION.getSearchVersion());
+        return searchVersionOverrideExists() ? Stream.of(getSearchVersionFromProperty()) : Stream.of(SearchServer.DEFAULT_VERSION.getSearchVersion());
     }
 
     /**
@@ -132,13 +132,13 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
      * @return
      */
     public static boolean isCompatible(SearchServer version) {
-        final var split = getVersionOverride().split("-");
+        final var split = getSearchVersionOverride().split("-");
         return version.getSearchVersion().satisfies(SearchVersion.Distribution.valueOfLabel(split[0]), "^" + split[1].charAt(0));
     }
 
     private Stream<SearchVersion> filterForCompatibleVersionOrDrop(SearchServer[] versions) {
-        if(versionOverrideExists()) {
-            return Stream.of(versions).anyMatch(ContainerMatrixTestEngine::isCompatible) ? Stream.of(getSearchVersionOverride()) : Stream.empty();
+        if(searchVersionOverrideExists()) {
+            return Stream.of(versions).anyMatch(ContainerMatrixTestEngine::isCompatible) ? Stream.of(getSearchVersionFromProperty()) : Stream.empty();
         } else {
             return Stream.of(versions).map(SearchServer::getSearchVersion);
         }
