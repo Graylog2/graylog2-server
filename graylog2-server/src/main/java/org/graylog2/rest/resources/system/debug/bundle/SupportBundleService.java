@@ -24,7 +24,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.PatternProcessor;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.NodeService;
@@ -41,9 +40,11 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.ProxiedResource.CallResult;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
+import org.graylog2.shared.system.stats.SystemStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
+import retrofit2.http.GET;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -264,6 +265,18 @@ public class SupportBundleService {
         } catch (Exception e) {
             LOG.warn("Failed to get metrics from node <{}>", nodeId, e);
         }
+
+        try (var systemStatsFile = new FileOutputStream(nodeDir.resolve("system-stats.json").toFile())) {
+            final ProxiedResource.NodeResponse<SystemStats> statsResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
+                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemStatsResource.class),
+                    RemoteSystemStatsResource::systemStats, Function.identity(), CALL_TIMEOUT.toMillis()
+            );
+            if (statsResponse.entity().isPresent()) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(systemStatsFile, statsResponse.entity().get());
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get system stats from node <{}>", nodeId, e);
+        }
     }
 
     @VisibleForTesting
@@ -348,7 +361,6 @@ public class SupportBundleService {
         final String filePattern = rollingFileAppender.getFilePattern();
         final String baseFileName = rollingFileAppender.getFileName();
 
-        final PatternProcessor patternProcessor = rollingFileAppender.getManager().getPatternProcessor();
         final ImmutableList.Builder<LogFile> logFiles = ImmutableList.builder();
 
         // The current open uncompressed logfile
@@ -478,5 +490,11 @@ public class SupportBundleService {
         protected <RemoteInterfaceType> Function<String, Optional<RemoteInterfaceType>> createRemoteInterfaceProvider(Class<RemoteInterfaceType> interfaceClass) {
             return super.createRemoteInterfaceProvider(interfaceClass);
         }
+
+    }
+
+    interface RemoteSystemStatsResource {
+        @GET("system/stats")
+        Call<SystemStats> systemStats();
     }
 }
