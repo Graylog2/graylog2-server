@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -117,9 +118,8 @@ public class StructuredSyslogTest {
     }
 
     @Test
-    public void testExtractFieldsOfNonStructuredMessage() {
-        Map<String, Object> result = syslogCodec.extractFields(newEvent(ValidNonStructuredMessage), false);
-        assertEquals(0, result.size());
+    public void testExtractFieldsOfNonStructuredMessageNotPossible() {
+        assertFalse(SyslogCodec.STRUCTURED_SYSLOG_PATTERN.matcher(ValidNonStructuredMessage).matches());
     }
 
     @Test

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { WidgetComponentProps } from 'views/types';
@@ -48,7 +48,15 @@ import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHand
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import EditMessageList from 'views/components/widgets/EditMessageList';
-import { DashboardsPage, ShowViewPage, NewSearchPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
+import {
+  DashboardsPage,
+  ShowViewPage,
+  NewSearchPage,
+  NewDashboardPage,
+  StreamSearchPage,
+  EventDefinitionReplaySearchPage,
+  EventReplaySearchPage,
+} from 'views/pages';
 import AddMessageCountActionHandler, { CreateMessageCount } from 'views/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler, { CreateMessagesWidget } from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
@@ -137,6 +145,8 @@ const exports: PluginExports = {
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
+    { path: Routes.ALERTS.replay_search(':alertId'), component: EventReplaySearchPage, parentComponent: App },
+    { path: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId'), component: EventDefinitionReplaySearchPage, parentComponent: App },
   ],
   enterpriseWidgets: [
     {

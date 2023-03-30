@@ -19,7 +19,7 @@ import { useCallback, useEffect, useContext, useRef, useMemo } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled from 'styled-components';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';

@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import without from 'lodash/without';
 
 import { LinkContainer } from 'components/common/router';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
@@ -48,7 +49,7 @@ class NotificationsForm extends React.Component {
 
   handleAssignNotification = (nextNotification) => {
     const { onChange, eventDefinition } = this.props;
-    const nextNotifications = lodash.cloneDeep(eventDefinition.notifications);
+    const nextNotifications = cloneDeep(eventDefinition.notifications);
 
     nextNotifications.push({
       notification_id: nextNotification,
@@ -61,7 +62,7 @@ class NotificationsForm extends React.Component {
   handleRemoveNotification = (notificationId) => {
     const { onChange, eventDefinition } = this.props;
     const notification = eventDefinition.notifications.find((n) => n.notification_id === notificationId);
-    const nextNotifications = lodash.without(eventDefinition.notifications, notification);
+    const nextNotifications = without(eventDefinition.notifications, notification);
 
     onChange('notifications', nextNotifications);
   };

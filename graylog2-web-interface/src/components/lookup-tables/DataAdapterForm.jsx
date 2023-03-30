@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TimeUnitInput, FormSubmit } from 'components/common';
@@ -24,8 +24,8 @@ import { Col, Row, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
-import history from 'util/History';
 import Routes from 'routing/Routes';
+import withHistory from 'routing/withHistory';
 
 class DataAdapterForm extends React.Component {
   validationCheckTimer = undefined;
@@ -40,6 +40,7 @@ class DataAdapterForm extends React.Component {
     dataAdapter: PropTypes.object,
     validate: PropTypes.func,
     validationErrors: PropTypes.object,
+    history: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -83,7 +84,7 @@ class DataAdapterForm extends React.Component {
 
     const { dataAdapter } = this.props;
 
-    if (_.isEqual(dataAdapter, prevProps.dataAdapter)) {
+    if (isEqual(dataAdapter, prevProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
       return;
     }
@@ -264,7 +265,7 @@ class DataAdapterForm extends React.Component {
 
   render() {
     const { dataAdapter, isFormDisabled } = this.state;
-    const { create, type, title } = this.props;
+    const { create, type, title, history } = this.props;
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
     const plugin = adapterPlugins.filter((p) => p.type === type);
@@ -382,4 +383,4 @@ class DataAdapterForm extends React.Component {
   }
 }
 
-export default DataAdapterForm;
+export default withHistory(DataAdapterForm);

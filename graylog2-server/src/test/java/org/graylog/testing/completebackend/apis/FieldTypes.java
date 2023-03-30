@@ -29,15 +29,15 @@ import static io.restassured.RestAssured.given;
 
 public class FieldTypes implements GraylogRestApi {
 
-    private final RequestSpecification requestSpecification;
+    private final GraylogApis api;
 
-    public FieldTypes(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    public FieldTypes(GraylogApis api) {
+        this.api = api;
     }
 
     public List<MappedFieldTypeDTO> getFieldTypes() {
         final MappedFieldTypeDTO[] as = given()
-                .spec(requestSpecification)
+                .spec(api.requestSpecification())
                 .get("/views/fields")
                 .as(MappedFieldTypeDTO[].class);
         return Arrays.asList(as);

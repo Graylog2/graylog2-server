@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { VisualizationType } from 'views/types';

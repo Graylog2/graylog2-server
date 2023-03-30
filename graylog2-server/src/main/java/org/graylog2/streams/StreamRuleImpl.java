@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.IntegerValidator;
@@ -35,11 +35,15 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+import static org.graylog2.streams.StreamRuleImpl.FIELD_DESCRIPTION;
 
 /**
  * Representing the rules of a single stream.
  */
-@CollectionName("streamrules")
+@DbEntity(collection = "streamrules",
+          titleField = FIELD_DESCRIPTION,
+          readPermission = STREAMS_READ)
 public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_VALUE = "value";

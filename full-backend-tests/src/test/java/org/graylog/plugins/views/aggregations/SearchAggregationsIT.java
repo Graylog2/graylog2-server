@@ -17,10 +17,7 @@
 package org.graylog.plugins.views.aggregations;
 
 import com.google.common.base.Joiner;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
@@ -36,7 +33,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -66,17 +63,15 @@ public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
 
-    private final RequestSpecification requestSpec;
-    private final GraylogBackend backend;
+    private final GraylogApis api;
 
-    public SearchAggregationsIT(RequestSpecification requestSpec, GraylogBackend backend) {
-        this.requestSpec = requestSpec;
-        this.backend = backend;
+    public SearchAggregationsIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void setUp() {
-        backend.importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
+        this.api.backend().importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
     }
 
     private ValidatableResponse execute(Pivot pivot) {
@@ -94,7 +89,7 @@ public class SearchAggregationsIT {
                 .build();
 
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(serialize(search))
                 .post("/views/search/sync")

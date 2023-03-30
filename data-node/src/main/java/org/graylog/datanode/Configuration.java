@@ -49,6 +49,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 /**
  * Helper class to hold configuration of Graylog
  */
@@ -156,7 +158,19 @@ public class Configuration extends BaseConfiguration {
     }
 
     public String getOpensearchLocation() {
-        return opensearchLocation;
+        // If the configured location exists, just use it.
+        if (Files.exists(Path.of(opensearchLocation))) {
+            return opensearchLocation;
+        }
+
+        // Otherwise check if the architecture dependent distribution exists.
+        final var osArch = System.getProperty("os.arch");
+        return switch (osArch) {
+            case "amd64" -> f("%s-linux-x64", opensearchLocation);
+            case "aarch64" -> f("%s-linux-aarch64", opensearchLocation);
+            default ->
+                    throw new UnsupportedOperationException("Unsupported OpenSearch distribution architecture: " + osArch);
+        };
     }
 
     public String getOpensearchVersion() {

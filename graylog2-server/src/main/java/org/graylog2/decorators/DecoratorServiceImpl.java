@@ -19,7 +19,7 @@ package org.graylog2.decorators;
 import com.google.common.base.Strings;
 import com.mongodb.DBCollection;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.mongojack.DBQuery;
@@ -38,7 +38,7 @@ public class DecoratorServiceImpl implements DecoratorService {
 
     @Inject
     public DecoratorServiceImpl(MongoConnection mongoConnection, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        final String collectionName = DecoratorImpl.class.getAnnotation(CollectionName.class).value();
+        final String collectionName = DecoratorImpl.class.getAnnotation(DbEntity.class).collection();
         final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, DecoratorImpl.class, String.class, mongoJackObjectMapperProvider.get());
     }

@@ -17,7 +17,6 @@
 import React, { useCallback, useState, useContext } from 'react';
 import URI from 'urijs';
 
-import history from 'util/History';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem } from 'components/bootstrap';
 import Input from 'components/bootstrap/Input';
@@ -25,6 +24,8 @@ import Routes from 'routing/Routes';
 import type View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 export type UntypedBigDisplayModeQuery = {
   interval?: string,
@@ -112,7 +113,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
   );
 };
 
-const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery, unsetWidgetFocusing): void => {
+const redirectToBigDisplayMode = (history: HistoryFunction, view: View, config: UntypedBigDisplayModeQuery, unsetWidgetFocusing): void => {
   unsetWidgetFocusing();
 
   history.push(
@@ -146,7 +147,8 @@ type Props = {
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
-  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view), unsetWidgetFocusing);
+  const history = useHistory();
+  const onSave = (config: Configuration) => redirectToBigDisplayMode(history, view, createQueryFromConfiguration(config, view), unsetWidgetFocusing);
 
   return (
     <>

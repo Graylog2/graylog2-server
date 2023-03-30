@@ -16,7 +16,10 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
-import { flatten, get, isEqual, last } from 'lodash';
+import flatten from 'lodash/flatten';
+import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
+import last from 'lodash/last';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';

@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import chroma from 'chroma-js';
-import { flatten } from 'lodash';
+import flatten from 'lodash/flatten';
 import leafletStyles from 'leaflet/dist/leaflet.css';
 
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
@@ -79,7 +79,7 @@ const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, na
   }
 
   const radius = _getBucket(value, radiusSize, min, max, increment);
-  const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v}</dd>]));
+  const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v as React.ReactNode}</dd>]));
 
   return (
     <CircleMarker key={`${name}-${coordinates}`}

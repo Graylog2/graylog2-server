@@ -17,10 +17,9 @@
 import * as React from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 import * as Immutable from 'immutable';
-import { Router } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 /* eslint-disable import/no-relative-packages */
-import history from '../src/util/History';
 import GraylogThemeProvider from '../src/theme/GraylogThemeProvider';
 import CurrentUserContext from '../src/contexts/CurrentUserContext';
 import User from '../src/logic/users/User';
@@ -54,15 +53,22 @@ type Props = {
   children: React.Component,
 }
 
-const StyleGuideWrapper = ({ children }: Props) => (
-  <Router history={history}>
-    <CurrentUserContext.Provider value={adminUser}>
-      <GraylogThemeProvider initialThemeModeOverride="teint">
-        <StyleGuideStyles />
-        {children}
-      </GraylogThemeProvider>
-    </CurrentUserContext.Provider>
-  </Router>
-);
+const StyleGuideWrapper = ({ children }: Props) => {
+  const router = createBrowserRouter([{
+    path: '/',
+    element: (
+      <CurrentUserContext.Provider value={adminUser}>
+        <GraylogThemeProvider initialThemeModeOverride="teint">
+          <StyleGuideStyles />
+          {children}
+        </GraylogThemeProvider>
+      </CurrentUserContext.Provider>
+    ),
+  }]);
+
+  return (
+    <RouterProvider router={router} />
+  );
+};
 
 export default StyleGuideWrapper;

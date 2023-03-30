@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { ListGroup, ListGroupItem, Button, Input } from 'components/bootstrap';
 

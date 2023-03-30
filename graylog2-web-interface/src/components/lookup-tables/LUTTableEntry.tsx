@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -26,6 +25,7 @@ import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import useHistory from 'routing/useHistory';
 
 type Props = {
   table: LookupTable,

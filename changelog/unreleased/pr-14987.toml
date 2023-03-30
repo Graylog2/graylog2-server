@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Sending new header on server response X-Content-Type-Options:nosniff"
+
+issues = ["Graylog2/graylog-plugin-enterprise#4890"]
+pull = ["14987"]

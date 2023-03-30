@@ -43,6 +43,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
 import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import fetchSearch from 'views/logic/views/fetchSearch';
+import useHistory from 'routing/useHistory';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -184,13 +185,13 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
-const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search, queryParams: { page: string }) => {
+const _updateDashboardWithNewSearch = (dashboard: View, newSearch: Search) => {
   const newDashboard = dashboard.toBuilder().search(newSearch).build();
 
-  return ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId, queryParams));
+  return ViewManagementActions.update(newDashboard);
 };
 
-const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: string) => (searchJson: SearchJson) => {
+const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: string) => async (searchJson: SearchJson) => {
   const search = Search.fromJSON(searchJson);
   const newDashboard = CopyPageToDashboard(queryId, activeView, targetDashboard.toBuilder().search(search).build());
 
@@ -200,22 +201,22 @@ const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: st
 
   const newQueryId = newDashboard.search.queries.last().id;
 
-  return createSearch(newDashboard.search).then(
-    (newSearch) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch, { page: newQueryId }),
-  );
+  const newSearch = await createSearch(newDashboard.search);
+
+  await _updateDashboardWithNewSearch(newDashboard, newSearch);
+
+  return [newDashboard, newQueryId] as const;
 };
 
-const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => (_dispatch: AppDispatch, getState: GetState) => {
+const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => async (_dispatch: AppDispatch, getState: GetState) => {
   const view = selectView(getState());
   const queryId = selectActiveQuery(getState());
 
-  return ViewManagementActions.get(selectedDashboardId).then((dashboardJson) => {
-    const targetDashboard = View.fromJSON(dashboardJson);
+  const dashboardJson = await ViewManagementActions.get(selectedDashboardId);
+  const targetDashboard = View.fromJSON(dashboardJson);
 
-    return fetchSearch(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, view, queryId)).catch((error) => {
-      UserNotification.error(`Copying dashboard page failed with error ${error}`);
-    });
-  });
+  return fetchSearch(dashboardJson.search_id)
+    .then(addPageToDashboard(targetDashboard, view, queryId));
 };
 
 const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove, onSelect, queryTitleEditModal, dashboardId }: Props) => {
@@ -224,12 +225,17 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const history = useHistory();
 
   const toggleCopyToDashboardModal = useCallback(() => {
     setShowCopyToDashboardModal((cur) => !cur);
   }, []);
 
-  const onCopyToDashboard = useCallback((selectedDashboardId: string) => dispatch(_onCopyToDashboard(selectedDashboardId)), [dispatch]);
+  const onCopyToDashboard = useCallback((selectedDashboardId: string) => dispatch(_onCopyToDashboard(selectedDashboardId))
+    .then(([newDashboard, newQueryId]) => loadDashboard(history, newDashboard.id, newQueryId))
+    .catch((error) => {
+      UserNotification.error(`Copying dashboard page failed with error ${error}`);
+    }), [dispatch, history]);
 
   const openTitleEditModal = useCallback((activeQueryTitle: string) => {
     if (queryTitleEditModal) {
@@ -238,9 +244,9 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
   }, [queryTitleEditModal]);
 
   const currentTabs = useMemo((): TabsTypes => {
-    let navItems = OrderedSet();
-    let menuItems = OrderedSet();
-    let lockedItems = OrderedSet();
+    let navItems = OrderedSet<React.ReactNode>();
+    let menuItems = OrderedSet<React.ReactNode>();
+    let lockedItems = OrderedSet<React.ReactNode>();
     let queriesList = OrderedSet<{ id: string, title: string }>();
 
     queries.keySeq().forEach((id, idx) => {
