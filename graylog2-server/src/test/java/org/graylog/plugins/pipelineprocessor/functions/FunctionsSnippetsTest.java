@@ -1198,6 +1198,19 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void lookupSetValueWithTtl() {
+        doReturn(LookupResult.single(123)).when(lookupTable).setValueWithTtl(any(), any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).setValueWithTtl("key", 123L, 456L);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(123);
+    }
+
+    @Test
     public void lookupClearKey() {
         // Stub method call to avoid having verifyNoMoreInteractions() fail
         doNothing().when(lookupTable).clearKey(any());
@@ -1219,6 +1232,21 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule);
 
         verify(lookupTable).setStringList("key", testList);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(testList);
+    }
+
+    @Test
+    public void lookupSetStringListWithTtl() {
+        final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
+
+        doReturn(LookupResult.withoutTTL().stringListValue(testList).build()).when(lookupTable).setStringListWithTtl(any(), any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).setStringListWithTtl("key", testList, 123L);
         verifyNoMoreInteractions(lookupTable);
 
         assertThat(message.getField("new_value")).isEqualTo(testList);
