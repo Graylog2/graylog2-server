@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.database.ValidationException;
 
@@ -43,6 +44,7 @@ public class PreflightStatusController {
         return new ConfigurationStatus(version.toString());
     }
 
+    @NoAuditEvent("No audit event yet")
     @POST
     @Path("/finish-config")
     public PreflightConfig finishConfig() throws ValidationException {
