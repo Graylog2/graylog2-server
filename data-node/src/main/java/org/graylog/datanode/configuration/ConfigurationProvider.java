@@ -61,7 +61,11 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
         config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        //config.put("discovery.type", "single-node");
+        if(localConfiguration.isSingleNodeOnly()) {
+            config.put("discovery.type", "single-node");
+        } else {
+            config.put("cluster.initial_master_nodes", "node1");
+        }
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");
@@ -69,7 +73,6 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
 
-        config.put("cluster.initial_master_nodes", "node1");
 
         final Path transportKeystorePath = Path.of(localConfiguration.getOpensearchConfigLocation())
                 .resolve(localConfiguration.getDatanodeTransportCertificate());

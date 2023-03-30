@@ -1,0 +1,20 @@
+# JVM Heap Settings
+#
+# It's recommended to set both values to the same size to avoid stop-the-world
+# GC pauses during resize.
+-Xms1g
+-Xmx1g
+
+# General JVM Settings
+#
+# Garbage collector
+-XX:+UseG1GC
+
+# Ensure full stack traces for debugging
+-XX:-OmitStackTraceInFastThrow
+
+# Allow usage of experimental JVM options
+-XX:+UnlockExperimentalVMOptions
+
+# Avoid endless loop with some TLSv1.3 implementations
+-Djdk.tls.acknowledgeCloseNotify=true

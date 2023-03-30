@@ -150,7 +150,7 @@ class LUTDataAdaptersPage extends React.Component {
       } else {
         content = (
           <DataAdapterCreate types={types}
-                             saved={_saved}
+                             saved={() => _saved(history)}
                              validate={_validateAdapter}
                              validationErrors={validationErrors} />
         );
@@ -206,8 +206,11 @@ LUTDataAdaptersPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withHistory(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage))), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
-  ...otherProps,
-  ...dataAdaptersStore,
-  errorStates: lookupTableStore.errorStates,
-})));
+export default connect(
+  withHistory(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage)))),
+  { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+  ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...dataAdaptersStore,
+    errorStates: lookupTableStore.errorStates,
+  }));

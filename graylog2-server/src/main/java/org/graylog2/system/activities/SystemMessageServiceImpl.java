@@ -22,7 +22,7 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.mongojack.DBSort;
@@ -42,7 +42,7 @@ public class SystemMessageServiceImpl extends PersistedServiceImpl implements Sy
         super(mongoConnection);
 
         // Make sure that the system messages collection is always created capped.
-        final String collectionName = SystemMessageImpl.class.getAnnotation(CollectionName.class).value();
+        final String collectionName = SystemMessageImpl.class.getAnnotation(DbEntity.class).collection();
         if (!mongoConnection.getDatabase().collectionExists(collectionName)) {
             final DBObject options = BasicDBObjectBuilder.start()
                     .add("capped", true)

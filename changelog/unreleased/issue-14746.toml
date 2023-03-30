@@ -1,0 +1,10 @@
+type = "c"
+message = "Generate a system notification when an aggregation search errors out unexpectedly."
+
+details.user = """
+An event definition with aggregation will fail silently (with just a log message) when encountering an ES/OS error.
+We now also generate a notification to alert the admin to the problem.
+"""
+
+issues = ["14746"]
+pulls = ["14967"]

@@ -97,18 +97,18 @@ public class DatanodeContainerizedBackend {
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
-        container.withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/datanode.jar")
+        container.withFileSystemBind("target/graylog-datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
         customizer.onContainer(container);
         return container;
     }
 
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
-        final String opensearchTarArchive = "opensearch-" + opensearchVersion + ".tar.gz";
+        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
-                .withFileFromPath(opensearchTarArchive, Path.of("bin", "download", opensearchTarArchive))
+                .withFileFromPath(opensearchTarArchive, Path.of("target", "downloads", opensearchTarArchive))
                 .withDockerfileFromBuilder(builder ->
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
@@ -121,7 +121,7 @@ public class DatanodeContainerizedBackend {
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
-                                .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
+                                .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
                                 .build());
     }
 

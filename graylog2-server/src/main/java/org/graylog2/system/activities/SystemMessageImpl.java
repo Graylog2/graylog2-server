@@ -18,7 +18,7 @@ package org.graylog2.system.activities;
 
 import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
@@ -29,7 +29,11 @@ import org.joda.time.DateTimeZone;
 import java.util.Collections;
 import java.util.Map;
 
-@CollectionName("system_messages")
+import static org.graylog2.shared.security.RestPermissions.SYSTEMMESSAGES_READ;
+
+@DbEntity(collection = "system_messages",
+          titleField = "content",
+          readPermission = SYSTEMMESSAGES_READ)
 public class SystemMessageImpl extends PersistedImpl implements SystemMessage {
 
     private final String caller;
