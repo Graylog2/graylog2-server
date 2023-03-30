@@ -34,6 +34,7 @@ const createSupportBundle = async (refetchList: () => Promise<QueryObserverResul
     await refetchList();
     setLoading(false);
   } catch (errorThrown) {
+    setLoading(false);
     UserNotification.error(`Creating the Support Bundle failed with status: ${errorThrown}`, 'Could not create the Support Bundle.');
   }
 };
