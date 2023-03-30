@@ -105,6 +105,7 @@ import {
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
+import GlobalContextProviders from 'contexts/GlobalContextProviders';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -140,7 +141,7 @@ const AppRouter = () => {
 
     {
       path: RoutePaths.STARTPAGE,
-      element: <App />,
+      element: <GlobalContextProviders><App /></GlobalContextProviders>,
       children: [
         { path: RoutePaths.STARTPAGE, element: <StartPage /> },
         { path: RoutePaths.SEARCH, element: <DelegatedSearchPage /> },

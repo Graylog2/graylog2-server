@@ -14,21 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.shared.rest;
 
-import AppRouter from 'routing/AppRouter';
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-import StreamsProvider from 'contexts/StreamsProvider';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 
-const LoggedInPage = () => (
-  <DefaultQueryClientProvider>
-    <ThemeAndUserProvider>
-      <StreamsProvider>
-        <AppRouter />
-      </StreamsProvider>
-    </ThemeAndUserProvider>
-  </DefaultQueryClientProvider>
-);
-
-export default LoggedInPage;
+public class CSPResponseFilter implements ContainerResponseFilter {
+    @Override
+    public void filter(final ContainerRequestContext requestContext,
+                       ContainerResponseContext responseContext) {
+        responseContext.getHeaders().add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;");
+    }
+}
