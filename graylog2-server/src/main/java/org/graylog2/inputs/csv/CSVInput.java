@@ -44,16 +44,16 @@ public class CSVInput extends MessageInput {
         super(metricRegistry, configuration, transport.create(configuration), localRegistry, codec.create(configuration), config,
                 descriptor, serverStatus);
     }
-    @FactoryClass
+
     public interface Factory extends MessageInput.Factory<CSVInput> {
         @Override
         CSVInput create(Configuration configuration);
 
         @Override
-        CSVInput.Config getConfig();
+        Config getConfig();
 
         @Override
-        CSVInput.Descriptor getDescriptor();
+        Descriptor getDescriptor();
     }
 
     public static class Descriptor extends MessageInput.Descriptor {
