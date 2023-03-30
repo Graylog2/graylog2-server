@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.debug.bundle;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import okhttp3.ResponseBody;
 import org.apache.commons.io.FileUtils;
@@ -71,6 +72,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -86,6 +89,8 @@ public class SupportBundleService {
     public static final String SUPPORT_BUNDLE_DIR_NAME = "support-bundle";
     public static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
     public static final String BUNDLE_NAME_PREFIX = "graylog-support-bundle";
+    public static final String IN_MEMORY_LOGFILE_ID = "memory";
+    public static final long LOG_COLLECTION_SIZE_LIMIT = 60 * 1024 * 1024; // Limits how many on-disk logs we collect per node
 
     private final ExecutorService executor;
     private final NodeService nodeService;
@@ -247,11 +252,31 @@ public class SupportBundleService {
         }
     }
 
+    @VisibleForTesting
+    List<LogFile> applyBundleSizeLogFileLimit(List<LogFile> allLogs) {
+        final ImmutableList.Builder<LogFile> truncatedLogFileList = ImmutableList.builder();
+
+        // Always collect the in-memory log and the newest on-disk log file
+        // Keep collecting until we pass LOG_COLLECTION_SIZE_LIMIT
+        final AtomicBoolean oneFileAdded = new AtomicBoolean(false);
+        final AtomicLong collectedSize = new AtomicLong();
+        allLogs.stream().sorted(Comparator.comparing(LogFile::lastModified).reversed()).forEach(logFile -> {
+            if (logFile.id().equals(IN_MEMORY_LOGFILE_ID)) {
+                truncatedLogFileList.add(logFile);
+            } else if (!oneFileAdded.get() || collectedSize.get() < LOG_COLLECTION_SIZE_LIMIT) {
+                truncatedLogFileList.add(logFile);
+                oneFileAdded.set(true);
+                collectedSize.addAndGet(logFile.size());
+            }
+        });
+        return truncatedLogFileList.build();
+    }
+
     private void fetchLogs(ProxiedResourceHelper proxiedResourceHelper, String nodeId, List<LogFile> logFiles, Path nodeDir) {
         final Path logDir = nodeDir.resolve("logs");
         var ignored = logDir.toFile().mkdirs();
 
-        logFiles.forEach(logFile -> {
+        applyBundleSizeLogFileLimit(logFiles).forEach(logFile -> {
             try {
                 final ProxiedResource.NodeResponse<ResponseBody> response = proxiedResourceHelper.doNodeApiCall(nodeId,
                         proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSupportBundleInterface.class),
@@ -298,7 +323,7 @@ public class SupportBundleService {
     private List<LogFile> getMemLogFiles(MemoryAppender memAppender) {
         try {
             memAppender.getLogMessages(1);
-            return List.of(new LogFile("memory", "server.mem.log", -1, Instant.now()));
+            return List.of(new LogFile(IN_MEMORY_LOGFILE_ID, "server.mem.log", -1, Instant.now()));
         } catch (Exception e) {
             LOG.warn("Failed to get logs from MemoryAppender <{}>", memAppender.getName(), e);
             return List.of();
@@ -344,7 +369,7 @@ public class SupportBundleService {
     }
 
     public void loadLogFileStream(LogFile logFile, OutputStream outputStream) throws IOException {
-        if (logFile.id().equals("memory")) {
+        if (logFile.id().equals(IN_MEMORY_LOGFILE_ID)) {
             final LoggerContext context = (LoggerContext) LogManager.getContext(false);
             final Configuration config = context.getConfiguration();
             final Optional<MemoryAppender> memAppender = getMemoryAppender(config);
