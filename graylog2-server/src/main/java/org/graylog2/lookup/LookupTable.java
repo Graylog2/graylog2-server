@@ -88,8 +88,20 @@ public abstract class LookupTable {
         return result;
     }
 
+    public LookupResult setValueWithTtl(@Nonnull Object key, @Nonnull Object value, @Nonnull Long ttlMs) {
+        final LookupResult result = dataAdapter().setValueWithTtl(key, value, ttlMs);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
+        return result;
+    }
+
     public LookupResult setStringList(@Nonnull Object key, @Nonnull List<String> value) {
         final LookupResult result = dataAdapter().setStringList(key, value);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
+        return result;
+    }
+
+    public LookupResult setStringListWithTtl(@Nonnull Object key, @Nonnull List<String> value, @Nonnull Long ttlMs) {
+        final LookupResult result = dataAdapter().setStringListWithTtl(key, value, ttlMs);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
     }

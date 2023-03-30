@@ -24,6 +24,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.lookup.LookupTableService;
 
+import java.util.Optional;
+
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
@@ -34,6 +36,7 @@ public class LookupSetValue extends AbstractFunction<Object> {
     private final ParameterDescriptor<String, LookupTableService.Function> lookupTableParam;
     private final ParameterDescriptor<Object, Object> keyParam;
     private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Long, Long> ttlMSParam;
 
     @Inject
     public LookupSetValue(LookupTableService lookupTableService) {
@@ -46,6 +49,10 @@ public class LookupSetValue extends AbstractFunction<Object> {
                 .build();
         valueParam = object("value")
                 .description("The single value that should be set into the lookup table")
+                .build();
+        ttlMSParam = ParameterDescriptor.integer("ttl")
+                .optional()
+                .description("The TTL in MS to assign to this entry")
                 .build();
     }
 
@@ -63,7 +70,12 @@ public class LookupSetValue extends AbstractFunction<Object> {
         if (value == null) {
             return null;
         }
-        return table.setValue(key, value).singleValue();
+        final Optional<Long> ttlMs = ttlMSParam.optional(args, context);
+        if (ttlMs.isPresent()) {
+            return table.setValueWithTtl(key, value, ttlMs.get()).singleValue();
+        } else {
+            return table.setValue(key, value).singleValue();
+        }
     }
 
     @Override
@@ -71,7 +83,7 @@ public class LookupSetValue extends AbstractFunction<Object> {
         return FunctionDescriptor.builder()
                 .name(NAME)
                 .description("Set a single value in the named lookup table. Returns the new value on success, null on failure.")
-                .params(lookupTableParam, keyParam, valueParam)
+                .params(lookupTableParam, keyParam, valueParam, ttlMSParam)
                 .returnType(Object.class)
                 .build();
     }
