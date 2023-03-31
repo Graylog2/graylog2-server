@@ -87,15 +87,11 @@ const useValidateSession = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
 
   useEffect(() => {
-    const sessionPromise = SessionActions.validate().then((response) => {
+    SessionActions.validate().then((response) => {
       setDidValidateSession(true);
 
       return response;
     });
-
-    return () => {
-      sessionPromise.cancel();
-    };
   }, []);
 
   return didValidateSession;

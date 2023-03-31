@@ -14,18 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
+import { NavDropdown } from 'react-bootstrap';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
-
-import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
 
 import menuItemStyles from './styles/menuItem';
 
-class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
+class ModifiedBootstrapNavDropdown extends NavDropdown {
   // eslint-disable-next-line class-methods-use-this
   isActive({ props }, activeKey, activeHref) {
     // NOTE: had to override library as it doesn't respect setting `active={false}`
@@ -45,35 +40,9 @@ class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   }
 }
 
-const StyledNavDropdown = styled(BootstrapNavDropdown)`
-  ${menuItemStyles}
-`;
-
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, ...props }) => {
-  const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
-
-  return (
-    <StyledNavDropdown {...props}
-                       title={<NavItemStateIndicator>{Badge ? <Badge text={title} /> : title}</NavItemStateIndicator>}
-                       active={isActive} />
-  );
-};
-
-NavDropdown.propTypes = {
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-  inactiveTitle: PropTypes.string,
-  badge: PropTypes.func,
-};
-
-NavDropdown.defaultProps = {
-  inactiveTitle: undefined,
-  badge: undefined,
-};
-
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
   ${menuItemStyles}
 `;
 
-/** @component */
-export default NavDropdown;
+// eslint-disable-next-line import/prefer-default-export
 export { ModifiedNavDropdown };
