@@ -19,6 +19,8 @@ package org.graylog2.bootstrap.preflight;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 
@@ -30,6 +32,7 @@ public class PreflightWebModule extends Graylog2Module {
     protected void configure() {
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
+        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
 
         bind(PreflightConfigService.class);
 

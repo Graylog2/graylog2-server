@@ -94,7 +94,6 @@ import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_P
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
-    private Optional<PreflightConfig> preflightConfig;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
@@ -171,7 +170,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
         modules.add(new PreflightWebModule());
-        modules.add(new MongoDBModule());
+
         final Injector preflightInjector = getPreflightInjector(modules);
 
         final PreflightConfigService preflightConfigService = preflightInjector.getInstance(PreflightConfigService.class);
@@ -191,7 +190,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             // wait till the marker document appears
             while(shouldRun.get()) {
                 try {
-                    LOG.info("Preflight config still in progress, waiting for the marker document");
+                    LOG.debug("Preflight config still in progress, waiting for the marker document");
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
