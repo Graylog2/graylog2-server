@@ -18,6 +18,8 @@ import React, { useMemo, useReducer, useCallback, useEffect } from 'react';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
+import isEmpty from 'lodash/isEmpty';
+import objectHas from 'lodash/has';
 
 import { Checkbox, Modal, Button } from 'components/bootstrap';
 import type {
@@ -44,6 +46,18 @@ const initState: State = {
   showDetails: false,
 };
 
+const updateIfHas = (possibleKeys: Checked, updates:Checked): Checked => {
+  const newState = { ...possibleKeys };
+
+  Object.entries(updates).forEach(([key, value]) => {
+    if (objectHas(possibleKeys, key)) {
+      newState[key] = value;
+    }
+  });
+
+  return newState;
+};
+
 const reducer = (state: State, action: { type: string, payload?: Checked, possibleKeys: Checked}): State => {
   const { type, payload, possibleKeys } = action;
 
@@ -64,13 +78,13 @@ const reducer = (state: State, action: { type: string, payload?: Checked, possib
       return ({
         strategy: 'ROW',
         showDetails: state.showDetails,
-        checked: { ...possibleKeys, columnValuePath: false, columnGroupBy: false },
+        checked: updateIfHas(possibleKeys, { columnValuePath: false, columnGroupBy: false }),
       });
     case 'SET_COL_STRATEGY':
       return ({
         strategy: 'COL',
         showDetails: state.showDetails,
-        checked: { ...possibleKeys, rowValuePath: false, rowGroupBy: false },
+        checked: updateIfHas(possibleKeys, { rowValuePath: false, rowGroupBy: false }),
       });
     case 'SET_CUSTOM_STRATEGY':
       return ({
@@ -82,7 +96,7 @@ const reducer = (state: State, action: { type: string, payload?: Checked, possib
       return ({
         strategy: 'CUSTOM',
         showDetails: state.showDetails,
-        checked: { ...state.checked, ...payload },
+        checked: updateIfHas(state.checked, payload),
       });
     case 'TOGGLE_SHOW_DETAILS':
       return ({
@@ -165,8 +179,18 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
         {
           showDetails && (
           <div>
-            <CheckBoxGroup onChange={onCheckboxChange} groupLabel="Aggregation" checked={aggregationChecks} labels={aggregationLabels} />
-            <CheckBoxGroup onChange={onCheckboxChange} groupLabel="Search query" checked={searchChecks} labels={searchLabels} />
+            {!isEmpty(aggregationChecks) && (
+            <CheckBoxGroup onChange={onCheckboxChange}
+                           groupLabel="Aggregation"
+                           checked={aggregationChecks}
+                           labels={aggregationLabels} />
+            )}
+            {!isEmpty(searchChecks) && (
+            <CheckBoxGroup onChange={onCheckboxChange}
+                           groupLabel="Search query"
+                           checked={searchChecks}
+                           labels={searchLabels} />
+            )}
             {
               Object.entries(restChecks).map(([key, isChecked]) => (
                 <Checkbox checked={isChecked} onChange={() => onCheckboxChange({ [key]: !isChecked })}>

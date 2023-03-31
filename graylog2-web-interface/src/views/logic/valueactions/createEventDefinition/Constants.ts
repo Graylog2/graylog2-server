@@ -28,11 +28,12 @@ export const labels: { [key in ItemKey]: string} = {
   streams: 'Streams',
   searchWithinMs: 'Search within ms',
   lutParameters: 'Lookup-table parameters',
+  searchFromValue: 'Query from value',
 };
 
 export const aggregationGroup: Array<ItemKey> = ['columnGroupBy', 'rowGroupBy', 'aggCondition'];
-export const searchGroup: Array<ItemKey> = ['rowValuePath', 'columnValuePath', 'searchFilterQuery',
-  'queryWithReplacedParams'];
+export const searchGroup: Array<ItemKey> = ['rowValuePath', 'columnValuePath',
+  'queryWithReplacedParams', 'searchFilterQuery', 'searchFromValue'];
 export const strategiesLabels: {[key in StrategyId]: { label: string, description: string}} = {
   EXACT: { label: 'All searches', description: 'Strategy includes all filters which relates to current search view' },
   ROW: { label: 'Row pivots', description: 'Strategy includes row pivots' },

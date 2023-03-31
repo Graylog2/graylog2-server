@@ -18,7 +18,7 @@
 import type Widget from 'views/logic/widgets/Widget';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 
-export type ItemKey = 'rowValuePath' | 'columnValuePath' | 'columnGroupBy' | 'rowGroupBy' | 'aggCondition' | 'queryWithReplacedParams' | 'searchFilterQuery' | 'streams' | 'searchWithinMs' | 'lutParameters';
+export type ItemKey = 'searchFromValue' | 'rowValuePath' | 'columnValuePath' | 'columnGroupBy' | 'rowGroupBy' | 'aggCondition' | 'queryWithReplacedParams' | 'searchFilterQuery' | 'streams' | 'searchWithinMs' | 'lutParameters';
 
 export type StrategyId = 'ALL' | 'ROW' | 'COL' | 'EXACT' |'CUSTOM';
 export type Strategy = { id: StrategyId, title: string, description: string };
