@@ -82,7 +82,7 @@ describe('SavedSearchesModal', () => {
       isInitialLoading: false,
     });
 
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
   });
 
   describe('render the SavedSearchesModal', () => {

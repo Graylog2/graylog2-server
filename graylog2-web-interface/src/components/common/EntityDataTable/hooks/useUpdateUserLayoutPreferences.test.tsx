@@ -45,7 +45,7 @@ jest.mock('./useUserLayoutPreferences');
 
 describe('useUserSearchFilterQuery hook', () => {
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
   });
 
   afterEach(() => {
@@ -61,7 +61,7 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should allow partial update of user layout preferences', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     const { result, waitFor } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
     result.current.mutate({ perPage: 100 });
