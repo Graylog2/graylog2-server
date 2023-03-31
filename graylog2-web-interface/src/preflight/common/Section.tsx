@@ -42,7 +42,6 @@ const SectionContainer = styled(SubsectionContainer)(({ theme }: ContainerType) 
   background-color: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.variant.lighter.default};
   border-radius: 4px;
-  min-height: 80vh;
 `);
 
 const SectionTitle = styled(Title)(({ theme }) => css`

@@ -15,23 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Title, Table } from '@mantine/core';
+import { Title, Table, Space } from '@mantine/core';
 
 const availableDataNodes = [
   { id: "data-node-id-1", transportAddress: 'transport.address1', isSecured: false },
   { id: "data-node-id-2", transportAddress: 'transport.address2', isSecured: false },
   { id: "data-node-id-3", transportAddress: 'transport.address3', isSecured: false }
 ]
-
 const DataNodesOverview = () => (
   <>
     <Title order={3}>Available Data Nodes</Title>
     <p>
-      These are the data nodes which are currently registered.<br />
-      The list is constantly updated.
+      These are the data nodes which are currently registered. The list is constantly updated.
     </p>
 
-    <Table>
+    <Space h="sm" />
+
+    <Table verticalSpacing="sm" fontSize="md">
       <thead>
       <tr>
         <th>Id</th>

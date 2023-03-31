@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {AppShell, Divider} from '@mantine/core';
+import {AppShell, Space} from '@mantine/core';
 
 import Section from 'preflight/common/Section';
 import Button from 'preflight/common/Button';
@@ -35,6 +35,8 @@ const App = () => (
 
     <Section title="Data Node Certificate Authority Configuration">
       <DataNodesOverview />
+      <Space h="md" />
+      <CAConfiguration />
     </Section>
   </AppShell>
 );
