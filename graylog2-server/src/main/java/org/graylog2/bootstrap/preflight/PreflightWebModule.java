@@ -18,10 +18,18 @@ package org.graylog2.bootstrap.preflight;
 
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
+import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 
 public class PreflightWebModule extends Graylog2Module {
@@ -33,12 +41,21 @@ public class PreflightWebModule extends Graylog2Module {
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
+        bind(NodeService.class).to(NodeServiceImpl.class);
 
         bind(PreflightConfigService.class);
 
-        addSystemRestResource(PreflightStatusController.class);
+        addSystemRestResource(PreflightResource.class);
+        addSystemRestResource(PreflightStatusResource.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
+
+
+        // needed for the ObjectMapperModule
+        MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
+                });
     }
 }

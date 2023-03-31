@@ -56,6 +56,7 @@ import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GenericInitializerBindings;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
+import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.SharedPeriodicalBindings;
@@ -170,8 +171,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
         modules.add(new PreflightWebModule());
+        modules.add(new ObjectMapperModule(chainingClassLoader));
 
         final Injector preflightInjector = getPreflightInjector(modules);
+        GuiceInjectorHolder.setInjector(preflightInjector);
 
         final PreflightConfigService preflightConfigService = preflightInjector.getInstance(PreflightConfigService.class);
 
@@ -183,8 +186,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         LOG.info("Fresh installation detected, starting configuration webserver");
 
+
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
-        GuiceInjectorHolder.createInjector(modules);
         try {
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears

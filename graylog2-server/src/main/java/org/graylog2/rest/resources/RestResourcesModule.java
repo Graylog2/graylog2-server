@@ -33,7 +33,6 @@ import org.graylog2.rest.resources.cluster.ClusterSystemResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemShutdownResource;
 import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource;
 import org.graylog2.rest.resources.messages.MessageResource;
-import org.graylog2.rest.resources.preflight.PreflightResource;
 import org.graylog2.rest.resources.roles.RolesResource;
 import org.graylog2.rest.resources.search.AbsoluteSearchResource;
 import org.graylog2.rest.resources.search.DecoratorResource;
@@ -117,7 +116,6 @@ public class RestResourcesModule extends Graylog2Module {
         addStreamsResources();
         addDebugResources();
 
-        addSystemRestResource(PreflightResource.class);
         addSystemRestResource(HelloWorldResource.class);
         addSystemRestResource(RolesResource.class);
         addSystemRestResource(ClusterConfigResource.class);

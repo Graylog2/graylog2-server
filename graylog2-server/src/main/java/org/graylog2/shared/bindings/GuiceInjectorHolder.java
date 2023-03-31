@@ -37,6 +37,10 @@ public final class GuiceInjectorHolder {
         return injector;
     }
 
+    public static void setInjector(Injector injector) {
+        GuiceInjectorHolder.injector = injector;
+    }
+
     public static void resetInjector() {
         injector = null;
     }

@@ -62,7 +62,7 @@ public class PreflightJerseyService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PreflightJerseyService.class);
 
     private final HttpConfiguration configuration;
-    private PreflightAuthFilter preflightAuthFilter;
+    private final PreflightAuthFilter preflightAuthFilter;
     private final Set<Class<?>> systemRestResources;
 
     private final ObjectMapper objectMapper;
@@ -145,7 +145,12 @@ public class PreflightJerseyService extends AbstractIdleService {
                         JacksonPropertyExceptionMapper.class
 )
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
-                .register((ContextResolver<ObjectMapper>) type -> objectMapper)
+                .register(new ContextResolver<ObjectMapper>() {
+                    @Override
+                    public ObjectMapper getContext(Class<?> type) {
+                        return objectMapper;
+                    }
+                })
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
                 .registerResources(additionalResources)

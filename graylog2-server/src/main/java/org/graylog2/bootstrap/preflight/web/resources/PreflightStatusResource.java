@@ -14,9 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog2.bootstrap.preflight.web.resources;
 
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.bootstrap.preflight.ConfigurationStatus;
+import org.graylog2.bootstrap.preflight.PreflightConfig;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.database.ValidationException;
 
@@ -29,13 +32,13 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
-public class PreflightStatusController {
+public class PreflightStatusResource {
 
     private final Version version = Version.CURRENT_CLASSPATH;
     private final PreflightConfigService preflightConfigService;
 
     @Inject
-    public PreflightStatusController(PreflightConfigService preflightConfigService) {
+    public PreflightStatusResource(PreflightConfigService preflightConfigService) {
         this.preflightConfigService = preflightConfigService;
     }
 
