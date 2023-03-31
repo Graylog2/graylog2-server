@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Avoid excessive DB requests for maintaining token last access time."
+
+issues = ["15013"]
+pulls = [""]
