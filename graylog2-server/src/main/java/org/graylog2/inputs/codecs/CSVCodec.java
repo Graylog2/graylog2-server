@@ -124,7 +124,7 @@ public class CSVCodec extends AbstractCodec implements MultiMessageCodec {
                     CK_DELIMITER,
                     "Delimiter of CSV resource",
                     ",",
-                    "The delimiter is what separates the values in the CSV",
+                    "The delimiter is what separates the values in the CSV. The Field only accepts single characters.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
