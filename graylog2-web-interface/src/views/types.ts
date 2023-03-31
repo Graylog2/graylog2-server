@@ -218,8 +218,8 @@ export interface ActionContexts {
   message: Message,
   valuePath: ValuePath,
   isLocalNode: boolean,
-  parameters: Immutable.Set<Parameter>,
-  parameterBindings: ParameterBindings,
+  parameters?: Immutable.Set<Parameter>,
+  parameterBindings?: ParameterBindings,
 }
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
