@@ -27,7 +27,13 @@ const Container = styled.div`
   align-items: baseline;
 `;
 
-const RadioSection = ({ strategy, onChange }: { strategy: StrategyId, onChange: (e: React.SyntheticEvent) => void }) => {
+type Props = {
+  strategy: StrategyId,
+  onChange: (e: React.SyntheticEvent) => void,
+  strategyAvailabilities: {[name in StrategyId]: boolean}
+}
+
+const RadioSection = ({ strategy, onChange, strategyAvailabilities }: Props) => {
   const { description } = strategiesLabels[strategy];
 
   return (
@@ -36,6 +42,8 @@ const RadioSection = ({ strategy, onChange }: { strategy: StrategyId, onChange: 
       <Container>
         {
       Object.entries(strategiesLabels).map(([curStrategy, { label }]) => {
+        if (!strategyAvailabilities[curStrategy]) return null;
+
         return (
           <Radio id={curStrategy}
                  key={curStrategy}

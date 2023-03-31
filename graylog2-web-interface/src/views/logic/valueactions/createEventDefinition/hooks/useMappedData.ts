@@ -49,6 +49,7 @@ const getFlattenPivots = (pivots): Set<string> => {
 };
 
 const filtratePathsByPivot = ({ flattenPivots, valuePath }: {flattenPivots: Set<string>, valuePath: Array<{ [name: string]: string }>}): Array<{[name:string]: string}> => {
+  if (!valuePath) return [];
   const map = valuePath.reduce((res, cur) => {
     const key = Object.keys(cur)[0];
 
@@ -167,6 +168,8 @@ const replaceParametersInQueryString = ({ query, restParameterValues }: {
 };
 
 const getStreams = (filter: FilterType): Array<string> => {
+  if (!filter) return [];
+
   return filter.get('filters').reduce((res, curFilter) => {
     if (curFilter.get('type') === 'stream') {
       res.push(curFilter.get('id'));

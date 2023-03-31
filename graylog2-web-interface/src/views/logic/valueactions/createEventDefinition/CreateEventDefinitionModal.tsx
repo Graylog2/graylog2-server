@@ -26,7 +26,7 @@ import type {
   ItemKey,
   Checked,
   State,
-  ModalData, MappedData,
+  ModalData, MappedData, StrategyId,
 } from 'views/logic/valueactions/createEventDefinition/types';
 import CheckBoxGroup from 'views/logic/valueactions/createEventDefinition/CheckBoxGroup';
 import {
@@ -66,7 +66,7 @@ const reducer = (state: State, action: { type: string, payload?: Checked, possib
       return ({
         strategy: 'ALL',
         showDetails: state.showDetails,
-        checked: { ...possibleKeys, searchFilterQuery: false, queryWithReplacedParams: false },
+        checked: updateIfHas(possibleKeys, { searchFilterQuery: false, queryWithReplacedParams: false }),
       });
     case 'SET_EXACT_STRATEGY':
       return ({
@@ -165,13 +165,23 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
     return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&config=${JSON.stringify(urlConfig)}`;
   }, [urlConfig]);
 
+  const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => {
+    return ({
+      ALL: true,
+      ROW: !!mappedData?.rowValuePath?.length,
+      COL: !!mappedData?.columnValuePath?.length,
+      CUSTOM: true,
+      EXACT: true,
+    });
+  }, [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
+
   return (
     <Modal onHide={onClose} show={show}>
       <Modal.Header closeButton>
-        <Modal.Title>Modal Title</Modal.Title>
+        <Modal.Title>Add values to Event Definition</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <RadioSection strategy={strategy} onChange={onStrategyChange} />
+        <RadioSection strategyAvailabilities={strategyAvailabilities} strategy={strategy} onChange={onStrategyChange} />
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
           <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
           {showDetails ? 'Hide strategy details' : 'Show strategy details'}
