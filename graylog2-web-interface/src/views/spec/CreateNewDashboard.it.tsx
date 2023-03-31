@@ -99,7 +99,7 @@ describe('Create a new dashboard', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
   });
 
   const SimpleAppRouter = () => (
