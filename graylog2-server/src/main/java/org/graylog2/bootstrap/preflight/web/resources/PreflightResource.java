@@ -18,18 +18,20 @@ package org.graylog2.bootstrap.preflight.web.resources;
 
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Path("/preflight")
+@Path("/api")
 public class PreflightResource {
 
     private final NodeService nodeService;
@@ -46,4 +48,45 @@ public class PreflightResource {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         return new ArrayList<>(activeDataNodes.values());
     }
+
+    @GET
+    @Path("/ca")
+    public void get() {
+
+    }
+
+    @POST
+    @Path("/ca/create")
+    public void createCA() {
+    }
+
+    @POST
+    @Path("/ca/upload")
+    public void uploadCA() {
+
+    }
+
+    @DELETE
+    @Path("/startOver")
+    public void startOver() {
+        //To reset all datanodes
+    }
+
+    @DELETE
+    @Path("/startOver/{id}")
+    public void startOver(@PathParam("id") String id) {
+        //To reset a specific datanode
+    }
+
+    @POST
+    @Path("/generate")
+    public void generate() {
+
+    }
+
+//    @POST
+//    @Path("/{nodeID}")
+//    public void addParameters(Parameters params) {
+//
+//    }
 }
