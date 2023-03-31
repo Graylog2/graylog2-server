@@ -19,6 +19,7 @@ package org.graylog2.cluster;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
@@ -29,11 +30,14 @@ import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class NodeServiceImpl extends PersistedServiceImpl implements NodeService {
     private final long pingTimeout;
+    private final static Map<String, Object> lastSeenField = Map.of("last_seen", Map.of("$type", "timestamp"));
 
     @Inject
     public NodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
@@ -50,29 +54,25 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public String registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("last_seen", Tools.getUTCTimestamp());
-        fields.put("node_id", nodeId);
-        fields.put("type", type().toString());
-        fields.put("is_leader", isLeader);
-        fields.put("transport_address", httpPublishUri.toString());
-        fields.put("hostname", hostname);
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
+        final Map<String, Object> fields = Map.of(
+                "$set", Map.of(
+                        "node_id", nodeId,
+                        "type", type().toString(),
+                        "is_leader", isLeader,
+                        "transport_address", httpPublishUri.toString(),
+                        "hostname", hostname
+                ),
+                "$currentDate", lastSeenField
+        );
 
-        try {
-            Node node;
-            try {
-                // Update existing node object.
-                final String objectId = byNodeId(nodeId).getId();
-                node = new NodeImpl(new ObjectId(objectId), fields);
-            } catch (NodeNotFoundException e) {
-                // Create new node object.
-                node = new NodeImpl(fields);
-            }
-            return save(node);
-        } catch (ValidationException e) {
-            throw new RuntimeException("Validation failed.", e);
-        }
+        final WriteResult result = this.collection(NodeImpl.class).update(
+                new BasicDBObject("node_id", nodeId),
+                new BasicDBObject(fields),
+                true,
+                false
+        );
+        return result.getN() == 1;
     }
 
     @Override
@@ -94,20 +94,15 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     @Override
     public Map<String, Node> allActive(Node.Type type) {
-        Map<String, Node> nodes = Maps.newHashMap();
+        final BasicDBObject query = new BasicDBObject(Map.of(
+                "$and", List.of(
+                        Map.of("type", type.toString()),
+                        recentHeartbeat()
+                )));
 
-        BasicDBObject query = new BasicDBObject();
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("type", type.toString());
-
-        for (DBObject obj : query(NodeImpl.class, query)) {
-            Node node = new NodeImpl((ObjectId) obj.get("_id"), obj.toMap());
-            String nodeId = (String) obj.get("node_id");
-
-            nodes.put(nodeId, node);
-        }
-
-        return nodes;
+        return query(NodeImpl.class, query)
+                .stream()
+                .collect(Collectors.toMap(obj -> (String)obj.get("node_id"), obj -> new NodeImpl((ObjectId) obj.get("_id"), obj.toMap())));
     }
 
     @Override
@@ -123,8 +118,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     @Override
     public void dropOutdated() {
-        BasicDBObject query = new BasicDBObject();
-        query.put("last_seen", new BasicDBObject("$lt", Tools.getUTCTimestamp() - pingTimeout));
+        final BasicDBObject query = new BasicDBObject("$nor", List.of(recentHeartbeat()));
 
         destroyAll(NodeImpl.class, query);
     }
@@ -132,41 +126,57 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    @Override
-    public void markAsAlive(Node node, boolean isLeader, String restTransportAddress) {
-        node.getFields().put("last_seen", Tools.getUTCTimestamp());
-        node.getFields().put("is_leader", isLeader);
-        node.getFields().put("transport_address", restTransportAddress);
-        try {
-            save(node);
-        } catch (ValidationException e) {
-            throw new RuntimeException("Validation failed.", e);
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
+        BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
+
+        final BasicDBObject update = new BasicDBObject(Map.of(
+                "$set", Map.of(
+                        "is_leader", isLeader,
+                        "transport_address", restTransportAddress.toString()
+                ),
+                "$currentDate", lastSeenField
+        ));
+
+        final WriteResult result = super.collection(NodeImpl.class).update(query, update);
+
+        final int updatedDocumentsCount = result.getN();
+        if (updatedDocumentsCount != 1) {
+            throw new NodeNotFoundException("Unable to find node " + node.getNodeId());
         }
     }
 
-    @Override
-    public void markAsAlive(Node node, boolean isLeader, URI restTransportAddress) {
-        markAsAlive(node, isLeader, restTransportAddress.toString());
+    private Map<String, Object> recentHeartbeat() {
+        return Map.of("$where", "this.last_seen >= Timestamp(new Date().getTime() / 1000 - " + pingTimeout + ", 1)");
     }
 
     @Override
     public boolean isOnlyLeader(NodeId nodeId) {
-        BasicDBObject query = new BasicDBObject();
-        query.put("type", Node.Type.SERVER.toString());
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("node_id", new BasicDBObject("$ne", nodeId.getNodeId()));
-        query.put("is_leader", true);
+        final BasicDBObject query = new BasicDBObject(Map.of(
+                "$and", List.of(
+                        recentHeartbeat(),
+                        Map.of(
+                                "type", Node.Type.SERVER.toString(),
+                                "node_id", new BasicDBObject("$ne", nodeId.getNodeId()),
+                                "is_leader", true
+                        )
+                )
+        ));
 
-        return query(NodeImpl.class, query).size() == 0;
+        return count(NodeImpl.class, query) == 0;
     }
 
     @Override
     public boolean isAnyLeaderPresent() {
-        BasicDBObject query = new BasicDBObject();
-        query.put("type", Node.Type.SERVER.toString());
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("is_leader", true);
+        final BasicDBObject query = new BasicDBObject(Map.of(
+                "$and", List.of(
+                        recentHeartbeat(),
+                        Map.of(
+                                "type", Node.Type.SERVER.toString(),
+                                "is_leader", true
+                        )
+                )
+        ));
 
-        return query(NodeImpl.class, query).size() > 0;
+        return count(NodeImpl.class, query) > 0;
     }
 }

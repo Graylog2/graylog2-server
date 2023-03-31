@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import groupBy from 'lodash/groupBy';
 
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -40,7 +40,7 @@ export const CatalogStore = singletonStore(
       const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
       const promise = fetch('GET', url)
         .then((result) => {
-          const entityIndex = lodash.groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
+          const entityIndex = groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
 
           this.trigger({ entityIndex: entityIndex });
 

@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -35,6 +36,7 @@ import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
+import org.graylog.events.processor.EventResolver;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
@@ -43,6 +45,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
@@ -126,6 +129,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkDeletionExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
+    private final EventResolver eventResolver;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -134,7 +138,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     EventProcessorEngine engine,
                                     RecentActivityService recentActivityService,
                                     AuditEventSender auditEventSender,
-                                    ObjectMapper objectMapper
+                                    ObjectMapper objectMapper,
+                                    EventResolver eventResolver
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -145,6 +150,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
         this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
+        this.eventResolver = eventResolver;
     }
 
 
@@ -228,9 +234,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public Map<String, Object> getWithContext(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
-                .map(evenDefinition -> ImmutableMap.of(
-                        "event_definition", evenDefinition,
-                        "context", contextService.contextFor(evenDefinition)
+                .map(eventDefinition -> ImmutableMap.of(
+                        "event_definition", eventDefinition,
+                        "context", contextService.contextFor(eventDefinition)
                 ))
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
     }
@@ -286,7 +292,21 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
+
         final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
+        final String dependencyTitle = eventDefinitionDto.isPresent() ? eventDefinitionDto.get().title() : definitionId;
+        final List<EventDefinitionDto> dependentEventDtoList = eventResolver.dependentEvents(definitionId);
+        if (!dependentEventDtoList.isEmpty()) {
+            final List<String> dependenciesTitles = dependentEventDtoList.stream().map(EventDefinitionDto::title).toList();
+            final List<String> dependenciesIds = dependentEventDtoList.stream().map(EventDefinitionDto::id).toList();
+            String msg = "Unable to delete event definition <" + dependencyTitle
+                    + "> - please remove all references from event definitions: " + StringUtils.join(dependenciesTitles, ",");
+            ValidationResult validationResult = new ValidationResult()
+                .addError("dependency", msg)
+                .addContext("dependency_ids", dependenciesIds);
+            throw new ValidationFailureException(validationResult, msg);
+        }
+
         eventDefinitionDto.ifPresent(d ->
                 recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
         );

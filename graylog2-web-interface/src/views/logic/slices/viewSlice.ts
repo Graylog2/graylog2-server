@@ -50,7 +50,7 @@ const viewSlice = createSlice({
     activeQuery: undefined,
   },
   reducers: {
-    selectQuery: (state: ViewState, action: PayloadAction<QueryId>) => ({
+    setActiveQuery: (state: ViewState, action: PayloadAction<QueryId>) => ({
       ...state,
       activeQuery: action.payload,
     }),
@@ -81,7 +81,7 @@ const viewSlice = createSlice({
   },
 });
 export const viewSliceReducer = viewSlice.reducer;
-export const { setView, selectQuery, setIsDirty, setIsNew } = viewSlice.actions;
+export const { setView, setIsDirty, setIsNew, setActiveQuery } = viewSlice.actions;
 
 const isViewEqualForSearch = (view: View, newView: View) => {
   const oldWidgets = view?.state?.map((s) => s.widgets);
@@ -95,6 +95,15 @@ const _recreateSearch = async (newView: View) => {
   const updatedSearch = await createSearch(updatedView.search);
 
   return updatedView.toBuilder().search(updatedSearch).build();
+};
+
+export const selectQuery = (activeQuery: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const currentActiveQuery = selectActiveQuery(getState());
+  dispatch(setActiveQuery(activeQuery));
+
+  if (currentActiveQuery !== activeQuery) {
+    dispatch(execute());
+  }
 };
 
 export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -202,7 +211,9 @@ export const duplicateQuery = (queryId: string) => async (dispatch: AppDispatch,
   const searchQuery = selectSearchQuery(queryId)(getState());
   const newSearchQuery = searchQuery.toBuilder().id(newId).build();
 
-  return dispatch(addQuery(newSearchQuery, newViewState));
+  await dispatch(addQuery(newSearchQuery, newViewState));
+
+  return newId;
 };
 
 export const setQueriesOrder = (queryIds: Immutable.OrderedSet<string>) => async (dispatch: AppDispatch, getState: () => RootState) => {

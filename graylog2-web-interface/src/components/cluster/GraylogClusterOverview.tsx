@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { reduce } from 'lodash';
+import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';

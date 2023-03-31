@@ -17,7 +17,7 @@
 import type * as React from 'react';
 import { useState, useLayoutEffect } from 'react';
 import useResizeObserver from '@react-hook/resize-observer';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 // Simple hook which provides the width and height of an element by using a ResizeObserver.
 const useElementDimensions = (target: React.RefObject<HTMLElement>, debounceDelay = 200) => {

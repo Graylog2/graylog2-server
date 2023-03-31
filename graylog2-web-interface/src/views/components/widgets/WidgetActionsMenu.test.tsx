@@ -232,7 +232,7 @@ describe('<WidgetActionsMenu />', () => {
             },
           ],
         },
-        isFetching: false,
+        isInitialLoading: false,
         refetch: () => {},
       });
 
@@ -304,7 +304,7 @@ describe('<WidgetActionsMenu />', () => {
       await renderAndClick();
       await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
-      expect(loadDashboard).toHaveBeenCalledWith('new-id');
+      expect(loadDashboard).toHaveBeenCalledWith(expect.anything(), 'new-id');
     });
   });
 

@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -27,8 +28,10 @@ function inputStateFilter(state) {
 }
 
 const InputStateControl = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'InputStateControl',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     input: PropTypes.object.isRequired,
   },
@@ -55,7 +58,7 @@ const InputStateControl = createReactClass({
     return nodeIDs.some((nodeID) => {
       const nodeState = this.state.inputState[nodeID];
 
-      return nodeState.state === 'RUNNING';
+      return nodeState.state === 'RUNNING' || nodeState.state === 'STARTING' || nodeState.state === 'FAILING';
     });
   },
 

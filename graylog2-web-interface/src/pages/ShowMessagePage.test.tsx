@@ -62,7 +62,7 @@ type SimpleShowMessagePageProps = {
 
 const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
   // @ts-expect-error
-  <ShowMessagePage params={{ index, messageId }} />
+  (<ShowMessagePage params={{ index, messageId }} />)
 );
 
 describe('ShowMessagePage', () => {

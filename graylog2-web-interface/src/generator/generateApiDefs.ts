@@ -19,14 +19,14 @@ import * as fs from 'fs';
 import { dirname } from 'path';
 
 import * as ts from 'typescript';
-import { chunk } from 'lodash';
+import chunk from 'lodash/chunk';
 
 const REQUEST_FUNCTION_NAME = '__request__';
 const REQUEST_FUNCTION_IMPORT = 'routing/request';
 const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
 
-const createString = (s) => ts.factory.createStringLiteral(s, true);
-const quotePropNameIfNeeded = (propName) => (propName.match(/^[0-9@]/) ? createString(propName) : propName);
+const createString = (s: string) => ts.factory.createStringLiteral(s, true);
+const quotePropNameIfNeeded = (propName: string) => (propName.match(/^[0-9@]/) ? createString(propName) : propName);
 
 // ===== Types ===== //
 const primitiveTypeMappings = {
@@ -40,10 +40,24 @@ const primitiveTypeMappings = {
   any: 'unknown',
 };
 
-const isArrayType = (type) => (type === 'array');
-const isObjectType = (type) => (type === 'object');
-const isPrimitiveType = (type) => Object.keys(primitiveTypeMappings).includes(type);
-const mapPrimitiveType = (type) => primitiveTypeMappings[type];
+type Type = string;
+type AdditionalProperties = string | PropDef;
+type Properties = { [key: string]: PropDef };
+
+type PropDef = {
+  type: Type,
+  id?: Type,
+  $ref?: string,
+  properties?: Properties,
+  additionalProperties?: AdditionalProperties,
+  enum?: Array<string>,
+  defaultValue?: string,
+  items?: PropDef,
+}
+const isArrayType = (type: Type) => (type === 'array');
+const isObjectType = (type: Type) => (type === 'object');
+const isPrimitiveType = (type: Type) => Object.keys(primitiveTypeMappings).includes(type);
+const mapPrimitiveType = (type: Type) => primitiveTypeMappings[type];
 
 const typeMappings = {
   'urn:jsonschema:org:joda:time:DateTime': 'string',
@@ -52,54 +66,55 @@ const typeMappings = {
   ZonedDateTime: 'string',
 };
 
-const isURN = (type) => type.split(':').length > 1;
+const isURN = (type: Type) => type.split(':').length > 1;
 
-const stripURN = (type) => {
+const stripURN = (type: Type) => {
   const splitted = type.split(':');
 
   return splitted[splitted.length - 1];
 };
 
-const isMappedType = (type) => Object.keys(typeMappings).includes(type);
-const mapType = (type) => typeMappings[type];
+const isMappedType = (type: Type) => Object.keys(typeMappings).includes(type);
+const mapType = (type: Type) => typeMappings[type];
 
-const isEnumType = (propDef) => propDef.enum !== undefined;
+const isEnumType = (propDef: PropDef) => propDef.enum !== undefined;
 
-const creatorForType = (type) => {
+const creatorForType = (type: Type) => {
   switch (type) {
-    case 'number': return (number) => ts.factory.createNumericLiteral(number);
-    default: return (text) => ts.factory.createStringLiteral(text, true);
+    case 'number': return (number: string | number) => ts.factory.createLiteralTypeNode(
+      ts.factory.createNumericLiteral(number),
+    );
+    default: return (text: string) => ts.factory.createLiteralTypeNode(
+      ts.factory.createStringLiteral(text, true),
+    );
   }
 };
 
-const createEnumType = ({ type, enum: enumOptions, defaultValue }) => {
+const createEnumType = ({ type, enum: enumOptions, defaultValue }: PropDef) => {
   const mappedPrimitiveType = mapPrimitiveType(type);
   const creator = creatorForType(mappedPrimitiveType);
   const options = defaultValue ? [...new Set(enumOptions).add(defaultValue)] : enumOptions;
   const types = options.map((option) => creator(option));
 
-  return ts.factory.createUnionTypeNode(types);
+  return ts.factory.createUnionTypeNode(types as ts.TypeNode[]);
 };
 
-const wrapAdditionalProperties = (additionalProperties) => (typeof additionalProperties === 'string' ? ({ type: additionalProperties }) : additionalProperties);
+const wrapAdditionalProperties = (additionalProperties: AdditionalProperties) => (typeof additionalProperties === 'string' ? ({ type: additionalProperties } as PropDef) : additionalProperties);
 
-const createIndexerSignature = (additionalProperties) => (additionalProperties ? [ts.factory.createIndexSignature(
-  undefined,
+const createIndexerSignature = (additionalProperties: AdditionalProperties) => (additionalProperties ? [ts.factory.createIndexSignature(
   [readonlyModifier],
   [ts.factory.createParameterDeclaration(
-    undefined,
     undefined,
     undefined,
     ts.factory.createIdentifier('_key'),
     undefined,
     ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-    undefined,
   )],
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   createTypeFor(wrapAdditionalProperties(additionalProperties)),
 )] : []);
 
-const createTypeFor = (propDef) => {
+const createTypeFor = (propDef: PropDef) => {
   const { type: rawType, ...rest } = propDef;
   const isOptional = rawType && rawType.endsWith('>');
 
@@ -151,7 +166,7 @@ const createTypeFor = (propDef) => {
 };
 
 // ===== Models ===== //
-const createProps = (properties) => Object.entries(properties)
+const createProps = (properties: Properties) => Object.entries(properties)
   .map(([propName, propDef]) => ts.factory.createPropertySignature(
     [readonlyModifier],
     quotePropNameIfNeeded(propName),
@@ -167,14 +182,12 @@ const cleanName = (name) => name.replace(/>/g, '');
 const createModel = ([name, definition]) => (definition.type === 'object'
   ? ts.factory.createInterfaceDeclaration(
     undefined,
-    undefined,
     cleanName(name),
     undefined,
     undefined,
     [...createProps(definition.properties), ...createIndexerSignature(definition.additional_properties)],
   )
   : ts.factory.createTypeAliasDeclaration(
-    undefined,
     undefined,
     ts.factory.createIdentifier(name),
     undefined,
@@ -184,13 +197,13 @@ const createModel = ([name, definition]) => (definition.type === 'object'
 
 // ==== APIs/Operations ==== //
 // === Types === //
-const createResultTypeFor = (typeNode) => ts.factory.createTypeReferenceNode('Promise', [typeNode]);
+const createResultTypeFor = (typeNode: ts.TypeNode) => ts.factory.createTypeReferenceNode('Promise', [typeNode]);
 
 // === Functions === //
 
-const extractVariable = (segment) => segment.replace(/[{}]/g, '').split(':')[0];
+const extractVariable = (segment: string) => segment.replace(/[{}]/g, '').split(':')[0];
 
-const createTemplateString = (path) => {
+const createTemplateString = (path: string) => {
   const segments = path.split(/({.+?})/);
 
   if (segments.length === 1) {
@@ -254,10 +267,10 @@ const createBlock = (method, path, bodyParameter, queryParameter, rawProduces) =
   );
 };
 
-const isNumeric = (type) => ['integer', 'number'].includes(type);
-const isBoolean = (type) => ['boolean'].includes(type);
+const isNumeric = (type: Type) => ['integer', 'number'].includes(type);
+const isBoolean = (type: Type) => ['boolean'].includes(type);
 
-const createInitializer = (type, defaultValue) => {
+const createInitializer = (type: Type, defaultValue) => {
   if (isNumeric(type)) {
     return ts.factory.createNumericLiteral(defaultValue);
   }
@@ -275,13 +288,12 @@ const createInitializer = (type, defaultValue) => {
 
 const sortByOptionality = (parameter1, parameter2) => parameter2.required - parameter1.required;
 
-const cleanParameterName = (name) => name.replace(/\s/g, '');
+const cleanParameterName = (name: string) => name.replace(/\s/g, '');
 
 const createFunctionParameter = ({ name, required, defaultValue, type, enum: allowableValues }) => {
   const mappedType = isPrimitiveType(type) ? mapPrimitiveType(type) : type;
 
   return ts.factory.createParameterDeclaration(
-    undefined,
     undefined,
     undefined,
     cleanParameterName(name),
@@ -291,9 +303,9 @@ const createFunctionParameter = ({ name, required, defaultValue, type, enum: all
   );
 };
 
-const firstNonEmpty = (...strings) => strings.find((s) => (s !== undefined && s.trim() !== ''));
+const firstNonEmpty = (...strings: Array<string>) => strings.find((s) => (s !== undefined && s.trim() !== ''));
 
-const deriveNameFromParameters = (functionName, parameters) => {
+const deriveNameFromParameters = (functionName: string, parameters) => {
   const joinedParameters = parameters.map(({ name }) => cleanParameterName(name)).join('And');
 
   return `${functionName}By${joinedParameters}`;
@@ -303,7 +315,7 @@ const bannedFunctionNames = {
   delete: 'remove',
 };
 
-const unbanFunctionname = (nickname) => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
+const unbanFunctionname = (nickname: string) => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
 
 const createRoute = ({ nickname, parameters: rawParameters = [], method, type, path: operationPath, summary, produces }, path, assignedNames) => {
   const parameters = rawParameters.map((parameter) => ({ ...parameter, name: cleanParameterName(parameter.name) }));
@@ -327,7 +339,6 @@ const createRoute = ({ nickname, parameters: rawParameters = [], method, type, p
     nodes: [
       jsDoc,
       ts.factory.createFunctionDeclaration(
-        undefined,
         [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
         undefined,
         ts.factory.createIdentifier(functionName),
@@ -364,7 +375,6 @@ const createApiObject = (api) => {
 };
 
 const importDeclaration = ts.factory.createImportDeclaration(
-  undefined,
   undefined,
   ts.factory.createImportClause(false, ts.factory.createIdentifier(REQUEST_FUNCTION_NAME), undefined),
   createString(REQUEST_FUNCTION_IMPORT),
@@ -415,7 +425,6 @@ const cleanIdentifier = (name) => name.replace(/\//g, '');
 const apis = [...apisSet];
 const packageIndexFile = ts.createSourceFile('index.ts', '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
 const reexports = ts.factory.createNodeArray(apis.map((name) => ts.factory.createExportDeclaration(
-  undefined,
   undefined,
   false,
   ts.factory.createNamespaceExport(ts.factory.createIdentifier(cleanIdentifier(name))),

@@ -228,8 +228,10 @@ const ApiRoutes = {
   },
   NotificationsApiController: {
     delete: (type: string) => { return { url: `/system/notifications/${type}` }; },
+    deleteWithKey: (type: string, key: string) => { return { url: `/system/notifications/${type}/${key}` }; },
     list: () => { return { url: '/system/notifications' }; },
     getHtmlMessage: (type: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }; },
+    getHtmlMessageWithKey: (type: string, key: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}` }; },
   },
   OutputsApiController: {
     index: () => { return { url: '/system/outputs' }; },
@@ -259,6 +261,8 @@ const ApiRoutes = {
     paginated: () => { return { url: '/streams/paginated' }; },
     get: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     bulk_delete: () => ({ url: '/streams/bulk_delete' }),
+    bulk_resume: () => ({ url: '/streams/bulk_resume' }),
+    bulk_pause: () => ({ url: '/streams/bulk_pause' }),
     create: () => { return { url: '/streams' }; },
     update: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     cloneStream: (streamId: string) => { return { url: `/streams/${streamId}/clone` }; },

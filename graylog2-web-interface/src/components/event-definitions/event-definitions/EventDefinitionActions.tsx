@@ -82,6 +82,10 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     return eventDefinition?.config?.type === 'system-notifications-v1';
   };
 
+  const isAggregationEventDefinition = (): boolean => {
+    return eventDefinition?.config?.type === 'aggregation-v1';
+  };
+
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
     setDialogType(type);
@@ -132,7 +136,9 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
               `Event Definition "${eventDefinition.title}" was deleted successfully.`);
           },
           (error) => {
-            UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+            const errorStatus = error?.additional?.body?.errors?.dependency.join(' ') || error;
+
+            UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${errorStatus}`,
               'Could not delete Event Definition');
           },
         ).finally(() => {
@@ -183,7 +189,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
             <MenuItem divider />
             <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-              {isScheduled ? 'Disable' : 'enable'}
+              {isScheduled ? 'Disable' : 'Enable'}
             </MenuItem>
 
             {showActions() && (
@@ -194,6 +200,19 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             )}
           </>
           )}
+          {
+            isAggregationEventDefinition() && (
+              <>
+                <MenuItem divider />
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
+                  <MenuItem>
+                    Replay search
+                  </MenuItem>
+                </LinkContainer>
+
+              </>
+            )
+          }
         </OverlayDropdownButton>
       </ButtonToolbar>
       {showDialog && (

@@ -17,7 +17,6 @@
 package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -37,14 +36,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST})
 public class SuggestionResourceIT {
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
     private String stream1Id;
     private String stream2Id;
 
-    public SuggestionResourceIT(RequestSpecification requestSpec, GraylogApis api) {
-        this.requestSpec = requestSpec;
+    public SuggestionResourceIT(GraylogApis api) {
         this.api = api;
     }
 
@@ -107,7 +104,7 @@ public class SuggestionResourceIT {
     @ContainerMatrixTest
     void testMinimalRequest() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"\"}")
                 .post("/search/suggest")
@@ -121,7 +118,7 @@ public class SuggestionResourceIT {
     @ContainerMatrixTest
     void testNumericalValueSuggestion() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(
                         """
@@ -138,7 +135,7 @@ public class SuggestionResourceIT {
     @ContainerMatrixTest
     void testSuggestionsAreLimitedToStream() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(Map.of(
                         "field", "source",
@@ -153,7 +150,7 @@ public class SuggestionResourceIT {
                 .body("suggestions.occurrence[0]", equalTo(3));
 
         final ValidatableResponse validatableResponse2 = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(Map.of(
                         "field", "source",
@@ -171,7 +168,7 @@ public class SuggestionResourceIT {
     @ContainerMatrixTest
     void testInvalidField() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"message\", \"input\":\"foo\"}")
                 .post("/search/suggest")
@@ -185,7 +182,7 @@ public class SuggestionResourceIT {
     @ContainerMatrixTest
     void testSizeOtherDocsCount() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"\", \"size\":1}")
                 .post("/search/suggest")
@@ -200,7 +197,7 @@ public class SuggestionResourceIT {
     @ContainerMatrixTest
     void testTypoCorrection() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"tets\"}")
                 .post("/search/suggest")

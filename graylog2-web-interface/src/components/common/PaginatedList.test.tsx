@@ -92,7 +92,7 @@ describe('PaginatedList', () => {
 
       asMock(useLocation).mockReturnValue({
         search: `?page=${currentPage}`,
-      } as Location<{ search: string }>);
+      } as Location);
 
       const { findByTestId } = render(
         <PaginatedList totalItems={200}

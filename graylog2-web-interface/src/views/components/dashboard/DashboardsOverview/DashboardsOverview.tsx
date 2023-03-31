@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useQueryParam, StringParam } from 'use-query-params';
 
 import type { Sort } from 'stores/PaginationTypes';
 import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
@@ -40,8 +41,8 @@ const renderBulkActions = (
 );
 
 const DashboardsOverview = () => {
-  const [query, setQuery] = useState('');
-  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
+  const [query, setQuery] = useQueryParam('q', StringParam);
+  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
@@ -59,12 +60,12 @@ const DashboardsOverview = () => {
     query,
   ]);
   const customColumnRenderers = useColumnRenderers({ searchParams });
-  const { data: paginatedDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
     setQuery(newQuery);
-  }, [paginationQueryParameter]);
+  }, [paginationQueryParameter, setQuery]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
@@ -88,7 +89,7 @@ const DashboardsOverview = () => {
     paginationQueryParameter.resetPage();
   }, [paginationQueryParameter, updateTableLayout]);
 
-  if (!paginatedDashboards) {
+  if (isLoadingDashboards || isLoadingLayoutPreferences) {
     return <Spinner />;
   }
 
@@ -113,18 +114,18 @@ const DashboardsOverview = () => {
         <NoSearchResult>No dashboards have been found.</NoSearchResult>
       )}
       {!!dashboards?.length && (
-        <EntityDataTable activeSort={layoutConfig.sort}
-                         bulkActions={renderBulkActions}
-                         columnDefinitions={attributes}
-                         columnRenderers={customColumnRenderers}
-                         columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                         data={dashboards}
-                         onColumnsChange={onColumnsChange}
-                         onPageSizeChange={onPageSizeChange}
-                         onSortChange={onSortChange}
-                         pageSize={layoutConfig.pageSize}
-                         rowActions={renderDashboardActions}
-                         visibleColumns={layoutConfig.displayedAttributes} />
+        <EntityDataTable<View> activeSort={layoutConfig.sort}
+                               bulkActions={renderBulkActions}
+                               columnDefinitions={attributes}
+                               columnRenderers={customColumnRenderers}
+                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                               data={dashboards}
+                               onColumnsChange={onColumnsChange}
+                               onPageSizeChange={onPageSizeChange}
+                               onSortChange={onSortChange}
+                               pageSize={layoutConfig.pageSize}
+                               rowActions={renderDashboardActions}
+                               visibleColumns={layoutConfig.displayedAttributes} />
       )}
     </PaginatedList>
   );

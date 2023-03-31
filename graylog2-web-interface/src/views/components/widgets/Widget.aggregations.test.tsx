@@ -44,7 +44,7 @@ import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import FieldTypesContext from '../contexts/FieldTypesContext';
 
-const testTimeout = applyTimeoutMultiplier(30000);
+const testTimeout = applyTimeoutMultiplier(60000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.mock('./WidgetHeader', () => 'widget-header');

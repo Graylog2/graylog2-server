@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix overflow problem with grouping section in aggregation builder."
+
+issues = ["14907"]
+pulls = ["14934"]

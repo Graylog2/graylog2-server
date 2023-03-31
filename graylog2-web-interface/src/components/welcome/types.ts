@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type EntityItemType = 'search' | 'dashboard' | 'search-filter';
 export type RecentActivityType = 'create' | 'update' | 'share' | 'delete'
 export type Pagination = {
   page: number,
@@ -25,23 +24,20 @@ export type Pagination = {
 }
 
 export type FavoriteItem = {
-  id: string,
-  type: EntityItemType,
+  grn: string,
   title: string
 }
 
 export type LastOpenedItem = {
   timestamp: string,
-  id: string,
-  type: EntityItemType,
+  grn: string,
   title: string
 }
 
 export type RecentActivityResponseItem = {
+  item_grn: string,
   id: string,
   activity_type: RecentActivityType,
-  item_type: EntityItemType,
-  item_id: string,
   item_title: string,
   timestamp: string,
   user_name?: string,
@@ -50,9 +46,8 @@ export type RecentActivityResponseItem = {
 export type RecentActivityItem = {
   id: string,
   activityType: RecentActivityType,
-  itemType: EntityItemType,
-  itemId: string,
-  itemTitle: string,
+  itemTitle,
+  itemGrn: string,
   timestamp: string,
   userName?: string
 }

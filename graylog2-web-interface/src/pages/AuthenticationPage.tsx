@@ -23,12 +23,12 @@ import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
 import StringUtils from 'util/StringUtils';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import BackendDetails from 'components/authentication/BackendDetails';
+import useHistory from 'routing/useHistory';
 
 const _pageTitle = (activeBackend: AuthenticationBackend | undefined | null, returnString?: boolean) => {
   const pageName = 'Active Authentication Service';
@@ -46,14 +46,16 @@ const _pageTitle = (activeBackend: AuthenticationBackend | undefined | null, ret
   return pageName;
 };
 
-const useRedirectToAppropriatePage = (finishedLoading, activeBackend, backendsTotal) => {
+const useRedirectToAppropriatePage = (finishedLoading: boolean, activeBackend: AuthenticationBackend, backendsTotal: number) => {
+  const history = useHistory();
+
   useEffect(() => {
     if (finishedLoading && !activeBackend && backendsTotal === 0) {
       history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE);
     } else if (finishedLoading && !activeBackend && backendsTotal) {
       history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
     }
-  }, [finishedLoading, activeBackend, backendsTotal]);
+  }, [finishedLoading, activeBackend, backendsTotal, history]);
 };
 
 const AuthenticationPage = () => {

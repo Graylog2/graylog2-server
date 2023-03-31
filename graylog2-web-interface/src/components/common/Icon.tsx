@@ -16,7 +16,7 @@
  */
 
 import React from 'react';
-import { find } from 'lodash';
+import find from 'lodash/find';
 import type { IconName } from '@fortawesome/fontawesome-common-types';
 import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 

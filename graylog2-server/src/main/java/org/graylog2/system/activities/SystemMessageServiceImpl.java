@@ -22,25 +22,27 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.indexer.IndexFailureImpl;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 
+@Singleton
 public class SystemMessageServiceImpl extends PersistedServiceImpl implements SystemMessageService {
     private static final int MAX_COLLECTION_BYTES = 50 * 1024 * 1024;
-    private final int PER_PAGE = 30;
+    private static final int PER_PAGE = 30;
+
     @Inject
     public SystemMessageServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
 
         // Make sure that the system messages collection is always created capped.
-        final String collectionName = SystemMessageImpl.class.getAnnotation(CollectionName.class).value();
+        final String collectionName = SystemMessageImpl.class.getAnnotation(DbEntity.class).collection();
         if (!mongoConnection.getDatabase().collectionExists(collectionName)) {
             final DBObject options = BasicDBObjectBuilder.start()
                     .add("capped", true)

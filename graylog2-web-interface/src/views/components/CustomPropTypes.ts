@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import TFieldType from 'views/logic/fieldtypes/FieldType';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -60,7 +60,6 @@ const Message = PropTypes.exact({
 
 const ValidElements = PropTypes.oneOfType([
   PropTypes.element,
-  PropTypes.func,
   PropTypes.string,
 ]);
 const OneOrMoreChildren = PropTypes.oneOfType([
@@ -126,4 +125,5 @@ export default ({
   OneOrMoreChildren,
   TimeRangeType,
   instanceOf,
+  ValidElements,
 });

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.grn.GRN;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -35,8 +36,6 @@ public abstract class RecentActivityDTO {
     public static final String FIELD_ID = "id";
     public static final String FIELD_ACTIVITY_TYPE = "activity_type";
     public static final String FIELD_ITEM_GRN = "item_grn";
-    public static final String FIELD_ITEM_ID = "item_id";
-    public static final String FIELD_ITEM_TYPE = "item_type";
     public static final String FIELD_ITEM_TITLE = "item_title";
     public static final String FIELD_USER_NAME = "user_name";
     public static final String FIELD_GRANTEE = "grantee";
@@ -52,14 +51,7 @@ public abstract class RecentActivityDTO {
     public abstract ActivityType activityType();
 
     @JsonProperty(FIELD_ITEM_GRN)
-    public abstract String itemGrn();
-
-    @JsonProperty(FIELD_ITEM_ID)
-    public abstract String itemId();
-
-    @Nullable
-    @JsonProperty(FIELD_ITEM_TYPE)
-    public abstract String itemType();
+    public abstract GRN itemGrn();
 
     @Nullable
     @JsonProperty(FIELD_ITEM_TITLE)
@@ -93,13 +85,7 @@ public abstract class RecentActivityDTO {
         public abstract RecentActivityDTO.Builder activityType(ActivityType activityType);
 
         @JsonProperty(FIELD_ITEM_GRN)
-        public abstract RecentActivityDTO.Builder itemGrn(String itemGrn);
-
-        @JsonProperty(FIELD_ITEM_ID)
-        public abstract RecentActivityDTO.Builder itemId(String itemId);
-
-        @JsonProperty(FIELD_ITEM_TYPE)
-        public abstract RecentActivityDTO.Builder itemType(String itemType);
+        public abstract RecentActivityDTO.Builder itemGrn(GRN itemGrn);
 
         @JsonProperty(FIELD_ITEM_TITLE)
         public abstract RecentActivityDTO.Builder itemTitle(String itemTitle);

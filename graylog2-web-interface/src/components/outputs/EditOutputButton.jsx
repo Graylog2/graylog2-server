@@ -36,6 +36,8 @@ class EditOutputButton extends React.Component {
   constructor(props) {
     super(props);
 
+    this.configurationForm = React.createRef();
+
     this.state = {
       typeDefinition: undefined,
     };
@@ -48,7 +50,10 @@ class EditOutputButton extends React.Component {
 
     getTypeDefinition(output.type, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
-      this.configurationForm.open();
+
+      if (this.configurationForm.current) {
+        this.configurationForm.current.open();
+      }
     });
   };
 
@@ -65,12 +70,12 @@ class EditOutputButton extends React.Component {
 
     if (typeDefinition) {
       configurationForm = (
-        <ConfigurationForm ref={(form) => { this.configurationForm = form; }}
+        <ConfigurationForm ref={this.configurationForm}
                            key={`configuration-form-output-${output.id}`}
                            configFields={typeDefinition}
                            title={`Editing Output ${output.title}`}
                            typeName={output.type}
-                           helpBlock="Select a name of your new output that describes it."
+                           titleHelpText="Select a name of your new output that describes it."
                            submitAction={this._handleSubmit}
                            submitButtonText="Update output"
                            values={output.configuration}

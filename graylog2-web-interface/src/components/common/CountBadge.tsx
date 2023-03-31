@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { forwardRef } from 'react';
 
 const Badge = styled.span(({ theme }) => `
   background-color: ${theme.colors.variant.light.info};
@@ -23,10 +24,21 @@ const Badge = styled.span(({ theme }) => `
 
 type Props = {
   children: React.ReactNode;
+  onClick?: () => void,
+  className?: string,
+  title?: string,
 };
 
-const CountBadge = ({ children }: Props) => (
-  <Badge className="badge">{children}</Badge>
-);
+const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick, className, title }: Props, ref) => (
+  <Badge className={`badge ${className}`} onClick={onClick} ref={ref} title={title}>
+    {children}
+  </Badge>
+));
+
+CountBadge.defaultProps = {
+  onClick: undefined,
+  className: '',
+  title: undefined,
+};
 
 export default CountBadge;

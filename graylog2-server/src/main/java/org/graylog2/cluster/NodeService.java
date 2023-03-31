@@ -25,7 +25,7 @@ import java.util.Map;
 public interface NodeService extends PersistedService {
     Node.Type type();
 
-    String registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname);
+    boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname);
 
     Node byNodeId(String nodeId) throws NodeNotFoundException;
 
@@ -37,9 +37,7 @@ public interface NodeService extends PersistedService {
 
     void dropOutdated();
 
-    void markAsAlive(Node node, boolean isLeader, String restTransportAddress);
-
-    void markAsAlive(Node node, boolean isLeader, URI restTransportAddress);
+    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException;
 
     boolean isOnlyLeader(NodeId nodeIde);
 

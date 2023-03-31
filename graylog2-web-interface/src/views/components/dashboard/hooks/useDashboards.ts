@@ -24,6 +24,12 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 
+const INITIAL_DATA = {
+  pagination: { total: 0 },
+  list: [],
+  attributes: [],
+};
+
 type PaginatedDashboardsResponse = PaginatedListJSON & {
   elements: Array<ViewJson>,
   attributes: Array<Attribute>,
@@ -57,11 +63,11 @@ const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enab
     list: Readonly<Array<View>>,
     pagination: { total: number },
     attributes: Array<Attribute>
-  } | undefined,
+  },
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['dashboards', 'overview', searchParams],
     () => fetchDashboards(searchParams),
     {
@@ -75,9 +81,9 @@ const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enab
   );
 
   return ({
-    data,
+    data: data ?? INITIAL_DATA,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 

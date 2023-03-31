@@ -36,10 +36,10 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public final class Streams implements GraylogRestApi {
 
-    private final RequestSpecification requestSpecification;
+    private final GraylogApis api;
 
-    public Streams(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    public Streams(GraylogApis api) {
+        this.api = api;
     }
 
     public record StreamRule(@JsonProperty("type") int type,
@@ -57,7 +57,7 @@ public final class Streams implements GraylogRestApi {
     public String createStream(String title, String indexSetId, boolean started, StreamRule... streamRules) {
         final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId);
         final String streamId = given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .body(body)
                 .post("/streams")
@@ -69,7 +69,7 @@ public final class Streams implements GraylogRestApi {
 
         if (started) {
             given()
-                    .spec(this.requestSpecification)
+                    .spec(api.requestSpecification())
                     .when()
                     .post("/streams/" + streamId + "/resume")
                     .then()
@@ -82,7 +82,7 @@ public final class Streams implements GraylogRestApi {
 
     public ValidatableResponse getStream(String streamId) {
         return given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/streams/" + streamId)
                 .then()
@@ -93,7 +93,7 @@ public final class Streams implements GraylogRestApi {
 
     private String getStreamRouterEngineFingerprint() {
         return given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/system/debug/streams/router_engine_info")
                 .then()

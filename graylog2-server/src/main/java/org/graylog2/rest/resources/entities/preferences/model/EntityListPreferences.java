@@ -21,6 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record EntityListPreferences(@JsonProperty("displayed_attributes") List<String> displayedAttributes,
-                                    @JsonProperty("per_page") int perPage,
+                                    @JsonProperty("per_page") Integer perPage,
                                     @JsonProperty("sort") SortPreferences sort) {
 }

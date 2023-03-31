@@ -14,17 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { OrderedMap } from 'immutable';
 
-type FilterBase = {
-  id: string,
-  title: string
+export type Filter = {
+  value: string,
+  title: string,
+
 }
 
-type DateFilter = FilterBase & { value: { from: string, to: string } }
-type BooleanFilter = FilterBase & { value: 'true' | 'false' }
-type ValueFilter = FilterBase & { value: string };
-export type Filter = DateFilter | BooleanFilter | ValueFilter;
-
-export type Filters = {
-  [attributeId: string]: Array<Filter>
-};
+export type Filters = OrderedMap<string, Array<Filter>>;
+export type UrlQueryFilters = OrderedMap<string, Array<string>>

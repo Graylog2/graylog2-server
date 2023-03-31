@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
@@ -54,6 +55,8 @@ public class PivotAggregationSearchTest {
     private EventDefinition eventDefinition;
     @Mock
     private MoreSearch moreSearch;
+    @Mock
+    private NotificationService notificationService;
 
     private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of);
 
@@ -87,7 +90,8 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                permittedStreams);
+                permittedStreams,
+                notificationService);
 
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
@@ -184,7 +188,8 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                permittedStreams);
+                permittedStreams,
+                notificationService);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -256,7 +261,8 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                permittedStreams);
+                permittedStreams,
+                notificationService);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")

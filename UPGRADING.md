@@ -90,7 +90,16 @@ Unless user-specified defaults are specified, the following new defaults will be
 - Shards: 1 (previously 4 in many cases)
 - Rotation Strategy: Time Size Optimizing - 30-40 days (previously Index Time [1D] in many cases)
 
-# API Changes
+## Removal of deprecated Inputs
+
+The following inputs are no longer available:
+- AWS Logs (deprecated)
+- AWS Flow Logs (deprecated)
+
+The inputs were marked as deprecated since Graylog version `3.2.0`.
+If you still run any of those inputs, please configure the alternative "Kinesis/CloudWatch" input instead ahead of upgrading.
+
+## Java API Changes
 The following Java Code API changes have been made.
 
 | File/method                                  | Description                                                                                                 |
@@ -146,15 +155,27 @@ will be returned like this if the `secret` attribute contains a sensitive value:
 }
 ```
 
+### Added Optional Default Timezone configuration for Syslog inputs
+When creating or editing a new syslog input, it is now possible to configure a default timezone in case logs ingested are not
+sending dates in UTC. When left as "Not configured", system behaves as before. 
+
+The following REST API endpoints were changed:
+
+| Endpoint                                                                                                   | Description                                   |
+|------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute. |
+
 ## Behaviour Changes
 
 - The `JSON path value from HTTP API` input will now only run on the leader node, if the `Global` option has been selected in the input configuration. Previously, the input was started on all nodes in the cluster.
 - The default connection and read timeouts for email sending have been reduced from 60 seconds to 10 seconds.
+- We are now parsing the time zone information send by Fortigate syslog messages. Any workarounds to transform the date into the right timezone because the forwared timezone information was not honored, should be removed.
 
 ## Configuration File Changes
 
-| Option                                      | Action  | Description                                                                                |
-|---------------------------------------------|---------|--------------------------------------------------------------------------------------------|
-| `gc_warning_threshold`                      | removed | GC warnings have been removed.                                                             |
-| `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds. |
-| `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.               |"
+| Option                                      | Action  | Description                                                                                     |
+|---------------------------------------------|---------|-------------------------------------------------------------------------------------------------|
+| `gc_warning_threshold`                      | removed | GC warnings have been removed.                                                                  |
+| `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds.      |
+| `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.                    |
+| `disabled_retention_strategies`             | added   | Allow disabling of `none` `close` `delete` retention strategies. At least one must stay enabled |

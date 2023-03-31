@@ -19,20 +19,17 @@ import 'webpack-entry';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Promise from 'bluebird';
-import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
+import ThreatIntelBindings from 'threatintel/bindings';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
-
-Promise.config({ cancellation: true });
-Reflux.setPromiseFactory((handlers) => new Promise(handlers));
+PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(

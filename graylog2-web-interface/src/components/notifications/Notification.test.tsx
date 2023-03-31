@@ -31,6 +31,7 @@ const notificationMessageFixture = {
 const notificationFixture = {
   severity: 'urgent',
   type: 'no_input_running',
+  key: 'test',
   timestamp: '2022-12-12T10:55:55.014Z',
   node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
 };
@@ -63,14 +64,14 @@ describe('<Notification>', () => {
 
     await screen.findByText(/loading\.\.\./i);
 
-    await waitFor(() => expect(NotificationsActions.getHtmlMessage).toHaveBeenCalledWith(notificationFixture.type, NotificationsFactory.getValuesForNotification(notificationFixture)));
+    await waitFor(() => expect(NotificationsActions.getHtmlMessage).toHaveBeenCalledWith(notificationFixture.type, notificationFixture.key, NotificationsFactory.getValuesForNotification(notificationFixture)));
   });
 
   test('should render notification message', async () => {
     jest.useFakeTimers();
 
     asMock(NotificationsStore.getInitialState).mockReturnValue({
-      messages: { no_input_running: notificationMessageFixture },
+      messages: { [`${notificationFixture.type}-${notificationFixture.key}`]: notificationMessageFixture },
       total: 1,
       notifications: [notificationFixture],
     });

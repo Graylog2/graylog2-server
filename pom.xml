@@ -26,8 +26,6 @@
         <module>graylog-storage-elasticsearch7</module>
         <module>graylog-storage-opensearch2</module>
         <module>distribution</module>
-        <module>data-node</module>
-        <module>data-node-distribution</module>
     </modules>
 
     <groupId>org.graylog</groupId>
@@ -162,7 +160,7 @@
         <slf4j.version>1.7.30</slf4j.version>
         <streamex.version>0.7.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
-        <syslog4j.version>0.9.60</syslog4j.version>
+        <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.2.0</ulid.version>
         <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
@@ -182,12 +180,12 @@
         <equalsverifier.version>3.10</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
-        <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <mockito.version>3.4.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.17.2</testcontainers.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v16.13.0</nodejs.version>
@@ -291,7 +289,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -585,6 +583,18 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>datanode</id>
+            <activation>
+                <property>
+                    <name>!skip.datanode</name>
+                </property>
+            </activation>
+            <modules>
+                <module>data-node</module>
+                <module>data-node-distribution</module>
+            </modules>
+        </profile>
         <profile>
             <id>release</id>
             <build>

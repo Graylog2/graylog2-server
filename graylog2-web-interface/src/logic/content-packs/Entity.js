@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { Map } from 'immutable';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 
 import ValueRefHelper from 'util/ValueRefHelper';
 

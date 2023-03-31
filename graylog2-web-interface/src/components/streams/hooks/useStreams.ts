@@ -22,6 +22,12 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 
+const INITIAL_DATA = {
+  pagination: { total: 0 },
+  elements: [],
+  attributes: [],
+};
+
 type Options = {
   enabled: boolean,
 }
@@ -31,11 +37,11 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
     elements: Array<Stream>,
     pagination: { total: number }
     attributes: Array<Attribute>
-  } | undefined,
+  },
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(
       searchParams.page,
@@ -58,9 +64,9 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
   );
 
   return ({
-    data,
+    data: data ?? INITIAL_DATA,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 

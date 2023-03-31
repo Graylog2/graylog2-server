@@ -21,6 +21,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,6 +34,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EncodingTest {
+    private final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
     final String MSG_FIELD = "short_message";
     final String MESSAGE = "äöüß";
     final String jsonString = "{"
@@ -70,7 +72,7 @@ class EncodingTest {
         Map<String, Object> jsonPathCollectionUTF8 = new HashMap<>();
         jsonPathCollectionUTF8.put(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_8.name());
         jsonPathCollectionUTF8.put(JsonPathCodec.CK_PATH, MSG_FIELD);
-        JsonPathCodec jsonPathCodecUTF8 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF8));
+        JsonPathCodec jsonPathCodecUTF8 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF8),objectMapperProvider.get());
 
         final Message message = jsonPathCodecUTF8.decode(rawUTF8);
         assertThat(message.getMessage()).contains(MESSAGE);
@@ -83,7 +85,7 @@ class EncodingTest {
         Map<String, Object> jsonPathCollectionUTF16 = new HashMap<>();
         jsonPathCollectionUTF16.put(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_16.name());
         jsonPathCollectionUTF16.put(JsonPathCodec.CK_PATH, MSG_FIELD);
-        JsonPathCodec jsonPathCodecUTF16 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF16));
+        JsonPathCodec jsonPathCodecUTF16 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF16),objectMapperProvider.get());
 
         final Message message = jsonPathCodecUTF16.decode(rawUTF16);
         assertThat(message.getMessage()).contains(MESSAGE);

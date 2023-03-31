@@ -20,7 +20,8 @@ import { Field } from 'formik';
 
 import { Icon, HoverForHelp } from 'components/common';
 import { TimeUnits } from 'views/Constants';
-import { FormControl, Checkbox, DropdownButton, MenuItem, InputGroup, Input } from 'components/bootstrap';
+import { FormControl, Checkbox, MenuItem, InputGroup, Input } from 'components/bootstrap';
+import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 const RangeSelect = styled.div`
   display: flex;
@@ -121,10 +122,14 @@ const Time = ({ index }: Props) => {
                            min="1"
                            onChange={(e) => onChange({ target: { name, value: { ...value, value: e.target.value } } })} />
               <InputGroup.Button>
-                <DropdownButton id="input-dropdown-addon"
-                                title={TimeUnits[value.unit] || ''}>
-                  {Object.keys(TimeUnits).map((unit) => <MenuItem key={unit} onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>{TimeUnits[unit]}</MenuItem>)}
-                </DropdownButton>
+                <OverlayDropdownButton title={TimeUnits[value.unit] || ''}>
+                  {Object.keys(TimeUnits).map((unit) => (
+                    <MenuItem key={unit}
+                              onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>
+                      {TimeUnits[unit]}
+                    </MenuItem>
+                  ))}
+                </OverlayDropdownButton>
               </InputGroup.Button>
             </InputGroup>
           )}

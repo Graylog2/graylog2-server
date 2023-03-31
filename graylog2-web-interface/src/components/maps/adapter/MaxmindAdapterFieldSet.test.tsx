@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import AppConfig from 'util/AppConfig';
 
+import type { Config } from './MaxmindAdapterFieldSet';
 import MaxmindAdapterFieldSet from './MaxmindAdapterFieldSet';
 
 jest.mock('util/AppConfig', () => ({
@@ -35,11 +36,11 @@ describe('MaxmindAdapterFieldSet', () => {
     });
 
     it('renders MaxmindAdapterFieldSet without path input', async () => {
-      render(<MaxmindAdapterFieldSet config={{}}
+      render(<MaxmindAdapterFieldSet config={{} as Config}
                                      updateConfig={() => {}}
                                      handleFormEvent={() => {}}
-                                     validationState={() => {}}
-                                     validationMessage={() => {}} />);
+                                     validationState={() => undefined}
+                                     validationMessage={() => undefined} />);
 
       expect(screen.getByText(/select the type of the database file/i)).toBeInTheDocument();
 
@@ -53,11 +54,11 @@ describe('MaxmindAdapterFieldSet', () => {
     });
 
     it('renders MaxmindAdapterFieldSet with path input', async () => {
-      render(<MaxmindAdapterFieldSet config={{}}
+      render(<MaxmindAdapterFieldSet config={{} as Config}
                                      updateConfig={() => {}}
                                      handleFormEvent={() => {}}
-                                     validationState={() => {}}
-                                     validationMessage={() => {}} />);
+                                     validationState={() => undefined}
+                                     validationMessage={() => undefined} />);
 
       expect(screen.getByText(/Select the type of the database file/i)).toBeInTheDocument();
 

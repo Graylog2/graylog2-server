@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 
@@ -28,10 +28,6 @@ import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 
-// Import built-in plugins
-import 'components/event-definitions/event-definition-types';
-import 'components/event-notifications/event-notification-types';
-
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
 
@@ -39,12 +35,16 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
+// Import built-in plugins
+import 'components/event-definitions/event-definition-types';
+import 'components/event-notifications/event-notification-types';
+
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<any>,
   validation: {
     errors: {
-      title: string,
+      title?: string,
     }
   },
   currentUser: User,
@@ -73,7 +73,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
           <dt>Description</dt>
           <dd>{eventDefinition.description || 'No description given'}</dd>
           <dt>Priority</dt>
-          <dd>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+          <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
         </dl>
       </>
     );

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import { debounce, cloneDeep } from 'lodash';
+import debounce from 'lodash/debounce';
+import cloneDeep from 'lodash/cloneDeep';
 import React from 'react';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';

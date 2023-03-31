@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration packages="org.graylog2.log4j" shutdownHook="disable">
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p [%c{1}] %m%n"/>
+        </Console>
+
+        <!-- Internal Graylog log appender. Please do not disable. This makes internal log messages available via REST calls. -->
+        <Memory name="graylog-internal-logs" bufferSize="500"/>
+    </Appenders>
+    <Loggers>
+        <!-- Application Loggers -->
+        <Logger name="org.graylog" level="info"/>
+        <Logger name="org.graylog2" level="info"/>
+        <Logger name="org.graylog2.datanode" level="info"/>
+        <Logger name="com.github.joschi.jadconfig" level="warn"/>
+        <!-- Disable messages from the version check -->
+        <Logger name="org.graylog2.periodical.VersionCheckThread" level="off"/>
+        <!-- Silence useless session validation messages -->
+        <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
+        <Root level="warn">
+            <AppenderRef ref="stdout"/>
+            <AppenderRef ref="graylog-internal-logs"/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix pagination of sidecar admin page when collectors are selected."
+
+issues = ["14924"]
+pulls = ["14925"]

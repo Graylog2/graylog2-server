@@ -21,6 +21,7 @@ import { useCallback, useState, useContext, useRef } from 'react';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
+import AddEvidence from 'components/security/investigations/AddEvidence';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
@@ -45,6 +46,7 @@ import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
+import useHistory from 'routing/useHistory';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -65,6 +67,12 @@ const _extractErrorMessage = (error: FetchError) => {
     && error.additional.body
     && error.additional.body.message) ? error.additional.body.message : error;
 };
+
+const addToInvestigation = ({ investigationSelected }) => (
+  <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
+    Add to investigation
+  </MenuItem>
+);
 
 const SearchActionsMenu = () => {
   const theme = useTheme();
@@ -91,6 +99,7 @@ const SearchActionsMenu = () => {
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
   const pluggableSaveViewControls = useSaveViewFormControls();
+  const history = useHistory();
 
   const toggleFormModal = useCallback(() => setShowForm((cur) => !cur), []);
   const toggleListModal = useCallback(() => setShowList((cur) => !cur), []);
@@ -144,17 +153,17 @@ const SearchActionsMenu = () => {
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
       .then(() => {
         if (deletedView.id === view.id) {
-          loadNewSearch();
+          loadNewSearch(history);
         }
 
         return Promise.resolve();
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  }, [view.id]);
+  }, [history, view.id]);
 
   const _loadAsDashboard = useCallback(() => {
-    loadAsDashboard(view);
-  }, [view]);
+    loadAsDashboard(history, view);
+  }, [history, view]);
 
   return (
     <Container aria-label="Search Meta Buttons">
@@ -199,6 +208,9 @@ const SearchActionsMenu = () => {
           Reset search
         </MenuItem>
         <MenuItem divider />
+        {loaded && (
+          <AddEvidence id={view.id} type="searches" child={addToInvestigation} />
+        )}
       </DropdownButton>
       {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}
       {showMetadataEdit && (

@@ -33,6 +33,7 @@ public interface UsedSearchFilter {
     String TYPE = "type";
 
     String TITLE_FIELD = "title";
+    String ID_FIELD = "id";
     String DESCRIPTION_FIELD = "description";
     String QUERY_STRING_FIELD = "queryString";
     String NEGATION_FIELD = "negation";

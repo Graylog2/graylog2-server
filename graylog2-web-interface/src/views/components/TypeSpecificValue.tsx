@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { isString, trim, truncate as trunc } from 'lodash';
+import isString from 'lodash/isString';
+import trim from 'lodash/trim';
+import trunc from 'lodash/truncate';
 
 import Timestamp from 'components/common/Timestamp';
 import FieldType from 'views/logic/fieldtypes/FieldType';
