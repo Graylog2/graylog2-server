@@ -65,7 +65,7 @@ const SavedSearchesList = ({
 }: Props) => {
   const [query, setQuery] = useState('');
   const [activePage, setActivePage] = useState(1);
-  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
+  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
