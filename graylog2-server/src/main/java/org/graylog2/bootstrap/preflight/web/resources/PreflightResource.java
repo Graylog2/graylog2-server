@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 
@@ -57,29 +58,34 @@ public class PreflightResource {
 
     @POST
     @Path("/ca/create")
+    @NoAuditEvent("No Audit Event needed")
     public void createCA() {
     }
 
     @POST
     @Path("/ca/upload")
+    @NoAuditEvent("No Audit Event needed")
     public void uploadCA() {
 
     }
 
     @DELETE
     @Path("/startOver")
+    @NoAuditEvent("No Audit Event needed")
     public void startOver() {
         //To reset all datanodes
     }
 
     @DELETE
     @Path("/startOver/{id}")
+    @NoAuditEvent("No Audit Event needed")
     public void startOver(@PathParam("id") String id) {
         //To reset a specific datanode
     }
 
     @POST
     @Path("/generate")
+    @NoAuditEvent("No Audit Event needed")
     public void generate() {
 
     }
