@@ -24,7 +24,7 @@ import isNumber from 'lodash/isNumber';
 import type { AggregationHandler, MappedData } from 'views/logic/valueactions/createEventDefinition/types';
 import { seriesToMetrics } from 'views/components/aggregationwizard/metric/MetricElement';
 import type Widget from 'views/logic/widgets/Widget';
-import type { FiltersType } from 'views/types';
+import type { ActionContexts, FiltersType } from 'views/types';
 import type { FilterType, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import type { ActionComponentProps } from 'views/components/actions/ActionHandler';
 import type Parameter from 'views/logic/parameters/Parameter';
@@ -176,7 +176,7 @@ const getStreams = (filter: FilterType): Array<string> => {
   }, []);
 };
 
-type HookProps = Pick<ActionComponentProps, 'contexts' | 'field' | 'queryId' | 'value'>
+type HookProps = Pick<ActionComponentProps, 'field' | 'queryId' | 'value'> & { contexts: ActionContexts }
 const useMappedData = ({ contexts, field, queryId, value }: HookProps) => useMemo<MappedData>(() => {
   const aggregationHandler = getAggregationHandler({ widget: contexts.widget, field: field });
   const curQuery = contexts.view.search.queries.find((query) => query.id === queryId);

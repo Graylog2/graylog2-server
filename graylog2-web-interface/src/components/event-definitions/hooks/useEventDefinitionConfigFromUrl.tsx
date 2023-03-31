@@ -24,7 +24,7 @@ export type EventDefinitionURLConfig = {
   type,
   query?: string,
   streams?: Array<string>,
-  search_within_ms: number,
+  search_within_ms?: number,
   group_by?: Array<string>,
   agg_function?: string,
   agg_field?: string,

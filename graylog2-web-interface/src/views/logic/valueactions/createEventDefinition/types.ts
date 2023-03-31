@@ -30,6 +30,7 @@ export type Checked = { [key in ItemKey]?: boolean };
 export type State = {
   strategy: StrategyId,
   checked: Checked;
+  showDetails: boolean;
 }
 
 export type MappedData= {

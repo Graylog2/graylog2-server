@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 
 import type { ActionComponentProps } from 'views/components/actions/ActionHandler';
 import CreateEventDefinitionModal from 'views/logic/valueactions/createEventDefinition/CreateEventDefinitionModal';
@@ -22,22 +22,11 @@ import useMappedData from 'views/logic/valueactions/createEventDefinition/hooks/
 import useModalData from 'views/logic/valueactions/createEventDefinition/hooks/useModalData';
 import { ActionContext } from 'views/logic/ActionContext';
 
-const concatQuery = (queryParts: Array<string>) => {
-  return queryParts.reduce((res, queryPart) => {
-    let curRes = res;
-
-    if (queryPart) {
-      curRes = `${res}${res ? ' AND ' : ' '}(${queryPart})`;
-    }
-
-    return curRes;
-  }, '');
-};
-
 const CreateEventDefinition = ({
   value,
   field,
   queryId,
+  onClose,
 }: ActionComponentProps) => {
   const contexts = useContext(ActionContext);
   /*
@@ -57,8 +46,13 @@ const CreateEventDefinition = ({
 
   const mappedData = useMappedData({ contexts, field, queryId, value });
   const modalData = useModalData(mappedData);
+  const [show, setShow] = useState(true);
+  const handleOnClose = useCallback(() => {
+    setShow(false);
+    onClose();
+  }, [onClose]);
 
-  return <CreateEventDefinitionModal modalData={modalData} />;
+  return show ? <CreateEventDefinitionModal modalData={modalData} mappedData={mappedData} onClose={handleOnClose} show={show} /> : null;
 };
 
 export default CreateEventDefinition;

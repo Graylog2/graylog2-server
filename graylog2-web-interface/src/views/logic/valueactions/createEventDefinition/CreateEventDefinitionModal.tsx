@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState, useReducer, useCallback, useEffect } from 'react';
+import React, { useMemo, useReducer, useCallback, useEffect } from 'react';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -24,7 +24,7 @@ import type {
   ItemKey,
   Checked,
   State,
-  ModalData,
+  ModalData, MappedData,
 } from 'views/logic/valueactions/createEventDefinition/types';
 import CheckBoxGroup from 'views/logic/valueactions/createEventDefinition/CheckBoxGroup';
 import {
@@ -33,45 +33,62 @@ import {
   labels,
 } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
+import { Icon } from 'components/common';
+import { Link } from 'components/common/router';
+import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
+import Routes from 'routing/Routes';
 
 const initState: State = {
   strategy: 'EXACT',
   checked: {},
+  showDetails: false,
 };
 
-const reducer = (state: State, action: { type: string, payload?: Checked, possibleKeys: Checked}) => {
+const reducer = (state: State, action: { type: string, payload?: Checked, possibleKeys: Checked}): State => {
   const { type, payload, possibleKeys } = action;
 
   switch (type) {
     case 'SET_ALL_STRATEGY':
       return ({
         strategy: 'ALL',
+        showDetails: state.showDetails,
         checked: { ...possibleKeys, searchFilterQuery: false, queryWithReplacedParams: false },
       });
     case 'SET_EXACT_STRATEGY':
       return ({
         strategy: 'EXACT',
+        showDetails: state.showDetails,
         checked: possibleKeys,
       });
     case 'SET_ROW_STRATEGY':
       return ({
         strategy: 'ROW',
+        showDetails: state.showDetails,
         checked: { ...possibleKeys, columnValuePath: false, columnGroupBy: false },
       });
     case 'SET_COL_STRATEGY':
       return ({
         strategy: 'COL',
+        showDetails: state.showDetails,
         checked: { ...possibleKeys, rowValuePath: false, rowGroupBy: false },
       });
     case 'SET_CUSTOM_STRATEGY':
       return ({
         strategy: 'CUSTOM',
+        showDetails: true,
         checked: state.checked,
       });
     case 'UPDATE_CHECKED_ITEMS':
       return ({
         strategy: 'CUSTOM',
+        showDetails: state.showDetails,
         checked: { ...state.checked, ...payload },
+      });
+    case 'TOGGLE_SHOW_DETAILS':
+      return ({
+        strategy: state.strategy,
+        showDetails: !state.showDetails,
+        checked: state.checked,
       });
     default:
       return state;
@@ -85,9 +102,9 @@ const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | n
   </span>
 );
 
-const CreateEventDefinitionModal = ({ modalData }: { modalData: ModalData }) => {
-  const [show, setShow] = useState(true);
-  const [{ strategy, checked }, dispatch] = useReducer(reducer, initState);
+const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { mappedData: MappedData, modalData: ModalData, show: boolean, onClose: () => void }) => {
+  const [{ strategy, checked, showDetails }, dispatch] = useReducer(reducer, initState);
+  const urlConfig = useUrlConfigData({ mappedData, checked });
   const dispatchWithData = useCallback(({ type, payload }: { type: string, payload?: Checked }) => {
     const possibleKeys = mapValues(modalData, (v) => !!v);
 
@@ -105,6 +122,10 @@ const CreateEventDefinitionModal = ({ modalData }: { modalData: ModalData }) => 
   const onStrategyChange = useCallback((e) => {
     dispatchWithData({ type: `SET_${e.target.value}_STRATEGY` });
   }, [dispatchWithData]);
+  const toggleDetailsOpen = useCallback(() => {
+    dispatchWithData({ type: 'TOGGLE_SHOW_DETAILS' });
+  }, [dispatchWithData]);
+
   const aggregationChecks = useMemo<Partial<Checked>>(() => pick(checked, aggregationGroup), [checked]);
   const searchChecks = useMemo<Partial<Checked>>(() => pick(checked, searchGroup), [checked]);
   const restChecks = useMemo<Partial<Checked>>(() => omit(checked, [...searchGroup, ...aggregationGroup]), [checked]);
@@ -126,27 +147,47 @@ const CreateEventDefinitionModal = ({ modalData }: { modalData: ModalData }) => 
     ));
   }, [modalData]);
 
+  const eventDefinitionCreationUrl = useMemo(() => {
+    return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&config=${JSON.stringify(urlConfig)}`;
+  }, [urlConfig]);
+
   return (
-    <Modal onHide={() => {}} show={show}>
+    <Modal onHide={onClose} show={show}>
       <Modal.Header closeButton>
         <Modal.Title>Modal Title</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <RadioSection strategy={strategy} onChange={onStrategyChange} />
-        <CheckBoxGroup onChange={onCheckboxChange} groupLabel="Aggregation" checked={aggregationChecks} labels={aggregationLabels} />
-        <CheckBoxGroup onChange={onCheckboxChange} groupLabel="Search query" checked={searchChecks} labels={searchLabels} />
+        <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
+          <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
+          {showDetails ? 'Hide strategy details' : 'Show strategy details'}
+        </Button>
         {
-          Object.entries(restChecks).map(([key, isChecked]) => (
-            <Checkbox checked={isChecked} onChange={() => onCheckboxChange({ [key]: !isChecked })}>
-              {restLabels[key]}
-            </Checkbox>
-          ))
+          showDetails && (
+          <div>
+            <CheckBoxGroup onChange={onCheckboxChange} groupLabel="Aggregation" checked={aggregationChecks} labels={aggregationLabels} />
+            <CheckBoxGroup onChange={onCheckboxChange} groupLabel="Search query" checked={searchChecks} labels={searchLabels} />
+            {
+              Object.entries(restChecks).map(([key, isChecked]) => (
+                <Checkbox checked={isChecked} onChange={() => onCheckboxChange({ [key]: !isChecked })}>
+                  {restLabels[key]}
+                </Checkbox>
+              ))
+            }
+          </div>
+          )
         }
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" onClick={() => {}}>
+        {/*
+        <Button type="button" onClick={onClose}>
           Cancel
         </Button>
+        <Button bsStyle="primary" to="/search">
+          Go to event definition
+        </Button>
+        */}
+        <Link onClick={onClose} to={eventDefinitionCreationUrl} target="_blank">Go to event definition</Link>
       </Modal.Footer>
     </Modal>
   );
