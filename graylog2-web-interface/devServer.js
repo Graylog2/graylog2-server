@@ -24,6 +24,7 @@ const proxy = require('express-http-proxy');
 const yargs = require('yargs');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
+const { expressCspHeader, INLINE, EVAL, SELF } = require('express-csp-header');
 
 const webpackConfig = require('./webpack.bundled');
 
@@ -65,6 +66,15 @@ app.use('/config.js', proxy(apiUrl, {
 
 app.use(compress()); // Enables compression middleware
 app.use(history()); // Enables HTML5 History API middleware
+
+app.use(expressCspHeader({
+  directives: {
+    'default-src': [SELF],
+    'script-src': [SELF, EVAL],
+    'style-src': [SELF, INLINE],
+    'img-src': [SELF, 'data:'],
+  },
+}));
 
 app.use(webpackDevMiddleware(vendorCompiler, {
   publicPath: appConfig.output.publicPath,
