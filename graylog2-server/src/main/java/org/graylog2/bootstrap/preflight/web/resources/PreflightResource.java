@@ -110,6 +110,7 @@ public class PreflightResource {
     @POST
     @Path("/{nodeID}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("No Audit Event needed")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
         dataNodeCertParameters.put(nodeID, params);
