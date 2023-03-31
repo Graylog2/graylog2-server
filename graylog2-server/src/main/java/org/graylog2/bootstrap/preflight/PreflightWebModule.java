@@ -21,7 +21,6 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
@@ -30,7 +29,6 @@ import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 
 public class PreflightWebModule extends Graylog2Module {
@@ -68,7 +66,7 @@ public class PreflightWebModule extends Graylog2Module {
         return Multibinder.newSetBinder(
                 binder(),
                 new TypeLiteral<Class<?>>() {},
-                PreflightRestResource.class
+                PreflightRestResourcesBinding.class
         );
     }
 }

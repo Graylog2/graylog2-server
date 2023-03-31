@@ -26,5 +26,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.PARAMETER, ElementType.TYPE })
 @BindingAnnotation
-public @interface PreflightRestResource {
+public @interface PreflightRestResourcesBinding {
 }

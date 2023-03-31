@@ -36,7 +36,6 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.bootstrap.preflight.web.PreflightAuthFilter;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
@@ -44,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import java.net.URI;
@@ -73,7 +71,7 @@ public class PreflightJerseyService extends AbstractIdleService {
     @Inject
     public PreflightJerseyService(final HttpConfiguration configuration,
                                  final PreflightAuthFilter preflightAuthFilter,
-                                  @PreflightRestResource final Set<Class<?>> systemRestResources,
+                                  @PreflightRestResourcesBinding final Set<Class<?>> systemRestResources,
                                   ObjectMapper objectMapper,
                                   MetricRegistry metricRegistry) {
         this.configuration = requireNonNull(configuration, "configuration");
