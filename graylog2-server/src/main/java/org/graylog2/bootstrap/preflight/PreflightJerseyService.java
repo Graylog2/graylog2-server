@@ -73,7 +73,7 @@ public class PreflightJerseyService extends AbstractIdleService {
     @Inject
     public PreflightJerseyService(final HttpConfiguration configuration,
                                  final PreflightAuthFilter preflightAuthFilter,
-                                  @Named(Graylog2Module.SYSTEM_REST_RESOURCES) final Set<Class<?>> systemRestResources,
+                                  @PreflightRestResource final Set<Class<?>> systemRestResources,
                                   ObjectMapper objectMapper,
                                   MetricRegistry metricRegistry) {
         this.configuration = requireNonNull(configuration, "configuration");

@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
@@ -45,8 +46,8 @@ public class PreflightWebModule extends Graylog2Module {
 
         bind(PreflightConfigService.class);
 
-        addSystemRestResource(PreflightResource.class);
-        addSystemRestResource(PreflightStatusResource.class);
+        addPreflightRestResource(PreflightResource.class);
+        addPreflightRestResource(PreflightStatusResource.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
@@ -57,5 +58,17 @@ public class PreflightWebModule extends Graylog2Module {
                 TypeLiteral.get(String.class),
                 new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
                 });
+    }
+
+    protected void addPreflightRestResource(Class<?> restResourceClass) {
+        preflightRestResourceBinder().addBinding().toInstance(restResourceClass);
+    }
+
+    private Multibinder<Class<?>> preflightRestResourceBinder() {
+        return Multibinder.newSetBinder(
+                binder(),
+                new TypeLiteral<Class<?>>() {},
+                PreflightRestResource.class
+        );
     }
 }
