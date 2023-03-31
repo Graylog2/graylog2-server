@@ -37,7 +37,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.security.UserContextBinder;
-import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
@@ -48,6 +47,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
+import org.graylog2.shared.rest.CSPResponseFilter;
 import org.graylog2.shared.rest.ContentTypeOptionFilter;
 import org.graylog2.shared.rest.EmbeddingControlFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
@@ -107,7 +107,6 @@ public class JerseyService extends AbstractIdleService {
     private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final HttpConfiguration configuration;
-    private final Configuration graylogConfiguration;
     private final Set<Class<?>> systemRestResources;
     private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
 
@@ -125,7 +124,6 @@ public class JerseyService extends AbstractIdleService {
 
     @Inject
     public JerseyService(final HttpConfiguration configuration,
-                         Configuration graylogConfiguration,
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
                          Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
@@ -138,7 +136,6 @@ public class JerseyService extends AbstractIdleService {
                          ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
-        this.graylogConfiguration = graylogConfiguration;
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
         this.exceptionMappers = requireNonNull(exceptionMappers, "exceptionMappers");
@@ -267,6 +264,7 @@ public class JerseyService extends AbstractIdleService {
                         WebAppNotFoundResponseFilter.class,
                         EmbeddingControlFilter.class,
                         OptionalResponseFilter.class,
+                        CSPResponseFilter.class,
                         ContentTypeOptionFilter.class)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
