@@ -1,0 +1,5 @@
+type = "c"
+message = "Add a Content Security Policy header to responses."
+
+pulls = ["14991"]
+issues = ["Graylog2/graylog-plugin-enterprise#4887"]

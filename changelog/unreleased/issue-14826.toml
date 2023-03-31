@@ -1,0 +1,5 @@
+type = "a"
+message = "Store selected filters and search query on streams and dashboards overview as URL query params."
+
+issues = ["14826"]
+pulls = ["15011"]

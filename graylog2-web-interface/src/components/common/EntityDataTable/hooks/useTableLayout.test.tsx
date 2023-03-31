@@ -50,7 +50,7 @@ describe('useUserSearchFilterQuery hook', () => {
   };
 
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
   });
 
   afterEach(() => {
@@ -71,7 +71,7 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should return defaults when there are no user layout preferences', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false });
 
     const { result } = renderHook(() => useTableLayout({
       entityTableId: 'streams',
@@ -86,7 +86,7 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should merge user preferences with defaults', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: { perPage: layoutPreferences.perPage }, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: { perPage: layoutPreferences.perPage }, isInitialLoading: false });
     const { result } = renderHook(() => useTableLayout({
       entityTableId: 'streams',
       ...defaultLayout,
