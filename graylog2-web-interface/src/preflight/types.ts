@@ -21,3 +21,7 @@ export type DataNode = {
 }
 
 export type DataNodes = Array<DataNode>;
+
+export type DataNodesCAStatus = {
+  isConfigured: boolean
+}

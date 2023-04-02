@@ -18,7 +18,7 @@ describe('useDataNodes', () => {
     asMock(fetch).mockReturnValue(Promise.resolve(availableDataNodes))
   })
 
-  it('should return fetched data nodes', async () => {
+  it('should return data nodes CA status', async () => {
     const { result, waitFor } = renderHook(() => useDataNodes());
 
     // expect(result.current.data).toEqual([]);
