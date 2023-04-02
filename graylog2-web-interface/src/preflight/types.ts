@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -15,14 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as Alert } from './Alert';
-export { default as Button } from './Button';
-export { default as Col } from './Col';
-export { default as Icon } from './Icon';
-export { default as Menu } from './Menu';
-export { default as MenuItem } from './MenuItem';
-export { default as Row } from './Row';
-export { default as Section } from './Section';
-export { default as MenuTarget } from './mantine/MenuTarget';
-export { default as MenuDropdownWrapper } from './mantine/MenuDropdownWrapper';
-export * from './mantine/imports';
+export type DataNode = {
+  id: string,
+  transportAddress: string,
+  isSecured: boolean,
+}
+
+export type DataNodes = Array<DataNode>;

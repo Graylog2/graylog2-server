@@ -15,40 +15,49 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Title, Table, Space } from '@mantine/core';
+import {Title, Table, Space} from '@mantine/core';
+import Spinner from 'components/common/Spinner';
+import useDataNodes from 'preflight/hooks/useDataNodes';
+import Alert from 'preflight/common/Alert';
 
-const availableDataNodes = [
-  { id: "data-node-id-1", transportAddress: 'transport.address1', isSecured: false },
-  { id: "data-node-id-2", transportAddress: 'transport.address2', isSecured: false },
-  { id: "data-node-id-3", transportAddress: 'transport.address3', isSecured: false }
-]
-const DataNodesOverview = () => (
-  <>
-    <Title order={3}>Available Data Nodes</Title>
-    <p>
-      These are the data nodes which are currently registered. The list is constantly updated.
-    </p>
+const DataNodesOverview = () => {
+  const { data: dataNodes, isFetching: isFetchingDataNodes, error: dataNodesFetchError } = useDataNodes()
 
-    <Space h="sm" />
+  return (
+    <>
+      <Title order={3}>Available Data Nodes</Title>
+      <p>
+        These are the data nodes which are currently registered. The list is constantly updated. {isFetchingDataNodes &&
+        <Spinner text="" />}
+      </p>
 
-    <Table verticalSpacing="sm" fontSize="md">
-      <thead>
-      <tr>
-        <th>Id</th>
-        <th>Transport Address</th>
-        <th>Is Secured</th>
-      </tr>
-      </thead>
-      <tbody>
-      {availableDataNodes.map((dataNode) => (
-        <tr key={dataNode.id}>
-          <td>{dataNode.id}</td>
-          <td>{dataNode.transportAddress}</td>
-          <td>{dataNode.isSecured ? 'yes' : 'no'}</td>
-        </tr>
-      ))}
-      </tbody>
-    </Table>
-  </>
-);
+      <Space h="sm" />
+      {!!dataNodes.length &&
+        <Table verticalSpacing="sm" fontSize="md">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Transport Address</th>
+            <th>Is Secured</th>
+          </tr>
+          </thead>
+          <tbody>
+          {dataNodes.map((dataNode) => (
+            <tr key={dataNode.id}>
+              <td>{dataNode.id}</td>
+              <td>{dataNode.transportAddress}</td>
+              <td>{dataNode.isSecured ? 'yes' : 'no'}</td>
+            </tr>
+          ))}
+          </tbody>
+        </Table>
+      }
+      {dataNodesFetchError && (
+        <Alert type="danger">
+          There was an error fetching the data nodes: {dataNodesFetchError.message}
+        </Alert>
+      )}
+    </>
+  );
+};
 export default DataNodesOverview;

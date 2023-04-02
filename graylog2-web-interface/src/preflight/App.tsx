@@ -18,19 +18,17 @@ import * as React from 'react';
 import {AppShell, Space} from '@mantine/core';
 
 import Section from 'preflight/common/Section';
-import Button from 'preflight/common/Button';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/DataNodesOverview';
 import CAConfiguration from 'preflight/CAConfiguration';
 
-const App = () => (
-  <AppShell padding="md" header={<Navigation />}>
+const App = () => {
+  return <AppShell padding="md" header={<Navigation />}>
     <Section title="Welcome!">
       <p>
         It looks like you are starting Graylog for the first time.
         Through this wizard, you can configure and secure your data nodes.
       </p>
-      <Button size="xs">Continue</Button>
     </Section>
 
     <Section title="Data Node Certificate Authority Configuration">
@@ -38,6 +36,6 @@ const App = () => (
       <Space h="md" />
       <CAConfiguration />
     </Section>
-  </AppShell>
-);
+  </AppShell>;
+};
 export default App;
