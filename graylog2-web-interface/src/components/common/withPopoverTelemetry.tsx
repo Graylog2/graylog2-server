@@ -33,12 +33,12 @@ const withPopoverTelemetry = (Component) => {
       };
 
       if (telemetryEvent.eventElement) {
-        sendTelemetry('open', telemetryEvent);
+        sendTelemetry('open_popover', telemetryEvent);
       }
 
       return () => {
         if (telemetryEvent.eventElement) {
-          sendTelemetry('close', telemetryEvent);
+          sendTelemetry('close_popover', telemetryEvent);
         }
       };
     }, [eventElement, appSection, sendTelemetry]);
