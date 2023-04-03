@@ -25,6 +25,7 @@ import Spinner from 'components/common/Spinner';
 import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Constants';
 import { List } from 'preflight/common';
 
+import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';
 
 const StepIcon = styled(Icon)<{ $color: string }>(({ $color, theme }) => css`
@@ -69,7 +70,7 @@ const ConfigurationWizard = () => {
     <Grid>
       <Grid.Col span={6}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
-        {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && '<CertificateProvisioning />'}
+        {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning />}
         {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && '<ConfigurationFinished />'}
       </Grid.Col>
       <Grid.Col span={6}>
