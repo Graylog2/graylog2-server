@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {AppShell, Space} from '@mantine/core';
+import { AppShell, Space } from '@mantine/core';
 
 import Section from 'preflight/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/DataNodesOverview';
 import ConfigurationWizard from 'preflight/ConfigurationWizard';
-const App = () => {
-  return <AppShell padding="md" header={<Navigation />}>
+
+const App = () => (
+  <AppShell padding="md" header={<Navigation />}>
     <Section title="Welcome!">
       <p>
         It looks like you are starting Graylog for the first time.
@@ -35,6 +36,7 @@ const App = () => {
       <Space h="md" />
       <ConfigurationWizard />
     </Section>
-  </AppShell>;
-};
+  </AppShell>
+);
+
 export default App;
