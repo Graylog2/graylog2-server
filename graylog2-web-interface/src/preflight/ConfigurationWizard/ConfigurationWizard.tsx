@@ -15,19 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Grid, List } from '@mantine/core';
+import { Grid, List as MantineList } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
-import type { IconName } from '@fortawesome/fontawesome-common-types';
 
+import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import useConfigurationStep from 'preflight/hooks/useConfigurationStep';
 import Spinner from 'components/common/Spinner';
 import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Constants';
+import { List } from 'preflight/common';
 
 import CAConfiguration from './CAConfiguration';
 
-const StepIcon = styled(Icon)<{ $color: string }>(({ $color }) => css`
+const StepIcon = styled(Icon)<{ $color: string }>(({ $color, theme }) => css`
   color: ${$color};
+  background-color: ${theme.colors.input.background};
+  border-radius: 50%;
 `);
 
 const stepIcon = (stepKey, activeStepKey, theme): { name: IconName, color: string } => {
@@ -78,9 +81,9 @@ const ConfigurationWizard = () => {
             const { name: iconName, color: iconColor } = stepIcon(configurationStepKey, activeStepKey, theme);
 
             return (
-              <List.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}>
+              <MantineList.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}>
                 {description}
-              </List.Item>
+              </MantineList.Item>
             );
           })}
         </List>

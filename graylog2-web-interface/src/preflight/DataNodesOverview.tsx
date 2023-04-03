@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Table, Space } from '@mantine/core';
+import { Space } from '@mantine/core';
 
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import Alert from 'preflight/common/Alert';
+import { Alert, Table } from 'preflight/common';
 
 const DataNodesOverview = () => {
   const { data: dataNodes, isFetching: isFetchingDataNodes, error: dataNodesFetchError } = useDataNodes();
