@@ -78,7 +78,7 @@ const ConfigurationWizard = () => {
             const { name: iconName, color: iconColor } = stepIcon(configurationStepKey, activeStepKey, theme);
 
             return (
-              <List.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} size="lg" />}>
+              <List.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}>
                 {description}
               </List.Item>
             );
