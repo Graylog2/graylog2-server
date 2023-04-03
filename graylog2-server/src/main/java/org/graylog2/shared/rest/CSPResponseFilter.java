@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { OrderedMap } from 'immutable';
+package org.graylog2.shared.rest;
 
-export type Filter = {
-  value: string,
-  title: string,
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 
+public class CSPResponseFilter implements ContainerResponseFilter {
+    @Override
+    public void filter(final ContainerRequestContext requestContext,
+                       ContainerResponseContext responseContext) {
+        responseContext.getHeaders().add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;");
+    }
 }
-
-export type Filters = OrderedMap<string, Array<Filter>>;
-export type UrlQueryFilters = OrderedMap<string, Array<string>>

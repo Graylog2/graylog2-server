@@ -21,6 +21,8 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
+const INITIAL_DATA = {};
+
 const preferencesFromJSON = ({
   displayed_attributes,
   sort,
@@ -35,15 +37,22 @@ const fetchUserLayoutPreferences = (entityId: string) => fetch(
   qualifyUrl(`/entitylists/preferences/${entityId}`),
 ).then((res) => preferencesFromJSON(res ?? {}));
 
-const useUserLayoutPreferences = (entityId: string): { data: TableLayoutPreferences | undefined, isLoading: boolean } => useQuery(
-  ['table-layout', entityId],
-  () => fetchUserLayoutPreferences(entityId),
-  {
-    onError: (error) => {
-      UserNotification.error(`Loading layout preferences for "${entityId}" overview failed with ${error}`);
-    },
-    keepPreviousData: true,
-    staleTime: 60 * (60 * 1000), // 1 hour
-  });
+const useUserLayoutPreferences = (entityId: string): { data: TableLayoutPreferences, isInitialLoading: boolean } => {
+  const { data, isInitialLoading } = useQuery(
+    ['table-layout', entityId],
+    () => fetchUserLayoutPreferences(entityId),
+    {
+      onError: (error) => {
+        UserNotification.error(`Loading layout preferences for "${entityId}" overview failed with ${error}`);
+      },
+      keepPreviousData: true,
+      staleTime: 60 * (60 * 1000), // 1 hour
+    });
+
+  return {
+    data: data ?? INITIAL_DATA,
+    isInitialLoading,
+  };
+};
 
 export default useUserLayoutPreferences;

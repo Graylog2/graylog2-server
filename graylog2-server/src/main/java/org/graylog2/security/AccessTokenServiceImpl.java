@@ -58,6 +58,9 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         super(mongoConnection);
         this.cipher = accessTokenCipher;
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
+
+        // make sure we cannot overwrite an existing access token
+        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
     }
 
     @Override
@@ -138,8 +141,6 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public String save(AccessToken accessToken) throws ValidationException {
-        // make sure we cannot overwrite an existing access token
-        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
         return super.save(encrypt(accessToken));
     }
 
