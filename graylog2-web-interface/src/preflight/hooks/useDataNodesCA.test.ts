@@ -21,6 +21,6 @@ describe('useDataNodesCA', () => {
     // await waitFor(() => !result.current.isFetching);
     //
     // expect(fetch).toHaveBeenCalledWith('GET', '/api/preflight/ca');
-    waitFor(() => expect(result.current.data).toEqual({ data: { isConfigured: false }, isFetching: false }));
+    await waitFor(() => expect(result.current.data).toEqual({ isConfigured: false }));
   });
 });

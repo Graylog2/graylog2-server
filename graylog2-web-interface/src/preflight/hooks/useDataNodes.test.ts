@@ -9,14 +9,14 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 describe('useDataNodes', () => {
   const availableDataNodes = [
-    { id: "data-node-id-1", transportAddress: 'transport.address1', isSecured: false },
-    { id: "data-node-id-2", transportAddress: 'transport.address2', isSecured: false },
-    { id: "data-node-id-3", transportAddress: 'transport.address3', isSecured: false }
-  ]
+    { id: 'data-node-id-1', transportAddress: 'transport.address1', isSecured: false },
+    { id: 'data-node-id-2', transportAddress: 'transport.address2', isSecured: false },
+    { id: 'data-node-id-3', transportAddress: 'transport.address3', isSecured: false },
+  ];
 
   beforeEach(() => {
-    asMock(fetch).mockReturnValue(Promise.resolve(availableDataNodes))
-  })
+    asMock(fetch).mockReturnValue(Promise.resolve(availableDataNodes));
+  });
 
   it('should return data nodes CA status', async () => {
     const { result, waitFor } = renderHook(() => useDataNodes());
@@ -27,6 +27,6 @@ describe('useDataNodes', () => {
     // await waitFor(() => !result.current.isFetching);
     //
     // expect(fetch).toHaveBeenCalledWith('GET', '/api/preflight/datanodes');
-    waitFor(() => expect(result.current.data).toEqual({ data: availableDataNodes, isFetching: false }));
+    await waitFor(() => expect(result.current.data).toEqual(availableDataNodes));
   });
 });
