@@ -14,30 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export type EvidenceTypes = 'logs' | 'dashboards' | 'searches' | 'events';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-export type AddEvidenceProps = {
+import type { EvidenceTypes } from './types';
+
+type Props = {
   index?: string,
   id: string,
   type: EvidenceTypes,
-  children: React.ReactElement,
+  child: React.ReactElement,
 };
 
-export type InvestigationsPlugin = {
-  components: {
-    AddEvidence: React.ComponentType<AddEvidenceProps>,
-    AddEvidenceModal: React.ComponentType<AddEvidenceProps>,
-  },
-  hooks: {
-    useInvestigationDrawer: () => ({
-      selectedInvestigationId: string,
-    }),
-  }
-};
+function AddEvidenceModal({ child, index, id, type }: Props) {
+  const investigations = usePluginEntities('investigationsPlugin');
 
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    investigationsPlugin?: Array<InvestigationsPlugin>,
-  }
+  if (!investigations || !investigations.length) return null;
+
+  const SecAddEvidenceModal = investigations[0].components.AddEvidenceModal;
+
+  return (
+    <SecAddEvidenceModal id={id} index={index} type={type}>
+      {child}
+    </SecAddEvidenceModal>
+  );
 }
+
+AddEvidenceModal.defaultProps = {
+  index: undefined,
+};
+
+export default AddEvidenceModal;

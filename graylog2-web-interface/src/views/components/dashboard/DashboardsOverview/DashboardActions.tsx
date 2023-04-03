@@ -22,7 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { ShareButton } from 'components/common';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MenuItem } from 'components/bootstrap';
-import AddEvidence from 'components/security/investigations/AddEvidence';
+import { AddEvidence, AddEvidenceModal } from 'components/security/investigations';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -70,8 +70,11 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    entityId={dashboard.id}
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
-      <OverlayDropdownButton bsSize="xsmall" title="More" closeOnSelect>
+      <OverlayDropdownButton bsSize="xsmall" title="More">
         <AddEvidence id={dashboard.id} type="dashboards" child={addToInvestigation} />
+        <AddEvidenceModal id={dashboard.id}
+                          type="dashboards"
+                          child={<MenuItem icon="puzzle-piece">Select an investigation</MenuItem>} />
         <MenuItem divider />
         <MenuItem onClick={onDashboardDelete}>
           <DeleteItem role="button">Delete</DeleteItem>

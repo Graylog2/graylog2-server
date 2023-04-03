@@ -23,14 +23,14 @@ import isEmpty from 'lodash/isEmpty';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';
 import { Timestamp, Icon } from 'components/common';
-import AddEvidence from 'components/security/investigations/AddEvidence';
+import { AddEvidence, AddEvidenceModal } from 'components/security/investigations';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 
-const EvidenceActionButton = styled.a(({ $disabled, theme }: { $disabled: boolean, theme: DefaultTheme }) => css`
+const EvidenceActionButton = styled.a(({ $disabled, theme }: { $disabled?: boolean, theme: DefaultTheme }) => css`
   display: flex;
   align-items: center;
   color: ${$disabled ? theme.colors.gray[90] : 'inherit'};
@@ -97,6 +97,15 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
                 <LinkToReplaySearch id={event.id} isEvent />
               </dd>
               <AddEvidence id={event.id} type="events" child={addToInvestigation} />
+              <AddEvidenceModal id={event.id}
+                                type="events"
+                                child={(
+                                  <dd>
+                                    <EvidenceActionButton>
+                                      Select an investigation <Icon name="puzzle-piece" size="sm" />
+                                    </EvidenceActionButton>
+                                  </dd>
+                                )} />
             </>
           )}
         </dl>

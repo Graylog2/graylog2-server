@@ -21,7 +21,7 @@ import { useCallback, useState, useContext, useRef } from 'react';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
-import AddEvidence from 'components/security/investigations/AddEvidence';
+import { AddEvidence, AddEvidenceModal } from 'components/security/investigations';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
@@ -209,7 +209,12 @@ const SearchActionsMenu = () => {
         </MenuItem>
         <MenuItem divider />
         {loaded && (
-          <AddEvidence id={view.id} type="searches" child={addToInvestigation} />
+          <>
+            <AddEvidence id={view.id} type="searches" child={addToInvestigation} />
+            <AddEvidenceModal id={view.id}
+                              type="searches"
+                              child={<MenuItem icon="puzzle-piece">Select an investigation</MenuItem>} />
+          </>
         )}
       </DropdownButton>
       {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}
