@@ -28,10 +28,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 
 import javax.inject.Inject;
 
-/**
- * This is the plugin. Your class should implement one of the existing plugin
- * interfaces. (i.e. AlarmCallback, MessageInput, MessageOutput)
- */
 public class CSVInput extends MessageInput {
     private static final String NAME = "CSV from HTTP API";
     @AssistedInject
