@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
@@ -32,6 +31,8 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 
 import javax.inject.Named;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -70,7 +71,7 @@ public class TelemetryResource extends ProxiedResource {
     @ApiOperation(value = "Get telemetry information.")
     public Map<String, Object> get() {
         try {
-            return telemetryService.createTelemetryResponse(getCurrentUserOrThrow(),
+            return telemetryService.getTelemetryResponse(getCurrentUserOrThrow(),
                     getSystemOverviewResponses());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -84,7 +85,7 @@ public class TelemetryResource extends ProxiedResource {
             @ApiResponse(code = 404, message = "Current user not found.")
     })
     public TelemetryUserSettings getTelemetryUserSettings() {
-        return TelemetryUserSettings.create(true, false);
+        return telemetryService.getTelemetryUserSettings(getCurrentUserOrThrow());
     }
 
     @PUT
@@ -94,11 +95,9 @@ public class TelemetryResource extends ProxiedResource {
             @ApiResponse(code = 404, message = "Current user not found.")
     })
     public void saveTelemetryUserSettings(@ApiParam(name = "JSON body", value = "The telemetry settings to assign to the user.", required = true)
-                                          TelemetryUserSettings telemetryUserSettings) throws ValidationException {
+                                          @Valid @NotNull TelemetryUserSettings telemetryUserSettings) {
 
-        User currentUser = getCurrentUserOrThrow();
-        // TODO persist telemetry user settings
-        userService.save(currentUser);
+        telemetryService.saveUserSettings(getCurrentUserOrThrow().getId(), telemetryUserSettings);
     }
 
     private User getCurrentUserOrThrow() {

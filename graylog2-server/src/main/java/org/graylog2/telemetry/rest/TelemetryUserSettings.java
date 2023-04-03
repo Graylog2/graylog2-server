@@ -1,27 +1,39 @@
 package org.graylog2.telemetry.rest;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
-import javax.validation.constraints.NotNull;
-
-@JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class TelemetryUserSettings {
 
+    public static Builder builder() {
+        return new AutoValue_TelemetryUserSettings.Builder();
+    }
+
     @JsonCreator
-    public static TelemetryUserSettings create(@JsonProperty("telemetry_enabled") @NotNull Boolean isTelemetryEnabled,
-                                               @JsonProperty("telemetry_permission_asked") @NotNull Boolean isTelemetryPermissionAsked) {
-        return new AutoValue_TelemetryUserSettings(isTelemetryEnabled, isTelemetryPermissionAsked);
+    public static TelemetryUserSettings create(@JsonProperty("telemetry_enabled") Boolean enabled,
+                                               @JsonProperty("telemetry_permission_asked") Boolean permissionAsked) {
+        return builder()
+                .telemetryEnabled(enabled)
+                .telemetryPermissionAsked(permissionAsked)
+                .build();
     }
 
     @JsonProperty
-    public abstract Boolean isTelemetryEnabled();
+    public abstract Boolean telemetryEnabled();
 
     @JsonProperty
-    public abstract Boolean isTelemetryPermissionAsked();
+    public abstract Boolean telemetryPermissionAsked();
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder telemetryEnabled(Boolean enabled);
+
+
+        public abstract Builder telemetryPermissionAsked(Boolean permissionAsked);
+
+        public abstract TelemetryUserSettings build();
+    }
 }

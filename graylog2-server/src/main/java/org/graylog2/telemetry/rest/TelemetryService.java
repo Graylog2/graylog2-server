@@ -30,6 +30,8 @@ import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
+import org.graylog2.telemetry.db.DBTelemetryUserSettingsService;
+import org.graylog2.telemetry.db.TelemetryUserSettingsDto;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -60,7 +62,8 @@ public class TelemetryService {
     private final ClusterAdapter elasticClusterAdapter;
     private final SearchVersion elasticsearchVersion;
     private final TelemetryResponseFactory telemetryResponseFactory;
-    private boolean isTelemetryEnabled;
+    private final DBTelemetryUserSettingsService dbTelemetryUserSettingsService;
+    private final boolean isTelemetryEnabled;
 
 
     @Inject
@@ -73,7 +76,8 @@ public class TelemetryService {
             Set<PluginMetaData> pluginMetaDataSet,
             ClusterAdapter elasticClusterAdapter,
             @DetectedSearchVersion SearchVersion elasticsearchVersion,
-            TelemetryResponseFactory telemetryResponseFactory) {
+            TelemetryResponseFactory telemetryResponseFactory,
+            DBTelemetryUserSettingsService dbTelemetryUserSettingsService) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
         this.clusterConfigService = clusterConfigService;
@@ -83,9 +87,10 @@ public class TelemetryService {
         this.elasticClusterAdapter = elasticClusterAdapter;
         this.elasticsearchVersion = elasticsearchVersion;
         this.telemetryResponseFactory = telemetryResponseFactory;
+        this.dbTelemetryUserSettingsService = dbTelemetryUserSettingsService;
     }
 
-    public Map<String, Object> createTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) throws JsonProcessingException {
+    public Map<String, Object> getTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) throws JsonProcessingException {
         if (isTelemetryEnabled) {
             String clusterId = getClusterId();
             return telemetryResponseFactory.createTelemetryResponse(
@@ -93,10 +98,34 @@ public class TelemetryService {
                     createUserInfo(currentUser, clusterId),
                     createPluginInfo(),
                     createSearchClusterInfo(),
-                    enterpriseDataProvider.licenseStatus(), TelemetryUserSettings.create(true, false));
+                    enterpriseDataProvider.licenseStatus(), getTelemetryUserSettings(currentUser));
         } else {
-            return telemetryResponseFactory.createTelemetryDisabledResponse(TelemetryUserSettings.create(false, false));
+            return telemetryResponseFactory.createTelemetryDisabledResponse(getTelemetryUserSettings(currentUser));
         }
+    }
+
+    public TelemetryUserSettings getTelemetryUserSettings(User currentUser) {
+        Optional<TelemetryUserSettingsDto> telemetryUserSettings = dbTelemetryUserSettingsService.findByUserId(currentUser.getId());
+        return telemetryUserSettings
+                .map(dto -> TelemetryUserSettings.builder()
+                        .telemetryEnabled(isTelemetryEnabled && dto.telemetryEnabled())
+                        .telemetryPermissionAsked(dto.telemetryPermissionAsked())
+                        .build())
+                .orElse(TelemetryUserSettings.builder()
+                        .telemetryEnabled(isTelemetryEnabled)
+                        .telemetryPermissionAsked(false)
+                        .build());
+    }
+
+    public void saveUserSettings(String userId, TelemetryUserSettings telemetryUserSettings) {
+
+        TelemetryUserSettingsDto.Builder builder = TelemetryUserSettingsDto.builder()
+                .userId(userId)
+                .telemetryEnabled(telemetryUserSettings.telemetryEnabled())
+                .telemetryPermissionAsked(telemetryUserSettings.telemetryPermissionAsked());
+
+        dbTelemetryUserSettingsService.findByUserId(userId).ifPresent(dto -> builder.id(dto.id()));
+        dbTelemetryUserSettingsService.save(builder.build());
     }
 
     private Map<String, Object> createUserInfo(User currentUser, String clusterId) throws JsonProcessingException {
