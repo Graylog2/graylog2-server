@@ -34,9 +34,7 @@ const stepIcon = (stepKey, activeStepKey, theme): { name: IconName, color: strin
   const stepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === stepKey);
   const activeStepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === activeStepKey);
 
-  console.log(stepKey, activeStepKey, stepIndex, activeStepIndex);
-
-  if (stepIndex < activeStepIndex || stepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED) {
+  if (stepIndex < activeStepIndex || activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key) {
     return {
       name: 'circle-check',
       color: theme.colors.variant.success,
@@ -45,14 +43,14 @@ const stepIcon = (stepKey, activeStepKey, theme): { name: IconName, color: strin
 
   if (stepKey === activeStepKey) {
     return {
-      name: 'circle',
+      name: 'circle-exclamation',
       color: theme.colors.variant.info,
     };
   }
 
   return {
     name: 'circle',
-    color: theme.colors.input.colorDisabled,
+    color: theme.colors.gray[90],
   };
 };
 
@@ -72,13 +70,15 @@ const ConfigurationWizard = () => {
         {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && '<ConfigurationFinished />'}
       </Grid.Col>
       <Grid.Col span={6}>
-        <List>
+        <List spacing="md"
+              size="lg"
+              center>
           {CONFIGURATION_STEPS_ORDER.map((configurationStepKey) => {
             const { description } = CONFIGURATION_STEPS[configurationStepKey];
             const { name: iconName, color: iconColor } = stepIcon(configurationStepKey, activeStepKey, theme);
 
             return (
-              <List.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} />}>
+              <List.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} size="lg" />}>
                 {description}
               </List.Item>
             );
