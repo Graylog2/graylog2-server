@@ -34,7 +34,7 @@ const DataNodesOverview = () => {
 
       <Space h="sm" />
       {!!dataNodes.length && (
-        <Table verticalSpacing="sm" fontSize="md">
+        <Table verticalSpacing="xxs" fontSize="md">
           <thead>
             <tr>
               <th>Id</th>
