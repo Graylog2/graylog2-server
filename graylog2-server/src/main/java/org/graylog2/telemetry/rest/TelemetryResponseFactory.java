@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 class TelemetryResponseFactory {
+    private static final String CURRENT_USER = "current_user";
+    private static final String USER_TELEMETRY_SETTINGS = "user_telemetry_settings";
+    private static final String CLUSTER = "cluster";
+    private static final String LICENSE = "license";
+    private static final String PLUGIN = "plugin";
+    private static final String SEARCH_CLUSTER = "search_cluster";
     private final ObjectMapper objectMapper;
 
     @Inject
@@ -21,34 +27,33 @@ class TelemetryResponseFactory {
         this.objectMapper = objectMapper;
     }
 
-    public Map<String, Object> createClusterInfo(String clusterId,
-                                                 DateTime clusterCreationDate,
-                                                 int nodesCount,
-                                                 Map<String, SystemOverviewResponse> nodes,
-                                                 long averageLastMonthTraffic,
-                                                 long usersCount) throws JsonProcessingException {
-        Map<String, Object> clusterInfo = new LinkedHashMap<>();
-        clusterInfo.put("cluster_id", clusterId);
-        clusterInfo.put("cluster.cluster_creation_date", clusterCreationDate);
-        clusterInfo.put("cluster.nodes_count", nodesCount);
-        clusterInfo.put("cluster.average_last_month_traffic", averageLastMonthTraffic);
-        clusterInfo.put("cluster.users_count", usersCount);
-        clusterInfo.putAll(flatten(Map.of("cluster", nodes)));
-        return clusterInfo;
-
+    Map<String, Object> createTelemetryResponse(Map<String, Object> clusterInfo,
+                                                Map<String, Object> userInfo,
+                                                Map<String, Object> pluginInfo,
+                                                Map<String, Object> searchClusterInfo,
+                                                List<TelemetryLicenseStatus> licenseStatuses,
+                                                TelemetryUserSettings telemetryUserSettings) throws JsonProcessingException {
+        Map<String, Object> telemetryResponse = new LinkedHashMap<>();
+        telemetryResponse.put(CURRENT_USER, userInfo);
+        telemetryResponse.put(USER_TELEMETRY_SETTINGS, telemetryUserSettings);
+        telemetryResponse.put(CLUSTER, clusterInfo);
+        telemetryResponse.put(LICENSE, createLicenseInfo(licenseStatuses));
+        telemetryResponse.put(PLUGIN, pluginInfo);
+        telemetryResponse.put(SEARCH_CLUSTER, searchClusterInfo);
+        return telemetryResponse;
     }
 
-    public Map<String, Object> createLicenseInfo(List<TelemetryLicenseStatus> telemetryLicenseStatuses) throws JsonProcessingException {
-        return flatten(Map.of("license", Map.of("license", telemetryLicenseStatuses)));
+    Map<String, Object> createTelemetryDisabledResponse(TelemetryUserSettings telemetryUserSettings) {
+        return Map.of(USER_TELEMETRY_SETTINGS, telemetryUserSettings);
     }
 
-    public Map<String, Object> createUserInfo(String userHash,
-                                              boolean isLocalAdmin,
-                                              int rolesCount,
-                                              int teamsCount) throws JsonProcessingException {
+    Map<String, Object> createUserInfo(String userHash,
+                                       boolean isLocalAdmin,
+                                       int rolesCount,
+                                       int teamsCount) throws JsonProcessingException {
         Map<String, Object> userInfo = new LinkedHashMap<>();
         userInfo.put("user", userHash);
-        userInfo.putAll(flatten(Map.of("current_user", Map.of(
+        userInfo.putAll(flatten(Map.of(CURRENT_USER, Map.of(
                 "is_local_admin", isLocalAdmin,
                 "roles_count", rolesCount,
                 "teams_count", teamsCount
@@ -57,22 +62,43 @@ class TelemetryResponseFactory {
         return userInfo;
     }
 
-    public Map<String, Object> createPluginInfo(boolean isEnterprisePluginInstalled,
-                                                List<String> plugins) throws JsonProcessingException {
+    Map<String, Object> createClusterInfo(String clusterId,
+                                          DateTime clusterCreationDate,
+                                          int nodesCount,
+                                          Map<String, SystemOverviewResponse> nodes,
+                                          long averageLastMonthTraffic,
+                                          long usersCount) throws JsonProcessingException {
+        Map<String, Object> clusterInfo = new LinkedHashMap<>();
+        clusterInfo.put("cluster_id", clusterId);
+        clusterInfo.put("cluster.cluster_creation_date", clusterCreationDate);
+        clusterInfo.put("cluster.nodes_count", nodesCount);
+        clusterInfo.put("cluster.average_last_month_traffic", averageLastMonthTraffic);
+        clusterInfo.put("cluster.users_count", usersCount);
+        clusterInfo.putAll(flatten(Map.of(CLUSTER, nodes)));
+        return clusterInfo;
+
+    }
+
+    Map<String, Object> createPluginInfo(boolean isEnterprisePluginInstalled,
+                                         List<String> plugins) throws JsonProcessingException {
         Map<String, Object> userInfo = new LinkedHashMap<>();
         userInfo.put("plugin.is_enterprise_plugin_installed", isEnterprisePluginInstalled);
-        userInfo.putAll(flatten(Map.of("plugin", Map.of("installed_plugins", plugins))));
+        userInfo.putAll(flatten(Map.of(PLUGIN, Map.of("installed_plugins", plugins))));
         return userInfo;
     }
 
-    public Map<String, Object> createSearchClusterInfo(int nodesCount,
-                                                       String version,
-                                                       Map<String, NodeInfo> nodes) throws JsonProcessingException {
+    Map<String, Object> createSearchClusterInfo(int nodesCount,
+                                                String version,
+                                                Map<String, NodeInfo> nodes) throws JsonProcessingException {
         Map<String, Object> userInfo = new LinkedHashMap<>();
         userInfo.put("search_cluster.nodes_count", nodesCount);
         userInfo.put("search_cluster.version", version);
-        userInfo.putAll(flatten(Map.of("search_cluster", Map.of("nodes", nodes))));
+        userInfo.putAll(flatten(Map.of(SEARCH_CLUSTER, Map.of("nodes", nodes))));
         return userInfo;
+    }
+
+    private Map<String, Object> createLicenseInfo(List<TelemetryLicenseStatus> telemetryLicenseStatuses) throws JsonProcessingException {
+        return flatten(Map.of(LICENSE, Map.of(LICENSE, telemetryLicenseStatuses)));
     }
 
     private Map<String, Object> flatten(Object o) throws JsonProcessingException {

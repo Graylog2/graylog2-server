@@ -37,41 +37,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.graylog2.configuration.TelemetryConfiguration.TELEMETRY_ENABLED;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class TelemetryService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryService.class);
-
     private final TrafficCounterService trafficCounterService;
     private final ClusterConfigService clusterConfigService;
     private final TelemetryEnterpriseDataProvider enterpriseDataProvider;
     private final UserService userService;
     private final Set<PluginMetaData> pluginMetaDataSet;
-
     private final ClusterAdapter elasticClusterAdapter;
     private final SearchVersion elasticsearchVersion;
     private final TelemetryResponseFactory telemetryResponseFactory;
+    private boolean isTelemetryEnabled;
 
 
     @Inject
-    public TelemetryService(TrafficCounterService trafficCounterService,
-                            ClusterConfigService clusterConfigService,
-                            TelemetryEnterpriseDataProvider enterpriseDataProvider,
-                            UserService userService,
-                            Set<PluginMetaData> pluginMetaDataSet,
-                            ClusterAdapter elasticClusterAdapter,
-                            @DetectedSearchVersion SearchVersion elasticsearchVersion,
-                            TelemetryResponseFactory telemetryResponseFactory) {
+    public TelemetryService(
+            @Named(TELEMETRY_ENABLED) boolean isTelemetryEnabled,
+            TrafficCounterService trafficCounterService,
+            ClusterConfigService clusterConfigService,
+            TelemetryEnterpriseDataProvider enterpriseDataProvider,
+            UserService userService,
+            Set<PluginMetaData> pluginMetaDataSet,
+            ClusterAdapter elasticClusterAdapter,
+            @DetectedSearchVersion SearchVersion elasticsearchVersion,
+            TelemetryResponseFactory telemetryResponseFactory) {
+        this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
         this.clusterConfigService = clusterConfigService;
         this.enterpriseDataProvider = enterpriseDataProvider;
@@ -83,14 +86,17 @@ public class TelemetryService {
     }
 
     public Map<String, Object> createTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) throws JsonProcessingException {
-        String clusterId = getClusterId();
-        Map<String, Object> telemetryResponse = new LinkedHashMap<>();
-        telemetryResponse.put("current_user", createUserInfo(currentUser, clusterId));
-        telemetryResponse.put("cluster", createClusterInfo(clusterId, systemOverviewResponses));
-        telemetryResponse.put("license", telemetryResponseFactory.createLicenseInfo(enterpriseDataProvider.licenseStatus()));
-        telemetryResponse.put("plugin", createPluginInfo());
-        telemetryResponse.put("search_cluster", createSearchClusterInfo());
-        return telemetryResponse;
+        if (isTelemetryEnabled) {
+            String clusterId = getClusterId();
+            return telemetryResponseFactory.createTelemetryResponse(
+                    createClusterInfo(clusterId, systemOverviewResponses),
+                    createUserInfo(currentUser, clusterId),
+                    createPluginInfo(),
+                    createSearchClusterInfo(),
+                    enterpriseDataProvider.licenseStatus(), TelemetryUserSettings.create(true, false));
+        } else {
+            return telemetryResponseFactory.createTelemetryDisabledResponse(TelemetryUserSettings.create(false, false));
+        }
     }
 
     private Map<String, Object> createUserInfo(User currentUser, String clusterId) throws JsonProcessingException {

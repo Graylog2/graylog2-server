@@ -19,8 +19,13 @@ package org.graylog2.telemetry.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.rest.resources.ProxiedResource;
@@ -29,6 +34,8 @@ import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -63,11 +70,45 @@ public class TelemetryResource extends ProxiedResource {
     @ApiOperation(value = "Get telemetry information.")
     public Map<String, Object> get() {
         try {
-            return telemetryService.createTelemetryResponse(getCurrentUser(), getSystemOverviewResponses());
+            return telemetryService.createTelemetryResponse(getCurrentUserOrThrow(),
+                    getSystemOverviewResponses());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
+
+    @GET
+    @Path("user/settings")
+    @ApiOperation("Retrieve a user's telemetry settings.")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Current user not found.")
+    })
+    public TelemetryUserSettings getTelemetryUserSettings() {
+        return TelemetryUserSettings.create(true, false);
+    }
+
+    @PUT
+    @Path("user/settings")
+    @ApiOperation("Update a user's telemetry settings.")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Current user not found.")
+    })
+    public void saveTelemetryUserSettings(@ApiParam(name = "JSON body", value = "The telemetry settings to assign to the user.", required = true)
+                                          TelemetryUserSettings telemetryUserSettings) throws ValidationException {
+
+        User currentUser = getCurrentUserOrThrow();
+        // TODO persist telemetry user settings
+        userService.save(currentUser);
+    }
+
+    private User getCurrentUserOrThrow() {
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            throw new NotFoundException("Couldn't find current user!");
+        }
+        return currentUser;
+    }
+
 
     private Map<String, SystemOverviewResponse> getSystemOverviewResponses() {
         Map<String, SystemOverviewResponse> results = new HashMap<>();

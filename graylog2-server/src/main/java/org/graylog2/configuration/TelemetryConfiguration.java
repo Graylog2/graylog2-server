@@ -23,13 +23,15 @@ import java.util.Map;
 
 public class TelemetryConfiguration {
 
+    public static final String TELEMETRY_ENABLED = "telemetry_enabled";
+
     @Parameter(value = "telemetry_api_key", required = true)
     private String telemetryApiKey;
 
     @Parameter(value = "telemetry_host")
     private String telemetryApiHost = "https://eu.posthog.com/";
 
-    @Parameter(value = "telemetry_enabled")
+    @Parameter(value = TELEMETRY_ENABLED)
     private boolean telemetryEnabled = true;
 
 
