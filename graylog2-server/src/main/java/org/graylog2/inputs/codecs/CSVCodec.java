@@ -20,7 +20,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -37,13 +36,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Codec(name = CSVCodec.NAME, displayName = "CSV Codec")
 public class CSVCodec extends AbstractCodec implements MultiMessageCodec {
@@ -67,41 +69,33 @@ public class CSVCodec extends AbstractCodec implements MultiMessageCodec {
 
     @Override
     public Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage) {
-        Collection<Message> messageCollection = new ArrayList<>();
-        final String csv = new String(rawMessage.getPayload(), charset);
-        List<Map<String, Object>> response;
         try {
-            response = read(csv,delimiter.charAt(0)); //TODO Find better solution for delimiter
+            return parseCsv(rawMessage.getPayload(), delimiter.charAt(0))
+                    .map(csvRow -> {
+                        final Message message = new Message(rawMessage.getTimestamp() + " from: " + configuration.getString(CK_URL),
+                                configuration.getString(CK_SOURCE),
+                                rawMessage.getTimestamp());
+                        message.addFields(csvRow);
+                        return message;
+                    })
+                    .collect(Collectors.toList());
         } catch (IOException e) {
-            LOG.warn("Could not parse CSV.", e);
-            throw new RuntimeException(e); // response not initialized if line is deleted, don't know why
+            LOG.warn("Could not parse CSV", e);
+            throw new RuntimeException("Could not parse CSV", e);
         }
-        for (Map<String, Object> csvRow : response) {
-            final Message message = new Message(rawMessage.getTimestamp() + " from: " + configuration.getString(CK_URL),
-                    configuration.getString(CK_SOURCE),
-                    rawMessage.getTimestamp());
-            message.addFields(csvRow);
-            messageCollection.add(message);
-        }
-        return messageCollection;
     }
 
-    public static List<Map<String, Object>> read(String file, char delimiter) throws IOException {
-        List<Map<String, Object>> responseList = new ArrayList<>();
+    private Stream<Map<String, Object>> parseCsv(byte[] payload, char delimiter) throws IOException {
         CSVParser response = CSVFormat.DEFAULT
                 .withFirstRecordAsHeader()
                 .withDelimiter(delimiter)
-                .parse(new StringReader(file));
+                .parse(new InputStreamReader(new ByteArrayInputStream(payload), charset));
 
         List<String> headerNames = response.getHeaderNames();
-        for (CSVRecord strings : response) {
-            Map<String, Object> tempMap = new HashMap<>();
-            for (String header : headerNames){
-                tempMap.put(header, strings.get(header));
-            }
-            responseList.add(tempMap);
-        }
-        return responseList;
+
+        return StreamSupport.stream(response.spliterator(), false)
+                .map(strings -> headerNames.stream().collect(Collectors.toMap(Function.identity(), strings::get)));
+
     }
 
     @FactoryClass
