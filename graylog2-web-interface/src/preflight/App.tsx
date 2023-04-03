@@ -21,19 +21,21 @@ import Section from 'preflight/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/DataNodesOverview';
 import ConfigurationWizard from 'preflight/ConfigurationWizard';
+import { Button } from 'preflight/common';
 
 const App = () => (
   <AppShell padding="md" header={<Navigation />}>
     <Section title="Welcome!">
       <p>
         It looks like you are starting Graylog for the first time.
-        Through this wizard, you can configure and secure your data nodes.
+        Through this wizard, you can configure and secure your data nodes.<br />
+        You can always skip the configuration and <Button variant="light" compact size="xs">resume startup</Button>.
       </p>
     </Section>
 
     <Section title="Data Node Configuration">
       <DataNodesOverview />
-      <Space h="md" />
+      <Space h="lg" />
       <ConfigurationWizard />
     </Section>
   </AppShell>

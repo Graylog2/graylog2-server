@@ -44,10 +44,6 @@ const SectionContainer = styled(SubsectionContainer)(({ theme }: ContainerType) 
   border-radius: 4px;
 `);
 
-const SectionTitle = styled(Title)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
-
 type Props = {
   title: React.ReactNode,
   actions?: React.ReactNode,
@@ -57,7 +53,7 @@ const SectionHeader = ({ title, actions }: Props) => {
   return (
     <Row>
       <Col lg={6} md={6}>
-        <SectionTitle order={2}>{title}</SectionTitle>
+        <Title order={2}>{title}</Title>
       </Col>
       <Col lg={6} md={6}>
         <TitleActionContainer>{actions}</TitleActionContainer>
