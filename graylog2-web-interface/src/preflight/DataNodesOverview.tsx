@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Title, Table, Space } from '@mantine/core';
+import { Table, Space } from '@mantine/core';
 
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
@@ -26,7 +26,6 @@ const DataNodesOverview = () => {
 
   return (
     <>
-      <Title order={3}>Available Data Nodes</Title>
       <p>
         These are the data nodes which are currently registered. The list is constantly updated. {isFetchingDataNodes
         && <Spinner text="" />}

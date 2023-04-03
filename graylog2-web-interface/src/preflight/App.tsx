@@ -31,7 +31,7 @@ const App = () => (
       </p>
     </Section>
 
-    <Section title="Data Node Certificate Authority Configuration">
+    <Section title="Data Node Configuration">
       <DataNodesOverview />
       <Space h="md" />
       <ConfigurationWizard />

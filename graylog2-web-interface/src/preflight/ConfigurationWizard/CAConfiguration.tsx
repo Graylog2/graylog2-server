@@ -15,15 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Title } from '@mantine/core';
+import { Title, Tabs, Space } from '@mantine/core';
+import styled, { css } from 'styled-components';
+
+import CAUpload from './CAUpload';
+
+const StyledTabs = styled(Tabs)(({ theme }) => css`
+  button {
+    font-size: ${theme.fonts.size.body.rem};
+  }
+`);
 
 const CAConfiguration = () => (
   <>
     <Title order={3}>Configure Certificate Authority</Title>
     <p>
-      In this first step you can either upload or create a new certificate authority.
+      In this first step you can either upload or create a new certificate authority.<br />
       Using it we can provision your data nodes with certificates easily.
     </p>
+    <Space h="md" />
+    <StyledTabs defaultValue="upload">
+      <Tabs.List>
+        <Tabs.Tab value="upload">Upload CA</Tabs.Tab>
+        <Tabs.Tab value="create">Create new CA</Tabs.Tab>
+      </Tabs.List>
+
+      <Tabs.Panel value="upload" pt="xs">
+        <CAUpload />
+      </Tabs.Panel>
+      <Tabs.Panel value="create" pt="xs">
+        Create new CA
+      </Tabs.Panel>
+    </StyledTabs>
   </>
 );
 export default CAConfiguration;
