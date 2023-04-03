@@ -9,8 +9,8 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 describe('useDataNodesCA', () => {
   beforeEach(() => {
-    asMock(fetch).mockReturnValue(Promise.resolve({ isConfigured: false }))
-  })
+    asMock(fetch).mockReturnValue(Promise.resolve({ isConfigured: false }));
+  });
 
   it('should return fetched data nodes', async () => {
     const { result, waitFor } = renderHook(() => useDataNodesCA());

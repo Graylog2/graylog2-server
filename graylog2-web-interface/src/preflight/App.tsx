@@ -20,8 +20,7 @@ import {AppShell, Space} from '@mantine/core';
 import Section from 'preflight/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/DataNodesOverview';
-import CAConfiguration from 'preflight/CAConfiguration';
-
+import ConfigurationWizard from 'preflight/ConfigurationWizard';
 const App = () => {
   return <AppShell padding="md" header={<Navigation />}>
     <Section title="Welcome!">
@@ -34,7 +33,7 @@ const App = () => {
     <Section title="Data Node Certificate Authority Configuration">
       <DataNodesOverview />
       <Space h="md" />
-      <CAConfiguration />
+      <ConfigurationWizard />
     </Section>
   </AppShell>;
 };

@@ -14,18 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { CONFIGURATION_STEPS } from 'preflight/Constants';
+import ConfigurationWizard from './ConfigurationWizard';
 
-export type DataNode = {
-  id: string,
-  transportAddress: string,
-  isSecured: boolean,
-}
-
-export type DataNodes = Array<DataNode>;
-
-export type DataNodesCAStatus = {
-  isConfigured: boolean
-}
-
-export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']
+export default ConfigurationWizard;

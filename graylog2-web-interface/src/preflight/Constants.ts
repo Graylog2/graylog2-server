@@ -14,18 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { CONFIGURATION_STEPS } from 'preflight/Constants';
 
-export type DataNode = {
-  id: string,
-  transportAddress: string,
-  isSecured: boolean,
-}
+export const CONFIGURATION_STEPS = {
+  CA_CONFIGURATION: {
+    key: 'CA_CONFIGURATION',
+    description: 'Configure a certificate authority',
+  },
+  CERTIFICATE_PROVISIONING: {
+    key: 'CERTIFICATE_PROVISIONING',
+    description: 'Provision certificates for your data nodes',
 
-export type DataNodes = Array<DataNode>;
+  },
+  CONFIGURATION_FINISHED: {
+    key: 'CONFIGURATION_FINISHED',
+    description: 'All data nodes are secured and reachable',
+  },
+};
 
-export type DataNodesCAStatus = {
-  isConfigured: boolean
-}
-
-export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']
+export const CONFIGURATION_STEPS_ORDER = [
+  CONFIGURATION_STEPS.CA_CONFIGURATION.key,
+  CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
+  CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
+];

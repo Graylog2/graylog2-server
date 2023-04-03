@@ -15,24 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import {useQuery} from '@tanstack/react-query'
-import {DataNodesCAStatus} from 'preflight/types';
-import FetchError from 'logic/errors/FetchError';
+import { useQuery } from '@tanstack/react-query';
+
+import type { DataNodesCAStatus } from 'preflight/types';
+import type FetchError from 'logic/errors/FetchError';
+
 const fetchDataNodesCA = async (): Promise<DataNodesCAStatus> => (
   // fetch('GET', qualifyUrl('/api/preflight/ca'))
   Promise.resolve({ isConfigured: false })
 );
 
-const useDataNodesCA = (): { data: DataNodesCAStatus, isFetching: boolean, error: FetchError } => {
-  const { data, isFetching, error  } = useQuery<DataNodesCAStatus, FetchError>({
+const useDataNodesCA = (): {
+  data: DataNodesCAStatus,
+  isFetching: boolean,
+  error: FetchError,
+  isInitialLoading: boolean
+} => {
+  const {
+    data,
+    isFetching,
+    error,
+    isInitialLoading,
+  } = useQuery<DataNodesCAStatus, FetchError>({
     queryKey: ['data-nodes', 'ca-status'],
     queryFn: fetchDataNodesCA,
     initialData: { isConfigured: false },
     retry: 3000,
   });
 
-  return { data, isFetching, error };
-}
+  return { data, isFetching, error, isInitialLoading };
+};
 
-
-export default useDataNodesCA
+export default useDataNodesCA;

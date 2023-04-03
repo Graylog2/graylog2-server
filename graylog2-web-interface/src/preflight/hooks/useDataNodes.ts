@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import {useQuery} from '@tanstack/react-query'
-import {DataNodes} from 'preflight/types';
-import FetchError from 'logic/errors/FetchError';
+import { useQuery } from '@tanstack/react-query';
+
+import type { DataNodes } from 'preflight/types';
+import type FetchError from 'logic/errors/FetchError';
 
 const availableDataNodes = [
-  { id: "data-node-id-1", transportAddress: 'transport.address1', isSecured: false },
-  { id: "data-node-id-2", transportAddress: 'transport.address2', isSecured: false },
-  { id: "data-node-id-3", transportAddress: 'transport.address3', isSecured: false }
+  { id: 'data-node-id-1', transportAddress: 'transport.address1', isSecured: false },
+  { id: 'data-node-id-2', transportAddress: 'transport.address2', isSecured: false },
+  { id: 'data-node-id-3', transportAddress: 'transport.address3', isSecured: false },
 ];
 
 const fetchDataNodes = async (): Promise<DataNodes> => (
@@ -30,16 +31,25 @@ const fetchDataNodes = async (): Promise<DataNodes> => (
   Promise.resolve(availableDataNodes)
 );
 
-const useDataNodes = (): { data: DataNodes, isFetching: boolean, error: FetchError } => {
-  const { data, isFetching, error  } = useQuery<DataNodes, FetchError>({
+const useDataNodes = (): {
+  data: DataNodes,
+  isFetching: boolean,
+  isInitialLoading: boolean,
+  error: FetchError
+} => {
+  const {
+    data,
+    isFetching,
+    error,
+    isInitialLoading,
+  } = useQuery<DataNodes, FetchError>({
     queryKey: ['data-nodes', 'overview'],
     queryFn: fetchDataNodes,
     initialData: [],
     retry: 3000,
   });
 
-  return { data, isFetching, error };
-}
+  return { data, isFetching, isInitialLoading, error };
+};
 
-
-export default useDataNodes
+export default useDataNodes;

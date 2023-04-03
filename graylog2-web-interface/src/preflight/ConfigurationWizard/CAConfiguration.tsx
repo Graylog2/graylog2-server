@@ -14,18 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { CONFIGURATION_STEPS } from 'preflight/Constants';
+import * as React from 'react';
+import { Title } from '@mantine/core';
 
-export type DataNode = {
-  id: string,
-  transportAddress: string,
-  isSecured: boolean,
-}
-
-export type DataNodes = Array<DataNode>;
-
-export type DataNodesCAStatus = {
-  isConfigured: boolean
-}
-
-export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']
+const CAConfiguration = () => (
+  <>
+    <Title order={3}>Configure Certificate Authority</Title>
+    <p>
+      In this first step you can either upload or create a new certificate authority.
+      Using it we can provision your data nodes with certificates easily.
+    </p>
+  </>
+);
+export default CAConfiguration;
