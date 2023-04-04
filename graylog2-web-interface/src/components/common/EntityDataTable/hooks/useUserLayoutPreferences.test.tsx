@@ -52,8 +52,8 @@ describe('useUserSearchFilterQuery hook', () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(layoutPreferencesJSON));
     const { result, waitFor } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
 
-    await waitFor(() => result.current.isLoading);
-    await waitFor(() => !result.current.isLoading);
+    await waitFor(() => result.current.isInitialLoading);
+    await waitFor(() => !result.current.isInitialLoading);
 
     expect(fetch).toHaveBeenCalledWith('GET', expect.stringContaining('/entitylists/preferences/streams'));
     expect(result.current.data).toEqual(layoutPreferences);
@@ -65,8 +65,8 @@ describe('useUserSearchFilterQuery hook', () => {
     const { result, waitFor } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
 
     await suppressConsole(async () => {
-      await waitFor(() => result.current.isLoading);
-      await waitFor(() => !result.current.isLoading);
+      await waitFor(() => result.current.isInitialLoading);
+      await waitFor(() => !result.current.isInitialLoading);
     });
 
     expect(UserNotification.error).toHaveBeenCalledWith('Loading layout preferences for "streams" overview failed with Error: Error!');

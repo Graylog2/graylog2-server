@@ -40,6 +40,10 @@
         <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
         <!-- Silence Azure SDK messages -->
         <Logger name="com.azure" level="warn"/>
+        <Logger name="reactor.core.publisher.Operators" level="off"/>
+        <Logger name="com.azure.messaging.eventhubs.PartitionPumpManager" level="off"/>
+        <Logger name="com.azure.core.amqp.implementation.ReactorReceiver" level="off"/>
+        <Logger name="com.azure.core.amqp.implementation.ReactorDispatcher" level="off"/>
         <Root level="warn">
             <AppenderRef ref="rolling-file"/>
             <AppenderRef ref="STDOUT"/>

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
@@ -43,14 +43,23 @@ const ScrollContainer = styled.div`
   overflow-x: auto;
 `;
 
-const StyledTable = styled(Table)`
+const StyledTable = styled(Table)(({ theme }) => css`
   table-layout: fixed;
 
   thead > tr > th,
   tbody > tr > td {
     padding: ${CELL_PADDING}px;
   }
-`;
+
+  && {
+    > tbody:nth-of-type(even) > tr {
+      background-color: ${theme.colors.table.background};
+    }
+    > tbody:nth-of-type(odd) > tr {
+      background-color: ${theme.colors.table.backgroundAlt};
+    }
+  }
+`);
 
 const ActionsRow = styled.div`
   display: flex;

@@ -46,7 +46,9 @@ class MessageFields extends React.Component {
 
   render() {
     const { message } = this.props;
-    const formattedFields = message.formatted_fields;
+    // eslint-disable-next-line no-unused-vars
+    const { _id, ...formatted_fields } = message.fields;
+    const formattedFields = message.formatted_fields || formatted_fields;
     const fields = this._formatFields(formattedFields);
 
     return (

@@ -439,6 +439,7 @@ const ApiRoutes = {
     multiple: () => { return { url: '/system/pipelines/rule/multiple' }; },
     functions: () => { return { url: '/system/pipelines/rule/functions' }; },
     parse: () => { return { url: '/system/pipelines/rule/parse' }; },
+    simulate: () => { return { url: '/system/pipelines/rule/simulate' }; },
     metricsConfig: () => { return { url: '/system/pipelines/rule/config/metrics' }; },
   },
   ConnectionsController: {
