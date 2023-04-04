@@ -69,6 +69,7 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, v
 
   const handleUndoReset = () => {
     setIsResetted(false);
+    setFileName(undefined);
     onChange(title, { is_set: true }, false);
   };
 
