@@ -24,6 +24,7 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
 import formatDecorator from './FormatDecorator';
@@ -55,6 +56,8 @@ const _updateOrder = (orderedDecorators: Array<{ id: string }>, decorators: Arra
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
+  const sendTelemetry = useSendTelemetry();
+
   const onCreate = useCallback(
     ({ stream, ...rest }: Decorator) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
     [modifiedDecorators, setModifiedDecorators],
@@ -63,7 +66,14 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     (orderedDecorators: Array<{ id: string }>) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
     [modifiedDecorators, setModifiedDecorators],
   );
-  const onSubmit = useCallback(() => onSave(modifiedDecorators), [onSave, modifiedDecorators]);
+  const onSubmit = useCallback(() => {
+    onSave(modifiedDecorators);
+
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_decorators',
+      eventElement: 'update_configuration_button',
+    });
+  }, [onSave, modifiedDecorators, sendTelemetry]);
 
   const currentDecorators = modifiedDecorators.filter((decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
   const decoratorItems = currentDecorators

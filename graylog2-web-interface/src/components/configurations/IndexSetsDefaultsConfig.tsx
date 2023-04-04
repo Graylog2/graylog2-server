@@ -30,6 +30,7 @@ import { Button, Col, Modal, Row } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import FormikInput from '../common/FormikInput';
 
@@ -73,6 +74,8 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
   const [currentConfig, setCurrentConfig] = useState<IndexConfig>(initialConfig);
   const handleSaveConfig = async (configToSave: IndexConfig) => updateConfig(configToSave);
 
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies().then((loadedRotationStrategies) => {
       setRotationStrategies(loadedRotationStrategies);
@@ -96,6 +99,12 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
     handleSaveConfig(defaultIndexValues)
       .then((config) => {
         setCurrentConfig(config as IndexConfig);
+
+        sendTelemetry('submit_form', {
+          appSection: 'configurations_index_defaults',
+          eventElement: 'update_configuration_button',
+        });
+
         setShowModal(false);
       })
       .catch(() => {

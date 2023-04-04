@@ -21,6 +21,7 @@ import { IfPermitted, Select, TimeUnitInput, ModalSubmit } from 'components/comm
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 export type GeoVendorType = 'MAXMIND' | 'IPINFO'
 export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS'
@@ -63,6 +64,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     return { ...defaultConfig };
   });
 
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     setCurConfig({ ...config });
   }, [config]);
@@ -78,6 +81,11 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
         if ('enabled' in value) {
           setShowModal(false);
         }
+
+        sendTelemetry('submit_form', {
+          appSection: 'configurations_geolocation_processor',
+          eventElement: 'update_configuration_button',
+        });
       });
   };
 

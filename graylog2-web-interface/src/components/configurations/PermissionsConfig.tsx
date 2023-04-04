@@ -25,6 +25,7 @@ import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   config: PermissionsConfigType,
@@ -49,9 +50,15 @@ const LabelSpan = styled.span(({ theme }: { theme: DefaultTheme }) => css`
 
 const PermissionsConfig = ({ config, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const sendTelemetry = useSendTelemetry();
 
   const _saveConfig = (values) => {
     updateConfig(values).then(() => {
+      sendTelemetry('submit_form', {
+        appSection: 'configurations_permissions',
+        eventElement: 'update_configuration_button',
+      });
+
       setShowModal(false);
     });
   };
