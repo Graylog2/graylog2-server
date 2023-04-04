@@ -73,11 +73,15 @@ public interface IndexSetService {
      * Retrieve a paginated set of index set.
      *
      * @param indexSetIds List of inde set ids to return
-     * @param limit Maximum number of index sets
-     * @param skip Number of index sets to skip
+     * @param limit       Maximum number of index sets
+     * @param skip        Number of index sets to skip
      * @return Paginated index sets
      */
     List<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip);
+
+    List<IndexSetConfig> findPaginated(String skip, int limit);
+
+    List<IndexSetConfig> searchByTitle(String searchString);
 
     /**
      * Save the given index set.

@@ -26,6 +26,7 @@ import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.streams.StreamService;
+import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
@@ -34,8 +35,10 @@ import org.mongojack.WriteResult;
 import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -150,6 +153,32 @@ public class MongoIndexSetService implements IndexSetService {
                 .sort(DBSort.asc("title"))
                 .skip(skip)
                 .limit(limit)
+                .toArray());
+    }
+
+    @Override
+    public List<IndexSetConfig> findPaginated(String skip, int limit) {
+        DBQuery.Query rangeQuery = DBQuery.greaterThan("_id", skip);
+        DBCursor<IndexSetConfig> indexSetConfigDBCursor;
+
+        if (Objects.nonNull(skip)) {
+            indexSetConfigDBCursor = collection.find(rangeQuery);
+        } else {
+            indexSetConfigDBCursor = collection.find();
+        }
+
+        return ImmutableList.copyOf(indexSetConfigDBCursor
+                .sort(DBSort.asc("title"))
+                .limit(limit)
+                .toArray());
+    }
+
+    @Override
+    public List<IndexSetConfig> searchByTitle(String searchString) {
+        Pattern searchPattern = Pattern.compile(".*%s.*".formatted(searchString), Pattern.CASE_INSENSITIVE);
+        DBQuery.Query query = DBQuery.regex("title", searchPattern);
+        return ImmutableList.copyOf(collection.find(query)
+                .sort(DBSort.asc("title"))
                 .toArray());
     }
 

@@ -39,6 +39,7 @@ import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetPaginationResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -157,6 +158,47 @@ public class IndexSetsResource extends RestResource {
         }
 
         return IndexSetResponse.create(count, indexSets, stats);
+    }
+
+    @GET
+    @Path("paginated")
+    @Timed
+    @ApiOperation(value = "Get a paginated list of all index sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+    })
+    public IndexSetPaginationResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).")
+                                           @QueryParam("skip") String skip,
+                                           @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                           @QueryParam("limit") @DefaultValue("0") int limit) {
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+
+        List<IndexSetSummary> indexSets = indexSetService.findPaginated(skip, limit).stream()
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .toList();
+
+        indexSetRegistry.getAll().stream()
+                .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
+        int lastIndex = limit != 0 ? (limit - 1) : limit;
+        return IndexSetPaginationResponse.create(indexSets, indexSets.get(lastIndex).id());
+    }
+
+    @GET
+    @Path("search")
+    @Timed
+    @ApiOperation(value = "Get a list of all index sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+    })
+    public IndexSetResponse search(@ApiParam(name = "searchTitle", value = "The number of elements to skip (offset).")
+                                   @QueryParam("searchTitle") String searchTitle) {
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+        List<IndexSetSummary> indexSets = indexSetService.searchByTitle(searchTitle).stream()
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .toList();
+        return IndexSetResponse.create(indexSets.size(), indexSets, Collections.emptyMap());
     }
 
     @GET
