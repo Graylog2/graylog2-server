@@ -284,7 +284,7 @@ public class PipelineInterpreter implements MessageProcessor {
         return result;
     }
 
-    private void evaluateStage(Stage stage,
+    public void evaluateStage(Stage stage,
                                Message message,
                                String msgId,
                                List<Message> result,
