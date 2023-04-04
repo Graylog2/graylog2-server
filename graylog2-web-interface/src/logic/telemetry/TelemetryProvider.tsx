@@ -14,17 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { useQuery } from '@tanstack/react-query';
 
 import { Telemetry } from '@graylog/server-api';
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
+import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
+import TelemetryInfoModal from 'logic/telemetry/TelemetryInfoModal';
 
 const TELEMETRY_CLUSTER_INFO_QUERY_KEY = 'telemetry.cluster.info';
+type TelemetryDataType = {
+  current_user: {
+    [key: string]: string,
+  },
+  user_telemetry_settings: {
+    [key: string]: string,
+  },
+  cluster: {
+    [key: string]: string,
+  },
+  license: {
+    [key: string]: string,
+  },
+  plugin: {
+    [key: string]: string,
+  },
+  search_cluster: {
+    [key: string]: string,
+  },
+}
 
-const useTelemetryClusterInfo = () => {
+const useTelemetryData = () => {
   return useQuery([TELEMETRY_CLUSTER_INFO_QUERY_KEY], () => Telemetry.get(), {
     retry: 0,
     keepPreviousData: true,
@@ -34,28 +56,37 @@ const useTelemetryClusterInfo = () => {
 
 const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
-  const { data: telemetryClusterInfo, isSuccess: telemetryClusterInfoLoaded } = useTelemetryClusterInfo();
+  const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
+  const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
 
   useEffect(() => {
     const setGroup = () => {
-      if (telemetryClusterInfoLoaded && telemetryClusterInfo?.cluster_info.cluster_id) {
+      if (isTelemetryDataLoaded && telemetryData) {
         const {
-          current_user: currentUser,
-          cluster_info: clusterInfo,
-          cluster_info: {
-            cluster_id: clusterId,
-          },
-          license_info: licenseInfo,
-        } = telemetryClusterInfo;
-        posthog.group('company', clusterId, { ...clusterInfo, licenseInfo });
-        posthog.identify(currentUser.user, currentUser);
+          cluster: { cluster_id: clusterId, ...clusterDetails },
+          current_user: { user, ...userDetails },
+          license,
+          plugin,
+          search_cluster: searchCluster,
+          user_telemetry_settings: { telemetry_permission_asked: isPermissionAsked },
+        } = telemetryData as TelemetryDataType;
+
+        posthog.group('company', clusterId, {
+          ...clusterDetails,
+          ...license,
+          ...plugin,
+          ...searchCluster,
+        });
+
+        posthog.identify(user, { ...userDetails });
+        setShowTelemetryInfo(!isPermissionAsked);
       }
     };
 
     if (posthog) {
       setGroup();
     }
-  }, [posthog, telemetryClusterInfo, telemetryClusterInfo?.cluster_info.cluster_id, telemetryClusterInfoLoaded]);
+  }, [posthog, isTelemetryDataLoaded, telemetryData]);
 
   const TelemetryContextValue = useMemo(() => {
     const sendTelemetry = (eventType: TelemetryEventType, event: TelemetryEvent) => {
@@ -69,9 +100,18 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
     });
   }, [posthog]);
 
+  const handleConfirmTelemetryDialog = () => {
+    TelemetrySettingsActions.update({ telemetry_permission_asked: true, telemetry_enabled: true }).then(() => {
+      refetchTelemetryData();
+    });
+
+    setShowTelemetryInfo(false);
+  };
+
   return (
     <TelemetryContext.Provider value={TelemetryContextValue}>
       {children}
+      <TelemetryInfoModal show={showTelemetryInfo} onConfirm={() => handleConfirmTelemetryDialog()} />
     </TelemetryContext.Provider>
   );
 };
