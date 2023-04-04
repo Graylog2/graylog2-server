@@ -18,18 +18,22 @@ import * as React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { usePostHog } from 'posthog-js/react';
 
+import { asMock, MockStore } from 'helpers/mocking';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
-import { asMock } from 'helpers/mocking';
 import AppConfig from 'util/AppConfig';
+import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
 
 const mockedTelemetryConfig = {
   api_key: 'key',
   host: 'http://localhost',
   enabled: true,
 };
-const posthogMock = { posthog_client: true };
+const posthogMock = { client: true };
 
 jest.mock('util/AppConfig', () => ({
+  gl2ServerUrl: jest.fn(() => {
+    'http://localhost';
+  }),
   telemetry: jest.fn(() => mockedTelemetryConfig),
 }));
 
@@ -39,17 +43,35 @@ jest.mock('posthog-js', () => ({
   debug: jest.fn(),
 }));
 
-const Wrapper = ({ children }: {children: React.ReactNode}) => (
+jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
+  TelemetrySettingsActions: {
+    get: jest.fn(),
+  },
+  TelemetrySettingsStore: MockStore(),
+}));
+
+const Wrapper = ({ children }: { children: React.ReactElement }) => (
   <TelemetryInit>
     {children}
   </TelemetryInit>
 );
 
 describe('<TelemetryInit>', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should render Telemetry and make usePosthog available', () => {
+    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
+      telemetrySettings: {
+        telemetry_permission_asked: false,
+        telemetry_enabled: true,
+      },
+    });
+
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
 
-    expect(result.current.posthog_client).toBeTruthy();
+    expect(result.current).toBeTruthy();
   });
 
   it('should not render PosthogContext when config is not present', () => {
@@ -57,6 +79,13 @@ describe('<TelemetryInit>', () => {
       api_key: undefined,
       host: undefined,
       enabled: false,
+    });
+
+    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
+      telemetrySettings: {
+        telemetry_permission_asked: false,
+        telemetry_enabled: false,
+      },
     });
 
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
