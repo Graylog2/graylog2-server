@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MongoDBPreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBPreflightCheck.class);
-    public static final String CLUSTER_CONFIG_COLLECTION_NAME = "cluster_config";
+    private static final String CLUSTER_CONFIG_COLLECTION_NAME = "cluster_config";
 
     private final int mongoVersionProbeAttempts;
     private final MongoConnection mongoConnection;
