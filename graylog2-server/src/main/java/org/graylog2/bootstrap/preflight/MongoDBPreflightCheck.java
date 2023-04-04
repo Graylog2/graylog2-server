@@ -86,7 +86,6 @@ public class MongoDBPreflightCheck {
                     .build()
                     .call(() -> {
                         try (MongoClient mongoClient = mongoConnection.connect()) {
-                            // Detect an empty, pristine database. It should have no collections
                             detectFreshInstallation();
                             return MongoDBVersionCheck.getVersion(mongoClient);
                         }
