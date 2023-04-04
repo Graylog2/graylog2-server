@@ -106,6 +106,7 @@ const SearchActionsMenu = () => {
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
+  const addEvidenceModalRef = React.useRef(null);
 
   const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {
@@ -211,9 +212,10 @@ const SearchActionsMenu = () => {
         {loaded && (
           <>
             <AddEvidence id={view.id} type="searches" child={addToInvestigation} />
-            <AddEvidenceModal id={view.id}
-                              type="searches"
-                              child={<MenuItem icon="puzzle-piece">Select an investigation</MenuItem>} />
+            <MenuItem icon="puzzle-piece"
+                      onClick={() => addEvidenceModalRef.current.toggle()}>
+              Select an investigation
+            </MenuItem>
           </>
         )}
       </DropdownButton>
@@ -233,6 +235,7 @@ const SearchActionsMenu = () => {
                           description="Search for a User or Team to add as collaborator on this saved search."
                           onClose={toggleShareSearch} />
       )}
+      <AddEvidenceModal id={view.id} type="searches" ref={addEvidenceModalRef} />
     </Container>
   );
 };

@@ -24,10 +24,9 @@ type Props = {
   index?: string,
   id: string,
   type: EvidenceTypes,
-  child: React.ReactElement,
 };
 
-function AddEvidenceModal({ child, index, id, type }: Props) {
+const AddEvidenceModal = React.forwardRef(({ index, id, type }: Props, ref: React.MutableRefObject<{ toggle: () => void }>) => {
   const investigations = usePluginEntities('investigationsPlugin');
 
   if (!investigations || !investigations.length) return null;
@@ -35,11 +34,9 @@ function AddEvidenceModal({ child, index, id, type }: Props) {
   const SecAddEvidenceModal = investigations[0].components.AddEvidenceModal;
 
   return (
-    <SecAddEvidenceModal id={id} index={index} type={type}>
-      {child}
-    </SecAddEvidenceModal>
+    <SecAddEvidenceModal id={id} index={index} type={type} ref={ref} />
   );
-}
+});
 
 AddEvidenceModal.defaultProps = {
   index: undefined,

@@ -61,6 +61,7 @@ const addToInvestigation = ({ investigationSelected }) => (
 );
 
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
+  const addEvidenceModalRef = React.useRef(null);
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
 
   const plugin = useMemo(() => {
@@ -72,69 +73,68 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   }, [event, eventDefinitionTypes]);
 
   return (
-    <Row>
-      <Col md={6}>
-        <dl>
-          <dt>ID</dt>
-          <dd>{event.id}</dd>
-          <dt>Priority</dt>
-          <dd>
-            {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
-          </dd>
-          <dt>Timestamp</dt>
-          <dd> <Timestamp dateTime={event.timestamp} />
-          </dd>
-          <dt>Event Definition</dt>
-          <dd>
-            <EventDefinitionLink event={event} eventDefinitionContext={eventDefinitionContext} />
-            &emsp;
-            ({(plugin && plugin.displayName) || event.event_definition_type})
-          </dd>
-          {event.replay_info && (
-            <>
-              <dt>Actions</dt>
-              <dd>
-                <LinkToReplaySearch id={event.id} isEvent />
-              </dd>
-              <AddEvidence id={event.id} type="events" child={addToInvestigation} />
-              <AddEvidenceModal id={event.id}
-                                type="events"
-                                child={(
-                                  <dd>
-                                    <EvidenceActionButton>
-                                      Select an investigation <Icon name="puzzle-piece" size="sm" />
-                                    </EvidenceActionButton>
-                                  </dd>
-                                )} />
-            </>
-          )}
-        </dl>
-      </Col>
-      <Col md={6}>
-        <dl>
-          {event.timerange_start && event.timerange_end && (
-            <>
-              <dt>Aggregation time range</dt>
-              <dd>
-                <Timestamp dateTime={event.timerange_start} />
-                &ensp;&mdash;&ensp;
-                <Timestamp dateTime={event.timerange_end} />
-              </dd>
-            </>
-          )}
-          <dt>Event Key</dt>
-          <dd>{event.key || 'No Key set for this Event.'}</dd>
-          <dt>Additional Fields</dt>
-          {isEmpty(event.fields)
-            ? <dd>No additional Fields added to this Event.</dd>
-            : <EventFields fields={event.fields} />}
-          <dt>Group-By Fields</dt>
-          {isEmpty(event.group_by_fields)
-            ? <dd>No group-by fields on this Event.</dd>
-            : <EventFields fields={event.group_by_fields} />}
-        </dl>
-      </Col>
-    </Row>
+    <>
+      <Row>
+        <Col md={6}>
+          <dl>
+            <dt>ID</dt>
+            <dd>{event.id}</dd>
+            <dt>Priority</dt>
+            <dd>
+              {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
+            </dd>
+            <dt>Timestamp</dt>
+            <dd> <Timestamp dateTime={event.timestamp} />
+            </dd>
+            <dt>Event Definition</dt>
+            <dd>
+              <EventDefinitionLink event={event} eventDefinitionContext={eventDefinitionContext} />
+              &emsp;
+              ({(plugin && plugin.displayName) || event.event_definition_type})
+            </dd>
+            {event.replay_info && (
+              <>
+                <dt>Actions</dt>
+                <dd>
+                  <LinkToReplaySearch id={event.id} isEvent />
+                </dd>
+                <AddEvidence id={event.id} type="events" child={addToInvestigation} />
+                <dd>
+                  <EvidenceActionButton onClick={() => addEvidenceModalRef.current.toggle()}>
+                    Select an investigation <Icon name="puzzle-piece" size="sm" />
+                  </EvidenceActionButton>
+                </dd>
+              </>
+            )}
+          </dl>
+        </Col>
+        <Col md={6}>
+          <dl>
+            {event.timerange_start && event.timerange_end && (
+              <>
+                <dt>Aggregation time range</dt>
+                <dd>
+                  <Timestamp dateTime={event.timerange_start} />
+                  &ensp;&mdash;&ensp;
+                  <Timestamp dateTime={event.timerange_end} />
+                </dd>
+              </>
+            )}
+            <dt>Event Key</dt>
+            <dd>{event.key || 'No Key set for this Event.'}</dd>
+            <dt>Additional Fields</dt>
+            {isEmpty(event.fields)
+              ? <dd>No additional Fields added to this Event.</dd>
+              : <EventFields fields={event.fields} />}
+            <dt>Group-By Fields</dt>
+            {isEmpty(event.group_by_fields)
+              ? <dd>No group-by fields on this Event.</dd>
+              : <EventFields fields={event.group_by_fields} />}
+          </dl>
+        </Col>
+      </Row>
+      <AddEvidenceModal id={event.id} type="events" ref={addEvidenceModalRef} />
+    </>
   );
 };
 

@@ -49,6 +49,7 @@ const addToInvestigation = ({ investigationSelected }) => (
 );
 
 const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
+  const addEvidenceModalRef = React.useRef(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const paginationQueryParameter = usePaginationQueryParameter();
 
@@ -72,9 +73,10 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    onClick={() => setShowShareModal(true)} />
       <OverlayDropdownButton bsSize="xsmall" title="More">
         <AddEvidence id={dashboard.id} type="dashboards" child={addToInvestigation} />
-        <AddEvidenceModal id={dashboard.id}
-                          type="dashboards"
-                          child={<MenuItem icon="puzzle-piece">Select an investigation</MenuItem>} />
+        <MenuItem icon="puzzle-piece"
+                  onClick={() => addEvidenceModalRef.current.toggle()}>
+          Select an investigation
+        </MenuItem>
         <MenuItem divider />
         <MenuItem onClick={onDashboardDelete}>
           <DeleteItem role="button">Delete</DeleteItem>
@@ -87,6 +89,7 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                           entityTitle={dashboard.title}
                           onClose={() => setShowShareModal(false)} />
       )}
+      <AddEvidenceModal id={dashboard.id} type="dashboards" ref={addEvidenceModalRef} />
     </>
   );
 };

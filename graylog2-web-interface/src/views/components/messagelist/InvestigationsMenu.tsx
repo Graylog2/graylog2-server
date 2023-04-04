@@ -35,18 +35,21 @@ const addToInvestigation = ({ investigationSelected }) => (
 );
 
 const InvestigationsMenu = ({ index, id, type, ...rest }: Props) => {
+  const addEvidenceModalRef = React.useRef(null);
   const investigations = usePluginEntities('investigationsPlugin');
 
   if (!investigations || !investigations.length) return null;
 
   return (
-    <DropdownButton id="investigations-dropdown" {...rest}>
-      <AddEvidence index={index} id={id} type={type} child={addToInvestigation} />
-      <AddEvidenceModal index={index}
-                        id={id}
-                        type={type}
-                        child={<MenuItem>Select an investigation</MenuItem>} />
-    </DropdownButton>
+    <>
+      <DropdownButton id="investigations-dropdown" {...rest}>
+        <AddEvidence index={index} id={id} type={type} child={addToInvestigation} />
+        <MenuItem onClick={() => addEvidenceModalRef.current.toggle()}>
+          Select an investigation
+        </MenuItem>
+      </DropdownButton>
+      <AddEvidenceModal index={index} id={id} type={type} ref={addEvidenceModalRef} />
+    </>
   );
 };
 
