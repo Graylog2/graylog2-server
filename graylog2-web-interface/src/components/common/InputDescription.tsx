@@ -30,7 +30,7 @@ const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => 
 
 type Props = {
   className?: string,
-  error?: React.ReactElement,
+  error?: React.ReactNode,
   help?: React.ReactNode,
 };
 

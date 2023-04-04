@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import CreatableSelect from 'react-select/creatable';
-import type { Props as CreatableProps } from 'react-select/creatable';
+import type { CreatableProps } from 'react-select/creatable';
 
 import { InputDescription } from 'components/common';
 import { FormGroup, ControlLabel } from 'components/bootstrap';
@@ -35,7 +35,7 @@ const createOption = (value: string | number) => ({
   value,
 });
 
-type Props = CreatableProps & {
+type Props = CreatableProps<any, boolean, any> & {
   name: string,
   values: (string | number)[],
   onChange: (newValue: React.ChangeEvent<GenericTarget<(string | number)[]>>) => void,
@@ -95,7 +95,7 @@ const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, 
                        onKeyDown={handleKeyDown}
                        value={value}
                        styles={styles(!error)}
-                       theme={inputListTheme}
+                       theme={(theme) => ({ ...theme, ...inputListTheme })}
                        {...rest} />
       <InputDescription error={error} help={help} />
     </FormGroup>
