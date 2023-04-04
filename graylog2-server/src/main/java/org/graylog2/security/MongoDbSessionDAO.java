@@ -78,7 +78,12 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
             // expired session or it was never there to begin with
             return null;
         }
-        return getSimpleSession(sessionId, dbSession);
+        final SimpleSession simpleSession = getSimpleSession(sessionId, dbSession);
+        // If the session was created on a different cluster node, we need to cache it here as well.
+        // Caching only happens for CachingSessionDAO.create() and CachingSessionDAO.update()
+
+         cache(simpleSession, sessionId);
+        return simpleSession;
     }
 
     private SimpleSession getSimpleSession(Serializable sessionId, MongoDbSession dbSession) {

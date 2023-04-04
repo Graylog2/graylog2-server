@@ -349,8 +349,11 @@ public class SupportBundleService {
 
     private List<LogFile> getMemLogFiles(MemoryAppender memAppender) {
         try {
-            memAppender.getLogMessages(1);
-            return List.of(new LogFile(IN_MEMORY_LOGFILE_ID, "server.mem.log", -1, Instant.now()));
+            final long logsSize = memAppender.getLogsSize();
+            if (logsSize == 0) {
+                return List.of();
+            }
+            return List.of(new LogFile(IN_MEMORY_LOGFILE_ID, "server.mem.log", logsSize, Instant.now()));
         } catch (Exception e) {
             LOG.warn("Failed to get logs from MemoryAppender <{}>", memAppender.getName(), e);
             return List.of();
@@ -403,7 +406,7 @@ public class SupportBundleService {
             if (memAppender.isEmpty()) {
                 throw new NotFoundException();
             }
-            memAppender.get().streamFormattedLogMessages(outputStream);
+            memAppender.get().streamFormattedLogMessages(outputStream, 0);
 
         } else {
             Files.copy(Path.of(logFile.name()), outputStream);
