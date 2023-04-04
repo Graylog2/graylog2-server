@@ -28,7 +28,7 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
-const getNoOptionMessgage = () => (
+const getNoOptionMessage = () => (
   <StyledDiv key="noOptions" className="menu-notice menu-notice--no-options">
     No Options
   </StyledDiv>
@@ -41,7 +41,7 @@ const AsyncCustomMenuList = ({
   children: Array<React.ReactNode>,
   selectProps: { loadOptions: () => void, total: number }
 }) => {
-  const items = children?.length ? children : [getNoOptionMessgage()];
+  const items = children?.length ? children : [getNoOptionMessage()];
 
   return (
     <InfiniteLoader isItemLoaded={(index: number) => index < children.length}
