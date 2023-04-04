@@ -24,6 +24,7 @@ import { Button, Alert, Table } from 'components/bootstrap';
 import { IfPermitted, SortableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const MessageProcessorsConfig = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -33,6 +34,7 @@ const MessageProcessorsConfig = createReactClass({
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -68,11 +70,16 @@ const MessageProcessorsConfig = createReactClass({
   },
 
   _saveConfig() {
-    const { updateConfig } = this.props;
+    const { updateConfig, sendTelemetry } = this.props;
     const { config } = this.state;
 
     if (!this._hasNoActiveProcessor()) {
       updateConfig(config).then(() => {
+        sendTelemetry('submit_form', {
+          appSection: 'configurations_message_processors',
+          eventElement: 'update_configuration_button',
+        });
+
         this._closeModal();
       });
     }
@@ -220,4 +227,4 @@ const MessageProcessorsConfig = createReactClass({
   },
 });
 
-export default MessageProcessorsConfig;
+export default withTelemetry(MessageProcessorsConfig);

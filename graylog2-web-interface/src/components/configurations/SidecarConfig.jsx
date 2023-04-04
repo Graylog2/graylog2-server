@@ -25,6 +25,7 @@ import ObjectUtils from 'util/ObjectUtils';
 import ISODurationUtils from 'util/ISODurationUtils';
 import { getValueFromInput } from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const SidecarConfig = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -40,6 +41,7 @@ const SidecarConfig = createReactClass({
       sidecar_configuration_override: PropTypes.bool,
     }),
     updateConfig: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -75,7 +77,14 @@ const SidecarConfig = createReactClass({
   },
 
   _saveConfig() {
-    this.props.updateConfig(this.state.config).then(() => {
+    const { updateConfig, sendTelemetry } = this.props;
+
+    updateConfig(this.state.config).then(() => {
+      sendTelemetry('submit_form', {
+        appSection: 'configurations_sidecar',
+        eventElement: 'update_configuration_button',
+      });
+
       this._closeModal();
     });
   },
@@ -185,4 +194,4 @@ const SidecarConfig = createReactClass({
   },
 });
 
-export default SidecarConfig;
+export default withTelemetry(SidecarConfig);

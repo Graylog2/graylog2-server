@@ -22,6 +22,8 @@ import { IfPermitted } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import type { TelemetryEvent, TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 type State = {
   config: WhiteListConfig,
@@ -32,12 +34,22 @@ type State = {
 type Props = {
   config: WhiteListConfig,
   updateConfig: (config: WhiteListConfig) => Promise<void>,
+  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
 };
 
 class UrlWhiteListConfig extends React.Component<Props, State> {
   static propTypes = {
-    config: PropTypes.object.isRequired,
+    config: PropTypes.exact({
+      entries: PropTypes.arrayOf(PropTypes.exact({
+        id: PropTypes.string,
+        title: PropTypes.string,
+        value: PropTypes.string,
+        type: PropTypes.string,
+      })),
+      disabled: PropTypes.bool,
+    }).isRequired,
     updateConfig: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   };
 
   constructor(props: Props) {
@@ -80,10 +92,15 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
 
   _saveConfig = () => {
     const { config, isValid } = this.state;
-    const { updateConfig } = this.props;
+    const { updateConfig, sendTelemetry } = this.props;
 
     if (isValid) {
       updateConfig(config).then(() => {
+        sendTelemetry('submit_form', {
+          appSection: 'configurations_url_whitelist',
+          eventElement: 'update_configuration_button',
+        });
+
         this._closeModal();
       });
     }
@@ -138,4 +155,4 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   }
 }
 
-export default UrlWhiteListConfig;
+export default withTelemetry(UrlWhiteListConfig);

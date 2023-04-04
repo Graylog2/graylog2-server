@@ -23,6 +23,8 @@ import { IfPermitted, ISODurationInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import type { SearchesConfig as SearchesConfigType } from 'components/search/SearchConfig';
 import Select from 'components/common/Select/Select';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import type { TelemetryEvent, TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 import 'moment-duration-format';
 
@@ -60,6 +62,7 @@ type Option = { period: string, description: string };
 type Props = {
   config: SearchesConfigType,
   updateConfig: (newConfig: SearchesConfigType) => Promise<unknown>,
+  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
 };
 type State = {
   config: SearchesConfigType,
@@ -77,14 +80,17 @@ class SearchesConfig extends React.Component<Props, State> {
   private readonly defaultState: State;
 
   static propTypes = {
-    config: PropTypes.shape({
+    config: PropTypes.exact({
       query_time_range_limit: PropTypes.string,
       relative_timerange_options: PropTypes.objectOf(PropTypes.string),
       surrounding_timerange_options: PropTypes.objectOf(PropTypes.string),
       surrounding_filter_fields: PropTypes.arrayOf(PropTypes.string),
       analysis_disabled_fields: PropTypes.arrayOf(PropTypes.string),
+      auto_refresh_timerange_options: PropTypes.objectOf(PropTypes.string),
+      default_auto_refresh_option: PropTypes.string,
     }).isRequired,
     updateConfig: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   };
 
   constructor(props: Props) {
@@ -158,7 +164,7 @@ class SearchesConfig extends React.Component<Props, State> {
   };
 
   _saveConfig = () => {
-    const { updateConfig } = this.props;
+    const { updateConfig, sendTelemetry } = this.props;
     const {
       analysisDisabledFields,
       config,
@@ -216,6 +222,11 @@ class SearchesConfig extends React.Component<Props, State> {
     }
 
     updateConfig(update).then(() => {
+      sendTelemetry('submit_form', {
+        appSection: 'configurations_search',
+        eventElement: 'update_configuration_button',
+      });
+
       this._closeModal();
     });
   };
@@ -383,4 +394,4 @@ class SearchesConfig extends React.Component<Props, State> {
   }
 }
 
-export default SearchesConfig;
+export default withTelemetry(SearchesConfig);

@@ -21,6 +21,7 @@ import createReactClass from 'create-react-class';
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const ThreatIntelPluginConfig = createReactClass({
   displayName: 'ThreatIntelPluginConfig',
@@ -28,6 +29,7 @@ const ThreatIntelPluginConfig = createReactClass({
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -92,7 +94,14 @@ const ThreatIntelPluginConfig = createReactClass({
   },
 
   _saveConfig() {
-    this.props.updateConfig(this.state.config).then(() => {
+    const { updateConfig, sendTelemetry } = this.props;
+
+    updateConfig(this.state.config).then(() => {
+      sendTelemetry('submit_form', {
+        appSection: 'configurations_threat_intel',
+        eventElement: 'update_configuration_button',
+      });
+
       this._closeModal();
     });
   },
@@ -148,4 +157,4 @@ const ThreatIntelPluginConfig = createReactClass({
   },
 });
 
-export default ThreatIntelPluginConfig;
+export default withTelemetry(ThreatIntelPluginConfig);

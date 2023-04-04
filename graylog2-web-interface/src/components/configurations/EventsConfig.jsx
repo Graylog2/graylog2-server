@@ -27,6 +27,7 @@ import { IfPermitted, TimeUnitInput } from 'components/common';
 import { getValueFromInput } from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 const DEFAULT_CATCH_UP_WINDOW = 3600000;
@@ -45,6 +46,7 @@ const EventsConfig = createReactClass({
       events_notification_tcp_keepalive: PropTypes.bool,
     }),
     updateConfig: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -82,10 +84,15 @@ const EventsConfig = createReactClass({
   },
 
   _saveConfig() {
-    const { updateConfig } = this.props;
+    const { updateConfig, sendTelemetry } = this.props;
     const { config } = this.state;
 
     updateConfig(config).then(() => {
+      sendTelemetry('submit_form', {
+        appSection: 'configurations_events_system',
+        eventElement: 'update_configuration_button',
+      });
+
       this._closeModal();
     });
   },
@@ -244,4 +251,4 @@ const EventsConfig = createReactClass({
   },
 });
 
-export default EventsConfig;
+export default withTelemetry(EventsConfig);
