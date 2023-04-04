@@ -25,7 +25,7 @@ import type { BooleanField as BooleanFieldType } from 'components/configurationf
 type Props = {
   autoFocus?: boolean,
   field: BooleanFieldType,
-  onChange: (title: string, value: boolean) => void,
+  onChange: (title: string, value: boolean, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value?: boolean,

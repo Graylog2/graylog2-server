@@ -27,7 +27,7 @@ type Props = {
   autoFocus: boolean,
   field: InlineBinaryFieldType,
   dirty: boolean,
-  onChange: (title: string, value: any) => void,
+  onChange: (title: string, value: any, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value?: EncryptedFieldValue<string>,
@@ -39,6 +39,7 @@ const FileContent = styled.span`
 
 const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
   const [fileName, setFileName] = useState(undefined);
+  const [isResetted, setIsResetted] = useState<boolean>(false);
   const isValuePresent = value.is_set;
   const isRequired = !field.is_optional;
   const showReadOnly = !dirty && isValuePresent;
@@ -61,16 +62,36 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, v
     }
   };
 
+  const handleReset = () => {
+    setIsResetted(true);
+    onChange(title, { delete_value: true });
+  };
+
+  const handleUndoReset = () => {
+    setIsResetted(false);
+    onChange(title, { is_set: true }, false);
+  };
+
   const resetButton = () => {
     if (isValuePresent) {
       return (
-        <Button type="button" onClick={() => onChange(title, { delete_value: true })}>
+        <Button type="button" onClick={handleReset}>
           Reset
         </Button>
       );
     }
 
     return null;
+  };
+
+  const undoResetButton = () => {
+    if (!isResetted) return null;
+
+    return (
+      <Button type="button" onClick={handleUndoReset}>
+        Undo Reset
+      </Button>
+    );
   };
 
   const removeButton = () => {
@@ -116,7 +137,7 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, v
              required={isRequired}
              help={field.description}
              autoFocus={autoFocus}
-             buttonAfter={removeButton()}>
+             buttonAfter={<>{removeButton()}{undoResetButton()}</>}>
         <FileContent>{fileName}</FileContent>
       </Input>
     ) : (
@@ -126,6 +147,7 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, v
              label={labelContent}
              required={isRequired}
              help={field.description}
+             buttonAfter={undoResetButton()}
              onChange={(e) => handleFileUpload(e.target.files[0])}
              autoFocus={autoFocus} />
     )
