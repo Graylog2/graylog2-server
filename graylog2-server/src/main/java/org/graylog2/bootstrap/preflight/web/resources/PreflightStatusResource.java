@@ -20,6 +20,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.ConfigurationStatus;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
+import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.database.ValidationException;
 
@@ -30,7 +31,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/")
+
+@Path(PreflightConstants.API_PREFIX + "/status")
 @Produces(MediaType.APPLICATION_JSON)
 public class PreflightStatusResource {
 
