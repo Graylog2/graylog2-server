@@ -25,7 +25,7 @@ import { Button } from 'preflight/common';
 
 const App = () => (
   <AppShell padding="md" header={<Navigation />}>
-    <Section title="Welcome!">
+    <Section title="Welcome!" titleOrder={1}>
       <p>
         It looks like you are starting Graylog for the first time.
         Through this wizard, you can configure and secure your data nodes.<br />
