@@ -29,20 +29,6 @@ const CreateEventDefinition = ({
   onClose,
 }: ActionComponentProps) => {
   const contexts = useContext(ActionContext);
-  /*
-  const eventDefinitionUrlConfig = ({
-    query: concatQuery([queryWithReplacedParams, searchFilterQuery, searchFromAggregation, columnValuePath, rowValuePath]),
-    loc_query_parameters: lutParameters,
-    search_within_ms,
-    type: 'aggregation-v1',
-    streams,
-    columnGroupBy,
-    rowGroupBy,
-    columnValuePath,
-    rowValuePath,
-    ...aggregationVales,
-  });
-  */
 
   const mappedData = useMappedData({ contexts, field, queryId, value });
   const modalData = useModalData(mappedData);
