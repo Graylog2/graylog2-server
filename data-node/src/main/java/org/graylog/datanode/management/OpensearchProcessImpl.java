@@ -121,7 +121,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     private HttpHost getRestBaseUrl(OpensearchConfiguration config) {
-        final boolean sslEnabled = Boolean.parseBoolean(configuration.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        final boolean sslEnabled = Boolean.parseBoolean(config.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
         return new HttpHost("localhost", config.httpPort(), sslEnabled ? "https" : "http");
     }
 
