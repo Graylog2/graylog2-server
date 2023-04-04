@@ -2,4 +2,4 @@ type = "added"
 message = "Added an "Undo Reset" button to fields in input configuration forms"
 
 issues = ["14767"]
-pulls = [""]
+pulls = ["15147", "graylog-plugin-enterprise#4964"]
