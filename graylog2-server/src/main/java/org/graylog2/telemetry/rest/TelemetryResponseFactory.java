@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog2.telemetry.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +28,8 @@ import javax.inject.Inject;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 class TelemetryResponseFactory {
     private static final String CURRENT_USER = "current_user";
@@ -32,7 +50,7 @@ class TelemetryResponseFactory {
                                                 Map<String, Object> pluginInfo,
                                                 Map<String, Object> searchClusterInfo,
                                                 List<TelemetryLicenseStatus> licenseStatuses,
-                                                TelemetryUserSettings telemetryUserSettings) throws JsonProcessingException {
+                                                TelemetryUserSettings telemetryUserSettings) {
         Map<String, Object> telemetryResponse = new LinkedHashMap<>();
         telemetryResponse.put(CURRENT_USER, userInfo);
         telemetryResponse.put(USER_TELEMETRY_SETTINGS, telemetryUserSettings);
@@ -50,7 +68,7 @@ class TelemetryResponseFactory {
     Map<String, Object> createUserInfo(String userHash,
                                        boolean isLocalAdmin,
                                        int rolesCount,
-                                       int teamsCount) throws JsonProcessingException {
+                                       int teamsCount) {
         Map<String, Object> userInfo = new LinkedHashMap<>();
         userInfo.put("user", userHash);
         userInfo.putAll(flatten(Map.of(CURRENT_USER, Map.of(
@@ -67,41 +85,46 @@ class TelemetryResponseFactory {
                                           int nodesCount,
                                           Map<String, SystemOverviewResponse> nodes,
                                           long averageLastMonthTraffic,
-                                          long usersCount) throws JsonProcessingException {
+                                          long usersCount) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
         clusterInfo.put("cluster_id", clusterId);
-        clusterInfo.put("cluster.cluster_creation_date", clusterCreationDate);
-        clusterInfo.put("cluster.nodes_count", nodesCount);
-        clusterInfo.put("cluster.average_last_month_traffic", averageLastMonthTraffic);
-        clusterInfo.put("cluster.users_count", usersCount);
+        clusterInfo.put(f("%s.cluster_creation_date", CLUSTER), clusterCreationDate);
+        clusterInfo.put(f("%s.nodes_count", CLUSTER), nodesCount);
+        clusterInfo.put(f("%s.average_last_month_traffic", CLUSTER), averageLastMonthTraffic);
+        clusterInfo.put(f("%s.users_count", CLUSTER), usersCount);
         clusterInfo.putAll(flatten(Map.of(CLUSTER, nodes)));
         return clusterInfo;
 
     }
 
     Map<String, Object> createPluginInfo(boolean isEnterprisePluginInstalled,
-                                         List<String> plugins) throws JsonProcessingException {
+                                         List<String> plugins) {
         Map<String, Object> userInfo = new LinkedHashMap<>();
-        userInfo.put("plugin.is_enterprise_plugin_installed", isEnterprisePluginInstalled);
+        userInfo.put(f("%s.is_enterprise_plugin_installed", PLUGIN), isEnterprisePluginInstalled);
         userInfo.putAll(flatten(Map.of(PLUGIN, Map.of("installed_plugins", plugins))));
         return userInfo;
     }
 
     Map<String, Object> createSearchClusterInfo(int nodesCount,
                                                 String version,
-                                                Map<String, NodeInfo> nodes) throws JsonProcessingException {
+                                                Map<String, NodeInfo> nodes) {
         Map<String, Object> userInfo = new LinkedHashMap<>();
-        userInfo.put("search_cluster.nodes_count", nodesCount);
-        userInfo.put("search_cluster.version", version);
+        userInfo.put(f("%s.nodes_count", SEARCH_CLUSTER), nodesCount);
+        userInfo.put(f("%s.version", SEARCH_CLUSTER), version);
         userInfo.putAll(flatten(Map.of(SEARCH_CLUSTER, Map.of("nodes", nodes))));
         return userInfo;
     }
 
-    private Map<String, Object> createLicenseInfo(List<TelemetryLicenseStatus> telemetryLicenseStatuses) throws JsonProcessingException {
+    private Map<String, Object> createLicenseInfo(List<TelemetryLicenseStatus> telemetryLicenseStatuses) {
         return flatten(Map.of(LICENSE, Map.of(LICENSE, telemetryLicenseStatuses)));
     }
 
-    private Map<String, Object> flatten(Object o) throws JsonProcessingException {
-        return JsonFlattener.flattenAsMap(objectMapper.writeValueAsString(o));
+    private Map<String, Object> flatten(Object o) {
+        try {
+            return JsonFlattener.flattenAsMap(objectMapper.writeValueAsString(o));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(f("Couldn't serialize %s!", o), e);
+        }
     }
+
 }

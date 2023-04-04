@@ -16,7 +16,6 @@
  */
 package org.graylog2.telemetry.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -70,12 +69,7 @@ public class TelemetryResource extends ProxiedResource {
     @GET
     @ApiOperation(value = "Get telemetry information.")
     public Map<String, Object> get() {
-        try {
-            return telemetryService.getTelemetryResponse(getCurrentUserOrThrow(),
-                    getSystemOverviewResponses());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return telemetryService.getTelemetryResponse(getCurrentUserOrThrow(), getSystemOverviewResponses());
     }
 
     @GET
@@ -97,7 +91,7 @@ public class TelemetryResource extends ProxiedResource {
     public void saveTelemetryUserSettings(@ApiParam(name = "JSON body", value = "The telemetry settings to assign to the user.", required = true)
                                           @Valid @NotNull TelemetryUserSettings telemetryUserSettings) {
 
-        telemetryService.saveUserSettings(getCurrentUserOrThrow().getId(), telemetryUserSettings);
+        telemetryService.saveUserSettings(getCurrentUserOrThrow(), telemetryUserSettings);
     }
 
     private User getCurrentUserOrThrow() {
