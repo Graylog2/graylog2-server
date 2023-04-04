@@ -37,6 +37,14 @@ public final class GuiceInjectorHolder {
         return injector;
     }
 
+    public static void setInjector(Injector injector) {
+        GuiceInjectorHolder.injector = injector;
+    }
+
+    public static void resetInjector() {
+        injector = null;
+    }
+
     public static Injector getInjector() {
         if (injector == null) {
             throw new IllegalStateException("No injector available. Please call createInjector() first.");
