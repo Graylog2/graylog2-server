@@ -46,7 +46,7 @@ public class DropdownFieldValueTemplatesTest {
     @Test
     @SuppressForbidden("Intentionally use system default timezone")
     public void testBuildTimeZoneMap() {
-        Map<String, String> timezones = DropdownField.ValueTemplates.timeZones();
+        Map<String, String> timezones = DropdownField.ValueTemplates.timeZones(false);
         DateTimeZone curDTZ = null;
         int curOffset = 0;
         Instant now = new DateTime().withZone(DateTimeZone.getDefault()).toInstant();
@@ -64,5 +64,13 @@ public class DropdownFieldValueTemplatesTest {
             curDTZ = nextDTZ;
             curOffset = nextOffset;
         }
+
+        assertThat(timezones).doesNotContainKey(DropdownField.NOT_CONFIGURED);
+    }
+
+    @Test
+    public void testBuildTimeZoneMapWithNotConfiguredOption() {
+        Map<String, String> timezones = DropdownField.ValueTemplates.timeZones(true);
+        assertThat(timezones).containsKey(DropdownField.NOT_CONFIGURED);
     }
 }

@@ -19,14 +19,13 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../data-node/bin</directory>
-            <outputDirectory>bin</outputDirectory>
+            <directory>${project.basedir}/../data-node/target/opensearch</directory>
+            <outputDirectory>dist</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
             <includes>
                 <include>*/**</include>
             </includes>
-            <excludes>
-                <exclude>download/*</exclude>
-            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../data-node/target/lib</directory>
@@ -47,8 +46,26 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.basedir}/../data-node/target/datanode-${project.version}.jar</source>
-            <destName>datanode.jar</destName>
+            <source>${project.basedir}/../data-node/bin/graylog-datanode.sh</source>
+            <destName>graylog-datanode</destName>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+        </file>
+        <file>
+            <source>${project.basedir}/../data-node/config/jvm.options</source>
+            <destName>jvm.options</destName>
+            <outputDirectory>config</outputDirectory>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>${project.basedir}/../data-node/config/log4j2.xml</source>
+            <destName>log4j2.xml</destName>
+            <outputDirectory>config</outputDirectory>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>${project.basedir}/../data-node/target/graylog-datanode-${project.version}.jar</source>
+            <destName>graylog-datanode.jar</destName>
             <outputDirectory>.</outputDirectory>
         </file>
         <file>

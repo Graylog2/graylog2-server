@@ -60,7 +60,6 @@ const Message = PropTypes.exact({
 
 const ValidElements = PropTypes.oneOfType([
   PropTypes.element,
-  PropTypes.func,
   PropTypes.string,
 ]);
 const OneOrMoreChildren = PropTypes.oneOfType([
@@ -126,4 +125,5 @@ export default ({
   OneOrMoreChildren,
   TimeRangeType,
   instanceOf,
+  ValidElements,
 });

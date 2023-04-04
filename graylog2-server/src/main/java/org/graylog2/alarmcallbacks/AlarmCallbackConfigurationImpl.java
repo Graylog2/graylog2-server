@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.database.CollectionName;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
@@ -29,7 +28,6 @@ import java.util.Map;
 
 @AutoValue
 @JsonAutoDetect
-@CollectionName("alarmcallbackconfigurations")
 public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackConfiguration {
     static final String FIELD_ID = "_id";
     static final String FIELD_STREAM_ID = "stream_id";

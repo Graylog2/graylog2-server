@@ -94,7 +94,6 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
     }
 
     > li.active {
-      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -244,9 +243,9 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
   }, [queryTitleEditModal]);
 
   const currentTabs = useMemo((): TabsTypes => {
-    let navItems = OrderedSet();
-    let menuItems = OrderedSet();
-    let lockedItems = OrderedSet();
+    let navItems = OrderedSet<React.ReactNode>();
+    let menuItems = OrderedSet<React.ReactNode>();
+    let lockedItems = OrderedSet<React.ReactNode>();
     let queriesList = OrderedSet<{ id: string, title: string }>();
 
     queries.keySeq().forEach((id, idx) => {

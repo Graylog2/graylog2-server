@@ -90,7 +90,7 @@ interface DirectoryServicesGroupSync {
   },
   components: {
     GroupSyncSection: React.ComponentType<GroupSyncSectionProps>;
-    MatchingGroupsProvider: React.ComponentType<MatchingGroupsProviderProps>;
+    MatchingGroupsProvider: React.ComponentType<React.PropsWithChildren<MatchingGroupsProviderProps>>;
     GroupSyncForm: React.ComponentType<GroupSyncFormProps>;
   },
   wizardConfig: Record<SupportedBackends, Backend>,
