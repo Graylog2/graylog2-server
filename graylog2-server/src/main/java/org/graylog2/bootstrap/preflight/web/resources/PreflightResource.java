@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
@@ -38,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Path("/api")
+@Path(PreflightConstants.API_PREFIX)
 @Produces(MediaType.APPLICATION_JSON)
 public class PreflightResource {
 
