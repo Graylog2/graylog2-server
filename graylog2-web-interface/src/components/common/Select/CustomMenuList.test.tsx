@@ -53,7 +53,7 @@ describe('CustomMenuList', () => {
 
   it('Check if List component rendered for number of items less than 1000', () => {
     render(
-      <CustomMenuList getStyles={() => ({})}>
+      <CustomMenuList getStyles={() => ({})} getClassNames={() => ''} cx={() => ''}>
         {getChildrenList(999)}
       </CustomMenuList>,
     );
