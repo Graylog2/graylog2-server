@@ -27,13 +27,14 @@ class MessageShow extends React.Component {
   static propTypes = {
     message: PropTypes.object.isRequired,
     inputs: PropTypes.object,
-    streams: PropTypes.object.isRequired,
+    streams: PropTypes.object,
     nodes: PropTypes.object,
   };
 
   static defaultProps = {
     inputs: undefined,
     nodes: undefined,
+    streams: undefined,
   };
 
   constructor(props) {
@@ -46,6 +47,7 @@ class MessageShow extends React.Component {
     this.setState(this._getImmutableProps(nextProps));
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _getImmutableProps = (props) => {
     return {
       streams: props.streams ? Immutable.Map(props.streams) : props.streams,
