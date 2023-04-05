@@ -21,6 +21,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 
 import javax.inject.Inject;
@@ -166,7 +167,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
     private void configureInitialAdmin(Path internalUsersFile, String adminUsername, String adminPassword) throws IOException {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), Map.class);
+        final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), TypeReferences.MAP_STRING_OBJECT);
         final Map<String, Object> adminUserConfig = (Map) map.get("admin");
 
         map.remove("admin");
