@@ -22,13 +22,17 @@ import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Table } from 'preflight/components/common';
 
 const DataNodesOverview = () => {
-  const { data: dataNodes, isFetching: isFetchingDataNodes, error: dataNodesFetchError } = useDataNodes();
+  const {
+    data: dataNodes,
+    isFetching: isFetchingDataNodes,
+    error: dataNodesFetchError,
+  } = useDataNodes();
 
   return (
     <>
       <p>
-        These are the data nodes which are currently registered. The list is constantly updated. {isFetchingDataNodes
-        && <Spinner text="" />}
+        These are the data nodes which are currently registered. The list is constantly updated.
+        {isFetchingDataNodes && <Spinner text="" />}
       </p>
 
       <Space h="sm" />

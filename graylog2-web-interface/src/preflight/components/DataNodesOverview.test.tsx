@@ -21,7 +21,7 @@ import DataNodesOverview from 'preflight/components/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
 
-jest.mock('preflight/components/DataNodesOverview');
+jest.mock('preflight/hooks/useDataNodes');
 
 const availableDataNodes = [
   { id: 'data-node-id-1', transportAddress: 'transport.address1', isSecured: false },
