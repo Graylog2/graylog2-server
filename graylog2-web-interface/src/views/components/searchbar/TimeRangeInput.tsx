@@ -26,6 +26,7 @@ import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDisplay from './TimeRangeDisplay';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   className?: string,
@@ -61,13 +62,17 @@ const TimeRangeInput = ({
   showPresetDropdown = true,
   limitDuration,
 }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const [show, setShow] = useState(false);
 
   if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
     throw new Error(`Value is of type ${value.type}, but only these types are valid: ${validTypes}`);
   }
 
-  const toggleShow = () => setShow(!show);
+  const toggleShow = () => {
+    sendTelemetry('toggle_input_button', { appSection: 'search_bar', eventElement: 'time-range-dropdown', eventInfo: { showing: !show } });
+    setShow(!show);
+  }
   const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (
