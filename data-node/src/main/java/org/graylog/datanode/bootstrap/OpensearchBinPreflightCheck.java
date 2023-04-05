@@ -50,7 +50,7 @@ public class OpensearchBinPreflightCheck implements PreflightCheck {
 
         final Path binPath = opensearchDir.resolve(Paths.get("bin", "opensearch"));
 
-        if (!Files.isDirectory(opensearchDir)) {
+        if (!Files.exists(opensearchDir)) {
             throw new PreflightCheckException("Opensearch binary " + binPath + " doesn't exist!");
         }
 
