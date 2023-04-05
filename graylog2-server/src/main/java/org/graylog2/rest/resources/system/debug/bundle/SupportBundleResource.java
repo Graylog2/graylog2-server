@@ -127,7 +127,7 @@ public class SupportBundleResource extends RestResource {
     }
 
     @DELETE
-    @Path("/bundle/delete/{filename}")
+    @Path("/bundle/{filename}")
     @ApiOperation(value = "Delete a certain support bundle")
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @RestrictToLeader

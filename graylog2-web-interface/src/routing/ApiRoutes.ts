@@ -214,7 +214,7 @@ const ApiRoutes = {
     setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => { return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }; },
   },
   ClusterSupportBundleController: {
-    delete: (filename: string) => { return { url: `/cluster/debug/support/bundle/delete/${filename}` }; },
+    delete: (filename: string) => { return { url: `/cluster/debug/support/bundle/${filename}` }; },
     download: (filename: string) => { return { url: `/cluster/debug/support/bundle/download/${filename}` }; },
     list: () => { return { url: '/cluster/debug/support/bundle/list' }; },
     create: () => { return { url: '/cluster/debug/support/bundle/build' }; },
