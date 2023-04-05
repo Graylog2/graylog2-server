@@ -104,7 +104,7 @@ public class MemoryLimitedCompressingFifoRingBufferTest {
     void benchmark() throws IOException {
         final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 100000;
         for (int i = 1; i < count; i++) {
-            buffer.add(("Loop " + i + "\n").getBytes());
+            buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
     }
 }
