@@ -23,9 +23,15 @@ const StyledList = styled(MantineList)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
 `);
 
-const List = ({ children, ...props }: ListProps) => (
+type ListComponent = ((props: ListProps) => React.ReactElement) & {
+  Item: typeof MantineList.Item
+}
+
+const List: ListComponent = ({ children, ...props }: ListProps) => (
   <StyledList {...props}>
     {children}
   </StyledList>
 );
+
+List.Item = MantineList.Item;
 export default List;

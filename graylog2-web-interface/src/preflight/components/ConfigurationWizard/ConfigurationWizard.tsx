@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Grid, List as MantineList } from '@mantine/core';
+import { Grid } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
 import type { IconName } from 'components/common/Icon';
@@ -83,9 +83,9 @@ const ConfigurationWizard = () => {
             const { name: iconName, color: iconColor } = stepIcon(configurationStepKey, activeStepKey, theme);
 
             return (
-              <MantineList.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}>
+              <List.Item key={configurationStepKey} icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}>
                 {description}
-              </MantineList.Item>
+              </List.Item>
             );
           })}
         </List>
