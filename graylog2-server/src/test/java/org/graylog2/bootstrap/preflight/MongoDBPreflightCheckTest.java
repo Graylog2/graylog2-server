@@ -37,16 +37,16 @@ public abstract class MongoDBPreflightCheckTest {
     }
 
     @Test
-    public void testEmptyDBisEmpty() {
+    public void testIsFreshInstallation() {
         mongoDBPreflightCheck.runCheck();
-        assertThat(mongoDBPreflightCheck.dbIsEmpty()).isTrue();
+        assertThat(mongoDBPreflightCheck.isFreshInstallation()).isTrue();
     }
 
     @Test
     @MongoDBFixtures("MongoDBPreflightCheckTest.json")
-    public void testNonEmptyDBisNotEmpty() {
+    public void testNonEmptyDBFreshInstallation() {
         mongoDBPreflightCheck.runCheck();
-        assertThat(mongoDBPreflightCheck.dbIsEmpty()).isFalse();
+        assertThat(mongoDBPreflightCheck.isFreshInstallation()).isFalse();
     }
 
     @Test

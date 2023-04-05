@@ -29,7 +29,7 @@ const NavigationLink = ({ description, path, topLevel, ...rest }) => (
 );
 
 NavigationLink.propTypes = {
-  description: PropTypes.string.isRequired,
+  description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   path: PropTypes.string.isRequired,
   topLevel: PropTypes.bool,
 };

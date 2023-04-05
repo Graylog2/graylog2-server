@@ -17,10 +17,12 @@
 import React from 'react';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { OrderedMap } from 'immutable';
 
 import type { Attributes } from 'stores/PaginationTypes';
 import { asMock } from 'helpers/mocking';
 import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
+import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
 
 import EntityFilters from './EntityFilters';
 
@@ -32,8 +34,10 @@ jest.useFakeTimers()
 
 jest.mock('logic/generateId', () => jest.fn(() => 'filter-id'));
 jest.mock('components/common/EntityFilters/hooks/useFilterValueSuggestions');
+jest.mock('components/common/EntityFilters/hooks/useFiltersWithTitle');
 
 describe('<EntityFilters />', () => {
+  const onChangeFiltersWithTitle = jest.fn();
   const attributes = [
     { id: 'title', title: 'Title', sortable: true },
     { id: 'description', title: 'Description', sortable: true },
@@ -48,28 +52,38 @@ describe('<EntityFilters />', () => {
       ],
     },
     {
-      filterable: true,
       id: 'index_set_id',
+      filterable: true,
       related_collection: 'index_sets',
       title: 'Index set',
       type: 'STRING',
     },
     {
-      filterable: true,
       id: 'created_at',
+      filterable: true,
       title: 'Created at',
       type: 'DATE',
     },
   ] as Attributes;
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    asMock(useFiltersWithTitle).mockReturnValue({
+      data: undefined,
+      onChange: onChangeFiltersWithTitle,
+      isInitialLoading: false,
+    });
+  });
+
   describe('boolean attribute', () => {
     it('should create filter', async () => {
-      const onChangeFilters = jest.fn();
+      const setUrlQueryFilters = jest.fn();
 
       render(
         <EntityFilters attributes={attributes}
-                       onChangeFilters={onChangeFilters}
-                       activeFilters={undefined} />,
+                       setUrlQueryFilters={setUrlQueryFilters}
+                       urlQueryFilters={undefined} />,
       );
 
       userEvent.click(await screen.findByRole('button', {
@@ -84,21 +98,35 @@ describe('<EntityFilters />', () => {
         name: /running/i,
       }));
 
-      await waitFor(() => expect(onChangeFilters).toHaveBeenCalledWith({
-        disabled: [{ id: 'filter-id', title: 'Running', value: 'false' }],
-      }));
+      await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
+        OrderedMap({
+          disabled: [{
+            title: 'Running',
+            value: 'false',
+          }],
+        }),
+        OrderedMap({ disabled: ['false'] }),
+      ));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ disabled: ['false'] })));
     });
 
     it('should update active filter on click', async () => {
-      const onChangeFilters = jest.fn();
+      const setUrlQueryFilters = jest.fn();
+
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ disabled: [{ title: 'Running', value: 'false' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
 
       render(
         <EntityFilters attributes={attributes}
-                       onChangeFilters={onChangeFilters}
-                       activeFilters={{ disabled: [{ id: 'filter-id', title: 'Running', value: 'false' }] }} />,
+                       setUrlQueryFilters={setUrlQueryFilters}
+                       urlQueryFilters={OrderedMap({ disabled: ['false'] })} />,
       );
 
-      const activeFilter = await screen.findByTestId('filter-filter-id');
+      const activeFilter = await screen.findByTestId('disabled-filter-false');
 
       const toggleFilterButton = within(activeFilter).getByRole('button', {
         name: /change filter value/i,
@@ -106,9 +134,12 @@ describe('<EntityFilters />', () => {
 
       userEvent.click(toggleFilterButton);
 
-      await waitFor(() => expect(onChangeFilters).toHaveBeenCalledWith({
-        disabled: [{ id: 'filter-id', title: 'Paused', value: 'true' }],
-      }));
+      await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
+        OrderedMap({ disabled: [{ title: 'Paused', value: 'true' }] }),
+        OrderedMap({ disabled: ['true'] }),
+      ));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ disabled: ['true'] })));
     });
   });
 
@@ -129,12 +160,10 @@ describe('<EntityFilters />', () => {
     });
 
     it('should create filter', async () => {
-      const onChangeFilters = jest.fn();
+      const setUrlQueryFilters = jest.fn();
 
       render(
-        <EntityFilters attributes={attributes}
-                       onChangeFilters={onChangeFilters}
-                       activeFilters={undefined} />,
+        <EntityFilters attributes={attributes} setUrlQueryFilters={setUrlQueryFilters} urlQueryFilters={undefined} />,
       );
 
       userEvent.click(await screen.findByRole('button', {
@@ -149,25 +178,34 @@ describe('<EntityFilters />', () => {
         name: /default index set/i,
       }));
 
-      await waitFor(() => expect(onChangeFilters).toHaveBeenCalledWith({
-        index_set_id: [{ id: 'filter-id', title: 'Default index set', value: 'index-set-1' }],
-      }));
+      await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
+        OrderedMap({ index_set_id: [{ title: 'Default index set', value: 'index-set-1' }] }),
+        OrderedMap({ index_set_id: ['index-set-1'] }),
+      ));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ index_set_id: ['index-set-1'] })));
     });
 
     it('should update active filter', async () => {
-      const onChangeFilters = jest.fn();
+      const setUrlQueryFilters = jest.fn();
+
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({
+          index_set_id: [
+            { title: 'Default index set', value: 'index-set-1' },
+          ],
+        }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
 
       render(
         <EntityFilters attributes={attributes}
-                       onChangeFilters={onChangeFilters}
-                       activeFilters={{
-                         index_set_id: [
-                           { id: 'filter-id', title: 'Default index set', value: 'index-set-1' },
-                         ],
-                       }} />,
+                       setUrlQueryFilters={setUrlQueryFilters}
+                       urlQueryFilters={OrderedMap({ index_set_id: ['index-set-1'] })} />,
       );
 
-      const activeFilter = await screen.findByTestId('filter-filter-id');
+      const activeFilter = await screen.findByTestId('index_set_id-filter-index-set-1');
 
       const openSuggestionsButton = within(activeFilter).getByRole('button', {
         name: /change filter value/i,
@@ -179,20 +217,23 @@ describe('<EntityFilters />', () => {
         name: /example index set/i,
       }));
 
-      await waitFor(() => expect(onChangeFilters).toHaveBeenCalledWith({
-        index_set_id: [{ id: 'filter-id', title: 'Example index set', value: 'index-set-2' }],
-      }));
+      await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
+        OrderedMap({ index_set_id: [{ title: 'Example index set', value: 'index-set-2' }] }),
+        OrderedMap({ index_set_id: ['index-set-2'] }),
+      ));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ index_set_id: ['index-set-2'] })));
     });
   });
 
   describe('date attribute', () => {
     it('should create filter', async () => {
-      const onChangeFilters = jest.fn();
+      const setUrlQueryFilters = jest.fn();
 
       render(
         <EntityFilters attributes={attributes}
-                       onChangeFilters={onChangeFilters}
-                       activeFilters={undefined} />,
+                       setUrlQueryFilters={setUrlQueryFilters}
+                       urlQueryFilters={undefined} />,
       );
 
       userEvent.click(await screen.findByRole('button', {
@@ -209,31 +250,40 @@ describe('<EntityFilters />', () => {
       });
       userEvent.click(submitButton);
 
-      await waitFor(() => expect(onChangeFilters).toHaveBeenCalledWith({
-        created_at: [{
-          id: 'filter-id',
-          title: '2020-01-01 00:55:00.000 - Now',
-          value: '2019-12-31T23:55:00.000+00:00><',
-        }],
-      }));
+      await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
+        OrderedMap({
+          created_at: [{
+            title: '2020-01-01 00:55:00.000 - Now',
+            value: '2019-12-31T23:55:00.000+00:00><',
+          }],
+        }),
+        OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] }),
+      ));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] })));
     });
 
     it('should update active filter', async () => {
-      const onChangeFilters = jest.fn();
+      const setUrlQueryFilters = jest.fn();
+
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({
+          created_at: [{
+            title: '2020-01-01 00:55:00 - Now',
+            value: '2019-12-31T23:55:00.001+00:00',
+          }],
+        }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
 
       render(
         <EntityFilters attributes={attributes}
-                       onChangeFilters={onChangeFilters}
-                       activeFilters={{
-                         created_at: [{
-                           id: 'filter-id',
-                           title: '2020-01-01 00:55:00 - Now',
-                           value: '2019-12-31T23:55:00.001+00:00',
-                         }],
-                       }} />,
+                       setUrlQueryFilters={setUrlQueryFilters}
+                       urlQueryFilters={OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] })} />,
       );
 
-      const activeFilter = await screen.findByTestId('filter-filter-id');
+      const activeFilter = await screen.findByTestId('created_at-filter-2019-12-31T23:55:00.001+00:00');
 
       const toggleFilterButton = within(activeFilter).getByRole('button', {
         name: /change filter value/i,
@@ -248,25 +298,65 @@ describe('<EntityFilters />', () => {
       });
       userEvent.click(submitButton);
 
-      await waitFor(() => expect(onChangeFilters).toHaveBeenCalledWith({
-        created_at: [{
-          id: 'filter-id',
-          title: '2020-01-01 00:55:00.001 - Now',
-          value: '2019-12-31T23:55:00.001+00:00><',
-        }],
-      }));
+      await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
+        OrderedMap({
+          created_at: [{
+            title: '2020-01-01 00:55:00.001 - Now',
+            value: '2019-12-31T23:55:00.001+00:00><',
+          }],
+        }),
+        OrderedMap({ created_at: ['2019-12-31T23:55:00.001+00:00><'] }),
+      ));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['2019-12-31T23:55:00.001+00:00><'] })));
     });
   });
 
   it('should display active filters', async () => {
-    const onChangeFilters = jest.fn();
+    const setUrlQueryFilters = jest.fn();
+
+    asMock(useFiltersWithTitle).mockReturnValue({
+      data: OrderedMap({
+        disabled: [{ title: 'Running', value: 'false' }],
+      }),
+      onChange: onChangeFiltersWithTitle,
+      isInitialLoading: false,
+    });
 
     render(
       <EntityFilters attributes={attributes}
-                     onChangeFilters={onChangeFilters}
-                     activeFilters={{ disabled: [{ id: 'filter-id', title: 'Running', value: 'false' }] }} />,
+                     setUrlQueryFilters={setUrlQueryFilters}
+                     urlQueryFilters={OrderedMap({ disabled: ['false'] })} />,
     );
 
-    await screen.findByTestId('filter-filter-id');
+    await screen.findByTestId('disabled-filter-false');
+  });
+
+  it('should delete an active filter', async () => {
+    const setUrlQueryFilters = jest.fn();
+
+    asMock(useFiltersWithTitle).mockReturnValue({
+      data: OrderedMap({
+        disabled: [{ title: 'Running', value: 'false' }],
+      }),
+      onChange: onChangeFiltersWithTitle,
+      isInitialLoading: false,
+    });
+
+    render(
+      <EntityFilters attributes={attributes}
+                     setUrlQueryFilters={setUrlQueryFilters}
+                     urlQueryFilters={OrderedMap({ disabled: ['false'] })} />,
+    );
+
+    const activeFilter = await screen.findByTestId('disabled-filter-false');
+    const deleteButton = within(activeFilter).getByRole('button', {
+      name: /delete filter/i,
+    });
+
+    userEvent.click(deleteButton);
+
+    await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(OrderedMap(), OrderedMap()));
+    await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap()));
   });
 });

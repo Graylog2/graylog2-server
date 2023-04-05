@@ -21,6 +21,8 @@
         <fileSet>
             <directory>${project.basedir}/../data-node/target/opensearch</directory>
             <outputDirectory>dist</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
             <includes>
                 <include>*/**</include>
             </includes>

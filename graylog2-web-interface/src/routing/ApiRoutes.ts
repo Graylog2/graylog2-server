@@ -22,7 +22,7 @@ type SearchQueryString = {
   query: string,
   limit?: number,
   offset?: number,
-  sort?: `${string}:${'asc' | 'desc'}`,
+  sort?: `${string}:${'asc'|'desc'}`,
   decorate?: boolean,
   fields?: string,
   filter?: string,
@@ -30,32 +30,16 @@ type SearchQueryString = {
 
 const ApiRoutes = {
   AlarmCallbacksApiController: {
-    available: () => {
-      return { url: '/alerts/callbacks/types' };
-    },
-    create: (streamId: string) => {
-      return { url: `/streams/${streamId}/alarmcallbacks` };
-    },
-    delete: (streamId: string, alarmCallbackId: string) => {
-      return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` };
-    },
-    listAll: () => {
-      return { url: '/alerts/callbacks' };
-    },
-    list: (streamId: string) => {
-      return { url: `/streams/${streamId}/alarmcallbacks` };
-    },
-    testAlert: (alarmCallbackId: string) => {
-      return { url: `/alerts/callbacks/${alarmCallbackId}/test` };
-    },
-    update: (streamId: string, alarmCallbackId: string) => {
-      return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` };
-    },
+    available: () => { return { url: '/alerts/callbacks/types' }; },
+    create: (streamId: string) => { return { url: `/streams/${streamId}/alarmcallbacks` }; },
+    delete: (streamId: string, alarmCallbackId: string) => { return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }; },
+    listAll: () => { return { url: '/alerts/callbacks' }; },
+    list: (streamId: string) => { return { url: `/streams/${streamId}/alarmcallbacks` }; },
+    testAlert: (alarmCallbackId: string) => { return { url: `/alerts/callbacks/${alarmCallbackId}/test` }; },
+    update: (streamId: string, alarmCallbackId: string) => { return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }; },
   },
   AlarmCallbackHistoryApiController: {
-    list: (streamId: string, alertId: string) => {
-      return { url: `/streams/${streamId}/alerts/${alertId}/history` };
-    },
+    list: (streamId: string, alertId: string) => { return { url: `/streams/${streamId}/alerts/${alertId}/history` }; },
   },
   AuthenticationController: {
     create: () => ({ url: '/system/authentication/services/backends' }),
@@ -73,552 +57,244 @@ const ApiRoutes = {
     updateConfiguration: () => ({ url: '/system/authentication/services/configuration' }),
   },
   AuthzRolesController: {
-    load: (roleId: string) => {
-      return { url: `/authz/roles/${roleId}` };
-    },
-    delete: (roleId: string) => {
-      return { url: `/authz/roles/${roleId}` };
-    },
-    list: () => {
-      return { url: '/authz/roles' };
-    },
-    removeMember: (roleId: string, username: string) => {
-      return { url: `/authz/roles/${roleId}/assignee/${username}` };
-    },
-    addMembers: (roleId: string) => {
-      return { url: `/authz/roles/${roleId}/assignees` };
-    },
-    loadRolesForUser: (username: string) => {
-      return { url: `/authz/roles/user/${username}` };
-    },
-    loadUsersForRole: (roleId: string) => {
-      return { url: `/authz/roles/${roleId}/assignees` };
-    },
+    load: (roleId: string) => { return { url: `/authz/roles/${roleId}` }; },
+    delete: (roleId: string) => { return { url: `/authz/roles/${roleId}` }; },
+    list: () => { return { url: '/authz/roles' }; },
+    removeMember: (roleId: string, username: string) => { return { url: `/authz/roles/${roleId}/assignee/${username}` }; },
+    addMembers: (roleId: string) => { return { url: `/authz/roles/${roleId}/assignees` }; },
+    loadRolesForUser: (username: string) => { return { url: `/authz/roles/user/${username}` }; },
+    loadUsersForRole: (roleId: string) => { return { url: `/authz/roles/${roleId}/assignees` }; },
   },
   CatalogsController: {
-    showEntityIndex: () => {
-      return { url: '/system/catalog' };
-    },
-    queryEntities: () => {
-      return { url: '/system/catalog' };
-    },
+    showEntityIndex: () => { return { url: '/system/catalog' }; },
+    queryEntities: () => { return { url: '/system/catalog' }; },
   },
   CodecTypesController: {
-    list: () => {
-      return { url: '/system/codecs/types/all' };
-    },
+    list: () => { return { url: '/system/codecs/types/all' }; },
   },
   ContentPacksController: {
-    list: () => {
-      return { url: '/system/content_packs/latest' };
-    },
-    get: (contentPackId: string) => {
-      return { url: `/system/content_packs/${contentPackId}` };
-    },
-    getRev: (contentPackId: string, revision: string) => {
-      return { url: `/system/content_packs/${contentPackId}/${revision}` };
-    },
-    downloadRev: (contentPackId: string, revision: string) => {
-      return { url: `/system/content_packs/${contentPackId}/${revision}/download` };
-    },
-    create: () => {
-      return { url: '/system/content_packs' };
-    },
-    delete: (contentPackId: string) => {
-      return { url: `/system/content_packs/${contentPackId}` };
-    },
-    deleteRev: (contentPackId: string, revision: string) => {
-      return { url: `/system/content_packs/${contentPackId}/${revision}` };
-    },
-    install: (contentPackId: string, revision: string) => {
-      return { url: `/system/content_packs/${contentPackId}/${revision}/installations` };
-    },
-    installList: (contentPackId: string) => {
-      return { url: `/system/content_packs/${contentPackId}/installations` };
-    },
-    uninstall: (contentPackId: string, installId: string) => {
-      return { url: `/system/content_packs/${contentPackId}/installations/${installId}` };
-    },
-    uninstallDetails: (contentPackId: string, installId: string) => {
-      return { url: `/system/content_packs/${contentPackId}/installations/${installId}/uninstall_details` };
-    },
+    list: () => { return { url: '/system/content_packs/latest' }; },
+    get: (contentPackId: string) => { return { url: `/system/content_packs/${contentPackId}` }; },
+    getRev: (contentPackId: string, revision: string) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
+    downloadRev: (contentPackId: string, revision: string) => { return { url: `/system/content_packs/${contentPackId}/${revision}/download` }; },
+    create: () => { return { url: '/system/content_packs' }; },
+    delete: (contentPackId: string) => { return { url: `/system/content_packs/${contentPackId}` }; },
+    deleteRev: (contentPackId: string, revision: string) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
+    install: (contentPackId: string, revision: string) => { return { url: `/system/content_packs/${contentPackId}/${revision}/installations` }; },
+    installList: (contentPackId: string) => { return { url: `/system/content_packs/${contentPackId}/installations` }; },
+    uninstall: (contentPackId: string, installId: string) => { return { url: `/system/content_packs/${contentPackId}/installations/${installId}` }; },
+    uninstallDetails: (contentPackId: string, installId: string) => { return { url: `/system/content_packs/${contentPackId}/installations/${installId}/uninstall_details` }; },
   },
   CountsApiController: {
-    total: () => {
-      return { url: '/count/total' };
-    },
-    indexSetTotal: (indexSetId: string) => {
-      return { url: `/count/${indexSetId}/total` };
-    },
+    total: () => { return { url: '/count/total' }; },
+    indexSetTotal: (indexSetId: string) => { return { url: `/count/${indexSetId}/total` }; },
   },
   ClusterApiResource: {
-    list: () => {
-      return { url: '/system/cluster/nodes' };
-    },
-    node: () => {
-      return { url: '/system/cluster/node' };
-    },
-    elasticsearchStats: () => {
-      return { url: '/system/cluster/stats/elasticsearch' };
-    },
+    list: () => { return { url: '/system/cluster/nodes' }; },
+    node: () => { return { url: '/system/cluster/node' }; },
+    elasticsearchStats: () => { return { url: '/system/cluster/stats/elasticsearch' }; },
   },
   ClusterConfigResource: {
-    config: () => {
-      return { url: '/system/cluster_config' };
-    },
+    config: () => { return { url: '/system/cluster_config' }; },
   },
   GrokPatternsController: {
-    test: () => {
-      return { url: '/system/grok/test' };
-    },
-    paginated: () => {
-      return { url: '/system/grok/paginated' };
-    },
+    test: () => { return { url: '/system/grok/test' }; },
+    paginated: () => { return { url: '/system/grok/paginated' }; },
   },
   DashboardsApiController: {
-    create: () => {
-      return { url: '/dashboards' };
-    },
-    index: () => {
-      return { url: '/dashboards' };
-    },
-    get: (id) => {
-      return { url: `/dashboards/${id}` };
-    },
-    delete: (id) => {
-      return { url: `/dashboards/${id}` };
-    },
-    update: (id) => {
-      return { url: `/dashboards/${id}` };
-    },
-    addWidget: (id) => {
-      return { url: `/dashboards/${id}/widgets` };
-    },
-    removeWidget: (dashboardId: string, widgetId: string) => {
-      return { url: `/dashboards/${dashboardId}/widgets/${widgetId}` };
-    },
-    widget: (dashboardId: string, widgetId: string) => {
-      return { url: `/dashboards/${dashboardId}/widgets/${widgetId}` };
-    },
-    updateWidget: (dashboardId: string, widgetId: string) => {
-      return { url: `/dashboards/${dashboardId}/widgets/${widgetId}` };
-    },
-    widgetValue: (dashboardId: string, widgetId: string) => {
-      return { url: `/dashboards/${dashboardId}/widgets/${widgetId}/value` };
-    },
-    updatePositions: (dashboardId: string) => {
-      return { url: `/dashboards/${dashboardId}/positions` };
-    },
+    create: () => { return { url: '/dashboards' }; },
+    index: () => { return { url: '/dashboards' }; },
+    get: (id) => { return { url: `/dashboards/${id}` }; },
+    delete: (id) => { return { url: `/dashboards/${id}` }; },
+    update: (id) => { return { url: `/dashboards/${id}` }; },
+    addWidget: (id) => { return { url: `/dashboards/${id}/widgets` }; },
+    removeWidget: (dashboardId: string, widgetId: string) => { return { url: `/dashboards/${dashboardId}/widgets/${widgetId}` }; },
+    widget: (dashboardId: string, widgetId: string) => { return { url: `/dashboards/${dashboardId}/widgets/${widgetId}` }; },
+    updateWidget: (dashboardId: string, widgetId: string) => { return { url: `/dashboards/${dashboardId}/widgets/${widgetId}` }; },
+    widgetValue: (dashboardId: string, widgetId: string) => { return { url: `/dashboards/${dashboardId}/widgets/${widgetId}/value` }; },
+    updatePositions: (dashboardId: string) => { return { url: `/dashboards/${dashboardId}/positions` }; },
   },
   DecoratorsResource: {
-    available: () => {
-      return { url: '/search/decorators/available' };
-    },
-    create: () => {
-      return { url: '/search/decorators' };
-    },
-    get: () => {
-      return { url: '/search/decorators' };
-    },
-    remove: (decoratorId: string) => {
-      return { url: `/search/decorators/${decoratorId}` };
-    },
-    update: (decoratorId: string) => {
-      return { url: `/search/decorators/${decoratorId}` };
-    },
+    available: () => { return { url: '/search/decorators/available' }; },
+    create: () => { return { url: '/search/decorators' }; },
+    get: () => { return { url: '/search/decorators' }; },
+    remove: (decoratorId: string) => { return { url: `/search/decorators/${decoratorId}` }; },
+    update: (decoratorId: string) => { return { url: `/search/decorators/${decoratorId}` }; },
   },
   DeflectorApiController: {
-    cycle: (indexSetId: string) => {
-      return { url: `/cluster/deflector/${indexSetId}/cycle` };
-    },
-    list: (indexSetId: string) => {
-      return { url: `/system/deflector/${indexSetId}` };
-    },
+    cycle: (indexSetId: string) => { return { url: `/cluster/deflector/${indexSetId}/cycle` }; },
+    list: (indexSetId: string) => { return { url: `/system/deflector/${indexSetId}` }; },
   },
   EntityScopeController: {
-    getScope: () => {
-      return { url: '/entity_scopes' };
-    },
+    getScope: () => { return { url: '/entity_scopes' }; },
   },
   EntityShareController: {
-    prepare: (entityGRN: string) => {
-      return { url: `/authz/shares/entities/${entityGRN}/prepare` };
-    },
-    update: (entityGRN: string) => {
-      return { url: `/authz/shares/entities/${entityGRN}` };
-    },
-    userSharesPaginated: (username: string) => {
-      return { url: `/authz/shares/user/${username}` };
-    },
-    entityScopes: () => {
-      return { url: '/entity_scopes' };
-    },
+    prepare: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}/prepare` }; },
+    update: (entityGRN: string) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
+    userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
+    entityScopes: () => { return { url: '/entity_scopes' }; },
   },
   EventDefinitionsApiController: {
-    list: () => {
-      return { url: '/events/definitions' };
-    },
-    paginated: () => {
-      return { url: '/events/definitions/paginated' };
-    },
-    get: (definitionId: string) => {
-      return { url: `/events/definitions/${definitionId}` };
-    },
-    create: () => {
-      return { url: '/events/definitions' };
-    },
-    bulkDelete: () => {
-      return { url: '/events/definitions/bulk_delete' };
-    },
-    bulkSchedule: () => {
-      return { url: '/events/definitions/bulk_schedule' };
-    },
-    bulkUnschedule: () => {
-      return { url: '/events/definitions/bulk_unschedule' };
-    },
-    update: (definitionId: string) => {
-      return { url: `/events/definitions/${definitionId}` };
-    },
-    delete: (definitionId: string) => {
-      return { url: `/events/definitions/${definitionId}` };
-    },
+    list: () => { return { url: '/events/definitions' }; },
+    paginated: () => { return { url: '/events/definitions/paginated' }; },
+    get: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+    create: () => { return { url: '/events/definitions' }; },
+    bulkDelete: () => { return { url: '/events/definitions/bulk_delete' }; },
+    bulkSchedule: () => { return { url: '/events/definitions/bulk_schedule' }; },
+    bulkUnschedule: () => { return { url: '/events/definitions/bulk_unschedule' }; },
+    update: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+    delete: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
   },
   EventNotificationsApiController: {
-    list: () => {
-      return { url: '/events/notifications' };
-    },
-    paginated: () => {
-      return { url: '/events/notifications/paginated' };
-    },
-    get: (definitionId: string) => {
-      return { url: `/events/notifications/${definitionId}` };
-    },
-    create: () => {
-      return { url: '/events/notifications' };
-    },
-    bulkDelete: () => {
-      return { url: '/events/notifications/bulk_delete' };
-    },
-    bulkSchedule: () => {
-      return { url: '/events/notifications/bulk_schedule' };
-    },
-    bulkUnschedule: () => {
-      return { url: '/events/notifications/bulk_unschedule' };
-    },
-    update: (definitionId: string) => {
-      return { url: `/events/notifications/${definitionId}` };
-    },
-    delete: (definitionId: string) => {
-      return { url: `/events/notifications/${definitionId}` };
-    },
+    list: () => { return { url: '/events/notifications' }; },
+    paginated: () => { return { url: '/events/notifications/paginated' }; },
+    get: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
+    create: () => { return { url: '/events/notifications' }; },
+    bulkDelete: () => { return { url: '/events/notifications/bulk_delete' }; },
+    bulkSchedule: () => { return { url: '/events/notifications/bulk_schedule' }; },
+    bulkUnschedule: () => { return { url: '/events/notifications/bulk_unschedule' }; },
+    update: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
+    delete: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
   },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
     update: () => ({ url: '/system/authentication/http-header-auth-config' }),
   },
   IndexerClusterApiController: {
-    health: () => {
-      return { url: '/system/indexer/cluster/health' };
-    },
-    name: () => {
-      return { url: '/system/indexer/cluster/name' };
-    },
+    health: () => { return { url: '/system/indexer/cluster/health' }; },
+    name: () => { return { url: '/system/indexer/cluster/name' }; },
   },
   IndexerFailuresApiController: {
-    count: (since: number) => {
-      return { url: `/system/indexer/failures/count?since=${since}` };
-    },
-    list: (limit: number, offset: number) => {
-      return { url: `/system/indexer/failures?limit=${limit}&offset=${offset}` };
-    },
+    count: (since: number) => { return { url: `/system/indexer/failures/count?since=${since}` }; },
+    list: (limit: number, offset: number) => { return { url: `/system/indexer/failures?limit=${limit}&offset=${offset}` }; },
   },
   IndexerOverviewApiResource: {
-    list: (indexSetId: string) => {
-      return { url: `/system/indexer/overview/${indexSetId}` };
-    },
+    list: (indexSetId: string) => { return { url: `/system/indexer/overview/${indexSetId}` }; },
   },
   IndexRangesApiController: {
-    list: () => {
-      return { url: '/system/indices/ranges' };
-    },
-    rebuild: (indexSetId: string) => {
-      return { url: `/system/indices/ranges/index_set/${indexSetId}/rebuild` };
-    },
-    rebuildSingle: (index: string) => {
-      return { url: `/system/indices/ranges/${index}/rebuild` };
-    },
+    list: () => { return { url: '/system/indices/ranges' }; },
+    rebuild: (indexSetId: string) => { return { url: `/system/indices/ranges/index_set/${indexSetId}/rebuild` }; },
+    rebuildSingle: (index: string) => { return { url: `/system/indices/ranges/${index}/rebuild` }; },
   },
   IndexSetsApiController: {
-    list: (stats) => {
-      return { url: `/system/indices/index_sets?stats=${stats}` };
-    },
-    listPaginated: (skip, limit, stats) => {
-      return { url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}` };
-    },
-    get: (indexSetId: string) => {
-      return { url: `/system/indices/index_sets/${indexSetId}` };
-    },
-    create: () => {
-      return { url: '/system/indices/index_sets' };
-    },
-    delete: (indexSetId: string, deleteIndices) => {
-      return { url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` };
-    },
-    setDefault: (indexSetId: string) => {
-      return { url: `/system/indices/index_sets/${indexSetId}/default` };
-    },
-    stats: () => {
-      return { url: '/system/indices/index_sets/stats' };
-    },
+    list: (stats) => { return { url: `/system/indices/index_sets?stats=${stats}` }; },
+    listPaginated: (skip, limit, stats) => { return { url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}` }; },
+    get: (indexSetId: string) => { return { url: `/system/indices/index_sets/${indexSetId}` }; },
+    create: () => { return { url: '/system/indices/index_sets' }; },
+    delete: (indexSetId: string, deleteIndices) => { return { url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }; },
+    setDefault: (indexSetId: string) => { return { url: `/system/indices/index_sets/${indexSetId}/default` }; },
+    stats: () => { return { url: '/system/indices/index_sets/stats' }; },
   },
   IndicesApiController: {
-    close: (indexName: string) => {
-      return { url: `/system/indexer/indices/${indexName}/close` };
-    },
-    delete: (indexName: string) => {
-      return { url: `/system/indexer/indices/${indexName}` };
-    },
-    list: (indexSetId: string) => {
-      return { url: `/system/indexer/indices/${indexSetId}/list` };
-    },
-    listAll: () => {
-      return { url: '/system/indexer/indices' };
-    },
-    listClosed: (indexSetId: string) => {
-      return { url: `/system/indexer/indices/${indexSetId}/closed` };
-    },
-    multiple: () => {
-      return { url: '/system/indexer/indices/multiple' };
-    },
-    reopen: (indexName: string) => {
-      return { url: `/system/indexer/indices/${indexName}/reopen` };
-    },
+    close: (indexName: string) => { return { url: `/system/indexer/indices/${indexName}/close` }; },
+    delete: (indexName: string) => { return { url: `/system/indexer/indices/${indexName}` }; },
+    list: (indexSetId: string) => { return { url: `/system/indexer/indices/${indexSetId}/list` }; },
+    listAll: () => { return { url: '/system/indexer/indices' }; },
+    listClosed: (indexSetId: string) => { return { url: `/system/indexer/indices/${indexSetId}/closed` }; },
+    multiple: () => { return { url: '/system/indexer/indices/multiple' }; },
+    reopen: (indexName: string) => { return { url: `/system/indexer/indices/${indexName}/reopen` }; },
   },
   InputsApiController: {
-    list: () => {
-      return { url: '/system/inputs' };
-    },
-    get: (id: string) => {
-      return { url: `/system/inputs/${id}` };
-    },
-    globalRecentMessage: (inputId: string) => {
-      return { url: `/${inputId}` };
-    },
+    list: () => { return { url: '/system/inputs' }; },
+    get: (id: string) => { return { url: `/system/inputs/${id}` }; },
+    globalRecentMessage: (inputId: string) => { return { url: `/${inputId}` }; },
   },
   InputStatesController: {
-    start: (inputId: string) => {
-      return { url: `/system/inputstates/${inputId}` };
-    },
-    stop: (inputId: string) => {
-      return { url: `/system/inputstates/${inputId}` };
-    },
+    start: (inputId: string) => { return { url: `/system/inputstates/${inputId}` }; },
+    stop: (inputId: string) => { return { url: `/system/inputstates/${inputId}` }; },
   },
   ClusterInputStatesController: {
-    list: () => {
-      return { url: '/cluster/inputstates' };
-    },
-    start: (inputId: string) => {
-      return { url: `/cluster/inputstates/${inputId}` };
-    },
-    stop: (inputId: string) => {
-      return { url: `/cluster/inputstates/${inputId}` };
-    },
+    list: () => { return { url: '/cluster/inputstates' }; },
+    start: (inputId: string) => { return { url: `/cluster/inputstates/${inputId}` }; },
+    stop: (inputId: string) => { return { url: `/cluster/inputstates/${inputId}` }; },
   },
   ClusterLoggersResource: {
-    loggers: () => {
-      return { url: '/cluster/system/loggers' };
-    },
-    subsystems: () => {
-      return { url: '/cluster/system/loggers/subsystems' };
-    },
-    setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => {
-      return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` };
-    },
+    loggers: () => { return { url: '/cluster/system/loggers' }; },
+    subsystems: () => { return { url: '/cluster/system/loggers/subsystems' }; },
+    setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => { return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }; },
   },
   MessageFieldsApiController: {
-    list: () => {
-      return { url: '/system/fields' };
-    },
+    list: () => { return { url: '/system/fields' }; },
     types: () => ({ url: 'views/fields' }),
   },
   MetricsApiController: {
-    multiple: () => {
-      return { url: '/system/metrics/multiple' };
-    },
-    byNamespace: (namespace: string) => {
-      return { url: `/system/metrics/namespace/${namespace}` };
-    },
+    multiple: () => { return { url: '/system/metrics/multiple' }; },
+    byNamespace: (namespace: string) => { return { url: `/system/metrics/namespace/${namespace}` }; },
   },
   ClusterMetricsApiController: {
-    multiple: (nodeId: string) => {
-      return { url: `/cluster/${nodeId}/metrics/multiple` };
-    },
-    multipleAllNodes: () => {
-      return { url: '/cluster/metrics/multiple' };
-    },
-    byNamespace: (nodeId: string, namespace: string) => {
-      return { url: `/cluster/${nodeId}/metrics/namespace/${namespace}` };
-    },
+    multiple: (nodeId: string) => { return { url: `/cluster/${nodeId}/metrics/multiple` }; },
+    multipleAllNodes: () => { return { url: '/cluster/metrics/multiple' }; },
+    byNamespace: (nodeId: string, namespace: string) => { return { url: `/cluster/${nodeId}/metrics/namespace/${namespace}` }; },
   },
   NotificationsApiController: {
-    delete: (type: string) => {
-      return { url: `/system/notifications/${type}` };
-    },
-    deleteWithKey: (type: string, key: string) => {
-      return { url: `/system/notifications/${type}/${key}` };
-    },
-    list: () => {
-      return { url: '/system/notifications' };
-    },
-    getHtmlMessage: (type: string) => {
-      return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}` };
-    },
-    getHtmlMessageWithKey: (type: string, key: string) => {
-      return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}` };
-    },
+    delete: (type: string) => { return { url: `/system/notifications/${type}` }; },
+    deleteWithKey: (type: string, key: string) => { return { url: `/system/notifications/${type}/${key}` }; },
+    list: () => { return { url: '/system/notifications' }; },
+    getHtmlMessage: (type: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }; },
+    getHtmlMessageWithKey: (type: string, key: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}` }; },
   },
   OutputsApiController: {
-    index: () => {
-      return { url: '/system/outputs' };
-    },
-    create: () => {
-      return { url: '/system/outputs' };
-    },
-    delete: (outputId: string) => {
-      return { url: `/system/outputs/${outputId}` };
-    },
-    update: (outputId: string) => {
-      return { url: `/system/outputs/${outputId}` };
-    },
-    availableType: (type: string) => {
-      return { url: `/system/outputs/available/${type}` };
-    },
-    availableTypes: () => {
-      return { url: '/system/outputs/available' };
-    },
+    index: () => { return { url: '/system/outputs' }; },
+    create: () => { return { url: '/system/outputs' }; },
+    delete: (outputId: string) => { return { url: `/system/outputs/${outputId}` }; },
+    update: (outputId: string) => { return { url: `/system/outputs/${outputId}` }; },
+    availableType: (type: string) => { return { url: `/system/outputs/available/${type}` }; },
+    availableTypes: () => { return { url: '/system/outputs/available' }; },
   },
   RolesApiController: {
-    listRoles: () => {
-      return { url: '/roles' };
-    },
-    createRole: () => {
-      return { url: '/roles' };
-    },
-    updateRole: (rolename: string) => {
-      return { url: `/roles/${rolename}` };
-    },
-    deleteRole: (rolename: string) => {
-      return { url: `/roles/${rolename}` };
-    },
-    loadMembers: (rolename: string) => {
-      return { url: `/roles/${rolename}/members` };
-    },
+    listRoles: () => { return { url: '/roles' }; },
+    createRole: () => { return { url: '/roles' }; },
+    updateRole: (rolename: string) => { return { url: `/roles/${rolename}` }; },
+    deleteRole: (rolename: string) => { return { url: `/roles/${rolename}` }; },
+    loadMembers: (rolename: string) => { return { url: `/roles/${rolename}/members` }; },
   },
   SavedSearchesApiController: {
-    create: () => {
-      return { url: '/search/saved' };
-    },
-    delete: (savedSearchId: string) => {
-      return { url: `/search/saved/${savedSearchId}` };
-    },
-    update: (savedSearchId: string) => {
-      return { url: `/search/saved/${savedSearchId}` };
-    },
+    create: () => { return { url: '/search/saved' }; },
+    delete: (savedSearchId: string) => { return { url: `/search/saved/${savedSearchId}` }; },
+    update: (savedSearchId: string) => { return { url: `/search/saved/${savedSearchId}` }; },
   },
   SessionsApiController: {
-    validate: () => {
-      return { url: '/system/sessions' };
-    },
+    validate: () => { return { url: '/system/sessions' }; },
   },
   StreamsApiController: {
-    index: () => {
-      return { url: '/streams' };
-    },
-    paginated: () => {
-      return { url: '/streams/paginated' };
-    },
-    get: (streamId: string) => {
-      return { url: `/streams/${streamId}` };
-    },
+    index: () => { return { url: '/streams' }; },
+    paginated: () => { return { url: '/streams/paginated' }; },
+    get: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     bulk_delete: () => ({ url: '/streams/bulk_delete' }),
     bulk_resume: () => ({ url: '/streams/bulk_resume' }),
     bulk_pause: () => ({ url: '/streams/bulk_pause' }),
-    create: () => {
-      return { url: '/streams' };
-    },
-    update: (streamId: string) => {
-      return { url: `/streams/${streamId}` };
-    },
-    cloneStream: (streamId: string) => {
-      return { url: `/streams/${streamId}/clone` };
-    },
-    delete: (streamId: string) => {
-      return { url: `/streams/${streamId}` };
-    },
-    pause: (streamId: string) => {
-      return { url: `/streams/${streamId}/pause` };
-    },
-    resume: (streamId: string) => {
-      return { url: `/streams/${streamId}/resume` };
-    },
-    testMatch: (streamId: string) => {
-      return { url: `/streams/${streamId}/testMatch` };
-    },
+    create: () => { return { url: '/streams' }; },
+    update: (streamId: string) => { return { url: `/streams/${streamId}` }; },
+    cloneStream: (streamId: string) => { return { url: `/streams/${streamId}/clone` }; },
+    delete: (streamId: string) => { return { url: `/streams/${streamId}` }; },
+    pause: (streamId: string) => { return { url: `/streams/${streamId}/pause` }; },
+    resume: (streamId: string) => { return { url: `/streams/${streamId}/resume` }; },
+    testMatch: (streamId: string) => { return { url: `/streams/${streamId}/testMatch` }; },
   },
   StreamOutputsApiController: {
-    add: (streamId: string) => {
-      return { url: `/streams/${streamId}/outputs` };
-    },
-    index: (streamId: string) => {
-      return { url: `/streams/${streamId}/outputs` };
-    },
-    delete: (streamId: string, outputId: string) => {
-      return { url: `/streams/${streamId}/outputs/${outputId}` };
-    },
+    add: (streamId: string) => { return { url: `/streams/${streamId}/outputs` }; },
+    index: (streamId: string) => { return { url: `/streams/${streamId}/outputs` }; },
+    delete: (streamId: string, outputId: string) => { return { url: `/streams/${streamId}/outputs/${outputId}` }; },
   },
   StreamRulesApiController: {
-    delete: (streamId: string, streamRuleId: string) => {
-      return { url: `/streams/${streamId}/rules/${streamRuleId}` };
-    },
-    update: (streamId: string, streamRuleId: string) => {
-      return { url: `/streams/${streamId}/rules/${streamRuleId}` };
-    },
-    create: (streamId: string) => {
-      return { url: `/streams/${streamId}/rules` };
-    },
+    delete: (streamId: string, streamRuleId: string) => { return { url: `/streams/${streamId}/rules/${streamRuleId}` }; },
+    update: (streamId: string, streamRuleId: string) => { return { url: `/streams/${streamId}/rules/${streamRuleId}` }; },
+    create: (streamId: string) => { return { url: `/streams/${streamId}/rules` }; },
   },
   SystemApiController: {
-    info: () => {
-      return { url: '/system' };
-    },
-    jvm: () => {
-      return { url: '/system/jvm' };
-    },
-    fields: () => {
-      return { url: '/system/fields' };
-    },
-    locales: () => {
-      return { url: '/system/locales' };
-    },
+    info: () => { return { url: '/system' }; },
+    jvm: () => { return { url: '/system/jvm' }; },
+    fields: () => { return { url: '/system/fields' }; },
+    locales: () => { return { url: '/system/locales' }; },
   },
   SystemJobsApiController: {
-    list: () => {
-      return { url: '/cluster/jobs' };
-    },
-    getJob: (jobId: string) => {
-      return { url: `/cluster/jobs/${jobId}` };
-    },
-    acknowledgeJob: (jobId: string) => {
-      return { url: `/system/jobs/acknowledge/${jobId}` };
-    },
-    cancelJob: (jobId: string) => {
-      return { url: `/cluster/jobs/${jobId}` };
-    },
+    list: () => { return { url: '/cluster/jobs' }; },
+    getJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
+    acknowledgeJob: (jobId: string) => { return { url: `/system/jobs/acknowledge/${jobId}` }; },
+    cancelJob: (jobId: string) => { return { url: `/cluster/jobs/${jobId}` }; },
   },
   SystemMessagesApiController: {
-    all: (page: number) => {
-      return { url: `/system/messages?page=${page}` };
-    },
+    all: (page: number) => { return { url: `/system/messages?page=${page}` }; },
   },
   SystemSearchVersionApiController: {
     satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: string) => {
@@ -626,42 +302,18 @@ const ApiRoutes = {
     },
   },
   ToolsApiController: {
-    grokTest: () => {
-      return { url: '/tools/grok_tester' };
-    },
-    jsonTest: () => {
-      return { url: '/tools/json_tester' };
-    },
-    naturalDateTest: (string, timezone) => {
-      return { url: `/tools/natural_date_tester?string=${string}&timezone=${timezone}` };
-    },
-    regexTest: () => {
-      return { url: '/tools/regex_tester' };
-    },
-    regexValidate: (regex: string) => {
-      return { url: `/tools/regex_tester/validate?regex=${regex}` };
-    },
-    regexReplaceTest: () => {
-      return { url: '/tools/regex_replace_tester' };
-    },
-    splitAndIndexTest: () => {
-      return { url: '/tools/split_and_index_tester' };
-    },
-    substringTest: () => {
-      return { url: '/tools/substring_tester' };
-    },
-    containsStringTest: () => {
-      return { url: '/tools/contains_string_tester' };
-    },
-    lookupTableTest: () => {
-      return { url: '/tools/lookup_table_tester' };
-    },
-    urlWhitelistCheck: () => {
-      return { url: '/system/urlwhitelist/check' };
-    },
-    urlWhitelistGenerateRegex: () => {
-      return { url: '/system/urlwhitelist/generate_regex' };
-    },
+    grokTest: () => { return { url: '/tools/grok_tester' }; },
+    jsonTest: () => { return { url: '/tools/json_tester' }; },
+    naturalDateTest: (string, timezone) => { return { url: `/tools/natural_date_tester?string=${string}&timezone=${timezone}` }; },
+    regexTest: () => { return { url: '/tools/regex_tester' }; },
+    regexValidate: (regex: string) => { return { url: `/tools/regex_tester/validate?regex=${regex}` }; },
+    regexReplaceTest: () => { return { url: '/tools/regex_replace_tester' }; },
+    splitAndIndexTest: () => { return { url: '/tools/split_and_index_tester' }; },
+    substringTest: () => { return { url: '/tools/substring_tester' }; },
+    containsStringTest: () => { return { url: '/tools/contains_string_tester' }; },
+    lookupTableTest: () => { return { url: '/tools/lookup_table_tester' }; },
+    urlWhitelistCheck: () => { return { url: '/system/urlwhitelist/check' }; },
+    urlWhitelistGenerateRegex: () => { return { url: '/system/urlwhitelist/generate_regex' }; },
   },
   TelemetryApiController: {
     info: () => {
@@ -682,13 +334,9 @@ const ApiRoutes = {
 
       queryString.query = query;
 
-      Object.keys(timerange).forEach((key) => {
-        queryString[key] = timerange[key];
-      });
+      Object.keys(timerange).forEach((key) => { queryString[key] = timerange[key]; });
 
-      Object.keys(streamFilter).forEach((key) => {
-        queryString[key] = streamFilter[key];
-      });
+      Object.keys(streamFilter).forEach((key) => { queryString[key] = streamFilter[key]; });
 
       return queryString as SearchQueryString;
     },
@@ -737,172 +385,74 @@ const ApiRoutes = {
     },
   },
   UsersApiController: {
-    changePassword: (userId: string) => {
-      return { url: `/users/${userId}/password` };
-    },
-    create: () => {
-      return { url: '/users' };
-    },
-    list: () => {
-      return { url: '/users' };
-    },
-    paginated: () => {
-      return { url: '/users/paginated' };
-    },
-    load: (userId: string) => {
-      return { url: `/users/id/${userId}` };
-    },
-    loadByUsername: (username: string) => {
-      return { url: `/users/${username}` };
-    },
-    delete: (id: string) => {
-      return { url: `/users/id/${id}` };
-    },
-    update: (userId: string) => {
-      return { url: `/users/${userId}` };
-    },
-    create_token: (userId: string, tokenName: string) => {
-      return { url: `/users/${userId}/tokens/${tokenName}` };
-    },
-    delete_token: (userId: string, tokenName: string) => {
-      return { url: `/users/${userId}/tokens/${tokenName}` };
-    },
-    list_tokens: (userId: string) => {
-      return { url: `/users/${userId}/tokens` };
-    },
-    setStatus: (userId: string, accountStatus) => {
-      return { url: `/users/${userId}/status/${accountStatus}` };
-    },
+    changePassword: (userId: string) => { return { url: `/users/${userId}/password` }; },
+    create: () => { return { url: '/users' }; },
+    list: () => { return { url: '/users' }; },
+    paginated: () => { return { url: '/users/paginated' }; },
+    load: (userId: string) => { return { url: `/users/id/${userId}` }; },
+    loadByUsername: (username: string) => { return { url: `/users/${username}` }; },
+    delete: (id: string) => { return { url: `/users/id/${id}` }; },
+    update: (userId: string) => { return { url: `/users/${userId}` }; },
+    create_token: (userId: string, tokenName: string) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
+    delete_token: (userId: string, tokenName: string) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
+    list_tokens: (userId: string) => { return { url: `/users/${userId}/tokens` }; },
+    setStatus: (userId: string, accountStatus) => { return { url: `/users/${userId}/status/${accountStatus}` }; },
   },
   DashboardsController: {
-    show: (id) => {
-      return { url: `/dashboards/${id}` };
-    },
+    show: (id) => { return { url: `/dashboards/${id}` }; },
   },
   ExtractorsController: {
-    create: (inputId: string) => {
-      return { url: `/system/inputs/${inputId}/extractors` };
-    },
-    delete: (inputId: string, extractorId: string) => {
-      return { url: `/system/inputs/${inputId}/extractors/${extractorId}` };
-    },
-    order: (inputId: string) => {
-      return { url: `/system/inputs/${inputId}/extractors/order` };
-    },
-    update: (inputId: string, extractorId: string) => {
-      return { url: `/system/inputs/${inputId}/extractors/${extractorId}` };
-    },
+    create: (inputId: string) => { return { url: `/system/inputs/${inputId}/extractors` }; },
+    delete: (inputId: string, extractorId: string) => { return { url: `/system/inputs/${inputId}/extractors/${extractorId}` }; },
+    order: (inputId: string) => { return { url: `/system/inputs/${inputId}/extractors/order` }; },
+    update: (inputId: string, extractorId: string) => { return { url: `/system/inputs/${inputId}/extractors/${extractorId}` }; },
   },
   MessagesController: {
-    analyze: (index: string, string: string) => {
-      return { url: `/messages/${index}/analyze?string=${string}` };
-    },
-    parse: () => {
-      return { url: '/messages/parse' };
-    },
-    single: (index: string, messageId: string) => {
-      return { url: `/messages/${index}/${messageId}` };
-    },
-    exportSearch: ((searchId: string) => {
-      return { url: `/views/search/messages/${searchId}` };
-    }),
-    exportSearchType: ((searchId: string, searchTypeId: string) => {
-      return { url: `/views/search/messages/${searchId}/${searchTypeId}` };
-    }),
-    jobResults: ((exportJobId: string, filename: string) => {
-      return { url: `/views/search/messages/job/${exportJobId}/${filename}` };
-    }),
+    analyze: (index: string, string: string) => { return { url: `/messages/${index}/analyze?string=${string}` }; },
+    parse: () => { return { url: '/messages/parse' }; },
+    single: (index: string, messageId: string) => { return { url: `/messages/${index}/${messageId}` }; },
+    exportSearch: ((searchId: string) => { return { url: `/views/search/messages/${searchId}` }; }),
+    exportSearchType: ((searchId: string, searchTypeId: string) => { return { url: `/views/search/messages/${searchId}/${searchTypeId}` }; }),
+    jobResults: ((exportJobId: string, filename: string) => { return { url: `/views/search/messages/job/${exportJobId}/${filename}` }; }),
   },
   ExportJobsController: {
-    exportSearch: ((searchId: string) => {
-      return { url: `/views/export/${searchId}` };
-    }),
-    exportSearchType: ((searchId: string, searchTypeId: string) => {
-      return { url: `/views/export/${searchId}/${searchTypeId}` };
-    }),
+    exportSearch: ((searchId: string) => { return { url: `/views/export/${searchId}` }; }),
+    exportSearchType: ((searchId: string, searchTypeId: string) => { return { url: `/views/export/${searchId}/${searchTypeId}` }; }),
   },
   MapDataController: {
-    search: () => {
-      return { url: '/search/mapdata' };
-    },
+    search: () => { return { url: '/search/mapdata' }; },
   },
   PipelinesController: {
-    list: () => {
-      return { url: '/system/pipelines/pipeline' };
-    },
-    paginatedList: () => {
-      return { url: '/system/pipelines/pipeline/paginated' };
-    },
-    create: () => {
-      return { url: '/system/pipelines/pipeline' };
-    },
-    get: (pipelineId: string) => {
-      return { url: `/system/pipelines/pipeline/${pipelineId}` };
-    },
-    update: (pipelineId: string) => {
-      return { url: `/system/pipelines/pipeline/${pipelineId}` };
-    },
-    delete: (pipelineId: string) => {
-      return { url: `/system/pipelines/pipeline/${pipelineId}` };
-    },
-    parse: () => {
-      return { url: '/system/pipelines/pipeline/parse' };
-    },
+    list: () => { return { url: '/system/pipelines/pipeline' }; },
+    paginatedList: () => { return { url: '/system/pipelines/pipeline/paginated' }; },
+    create: () => { return { url: '/system/pipelines/pipeline' }; },
+    get: (pipelineId: string) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
+    update: (pipelineId: string) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
+    delete: (pipelineId: string) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
+    parse: () => { return { url: '/system/pipelines/pipeline/parse' }; },
   },
   RulesController: {
-    list: () => {
-      return { url: '/system/pipelines/rule' };
-    },
-    paginatedList: () => {
-      return { url: '/system/pipelines/rule/paginated' };
-    },
-    create: () => {
-      return { url: '/system/pipelines/rule' };
-    },
-    get: (ruleId: string) => {
-      return { url: `/system/pipelines/rule/${ruleId}` };
-    },
-    update: (ruleId: string) => {
-      return { url: `/system/pipelines/rule/${ruleId}` };
-    },
-    delete: (ruleId: string) => {
-      return { url: `/system/pipelines/rule/${ruleId}` };
-    },
-    multiple: () => {
-      return { url: '/system/pipelines/rule/multiple' };
-    },
-    functions: () => {
-      return { url: '/system/pipelines/rule/functions' };
-    },
-    parse: () => {
-      return { url: '/system/pipelines/rule/parse' };
-    },
-    simulate: () => {
-      return { url: '/system/pipelines/rule/simulate' };
-    },
-    metricsConfig: () => {
-      return { url: '/system/pipelines/rule/config/metrics' };
-    },
+    list: () => { return { url: '/system/pipelines/rule' }; },
+    paginatedList: () => { return { url: '/system/pipelines/rule/paginated' }; },
+    create: () => { return { url: '/system/pipelines/rule' }; },
+    get: (ruleId: string) => { return { url: `/system/pipelines/rule/${ruleId}` }; },
+    update: (ruleId: string) => { return { url: `/system/pipelines/rule/${ruleId}` }; },
+    delete: (ruleId: string) => { return { url: `/system/pipelines/rule/${ruleId}` }; },
+    multiple: () => { return { url: '/system/pipelines/rule/multiple' }; },
+    functions: () => { return { url: '/system/pipelines/rule/functions' }; },
+    parse: () => { return { url: '/system/pipelines/rule/parse' }; },
+    simulate: () => { return { url: '/system/pipelines/rule/simulate' }; },
+    metricsConfig: () => { return { url: '/system/pipelines/rule/config/metrics' }; },
   },
   ConnectionsController: {
-    list: () => {
-      return { url: '/system/pipelines/connections' };
-    },
-    to_stream: () => {
-      return { url: '/system/pipelines/connections/to_stream' };
-    },
-    to_pipeline: () => {
-      return { url: '/system/pipelines/connections/to_pipeline' };
-    },
+    list: () => { return { url: '/system/pipelines/connections' }; },
+    to_stream: () => { return { url: '/system/pipelines/connections/to_stream' }; },
+    to_pipeline: () => { return { url: '/system/pipelines/connections/to_pipeline' }; },
   },
   SimulatorController: {
-    simulate: () => {
-      return { url: '/system/pipelines/simulate' };
-    },
+    simulate: () => { return { url: '/system/pipelines/simulate' }; },
   },
-  ping: () => {
-    return { url: '/' };
-  },
+  ping: () => { return { url: '/' }; },
 };
 
 export default ApiRoutes;
