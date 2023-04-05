@@ -162,6 +162,8 @@ class SourceCodeEditor extends React.Component {
       const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
 
       fetch('GET', url).then((response) => {
+        if (!Array.isArray(response)) return '';
+
         const functions = response.map((res) => res.name).join('|');
         const pipelineRulesMode = new PipelineRulesMode(functions);
 

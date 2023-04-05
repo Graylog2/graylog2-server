@@ -20,6 +20,7 @@ import 'webpack-entry';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import Reflux from 'reflux';
 
 import AppFacade from 'routing/AppFacade';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
@@ -27,6 +28,9 @@ import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+import CancellablePromise from 'logic/rest/CancellablePromise';
+
+Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
