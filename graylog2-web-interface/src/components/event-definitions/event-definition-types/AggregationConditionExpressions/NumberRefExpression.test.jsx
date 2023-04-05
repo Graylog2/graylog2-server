@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+import { act } from 'react-dom/test-utils';
 
 import NumberRefExpression from './NumberRefExpression';
 
@@ -113,7 +114,9 @@ describe('NumberRefExpression', () => {
 
     const functionSelect = wrapper.find('Select Select.aggregation-function').at(0);
 
-    functionSelect.prop('onChange')({ value: 'card' });
+    act(() => {
+      functionSelect.prop('onChange')({ value: 'card' });
+    });
 
     expect(handleChange.mock.calls.length).toBe(1);
   });
@@ -146,7 +149,9 @@ describe('NumberRefExpression', () => {
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
 
-    fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    act(() => {
+      fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    });
 
     expect(handleChange.mock.calls.length).toBe(1);
   });
@@ -179,7 +184,9 @@ describe('NumberRefExpression', () => {
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
 
-    fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    act(() => {
+      fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    });
 
     expect(handleChange.mock.calls.length).toBe(1);
   });
