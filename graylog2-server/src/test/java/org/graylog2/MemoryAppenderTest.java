@@ -25,6 +25,7 @@ import org.graylog2.log4j.MemoryAppender;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -58,7 +59,7 @@ public class MemoryAppenderTest {
 
         var outStream = new ByteArrayOutputStream();
         appender.streamFormattedLogMessages(outStream, 0);
-        List<String> result = List.of(Strings.split(outStream.toString(), '\n'));
+        List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
 
         assertThat(result.stream().findFirst()).isNotEmpty();
         assertThat(result.stream().findFirst().get()).startsWith("Message ");

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,25 +39,25 @@ public class MemoryLimitedCompressingFifoRingBufferTest {
 
     @Test
     void addSingle() throws IOException {
-        buffer.add("Foo".getBytes());
+        buffer.add("Foo".getBytes(StandardCharsets.UTF_8));
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         buffer.streamContent(outStream, 0);
 
-        assertThat(outStream.toString()).isEqualTo("Foo");
+        assertThat(outStream.toString(StandardCharsets.UTF_8)).isEqualTo("Foo");
     }
 
     @Test
     void addBeyondCacheSize() throws IOException {
         final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 2 + 10;
         for (int i = 1; i < count; i++) {
-            buffer.add(("Loop " + i + "\n").getBytes());
+            buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         buffer.streamContent(outStream, 0);
 
-        final List<String> result = List.of(Strings.split(outStream.toString(), '\n'));
+        final List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
         assertThat(result).hasSize(count);
         assertThat(result.get(0)).isEqualTo("Loop 1");
         assertThat(result.get(result.size() - 2)).isEqualTo("Loop " + (count - 1));
@@ -66,13 +67,13 @@ public class MemoryLimitedCompressingFifoRingBufferTest {
     void compressedRotation() throws IOException {
         final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 7;
         for (int i = 1; i < count; i++) {
-            buffer.add(("Loop " + i + "\n").getBytes());
+            buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         buffer.streamContent(outStream, 0);
 
-        final List<String> result = List.of(Strings.split(outStream.toString(), '\n'));
+        final List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
         assertThat(result.size()).isLessThan(count);
 
         // assert that newest entries are kept while older ones are removed
@@ -84,17 +85,17 @@ public class MemoryLimitedCompressingFifoRingBufferTest {
     void limitedStream() throws IOException {
         final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 4 + 1;
         for (int i = 1; i < count; i++) {
-            buffer.add(("Loop " + i + "\n").getBytes());
+            buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         buffer.streamContent(outStream, 1);
 
-        List<String> result = List.of(Strings.split(outStream.toString(), '\n'));
+        List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
         assertThat(result.size()).isEqualTo(MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE + 1);
 
         buffer.streamContent(outStream, 2);
-        result = List.of(Strings.split(outStream.toString(), '\n'));
+        result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
         assertThat(result.size()).isEqualTo(MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 2 + 1);
     }
 
