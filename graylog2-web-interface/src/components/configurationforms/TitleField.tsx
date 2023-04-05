@@ -23,7 +23,7 @@ import type { TextField as TextFieldType } from './types';
 
 type Props = {
   helpText?: string,
-  onChange: (title: string, value: string) => void,
+  onChange: (title: string, value: string, dirty?: boolean) => void,
   typeName: string,
   value: string,
 };

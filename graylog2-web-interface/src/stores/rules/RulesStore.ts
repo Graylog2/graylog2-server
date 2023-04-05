@@ -72,6 +72,7 @@ type RulesActionsType = {
   save: (rule: RuleType) => Promise<unknown>,
   update: (rule: RuleType) => Promise<unknown>,
   parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
+  simulate: (messageString: string, rule: RuleType, callback: () => void) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
@@ -88,6 +89,7 @@ export const RulesActions = singletonActions(
     save: { asyncResult: true },
     update: { asyncResult: true },
     parse: { asyncResult: true },
+    simulate: { asyncResult: true },
     multiple: { asyncResult: true },
     loadFunctions: { asyncResult: true },
     loadMetricsConfig: { asyncResult: true },
@@ -283,6 +285,23 @@ export const RulesStore = singletonStore(
           if (error.status === 400) {
             callback(error.additional.body);
           }
+        },
+      );
+    },
+    simulate(message, ruleSource, callback) {
+      const url = qualifyUrl(ApiRoutes.RulesController.simulate().url);
+      const rule = {
+        rule_source: {
+          title: ruleSource.title,
+          description: ruleSource.description,
+          source: ruleSource.source,
+        },
+        message,
+      };
+
+      return fetch('POST', url, rule).then(callback,
+        (error) => {
+          UserNotification.error(`Couldn't load rule simulation result: ${error.message}`, "Couldn't load rule simulation result");
         },
       );
     },

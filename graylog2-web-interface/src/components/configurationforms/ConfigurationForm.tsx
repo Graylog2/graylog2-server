@@ -174,9 +174,9 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     setTitleValue(value);
   };
 
-  const handleChange = (field: string, value: ConfigurationFieldValue) => {
+  const handleChange = (field: string, value: ConfigurationFieldValue, dirty: boolean = true) => {
     setValues({ ...values, ...{ [field]: value } });
-    setFieldStates({ ...fieldStates, ...{ [field]: { dirty: true } } });
+    setFieldStates({ ...fieldStates, ...{ [field]: { dirty } } });
   };
 
   const renderConfigField = (configField, key, autoFocus) => {

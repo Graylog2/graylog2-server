@@ -1,0 +1,5 @@
+type = "a"
+message = "Added badge to navigation bar to show when a new Illuminate bundle is ready to download and install."
+
+pulls = ["15001"]
+issues = ["Graylog2/graylog-plugin-enterprise#4868"]
