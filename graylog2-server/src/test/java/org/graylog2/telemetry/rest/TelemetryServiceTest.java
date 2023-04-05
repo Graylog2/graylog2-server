@@ -30,6 +30,7 @@ import org.graylog2.telemetry.db.DBTelemetryUserSettingsService;
 import org.graylog2.telemetry.db.TelemetryUserSettingsDto;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -49,7 +50,7 @@ import static org.mockito.Mockito.when;
 public class TelemetryServiceTest {
 
     public static final TrafficHistogram TRAFFIC_HISTOGRAM = TrafficHistogram.create(
-            DateTime.now(), DateTime.now(), Map.of(), Map.of(), Map.of());
+            DateTime.now(DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC), Map.of(), Map.of(), Map.of());
     private static final String CURRENT_USER = "current_user";
     private static final String USER_TELEMETRY_SETTINGS = "user_telemetry_settings";
     private static final String CLUSTER = "cluster";
