@@ -32,25 +32,28 @@ import java.util.stream.Collectors;
 
 public class OpensearchBinPreflightCheck implements PreflightCheck {
 
-    private final String opensearchLocation;
+    private final Path opensearchDir;
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchBinPreflightCheck.class);
 
     @Inject
     public OpensearchBinPreflightCheck(Configuration configuration) {
-        this.opensearchLocation = configuration.getOpensearchLocation();
+        this(Path.of(configuration.getOpensearchLocation()));
+    }
+
+    protected OpensearchBinPreflightCheck(Path opensearchBaseDirectory) {
+        this.opensearchDir = opensearchBaseDirectory;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        final Path opensearchDir = Path.of(opensearchLocation);
         if (!Files.isDirectory(opensearchDir)) {
-            throw new PreflightCheckException("Opensearch base directory " + opensearchLocation + " doesn't exist!");
+            throw new PreflightCheckException("Opensearch base directory " + opensearchDir + " doesn't exist!");
         }
 
         final Path binPath = opensearchDir.resolve(Paths.get("bin", "opensearch"));
 
-        if (!Files.exists(opensearchDir)) {
+        if (!Files.exists(binPath)) {
             throw new PreflightCheckException("Opensearch binary " + binPath + " doesn't exist!");
         }
 
