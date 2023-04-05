@@ -5,7 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 import useDataNodes from './useDataNodes';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('logic/rest/FetchProvider');
 
 describe('useDataNodes', () => {
   const availableDataNodes = [

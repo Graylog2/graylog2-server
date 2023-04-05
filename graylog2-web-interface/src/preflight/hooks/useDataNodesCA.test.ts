@@ -5,7 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 import useDataNodesCA from './useDataNodesCA';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('logic/rest/FetchProvider');
 
 describe('useDataNodesCA', () => {
   beforeEach(() => {

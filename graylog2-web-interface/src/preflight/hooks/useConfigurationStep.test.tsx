@@ -7,9 +7,9 @@ import { CONFIGURATION_STEPS } from 'preflight/Constants';
 
 import useConfigurationStep from './useConfigurationStep';
 
-jest.mock('preflight/hooks/useDataNodes', () => jest.fn());
-jest.mock('preflight/hooks/useDataNodesCA', () => jest.fn());
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('preflight/hooks/useDataNodes');
+jest.mock('preflight/hooks/useDataNodesCA');
+jest.mock('logic/rest/FetchProvider');
 
 describe('useConfigurationStep', () => {
   const availableDataNodes = [
