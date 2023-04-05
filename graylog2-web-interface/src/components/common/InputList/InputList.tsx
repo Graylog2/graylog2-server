@@ -39,11 +39,11 @@ type Props = CreatableProps<any, boolean, any> & {
   name: string,
   values: (string | number)[],
   onChange: (newValue: React.ChangeEvent<GenericTarget<(string | number)[]>>) => void,
-  label?: string | React.ReactHTMLElement<HTMLElement> | null,
+  label?: React.ReactNode,
   size?: 'small' | 'normal',
   bsStyle?: 'success' | 'warning' | 'error' | null,
-  error?: string | React.ReactHTMLElement<HTMLElement> | null,
-  help?: string | React.ReactHTMLElement<HTMLElement> | null,
+  error?: React.ReactNode,
+  help?: React.ReactNode,
 };
 
 const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, ...rest }: Props) => {
