@@ -23,9 +23,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.lookup.LookupTableService;
-import org.graylog2.plugin.lookup.LookupResult;
-
-import java.util.List;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -36,7 +33,7 @@ public class LookupAssignTtl extends AbstractFunction<Object> {
 
     private final ParameterDescriptor<String, LookupTableService.Function> lookupTableParam;
     private final ParameterDescriptor<Object, Object> keyParam;
-    private final ParameterDescriptor<Long, Long> ttlMSParam;
+    private final ParameterDescriptor<Long, Long> ttlSecondsParam;
 
     @Inject
     public LookupAssignTtl(LookupTableService lookupTableService) {
@@ -47,8 +44,8 @@ public class LookupAssignTtl extends AbstractFunction<Object> {
         keyParam = object("key")
                 .description("The key to update in the lookup table")
                 .build();
-        ttlMSParam = ParameterDescriptor.integer("ttl")
-                .description("The TTL in MS to assign to this entry")
+        ttlSecondsParam = ParameterDescriptor.integer("ttl")
+                .description("The time to live in seconds to assign to this entry")
                 .build();
     }
 
@@ -62,7 +59,7 @@ public class LookupAssignTtl extends AbstractFunction<Object> {
         if (table == null) {
             return null;
         }
-        Long ttl = ttlMSParam.required(args, context);
+        Long ttl = ttlSecondsParam.required(args, context);
         if (ttl == null) {
             return null;
         }
@@ -75,7 +72,7 @@ public class LookupAssignTtl extends AbstractFunction<Object> {
         return FunctionDescriptor.builder()
                 .name(NAME)
                 .description("Add a time to live to the key in the named lookup table. Returns the updated entry on success, null on failure.")
-                .params(lookupTableParam, keyParam, ttlMSParam)
+                .params(lookupTableParam, keyParam, ttlSecondsParam)
                 .returnType(Object.class)
                 .build();
     }

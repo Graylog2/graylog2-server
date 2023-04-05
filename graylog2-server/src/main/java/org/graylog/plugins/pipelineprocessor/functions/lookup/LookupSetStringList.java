@@ -38,7 +38,7 @@ public class LookupSetStringList extends AbstractFunction<Object> {
     private final ParameterDescriptor<Object, Object> keyParam;
     @SuppressWarnings("rawtypes")
     private final ParameterDescriptor<List, List> valueParam;
-    private final ParameterDescriptor<Long, Long> ttlMSParam;
+    private final ParameterDescriptor<Long, Long> ttlSecondsParam;
 
     @Inject
     public LookupSetStringList(LookupTableService lookupTableService) {
@@ -52,9 +52,9 @@ public class LookupSetStringList extends AbstractFunction<Object> {
         valueParam = ParameterDescriptor.type("value", List.class)
                 .description("The list value that should be set into the lookup table")
                 .build();
-        ttlMSParam = ParameterDescriptor.integer("ttl")
+        ttlSecondsParam = ParameterDescriptor.integer("ttl")
                 .optional()
-                .description("The TTL in MS to assign to this entry")
+                .description("The time to live in seconds to assign to this entry")
                 .build();
     }
 
@@ -72,9 +72,9 @@ public class LookupSetStringList extends AbstractFunction<Object> {
         if (value == null) {
             return null;
         }
-        final Optional<Long> ttlMs = ttlMSParam.optional(args, context);
-        if (ttlMs.isPresent()) {
-            return table.setStringListWithTtl(key, value, ttlMs.get()).stringListValue();
+        final Optional<Long> ttlSec = ttlSecondsParam.optional(args, context);
+        if (ttlSec.isPresent()) {
+            return table.setStringListWithTtl(key, value, ttlSec.get()).stringListValue();
         } else {
             return table.setStringList(key, value).stringListValue();
         }
@@ -85,7 +85,7 @@ public class LookupSetStringList extends AbstractFunction<Object> {
         return FunctionDescriptor.builder()
                 .name(NAME)
                 .description("Set a string list in the named lookup table. Returns the new value on success, null on failure.")
-                .params(lookupTableParam, keyParam, valueParam, ttlMSParam)
+                .params(lookupTableParam, keyParam, valueParam, ttlSecondsParam)
                 .returnType(List.class)
                 .build();
     }

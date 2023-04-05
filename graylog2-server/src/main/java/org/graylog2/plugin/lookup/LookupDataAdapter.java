@@ -164,10 +164,10 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
      * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
      * @param key       The key that should be updated.
      * @param value     The new value.
-     * @param ttlMs     The time to live to assigned to this entry.
+     * @param ttlSec    The time to live in seconds to assigned to this entry.
      * @return A LookupResult containing the updated value or an error
      */
-    public LookupResult setValueWithTtl(Object key, Object value, Long ttlMs) {
+    public LookupResult setValueWithTtl(Object key, Object value, Long ttlSec) {
         return resultWithError;
     }
 
@@ -187,10 +187,10 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
      * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
      * @param key           The key that should be updated.
      * @param listValue     The new list values.
-     * @param ttlMs         The time to live to assigned to this entry.
+     * @param ttlSec        The time to live in seconds to assigned to this entry.
      * @return A LookupResult containing the updated list or an error
      */
-    public LookupResult setStringListWithTtl(Object key, List<String> listValue, Long ttlMs) {
+    public LookupResult setStringListWithTtl(Object key, List<String> listValue, Long ttlSec) {
         return resultWithError;
     }
 
@@ -230,10 +230,10 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
      * Update / add a time to live for the given key in a DataAdapter.
      * This is a method stub that can be implemented in DataAdapters that support TTLs.
      * @param key             The key that should be updated.
-     * @param ttlMs           The time to live that should be assigned.
+     * @param ttlSec          The time to live in seconds that should be assigned.
      * @return A LookupResult containing the updated value or an error
      */
-    public LookupResult assignTtl(Object key, Long ttlMs) {
+    public LookupResult assignTtl(Object key, Long ttlSec) {
         return resultWithError;
     }
 

@@ -665,12 +665,12 @@ public class LookupTableService extends AbstractIdleService {
             return lookupTable.setValue(requireValidKey(key), requireNonNull(value, "value cannot be null"));
         }
 
-        public LookupResult setValueWithTtl(Object key, Object value, Long ttlMs) {
+        public LookupResult setValueWithTtl(Object key, Object value, Long ttlSec) {
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
                 return LookupResult.withError();
             }
-            return lookupTable.setValueWithTtl(requireValidKey(key), requireNonNull(value, "value cannot be null"), ttlMs);
+            return lookupTable.setValueWithTtl(requireValidKey(key), requireNonNull(value, "value cannot be null"), ttlSec);
         }
 
         public LookupResult setStringList(Object key, List<String> value) {
@@ -681,12 +681,12 @@ public class LookupTableService extends AbstractIdleService {
             return lookupTable.setStringList(requireValidKey(key), requireValidStringList(value));
         }
 
-        public LookupResult setStringListWithTtl(Object key, List<String> value, Long ttlMs) {
+        public LookupResult setStringListWithTtl(Object key, List<String> value, Long ttlSec) {
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
                 return LookupResult.withError();
             }
-            return lookupTable.setStringListWithTtl(requireValidKey(key), requireValidStringList(value), ttlMs);
+            return lookupTable.setStringListWithTtl(requireValidKey(key), requireValidStringList(value), ttlSec);
         }
 
         public LookupResult addStringList(Object key, List<String> value, boolean keepDuplicates) {
@@ -717,12 +717,12 @@ public class LookupTableService extends AbstractIdleService {
             return lookupTableService.getTable(lookupTableName);
         }
 
-        public LookupResult assignTtl(Object key, Long ttlMs) {
+        public LookupResult assignTtl(Object key, Long ttlSec) {
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
                 return LookupResult.withError();
             }
-            return lookupTable.assignTtl(requireValidKey(key), ttlMs);
+            return lookupTable.assignTtl(requireValidKey(key), ttlSec);
         }
     }
 }

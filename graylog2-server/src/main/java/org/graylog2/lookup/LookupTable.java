@@ -88,8 +88,8 @@ public abstract class LookupTable {
         return result;
     }
 
-    public LookupResult setValueWithTtl(@Nonnull Object key, @Nonnull Object value, @Nonnull Long ttlMs) {
-        final LookupResult result = dataAdapter().setValueWithTtl(key, value, ttlMs);
+    public LookupResult setValueWithTtl(@Nonnull Object key, @Nonnull Object value, @Nonnull Long ttlSec) {
+        final LookupResult result = dataAdapter().setValueWithTtl(key, value, ttlSec);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
     }
@@ -100,8 +100,8 @@ public abstract class LookupTable {
         return result;
     }
 
-    public LookupResult setStringListWithTtl(@Nonnull Object key, @Nonnull List<String> value, @Nonnull Long ttlMs) {
-        final LookupResult result = dataAdapter().setStringListWithTtl(key, value, ttlMs);
+    public LookupResult setStringListWithTtl(@Nonnull Object key, @Nonnull List<String> value, @Nonnull Long ttlSec) {
+        final LookupResult result = dataAdapter().setStringListWithTtl(key, value, ttlSec);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
     }
@@ -123,8 +123,8 @@ public abstract class LookupTable {
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
     }
 
-    public LookupResult assignTtl(@Nonnull Object key, @Nonnull Long ttlMs) {
-        final LookupResult result = dataAdapter().assignTtl(key, ttlMs);
+    public LookupResult assignTtl(@Nonnull Object key, @Nonnull Long ttlSec) {
+        final LookupResult result = dataAdapter().assignTtl(key, ttlSec);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
     }
