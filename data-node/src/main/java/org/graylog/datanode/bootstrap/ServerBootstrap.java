@@ -146,7 +146,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             throw e;
         }
 
-        if (mongoDBPreflightCheck.dbIsEmpty()) {
+        if (mongoDBPreflightCheck.isFreshInstallation()) {
             registerFreshInstallation();
         }
     }
