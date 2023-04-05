@@ -20,8 +20,8 @@ import type { DefaultTheme } from 'styled-components';
 import { Box, Title } from '@mantine/core';
 import type { BoxProps, TitleOrder } from '@mantine/core';
 
-import Col from 'preflight/common/Col';
-import Row from 'preflight/common/Row';
+import Col from 'preflight/components/common/Col';
+import Row from 'preflight/components/common/Row';
 
 type ContainerType = BoxProps & {
   theme: DefaultTheme,

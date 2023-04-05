@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { Title, Space } from '@mantine/core';
 
-import { Button } from 'preflight/common';
+import { Button } from 'preflight/components/common';
 
 const ConfigurationFinished = () => (
   <div>

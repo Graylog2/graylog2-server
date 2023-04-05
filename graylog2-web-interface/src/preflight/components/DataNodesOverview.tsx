@@ -19,7 +19,7 @@ import { Space } from '@mantine/core';
 
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { Alert, Table } from 'preflight/common';
+import { Alert, Table } from 'preflight/components/common';
 
 const DataNodesOverview = () => {
   const { data: dataNodes, isFetching: isFetchingDataNodes, error: dataNodesFetchError } = useDataNodes();

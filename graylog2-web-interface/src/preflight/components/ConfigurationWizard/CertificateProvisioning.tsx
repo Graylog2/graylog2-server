@@ -18,7 +18,7 @@ import * as React from 'react';
 import { Title, Space } from '@mantine/core';
 
 import fetch from 'logic/rest/FetchProvider';
-import { Button } from 'preflight/common';
+import { Button } from 'preflight/components/common';
 import URLUtils from 'util/URLUtils';
 
 const provisionCertificates = () => {

@@ -17,11 +17,11 @@
 import * as React from 'react';
 import { AppShell, Space } from '@mantine/core';
 
-import Section from 'preflight/common/Section';
+import Section from 'preflight/components/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
-import DataNodesOverview from 'preflight/DataNodesOverview';
-import ConfigurationWizard from 'preflight/ConfigurationWizard';
-import { Button } from 'preflight/common';
+import DataNodesOverview from 'preflight/components/DataNodesOverview';
+import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
+import { Button } from 'preflight/components/common';
 
 const App = () => (
   <AppShell padding="md" header={<Navigation />}>

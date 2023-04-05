@@ -1,7 +1,6 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import useDataNodesCA from 'preflight/hooks/useDataNodesCA';
 import { CONFIGURATION_STEPS } from 'preflight/Constants';

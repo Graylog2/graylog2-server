@@ -23,7 +23,7 @@ import Icon from 'components/common/Icon';
 import useConfigurationStep from 'preflight/hooks/useConfigurationStep';
 import Spinner from 'components/common/Spinner';
 import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Constants';
-import { List } from 'preflight/common';
+import { List } from 'preflight/components/common';
 
 import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';

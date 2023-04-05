@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { useCallback } from 'react';
 
 import UserNotification from 'util/UserNotification';
-import { Icon } from 'preflight/common';
+import { Icon } from 'preflight/components/common';
 
 const CADropzone = styled(Dropzone)`
   height: 120px;

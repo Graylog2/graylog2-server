@@ -18,8 +18,8 @@ import * as React from 'react';
 import styled, { css, ThemeContext } from 'styled-components';
 import { Alert as MantineAlert } from '@mantine/core';
 import { useContext } from 'react';
-import { ColorVariants } from '../theme/types';
 
+import type { ColorVariants } from '../../theme/types';
 
 const StyledAlert = styled(MantineAlert)(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
