@@ -47,6 +47,6 @@ public interface RemoteSupportBundleInterface {
     @Headers({"Accept: application/octet-stream"})
     Call<ResponseBody> downloadBundle(@Path("filename") String filename);
 
-    @DELETE("system/debug/support/bundle/delete/{filename}")
+    @DELETE("system/debug/support/bundle/{filename}")
     Call<Void> deleteBundle(@Path("filename") String filename);
 }
