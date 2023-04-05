@@ -21,7 +21,7 @@ import { Button } from 'preflight/components/common';
 
 const ConfigurationFinished = () => (
   <div>
-    <Title order={3}>All data nodes are secured and reachable</Title>
+    <Title order={3}>All data nodes are secured and reachable.</Title>
     <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
     <Space h="md" />
     <Button>Resume startup</Button>
