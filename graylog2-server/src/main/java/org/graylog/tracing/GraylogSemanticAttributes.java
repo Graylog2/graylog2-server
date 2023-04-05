@@ -39,4 +39,9 @@ public final class GraylogSemanticAttributes {
     public static final AttributeKey<String> PERIODICAL_TYPE = stringKey("org.graylog.periodical.type");
 
     public static final AttributeKey<String> SYSTEM_JOB_TYPE = stringKey("org.graylog.system_job.type");
+
+    public static final AttributeKey<String> SCHEDULER_JOB_CLASS = stringKey("org.graylog.scheduler.job_class");
+    public static final AttributeKey<String> SCHEDULER_JOB_DEFINITION_TYPE = stringKey("org.graylog.scheduler.job_definition.type");
+    public static final AttributeKey<String> SCHEDULER_JOB_DEFINITION_TITLE = stringKey("org.graylog.scheduler.job_definition.title");
+    public static final AttributeKey<String> SCHEDULER_JOB_DEFINITION_ID = stringKey("org.graylog.scheduler.job_definition.id");
 }
