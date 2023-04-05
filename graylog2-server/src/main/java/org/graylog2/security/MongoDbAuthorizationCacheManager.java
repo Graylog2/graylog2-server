@@ -51,7 +51,7 @@ public class MongoDbAuthorizationCacheManager implements CacheManager {
 
         public GuavaCacheWrapper(MetricRegistry registry) {
             cache = CacheBuilder.newBuilder()
-                    .expireAfterWrite(10, TimeUnit.SECONDS)
+                    .expireAfterWrite(1, TimeUnit.SECONDS)
                     .maximumSize(1000)
                     .concurrencyLevel(8)
                     .recordStats()
