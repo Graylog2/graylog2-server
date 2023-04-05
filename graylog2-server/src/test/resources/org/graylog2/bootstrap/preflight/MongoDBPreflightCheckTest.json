@@ -1,5 +1,5 @@
 {
-  "some_collection": [
+  "cluster_config": [
     {
       "_id": {
         "$oid": "54e3deadbeefdeadbeefaffe"
