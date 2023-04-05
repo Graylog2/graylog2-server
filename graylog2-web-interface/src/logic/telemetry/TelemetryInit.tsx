@@ -18,11 +18,9 @@ import React from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
-// import AppConfig from 'util/AppConfig';
 import { useStore } from 'stores/connect';
 import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
-
-// import AppConfig from 'util/AppConfig';
+import AppConfig from 'util/AppConfig';
 
 type PostHogSettings = {
   host: string;
@@ -32,11 +30,11 @@ type PostHogSettings = {
 const POSTHOG_DEBUG = true;
 
 const getPostHogSettings = (): PostHogSettings => {
-  // const {} = AppConfig.telemetry();
+  const { host, api_key: key } = AppConfig.telemetry();
 
   return {
-    host: 'https://eu.posthog.com',
-    key: 'phc_KJcd3d9PRkSj9FtzXtFdx5n9dgxuq9kLFMRTyM8BCbZ',
+    host: host,
+    key: key,
     debug: POSTHOG_DEBUG,
   };
 };
