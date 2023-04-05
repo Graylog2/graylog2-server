@@ -105,6 +105,7 @@ import {
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
+import GlobalContextProviders from 'contexts/GlobalContextProviders';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -128,7 +129,7 @@ const routeHasAppParent = (route: PluginRoute) => route.parentComponent === App;
 
 const AppRouter = () => {
   const pluginRoutes = usePluginEntities('routes');
-  const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map(renderPluginRoute);
+  const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((route) => renderPluginRoute({ ...route, parentComponent: GlobalContextProviders }));
   const pluginRoutesWithAppParent = pluginRoutes.filter((route) => routeHasAppParent(route)).map((route) => renderPluginRoute({ ...route, parentComponent: null }));
   const pluginRoutesWithParent = pluginRoutes.filter((route) => (route.parentComponent && !routeHasAppParent(route))).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
@@ -140,7 +141,7 @@ const AppRouter = () => {
 
     {
       path: RoutePaths.STARTPAGE,
-      element: <App />,
+      element: <GlobalContextProviders><App /></GlobalContextProviders>,
       children: [
         { path: RoutePaths.STARTPAGE, element: <StartPage /> },
         { path: RoutePaths.SEARCH, element: <DelegatedSearchPage /> },

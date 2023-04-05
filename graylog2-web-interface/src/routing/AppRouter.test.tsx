@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import { renderUnwrapped as render, screen } from 'wrappedTestingLibrary';
 import DefaultProviders from 'DefaultProviders';
 import type { RouteObject } from 'react-router-dom';
@@ -26,6 +27,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
+import GlobalContextProviders from 'contexts/GlobalContextProviders';
 
 import AppRouter from './AppRouter';
 
@@ -37,6 +39,7 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
+jest.mock('contexts/GlobalContextProviders', () => jest.fn(({ children }: React.PropsWithChildren<{}>) => children));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -126,6 +129,24 @@ describe('AppRouter', () => {
       const { findByText } = render(<AppRouterWithContext />);
 
       await findByText('Hey there!');
+    });
+
+    it('renders null-parent component plugin wrapped in global providers', async () => {
+      const TestContext = React.createContext(undefined);
+      asMock(GlobalContextProviders).mockImplementation(({ children }: React.PropsWithChildren<{}>) => <TestContext.Provider value={42}>{children}</TestContext.Provider>);
+
+      const TestComponent = () => {
+        const contextValue = useContext(TestContext);
+
+        return <span>Current context value is {contextValue}</span>;
+      };
+
+      asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: TestComponent, path: '/test' }]);
+
+      setInitialPath('/test');
+      const { findByText } = render(<AppRouterWithContext />);
+
+      await findByText('Current context value is 42');
     });
   });
 });

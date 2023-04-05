@@ -218,6 +218,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "root_email")
     private String rootEmail = "";
 
+    @Parameter(value = "single_node_only")
+    private boolean singleNodeOnly = false;
 
     public String getNodeIdFile() {
         return nodeIdFile;
@@ -279,6 +281,10 @@ public class Configuration extends BaseConfiguration {
 
     public Optional<String> getOpensearchNetworkHostHost() {
         return Optional.ofNullable(opensearchNetworkHostHost);
+    }
+
+    public boolean isSingleNodeOnly() {
+        return singleNodeOnly;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

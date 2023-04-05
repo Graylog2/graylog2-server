@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import Promise from 'bluebird';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
@@ -232,7 +231,7 @@ export const ExtractorsStore = singletonStore(
         promises.push(promise);
       });
 
-      Promise.settle(promises).then(() => {
+      Promise.allSettled(promises).then(() => {
         if (failedImports === 0) {
           UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
             'Import operation successful');

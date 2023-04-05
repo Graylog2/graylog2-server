@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix isFreshInstallation flag in setups with newly registred datanodes"
+
+pulls = ["15141"]

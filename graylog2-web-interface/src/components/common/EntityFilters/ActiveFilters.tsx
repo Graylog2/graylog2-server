@@ -26,6 +26,8 @@ const FilterGroup = styled.div`
   display: inline-flex;
   align-items: center;
   min-height: ${ROW_MIN_HEIGHT}px;
+  gap: 3px;
+  flex-wrap: wrap;
 `;
 
 const FilterGroupTitle = styled.div`
@@ -36,13 +38,13 @@ type Props = {
   attributes: Attributes,
   filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
   filters: Filters,
-  onChangeFilter: (attributeId: string, newFilter: Filter) => void,
-  onDeleteFilter: (attributeId: string, filterId: string) => void,
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
+  onDeleteFilter: (attributeId: string, filterValue: string) => void,
 }
 
 const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
   <>
-    {Object.entries(filters).map(([attributeId, filterValues]) => {
+    {filters.entrySeq().map(([attributeId, filterValues]) => {
       const attribute = attributes.find(({ id }) => id === attributeId);
 
       return (
@@ -53,7 +55,7 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
           {filterValues.map((filter) => (
             <ActiveFilter filter={filter}
                           allActiveFilters={filters}
-                          key={filter.id}
+                          key={`${attribute.id}-${filter.value}`}
                           attribute={attribute}
                           filterValueRenderer={filterValueRenderers?.[attributeId]}
                           onChangeFilter={onChangeFilter}
@@ -62,7 +64,6 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
         </FilterGroup>
       );
     })}
-
   </>
 );
 
