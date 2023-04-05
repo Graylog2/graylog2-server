@@ -16,17 +16,22 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ConfirmDialog, Icon} from 'components/common';
-import {Alert} from 'components/bootstrap';
+
+import { ConfirmDialog, Icon } from 'components/common';
+import { Alert } from 'components/bootstrap';
 
 type Props = {
   show: boolean,
   onConfirm: () => void,
 }
-const TelemetryInfoModal = ({show, onConfirm}: Props) => {
 
+const TelemetryInfoModal = ({ show, onConfirm }: Props) => {
   return (
-    <ConfirmDialog show={show} onConfirm={onConfirm} hideCancelButton={false} title="Help us improve Graylog"
+    <ConfirmDialog show={show}
+                   onConfirm={onConfirm}
+                   hideCancelButton={false}
+                   onCancel={onConfirm}
+                   title="Help us improve Graylog"
                    btnConfirmText="Ok">
       <Alert bsStyle="info">
         <Icon name="info-circle" /> We would like to collect anonymously usage data to help us prioritize improvements
@@ -42,8 +47,8 @@ const TelemetryInfoModal = ({show, onConfirm}: Props) => {
 };
 
 TelemetryInfoModal.propTypes = {
-  show: PropTypes.bool,
-  onConfirm: PropTypes.func,
+  show: PropTypes.bool.isRequired,
+  onConfirm: PropTypes.func.isRequired,
 };
 
 export default TelemetryInfoModal;

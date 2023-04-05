@@ -22,7 +22,7 @@ export type TelemetryEvent = {
   appSection?: string,
   eventElement?: string
   eventInfo?: {
-    [key: string]: string | boolean,
+    [key: string]: string | boolean | number,
   }
 };
 
@@ -33,7 +33,8 @@ type ContextType = {
   sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
 }
 const TelemetryContext = React.createContext<ContextType>({
-  sendTelemetry: () => {},
+  sendTelemetry: () => {
+  },
 });
 
 export default singleton('contexts.TelemetryContext', () => TelemetryContext);
