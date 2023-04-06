@@ -75,7 +75,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @ApiOperation(value = "Get the Support Bundle Manifest from all nodes in the cluster")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     public Map<String, CallResult<SupportBundleNodeManifest>> getClusterManifest() {
-        return requestOnAllNodes(createRemoteInterfaceProvider(RemoteSupportBundleInterface.class), RemoteSupportBundleInterface::getNodeManifest);
+        return requestOnAllNodes(RemoteSupportBundleInterface.class, RemoteSupportBundleInterface::getNodeManifest);
     }
 
     @POST
@@ -89,7 +89,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
                     final NodeResponse<Void> response;
                     try {
                         response = requestOnLeader(RemoteSupportBundleInterface::buildSupportBundle,
-                                createRemoteInterfaceProvider(RemoteSupportBundleInterface.class), Duration.ofSeconds(60));
+                                RemoteSupportBundleInterface.class, Duration.ofSeconds(60));
                     } catch (IOException e) {
                         return Response.serverError().entity(e.getMessage()).build();
                     }
@@ -103,7 +103,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @ApiOperation(value = "Returns the list of downloadable support bundles")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     public List<BundleFile> listBundles() throws IOException {
-        final NodeResponse<List<BundleFile>> listNodeResponse = requestOnLeader(RemoteSupportBundleInterface::listBundles, createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
+        final NodeResponse<List<BundleFile>> listNodeResponse = requestOnLeader(RemoteSupportBundleInterface::listBundles, RemoteSupportBundleInterface.class);
         if (listNodeResponse.isSuccess()) {
             return listNodeResponse.entity().orElse(List.of());
         }
@@ -116,7 +116,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response download(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
-        final NodeResponse<ResponseBody> nodeResponse = requestOnLeader(c -> c.downloadBundle(filename), createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
+        final NodeResponse<ResponseBody> nodeResponse = requestOnLeader(c -> c.downloadBundle(filename), RemoteSupportBundleInterface.class);
         if (nodeResponse.isSuccess()) {
             // we cannot use try-with because the ResponseBody needs to stream the output
             ResponseBody responseBody = nodeResponse.entity().orElseThrow();
@@ -146,7 +146,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
-        final NodeResponse<Void> nodeResponse = requestOnLeader(c -> c.deleteBundle(filename), createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
+        final NodeResponse<Void> nodeResponse = requestOnLeader(c -> c.deleteBundle(filename), RemoteSupportBundleInterface.class);
         return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
     }
 }

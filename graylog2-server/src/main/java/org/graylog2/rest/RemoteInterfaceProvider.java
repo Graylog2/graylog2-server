@@ -28,20 +28,31 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import java.time.Duration;
 
 public class RemoteInterfaceProvider {
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
+    private final Duration defaultProxyTimeout;
 
     @Inject
     public RemoteInterfaceProvider(ObjectMapper objectMapper,
-                                   OkHttpClient okHttpClient) {
+                                   OkHttpClient okHttpClient,
+                                   @Named("proxied_requests_default_call_timeout")
+                                       com.github.joschi.jadconfig.util.Duration defaultProxyTimeout
+                                   ) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
+        this.defaultProxyTimeout = Duration.ofMillis(defaultProxyTimeout.toMicroseconds());
     }
 
-    public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
+    public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass, Duration timeout) {
         final OkHttpClient okHttpClient = this.okHttpClient.newBuilder()
+                .writeTimeout(timeout)
+                .readTimeout(timeout)
+                .callTimeout(timeout)
+                .connectTimeout(timeout)
                 .addInterceptor(chain -> {
                     final Request original = chain.request();
 
@@ -71,6 +82,9 @@ public class RemoteInterfaceProvider {
                 .build();
 
         return retrofit.create(interfaceClass);
+    }
+    public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
+        return get(node, authorizationToken, interfaceClass, defaultProxyTimeout);
     }
 
     public <T> T get(Node node, Class<T> interfaceClass) {
