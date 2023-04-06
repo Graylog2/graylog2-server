@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -41,11 +42,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MongoDBPreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBPreflightCheck.class);
+    private static final String CLUSTER_CONFIG_COLLECTION_NAME = "cluster_config";
 
     private final int mongoVersionProbeAttempts;
     private final MongoConnection mongoConnection;
 
-    private final AtomicBoolean dbIsEmpty;
+    private final AtomicBoolean isFreshInstallation;
 
     @Inject
     public MongoDBPreflightCheck(@Named(value = "mongodb_version_probe_attempts") int mongoVersionProbeAttempts,
@@ -53,11 +55,11 @@ public class MongoDBPreflightCheck {
         this.mongoVersionProbeAttempts = mongoVersionProbeAttempts;
         // We build our own MongoConnection instance here, so we can close it without interfering with other users
         this.mongoConnection = new MongoConnectionImpl(configuration);
-        dbIsEmpty = new AtomicBoolean(false);
+        isFreshInstallation = new AtomicBoolean(false);
     }
 
-    public boolean dbIsEmpty() {
-        return dbIsEmpty.get();
+    public boolean isFreshInstallation() {
+        return isFreshInstallation.get();
     }
 
     public void runCheck() throws PreflightCheckException {
@@ -83,10 +85,8 @@ public class MongoDBPreflightCheck {
                     .withStopStrategy(mongoVersionProbeAttempts == 0 ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(mongoVersionProbeAttempts))
                     .build()
                     .call(() -> {
-                        try (MongoClient mongoClient = (MongoClient) mongoConnection.connect()) {
-                            // Detect an empty, pristine database. It should have no collections
-                            final String firstCollectionName = mongoConnection.getMongoDatabase().listCollectionNames().first();
-                            dbIsEmpty.set(firstCollectionName == null);
+                        try (MongoClient mongoClient = mongoConnection.connect()) {
+                            detectFreshInstallation();
                             return MongoDBVersionCheck.getVersion(mongoClient);
                         }
                     });
@@ -96,5 +96,19 @@ public class MongoDBPreflightCheck {
         } catch (ExecutionException | RetryException e) {
             throw new PreflightCheckException("Failed to retrieve MongoDB version.", e);
         }
+    }
+
+    /**
+     * The fresh installation detecion is based on the presence of the cluster_config collection. If this
+     * collection exists, we assume that the installation is not fresh. We can't use empty database for this
+     * verification - datanodes may register itself into the nodes collection and maybe even persist some more
+     * information in other collections.
+     */
+    private void detectFreshInstallation() {
+        final boolean configurationExists = mongoConnection.getMongoDatabase()
+                .listCollectionNames()
+                .into(new HashSet<>())
+                .contains(CLUSTER_CONFIG_COLLECTION_NAME);
+        this.isFreshInstallation.set(!configurationExists);
     }
 }

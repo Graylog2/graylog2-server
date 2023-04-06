@@ -76,9 +76,12 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     }
 
     setValues({ ...defaultValues, ...initialValues });
-    setTitleValue(initialTitleValue);
     setFieldStates({});
-  }, [showConfigurationModal, configFields, initialValues, initialTitleValue]);
+  }, [showConfigurationModal, configFields, initialValues]);
+
+  useEffect(() => {
+    setTitleValue(initialTitleValue);
+  }, [initialTitleValue, showConfigurationModal]);
 
   const getFormData = (): ConfigurationFormData<Configuration> => {
     const data: ConfigurationFormData<Configuration> = {
@@ -174,9 +177,9 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     setTitleValue(value);
   };
 
-  const handleChange = (field: string, value: ConfigurationFieldValue) => {
+  const handleChange = (field: string, value: ConfigurationFieldValue, dirty: boolean = true) => {
     setValues({ ...values, ...{ [field]: value } });
-    setFieldStates({ ...fieldStates, ...{ [field]: { dirty: true } } });
+    setFieldStates({ ...fieldStates, ...{ [field]: { dirty } } });
   };
 
   const renderConfigField = (configField, key, autoFocus) => {
