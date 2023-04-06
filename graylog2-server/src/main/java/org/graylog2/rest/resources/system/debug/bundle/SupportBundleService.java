@@ -188,8 +188,7 @@ public class SupportBundleService {
                     RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT);
 
             final Map<String, CallResult<PluginList>> installedPlugins = proxiedResourceHelper.requestOnAllNodes(
-                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemPluginResource.class),
-                    RemoteSystemPluginResource::list, CALL_TIMEOUT);
+                    RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT);
 
             final Map<String, Object> result = new HashMap<>(
                     Map.of(
