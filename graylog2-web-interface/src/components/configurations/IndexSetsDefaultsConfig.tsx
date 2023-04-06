@@ -244,10 +244,10 @@ const IndexSetsDefaultsConfig = () => {
                     </Modal.Body>
 
                     <Modal.Footer>
-                      <Button type="button" bsStyle="link" onClick={resetConfig}>Close</Button>
+                      <Button type="button" onClick={resetConfig}>Cancel</Button>
                       <Button type="submit"
                               bsStyle="success"
-                              disabled={isSubmitting}>{isSubmitting ? 'Saving' : 'Save'}
+                              disabled={isSubmitting}>{isSubmitting ? 'Updating configuration' : 'Update configuration'}
                       </Button>
                     </Modal.Footer>
                   </Form>
