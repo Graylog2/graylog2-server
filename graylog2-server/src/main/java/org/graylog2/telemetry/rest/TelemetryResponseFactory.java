@@ -82,16 +82,15 @@ class TelemetryResponseFactory {
 
     Map<String, Object> createClusterInfo(String clusterId,
                                           DateTime clusterCreationDate,
-                                          int nodesCount,
                                           Map<String, SystemOverviewResponse> nodes,
                                           long averageLastMonthTraffic,
                                           long usersCount) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
         clusterInfo.put("cluster_id", clusterId);
-        clusterInfo.put(f("%s.cluster_creation_date", CLUSTER), clusterCreationDate);
-        clusterInfo.put(f("%s.nodes_count", CLUSTER), nodesCount);
-        clusterInfo.put(f("%s.average_last_month_traffic", CLUSTER), averageLastMonthTraffic);
-        clusterInfo.put(f("%s.users_count", CLUSTER), usersCount);
+        clusterInfo.put("cluster_creation_date", clusterCreationDate);
+        clusterInfo.put("nodes_count", nodes.size());
+        clusterInfo.put("average_last_month_traffic", averageLastMonthTraffic);
+        clusterInfo.put("users_count", usersCount);
         clusterInfo.putAll(flatten(Map.of(CLUSTER, nodes)));
         return clusterInfo;
 

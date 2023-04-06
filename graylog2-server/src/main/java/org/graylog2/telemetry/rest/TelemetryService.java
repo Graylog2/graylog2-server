@@ -168,7 +168,6 @@ public class TelemetryService {
         return telemetryResponseFactory.createClusterInfo(
                 clusterId,
                 getClusterCreationDate(),
-                systemOverviewResponses.size(),
                 systemOverviewResponses,
                 getAverageLastMonthTraffic(),
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count());
