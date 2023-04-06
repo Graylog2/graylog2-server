@@ -23,6 +23,7 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import Spinner from 'components/common/Spinner';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { OutputsStore } from 'stores/outputs/OutputsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
@@ -81,6 +82,11 @@ const OutputsComponent = createReactClass({
         this._handleUpdate();
       }
 
+      this.props.sendTelemetry('submit_form', {
+        appSection: 'outputs',
+        eventElement: 'create-output',
+      });
+
       return result;
     });
   },
@@ -100,6 +106,11 @@ const OutputsComponent = createReactClass({
     StreamsStore.addOutput(this.props.streamId, outputId, (response) => {
       this._handleUpdate();
 
+      this.props.sendTelemetry('submit_form', {
+        appSection: 'outputs',
+        eventElement: 'assign-output',
+      });
+
       return response;
     });
   },
@@ -109,6 +120,11 @@ const OutputsComponent = createReactClass({
       OutputsStore.remove(outputId, (response) => {
         UserNotification.success('Output was terminated.', 'Success');
         this._handleUpdate();
+
+        this.props.sendTelemetry('submit_form', {
+          appSection: 'outputs',
+          eventElement: 'remove-output-globally',
+        });
 
         return response;
       });
@@ -121,6 +137,11 @@ const OutputsComponent = createReactClass({
         UserNotification.success('Output was removed from stream.', 'Success');
         this._handleUpdate();
 
+        this.props.sendTelemetry('submit_form', {
+          appSection: 'outputs',
+          eventElement: 'remove-output-from-stream',
+        });
+
         return response;
       });
     }
@@ -129,6 +150,11 @@ const OutputsComponent = createReactClass({
   _handleOutputUpdate(output, deltas) {
     OutputsStore.update(output, deltas, () => {
       this._handleUpdate();
+
+      this.props.sendTelemetry('submit_form', {
+        appSection: 'outputs',
+        eventElement: 'update-output',
+      });
     });
   },
 
@@ -176,4 +202,5 @@ const OutputsComponent = createReactClass({
     return <Spinner />;
   },
 });
-export default OutputsComponent;
+
+export default withTelemetry(OutputsComponent);
