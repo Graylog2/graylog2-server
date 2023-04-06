@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {singletonStore, singletonActions} from 'logic/singleton';
 import Reflux from 'reflux';
-import {RefluxActions} from 'stores/StoreTypes';
-import {qualifyUrl} from 'util/URLUtils';
+
+import { singletonStore, singletonActions } from 'logic/singleton';
+import type { RefluxActions } from 'stores/StoreTypes';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -29,7 +30,7 @@ export type UserTelemetrySettings = {
 
 type TelemetrySettingsActionsType = RefluxActions<{
   update: (settings: Partial<UserTelemetrySettings>) => Promise<unknown>,
-  get: () => Promise<unknown>,
+  get: () => Promise<UserTelemetrySettings>,
 }>;
 
 export type TelemetrySettingsStoreState = {
@@ -39,10 +40,9 @@ export type TelemetrySettingsStoreState = {
 const urlPrefix = ApiRoutes.TelemetryApiController.setting().url;
 
 export const TelemetrySettingsActions: TelemetrySettingsActionsType = singletonActions('telemetry.settings.actions', () => Reflux.createActions({
-  update: {asyncResult: true},
-  get: {asyncResult: true},
+  update: { asyncResult: true },
+  get: { asyncResult: true },
 }));
-
 export const TelemetrySettingsStore = singletonStore('telemetry.settings.store', () => Reflux.createStore<TelemetrySettingsStoreState>({
   listenables: [TelemetrySettingsActions],
 
@@ -82,7 +82,7 @@ export const TelemetrySettingsStore = singletonStore('telemetry.settings.store',
         return response;
       },
       (error) => {
-        UserNotification.error(`Update failed: ${error}`, `Could not update telemetry settings.`);
+        UserNotification.error(`Update failed: ${error}`, 'Could not update telemetry settings.');
       },
     );
 

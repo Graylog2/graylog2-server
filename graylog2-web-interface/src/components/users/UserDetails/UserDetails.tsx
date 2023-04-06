@@ -19,6 +19,7 @@ import * as React from 'react';
 import { IfPermitted, Spinner } from 'components/common';
 import type User from 'logic/users/User';
 import SectionGrid from 'components/common/Section/SectionGrid';
+import TelemetrySettingsDetails from 'logic/telemetry/TelemetrySettingsDetails';
 
 import PreferencesSection from './PreferencesSection';
 import ProfileSection from './ProfileSection';
@@ -57,6 +58,7 @@ const UserDetails = ({ user }: Props) => {
             <IfPermitted permissions={`teams:edit:${user.username}`}>
               <TeamsSection user={user} />
             </IfPermitted>
+            <TelemetrySettingsDetails />
           </div>
         </IfPermitted>
       </SectionGrid>
