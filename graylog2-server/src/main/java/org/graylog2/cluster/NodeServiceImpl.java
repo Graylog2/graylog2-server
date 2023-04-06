@@ -30,7 +30,6 @@ import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -136,10 +135,6 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
                 new BasicDBObject("$match", Map.of("$and", match)),
                 new BasicDBObject("$unset", "last_seen_date")
         );
-    }
-
-    private List<? extends DBObject> recentHeartbeat() {
-        return recentHeartbeat(Collections.emptyList());
     }
 
     @Override
