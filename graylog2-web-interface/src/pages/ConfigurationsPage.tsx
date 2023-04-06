@@ -166,12 +166,11 @@ const ConfigurationsPage = () => {
           </Nav>
         </Col>
 
-        <Col md={10}>
-          {configurationSections.map(({ name, hide, props, SectionComponent }) => (
-            isSectionActive(name) && !hide && (
-              <SectionComponent {...props} key={name} />
-            )))}
-        </Col>
+        {configurationSections.map(({ name, hide, props, SectionComponent }) => (
+          isSectionActive(name) && !hide && (
+            <SectionComponent {...props} key={name} />
+          )
+        ))}
       </ConfigletRow>
     </DocumentTitle>
   );

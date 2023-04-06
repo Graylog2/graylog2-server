@@ -24,7 +24,7 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 import usePluginEntities from 'hooks/usePluginEntities';
 import { getConfig } from 'components/configurations/helpers';
 import { PluginConfigurationType } from 'components/configurations/ConfigurationTypes';
-import { Col, Nav, NavItem, Row } from 'components/bootstrap';
+import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
 const PluginsConfig = () => {
@@ -78,8 +78,8 @@ const PluginsConfig = () => {
   if (!isLoaded || !pluginSystemConfigs) { return <Spinner />; }
 
   return (
-    <Row>
-      <Col md={3}>
+    <>
+      <Col md={2}>
         <Nav bsStyle="pills"
              stacked
              activeKey={activeSectionKey}
@@ -95,7 +95,7 @@ const PluginsConfig = () => {
           })}
         </Nav>
       </Col>
-      <Col md={9} lg={6}>
+      <Col md={8} lg={5}>
         {pluginSystemConfigs
           .map(({ component: SystemConfigComponent, configType }, index) => (
             (index + 1 === activeSectionKey) && (
@@ -107,7 +107,7 @@ const PluginsConfig = () => {
             )
           ))}
       </Col>
-    </Row>
+    </>
   );
 };
 

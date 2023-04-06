@@ -25,11 +25,11 @@ type ConfigurationSectionProps = {
 }
 
 const ConfigurationSection = ({ ConfigurationComponent, title } : ConfigurationSectionProps) => (
-  <ConfigletContainer title={title}>
-    <Col md={10}>
+  <Col md={10}>
+    <ConfigletContainer title={title}>
       <ConfigurationComponent />
-    </Col>
-  </ConfigletContainer>
+    </ConfigletContainer>
+  </Col>
 );
 
 export type { ConfigurationSectionProps };
