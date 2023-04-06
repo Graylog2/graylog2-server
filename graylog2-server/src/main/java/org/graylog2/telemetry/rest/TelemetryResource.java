@@ -22,6 +22,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -46,6 +49,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
+import static org.graylog2.audit.AuditEventTypes.TELEMETRY_USER_SETTINGS_UPDATE;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -56,14 +60,17 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class TelemetryResource extends ProxiedResource {
 
     private final TelemetryService telemetryService;
+    private final AuditEventSender auditEventSender;
 
     protected TelemetryResource(NodeService nodeService,
                                 RemoteInterfaceProvider remoteInterfaceProvider,
                                 @Context HttpHeaders httpHeaders,
                                 @Named("proxiedRequestsExecutorService") ExecutorService executorService,
-                                TelemetryService telemetryService) {
+                                TelemetryService telemetryService,
+                                AuditEventSender auditEventSender) {
         super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
         this.telemetryService = telemetryService;
+        this.auditEventSender = auditEventSender;
     }
 
     @GET
@@ -85,13 +92,21 @@ public class TelemetryResource extends ProxiedResource {
     @PUT
     @Path("user/settings")
     @ApiOperation("Update a user's telemetry settings.")
-    @ApiResponses({
-            @ApiResponse(code = 404, message = "Current user not found.")
-    })
+    @ApiResponses({@ApiResponse(code = 404, message = "Current user not found.")})
+    @NoAuditEvent("Audit event is sent manually.")
     public void saveTelemetryUserSettings(@ApiParam(name = "JSON body", value = "The telemetry settings to assign to the user.", required = true)
                                           @Valid @NotNull TelemetryUserSettings telemetryUserSettings) {
 
-        telemetryService.saveUserSettings(getCurrentUserOrThrow(), telemetryUserSettings);
+        User currentUser = getCurrentUserOrThrow();
+        telemetryService.saveUserSettings(currentUser, telemetryUserSettings);
+        auditEventSender.success(
+                AuditActor.user(currentUser.getName()),
+                TELEMETRY_USER_SETTINGS_UPDATE,
+                Map.of(
+                        "telemetry_enabled", telemetryUserSettings.telemetryEnabled(),
+                        "telemetry_permission_asked", telemetryUserSettings.telemetryPermissionAsked()
+                )
+        );
     }
 
     private User getCurrentUserOrThrow() {
