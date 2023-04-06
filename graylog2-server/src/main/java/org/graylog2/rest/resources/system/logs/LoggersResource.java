@@ -214,8 +214,8 @@ public class LoggersResource extends RestResource {
     @Produces(MediaType.TEXT_PLAIN)
     @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
     @HideOnCloud
-    public Response messages(@ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages", defaultValue = "0", allowableValues = "range[0, infinity]")
-                                       @QueryParam("limit") @DefaultValue("0") @Min(0L) int limit) {
+    public Response messages(@ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages", defaultValue = "1000", allowableValues = "range[0, infinity]")
+                                       @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {
             throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
