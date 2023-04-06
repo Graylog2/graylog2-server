@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -38,6 +39,15 @@ import type { ConfigurationSectionProps } from './configurations/ConfigurationSe
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import UserConfig from '../components/configurations/UserConfig';
+
+const SubNavIconClosed = styled(Icon)`
+  margin-left: 5px;
+  vertical-align: middle;
+`;
+
+const SubNavIconOpen = styled(Icon)`
+  margin-left: 5px;
+`;
 
 const ConfigurationsPage = () => {
   const currentUser = useCurrentUser();
@@ -158,8 +168,8 @@ const ConfigurationsPage = () => {
               <NavItem key={`nav-${name}`} eventKey={index + 1} title={name}>
                 {name}
                 {showCaret && (isSectionActive(name)
-                  ? <Icon name="caret-right" style={{ marginLeft: 5, verticalAlign: 'middle' }} />
-                  : <Icon name="caret-down" style={{ marginLeft: 5 }} />)}
+                  ? <SubNavIconClosed name="caret-right" />
+                  : <SubNavIconOpen name="caret-down" />)}
               </NavItem>
               )
             ))}
