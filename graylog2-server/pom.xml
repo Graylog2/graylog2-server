@@ -750,6 +750,10 @@
                 <targetPath>web-interface/assets</targetPath>
             </resource>
             <resource>
+                <directory>${webInterface.path}/target/preflight/build</directory>
+                <targetPath>preflight/assets</targetPath>
+            </resource>
+            <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>**/*.properties</exclude>
