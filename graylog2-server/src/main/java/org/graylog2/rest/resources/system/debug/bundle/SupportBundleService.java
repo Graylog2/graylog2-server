@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.debug.bundle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import okhttp3.ResponseBody;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +28,7 @@ import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -41,6 +43,9 @@ import org.graylog2.shared.rest.resources.ProxiedResource.CallResult;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 import org.graylog2.shared.system.stats.SystemStats;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.system.stats.ClusterStatsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -54,6 +59,7 @@ import javax.ws.rs.core.HttpHeaders;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -66,6 +72,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -74,10 +81,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -100,18 +112,31 @@ public class SupportBundleService {
     private final RemoteInterfaceProvider remoteInterfaceProvider;
     private final Path bundleDir;
     private final ObjectMapper objectMapper;
+    private final ClusterStatsService clusterStatsService;
+    private final VersionProbe elasticVersionProbe;
+    private final List<URI> elasticsearchHosts;
+    private final ClusterAdapter searchDbClusterAdapter;
+
 
     @Inject
     public SupportBundleService(@Named("proxiedRequestsExecutorService") ExecutorService executor,
                                 NodeService nodeService,
                                 RemoteInterfaceProvider remoteInterfaceProvider,
                                 @Named("data_dir") Path dataDir,
-                                ObjectMapperProvider objectMapperProvider) {
+                                ObjectMapperProvider objectMapperProvider,
+                                ClusterStatsService clusterStatsService,
+                                VersionProbe searchDbProbe,
+                                @Named("elasticsearch_hosts") List<URI> searchDbHosts,
+                                ClusterAdapter searchDbClusterAdapter) {
         this.executor = executor;
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         objectMapper = objectMapperProvider.get();
         bundleDir = dataDir.resolve(SUPPORT_BUNDLE_DIR_NAME);
+        this.clusterStatsService = clusterStatsService;
+        this.elasticVersionProbe = searchDbProbe;
+        this.elasticsearchHosts = searchDbHosts;
+        this.searchDbClusterAdapter = searchDbClusterAdapter;
     }
 
     public void buildBundle(HttpHeaders httpHeaders, Subject currentSubject) {
@@ -164,7 +189,7 @@ public class SupportBundleService {
                     proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
                     RemoteSystemResource::processBufferDump, CALL_TIMEOUT);
 
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson,
+            final Map<String, Object> result = new HashMap<>(
                     Map.of(
                             "manifest", nodeManifests,
                             "cluster_system_overview", stripCallResult(systemOverview),
@@ -172,7 +197,46 @@ public class SupportBundleService {
                             "process_buffer_dump", stripCallResult(processBuffer)
                     )
             );
+            result.putAll(getClusterInfo());
+
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson, result);
         }
+    }
+
+    private Map<String, Object> getClusterInfo() {
+        ExecutorService executorService =
+                Executors.newFixedThreadPool(3,
+                        new ThreadFactoryBuilder().setNameFormat("support-bundle-cluster-info-collector").build());
+
+        final Map<String, Object> clusterInfo = new ConcurrentHashMap<>();
+        final Map<String, Object> searchDb = new ConcurrentHashMap<>();
+
+        final CompletableFuture<?> clusterStats = timeLimitedOrErrorString(clusterStatsService::clusterStats,
+                executorService).thenAccept(stats -> clusterInfo.put("cluster_stats", stats));
+
+        final CompletableFuture<?> searchDbVersion =
+                timeLimitedOrErrorString(() -> elasticVersionProbe.probe(elasticsearchHosts)
+                        .map(SearchVersion::toString).orElse("Unknown"), executorService)
+                        .thenAccept(version -> searchDb.put("version", version));
+        final CompletableFuture<?> searchDbStats = timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats,
+                executorService).thenAccept(stats -> searchDb.put("stats", stats));
+
+        try {
+            CompletableFuture.allOf(clusterStats, searchDbVersion, searchDbStats).get();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed collecting cluster info", e);
+        } finally {
+            executorService.shutdownNow();
+        }
+
+        clusterInfo.put("search_db", searchDb);
+        return clusterInfo;
+    }
+
+    private CompletableFuture<Object> timeLimitedOrErrorString(Supplier<Object> supplier, Executor executor) {
+        return CompletableFuture.supplyAsync(supplier, executor)
+                .exceptionally(e -> Optional.ofNullable(e.getLocalizedMessage()).orElse(e.getClass().getSimpleName()))
+                .completeOnTimeout("Timeout after " + CALL_TIMEOUT + "!", CALL_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     private <T> Map<String, T> stripCallResult(Map<String, CallResult<T>> input) {
