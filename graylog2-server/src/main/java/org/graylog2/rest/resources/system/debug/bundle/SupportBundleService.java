@@ -33,6 +33,7 @@ import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
+import org.graylog2.rest.models.system.plugins.responses.PluginList;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse;
@@ -41,6 +42,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.ProxiedResource.CallResult;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
+import org.graylog2.shared.rest.resources.system.RemoteSystemPluginResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 import org.graylog2.shared.system.stats.SystemStats;
 import org.graylog2.storage.SearchVersion;
@@ -189,12 +191,16 @@ public class SupportBundleService {
                     proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
                     RemoteSystemResource::processBufferDump, CALL_TIMEOUT);
 
+            final Map<String, CallResult<PluginList>> installedPlugins = proxiedResourceHelper.requestOnAllNodes(
+                    RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT);
+
             final Map<String, Object> result = new HashMap<>(
                     Map.of(
                             "manifest", nodeManifests,
                             "cluster_system_overview", stripCallResult(systemOverview),
                             "jvm", stripCallResult(jvm),
-                            "process_buffer_dump", stripCallResult(processBuffer)
+                            "process_buffer_dump", stripCallResult(processBuffer),
+                            "installed_plugins", stripCallResult(installedPlugins)
                     )
             );
             result.putAll(getClusterInfo());
