@@ -41,8 +41,16 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class NodeServiceImpl extends PersistedServiceImpl implements NodeService {
+    public static final String LAST_SEEN_FIELD = "$last_seen";
     private final long pingTimeout;
-    private final static Map<String, Object> lastSeenField = Map.of("last_seen", Map.of("$type", "timestamp"));
+    private final static Map<String, Object> lastSeenFieldDefinition = Map.of("last_seen", Map.of("$type", "timestamp"));
+    private final static DBObject addLastSeenFieldAsDate = new BasicDBObject("$addFields", Map.of("last_seen_date", Map.of("$cond",
+            Map.of(
+                    "if", Map.of("$isNumber", LAST_SEEN_FIELD),
+                    "then", Map.of("$toDate", Map.of("$toLong", LAST_SEEN_FIELD)),
+                    "else", Map.of("$toDate", Map.of("$dateToString", Map.of("date", LAST_SEEN_FIELD)))
+            )
+    )));
 
     @Inject
     public NodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
@@ -68,7 +76,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
                         "transport_address", httpPublishUri.toString(),
                         "hostname", hostname
                 ),
-                "$currentDate", lastSeenField
+                "$currentDate", lastSeenFieldDefinition
         );
 
         final WriteResult result = this.collection(NodeImpl.class).update(
@@ -124,7 +132,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
                 .addAll(additionalMatches)
                 .build();
         return List.of(
-                new BasicDBObject("$addFields", Map.of("last_seen_date", Map.of("$toDate", Map.of("$dateToString", Map.of("date", "$last_seen"))))),
+                addLastSeenFieldAsDate,
                 new BasicDBObject("$match", Map.of("$and", match)),
                 new BasicDBObject("$unset", "last_seen_date")
         );
@@ -137,7 +145,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Override
     public void dropOutdated() {
         var outdatedIds = aggregate(List.of(
-                new BasicDBObject("$addFields", Map.of("last_seen_date", Map.of("$toDate", Map.of("$dateToString", Map.of("date", "$last_seen"))))),
+                addLastSeenFieldAsDate,
                 new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout)))))),
                 new BasicDBObject("$project", Map.of("_id", "$_id"))
         ))
@@ -165,7 +173,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
                         "is_leader", isLeader,
                         "transport_address", restTransportAddress.toString()
                 ),
-                "$currentDate", lastSeenField
+                "$currentDate", lastSeenFieldDefinition
         ));
 
         final WriteResult result = super.collection(NodeImpl.class).update(query, update);
