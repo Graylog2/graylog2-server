@@ -61,7 +61,10 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
 
   useEffect(() => {
     const setGroup = () => {
-      if (isTelemetryDataLoaded && telemetryData) {
+      if (isTelemetryDataLoaded
+        && telemetryData
+        && telemetryData.user_telemetry_settings?.telemetry_enabled) {
+        console.log(telemetryData);
         const {
           cluster: { cluster_id: clusterId, ...clusterDetails },
           current_user: { user, ...userDetails },
