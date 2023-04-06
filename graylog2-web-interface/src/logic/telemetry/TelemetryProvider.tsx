@@ -64,7 +64,6 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
       if (isTelemetryDataLoaded
         && telemetryData
         && telemetryData.user_telemetry_settings?.telemetry_enabled) {
-        console.log(telemetryData);
         const {
           cluster: { cluster_id: clusterId, ...clusterDetails },
           current_user: { user, ...userDetails },
@@ -74,7 +73,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
           user_telemetry_settings: { telemetry_permission_asked: isPermissionAsked },
         } = telemetryData as TelemetryDataType;
 
-        posthog.group('company', clusterId, {
+        posthog.group('cluster', clusterId, {
           ...clusterDetails,
           ...license,
           ...plugin,
