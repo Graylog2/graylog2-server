@@ -462,6 +462,11 @@
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -541,6 +546,31 @@
                                     <replacement>$1-linux-aarch64/</replacement>
                                 </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                             </fileMappers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>fix-opensearch-config-permissions</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- Some config files in opensearch-*/config/ use 660 permissions. That's a problem
+                                     when running OpenSearch under a different user account than the owner of the
+                                     OpenSearch config files. (OS packages or container image)
+                                -->
+                                <chmod dir="${project.build.directory}/opensearch"
+                                       includes="opensearch-*/config/**"
+                                       perm="ugo+r" />
+                            </target>
                         </configuration>
                     </execution>
                 </executions>

@@ -38,7 +38,9 @@ public class ProcessStateMachine {
 
         // Freshly created process, it hasn't started yet and doesn't have any pid.
         config.configure(ProcessState.NEW)
-                .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING);
+                .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
+                .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
+                .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.TERMINATED);
 
         // the process has started already, now we have to wait for a running OS and available REST api
         // the startupFailuresCounter keeps track of failed REST status calls and allow failures during the
