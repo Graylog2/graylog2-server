@@ -11,7 +11,9 @@
   "readme": "../README.md",
   "scripts": {
     "start": "webpack serve -c webpack.bundled.ts",
+    "start:preflight": "webpack serve -c webpack.preflight.ts",
     "build": "cross-env disable_plugins=true webpack --config webpack.bundled.ts",
+    "build:preflight": "cross-env webpack --config webpack.preflight.ts",
     "build:stats": "cross-env disable_plugins=true webpack --profile --json > ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json",
     "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
     "generate:apidefs": "ts-node src/generator/generate.ts ../graylog2-server/target/swagger target/api",
@@ -75,7 +77,7 @@
     "mousetrap": "^1.6.5",
     "numeral": "^2.0.6",
     "plotly.js": "2.20.0",
-    "posthog-js": "^1.51.5",
+    "posthog-js": "^1.52.0",
     "promise-polyfill": "^8.2.0",
     "qs": "^6.3.0",
     "react-ace": "10.1.0",
