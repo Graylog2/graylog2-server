@@ -29,7 +29,7 @@ public class TelemetryConfiguration {
     private String telemetryApiKey;
 
     @Parameter(value = "telemetry_host")
-    private String telemetryApiHost = "https://eu.posthog.com/";
+    private String telemetryApiHost = "https://eu.posthog.com";
 
     @Parameter(value = TELEMETRY_ENABLED)
     private boolean telemetryEnabled = true;
