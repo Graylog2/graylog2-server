@@ -1123,6 +1123,7 @@
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
+                                <id>copy-web-ui-assets</id>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -1136,12 +1137,8 @@
                                     </resources>
                                 </configuration>
                             </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
                             <execution>
+                                <id>copy-preflight-ui-assets</id>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
