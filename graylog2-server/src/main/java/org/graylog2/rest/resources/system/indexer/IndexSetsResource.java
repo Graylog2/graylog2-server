@@ -136,11 +136,20 @@ public class IndexSetsResource extends RestResource {
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
                 .toList();
 
-        List<IndexSetConfig> pagedConfigs = allowedConfigurations.stream()
-                .sorted(Comparator.comparing(IndexSetConfig::title))
-                .skip(skip)
-                .limit(limit)
-                .toList();
+        List<IndexSetConfig> pagedConfigs;
+        Comparator<IndexSetConfig> titleComparator = Comparator.comparing(IndexSetConfig::title, String.CASE_INSENSITIVE_ORDER);
+
+        if (limit > 0) {
+            pagedConfigs = allowedConfigurations.stream()
+                    .sorted(titleComparator)
+                    .skip(skip)
+                    .limit(limit)
+                    .toList();
+        } else {
+            pagedConfigs = allowedConfigurations.stream()
+                    .sorted(titleComparator)
+                    .toList();
+        }
 
         indexSets = pagedConfigs.stream()
                 .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
