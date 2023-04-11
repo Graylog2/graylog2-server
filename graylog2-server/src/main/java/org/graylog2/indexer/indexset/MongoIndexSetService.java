@@ -35,6 +35,7 @@ import org.mongojack.WriteResult;
 import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -175,7 +176,8 @@ public class MongoIndexSetService implements IndexSetService {
 
     @Override
     public List<IndexSetConfig> searchByTitle(String searchString) {
-        Pattern searchPattern = Pattern.compile(".*%s.*".formatted(searchString), Pattern.CASE_INSENSITIVE);
+        String formatedSearchString = String.format(Locale.getDefault(), ".*%s.*", searchString);
+        Pattern searchPattern = Pattern.compile(formatedSearchString, Pattern.CASE_INSENSITIVE);
         DBQuery.Query query = DBQuery.regex("title", searchPattern);
         return ImmutableList.copyOf(collection.find(query)
                 .sort(DBSort.asc("title"))
