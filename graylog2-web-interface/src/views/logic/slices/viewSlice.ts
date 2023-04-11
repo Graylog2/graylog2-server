@@ -251,7 +251,7 @@ export const mergeQueryTitles = (newQueryTitles: { queryId: QueryId, titlesMap: 
 export const setQueryString = (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
   const query = selectQueryById(queryId)(getState());
   const newQuery = query.toBuilder()
-    .query({ type: 'elasticsearch', query_string: newQueryString })
+    .query(createElasticsearchQueryString(newQueryString))
     .build();
 
   return dispatch(updateQuery(queryId, newQuery));
