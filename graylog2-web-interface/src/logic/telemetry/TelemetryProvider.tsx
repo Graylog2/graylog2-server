@@ -16,43 +16,13 @@
  */
 import React, { useMemo, useEffect, useState } from 'react';
 import { usePostHog } from 'posthog-js/react';
-import { useQuery } from '@tanstack/react-query';
 
-import { Telemetry } from '@graylog/server-api';
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
 import TelemetryInfoModal from 'logic/telemetry/TelemetryInfoModal';
-
-const TELEMETRY_CLUSTER_INFO_QUERY_KEY = 'telemetry.cluster.info';
-type TelemetryDataType = {
-  current_user: {
-    [key: string]: string,
-  },
-  user_telemetry_settings: {
-    [key: string]: string,
-  },
-  cluster: {
-    [key: string]: string,
-  },
-  license: {
-    [key: string]: string,
-  },
-  plugin: {
-    [key: string]: string,
-  },
-  search_cluster: {
-    [key: string]: string,
-  },
-}
-
-const useTelemetryData = () => {
-  return useQuery([TELEMETRY_CLUSTER_INFO_QUERY_KEY], () => Telemetry.get() as Promise<TelemetryDataType>, {
-    retry: 0,
-    keepPreviousData: true,
-    notifyOnChangeProps: ['data', 'error'],
-  });
-};
+import type { TelemetryDataType } from 'logic/telemetry/useTelemetryData';
+import useTelemetryData from 'logic/telemetry/useTelemetryData';
 
 const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
@@ -113,7 +83,8 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   return (
     <TelemetryContext.Provider value={TelemetryContextValue}>
       {children}
-      <TelemetryInfoModal show={showTelemetryInfo} onConfirm={() => handleConfirmTelemetryDialog()} />
+      {showTelemetryInfo
+        && <TelemetryInfoModal show={showTelemetryInfo} onConfirm={() => handleConfirmTelemetryDialog()} />}
     </TelemetryContext.Provider>
   );
 };
