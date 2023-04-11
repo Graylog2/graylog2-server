@@ -1,0 +1,4 @@
+type = "s"
+message = "Update snakeyaml version to 2.0. (fixes CVE-2022-1471)"
+
+pulls = ["15188"]
