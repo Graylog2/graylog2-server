@@ -24,6 +24,7 @@ import { Col, Row, Button } from 'components/bootstrap';
 import { LinkToNode, IfPermitted, Icon } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const NodeLoggers = createReactClass({
   displayName: 'NodeLoggers',
@@ -31,6 +32,7 @@ const NodeLoggers = createReactClass({
   propTypes: {
     nodeId: PropTypes.string.isRequired,
     subsystems: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connect(MetricsStore)],
@@ -67,7 +69,7 @@ const NodeLoggers = createReactClass({
   },
 
   render() {
-    const { nodeId, subsystems } = this.props;
+    const { nodeId, subsystems, sendTelemetry } = this.props;
     const { showDetails } = this.state;
     const subsystemKeys = Object.keys(subsystems)
       .map((subsystem) => (
@@ -88,7 +90,15 @@ const NodeLoggers = createReactClass({
                 <Button bsSize="sm"
                         bsStyle="primary"
                         className="trigger-log-level-metrics"
-                        onClick={() => this.setState({ showDetails: !showDetails })}>
+                        onClick={() => {
+                          this.setState({ showDetails: !showDetails });
+
+                          sendTelemetry('toggle_input_button', {
+                            appSection: 'logging',
+                            eventElement: 'show-log-level-metrics',
+                            eventInfo: { showing: !showDetails },
+                          });
+                        }}>
                   <Icon name="tachometer-alt" />{' '}
                   {showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
@@ -109,4 +119,4 @@ const NodeLoggers = createReactClass({
   },
 });
 
-export default NodeLoggers;
+export default withTelemetry(NodeLoggers);
