@@ -19,6 +19,10 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from 'views/types';
 import { selectGlobalOverride, selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import View from 'views/logic/views/View';
+import type { ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
+import type Search from 'views/logic/search/Search';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 export const selectRootView = (state: RootState) => state.view;
 export const selectView = createSelector(selectRootView, (state) => state.view);
@@ -50,13 +54,24 @@ export const selectQueryById = (queryId: string) => createSelector(
 export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);
 export const selectWidget = (widgetId: string) => createSelector(selectWidgets, (widgets) => widgets.find((widget) => widget.id === widgetId));
 export const selectTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);
+
+const queryStringFromActiveQuery = (queryId: string, search: Search) => search.queries.find((q) => q.id === queryId).query.query_string;
+
+const queryStringFromGlobalOverride = (globalOverride: GlobalOverride) => {
+  const { query_string: queryString }: ElasticsearchQueryString = globalOverride?.query
+    ? globalOverride.query
+    : createElasticsearchQueryString();
+
+  return queryString;
+};
+
 export const selectCurrentQueryString = (queryId: string) => createSelector(
   selectViewType,
   selectGlobalOverride,
   selectSearch,
   (viewType, globalOverride, search) => (viewType === View.Type.Search
-    ? search.queries.find((q) => q.id === queryId).query.query_string
-    : globalOverride.query.query_string),
+    ? queryStringFromActiveQuery(queryId, search)
+    : queryStringFromGlobalOverride(globalOverride)),
 );
 
 export const selectParameters = createSelector(selectSearch, (search) => search.parameters);
