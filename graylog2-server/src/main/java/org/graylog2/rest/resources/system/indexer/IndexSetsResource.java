@@ -69,6 +69,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -130,28 +131,26 @@ public class IndexSetsResource extends RestResource {
         List<IndexSetSummary> indexSets;
         int count;
 
-        if (limit > 0) {
-            // First collect all index set ids the user is allowed to see.
-            final Set<String> allowedIds = indexSetService.findAll().stream()
-                    .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
-                    .map(IndexSetConfig::id)
-                    .collect(Collectors.toSet());
+        List<IndexSetConfig> allowedConfigurations = indexSetService.findAll()
+                .stream()
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+                .toList();
 
-            indexSets = indexSetService.findPaginated(allowedIds, limit, skip).stream()
-                    .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
-                    .collect(Collectors.toList());
-            count = allowedIds.size();
-        } else {
-            indexSets = indexSetService.findAll().stream()
-                    .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
-                    .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
-                    .collect(Collectors.toList());
-            count = indexSets.size();
-        }
+        List<IndexSetConfig> pagedConfigs = allowedConfigurations.stream()
+                .sorted(Comparator.comparing(IndexSetConfig::title))
+                .skip(skip)
+                .limit(limit)
+                .toList();
+
+        indexSets = pagedConfigs.stream()
+                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .toList();
+
+        count = allowedConfigurations.size();
 
         final Map<String, IndexSetStats> stats;
         if (computeStats) {
-            stats = indexSetRegistry.getAll().stream()
+            stats = indexSetRegistry.getForIndexConfig(pagedConfigs).stream()
                     .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
         } else {
             stats = Collections.emptyMap();
