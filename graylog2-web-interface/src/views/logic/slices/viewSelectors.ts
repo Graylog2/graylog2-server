@@ -53,8 +53,8 @@ export const selectWidget = (widgetId: string) => createSelector(selectWidgets, 
 export const selectTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);
 
 const selectQueryStringFromQuery = (queryId: string) => createSelector(selectSearch, (search) => (
-  search.queries.find((q) => q.id === queryId).query.query_string),
-);
+  search.queries.find((q) => q.id === queryId).query.query_string
+));
 
 const selectQueryStringFromGlobalOverride = createSelector(selectGlobalOverride, (globalOverride) => {
   const { query_string } = globalOverride?.query ?? createElasticsearchQueryString();
@@ -66,7 +66,7 @@ export const selectQueryString = (queryId: string) => createSelector(
   selectViewType,
   selectQueryStringFromQuery(queryId),
   selectQueryStringFromGlobalOverride,
-  (viewType, globalOverrideQueryString, queryQueryString) => (
+  (viewType, queryQueryString, globalOverrideQueryString) => (
     viewType === View.Type.Search
       ? queryQueryString
       : globalOverrideQueryString
