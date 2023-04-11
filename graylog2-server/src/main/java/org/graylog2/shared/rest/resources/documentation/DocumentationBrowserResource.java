@@ -35,7 +35,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
@@ -47,9 +46,6 @@ import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
 public class DocumentationBrowserResource extends RestResource {
-    private final static String CSP_HEADER = "Content-Security-Policy";
-    private final static String CSP_STRING = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval'; img-src 'self' data:;";
-
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;
 
@@ -72,7 +68,6 @@ public class DocumentationBrowserResource extends RestResource {
         final String index = index(httpHeaders);
         return Response.ok(index, MediaType.TEXT_HTML_TYPE)
                 .header(HttpHeaders.CONTENT_LENGTH, index.length())
-                .header(CSP_HEADER, CSP_STRING)
                 .build();
     }
 
@@ -83,13 +78,8 @@ public class DocumentationBrowserResource extends RestResource {
     public String index(@Context HttpHeaders httpHeaders) throws IOException {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
-
-        final MultivaluedMap<String, String> requestHeaders = httpHeaders.getRequestHeaders();
-        requestHeaders.add(CSP_HEADER, CSP_STRING);
-        final URI relativePath = RestTools.buildRelativeExternalUri(requestHeaders, httpConfiguration.getHttpPublishUri());
-
         final Map<String, Object> model = ImmutableMap.of(
-                "baseUri", relativePath.resolve(HttpConfiguration.PATH_API).toString(),
+                "baseUri", httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API).toString(),
                 "globalModePath", "",
                 "globalUriMarker", "",
                 "showWarning", "");
@@ -103,10 +93,7 @@ public class DocumentationBrowserResource extends RestResource {
     public String allIndex(@Context HttpHeaders httpHeaders) throws IOException {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
-
-        final MultivaluedMap<String, String> requestHeaders = httpHeaders.getRequestHeaders();
-        requestHeaders.add(CSP_HEADER, CSP_STRING);
-        final URI relativePath = RestTools.buildRelativeExternalUri(requestHeaders, httpConfiguration.getHttpExternalUri());
+        final URI relativePath = RestTools.buildRelativeExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri());
 
         final Map<String, Object> model = ImmutableMap.of(
                 "baseUri", relativePath.resolve(HttpConfiguration.PATH_API).toString(),
@@ -136,7 +123,6 @@ public class DocumentationBrowserResource extends RestResource {
 
                 return Response.ok(resourceBytes, mimeTypes.getContentType(route))
                         .header("Content-Length", resourceBytes.length)
-                        .header(CSP_HEADER, CSP_STRING)
                         .build();
             } catch (IOException e) {
                 throw new NotFoundException("Couldn't load " + resource, e);
