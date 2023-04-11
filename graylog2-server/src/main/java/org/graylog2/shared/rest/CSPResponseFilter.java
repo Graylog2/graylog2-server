@@ -27,9 +27,15 @@ public class CSPResponseFilter implements ContainerResponseFilter {
     public void filter(final ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
         final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
+
         if (!headers.containsKey(CSP_HEADER)) {
-            headers.add(CSP_HEADER,
-                    "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;");
+            String cspString;
+            if (requestContext.getUriInfo().getRequestUri().toString().contains("api-browser")) {
+                cspString = "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:;";
+            } else {
+                cspString = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;";
+            }
+            headers.add(CSP_HEADER, cspString);
         }
     }
 }
