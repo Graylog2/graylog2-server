@@ -40,6 +40,7 @@ import createSearch from 'views/logic/slices/createSearch';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 const viewSlice = createSlice({
   name: 'view',
