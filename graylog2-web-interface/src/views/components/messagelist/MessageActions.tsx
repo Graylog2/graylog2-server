@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 
 import { LinkContainer } from 'components/common/router';
@@ -23,8 +24,7 @@ import { ClipboardButton } from 'components/common';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-
-import InvestigationsMenu from './InvestigationsMenu';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const streamList = streams.map((stream) => {
@@ -79,6 +79,9 @@ const MessageActions = ({
   streams,
   searchConfig,
 }: Props) => {
+  const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
+  const menuActions = useMemo(() => pluggableMenuActions.map((PluggableMenuAction) => <PluggableMenuAction id={id} index={index} />), [pluggableMenuActions]);
+
   if (disabled) {
     return <ButtonGroup className="pull-right" bsSize="small" />;
   }
@@ -100,11 +103,7 @@ const MessageActions = ({
     <ButtonGroup className="pull-right" bsSize="small">
       {showChanges}
       <Button href={messageUrl}>Permalink</Button>
-      <InvestigationsMenu index={index}
-                          id={id}
-                          type="logs"
-                          bsSize="small"
-                          title="Investigations" />
+      {menuActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
