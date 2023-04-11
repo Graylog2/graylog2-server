@@ -24,6 +24,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, Tooltip, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
 import { OverlayTrigger, IfPermitted } from 'components/common';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   user: UserOverview,
@@ -65,24 +66,40 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
 
 const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
   const currentUser = useCurrentUser();
+  const sendTelemetry = useSendTelemetry();
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
         UsersDomain.setStatus(id, 'disabled');
+
+        sendTelemetry('click', {
+          appSection: 'user_actions',
+          eventElement: 'disabled-user',
+        });
       }
 
       return;
     }
 
     UsersDomain.setStatus(id, 'enabled');
+
+    sendTelemetry('click', {
+      appSection: 'user_actions',
+      eventElement: 'enable-user',
+    });
   };
 
   const _deleteUser = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete user ${fullName}?`)) {
       UsersDomain.delete(id, fullName);
+
+      sendTelemetry('click', {
+        appSection: 'user_actions',
+        eventElement: 'delete-user',
+      });
     }
   };
 
