@@ -30,7 +30,7 @@ type PostHogSettings = {
 const POSTHOG_DEBUG = true;
 
 const getPostHogSettings = (): PostHogSettings => {
-  const { host, api_key: key } = AppConfig.telemetry();
+  const { host, api_key: key } = AppConfig.telemetry() || {};
 
   return {
     host: host,
