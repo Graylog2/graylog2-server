@@ -79,7 +79,7 @@ import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets", description = "Index sets", tags={CLOUD_VISIBLE})
+@Api(value = "System/IndexSets", description = "Index sets", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/index_sets")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
@@ -170,18 +170,26 @@ public class IndexSetsResource extends RestResource {
     public IndexSetPaginationResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).")
                                            @QueryParam("skip") String skip,
                                            @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                           @QueryParam("limit") @DefaultValue("0") int limit) {
+                                           @QueryParam("limit") @DefaultValue("0") int limit,
+                                           @ApiParam(name = "stats", value = "Include index set stats.")
+                                           @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
 
-        List<IndexSetSummary> indexSets = indexSetService.findPaginated(skip, limit).stream()
-                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+        List<IndexSetConfig> permittedConfigs = indexSetService.findPaginated(skip, limit).stream()
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id())).collect(Collectors.toList());
+        List<IndexSetSummary> indexSets = permittedConfigs.stream()
                 .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
                 .toList();
 
-        indexSetRegistry.getAll().stream()
-                .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
+        Map<String, IndexSetStats> statsMap = Collections.emptyMap();
+
+        if (computeStats) {
+            statsMap = indexSetRegistry.getForIndexConfig(permittedConfigs).stream()
+                    .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
+        }
+
         int lastIndex = limit != 0 ? (limit - 1) : limit;
-        return IndexSetPaginationResponse.create(indexSets, indexSets.get(lastIndex).id());
+        return IndexSetPaginationResponse.create(indexSets, statsMap, indexSets.get(lastIndex).id());
     }
 
     @GET
