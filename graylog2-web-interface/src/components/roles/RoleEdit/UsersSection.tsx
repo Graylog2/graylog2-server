@@ -26,6 +26,7 @@ import { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type Role from 'logic/roles/Role';
 import type { PaginatedList } from 'stores/PaginationTypes';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import UsersSelector from './UsersSelector';
 
@@ -42,6 +43,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedList<UserOverview>>();
   const [errors, setErrors] = useState<string | undefined>();
+  const sendTelemetry = useSendTelemetry();
 
   const _onLoad = useCallback((pagination) => {
     setLoading(true);
@@ -59,6 +61,11 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
     .then((result) => {
       setPaginatedUsers(result);
 
+      sendTelemetry('click', {
+        appSection: 'edit_role',
+        eventElement: 'assign-user',
+      });
+
       return result;
     }));
 
@@ -75,6 +82,11 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
 
     AuthzRolesDomain.removeMember(id, user.name).then(() => {
       _onLoad(DEFAULT_PAGINATION).then(setPaginatedUsers);
+
+      sendTelemetry('click', {
+        appSection: 'edit_role',
+        eventElement: 'unassign-user',
+      });
     });
   };
 
