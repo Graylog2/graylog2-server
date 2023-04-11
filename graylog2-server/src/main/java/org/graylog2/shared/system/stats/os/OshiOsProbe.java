@@ -22,6 +22,7 @@ import oshi.hardware.CentralProcessor.TickType;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.VirtualMemory;
+import oshi.util.Util;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,6 +60,8 @@ public class OshiOsProbe implements OsProbe {
         final CentralProcessor centralProcessor = hardware.getProcessor();
 
         long[] prevTicks = centralProcessor.getSystemCpuLoadTicks();
+        // Wait a second...
+        Util.sleep(1000);
         long[] ticks = centralProcessor.getSystemCpuLoadTicks();
         short user = (short) (ticks[TickType.USER.getIndex()] - prevTicks[TickType.USER.getIndex()]);
         short sys = (short) (ticks[TickType.SYSTEM.getIndex()] - prevTicks[TickType.SYSTEM.getIndex()]);
@@ -71,7 +74,7 @@ public class OshiOsProbe implements OsProbe {
         final Processor proc = Processor.create(
                 processorIdentifier.getName(),
                 processorIdentifier.getVendor(),
-                ((int) processorIdentifier.getVendorFreq() / 1000000),
+                (int) (processorIdentifier.getVendorFreq() / 1000000),
                 centralProcessor.getLogicalProcessorCount(),
                 centralProcessor.getPhysicalPackageCount(),
                 centralProcessor.getLogicalProcessorCount() / totalSockets,
