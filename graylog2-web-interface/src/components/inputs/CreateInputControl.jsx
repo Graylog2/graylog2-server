@@ -100,13 +100,13 @@ const CreateInputControl = createReactClass({
   },
 
   _createInput(data) {
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'inputs',
+      eventElement: 'create-input',
+    });
+
     InputsActions.create(data).then(() => {
       this.setState(this.getInitialState());
-
-      this.props.sendTelemetry('submit_form', {
-        appSection: 'inputs',
-        eventElement: 'create-input',
-      });
     });
   },
 

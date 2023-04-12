@@ -66,13 +66,13 @@ const IndexSetsComponent = createReactClass({
 
   _onSetDefault(indexSet) {
     return () => {
+      this.props.sendTelemetry('click', {
+        appSection: 'index_sets',
+        eventElement: 'set-default-index-set',
+      });
+
       IndexSetsActions.setDefault(indexSet).then(() => {
         this.loadData(this.currentPageNo, this.currentPageSize);
-
-        this.props.sendTelemetry('click', {
-          appSection: 'index_sets',
-          eventElement: 'set-default-index-set',
-        });
       });
     };
   },
@@ -86,13 +86,13 @@ const IndexSetsComponent = createReactClass({
   _deleteIndexSet(indexSet, deleteIndices) {
     this.props.paginationQueryParameter.resetPage();
 
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'index_sets',
+      eventElement: 'delete-index-set',
+    });
+
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
       this.loadData(1, this.PAGE_SIZE);
-
-      this.props.sendTelemetry('submit_form', {
-        appSection: 'index_sets',
-        eventElement: 'delete-index-set',
-      });
     });
   },
   // eslint-disable-next-line react/no-unstable-nested-components

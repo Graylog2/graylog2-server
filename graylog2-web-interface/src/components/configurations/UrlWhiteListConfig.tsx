@@ -94,13 +94,13 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     const { config, isValid } = this.state;
     const { updateConfig, sendTelemetry } = this.props;
 
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_url_whitelist',
+      eventElement: 'update_configuration_button',
+    });
+
     if (isValid) {
       updateConfig(config).then(() => {
-        sendTelemetry('submit_form', {
-          appSection: 'configurations_url_whitelist',
-          eventElement: 'update_configuration_button',
-        });
-
         this._closeModal();
       });
     }

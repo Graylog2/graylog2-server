@@ -69,6 +69,11 @@ const OutputsComponent = createReactClass({
   },
 
   _handleCreateOutput(data) {
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'outputs',
+      eventElement: 'create-output',
+    });
+
     OutputsStore.save(data, (result) => {
       this.setState({ typeName: 'placeholder' });
 
@@ -81,11 +86,6 @@ const OutputsComponent = createReactClass({
       } else {
         this._handleUpdate();
       }
-
-      this.props.sendTelemetry('submit_form', {
-        appSection: 'outputs',
-        eventElement: 'create-output',
-      });
 
       return result;
     });
@@ -103,28 +103,28 @@ const OutputsComponent = createReactClass({
   },
 
   _handleAssignOutput(outputId) {
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'outputs',
+      eventElement: 'assign-output',
+    });
+
     StreamsStore.addOutput(this.props.streamId, outputId, (response) => {
       this._handleUpdate();
-
-      this.props.sendTelemetry('submit_form', {
-        appSection: 'outputs',
-        eventElement: 'assign-output',
-      });
 
       return response;
     });
   },
 
   _removeOutputGlobally(outputId) {
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'outputs',
+      eventElement: 'remove-output-globally',
+    });
+
     if (window.confirm('Do you really want to terminate this output?')) {
       OutputsStore.remove(outputId, (response) => {
         UserNotification.success('Output was terminated.', 'Success');
         this._handleUpdate();
-
-        this.props.sendTelemetry('submit_form', {
-          appSection: 'outputs',
-          eventElement: 'remove-output-globally',
-        });
 
         return response;
       });
@@ -132,15 +132,15 @@ const OutputsComponent = createReactClass({
   },
 
   _removeOutputFromStream(outputId, streamId) {
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'outputs',
+      eventElement: 'remove-output-from-stream',
+    });
+
     if (window.confirm('Do you really want to remove this output from the stream?')) {
       StreamsStore.removeOutput(streamId, outputId, (response) => {
         UserNotification.success('Output was removed from stream.', 'Success');
         this._handleUpdate();
-
-        this.props.sendTelemetry('submit_form', {
-          appSection: 'outputs',
-          eventElement: 'remove-output-from-stream',
-        });
 
         return response;
       });
@@ -148,13 +148,13 @@ const OutputsComponent = createReactClass({
   },
 
   _handleOutputUpdate(output, deltas) {
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'outputs',
+      eventElement: 'update-output',
+    });
+
     OutputsStore.update(output, deltas, () => {
       this._handleUpdate();
-
-      this.props.sendTelemetry('submit_form', {
-        appSection: 'outputs',
-        eventElement: 'update-output',
-      });
     });
   },
 

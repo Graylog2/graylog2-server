@@ -87,12 +87,12 @@ const EventsConfig = createReactClass({
     const { updateConfig, sendTelemetry } = this.props;
     const { config } = this.state;
 
-    updateConfig(config).then(() => {
-      sendTelemetry('submit_form', {
-        appSection: 'configurations_events_system',
-        eventElement: 'update_configuration_button',
-      });
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_events_system',
+      eventElement: 'update_configuration_button',
+    });
 
+    updateConfig(config).then(() => {
       this._closeModal();
     });
   },

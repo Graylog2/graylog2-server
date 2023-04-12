@@ -56,20 +56,27 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       });
   }, [id, name]);
 
-  const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => AuthzRolesDomain.addMembers(id,
-    newUsers.map((u) => u.username).toSet()).then(() => _onLoad(DEFAULT_PAGINATION)
-    .then((result) => {
-      setPaginatedUsers(result);
+  const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => {
+    sendTelemetry('click', {
+      appSection: 'edit_role',
+      eventElement: 'assign-user',
+    });
 
-      sendTelemetry('click', {
-        appSection: 'edit_role',
-        eventElement: 'assign-user',
-      });
+    return AuthzRolesDomain.addMembers(id,
+      newUsers.map((u) => u.username).toSet()).then(() => _onLoad(DEFAULT_PAGINATION)
+      .then((result) => {
+        setPaginatedUsers(result);
 
-      return result;
-    }));
+        return result;
+      }));
+  };
 
   const _onUnassignUser = (user) => {
+    sendTelemetry('click', {
+      appSection: 'edit_role',
+      eventElement: 'unassign-user',
+    });
+
     if ((role.name === 'Reader' || role.name === 'Admin')
       && (!user.roles.includes('Reader') || !user.roles.includes('Admin'))) {
       setErrors(`User '${user.name}' needs at least a Reader or Admin role.`);
@@ -82,11 +89,6 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
 
     AuthzRolesDomain.removeMember(id, user.name).then(() => {
       _onLoad(DEFAULT_PAGINATION).then(setPaginatedUsers);
-
-      sendTelemetry('click', {
-        appSection: 'edit_role',
-        eventElement: 'unassign-user',
-      });
     });
   };
 

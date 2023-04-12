@@ -67,28 +67,28 @@ const InputStateControl = createReactClass({
   _startInput() {
     this.setState({ loading: true });
 
+    this.props.sendTelemetry('click', {
+      appSection: 'inputs',
+      eventElement: 'start-input',
+    });
+
     InputStatesStore.start(this.props.input)
       .finally(() => {
-        this.setState({ loading: false })
-
-        this.props.sendTelemetry('click', {
-          appSection: 'inputs',
-          eventElement: 'start-input',
-        });
+        this.setState({ loading: false });
       });
   },
 
   _stopInput() {
     this.setState({ loading: true });
 
+    this.props.sendTelemetry('click', {
+      appSection: 'inputs',
+      eventElement: 'stop-input',
+    });
+
     InputStatesStore.stop(this.props.input)
       .finally(() => {
-        this.setState({ loading: false })
-
-        this.props.sendTelemetry('click', {
-          appSection: 'inputs',
-          eventElement: 'stop-input',
-        });
+        this.setState({ loading: false });
       });
   },
 

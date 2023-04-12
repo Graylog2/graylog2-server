@@ -47,13 +47,14 @@ const InputListItem = createReactClass({
   mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
 
   _deleteInput() {
+    this.props.sendTelemetry('click', {
+      appSection: 'inputs',
+      eventElement: 'delete-input',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete(this.props.input);
-      this.props.sendTelemetry('click', {
-        appSection: 'inputs',
-        eventElement: 'delete-input',
-      });
     }
   },
 

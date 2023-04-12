@@ -176,6 +176,11 @@ class SearchesConfig extends React.Component<Props, State> {
     } = this.state;
     const update = ObjectUtils.clone(config);
 
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_search',
+      eventElement: 'update_configuration_button',
+    });
+
     if (relativeTimeRangeOptionsUpdate) {
       update.relative_timerange_options = {};
 
@@ -222,11 +227,6 @@ class SearchesConfig extends React.Component<Props, State> {
     }
 
     updateConfig(update).then(() => {
-      sendTelemetry('submit_form', {
-        appSection: 'configurations_search',
-        eventElement: 'update_configuration_button',
-      });
-
       this._closeModal();
     });
   };

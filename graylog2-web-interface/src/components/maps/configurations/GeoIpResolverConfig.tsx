@@ -76,16 +76,16 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   };
 
   const handleSubmit = (values: GeoIpConfigType) => {
-    return updateConfig(values)
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_geolocation_processor',
+      eventElement: 'update_configuration_button',
+    });
+
+    updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
           setShowModal(false);
         }
-
-        sendTelemetry('submit_form', {
-          appSection: 'configurations_geolocation_processor',
-          eventElement: 'update_configuration_button',
-        });
       });
   };
 

@@ -53,12 +53,12 @@ const UserConfig = ({ config, updateConfig }: Props) => {
   const sendTelemetry = useSendTelemetry();
 
   const _saveConfig = (values) => {
-    updateConfig(values).then(() => {
-      sendTelemetry('submit_form', {
-        appSection: 'configurations_user',
-        eventElement: 'update_configuration_button',
-      });
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_user',
+      eventElement: 'update_configuration_button',
+    });
 
+    updateConfig(values).then(() => {
       setShowModal(false);
     });
   };

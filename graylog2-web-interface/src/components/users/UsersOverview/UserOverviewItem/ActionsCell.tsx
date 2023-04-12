@@ -70,14 +70,14 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {
+      sendTelemetry('click', {
+        appSection: 'user_actions',
+        eventElement: 'disabled-user',
+      });
+
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
         UsersDomain.setStatus(id, 'disabled');
-
-        sendTelemetry('click', {
-          appSection: 'user_actions',
-          eventElement: 'disabled-user',
-        });
       }
 
       return;
@@ -92,14 +92,14 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
   };
 
   const _deleteUser = () => {
+    sendTelemetry('click', {
+      appSection: 'user_actions',
+      eventElement: 'delete-user',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete user ${fullName}?`)) {
       UsersDomain.delete(id, fullName);
-
-      sendTelemetry('click', {
-        appSection: 'user_actions',
-        eventElement: 'delete-user',
-      });
     }
   };
 

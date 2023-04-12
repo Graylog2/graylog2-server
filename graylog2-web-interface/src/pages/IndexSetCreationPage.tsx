@@ -58,16 +58,16 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   }, []);
 
   const _saveConfiguration = (indexSetItem: IndexSet) => {
+    sendTelemetry('submit_form', {
+      appSection: 'index_sets',
+      eventElement: 'create-index-set',
+    });
+
     const copy = indexSetItem;
 
     copy.creation_date = adjustFormat(new Date(), 'internal');
 
     return IndexSetsActions.create(copy).then(() => {
-      sendTelemetry('submit_form', {
-        appSection: 'index_sets',
-        eventElement: 'create-index-set',
-      });
-
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
   };

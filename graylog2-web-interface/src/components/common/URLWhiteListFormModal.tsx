@@ -104,15 +104,14 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
       event.stopPropagation();
     }
 
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_url_whitelist',
+      eventElement: 'update_configuration_button',
+    });
+
     if (isValid) {
       ConfigurationsActions.updateWhitelist(URL_WHITELIST_CONFIG, config).then(() => {
         onUpdate();
-
-        sendTelemetry('submit_form', {
-          appSection: 'configurations_url_whitelist',
-          eventElement: 'update_configuration_button',
-        });
-
         closeModal();
       });
     }

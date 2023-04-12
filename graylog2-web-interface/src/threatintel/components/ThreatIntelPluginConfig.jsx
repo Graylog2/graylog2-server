@@ -96,12 +96,12 @@ const ThreatIntelPluginConfig = createReactClass({
   _saveConfig() {
     const { updateConfig, sendTelemetry } = this.props;
 
-    updateConfig(this.state.config).then(() => {
-      sendTelemetry('submit_form', {
-        appSection: 'configurations_threat_intel',
-        eventElement: 'update_configuration_button',
-      });
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_threat_intel',
+      eventElement: 'update_configuration_button',
+    });
 
+    updateConfig(this.state.config).then(() => {
       this._closeModal();
     });
   },

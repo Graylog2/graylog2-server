@@ -73,13 +73,13 @@ const MessageProcessorsConfig = createReactClass({
     const { updateConfig, sendTelemetry } = this.props;
     const { config } = this.state;
 
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_message_processors',
+      eventElement: 'update_configuration_button',
+    });
+
     if (!this._hasNoActiveProcessor()) {
       updateConfig(config).then(() => {
-        sendTelemetry('submit_form', {
-          appSection: 'configurations_message_processors',
-          eventElement: 'update_configuration_button',
-        });
-
         this._closeModal();
       });
     }

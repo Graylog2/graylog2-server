@@ -96,15 +96,14 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
     delete defaultIndexValues?.rotation_strategy;
     delete defaultIndexValues?.retention_strategy;
 
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_index_defaults',
+      eventElement: 'update_configuration_button',
+    });
+
     handleSaveConfig(defaultIndexValues)
       .then((config) => {
         setCurrentConfig(config as IndexConfig);
-
-        sendTelemetry('submit_form', {
-          appSection: 'configurations_index_defaults',
-          eventElement: 'update_configuration_button',
-        });
-
         setShowModal(false);
       })
       .catch(() => {
