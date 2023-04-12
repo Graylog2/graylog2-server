@@ -32,7 +32,7 @@ const TelemetryInfoText = ({ showProfile }: Props) => {
       We <b>do not</b> collect any personal data, any sensitive information or content such as logs that are in your
       instances.
       <br />
-      Learn more on our <ExternalLink href="https://www.graylog.com/">Privacy Policy</ExternalLink>.
+      Learn more on our <ExternalLink href="https://www.graylog.org/legal/">Privacy Policy</ExternalLink>.
       <br />
       You can turn data collection off or on any time
       {showProfile && <b> on User profile</b>}
