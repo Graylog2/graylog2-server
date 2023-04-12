@@ -22,7 +22,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 
 public class CSPResponseFilter implements ContainerResponseFilter {
-    private final static String CSP_HEADER = "Content-Security-Policy";
+    public final static String CSP_HEADER = "Content-Security-Policy";
     private String value;
 
     public CSPResponseFilter(String value) {
