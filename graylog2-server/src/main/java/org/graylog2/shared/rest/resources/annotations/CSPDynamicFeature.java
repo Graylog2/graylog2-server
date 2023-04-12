@@ -1,6 +1,5 @@
 package org.graylog2.shared.rest.resources.annotations;
 
-import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.rest.CSPResponseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,7 @@ import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
 public class CSPDynamicFeature implements DynamicFeature {
-    private static final Logger LOG = LoggerFactory.getLogger(MetricsDynamicBinding.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CSPDynamicFeature.class);
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
@@ -20,10 +19,10 @@ public class CSPDynamicFeature implements DynamicFeature {
         String cspValue = null;
         if (resourceClass != null && resourceClass.isAnnotationPresent(CSP.class)) {
             cspValue = resourceClass.getAnnotation(CSP.class).value();
-            LOG.info("CSP class annotation: {}", cspValue);
+            LOG.debug("CSP class annotation for {}: {}", resourceClass.getSimpleName(), cspValue);
         } else if (resourceMethod != null && resourceMethod.isAnnotationPresent(CSP.class)) {
             cspValue = resourceMethod.getAnnotation(CSP.class).value();
-            LOG.info("CSP method annotation: {}", cspValue);
+            LOG.debug("CSP method annotation for {}: {}", resourceMethod.getName(), cspValue);
         }
         if (cspValue != null) {
             CSPResponseFilter filter = new CSPResponseFilter(cspValue);
