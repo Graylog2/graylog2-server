@@ -1,0 +1,4 @@
+type = "s"
+message = "Update to Apache Shiro dependency to version 1.11.0. (the fixed CVEs don't affect Graylog)"
+
+pulls = ["15187"]

@@ -14,29 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+import * as React from 'react';
 
-import org.graylog.datanode.process.ProcessInfo;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import { Col } from 'components/bootstrap';
+import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 
-import java.net.URI;
-import java.util.List;
-
-public interface OpensearchProcess extends ManagableProcess {
-
-    ProcessInfo processInfo();
-
-    RestHighLevelClient restClient();
-
-    Object nodeName();
-
-    boolean isLeaderNode();
-    void setLeaderNode(boolean isManagerNode);
-
-    String opensearchVersion();
-
-    List<String> stdOutLogs();
-    List<String> stdErrLogs();
-
-    URI getOpensearchBaseUrl();
+type ConfigurationSectionProps = {
+  ConfigurationComponent: React.ComponentType,
+  title: string
 }
+
+const ConfigurationSection = ({ ConfigurationComponent, title } : ConfigurationSectionProps) => (
+  <Col md={10}>
+    <ConfigletContainer title={title}>
+      <ConfigurationComponent />
+    </ConfigletContainer>
+  </Col>
+);
+
+export type { ConfigurationSectionProps };
+
+export default ConfigurationSection;
