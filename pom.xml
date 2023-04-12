@@ -592,7 +592,6 @@
             </activation>
             <modules>
                 <module>data-node</module>
-                <module>data-node-distribution</module>
             </modules>
         </profile>
         <profile>
