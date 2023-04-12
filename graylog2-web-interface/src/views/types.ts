@@ -248,6 +248,18 @@ type MessageDetailContextProviderProps = {
 
 type DashboardActionComponentProps = {
   dashboard: View,
+  modalRef: () => unknown,
+}
+
+type DashboardActionModalProps = {
+  dashboard: View,
+  ref: React.Ref<unknown>,
+}
+
+type DashboardAction = {
+  key: string,
+  component: React.ComponentType<DashboardActionComponentProps>,
+  modal?: React.ComponentType<DashboardActionModalProps>,
 }
 
 type EventActionComponentProps = {
@@ -380,7 +392,7 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
-    'views.components.dashboardActions'?: Array<React.ComponentType<DashboardActionComponentProps>>;
+    'views.components.dashboardActions'?: Array<DashboardAction>;
     'views.components.eventActions'?: Array<React.ComponentType<EventActionComponentProps>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;

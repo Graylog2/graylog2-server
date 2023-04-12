@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -46,7 +46,15 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const paginationQueryParameter = usePaginationQueryParameter();
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
-  const dashboardActions = useMemo(() => pluggableDashboardActions.map((PluggableDashboardAction) => <PluggableDashboardAction dashboard={dashboard} />), [pluggableDashboardActions, dashboard]);
+  const modalRefs = useRef({});
+  const dashboardActions = useMemo(() => pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
+    <PluggableDashboardAction key={`dashboard-action-${key}`} dashboard={dashboard} modalRef={() => modalRefs.current[key]} />
+  )), [pluggableDashboardActions, dashboard]);
+  const dashboardActionModals = useMemo(() => pluggableDashboardActions
+    .filter(({ modal }) => !!modal)
+    .map(({ modal: ActionModal, key }) => (
+      <ActionModal key={`dashboard-action-modal-${key}`} dashboard={dashboard} ref={(r) => { modalRefs.current[key] = r; }} />
+    )), [pluggableDashboardActions, dashboard]);
 
   const onDashboardDelete = useCallback(async () => {
     const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
@@ -84,6 +92,7 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                           entityTitle={dashboard.title}
                           onClose={() => setShowShareModal(false)} />
       )}
+      {dashboardActionModals}
     </>
   );
 };
