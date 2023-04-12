@@ -46,8 +46,7 @@ public class RemoteInterfaceProvider {
                     final Request original = chain.request();
 
                     final Request.Builder builder = original.newBuilder()
-                            .header(CsrfProtectionFilter.HEADER_NAME, "Graylog Server")
-                            .method(original.method(), original.body());
+                            .header(CsrfProtectionFilter.HEADER_NAME, "Graylog Server");
 
                     if (original.headers(HttpHeaders.ACCEPT).isEmpty()) {
                         builder.header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString());
