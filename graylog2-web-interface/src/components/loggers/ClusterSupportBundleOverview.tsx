@@ -80,7 +80,11 @@ const ClusterSupportBundleOverview = () => {
             </Button>
           </Header>
           <p className="description">
-            Export zip file which contains useful debugging information from your Graylog cluster.
+            Create a zip file which contains useful debugging information from your Graylog cluster.<br/>
+            Graylog Enterprise customers can attach bundles to their support ticket, which will help the Graylog technical support team
+            with analyzing and diagnosing issues.<br/>
+            <strong>Please examine the bundle before sending it to Graylog.
+              It might contain sensitive data like IP addresses, hostnames or even passwords!</strong>
           </p>
           {(list.length > 0) ? (
             <Table className="table-striped table-condensed table-hover">
