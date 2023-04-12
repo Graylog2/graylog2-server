@@ -93,15 +93,28 @@ public class NodePingPeriodical extends Periodical {
     }
 
     @Override
+    public void initialize() {
+        registerServer();
+    }
+
+    @Override
     public void doRun() {
         try {
             nodeService.markAsAlive(nodeId, isLeader.get(), opensearchBaseUri);
         } catch (NodeNotFoundException e) {
-            LOG.info("Did not find meta info of this node. Re-registering.");
-            nodeService.registerServer(nodeId.getNodeId(),
-                    isLeader.get(),
-                    opensearchBaseUri,
-                    Tools.getLocalCanonicalHostname());
+            LOG.warn("Did not find meta info of this node. Re-registering.");
+            registerServer();
+        }
+    }
+
+    private void registerServer() {
+        final boolean registrationSucceeded = nodeService.registerServer(nodeId.getNodeId(),
+                isLeader.get(),
+                opensearchBaseUri,
+                Tools.getLocalCanonicalHostname());
+
+        if (!registrationSucceeded) {
+            LOG.error("Failed to register node {} for heartbeats.", nodeId.getNodeId());
         }
     }
 }
