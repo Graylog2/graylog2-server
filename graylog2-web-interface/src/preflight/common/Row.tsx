@@ -15,21 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { AppShell } from '@mantine/core';
+import { Grid } from '@mantine/core';
 
-import Section from 'preflight/common/Section';
-import Button from 'preflight/common/Button';
-import Navigation from 'preflight/navigation/Navigation';
-
-const App = () => (
-  <AppShell padding="md" header={<Navigation />}>
-    <Section title="Welcome!">
-      <p>
-        It looks like you are starting Graylog for the first time.
-        Through this wizard, you can configure and secure your data nodes.
-      </p>
-      <Button size="xs">Continue</Button>
-    </Section>
-  </AppShell>
+const Row = ({ children, ...props }: React.ComponentProps<typeof Grid>) => (
+  <Grid {...props}>
+    {children}
+  </Grid>
 );
-export default App;
+
+export default Row;
