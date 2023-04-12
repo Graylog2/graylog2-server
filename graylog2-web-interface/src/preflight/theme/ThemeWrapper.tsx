@@ -61,10 +61,11 @@ const ThemeWrapper = ({ children }: Props) => {
       },
     },
     spacing: {
-      xs: theme.spacings.px.xs,
-      sm: theme.spacings.px.sm,
-      lg: theme.spacings.px.lg,
-      xl: theme.spacings.px.xl,
+      xs: theme.spacings.xs,
+      sm: theme.spacings.sm,
+      md: theme.spacings.md,
+      lg: theme.spacings.lg,
+      xl: theme.spacings.xl,
     },
     components: {
       Text: {
