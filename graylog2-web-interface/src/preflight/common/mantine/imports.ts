@@ -14,22 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { AppShell } from '@mantine/core';
-
-import Section from 'preflight/common/Section';
-import Button from 'preflight/common/Button';
-import Navigation from 'preflight/navigation/Navigation';
-
-const App = () => (
-  <AppShell padding="md" header={<Navigation />}>
-    <Section title="Welcome!">
-      <p>
-        It looks like you are starting Graylog for the first time.
-        Through this wizard, you can configure and secure your data nodes.
-      </p>
-      <Button size="xs">Continue</Button>
-    </Section>
-  </AppShell>
-);
-export default App;
+// eslint-disable-next-line no-restricted-imports
+export {
+  Anchor,
+  Box,
+  Grid,
+  Divider,
+  Group,
+  Header,
+  Text,
+  UnstyledButton,
+  Collapse,
+} from '@mantine/core';
