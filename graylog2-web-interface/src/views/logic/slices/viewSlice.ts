@@ -40,6 +40,7 @@ import createSearch from 'views/logic/slices/createSearch';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -250,7 +251,7 @@ export const mergeQueryTitles = (newQueryTitles: { queryId: QueryId, titlesMap: 
 export const setQueryString = (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
   const query = selectQueryById(queryId)(getState());
   const newQuery = query.toBuilder()
-    .query({ type: 'elasticsearch', query_string: newQueryString })
+    .query(createElasticsearchQueryString(newQueryString))
     .build();
 
   return dispatch(updateQuery(queryId, newQuery));

@@ -14,31 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export type EvidenceTypes = 'logs' | 'dashboards' | 'searches' | 'events';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-export type AddEvidenceProps = {
+import type { EvidenceTypes } from './types';
+
+type Props = {
   index?: string,
   id: string,
   type: EvidenceTypes,
-  children?: React.ReactElement,
-  ref?: React.MutableRefObject<{ toggle: () => void }>
 };
 
-export type InvestigationsPlugin = {
-  components: {
-    AddEvidence: React.ComponentType<AddEvidenceProps>,
-    AddEvidenceModal: React.ComponentType<AddEvidenceProps>,
-  },
-  hooks: {
-    useInvestigationDrawer: () => ({
-      selectedInvestigationId: string,
-    }),
-  }
+const AddEvidenceModal = React.forwardRef(({ index, id, type }: Props, ref: React.MutableRefObject<{ toggle: () => void }>) => {
+  const investigations = usePluginEntities('investigationsPlugin');
+
+  if (!investigations || !investigations.length) return null;
+
+  const SecAddEvidenceModal = investigations[0].components.AddEvidenceModal;
+
+  return (
+    <SecAddEvidenceModal id={id} index={index} type={type} ref={ref} />
+  );
+});
+
+AddEvidenceModal.defaultProps = {
+  index: undefined,
 };
 
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    investigationsPlugin?: Array<InvestigationsPlugin>,
-  }
-}
+export default AddEvidenceModal;

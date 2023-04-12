@@ -25,7 +25,6 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ReservedIpChecker {
@@ -61,7 +60,7 @@ public class ReservedIpChecker {
     private List<IpSubnet> loadReservedIpBlocks() {
 
         return Arrays.stream(RESERVED_IPV4_BLOCKS)
-                .map(stringToSubnet())
+                .map(ReservedIpChecker::stringToSubnet)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -79,20 +78,18 @@ public class ReservedIpChecker {
         return ipBlocks.stream().anyMatch(e -> subnetContainsAddress(e, address));
     }
 
-    private static Function<String, Optional<IpSubnet>> stringToSubnet() {
-        return line -> {
-            IpSubnet subnet;
-            try {
-                subnet = new IpSubnet(line);
-            } catch (UnknownHostException ignore) {
-                subnet = null;
-            }
+    public static Optional<IpSubnet> stringToSubnet(String range) {
+        IpSubnet subnet;
+        try {
+            subnet = new IpSubnet(range);
+        } catch (UnknownHostException ignore) {
+            subnet = null;
+        }
 
-            return Optional.ofNullable(subnet);
-        };
+        return Optional.ofNullable(subnet);
     }
 
-    private static boolean subnetContainsAddress(IpSubnet subnet, String targetAddress) {
+    public static boolean subnetContainsAddress(IpSubnet subnet, String targetAddress) {
         try {
             return subnet.contains(targetAddress);
         } catch (UnknownHostException ignore) {

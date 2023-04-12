@@ -1,0 +1,5 @@
+type = "a"
+message = "Adds Add Evidence Modal"
+
+pulls = ["15148"]
+issues = ["Graylog2/graylog-plugin-enterprise#4848"]
