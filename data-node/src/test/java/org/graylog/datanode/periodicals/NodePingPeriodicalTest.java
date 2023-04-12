@@ -30,7 +30,7 @@ class NodePingPeriodicalTest {
     void doRun() throws NodeNotFoundException {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-        final URI uri = URI.create("http://localhost:8999");
+        final URI uri = URI.create("http://localhost:9200");
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
         final NodePingPeriodical task = new NodePingPeriodical(
@@ -53,7 +53,7 @@ class NodePingPeriodicalTest {
     void doRunWithRegister() throws NodeNotFoundException {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-        final URI uri = URI.create("http://localhost:8999");
+        final URI uri = URI.create("http://localhost:9200");
 
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
