@@ -168,7 +168,7 @@ public class MemoryLimitedCompressingFifoRingBuffer {
                 try {
                     removeFirst();
                 } catch (NoSuchElementException ignored) {
-                    LOG.warn("Buffer size <{}> to small to hold a single message of size <{}>", memLimit, element.length);
+                    LOG.warn("Buffer size <{}> too small to hold a single message of size <{}>", memLimit, element.length);
                     return false;
                 }
             }
