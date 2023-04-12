@@ -153,7 +153,7 @@ const validate = (values: FormValues) => {
   }
 
   if (!values.from && !values.until) {
-    errors = { ...errors, from: 'Either "from" or "until" must be an actual date.' };
+    errors = { ...errors, from: 'Remove filter to search from "All time" until "Now".' };
   }
 
   return errors;
