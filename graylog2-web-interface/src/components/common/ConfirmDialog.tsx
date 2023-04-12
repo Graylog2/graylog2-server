@@ -40,7 +40,6 @@ const ConfirmDialog = ({
   return (
     <Modal show={show}
            onHide={onHide}
-           data-app-section=""
            data-event-element={StringUtils.getRecursiveChildText(title)}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
