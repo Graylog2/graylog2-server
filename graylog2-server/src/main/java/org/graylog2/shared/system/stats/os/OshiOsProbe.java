@@ -74,6 +74,7 @@ public class OshiOsProbe implements OsProbe {
         long steal = ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()];
 
         long totalCpu = user + nice + system + idle + iowait + irq + softirq + steal;
+        totalCpu = totalCpu == 0 ? 1 : totalCpu; // avoid division by zero
 
         short sys = (short) (100 * system / totalCpu);
         short us = (short) (100 * user / totalCpu);
