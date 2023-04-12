@@ -55,9 +55,10 @@ import retrofit2.http.GET;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -164,7 +165,7 @@ public class SupportBundleService {
             writeZipFile(bundleSpoolDir);
         } catch (Exception e) {
             LOG.warn("Exception while trying to build support bundle", e);
-            throw new BadRequestException(e);
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, e);
         } finally {
             try {
                 if (bundleSpoolDir != null) {
@@ -494,7 +495,7 @@ public class SupportBundleService {
                             return new BundleFile(f.getFileName().toString(), Files.size(f));
                         } catch (IOException e) {
                             LOG.warn("Exception while trying to list support bundles", e);
-                            throw new BadRequestException(e);
+                            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, e);
                         }
                     })
                     .sorted(Comparator.comparing(BundleFile::fileName).reversed())
@@ -503,7 +504,7 @@ public class SupportBundleService {
             return List.of();
         } catch (IOException e) {
             LOG.warn("Exception while trying to list support bundles", e);
-            throw new BadRequestException(e);
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, e);
         }
     }
 

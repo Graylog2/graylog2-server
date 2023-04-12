@@ -31,13 +31,13 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -107,7 +107,8 @@ public class SupportBundleClusterResource extends ProxiedResource {
         if (listNodeResponse.isSuccess()) {
             return listNodeResponse.entity().orElse(List.of());
         }
-        throw new BadRequestException(f("Failed to retrieve bundle files <{}>", listNodeResponse.errorText()));
+        final String msg = f("Failed to retrieve bundle files <{}>", listNodeResponse.errorText());
+        throw new ServerErrorException(msg, listNodeResponse.code());
     }
 
     @GET

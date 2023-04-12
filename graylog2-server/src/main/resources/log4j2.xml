@@ -35,7 +35,6 @@
         <Logger name="com.azure.core.amqp.implementation.ReactorReceiver" level="off"/>
         <Logger name="com.azure.core.amqp.implementation.ReactorDispatcher" level="off"/>
         <Root level="warn">
-            <AppenderRef ref="rolling-file"/>
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>
         </Root>
