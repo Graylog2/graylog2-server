@@ -1,0 +1,5 @@
+type = "a"
+message = 'Allow pipeline function "remove_field" to take a regex pattern instead of a field name.'
+
+issues = ["5653"]
+pulls = ["15131"]
