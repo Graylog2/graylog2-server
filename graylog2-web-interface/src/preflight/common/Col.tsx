@@ -19,6 +19,7 @@ import { Grid } from '@mantine/core';
 
 const Col = ({ children, ...props }: React.ComponentProps<typeof Grid.Col>) => {
   return (
+    // eslint-disable-next-line react/prop-types
     <Grid.Col {...props} style={{ ...props.style }}>
       {children}
     </Grid.Col>
