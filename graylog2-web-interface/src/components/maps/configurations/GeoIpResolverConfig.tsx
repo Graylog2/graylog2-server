@@ -94,7 +94,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
 
   return (
     <div>
-      <h3>Geo-Location Processor</h3>
+      <h3>Geo-Location Processor Configuration</h3>
 
       <p>
         The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an
