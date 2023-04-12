@@ -23,7 +23,7 @@ import java.time.Instant;
 
 @JsonAutoDetect
 public record LogFile (@JsonProperty("id") String id,
-                       @JsonProperty("name")String name,
+                       @JsonProperty("name") String name,
                        @JsonProperty("size") long size,
                        @JsonProperty("lastModified") Instant lastModified) {}
 
