@@ -93,7 +93,7 @@ describe('<TelemetryProvider>', () => {
     asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
 
     asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySettings: {
+      telemetrySetting: {
         telemetry_permission_asked: false,
         telemetry_enabled: false,
       },

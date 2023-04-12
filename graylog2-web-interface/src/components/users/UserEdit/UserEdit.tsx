@@ -91,7 +91,11 @@ const UserEdit = ({ user }: Props) => {
           <IfPermitted permissions="teams:edit">
             <TeamsSection user={user} />
           </IfPermitted>
-          <TelemetrySettingsConfig />
+          {(currentUser.id === user.id) && (
+            <IfPermitted permissions={`users:edit:${user.username}`}>
+              <TelemetrySettingsConfig />
+            </IfPermitted>
+          )}
         </div>
       </IfPermitted>
     </SectionGrid>
