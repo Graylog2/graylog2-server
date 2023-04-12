@@ -36,7 +36,7 @@ export type State = {
 export type MappedData= {
   aggField?: string,
   aggFunction?: string,
-  aggValue?: string,
+  aggValue?: string | number,
   search?: string,
   searchFromValue?: string,
   rowGroupBy?: Array<string>,
@@ -49,4 +49,4 @@ export type MappedData= {
   queryWithReplacedParams?: string,
   streams?: Array<string>
 }
-export type AggregationHandler = (args: { widget?: Widget, field: string, value: string, valuePath?: Array<{ [name: string]: string}>, })=> MappedData;
+export type AggregationHandler = (args: { widget?: Widget, field: string, value: string | number, valuePath?: Array<{ [name: string]: string}>, })=> MappedData;

@@ -1,0 +1,182 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+
+import Immutable from 'immutable';
+
+import type { FilterType } from 'views/logic/queries/Query';
+import type { AggregationHandler } from 'views/logic/valueactions/createEventDefinition/types';
+import { seriesToMetrics } from 'views/components/aggregationwizard/metric/MetricElement';
+import type Widget from 'views/logic/widgets/Widget';
+import type Parameter from 'views/logic/parameters/Parameter';
+import type ValueParameter from 'views/logic/parameters/ValueParameter';
+import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import type ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import type { FiltersType } from 'views/types';
+
+export const getStreams = (filter: FilterType): Array<string> => {
+  if (!filter) return [];
+
+  return filter.get('filters').reduce((res, curFilter) => {
+    if (curFilter.get('type') === 'stream') {
+      res.push(curFilter.get('id'));
+    }
+
+    return res;
+  }, []);
+};
+
+export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) => {
+  return valuePath.reduce((res, path) => {
+    const key = Object.keys(path)[0];
+    if (key === '_exists_') return res;
+
+    const [field, value] = Object.entries(path)[0];
+
+    return `${res}${res ? ' AND ' : ''}${field}:${value}`;
+  }, '');
+};
+
+export const getFlattenPivots = (pivots): Set<string> => {
+  return pivots.reduce((res, cur) => {
+    cur.fields.forEach((pivotField) => res.add(pivotField));
+
+    return res;
+  }, new Set([]));
+};
+
+export const filtratePathsByPivot = ({ flattenPivots, valuePath }: {flattenPivots: Set<string>, valuePath: Array<{ [name: string]: string }>}): Array<{[name:string]: string}> => {
+  if (!valuePath) return [];
+  const map = valuePath.reduce((res, cur) => {
+    const key = Object.keys(cur)[0];
+
+    if (!res.has(key) && flattenPivots.has(key)) {
+      res.set(key, cur);
+    }
+
+    return res;
+  }, new Map([])) as Map<string, {[name:string]: string}>;
+
+  return Array.from(map.values());
+};
+
+export const aggregationMetricValueHandler: AggregationHandler = ({ widget, value, field, valuePath }) => {
+  const curSeries = widget.config.series.find((series) => series.function === field);
+  const { field: agg_field, function: agg_function } = seriesToMetrics([curSeries])[0];
+  const { rowPivots, columnPivots } = widget.config;
+  const flattenRowPivots = getFlattenPivots(rowPivots);
+  const flattenColumnPivots = getFlattenPivots(columnPivots);
+  const rowPaths = filtratePathsByPivot({ flattenPivots: flattenRowPivots, valuePath });
+  const columnPaths = filtratePathsByPivot({ flattenPivots: flattenColumnPivots, valuePath });
+  const rowValuePath = transformValuePathToQuery(rowPaths);
+  const columnValuePath = transformValuePathToQuery(columnPaths);
+
+  return ({
+    aggField: agg_field,
+    aggFunction: agg_function,
+    aggValue: value,
+    rowGroupBy: Array.from(flattenRowPivots),
+    columnGroupBy: Array.from(flattenColumnPivots),
+    rowValuePath,
+    columnValuePath,
+  });
+};
+
+export const aggregationValueHandler: AggregationHandler = ({ widget, value, field, valuePath }) => {
+  const { rowPivots } = widget.config;
+  const flattenRowPivots = getFlattenPivots(rowPivots);
+  const rowPaths = filtratePathsByPivot({ flattenPivots: flattenRowPivots, valuePath });
+  const rowValuePath = transformValuePathToQuery(rowPaths);
+
+  return ({
+    searchFromValue: `${field}:${value}`,
+    rowValuePath,
+  });
+};
+
+export const messagesValueHandler: AggregationHandler = ({ value, field }) => {
+  return ({
+    searchFromValue: `${field}:${value}`,
+  });
+};
+
+export const logsValueHandler: AggregationHandler = ({ value, field }) => {
+  return ({
+    searchFromValue: `${field}:${value}`,
+  });
+};
+
+export const getAggregationHandler = ({ widget, field }: { widget: Widget, field: string }): AggregationHandler => {
+  if (widget.type === 'AGGREGATION') {
+    const isMetrics = !!widget.config.series.find((series) => series.function === field);
+
+    return isMetrics ? aggregationMetricValueHandler : aggregationValueHandler;
+  }
+
+  if (widget.type === 'logs') return logsValueHandler;
+  if (widget.type === 'messages') return messagesValueHandler;
+
+  throw new Error('This widget type has incorrect type or no handler');
+};
+
+export const getLutParameters = (parameters: Immutable.Set<Parameter>) => parameters.reduce((res, cur) => {
+  if (cur.type === 'lut-parameter-v1') {
+    const paramJSON = cur.toJSON();
+    res.push(paramJSON);
+  }
+
+  return res;
+}, []);
+
+export const getRestParameterValues = (
+  { parameters, parameterBindings }:
+    { parameters: Immutable.Set<ValueParameter | LookupTableParameter>, parameterBindings?: Immutable.Map<string, ParameterBinding>},
+) => parameters.reduce((res, cur) => {
+  if (cur.type !== 'lut-parameter-v1') {
+    const paramJSON = cur.toJSON();
+    const { name } = paramJSON;
+    const bindingValue = parameterBindings?.get(name)?.value;
+    res[name] = bindingValue ?? paramJSON?.default_value;
+  }
+
+  return res;
+}, {});
+
+export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => {
+  return filters.reduce((res, filter) => {
+    let curRes = res;
+
+    if (filter.queryString && !filter.disabled) {
+      const curPart = `${filter.negation ? 'NOT' : ''}(${filter.queryString})`;
+      curRes = `${res}${res ? ' AND ' : ''}${curPart}`;
+    }
+
+    return curRes;
+  }, '');
+};
+
+export const replaceParametersInQueryString = ({ query, restParameterValues }: {
+  query: string,
+  restParameterValues: { [name: string]: string | number }
+}) => {
+  let curQuery = query;
+
+  Object.entries(restParameterValues).forEach(([parameterName, parameterValue]) => {
+    curQuery = curQuery.replace(`$${parameterName}$`, `${parameterValue}`);
+  });
+
+  return curQuery;
+};
