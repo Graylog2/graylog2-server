@@ -18,6 +18,7 @@ package org.graylog.datanode.bootstrap.commands.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import org.apache.logging.log4j.util.Strings;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -45,6 +46,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Locale;
 
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilHttp implements CliCommand {
@@ -116,15 +118,20 @@ public class CertutilHttp implements CliCommand {
 
                 final int validityDays = console.readInt("Enter certificate validity in days: ");
 
-                CertRequest certificateRequest = CertRequest.signed("localhost", caKeyPair)
-                        .withSubjectAlternativeName("localhost")
+                final String cnName = "localhost";
+
+                CertRequest certificateRequest = CertRequest.signed(cnName, caKeyPair)
+                        .withSubjectAlternativeName(cnName)
                         .withSubjectAlternativeName(Tools.getLocalHostname())
                         .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
                         .validity(Duration.ofDays(validityDays));
 
                 final String alternativeNames = console.readLine("Enter alternative names (addresses) of this node [comma separated]: ");
-                Arrays.stream(alternativeNames.split(",")).forEach(certificateRequest::withSubjectAlternativeName);
+                Arrays.stream(alternativeNames.split(","))
+                        .filter(Strings::isNotBlank)
+                        .forEach(certificateRequest::withSubjectAlternativeName);
 
+                console.printLine(String.format(Locale.ROOT, "Generating certificate for CN=%s, with validity %d days and subject alternative names %s", cnName, certificateRequest.validity().toDays(), certificateRequest.subjectAlternativeNames()));
                 KeyPair nodePair = CertificateGenerator.generate(certificateRequest);
                 console.printLine("Successfully generated CA from the keystore");
 

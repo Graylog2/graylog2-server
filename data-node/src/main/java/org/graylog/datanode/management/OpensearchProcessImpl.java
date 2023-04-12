@@ -179,11 +179,13 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public void onProcessComplete(int exitValue) {
+        LOG.info("Opensearch process completed with exit code {}", exitValue);
         onEvent(ProcessEvent.PROCESS_TERMINATED);
     }
 
     @Override
     public void onProcessFailed(ExecuteException e) {
+        LOG.warn("Opensearch process failed", e);
         onEvent(ProcessEvent.PROCESS_TERMINATED);
     }
 }

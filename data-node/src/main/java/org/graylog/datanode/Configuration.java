@@ -74,19 +74,19 @@ public class Configuration extends BaseConfiguration {
     private boolean disableNativeSystemStatsCollector = false;
 
     @Parameter(value = "opensearch_location")
-    private String opensearchLocation = "./data-node/bin/opensearch-2.4.1";
+    private String opensearchLocation = "dist/opensearch-2.4.1";
 
     @Parameter(value = "opensearch_version")
     private String opensearchVersion = "2.4.1";
 
     @Parameter(value = "opensearch_data_location")
-    private String opensearchDataLocation = "./data-node/bin/data";
+    private String opensearchDataLocation = "data";
 
     @Parameter(value = "opensearch_logs_location")
-    private String opensearchLogsLocation = "./data-node/bin/logs";
+    private String opensearchLogsLocation = "logs";
 
     @Parameter(value = "opensearch_config_location")
-    private String opensearchConfigLocation = "./data-node/bin/config";
+    private String opensearchConfigLocation = "config";
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
@@ -207,7 +207,7 @@ public class Configuration extends BaseConfiguration {
     private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
-    private String nodeIdFile = "/etc/graylog/datanode/node-id";
+    private String nodeIdFile = "data/node-id";
 
     @Parameter(value = "root_username")
     private String rootUsername = "admin";

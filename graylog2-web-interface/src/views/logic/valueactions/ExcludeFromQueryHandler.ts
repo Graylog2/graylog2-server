@@ -19,7 +19,7 @@ import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
-import { selectCurrentQueryString } from 'views/logic/slices/viewSelectors';
+import { selectQueryString } from 'views/logic/slices/viewSelectors';
 
 const formatNewQuery = (oldQuery: string, field: string, value: any) => {
   const fieldPredicate = value === MISSING_BUCKET_NAME
@@ -36,7 +36,7 @@ type Args = {
 };
 
 const ExcludeFromQueryHandler = ({ queryId, field, value }: Args) => (dispatch: AppDispatch, getState: () => RootState) => {
-  const oldQuery = selectCurrentQueryString(queryId)(getState());
+  const oldQuery = selectQueryString(queryId)(getState());
   const newQuery = formatNewQuery(oldQuery, field, value);
 
   return dispatch(updateQueryString(queryId, newQuery));

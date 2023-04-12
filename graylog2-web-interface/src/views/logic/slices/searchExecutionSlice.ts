@@ -124,7 +124,7 @@ export const execute = () => (dispatch: AppDispatch, getState: () => RootState) 
 
 export const setGlobalOverrideQuery = (queryString: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
-  const newGlobalOverride = globalOverride.toBuilder().query({ type: 'elasticsearch', query_string: queryString }).build();
+  const newGlobalOverride = globalOverride.toBuilder().query(createElasticsearchQueryString(queryString)).build();
 
   return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
 };
