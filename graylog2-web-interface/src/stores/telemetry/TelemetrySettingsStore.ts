@@ -34,7 +34,7 @@ type TelemetrySettingsActionsType = RefluxActions<{
 }>;
 
 export type TelemetrySettingsStoreState = {
-  telemetrySettings: UserTelemetrySettings,
+  telemetrySetting: UserTelemetrySettings,
 };
 
 const urlPrefix = ApiRoutes.TelemetryApiController.setting().url;
@@ -46,11 +46,11 @@ export const TelemetrySettingsActions: TelemetrySettingsActionsType = singletonA
 export const TelemetrySettingsStore = singletonStore('telemetry.settings.store', () => Reflux.createStore<TelemetrySettingsStoreState>({
   listenables: [TelemetrySettingsActions],
 
-  telemetrySetting: {},
+  telemetrySetting: undefined,
 
   getInitialState() {
     return {
-      telemetrySetting: this.telemetrySettings,
+      telemetrySetting: this.telemetrySetting,
     };
   },
 

@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
+import { useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
-import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
+import { TelemetrySettingsStore, TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
 import AppConfig from 'util/AppConfig';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 type PostHogSettings = {
   host: string;
@@ -68,8 +70,15 @@ const init = () => {
 };
 
 const TelemetryInit = ({ children }: { children: React.ReactElement }) => {
-  const settings = useStore(TelemetrySettingsStore, (state) => state.telemetrySettings);
+  const settings = useStore(TelemetrySettingsStore, (state) => state.telemetrySetting);
   const { host, key } = getPostHogSettings();
+  const { currentUser } = useStore(CurrentUserStore);
+
+  useEffect(() => {
+    if (currentUser) {
+      TelemetrySettingsActions.get();
+    }
+  }, [currentUser]);
 
   if ((settings && !settings.telemetry_enabled) || !host || !key) {
     return children;

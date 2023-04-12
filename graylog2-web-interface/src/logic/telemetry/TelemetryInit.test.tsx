@@ -63,7 +63,7 @@ describe('<TelemetryInit>', () => {
 
   it('should render Telemetry and make usePosthog available', () => {
     asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySettings: {
+      telemetrySetting: {
         telemetry_permission_asked: false,
         telemetry_enabled: true,
       },
@@ -82,7 +82,7 @@ describe('<TelemetryInit>', () => {
     });
 
     asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySettings: {
+      telemetrySetting: {
         telemetry_permission_asked: false,
         telemetry_enabled: false,
       },

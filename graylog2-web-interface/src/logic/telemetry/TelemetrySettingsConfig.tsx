@@ -42,6 +42,7 @@ const TelemetrySettingsConfig = () => {
   const onSubmit = (data: UserTelemetrySettings, { setSubmitting }) => {
     TelemetrySettingsActions.update(data).then(() => {
       setSubmitting(false);
+      window.location.reload();
     });
   };
 
