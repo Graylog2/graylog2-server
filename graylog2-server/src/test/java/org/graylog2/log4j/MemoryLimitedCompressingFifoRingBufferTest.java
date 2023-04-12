@@ -16,7 +16,6 @@
  */
 package org.graylog2.log4j;
 
-import org.bouncycastle.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.log4j.MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE;
 
 public class MemoryLimitedCompressingFifoRingBufferTest {
 
@@ -49,61 +49,107 @@ public class MemoryLimitedCompressingFifoRingBufferTest {
 
     @Test
     void addBeyondCacheSize() throws IOException {
-        final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 2 + 10;
-        for (int i = 1; i < count; i++) {
+        final int count = BATCHSIZE * 2 + 10;
+        for (int i = 1; i <= count; i++) {
             buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         buffer.streamContent(outStream, 0);
 
-        final List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
+        final List<String> result = outStream.toString(StandardCharsets.UTF_8).lines().toList();
         assertThat(result).hasSize(count);
         assertThat(result.get(0)).isEqualTo("Loop 1");
-        assertThat(result.get(result.size() - 2)).isEqualTo("Loop " + (count - 1));
+        assertThat(result.get(result.size() - 1)).isEqualTo("Loop " + count);
     }
 
     @Test
     void compressedRotation() throws IOException {
-        final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 7;
+        final int count = BATCHSIZE * 7;
         for (int i = 1; i < count; i++) {
             buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         buffer.streamContent(outStream, 0);
+        final List<String> result = outStream.toString(StandardCharsets.UTF_8).lines().toList();
 
-        final List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
         assertThat(result.size()).isLessThan(count);
 
         // assert that newest entries are kept while older ones are removed
         assertThat(result.get(0)).isNotEqualTo("Loop 1");
-        assertThat(result.get(result.size() - 2)).isEqualTo("Loop " + (count - 1));
+        assertThat(result.get(result.size() - 1)).isEqualTo("Loop " + (count - 1));
     }
 
     @Test
     void limitedStream() throws IOException {
-        final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 4 + 1;
-        for (int i = 1; i < count; i++) {
+        final int count = BATCHSIZE * 4 + 1;
+        for (int i = 1; i <= count; i++) {
             buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
 
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         buffer.streamContent(outStream, 1);
 
-        List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
-        assertThat(result.size()).isEqualTo(MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE + 1);
+        List<String> result = outStream.toString(StandardCharsets.UTF_8).lines().toList();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).containsExactly("Loop " + count);
 
-        buffer.streamContent(outStream, 2);
-        result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
-        assertThat(result.size()).isEqualTo(MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 2 + 1);
+    }
+
+    @Test
+    void limitedStreamOverOneBatch() throws IOException {
+        final int count = BATCHSIZE * 4 + 100;
+        for (int i = 1; i <= count; i++) {
+            buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
+        }
+
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        buffer.streamContent(outStream, BATCHSIZE + 10);
+        List<String> result = outStream.toString(StandardCharsets.UTF_8).lines().toList();
+        assertThat(result.size()).isEqualTo(100 + BATCHSIZE); // gets the entire current buffer + one batch
+
+        assertThat(result).isEqualTo(result.stream().sorted().toList()); // ensure we got the content in order
+        assertThat(result.get(0)).isEqualTo("Loop " + (BATCHSIZE * 3 + 1)); // start of the 3rd batch
+        assertThat(result.get(result.size() -1)).isEqualTo("Loop " + count); // last entry
+    }
+
+    @Test
+    void limitedStreamWithNoCompressedBatch() throws IOException {
+        final int count = 100;
+        for (int i = 1; i <= count; i++) {
+            buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
+        }
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        buffer.streamContent(outStream, 10);
+        List<String> result = outStream.toString(StandardCharsets.UTF_8).lines().toList();
+        assertThat(result.size()).isEqualTo(10);
+
+        outStream = new ByteArrayOutputStream();
+        buffer.streamContent(outStream, 100000);
+        result = outStream.toString(StandardCharsets.UTF_8).lines().toList();
+        assertThat(result.size()).isEqualTo(count);
+    }
+
+    @Test
+    void limitedStreamWithExactBatchBoundary() throws IOException {
+        final int count = BATCHSIZE * 2;
+        for (int i = 1; i <= count; i++) {
+            buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
+        }
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        buffer.streamContent(outStream, BATCHSIZE);
+        List<String> result = outStream.toString(StandardCharsets.UTF_8).lines().toList();
+        assertThat(result.size()).isEqualTo(BATCHSIZE);
     }
 
     @Test
     @Disabled
     void benchmark() throws IOException {
-        final int count = MemoryLimitedCompressingFifoRingBuffer.BATCHSIZE * 100000;
-        for (int i = 1; i < count; i++) {
+        final int count = BATCHSIZE * 100000;
+        for (int i = 1; i <= count; i++) {
             buffer.add(("Loop " + i + "\n").getBytes(StandardCharsets.UTF_8));
         }
     }
