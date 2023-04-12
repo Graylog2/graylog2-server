@@ -6,7 +6,7 @@ type = "fixed"
 message = "Fixed calculation and expression of CPU load in OshiProbe."
 
 issues = [""]
-pulls = ["15195"]
+pulls = ["15195", "15183" ]
 
 contributors = ["panxt"]
 
