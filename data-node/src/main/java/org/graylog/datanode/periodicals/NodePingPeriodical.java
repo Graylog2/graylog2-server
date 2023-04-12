@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.periodicals;
 
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -36,24 +35,24 @@ public class NodePingPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(NodePingPeriodical.class);
     private final NodeService nodeService;
     private final NodeId nodeId;
-    private final URI httpPublishUri;
+    private final URI opensearchBaseUri;
     private final Supplier<Boolean> isLeader;
 
 
     @Inject
-    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
-        this(nodeService, nodeId, configuration.getHttpPublishUri(), managedOpenSearch::isLeaderNode);
+    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, OpensearchProcess managedOpenSearch) {
+        this(nodeService, nodeId, managedOpenSearch.getOpensearchBaseUrl(), managedOpenSearch::isLeaderNode);
     }
 
     NodePingPeriodical(
             NodeService nodeService,
             NodeId nodeId,
-            URI httpPublishUri,
+            URI opensearchBaseUri,
             Supplier<Boolean> isLeader
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
-        this.httpPublishUri = httpPublishUri;
+        this.opensearchBaseUri = opensearchBaseUri;
         this.isLeader = isLeader;
     }
 
@@ -94,15 +93,28 @@ public class NodePingPeriodical extends Periodical {
     }
 
     @Override
+    public void initialize() {
+        registerServer();
+    }
+
+    @Override
     public void doRun() {
         try {
-            nodeService.markAsAlive(nodeId, isLeader.get(), httpPublishUri);
+            nodeService.markAsAlive(nodeId, isLeader.get(), opensearchBaseUri);
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
-            nodeService.registerServer(nodeId.getNodeId(),
-                    isLeader.get(),
-                    httpPublishUri,
-                    Tools.getLocalCanonicalHostname());
+            registerServer();
+        }
+    }
+
+    private void registerServer() {
+        final boolean registrationSucceeded = nodeService.registerServer(nodeId.getNodeId(),
+                isLeader.get(),
+                opensearchBaseUri,
+                Tools.getLocalCanonicalHostname());
+
+        if (!registrationSucceeded) {
+            LOG.error("Failed to register node {} for heartbeats.", nodeId.getNodeId());
         }
     }
 }

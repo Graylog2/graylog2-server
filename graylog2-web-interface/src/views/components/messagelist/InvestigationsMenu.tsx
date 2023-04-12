@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
-import AddEvidence from 'components/security/investigations/AddEvidence';
+import { AddEvidence, AddEvidenceModal } from 'components/security/investigations';
 import type { EvidenceTypes } from 'components/security/investigations/types';
 
 type Props = {
@@ -35,14 +35,21 @@ const addToInvestigation = ({ investigationSelected }) => (
 );
 
 const InvestigationsMenu = ({ index, id, type, ...rest }: Props) => {
+  const addEvidenceModalRef = React.useRef(null);
   const investigations = usePluginEntities('investigationsPlugin');
 
   if (!investigations || !investigations.length) return null;
 
   return (
-    <DropdownButton id="investigations-dropdown" {...rest}>
-      <AddEvidence index={index} id={id} type={type} child={addToInvestigation} />
-    </DropdownButton>
+    <>
+      <DropdownButton id="investigations-dropdown" {...rest}>
+        <AddEvidence index={index} id={id} type={type} child={addToInvestigation} />
+        <MenuItem onClick={() => addEvidenceModalRef.current.toggle()}>
+          Select an investigation
+        </MenuItem>
+      </DropdownButton>
+      <AddEvidenceModal index={index} id={id} type={type} ref={addEvidenceModalRef} />
+    </>
   );
 };
 

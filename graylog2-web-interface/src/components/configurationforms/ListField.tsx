@@ -26,7 +26,7 @@ import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 type Props = {
   autoFocus?: boolean,
   field: ListFieldType,
-  onChange: (title: string, value: Array<string>) => void,
+  onChange: (title: string, value: Array<string>, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value: Array<string> | string,

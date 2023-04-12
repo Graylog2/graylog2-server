@@ -1,0 +1,4 @@
+type = "added"
+message = "Added support for CIDR lookups in CSV file data adapters"
+
+pulls = ["15016"]
