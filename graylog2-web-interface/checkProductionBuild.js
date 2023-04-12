@@ -36,6 +36,7 @@ function generateIndexHtml(assets) {
       <head>
       </head>
       <body>
+        <div id="app-root" />
         ${assets.map((asset) => `<script src="${asset}"></script>`).join('\n')}
       </body>
     <html>
