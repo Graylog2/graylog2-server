@@ -35,6 +35,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bindings.ElasticsearchModule;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
@@ -43,6 +44,7 @@ import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
+import org.graylog2.configuration.IndexDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
@@ -238,6 +240,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new IndexDiscoveryModule(),
                 new ServerPreflightChecksModule(),
                 binder -> preflightCheckModules.forEach(binder::install));
     }
