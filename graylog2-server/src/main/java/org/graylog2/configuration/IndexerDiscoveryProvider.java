@@ -16,6 +16,7 @@
  */
 package org.graylog2.configuration;
 
+import com.google.common.base.Suppliers;
 import com.google.inject.Provider;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
@@ -25,6 +26,7 @@ import javax.inject.Named;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
@@ -33,22 +35,21 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     public static final URI DEFAULT_INDEXER_HOST = URI.create("http://127.0.0.1:9200");
     private final List<URI> hosts;
     private final NodeService nodeService;
+    private final Supplier<List<URI>> supplier;
 
     @Inject
     public IndexerDiscoveryProvider(@Named("elasticsearch_hosts") List<URI> hosts, NodeService nodeService) {
         this.hosts = hosts;
         this.nodeService = nodeService;
-    }
-
-    public List<URI> discover() {
-        return nodeService.allActive(Node.Type.DATANODE).values().stream()
-                .map(Node::getTransportAddress)
-                .map(URI::create)
-                .collect(Collectors.toList());
+        this.supplier = Suppliers.memoize(this::doGet);
     }
 
     @Override
     public List<URI> get() {
+        return supplier.get();
+    }
+
+    private List<URI> doGet() {
         if (hosts != null && !hosts.isEmpty()) {
             return hosts;
         }
@@ -58,5 +59,12 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
             return discovered;
         }
         return Collections.singletonList(DEFAULT_INDEXER_HOST);
+    }
+
+    private List<URI> discover() {
+        return nodeService.allActive(Node.Type.DATANODE).values().stream()
+                .map(Node::getTransportAddress)
+                .map(URI::create)
+                .collect(Collectors.toList());
     }
 }
