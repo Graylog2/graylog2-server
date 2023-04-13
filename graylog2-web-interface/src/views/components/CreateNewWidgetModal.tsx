@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { kebabCase } from 'lodash';
 
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -25,6 +26,7 @@ import generateId from 'logic/generateId';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const modalTitle = 'Create new widget';
 
@@ -64,9 +66,15 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
   const dispatch = useAppDispatch();
+  const sendTelemetry = useSendTelemetry();
 
   const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
+      sendTelemetry('click', {
+        appSection: 'search-widget',
+        eventElement: `widget-create-${kebabCase(title)}-button`,
+      });
+
       const newId = generateId();
       const newWidget = func({ view }).toBuilder().id(newId).build();
 
@@ -78,7 +86,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
         <HugeIcon><WidgetIcon /></HugeIcon>{title}
       </CreateWidgetButton>
     );
-  }), [creators, dispatch, position, view]);
+  }), [creators, dispatch, position, sendTelemetry, view]);
 
   return (
     <Modal onHide={onCancel}

@@ -21,12 +21,12 @@ import styled from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDisplay from './TimeRangeDisplay';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   className?: string,
@@ -35,7 +35,7 @@ type Props = {
   limitDuration: number,
   noOverride?: boolean,
   onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
-  position?: 'bottom'|'right',
+  position?: 'bottom' | 'right',
   showPresetDropdown?: boolean,
   validTypes?: Array<TimeRangeType>,
   value: TimeRange | NoTimeRangeOverride,
@@ -70,9 +70,17 @@ const TimeRangeInput = ({
   }
 
   const toggleShow = () => {
-    sendTelemetry('toggle_input_button', { appSection: 'search_bar', eventElement: 'time-range-dropdown', eventInfo: { showing: !show } });
     setShow(!show);
-  }
+
+    sendTelemetry('toggle_input_button', {
+      appSection: 'search_bar',
+      eventElement: 'time-range-dropdown',
+      eventInfo: {
+        showing: !show,
+      },
+    });
+  };
+
   const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (

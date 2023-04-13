@@ -44,6 +44,7 @@ import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions'
 import fetchSearch from 'views/logic/views/fetchSearch';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -151,12 +152,48 @@ const WidgetActionsMenu = ({
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
   const dispatch = useAppDispatch();
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
-  const onDuplicate = useCallback(() => dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title)), [dispatch, widget.id, unsetWidgetFocusing, title]);
-  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history), [history, view]);
-  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
-  const onDelete = useCallback(() => dispatch(_onDelete(widget, view, title)), [dispatch, title, view, widget]);
-  const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
+  const onDuplicate = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'search-widget',
+      eventElement: 'widget-duplicate-button',
+    });
+
+    return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
+  }, [dispatch, widget.id, unsetWidgetFocusing, title, sendTelemetry]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => {
+    sendTelemetry('click', {
+      appSection: 'search-widget',
+      eventElement: 'widget-copy-to-dashboard-button',
+    });
+
+    return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
+  }, [history, sendTelemetry, view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
+    sendTelemetry('click', {
+      appSection: 'search-widget',
+      eventElement: 'widget-move-button',
+    });
+
+    return _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy);
+  }, [dispatch, sendTelemetry, view]);
+  const onDelete = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'search-widget',
+      eventElement: 'widget-delete-button',
+    });
+
+    return dispatch(_onDelete(widget, view, title));
+  }, [dispatch, sendTelemetry, title, view, widget]);
+  const focusWidget = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'search-widget',
+      eventElement: 'widget-delete-button',
+    });
+
+    return setWidgetFocusing(widget.id);
+  }, [sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
     <Container>
@@ -202,7 +239,9 @@ const WidgetActionsMenu = ({
               Move to Page
             </MenuItem>
           </IfDashboard>
-          <ExtraWidgetActions widget={widget} onSelect={() => {}} />
+          <ExtraWidgetActions widget={widget}
+                              onSelect={() => {
+                              }} />
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>
             Delete
