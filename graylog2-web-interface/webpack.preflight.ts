@@ -22,6 +22,7 @@ const merge = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
+const { DEFAULT_API_URL } = require('./webpack.vendor');
 const supportedBrowsers = require('./supportedBrowsers');
 const core = require('./webpack/core');
 
@@ -33,7 +34,6 @@ const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 const mode = TARGET.startsWith('build') ? 'production' : 'development';
 
-const DEFAULT_API_URL = 'http://localhost:9000';
 const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
 
 const baseConfig = {

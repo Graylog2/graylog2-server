@@ -26,6 +26,7 @@ const DataNodesOverview = () => {
     data: dataNodes,
     isFetching: isFetchingDataNodes,
     error: dataNodesFetchError,
+    isInitialLoading: isInitialLoadingDataNodes,
   } = useDataNodes();
 
   return (
@@ -35,26 +36,46 @@ const DataNodesOverview = () => {
         {isFetchingDataNodes && <Spinner text="" />}
       </p>
 
-      <Space h="sm" />
       {!!dataNodes.length && (
-        <Table verticalSpacing="xxs" fontSize="md">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Transport Address</th>
-              <th>Is Secured</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dataNodes.map((dataNode) => (
-              <tr key={dataNode.id}>
-                <td>{dataNode.id}</td>
-                <td>{dataNode.transportAddress}</td>
-                <td>{dataNode.isSecured ? 'yes' : 'no'}</td>
+        <>
+          <Space h="sm" />
+          <Table verticalSpacing="xxs" fontSize="md">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Alternative Names</th>
+                <th>Transport Address</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {dataNodes.map(({
+                id,
+                name,
+                altNames,
+                transportAddress,
+                status,
+              }) => (
+                <tr key={id}>
+                  <td>{id}</td>
+                  <td>{name}</td>
+                  <td>{altNames?.join()}</td>
+                  <td>{transportAddress}</td>
+                  <td>
+                    {status.toLowerCase()}
+                    {/* {STATUS_EXPLANATION[status] && <HoverForHelp>{STATUS_EXPLANATION[status]}</HoverForHelp>} */}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </>
+      )}
+      {(!dataNodes.length && !isInitialLoadingDataNodes) && (
+        <Alert type="info">
+          No data nodes have been found.
+        </Alert>
       )}
       {dataNodesFetchError && (
         <Alert type="danger">

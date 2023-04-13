@@ -36,3 +36,21 @@ export const CONFIGURATION_STEPS_ORDER = [
   CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
   CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
 ];
+
+export const DATA_NODES_STATUS = {
+  UNCONFIGURED: {
+    key: 'UNCONFIGURED',
+  },
+  CSR: {
+    key: 'CSR',
+  },
+  SIGNED: {
+    key: 'SIGNED',
+  },
+  CONNECTED: {
+    key: 'CONNECTED',
+  },
+  ERROR: {
+    key: 'ERROR',
+  },
+};

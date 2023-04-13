@@ -14,12 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { CONFIGURATION_STEPS } from 'preflight/Constants';
+import type { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
 
 export type DataNode = {
   id: string,
+  name: string,
+  altNames: Array<string>,
   transportAddress: string,
-  isSecured: boolean,
+  status: DataNodeStatus
 }
 
 export type DataNodes = Array<DataNode>;
@@ -27,5 +29,7 @@ export type DataNodes = Array<DataNode>;
 export type DataNodesCAStatus = {
   isConfigured: boolean
 }
+
+export type DataNodeStatus = typeof DATA_NODES_STATUS[keyof typeof DATA_NODES_STATUS]['key']
 
 export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']

@@ -9,9 +9,27 @@ jest.mock('logic/rest/FetchProvider');
 
 describe('useDataNodes', () => {
   const availableDataNodes = [
-    { id: 'data-node-id-1', transportAddress: 'transport.address1', isSecured: false },
-    { id: 'data-node-id-2', transportAddress: 'transport.address2', isSecured: false },
-    { id: 'data-node-id-3', transportAddress: 'transport.address3', isSecured: false },
+    {
+      id: 'data-node-id-1',
+      name: 'data-node-name',
+      transportAddress: 'transport.address1',
+      altNames: [],
+      status: 'UNCONFIGURED',
+    },
+    {
+      id: 'data-node-id-2',
+      name: 'data-node-name',
+      altNames: [],
+      transportAddress: 'transport.address2',
+      status: 'UNCONFIGURED',
+    },
+    {
+      id: 'data-node-id-3',
+      name: 'data-node-name',
+      altNames: [],
+      transportAddress: 'transport.address3',
+      status: 'UNCONFIGURED',
+    },
   ];
 
   beforeEach(() => {
