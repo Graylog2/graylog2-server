@@ -64,6 +64,7 @@ const ThemeWrapper = ({ children }: Props) => {
       xxs: theme.spacings.xxs,
       xs: theme.spacings.xs,
       sm: theme.spacings.sm,
+      md: theme.spacings.md,
       lg: theme.spacings.lg,
       xl: theme.spacings.xl,
     },

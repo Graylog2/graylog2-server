@@ -18,7 +18,6 @@ export { default as Alert } from './Alert';
 export { default as Button } from './Button';
 export { default as Col } from './Col';
 export { default as Icon } from './Icon';
-export { default as List } from './List';
 export { default as Menu } from './Menu';
 export { default as MenuItem } from './MenuItem';
 export { default as Row } from './Row';

@@ -73,6 +73,6 @@ describe('DataNodesOverview', () => {
     render(<DataNodesOverview />);
 
     await screen.findByText('data-node-id-1');
-    await screen.findByText('transport.address1');
+    await screen.findByText('http://localhost:9200');
   });
 });
