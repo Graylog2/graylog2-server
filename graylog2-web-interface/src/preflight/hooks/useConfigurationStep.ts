@@ -17,20 +17,20 @@
 
 import type { DataNodes, ConfigurationStep, DataNodesCAStatus } from 'preflight/types';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
+import { CONFIGURATION_STEPS } from 'preflight/Constants';
 
 import useDataNodesCA from './useDataNodesCA';
 
-const configurationStep = (dataNodes: DataNodes, dataNodesCAStatus: DataNodesCAStatus) => {
+const configurationStep = (_dataNodes: DataNodes, dataNodesCAStatus: DataNodesCAStatus) => {
   if (!dataNodesCAStatus.isConfigured) {
     return CONFIGURATION_STEPS.CA_CONFIGURATION.key;
   }
 
-  const finishedProvisioning = !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.SIGNED.key);
-
-  if (!finishedProvisioning) {
-    return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
-  }
+  // const finishedProvisioning = !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.SIGNED.key);
+  //
+  // if (!finishedProvisioning) {
+  //   return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
+  // }
 
   return CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key;
 };

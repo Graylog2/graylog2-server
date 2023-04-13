@@ -20,6 +20,7 @@ import { Space } from '@mantine/core';
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Table } from 'preflight/components/common';
+import Timestamp from 'components/common/Timestamp';
 
 const DataNodesOverview = () => {
   const {
@@ -43,29 +44,35 @@ const DataNodesOverview = () => {
             <thead>
               <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>Alternative Names</th>
+                <th>Hostname</th>
                 <th>Transport Address</th>
-                <th>Status</th>
+                <th>Node Id</th>
+                <th>Short Node Id</th>
+                <th>Is Leader</th>
+                <th>Is Master</th>
+                <th>Last seen</th>
               </tr>
             </thead>
             <tbody>
               {dataNodes.map(({
                 id,
-                name,
-                altNames,
-                transportAddress,
-                status,
+                hostname,
+                transport_address,
+                node_id,
+                short_node_id,
+                is_leader,
+                is_master,
+                last_seen,
               }) => (
                 <tr key={id}>
                   <td>{id}</td>
-                  <td>{name}</td>
-                  <td>{altNames?.join()}</td>
-                  <td>{transportAddress}</td>
-                  <td>
-                    {status.toLowerCase()}
-                    {/* {STATUS_EXPLANATION[status] && <HoverForHelp>{STATUS_EXPLANATION[status]}</HoverForHelp>} */}
-                  </td>
+                  <td>{hostname}</td>
+                  <td>{transport_address}</td>
+                  <td>{node_id}</td>
+                  <td>{short_node_id}</td>
+                  <td>{is_leader ? 'yes' : 'no'}</td>
+                  <td>{is_master ? 'yes' : 'no'}</td>
+                  <td><Timestamp dateTime={last_seen} /></td>
                 </tr>
               ))}
             </tbody>

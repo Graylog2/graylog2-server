@@ -14,25 +14,37 @@ jest.mock('logic/rest/FetchProvider');
 describe('useConfigurationStep', () => {
   const availableDataNodes = [
     {
+      hostname: '192.168.0.10',
       id: 'data-node-id-1',
-      name: 'data-node-name',
-      transportAddress: 'transport.address1',
-      altNames: [],
-      status: 'UNCONFIGURED',
+      is_leader: false,
+      is_master: false,
+      last_seen: '2020-01-10T10:40:00.000Z',
+      node_id: 'node-id-complete-1',
+      short_node_id: 'node-id-1',
+      transport_address: 'http://localhost:9200',
+      type: 'DATANODE',
     },
     {
+      hostname: '192.168.0.11',
       id: 'data-node-id-2',
-      name: 'data-node-name',
-      altNames: [],
-      transportAddress: 'transport.address2',
-      status: 'UNCONFIGURED',
+      is_leader: false,
+      is_master: false,
+      last_seen: '2020-01-10T10:40:00.000Z',
+      node_id: 'node-id-complete-2',
+      short_node_id: 'node-id-2',
+      transport_address: 'http://localhost:9201',
+      type: 'DATANODE',
     },
     {
+      hostname: '192.168.0.12',
       id: 'data-node-id-3',
-      name: 'data-node-name',
-      altNames: [],
-      transportAddress: 'transport.address3',
-      status: 'UNCONFIGURED',
+      is_leader: false,
+      is_master: false,
+      last_seen: '2020-01-10T10:40:00.000Z',
+      node_id: 'node-id-complete-3',
+      short_node_id: 'node-id-3',
+      transport_address: 'http://localhost:9202',
+      type: 'DATANODE',
     },
   ];
 
@@ -100,11 +112,15 @@ describe('useConfigurationStep', () => {
     asMock(useDataNodes).mockReturnValue({
       ...useDataNodesResult,
       data: [{
+        hostname: '192.168.0.10',
         id: 'data-node-id-1',
-        name: 'data-node-name',
-        transportAddress: 'transport.address1',
-        altNames: [],
-        status: 'UNCONFIGURED',
+        is_leader: false,
+        is_master: false,
+        last_seen: '2020-01-10T10:40:00.000Z',
+        node_id: 'node-id-complete-1',
+        short_node_id: 'node-id-1',
+        transport_address: 'http://localhost:9200',
+        type: 'DATANODE',
       }],
     });
 
@@ -125,11 +141,15 @@ describe('useConfigurationStep', () => {
     asMock(useDataNodes).mockReturnValue({
       ...useDataNodesResult,
       data: [{
+        hostname: '192.168.0.10',
         id: 'data-node-id-1',
-        name: 'data-node-name',
-        transportAddress: 'transport.address1',
-        altNames: [],
-        status: 'SIGNED',
+        is_leader: false,
+        is_master: false,
+        last_seen: '2020-01-10T10:40:00.000Z',
+        node_id: 'node-id-complete-1',
+        short_node_id: 'node-id-1',
+        transport_address: 'http://localhost:9200',
+        type: 'DATANODE',
       }],
     });
 

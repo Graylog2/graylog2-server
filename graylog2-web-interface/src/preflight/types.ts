@@ -17,11 +17,15 @@
 import type { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
 
 export type DataNode = {
+  hostname: string,
   id: string,
-  name: string,
-  altNames: Array<string>,
-  transportAddress: string,
-  status: DataNodeStatus
+  is_leader: boolean,
+  is_master: boolean,
+  last_seen: string,
+  node_id: string,
+  short_node_id: string,
+  transport_address: string,
+  type: string,
 }
 
 export type DataNodes = Array<DataNode>;
