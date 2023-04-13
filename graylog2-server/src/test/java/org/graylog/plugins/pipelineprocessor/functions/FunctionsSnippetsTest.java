@@ -1262,6 +1262,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule);
 
+        verify(lookupTable, times(3)).lookup(any());
+        verifyNoMoreInteractions(lookupTable);
+
         assertThat(message.getField("check_present")).isEqualTo(true);
         assertThat(message.getField("check_absent")).isEqualTo(false);
         assertThat(message.getField("check_empty")).isEqualTo(false);
