@@ -39,6 +39,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.getSearchVersionOverride;
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.isCompatible;
+
 public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     private static final IsContainerMatrixTest isTestMethod = new IsContainerMatrixTest();
 
@@ -82,11 +85,13 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     }
 
     private boolean isMatchingSearchServer(ContainerMatrixTestsConfiguration config) {
-        if(ContainerMatrixTestEngine.searchVersionOverrideExists()) {
+        final var optional = getSearchVersionOverride();
+        if(optional.isPresent()) {
             if(config.searchVersions().length == 0) {
                 return true;
             } else {
-                return Arrays.stream(config.searchVersions()).anyMatch(ContainerMatrixTestEngine::isCompatible);
+                final var override = optional.get();
+                return Arrays.stream(config.searchVersions()).anyMatch(version -> isCompatible(override, version));
             }
         } else {
             return getSearchServers(config).contains(container.getEsVersion());
