@@ -35,7 +35,7 @@ const TelemetryInfoText = ({ showProfile }: Props) => {
       Learn more on our <ExternalLink href="https://www.graylog.org/legal/">Privacy Policy</ExternalLink>.
       <br />
       You can turn data collection off or on any time
-      {showProfile && <b> in User profile</b>}
+      {showProfile && <b> in the user profile</b>}
       {!showProfile && ' here'}.
     </Alert>
   );
