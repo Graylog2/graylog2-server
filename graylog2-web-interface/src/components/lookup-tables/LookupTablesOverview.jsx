@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import { OverlayTrigger, PaginatedList, SearchForm, Icon } from 'components/common';
@@ -24,6 +25,10 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
 import Styles from './Overview.css';
+
+const ScrollContainer = styled.div`
+  overflow-x: auto;
+`;
 
 const _lookupName = (id, map) => {
   const empty = { title: 'None' };
@@ -95,9 +100,7 @@ class LookupTablesOverview extends React.Component {
   };
 
   _onSearch = (query, resetLoadingStateCb) => {
-    const { resetPage, pageSize } = this.props.paginationQueryParameter;
-
-    resetPage();
+    const { pageSize } = this.props.paginationQueryParameter;
 
     LookupTablesActions
       .searchPaginated(1, pageSize, query)
@@ -106,9 +109,7 @@ class LookupTablesOverview extends React.Component {
 
   _onReset = () => {
     const { resetPage, pageSize } = this.props.paginationQueryParameter;
-
     resetPage();
-
     LookupTablesActions.searchPaginated(1, pageSize);
   };
 
@@ -159,19 +160,21 @@ class LookupTablesOverview extends React.Component {
                   <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
                 </OverlayTrigger>
               </SearchForm>
-              <Table condensed hover className={Styles.overviewTable}>
-                <thead>
-                  <tr>
-                    <th className={Styles.rowTitle}>Title</th>
-                    <th className={Styles.rowDescription}>Description</th>
-                    <th className={Styles.rowName}>Name</th>
-                    <th className={Styles.rowCache}>Cache</th>
-                    <th className={Styles.rowAdapter}>Data Adapter</th>
-                    <th className={Styles.rowActions}>Actions</th>
-                  </tr>
-                </thead>
-                {lookupTables}
-              </Table>
+              <ScrollContainer>
+                <Table condensed hover className={Styles.overviewTable}>
+                  <thead>
+                    <tr>
+                      <th className={Styles.rowTitle}>Title</th>
+                      <th className={Styles.rowDescription}>Description</th>
+                      <th className={Styles.rowName}>Name</th>
+                      <th className={Styles.rowCache}>Cache</th>
+                      <th className={Styles.rowAdapter}>Data Adapter</th>
+                      <th className={Styles.rowActions}>Actions</th>
+                    </tr>
+                  </thead>
+                  {lookupTables}
+                </Table>
+              </ScrollContainer>
             </PaginatedList>
           </Col>
         </Row>

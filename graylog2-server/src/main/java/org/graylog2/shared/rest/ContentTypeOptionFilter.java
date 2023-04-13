@@ -14,22 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.shared.rest;
 
-import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
-import { Row } from 'components/bootstrap';
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import java.io.IOException;
 
-const NAV_ITEMS = [
-  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
-  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST },
-  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST },
-];
+public class ContentTypeOptionFilter implements ContainerResponseFilter {
+    public static final String X_CONTENT_TYPE_OPTIONS = "X-Content-Type-Options";
 
-const EventsPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
-);
-
-export default EventsPageNavigation;
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        responseContext.getHeaders().add(X_CONTENT_TYPE_OPTIONS, "nosniff");
+    }
+}

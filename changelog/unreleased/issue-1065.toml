@@ -1,0 +1,11 @@
+type = "fixed"
+message = "Fix Maxmind database types in cloud environment."
+
+pulls = ["13911"]
+
+details.user = """
+We need to reduce the available database types for Maxmind,
+in the cloud environment and no longer allow database path customization.
+
+Because the user has no access to the file system in the cloud environment.
+"""

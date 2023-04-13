@@ -84,12 +84,12 @@ const CacheTableEntry = ({ cache }: Props) => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
   };
 
-  const handleDelete = (inCache: LookupTableCache) => {
+  const handleDelete = () => {
     // eslint-disable-next-line no-alert
-    const shouldDelete = window.confirm(`Are you sure you want to delete cache "${inCache.title}"?`);
+    const shouldDelete = window.confirm(`Are you sure you want to delete cache "${cache.title}"?`);
 
     if (shouldDelete) {
-      LookupTableCachesActions.delete(inCache.id).then(() => LookupTableCachesActions.reloadPage());
+      LookupTableCachesActions.delete(cache.id).then(() => LookupTableCachesActions.reloadPage());
     }
   };
 
