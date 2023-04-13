@@ -9,7 +9,7 @@
 This is often an indication of persistent network failures.
         <#if _cloud == false>
             <#if SYSTEM_INPUTS?has_content>
-                You can click {' '} <a href="${SYSTEM_INPUTS}" target="_blank" rel="noreferrer">here</a> to see the input.
+                You can click  <a href="${SYSTEM_INPUTS}" target="_blank" rel="noreferrer">here</a> to see the input.
             </#if>
         </#if>
     </span>
