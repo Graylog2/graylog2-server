@@ -18,14 +18,12 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import { Builder } from 'logic/rest/FetchProvider';
+import fetch from 'logic/rest/FetchProvider';
 import type { DataNodes } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
 
 const fetchDataNodes = () => (
-  new Builder('GET', qualifyUrl('/api/data_nodes'))
-    .json()
-    .build()
+  fetch('GET', qualifyUrl('/api/data_nodes'), undefined, false)
 );
 
 const useDataNodes = (): {
@@ -44,7 +42,7 @@ const useDataNodes = (): {
     fetchDataNodes,
     {
       initialData: [],
-      retry: 3000,
+      refetchInterval: 3000,
     });
 
   return { data, isFetching, isInitialLoading, error };

@@ -214,12 +214,16 @@ function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<
 
 type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 
-export default function fetch<T = any>(method: Method, url: string, body?: any): Promise<T> {
+export default function fetch<T = any>(method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
   const promise = () => new Builder(method, url)
     .json(body)
     .build();
 
-  return queuePromiseIfNotLoggedin(promise)();
+  if (requireSession) {
+    return queuePromiseIfNotLoggedin(promise)();
+  }
+
+  return promise();
 }
 
 export function fetchPlainText(method, url, body) {

@@ -5,7 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 import useDataNodes from './useDataNodes';
 
-jest.mock('logic/rest/FetchProvider');
+jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 describe('useDataNodes', () => {
   const availableDataNodes = [
@@ -39,12 +39,13 @@ describe('useDataNodes', () => {
   it('should return data nodes CA status', async () => {
     const { result, waitFor } = renderHook(() => useDataNodes());
 
-    // expect(result.current.data).toEqual([]);
-    //
-    // await waitFor(() => result.current.isFetching);
-    // await waitFor(() => !result.current.isFetching);
-    //
-    // expect(fetch).toHaveBeenCalledWith('GET', '/api/preflight/datanodes');
+    expect(result.current.data).toEqual([]);
+
+    await waitFor(() => result.current.isFetching);
+    await waitFor(() => !result.current.isFetching);
+
+    expect(fetch).toHaveBeenCalledWith('GET', expect.stringContaining('/api/data_nodes'), undefined, false);
+
     await waitFor(() => expect(result.current.data).toEqual(availableDataNodes));
   });
 });
