@@ -65,6 +65,7 @@ class IndexSetConfigurationPage extends React.Component {
     }
 
     const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies, history, sendTelemetry } = this.props;
+
     const saveConfiguration = (newIndexSet) => {
       _saveConfiguration(history, newIndexSet);
 
@@ -72,7 +73,7 @@ class IndexSetConfigurationPage extends React.Component {
         appSection: 'index_sets',
         eventElement: 'update-index-set',
       });
-    ;}
+    };
 
     return (
       <DocumentTitle title="Configure Index Set">
@@ -121,6 +122,7 @@ IndexSetConfigurationPage.propTypes = {
     max_index_retention_period: PropTypes.string,
   }),
   history: PropTypes.object.isRequired,
+  sendTelemetry: PropTypes.func.isRequired,
 };
 
 IndexSetConfigurationPage.defaultProps = {
