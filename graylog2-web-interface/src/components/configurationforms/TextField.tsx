@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
 import { hasAttribute, optionalMarker } from 'components/configurationforms/FieldHelpers';
@@ -27,7 +27,7 @@ type Props = {
   autoFocus: boolean,
   field: TextFieldType,
   dirty: boolean,
-  onChange: (title: string, value: string | EncryptedFieldValue<string>) => void,
+  onChange: (title: string, value: string | EncryptedFieldValue<string>, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value?: string | EncryptedFieldValue<string>,
@@ -38,6 +38,7 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
   const showReadOnlyEncrypted = field.is_encrypted && !dirty && typeof value !== 'string' && value.is_set;
   const fieldType = (!hasAttribute(field.attributes, 'textarea') && (hasAttribute(field.attributes, 'is_password') || showReadOnlyEncrypted) ? 'password' : 'text');
   const fieldId = `${typeName}-${title}`;
+  const [isResetted, setIsResetted] = useState<boolean>(false);
 
   const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
 
@@ -63,13 +64,31 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
     }
   };
 
+  const handleReset = () => {
+    setIsResetted(true);
+    onChange(title, { delete_value: true });
+  };
+
+  const handleUndoReset = () => {
+    setIsResetted(false);
+    onChange(title, { is_set: true }, false);
+  };
+
   const buttonAfter = () => {
+    if (isResetted) {
+      return (
+        <Button type="button" onClick={handleUndoReset}>
+          Undo Reset
+        </Button>
+      );
+    }
+
     if (!showReadOnlyEncrypted) {
       return null;
     }
 
     return (
-      <Button type="button" onClick={() => onChange(title, { delete_value: true })}>
+      <Button type="button" onClick={handleReset}>
         Reset
       </Button>
     );

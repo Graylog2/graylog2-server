@@ -35,7 +35,7 @@ type Props = {
   configValue: FieldValue | EncryptedFieldValue<FieldValue>,
   dirty: boolean,
   autoFocus: boolean,
-  onChange: (field: string, value: FieldValue | EncryptedFieldValue<FieldValue>) => void,
+  onChange: (field: string, value: FieldValue | EncryptedFieldValue<FieldValue>, dirty?: boolean) => void,
 };
 
 const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {

@@ -107,11 +107,15 @@ describe('AddToQueryHandler', () => {
   });
 
   describe('for dashboards', () => {
+    const query = createQuery('queryId');
+    const view = createViewWithQuery(query, View.Type.Dashboard);
+    const mockDashboardRootState = {
+      view: { view },
+    };
+
     it('retrieves query string from global override', async () => {
-      const query = createQuery('queryId');
-      const view = createViewWithQuery(query, View.Type.Dashboard);
       const state = {
-        view: { view },
+        ...mockDashboardRootState,
         searchExecution: {
           executionState: SearchExecutionState.create(
             Immutable.Map(),
@@ -129,6 +133,28 @@ describe('AddToQueryHandler', () => {
       }));
 
       expect(updateQueryString).toHaveBeenCalledWith('queryId', 'something AND bar:42');
+    });
+
+    it('creates query string when global override is undefined', async () => {
+      const state = {
+        ...mockDashboardRootState,
+        searchExecution: {
+          executionState: SearchExecutionState.create(
+            Immutable.Map(),
+            undefined,
+          ),
+        },
+      } as RootState;
+      const dispatch = mockDispatch(state);
+
+      await dispatch(AddToQueryHandler({
+        queryId: 'queryId',
+        field: 'bar',
+        value: 42,
+        type: new FieldType('keyword', [], []),
+      }));
+
+      expect(updateQueryString).toHaveBeenCalledWith('queryId', 'bar:42');
     });
   });
 });

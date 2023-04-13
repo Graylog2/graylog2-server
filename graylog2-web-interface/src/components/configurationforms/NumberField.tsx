@@ -26,7 +26,7 @@ import type { NumberField as NumberFieldType } from './types';
 type Props = {
   autoFocus?: boolean,
   field: NumberFieldType,
-  onChange: (title: string, value: number) => void,
+  onChange: (title: string, value: number, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value: number,

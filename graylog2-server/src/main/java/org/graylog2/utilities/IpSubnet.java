@@ -40,11 +40,16 @@
 * */
 package org.graylog2.utilities;
 
+import com.google.common.net.InetAddresses;
+import org.graylog2.shared.utilities.StringUtils;
+
 import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.Optional;
 
 /**
  * A class that enables to get an IP range from CIDR specification. It supports
@@ -138,8 +143,12 @@ public class IpSubnet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         IpSubnet that = (IpSubnet) o;
 
@@ -156,5 +165,36 @@ public class IpSubnet {
     @Override
     public String toString() {
         return inetAddress.getHostAddress() + "/" + prefixLength;
+    }
+
+    /**
+     * Formats the given value in CIDR notation. If the value is already valid CIDR just return it.
+     * Otherwise, check if the value is an individual IP address. If it is, add the appropriate /32 or /128 depending
+     * on if the IP is v4 or v6. If the value is not already valid CIDR notation or an IP address, return empty.
+     *
+     * @param value string value to be formatted as CIDR
+     * @return optional valid CIDR formatted String
+     */
+    public static Optional<String> formatCIDR(String value) {
+        Optional<String> cidr = Optional.empty();
+
+        try {
+            new IpSubnet(value);
+            cidr = Optional.of(value);
+        } catch (UnknownHostException e) {
+            try {
+                // If the key is not a subnet, check if it is a single IP address
+                InetAddress address = InetAddresses.forString(value);
+                // If it is, tack on /32 or /128  to allow for proper contains functionality
+                if (address instanceof Inet4Address) {
+                    cidr = Optional.of(StringUtils.f("%s/32", value));
+                } else if (address instanceof Inet6Address) {
+                    cidr = Optional.of(StringUtils.f("%s/128", value));
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        return cidr;
     }
 }

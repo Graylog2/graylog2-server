@@ -11,6 +11,7 @@
     ${end}
   </head>
   <body>
+    <div id="app-root" />
     <script src="${appPrefix}config.js"></script>
     ${foreach jsFiles jsFile}
     <script src="${appPrefix}assets/${jsFile}"></script>
