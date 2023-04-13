@@ -42,8 +42,9 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
 
   const handleChange = (selected: string) => {
     sendTelemetry('change_input_value', { appSection: 'search_bar', eventElement: 'stream-filter', eventInfo: {} });
-    onChange(selected === '' ? [] : selected.split(','))
-  }
+    onChange(selected === '' ? [] : selected.split(','));
+  };
+
   return (
     <Container data-testid="streams-filter" title={placeholder}>
       <Select placeholder={placeholder}

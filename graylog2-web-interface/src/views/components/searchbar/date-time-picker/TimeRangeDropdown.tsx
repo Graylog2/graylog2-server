@@ -218,7 +218,7 @@ const TimeRangeTabs = ({
         tab: nextTab,
       },
     });
-  }, [handleActiveTab]);
+  }, [handleActiveTab, sendTelemetry]);
 
   const tabs = useMemo(() => timeRangeTypeTabs({
     activeTab,
