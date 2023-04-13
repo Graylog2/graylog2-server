@@ -88,6 +88,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
@@ -373,6 +374,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupSetStringList.NAME, new LookupSetStringList(lookupTableService));
         functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
+        functions.put(LookupHasValue.NAME, new LookupHasValue(lookupTableService));
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1249,6 +1251,20 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         verifyNoMoreInteractions(lookupTable);
 
         assertThat(message.getField("new_value")).isEqualTo(result);
+    }
+
+    @Test
+    public void lookupHasValue() {
+        doReturn(null).when(lookupTable).lookup(any());
+        doReturn(LookupResult.withoutTTL().single("present").build()).when(lookupTable).lookup("present");
+        doReturn(LookupResult.withoutTTL().build()).when(lookupTable).lookup("empty");
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message.getField("check_present")).isEqualTo(true);
+        assertThat(message.getField("check_absent")).isEqualTo(false);
+        assertThat(message.getField("check_empty")).isEqualTo(false);
     }
 
     @Test
