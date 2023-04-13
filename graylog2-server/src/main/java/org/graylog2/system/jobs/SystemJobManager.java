@@ -110,7 +110,7 @@ public class SystemJobManager {
     }
 
     @WithSpan
-    protected void executeJob(SystemJob job) {
+    private void executeJob(SystemJob job) {
         Span.current().setAttribute(GraylogSemanticAttributes.SYSTEM_JOB_TYPE, job.getClassName());
         job.execute();
     }
