@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.commands.certutil;
+package org.graylog.security.certutil.console;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import java.util.Locale;
  */
 public class SystemConsole implements CommandLineConsole {
 
+    @Override
     public String readLine(String format, Object... args) {
         if (System.console() != null) {
             return System.console().readLine(format, args);
@@ -42,6 +43,7 @@ public class SystemConsole implements CommandLineConsole {
         }
     }
 
+    @Override
     public char[] readPassword(String format, Object... args) {
         if (System.console() != null) {
             return System.console().readPassword(format, args);
