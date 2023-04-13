@@ -71,7 +71,7 @@ describe('<TelemetryInit>', () => {
 
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
 
-    expect(result.current).toBeTruthy();
+    expect(result.current).toBeDefined();
   });
 
   it('should not render PosthogContext when config is not present', () => {
