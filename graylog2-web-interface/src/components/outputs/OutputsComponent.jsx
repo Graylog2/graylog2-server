@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Row, Col } from 'components/bootstrap';
@@ -30,8 +32,22 @@ import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
 
 const OutputsComponent = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'OutputsComponent',
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    streamId: PropTypes.string.isRequired,
+    permissions: PropTypes.array.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
+  },
+
   mixins: [PermissionsMixin],
+
+  getInitialState() {
+    return {
+    };
+  },
 
   componentDidMount() {
     this.loadData();
@@ -59,11 +75,6 @@ const OutputsComponent = createReactClass({
     });
   },
 
-  getInitialState() {
-    return {
-    };
-  },
-
   _handleUpdate() {
     this.loadData();
   },
@@ -75,8 +86,6 @@ const OutputsComponent = createReactClass({
     });
 
     OutputsStore.save(data, (result) => {
-      this.setState({ typeName: 'placeholder' });
-
       if (this.props.streamId) {
         StreamsStore.addOutput(this.props.streamId, result.id, (response) => {
           this._handleUpdate();
@@ -121,6 +130,7 @@ const OutputsComponent = createReactClass({
       eventElement: 'remove-output-globally',
     });
 
+    // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to terminate this output?')) {
       OutputsStore.remove(outputId, (response) => {
         UserNotification.success('Output was terminated.', 'Success');
@@ -137,6 +147,7 @@ const OutputsComponent = createReactClass({
       eventElement: 'remove-output-from-stream',
     });
 
+    // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this output from the stream?')) {
       StreamsStore.removeOutput(streamId, outputId, (response) => {
         UserNotification.success('Output was removed from stream.', 'Success');

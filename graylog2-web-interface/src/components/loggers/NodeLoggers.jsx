@@ -27,8 +27,10 @@ import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const NodeLoggers = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'NodeLoggers',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     nodeId: PropTypes.string.isRequired,
     subsystems: PropTypes.object.isRequired,
