@@ -44,7 +44,7 @@ const mockUseInvestigationDrawer = jest.fn(() => ({
 type SecAddEvidenceProps = {
   id: string,
   type: string,
-  children: React.ReactNode,
+  children: React.ReactElement,
   index?: string,
 };
 
@@ -78,9 +78,7 @@ const MockSecAddEvidence = ({ id, index, type, children }: SecAddEvidenceProps) 
     }
   };
 
-  const childrenWithProps = React.Children.map(children, (child: React.ReactElement) => (
-    React.cloneElement(child, { onClick: submitEvidence })
-  ) as React.ReactElement);
+  const childrenWithProps = React.cloneElement(React.Children.only(children), { onClick: submitEvidence });
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{childrenWithProps}</>;
