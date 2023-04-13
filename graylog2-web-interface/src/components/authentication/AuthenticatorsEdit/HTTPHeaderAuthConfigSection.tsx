@@ -26,6 +26,7 @@ import { FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import useHistory from 'routing/useHistory';
 import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const HTTPHeaderAuthConfigSection = () => {
   const [submitError, setSubmitError] = useState<string | undefined>();
@@ -33,7 +34,14 @@ const HTTPHeaderAuthConfigSection = () => {
   const sectionTitle = 'Trusted Header Authentication';
   const history = useHistory();
 
+  const sendTelemetry = useSendTelemetry();
+
   const _onSubmit = (data: HTTPHeaderAuthConfigJSON) => {
+    sendTelemetry('submit_form', {
+      appSection: 'trusted_header_authentication',
+      eventElement: 'update-config',
+    });
+
     setSubmitError(undefined);
 
     return HTTPHeaderAuthConfigDomain.update(data).then(() => {
