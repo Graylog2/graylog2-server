@@ -67,7 +67,7 @@ import static java.util.Objects.requireNonNull;
 
 @Singleton
 @Path("")
-@CSP(value = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;")
+@CSP(value = CSP.CSP_DEFAULT)
 public class WebInterfaceAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final IndexHtmlGenerator indexHtmlGenerator;

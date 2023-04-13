@@ -46,7 +46,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
-@CSP(value = "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:;")
+@CSP(value = CSP.CSP_SWAGGER)
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;
