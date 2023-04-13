@@ -117,14 +117,15 @@ public class MemoryLimitedCompressingFifoRingBuffer {
         long skipFromCompressed = getCompressedBatches - compressedRingBuffer.size();
         skipFromCompressed = skipFromCompressed > 0 ? 0 : skipFromCompressed * -1;
 
-        compressedRingBuffer.stream().map(input -> {
+        compressedRingBuffer.stream()
+                .skip(skipFromCompressed)
+                .map(input -> {
                     try {
                         return decompress(input);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 })
-                .skip(skipFromCompressed)
                 .forEach(b -> {
                     try {
                         outputStream.write(b);
