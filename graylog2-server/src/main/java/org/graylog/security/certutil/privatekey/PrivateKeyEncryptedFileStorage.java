@@ -33,6 +33,7 @@ import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.PrivateKey;
 import java.security.Security;
 
@@ -46,7 +47,7 @@ public record PrivateKeyEncryptedFileStorage(String privateKeyFilename) implemen
     public void writeEncryptedKey(char[] passwd, PrivateKey privateKey)
             throws IOException, OperatorCreationException {
 
-        JcaPEMWriter pemWriter = new JcaPEMWriter(new FileWriter(privateKeyFilename));
+        JcaPEMWriter pemWriter = new JcaPEMWriter(new FileWriter(privateKeyFilename, Charset.defaultCharset()));
         PKCS8EncryptedPrivateKeyInfoBuilder pkcs8Builder =
                 new JcaPKCS8EncryptedPrivateKeyInfoBuilder(privateKey);
         pemWriter.writeObject(pkcs8Builder.build(new JcePKCSPBEOutputEncryptorBuilder(
@@ -60,7 +61,7 @@ public record PrivateKeyEncryptedFileStorage(String privateKeyFilename) implemen
     @Override
     public PrivateKey readEncryptedKey(char[] password)
             throws IOException, OperatorCreationException, PKCSException {
-        PEMParser parser = new PEMParser(new FileReader(privateKeyFilename));
+        PEMParser parser = new PEMParser(new FileReader(privateKeyFilename, Charset.defaultCharset()));
         PKCS8EncryptedPrivateKeyInfo encPrivKeyInfo = (PKCS8EncryptedPrivateKeyInfo) parser.readObject();
         InputDecryptorProvider pkcs8Prov = new JcePKCSPBEInputDecryptorProviderBuilder()
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME)

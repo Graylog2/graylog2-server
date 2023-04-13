@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.security.Security;
 
 public record CsrFileStorage(String csrFilename) implements CsrStorage {
@@ -38,7 +39,7 @@ public record CsrFileStorage(String csrFilename) implements CsrStorage {
     public void writeCsr(PKCS10CertificationRequest csr)
             throws IOException, OperatorCreationException {
 
-        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(new FileWriter(csrFilename))) {
+        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(new FileWriter(csrFilename, Charset.defaultCharset()))) {
             jcaPEMWriter.writeObject(csr);
         }
     }
@@ -47,7 +48,7 @@ public record CsrFileStorage(String csrFilename) implements CsrStorage {
     public PKCS10CertificationRequest readCsr()
             throws IOException, OperatorCreationException {
 
-        Reader pemReader = new BufferedReader(new FileReader(csrFilename));
+        Reader pemReader = new BufferedReader(new FileReader(csrFilename, Charset.defaultCharset()));
         PEMParser pemParser = new PEMParser(pemReader);
         Object parsedObj = pemParser.readObject();
         if (parsedObj instanceof PKCS10CertificationRequest) {
