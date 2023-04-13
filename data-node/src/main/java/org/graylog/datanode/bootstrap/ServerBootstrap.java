@@ -146,7 +146,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             throw e;
         }
 
-        if (mongoDBPreflightCheck.dbIsEmpty()) {
+        if (mongoDBPreflightCheck.isFreshInstallation()) {
             registerFreshInstallation();
         }
     }
@@ -200,8 +200,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
-
-        startNodeRegistration(injector);
 
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;

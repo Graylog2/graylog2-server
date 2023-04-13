@@ -1,0 +1,10 @@
+type = "fixed"
+message = "Fix NodeService#allActive() implementation, returning only nodes of correct type"
+
+issues = ["15129"]
+pulls = ["15139"]
+
+details.user = """
+With the addition of the DATANODE type to the NodeService, the allActive method would return also datanodes. This
+may lead to problems in calls that expect only SERVER type.
+"""
