@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -64,14 +65,13 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.stderr = new CircularFifoQueue<>(logsCacheSize);
     }
 
-    private static RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
+    private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
-        final boolean sslEnabled = Boolean.parseBoolean(configuration.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        final HttpHost host = new HttpHost("localhost", configuration.httpPort(), sslEnabled ? "https" : "http");
+        final HttpHost host = getRestBaseUrl(configuration);
 
         RestClientBuilder builder = RestClient.builder(host);
-        if (sslEnabled) {
+        if ("https".equals(host.getSchemeName())) {
             if (configuration.authUsername() != null && configuration.authPassword() != null) {
                 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(configuration.authUsername(), configuration.authPassword()));
             }
@@ -103,7 +103,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public ProcessInfo processInfo() {
-
         return process().map(process -> new ProcessInfo(
                 process.pid(),
                 configuration.nodeName(), processState.getState(),
@@ -114,6 +113,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 getRestBaseUrl(configuration).toString()
 
         )).orElseGet(() -> new ProcessInfo(-1, configuration.nodeName(), processState.getState(), false, null, null, null, null));
+    }
+
+    @Override
+    public URI getOpensearchBaseUrl() {
+        return URI.create(getRestBaseUrl(configuration).toURI());
     }
 
     private HttpHost getRestBaseUrl(OpensearchConfiguration config) {

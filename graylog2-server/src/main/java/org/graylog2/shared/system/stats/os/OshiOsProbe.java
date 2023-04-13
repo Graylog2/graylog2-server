@@ -22,6 +22,7 @@ import oshi.hardware.CentralProcessor.TickType;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.VirtualMemory;
+import oshi.util.Util;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,11 +60,26 @@ public class OshiOsProbe implements OsProbe {
         final CentralProcessor centralProcessor = hardware.getProcessor();
 
         long[] prevTicks = centralProcessor.getSystemCpuLoadTicks();
+        // Wait a second...
+        Util.sleep(1000);
         long[] ticks = centralProcessor.getSystemCpuLoadTicks();
-        short user = (short) (ticks[TickType.USER.getIndex()] - prevTicks[TickType.USER.getIndex()]);
-        short sys = (short) (ticks[TickType.SYSTEM.getIndex()] - prevTicks[TickType.SYSTEM.getIndex()]);
-        short idle = (short) (ticks[TickType.IDLE.getIndex()] - prevTicks[TickType.IDLE.getIndex()]);
-        short steal = (short) (ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()]);
+
+        long user = ticks[TickType.USER.getIndex()] - prevTicks[TickType.USER.getIndex()];
+        long nice = ticks[TickType.NICE.getIndex()] - prevTicks[TickType.NICE.getIndex()];
+        long system = ticks[TickType.SYSTEM.getIndex()] - prevTicks[TickType.SYSTEM.getIndex()];
+        long idle = ticks[TickType.IDLE.getIndex()] - prevTicks[TickType.IDLE.getIndex()];
+        long iowait = ticks[TickType.IOWAIT.getIndex()] - prevTicks[TickType.IOWAIT.getIndex()];
+        long irq = ticks[TickType.IRQ.getIndex()] - prevTicks[TickType.IRQ.getIndex()];
+        long softirq = ticks[TickType.SOFTIRQ.getIndex()] - prevTicks[TickType.SOFTIRQ.getIndex()];
+        long steal = ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()];
+
+        long totalCpu = user + nice + system + idle + iowait + irq + softirq + steal;
+        totalCpu = totalCpu == 0 ? 1 : totalCpu; // avoid division by zero
+
+        short sys = (short) (100 * system / totalCpu);
+        short us = (short) (100 * user / totalCpu);
+        short id = (short) (100 * idle / totalCpu);
+        short st = (short) (100 * steal / totalCpu);
 
         final CentralProcessor.ProcessorIdentifier processorIdentifier = centralProcessor.getProcessorIdentifier();
         final int totalSockets = centralProcessor.getPhysicalPackageCount() > 0 ? centralProcessor.getPhysicalPackageCount() : 1;
@@ -71,15 +87,15 @@ public class OshiOsProbe implements OsProbe {
         final Processor proc = Processor.create(
                 processorIdentifier.getName(),
                 processorIdentifier.getVendor(),
-                ((int) processorIdentifier.getVendorFreq() / 1000000),
+                (int) (processorIdentifier.getVendorFreq() / 1000000),
                 centralProcessor.getLogicalProcessorCount(),
                 centralProcessor.getPhysicalPackageCount(),
                 centralProcessor.getLogicalProcessorCount() / totalSockets,
                 -1,
                 sys,
-                user,
-                idle,
-                steal);
+                us,
+                id,
+                st);
 
 
         return OsStats.create(

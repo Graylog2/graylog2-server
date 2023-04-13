@@ -17,15 +17,45 @@
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
+import MockStore from 'helpers/mocking/StoreMock';
+
 import SidecarConfig from './SidecarConfig';
 
-describe('SidecarConfig', () => {
-  it('updates config after change', async () => {
-    const updateConfig = jest.fn(() => Promise.resolve());
-    render(<SidecarConfig updateConfig={updateConfig} />);
+const mockConfig = {
+  sidecar_configuration_override: false,
+  sidecar_expiration_threshold: 'P14D',
+  sidecar_inactive_threshold: 'PT1M',
+  sidecar_send_status: true,
+  sidecar_update_interval: 'PT30S',
+};
 
-    const openButton = await screen.findByRole('button', { name: /edit configuration/i });
-    fireEvent.click(openButton);
+let mockUpdate;
+
+jest.mock('stores/configurations/ConfigurationsStore', () => {
+  mockUpdate = jest.fn().mockReturnValue(Promise.resolve());
+
+  return ({
+    ConfigurationsStore: MockStore(['getInitialState', () => ({
+      configuration: {
+        'org.graylog.plugins.sidecar.system.SidecarConfiguration': mockConfig,
+      },
+    })]),
+    ConfigurationsActions: {
+      list: jest.fn(() => Promise.resolve()),
+      update: mockUpdate,
+    },
+  });
+});
+
+describe('SidecarConfig', () => {
+  afterEach(() => jest.resetAllMocks());
+
+  it('updates config after change', async () => {
+    render(<SidecarConfig />);
+
+    const editButton = await screen.findByRole('button', { name: /edit configuration/i });
+
+    fireEvent.click(editButton);
 
     fireEvent.click(await screen.findByRole('checkbox', {
       name: /override sidecar configuration/i,
@@ -37,6 +67,6 @@ describe('SidecarConfig', () => {
       hidden: true,
     }));
 
-    await waitFor(() => { expect(updateConfig).toHaveBeenCalledWith(expect.objectContaining({ sidecar_configuration_override: true })); });
+    await waitFor(() => { expect(mockUpdate).toHaveBeenCalledWith('org.graylog.plugins.sidecar.system.SidecarConfiguration', expect.objectContaining({ sidecar_configuration_override: true })); });
   });
 });

@@ -50,12 +50,5 @@ function renderAppContainer(appContainer) {
   );
 }
 
-window.onload = () => {
-  const appContainer = document.createElement('div');
-
-  appContainer.id = 'app-root';
-
-  document.body.appendChild(appContainer);
-
-  renderAppContainer(appContainer);
-};
+const appContainer = document.querySelector('div#app-root');
+renderAppContainer(appContainer);

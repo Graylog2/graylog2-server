@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery } from '@tanstack/react-query';
-
 import { Telemetry } from '@graylog/server-api';
 
 const TELEMETRY_CLUSTER_INFO_QUERY_KEY = 'telemetry.cluster.info';

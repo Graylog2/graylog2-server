@@ -201,8 +201,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
 
-        startNodeRegistration(injector);
-
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
         try {

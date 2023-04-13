@@ -17,6 +17,30 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
+import GlobalThemeStyles from 'preflight/theme/GlobalThemeStyles';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+import ThemeWrapper from 'preflight/theme/ThemeWrapper';
+
 import App from './App';
 
-ReactDOM.render(<App />, document.getElementById('app-root'));
+ReactDOM.render((
+  <React.StrictMode>
+    <PreflightThemeProvider>
+      <GlobalThemeStyles />
+      <DefaultQueryClientProvider>
+        <ThemeWrapper>
+          <App />
+        </ThemeWrapper>
+      </DefaultQueryClientProvider>
+    </PreflightThemeProvider>
+  </React.StrictMode>
+),
+document.getElementById('app-root'),
+);
+
+// @ts-ignore
+if (import.meta.webpackHot) {
+  // @ts-ignore
+  import.meta.webpackHot.accept();
+}
