@@ -23,6 +23,7 @@ import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.annotations.CSP;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.inject.Inject;
@@ -45,6 +46,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
+@CSP(value = CSP.CSP_SWAGGER)
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;
