@@ -154,6 +154,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
+
         final SearchJob searchJob = searchExecutor.execute(id, searchUser, executionState);
 
         postAuditEvent(searchJob);

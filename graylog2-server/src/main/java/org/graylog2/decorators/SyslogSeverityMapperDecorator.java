@@ -18,6 +18,7 @@ package org.graylog2.decorators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -97,6 +98,7 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
         this.targetField = (String) requireNonNull(decorator.config().get(CK_TARGET_FIELD), CK_TARGET_FIELD + " cannot be null");
     }
 
+    @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
