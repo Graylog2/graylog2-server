@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -185,6 +186,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .map(Optional::get);
     }
 
+    @WithSpan
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);

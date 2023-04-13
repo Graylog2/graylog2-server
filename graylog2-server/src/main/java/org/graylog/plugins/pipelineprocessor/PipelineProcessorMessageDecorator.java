@@ -20,7 +20,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.assistedinject.Assisted;
-
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
@@ -35,12 +35,11 @@ import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 public class PipelineProcessorMessageDecorator implements SearchResponseDecorator {
     private static final String CONFIG_FIELD_PIPELINE = "pipeline";
@@ -81,7 +80,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
                         "Which pipeline to use for message decoration",
                         ConfigurationField.Optional.NOT_OPTIONAL));
             }};
-        };
+        }
     }
 
     public static class Descriptor extends SearchResponseDecorator.Descriptor {
@@ -104,6 +103,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
         }
     }
 
+    @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> results = new ArrayList<>();

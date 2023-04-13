@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -46,6 +47,7 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
                 .collect(Collectors.toList());
     }
 
+    @WithSpan
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, EventList searchType, SearchResponse result,
                                              Aggregations aggregations, ESGeneratedQueryContext queryContext) {
