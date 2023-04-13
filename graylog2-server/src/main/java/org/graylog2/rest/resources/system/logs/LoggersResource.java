@@ -214,7 +214,9 @@ public class LoggersResource extends RestResource {
     @Produces(MediaType.TEXT_PLAIN)
     @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
     @HideOnCloud
-    public Response messages(@ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages", defaultValue = "1000", allowableValues = "range[0, infinity]")
+    public Response messages(@ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
+                                       "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
+                                       defaultValue = "1000", allowableValues = "range[0, infinity]")
                                        @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {
