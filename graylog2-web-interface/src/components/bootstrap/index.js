@@ -50,3 +50,4 @@ export { default as Tooltip } from './Tooltip';
 export { default as Well } from './Well';
 
 export * from './imports';
+export * from './importsTypes';

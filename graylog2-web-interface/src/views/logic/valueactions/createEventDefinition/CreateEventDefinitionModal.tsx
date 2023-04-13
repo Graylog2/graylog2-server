@@ -33,8 +33,7 @@ import {
   labels,
 } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
-import { Icon } from 'components/common';
-import { Link } from 'components/common/router';
+import { Icon, LinkButton } from 'components/common';
 import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
@@ -134,7 +133,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
         }
       </Modal.Body>
       <Modal.Footer>
-        <Link onClick={onClose} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</Link>
+        <LinkButton bsStyle="primary" onClick={onClose} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</LinkButton>
       </Modal.Footer>
     </Modal>
   );
