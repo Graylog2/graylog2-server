@@ -28,16 +28,13 @@ import {
 import useMappedData from 'views/logic/valueactions/createEventDefinition/hooks/useMappedData';
 import {
   ltParam,
-  ltParamJSON,
+  ltParamJSON, mappedDataResult, mockedContexts,
   mockedFilter,
   mockedSearchFilters,
-  mockedView,
   parameterBindings,
   parameters,
-  testAggregationWidget,
   valueParameter,
   valueParameterJSON,
-  valuePath,
 } from 'fixtures/createEventDefinitionFromValue';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -68,17 +65,7 @@ describe('useMappedData', () => {
     asMock(replaceParametersInQueryString).mockReturnValue('http_method:GET');
 
     const { result, waitFor } = renderHook(() => useMappedData({
-      contexts: {
-        widget: testAggregationWidget,
-        view: mockedView,
-        parameterBindings: parameterBindings,
-        valuePath: valuePath,
-        parameters: parameters,
-        analysisDisabledFields: undefined,
-        currentUser: undefined,
-        message: undefined,
-        isLocalNode: undefined,
-      },
+      contexts: mockedContexts,
       field: 'action',
       value: 'show',
       queryId: 'query-id',
@@ -101,13 +88,6 @@ describe('useMappedData', () => {
     });
     // await expect(getAggregationHandler).toHaveBeenCalled();
 
-    expect(result.current).toEqual({
-      searchWithinMs: 300000,
-      lutParameters: [ltParamJSON],
-      searchFilterQuery: '(http_method:GET)',
-      queryWithReplacedParams: 'http_method:GET',
-      streams: ['streamId'],
-      searchFromValue: 'action:show',
-    });
+    expect(result.current).toEqual(mappedDataResult);
   });
 });

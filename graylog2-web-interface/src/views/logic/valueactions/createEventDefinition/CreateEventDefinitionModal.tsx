@@ -14,18 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useReducer, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
-import objectHas from 'lodash/has';
 
 import { Checkbox, Modal, Button } from 'components/bootstrap';
 import type {
   ItemKey,
   Checked,
-  State,
   ModalData, MappedData, StrategyId,
 } from 'views/logic/valueactions/createEventDefinition/types';
 import CheckBoxGroup from 'views/logic/valueactions/createEventDefinition/CheckBoxGroup';
@@ -39,75 +37,7 @@ import { Icon } from 'components/common';
 import { Link } from 'components/common/router';
 import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
 import Routes from 'routing/Routes';
-
-const initState: State = {
-  strategy: 'EXACT',
-  checked: {},
-  showDetails: false,
-};
-
-const updateIfHas = (possibleKeys: Checked, updates:Checked): Checked => {
-  const newState = { ...possibleKeys };
-
-  Object.entries(updates).forEach(([key, value]) => {
-    if (objectHas(possibleKeys, key)) {
-      newState[key] = value;
-    }
-  });
-
-  return newState;
-};
-
-const reducer = (state: State, action: { type: string, payload?: Checked, possibleKeys: Checked}): State => {
-  const { type, payload, possibleKeys } = action;
-
-  switch (type) {
-    case 'SET_ALL_STRATEGY':
-      return ({
-        strategy: 'ALL',
-        showDetails: state.showDetails,
-        checked: updateIfHas(possibleKeys, { searchFilterQuery: false, queryWithReplacedParams: false }),
-      });
-    case 'SET_EXACT_STRATEGY':
-      return ({
-        strategy: 'EXACT',
-        showDetails: state.showDetails,
-        checked: possibleKeys,
-      });
-    case 'SET_ROW_STRATEGY':
-      return ({
-        strategy: 'ROW',
-        showDetails: state.showDetails,
-        checked: updateIfHas(possibleKeys, { columnValuePath: false, columnGroupBy: false }),
-      });
-    case 'SET_COL_STRATEGY':
-      return ({
-        strategy: 'COL',
-        showDetails: state.showDetails,
-        checked: updateIfHas(possibleKeys, { rowValuePath: false, rowGroupBy: false }),
-      });
-    case 'SET_CUSTOM_STRATEGY':
-      return ({
-        strategy: 'CUSTOM',
-        showDetails: true,
-        checked: state.checked,
-      });
-    case 'UPDATE_CHECKED_ITEMS':
-      return ({
-        strategy: 'CUSTOM',
-        showDetails: state.showDetails,
-        checked: updateIfHas(state.checked, payload),
-      });
-    case 'TOGGLE_SHOW_DETAILS':
-      return ({
-        strategy: state.strategy,
-        showDetails: !state.showDetails,
-        checked: state.checked,
-      });
-    default:
-      return state;
-  }
-};
+import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
 
 const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | number}) => (
   <span>
@@ -117,13 +47,8 @@ const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | n
 );
 
 const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { mappedData: MappedData, modalData: ModalData, show: boolean, onClose: () => void }) => {
-  const [{ strategy, checked, showDetails }, dispatch] = useReducer(reducer, initState);
+  const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
   const urlConfig = useUrlConfigData({ mappedData, checked });
-  const dispatchWithData = useCallback(({ type, payload }: { type: string, payload?: Checked }) => {
-    const possibleKeys = mapValues(modalData, (v) => !!v);
-
-    return dispatch({ type, payload, possibleKeys });
-  }, [modalData]);
 
   useEffect(() => {
     dispatchWithData({ type: 'SET_EXACT_STRATEGY' });
@@ -178,7 +103,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   return (
     <Modal onHide={onClose} show={show}>
       <Modal.Header closeButton>
-        <Modal.Title>Add values to Event Definition</Modal.Title>
+        <Modal.Title>Configure new event definition</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <RadioSection strategyAvailabilities={strategyAvailabilities} strategy={strategy} onChange={onStrategyChange} />
@@ -203,7 +128,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
             )}
             {
               Object.entries(restChecks).map(([key, isChecked]) => (
-                <Checkbox checked={isChecked} onChange={() => onCheckboxChange({ [key]: !isChecked })}>
+                <Checkbox key={key} checked={isChecked} onChange={() => onCheckboxChange({ [key]: !isChecked })}>
                   {restLabels[key]}
                 </Checkbox>
               ))
@@ -213,15 +138,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
         }
       </Modal.Body>
       <Modal.Footer>
-        {/*
-        <Button type="button" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button bsStyle="primary" to="/search">
-          Go to event definition
-        </Button>
-        */}
-        <Link onClick={onClose} to={eventDefinitionCreationUrl} target="_blank">Go to event definition</Link>
+        <Link onClick={onClose} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</Link>
       </Modal.Footer>
     </Modal>
   );

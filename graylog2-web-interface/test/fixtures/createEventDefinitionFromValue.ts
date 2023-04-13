@@ -32,6 +32,7 @@ import Search from 'views/logic/search/Search';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
+import type { MappedData } from 'views/logic/valueactions/createEventDefinition/types';
 
 export const valuePath = [
   { http_method: 'GET' },
@@ -175,3 +176,36 @@ export const mockedView = View.create()
   })
   .search(searchOneAggregation)
   .build();
+
+export const mockedContexts = {
+  widget: testAggregationWidget,
+  view: mockedView,
+  parameterBindings: parameterBindings,
+  valuePath: valuePath,
+  parameters: parameters,
+  analysisDisabledFields: undefined,
+  currentUser: undefined,
+  message: undefined,
+  isLocalNode: undefined,
+};
+
+export const mappedDataResult: MappedData = {
+  searchWithinMs: 300000,
+  lutParameters: [ltParamJSON],
+  searchFilterQuery: '(http_method:GET)',
+  queryWithReplacedParams: 'http_method:GET',
+  streams: ['streamId'],
+  searchFromValue: 'action:show',
+};
+
+export const modalDataResult = {
+  aggCondition: 'count(action): 400',
+  columnGroupBy: 'action, http_method',
+  lutParameters: 'newParameter',
+  queryWithReplacedParams: 'http_method:GET',
+  rowGroupBy: 'action',
+  searchFilterQuery: '(http_method:GET)',
+  searchFromValue: 'action:show',
+  searchWithinMs: 300000,
+  streams: 'streamId-1, streamId-2',
+};

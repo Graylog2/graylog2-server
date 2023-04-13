@@ -71,7 +71,7 @@ const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, che
     }
 
     if (checked.rowGroupBy) {
-      res.group_by = rowGroupBy.concat(res.group_by || []);
+      res.group_by = (rowGroupBy || []).concat(res.group_by || []);
     }
 
     return res;
