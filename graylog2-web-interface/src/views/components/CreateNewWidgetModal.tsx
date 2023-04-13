@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { kebabCase } from 'lodash';
+import kebabCase from 'lodash/kebabCase';
 
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';

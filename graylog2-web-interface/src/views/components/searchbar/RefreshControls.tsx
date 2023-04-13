@@ -66,7 +66,7 @@ const RefreshControls = () => {
     } else {
       RefreshActions.enable();
     }
-  }, [refreshConfig?.enabled]);
+  }, [refreshConfig?.enabled, sendTelemetry]);
 
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
     <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>

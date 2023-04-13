@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -24,8 +25,10 @@ import ObjectUtils from 'util/ObjectUtils';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const ThreatIntelPluginConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ThreatIntelPluginConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,
@@ -51,7 +54,7 @@ const ThreatIntelPluginConfig = createReactClass({
     };
   },
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.setState({ config: ObjectUtils.clone(newProps.config) });
   },
 
@@ -68,12 +71,14 @@ const ThreatIntelPluginConfig = createReactClass({
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   _onSelect(field) {
     return (selection) => {
       this._updateConfigField(field, selection);
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   _onUpdate(field) {
     return (e) => {
       this._updateConfigField(field, e.target.value);
@@ -135,6 +140,7 @@ const ThreatIntelPluginConfig = createReactClass({
           <fieldset>
             <Input type="checkbox"
                    id="tor-checkbox"
+                   // eslint-disable-next-line react/no-unused-class-component-methods
                    ref={(elem) => { this.torEnabled = elem; }}
                    label="Allow Tor exit node lookups?"
                    help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
@@ -144,6 +150,7 @@ const ThreatIntelPluginConfig = createReactClass({
 
             <Input type="checkbox"
                    id="spamhaus-checkbox"
+                   // eslint-disable-next-line react/no-unused-class-component-methods
                    ref={(elem) => { this.spamhausEnabled = elem; }}
                    label="Allow Spamhaus DROP/EDROP lookups?"
                    help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
