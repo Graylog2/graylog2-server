@@ -146,7 +146,7 @@ public class SupportBundleService {
         final ProxiedResourceHelper proxiedResourceHelper = new ProxiedResourceHelper(httpHeaders, currentSubject, nodeService, remoteInterfaceProvider, executor);
 
         final var manifestsResponse = proxiedResourceHelper.requestOnAllNodes(
-                proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSupportBundleInterface.class),
+                RemoteSupportBundleInterface.class,
                 RemoteSupportBundleInterface::getNodeManifest, CALL_TIMEOUT);
         final Map<String, SupportBundleNodeManifest> nodeManifests = extractManifests(manifestsResponse);
 
@@ -180,21 +180,16 @@ public class SupportBundleService {
     private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir) throws IOException {
         try (FileOutputStream clusterJson = new FileOutputStream(tmpDir.resolve("cluster.json").toFile())) {
             final Map<String, CallResult<SystemOverviewResponse>> systemOverview =
-                    proxiedResourceHelper.requestOnAllNodes(
-                            proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
-                            RemoteSystemResource::system, CALL_TIMEOUT);
+                    proxiedResourceHelper.requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT);
 
             final Map<String, CallResult<SystemJVMResponse>> jvm = proxiedResourceHelper.requestOnAllNodes(
-                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
-                    RemoteSystemResource::jvm, CALL_TIMEOUT);
+                    RemoteSystemResource.class, RemoteSystemResource::jvm, CALL_TIMEOUT);
 
             final Map<String, CallResult<SystemProcessBufferDumpResponse>> processBuffer = proxiedResourceHelper.requestOnAllNodes(
-                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
-                    RemoteSystemResource::processBufferDump, CALL_TIMEOUT);
+                    RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT);
 
             final Map<String, CallResult<PluginList>> installedPlugins = proxiedResourceHelper.requestOnAllNodes(
-                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemPluginResource.class),
-                    RemoteSystemPluginResource::list, CALL_TIMEOUT);
+                    RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT);
 
             final Map<String, Object> result = new HashMap<>(
                     Map.of(
@@ -316,8 +311,7 @@ public class SupportBundleService {
         try (var threadDumpFile = new FileOutputStream(nodeDir.resolve("thread-dump.txt").toFile())) {
 
             final ProxiedResource.NodeResponse<SystemThreadDumpResponse> dump = proxiedResourceHelper.doNodeApiCall(nodeId,
-                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
-                    RemoteSystemResource::threadDump, Function.identity(), CALL_TIMEOUT.toMillis()
+                    RemoteSystemResource.class, RemoteSystemResource::threadDump, Function.identity(), CALL_TIMEOUT
             );
             if (dump.entity().isPresent()) {
                 threadDumpFile.write(dump.entity().get().threadDump().getBytes(StandardCharsets.UTF_8));
@@ -328,8 +322,7 @@ public class SupportBundleService {
 
         try (var nodeMetricsFile = new FileOutputStream(nodeDir.resolve("metrics.json").toFile())) {
             final ProxiedResource.NodeResponse<MetricsSummaryResponse> metrics = proxiedResourceHelper.doNodeApiCall(nodeId,
-                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteMetricsResource.class),
-                    c -> c.byNamespace("org"), Function.identity(), CALL_TIMEOUT.toMillis()
+                    RemoteMetricsResource.class, c -> c.byNamespace("org"), Function.identity(), CALL_TIMEOUT
             );
             if (metrics.entity().isPresent()) {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(nodeMetricsFile, metrics.entity().get());
@@ -340,8 +333,7 @@ public class SupportBundleService {
 
         try (var systemStatsFile = new FileOutputStream(nodeDir.resolve("system-stats.json").toFile())) {
             final ProxiedResource.NodeResponse<SystemStats> statsResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
-                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemStatsResource.class),
-                    RemoteSystemStatsResource::systemStats, Function.identity(), CALL_TIMEOUT.toMillis()
+                    RemoteSystemStatsResource.class, RemoteSystemStatsResource::systemStats, Function.identity(), CALL_TIMEOUT
             );
             if (statsResponse.entity().isPresent()) {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(systemStatsFile, statsResponse.entity().get());
@@ -378,8 +370,7 @@ public class SupportBundleService {
         applyBundleSizeLogFileLimit(logFiles).forEach(logFile -> {
             try {
                 final ProxiedResource.NodeResponse<ResponseBody> response = proxiedResourceHelper.doNodeApiCall(nodeId,
-                        proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSupportBundleInterface.class),
-                        f -> f.getLogFile(logFile.id()), Function.identity(), CALL_TIMEOUT.toMillis());
+                        RemoteSupportBundleInterface.class, f -> f.getLogFile(logFile.id()), Function.identity(), CALL_TIMEOUT);
 
                 if (response.entity().isPresent()) {
                     final String logName = Path.of(logFile.name()).getFileName().toString();
@@ -549,21 +540,16 @@ public class SupportBundleService {
 
         @Override
         protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
-                String nodeId, Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider, Function<RemoteInterfaceType,
+                String nodeId, Class<RemoteInterfaceType> interfaceClass, Function<RemoteInterfaceType,
                 Call<RemoteCallResponseType>> remoteInterfaceFunction, Function<RemoteCallResponseType, FinalResponseType> transformer,
-                long callTimeoutMs) throws IOException {
-            return super.doNodeApiCall(nodeId, remoteInterfaceProvider, remoteInterfaceFunction, transformer, callTimeoutMs);
+                Duration timeout) throws IOException {
+            return super.doNodeApiCall(nodeId, interfaceClass, remoteInterfaceFunction, transformer, timeout);
         }
 
         @Override
         protected <RemoteInterfaceType, RemoteCallResponseType> Map<String, CallResult<RemoteCallResponseType>> requestOnAllNodes(
-                Function<String, Optional<RemoteInterfaceType>> interfaceProvider, Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn, Duration timeout) {
-            return super.requestOnAllNodes(interfaceProvider, fn, timeout);
-        }
-
-        @Override
-        protected <RemoteInterfaceType> Function<String, Optional<RemoteInterfaceType>> createRemoteInterfaceProvider(Class<RemoteInterfaceType> interfaceClass) {
-            return super.createRemoteInterfaceProvider(interfaceClass);
+                Class<RemoteInterfaceType> interfaceClass, Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn, Duration timeout) {
+            return super.requestOnAllNodes(interfaceClass, fn, timeout);
         }
 
     }

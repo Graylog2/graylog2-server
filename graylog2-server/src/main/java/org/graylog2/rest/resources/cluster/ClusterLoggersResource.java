@@ -66,7 +66,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @ApiOperation(value = "List all loggers of all nodes and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Optional<LoggersSummary>> loggers() {
-        return getForAllNodes(RemoteLoggersResource::loggers, createRemoteInterfaceProvider(RemoteLoggersResource.class));
+        return stripCallResult(requestOnAllNodes(RemoteLoggersResource.class, RemoteLoggersResource::loggers));
     }
 
     @GET
@@ -75,7 +75,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @ApiOperation(value = "List all logger subsystems and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Optional<SubsystemSummary>> subsystems() {
-        return getForAllNodes(RemoteLoggersResource::subsystems, createRemoteInterfaceProvider(RemoteLoggersResource.class));
+        return stripCallResult(requestOnAllNodes(RemoteLoggersResource.class, RemoteLoggersResource::subsystems));
     }
 
     @PUT
@@ -105,7 +105,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @NoAuditEvent("proxy resource, audit event will be emitted on target nodes")
     public Map<String, CallResult<Void>> setClusterSingleLoggerLevel(
             @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
-            @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) throws NodeNotFoundException, IOException {
-        return requestOnAllNodes(createRemoteInterfaceProvider(RemoteLoggersResource.class), client -> client.setSingleLoggerLevel(loggerName, level));
+            @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
+        return requestOnAllNodes(RemoteLoggersResource.class, client -> client.setSingleLoggerLevel(loggerName, level));
     }
 }

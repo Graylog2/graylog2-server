@@ -40,7 +40,6 @@ import javax.ws.rs.container.ConnectionCallback;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -69,7 +68,6 @@ public abstract class ProxiedResource extends RestResource {
 
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
     private final ExecutorService executor;
-    private final MultivaluedMap<String, String> httpRequestHeaders;
 
     @Inject
     @Named("proxied_requests_default_call_timeout")
@@ -83,7 +81,6 @@ public abstract class ProxiedResource extends RestResource {
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         this.executor = executorService;
         this.authenticationToken = authenticationToken(httpHeaders);
-        this.httpRequestHeaders = httpHeaders.getRequestHeaders();
     }
 
     protected Duration getDefaultProxyCallTimeout() {
@@ -156,7 +153,7 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Prefer using {@link ProxiedResource#requestOnAllNodes(Function, Function)} instead.
+     * Prefer using {@link #requestOnAllNodes(Class, Function)} instead.
      * The new method properly handles the case of `No-Content` response and provides
      * detailed report per each node API call.
      */
@@ -169,7 +166,7 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Prefer using {@link ProxiedResource#requestOnAllNodes(Function, Function)} instead.
+     * Prefer using {@link #requestOnAllNodes(Class, Function, Duration)} instead.
      * The new method properly handles the case of `No-Content` response and provides
      * detailed report per each node API call.
      */
@@ -183,7 +180,7 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Prefer using {@link ProxiedResource#requestOnAllNodes(Function, Function, Function)} instead.
+     * Prefer using {@link ProxiedResource#requestOnAllNodes(Class, Function, Function)} instead.
      * The new method properly handles the case of `No-Content` response and provides
      * detailed report per each node API call.
      */
@@ -197,7 +194,7 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Prefer using {@link ProxiedResource#requestOnAllNodes(Function, Function, Function)} instead.
+     * Prefer using {@link ProxiedResource#requestOnAllNodes(Class, Function, Function, Duration)} instead.
      * The new method properly handles the case of `No-Content` response and provides
      * detailed report per each node API call.
      */
@@ -257,11 +254,11 @@ public abstract class ProxiedResource extends RestResource {
                 }));
     }
 
-    protected <RemoteInterfaceType> Function<String, Optional<RemoteInterfaceType>> createRemoteInterfaceProvider(Class<RemoteInterfaceType> interfaceClass) {
+    protected <RemoteInterfaceType> Function<String, Optional<RemoteInterfaceType>> createRemoteInterface(Class<RemoteInterfaceType> interfaceClass, @Nullable Duration timeout) {
         return nodeId -> {
             try {
                 final Node targetNode = nodeService.byNodeId(nodeId);
-                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), interfaceClass));
+                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), interfaceClass, timeout == null ? getDefaultProxyCallTimeout() : timeout));
             } catch (NodeNotFoundException e) {
                 LOG.warn("Node <" + nodeId + "> not found while trying to call " + interfaceClass.getName() + " on it.");
                 return Optional.empty();
@@ -270,32 +267,32 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     protected <RemoteInterfaceType, RemoteCallResponseType> Map<String, CallResult<RemoteCallResponseType>> requestOnAllNodes(
-            Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
+            Class<RemoteInterfaceType> interfaceClass,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn
     ) {
-        return requestOnAllNodes(interfaceProvider, fn, Function.identity(), Duration.ZERO);
+        return requestOnAllNodes(interfaceClass, fn, Function.identity(), null);
     }
 
     protected <RemoteInterfaceType, RemoteCallResponseType> Map<String, CallResult<RemoteCallResponseType>> requestOnAllNodes(
-            Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
+            Class<RemoteInterfaceType> interfaceClass,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn,
             Duration timeout
     ) {
-        return requestOnAllNodes(interfaceProvider, fn, Function.identity(), timeout);
+        return requestOnAllNodes(interfaceClass, fn, Function.identity(), timeout);
     }
 
     protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> Map<String, CallResult<FinalResponseType>> requestOnAllNodes(
-            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
+            Class<RemoteInterfaceType> interfaceClass,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceCallProvider,
             Function<RemoteCallResponseType, FinalResponseType> responseTransformer
     ) {
-        return requestOnAllNodes(remoteInterfaceProvider, remoteInterfaceCallProvider, responseTransformer, Duration.ZERO);
+        return requestOnAllNodes(interfaceClass, remoteInterfaceCallProvider, responseTransformer, null);
     }
 
     /**
      * This method concurrently performs an API call on all active nodes.
      *
-     * @param remoteInterfaceProvider     provides an instance of Retrofit HTTP client for the target API
+     * @param interfaceClass              The class of the Retrotfit interface for this call
      * @param remoteInterfaceCallProvider provides an invocation of a Retrofit method for the intended API call.
      * @param responseTransformer         applies transformations to HTTP response body
      * @param <RemoteInterfaceType>       Type of the Retrofit HTTP client
@@ -304,19 +301,18 @@ public abstract class ProxiedResource extends RestResource {
      * @return Detailed report on call results per each active node.
      */
     protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> Map<String, CallResult<FinalResponseType>> requestOnAllNodes(
-            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
+            Class<RemoteInterfaceType> interfaceClass,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceCallProvider,
             Function<RemoteCallResponseType, FinalResponseType> responseTransformer,
-            Duration timeout
+            @Nullable Duration timeout
     ) {
-
-        final long callTimeoutMs = Duration.ZERO.equals(timeout) ? getDefaultProxyCallTimeout().toMillis() : timeout.toMillis();
+        final long callTimeoutMs = (timeout == null) ? getDefaultProxyCallTimeout().toMillis() : timeout.toMillis();
 
         final Map<String, Future<CallResult<FinalResponseType>>> futures = this.nodeService.allActive().keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), nodeId -> executor.submit(() -> {
                             final Stopwatch sw = Stopwatch.createStarted();
                             try {
-                                return CallResult.success(doNodeApiCall(nodeId, remoteInterfaceProvider, remoteInterfaceCallProvider, responseTransformer, callTimeoutMs));
+                                return CallResult.success(doNodeApiCall(nodeId, interfaceClass, remoteInterfaceCallProvider, responseTransformer, timeout));
                             } catch (Exception e) {
                                 final long elapsedMs = sw.stop().elapsed().toMillis();
                                 if (LOG.isDebugEnabled()) {
@@ -349,16 +345,6 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * @deprecated Use {@link #requestOnLeader(Function, Function)} instead.
-     */
-    protected <RemoteInterfaceType, RemoteCallResponseType> MasterResponse<RemoteCallResponseType> requestOnMaster(
-            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
-            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
-    ) throws IOException {
-        return MasterResponse.create(requestOnLeader(remoteInterfaceFunction, remoteInterfaceProvider));
-    }
-
-    /**
      * Execute the given remote interface function on the leader node.
      * <p>
      * This is used to forward an API request to the leader node. It is useful in situations where an API call can only
@@ -368,14 +354,14 @@ public abstract class ProxiedResource extends RestResource {
      */
     protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnLeader(
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
-            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider, Duration timeout
+            Class<RemoteInterfaceType> interfaceClass, Duration timeout
     ) throws IOException {
         final Node leaderNode = nodeService.allActive().values().stream()
                 .filter(Node::isLeader)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No active leader node found"));
 
-        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity(), timeout.toMillis());
+        return doNodeApiCall(leaderNode.getNodeId(), interfaceClass, remoteInterfaceFunction, Function.identity(), timeout);
     }
 
     /**
@@ -388,22 +374,24 @@ public abstract class ProxiedResource extends RestResource {
      */
     protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnLeader(
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
-            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
+            Class<RemoteInterfaceType> interfaceClass
     ) throws IOException {
-        return requestOnLeader(remoteInterfaceFunction, remoteInterfaceProvider, getDefaultProxyCallTimeout());
+        return requestOnLeader(remoteInterfaceFunction, interfaceClass, getDefaultProxyCallTimeout());
     }
 
     protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
             String nodeId,
-            Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
+            Class<RemoteInterfaceType> interfaceClass,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
             Function<RemoteCallResponseType, FinalResponseType> transformer,
-            long callTimeoutMs
+            @Nullable Duration timeout
     ) throws IOException {
-        final RemoteInterfaceType remoteInterfaceType = remoteInterfaceProvider.apply(nodeId)
+        final Function<String, Optional<RemoteInterfaceType>> remoteInterface = createRemoteInterface(interfaceClass, timeout);
+        final RemoteInterfaceType remoteInterfaceType = remoteInterface.apply(nodeId)
                 .orElseThrow(() -> new IllegalStateException("Node " + nodeId + " not found"));
         final Call<RemoteCallResponseType> call = remoteInterfaceFunction.apply(remoteInterfaceType);
 
+        final long callTimeoutMs = (timeout == null) ? getDefaultProxyCallTimeout().toMillis() : timeout.toMillis();
         call.timeout().timeout(callTimeoutMs, TimeUnit.MILLISECONDS);
 
         final Response<RemoteCallResponseType> response = call.execute();
@@ -416,6 +404,17 @@ public abstract class ProxiedResource extends RestResource {
                     errorBody == null ? null : errorBody.bytes()
             );
         }
+    }
+
+    /**
+     * Helper function to remove the {@link CallResult} wrapper
+     * @param input   responses that are wrapped with a {@link CallResult}
+     * @return the response in the legacy format of {@code Map<String, Optional<T>>}
+     */
+    protected <T> Map<String, Optional<T>> stripCallResult(Map<String, CallResult<T>> input) {
+        return input.entrySet().stream()
+                .filter(e -> e.getValue().response() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().response().entity()));
     }
 
     /**

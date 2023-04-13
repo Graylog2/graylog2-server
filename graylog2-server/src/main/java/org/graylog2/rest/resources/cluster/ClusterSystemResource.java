@@ -73,7 +73,7 @@ public class ClusterSystemResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Get system overview of all Graylog nodes")
     public Map<String, Optional<SystemOverviewResponse>> get() {
-        return getForAllNodes(RemoteSystemResource::system, createRemoteInterfaceProvider(RemoteSystemResource.class));
+        return stripCallResult(requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::system));
     }
 
     @GET
@@ -144,7 +144,7 @@ public class ClusterSystemResource extends ProxiedResource {
     @RequiresPermissions(RestPermissions.PROCESSBUFFER_DUMP)
     @Path("processbufferdump")
     public Map<String, Optional<SystemProcessBufferDumpResponse>> clusterProcessBufferDump() {
-        return getForAllNodes(RemoteSystemResource::processBufferDump, createRemoteInterfaceProvider(RemoteSystemResource.class));
+        return stripCallResult(requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::processBufferDump));
     }
 }
 
