@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.commands.certutil;
+package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -25,9 +25,11 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.graylog.security.certutil.console.CommandLineConsole;
+import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog2.bootstrap.CliCommand;
-import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.SuppressForbidden;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.FileInputStream;

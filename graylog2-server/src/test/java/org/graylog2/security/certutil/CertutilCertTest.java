@@ -14,15 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.commands.certutil;
+package org.graylog2.security.certutil;
 
 import org.assertj.core.api.Assertions;
+import org.graylog.security.certutil.CertutilCa;
+import org.graylog.security.certutil.CertutilCert;
+import org.graylog.security.certutil.console.TestableConsole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

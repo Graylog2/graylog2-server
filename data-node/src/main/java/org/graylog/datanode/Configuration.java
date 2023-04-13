@@ -74,10 +74,10 @@ public class Configuration extends BaseConfiguration {
     private boolean disableNativeSystemStatsCollector = false;
 
     @Parameter(value = "opensearch_location")
-    private String opensearchLocation = "dist/opensearch-2.4.1";
+    private String opensearchLocation = "dist/opensearch-2.5.0";
 
     @Parameter(value = "opensearch_version")
-    private String opensearchVersion = "2.4.1";
+    private String opensearchVersion = "2.5.0";
 
     @Parameter(value = "opensearch_data_location")
     private String opensearchDataLocation = "data";

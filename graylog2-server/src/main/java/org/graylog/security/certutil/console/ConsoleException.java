@@ -14,7 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.commands.certutil;
+package org.graylog.security.certutil.console;
 
-public record KeyPair(java.security.PrivateKey privateKey, java.security.PublicKey publicKey, java.security.cert.X509Certificate certificate) {
+public class ConsoleException extends RuntimeException {
+    public ConsoleException(Throwable cause) {
+        super(cause);
+    }
+
+    public ConsoleException(String message) {
+        super(message);
+    }
 }

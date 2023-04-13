@@ -27,6 +27,8 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.system.NodeId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -40,6 +42,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class NodeServiceImpl extends PersistedServiceImpl implements NodeService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NodeServiceImpl.class);
+
     public static final String LAST_SEEN_FIELD = "$last_seen";
     private final long pingTimeout;
     private final static Map<String, Object> lastSeenFieldDefinition = Map.of("last_seen", Map.of("$type", "timestamp"));
@@ -114,6 +119,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
                 .collect(Collectors.toMap(obj -> (String) obj.get("node_id"), obj -> new NodeImpl((ObjectId) obj.get("_id"), obj.toMap())));
     }
 
+    @Deprecated
     @Override
     public Map<String, Node> allActive() {
         Map<String, Node> nodes = Maps.newHashMap();
@@ -181,6 +187,11 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     @Override
     public boolean isOnlyLeader(NodeId nodeId) {
+
+        if(type() != Node.Type.SERVER) {
+            LOG.warn("Caution, isOnlyLeader called in the {} context, but returning only results of type {}", type(), Node.Type.SERVER);
+        }
+
         return aggregate(recentHeartbeat(List.of(
                 Map.of(
                         "type", Node.Type.SERVER.toString(),
@@ -192,6 +203,11 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     @Override
     public boolean isAnyLeaderPresent() {
+
+        if(type() != Node.Type.SERVER) {
+            LOG.warn("Caution, isOnlyLeader called in the {} context, but returning only results of type {}", type(), Node.Type.SERVER);
+        }
+
         return aggregate(recentHeartbeat(List.of(
                 Map.of(
                         "type", Node.Type.SERVER.toString(),
