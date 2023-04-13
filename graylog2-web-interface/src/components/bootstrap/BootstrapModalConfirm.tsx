@@ -53,7 +53,7 @@ const BootstrapModalConfirm = ({
     <BootstrapModalWrapper showModal={showModal}
                            onHide={onCancel}
                            role="alertdialog"
-                           data-event-element={StringUtils.getRecursiveChildText(title)}
+                           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
                            {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>

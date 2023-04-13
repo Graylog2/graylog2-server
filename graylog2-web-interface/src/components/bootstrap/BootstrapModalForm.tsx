@@ -84,7 +84,7 @@ const BootstrapModalForm = ({
                            showModal={show}
                            backdrop={backdrop}
                            onHide={onCancel}
-                           data-event-element={StringUtils.getRecursiveChildText(title)}
+                           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
                            {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>

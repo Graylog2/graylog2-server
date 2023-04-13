@@ -21,6 +21,17 @@ import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 import StringUtils from 'util/StringUtils';
 
+type Props = {
+  show?: boolean,
+  onConfirm: (event) => void,
+  onCancel?: () => void,
+  title: string|React.ReactNode,
+  children: React.ReactNode,
+  btnConfirmDisabled?: boolean,
+  btnConfirmText?: string,
+  hideCancelButton?: boolean,
+};
+
 /**
  * Component that displays a confirmation dialog box that the user can
  * cancel or confirm.
@@ -34,13 +45,14 @@ const ConfirmDialog = ({
   btnConfirmDisabled,
   btnConfirmText,
   hideCancelButton,
-}) => {
+  ...restProps
+}: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
   return (
     <Modal show={show}
            onHide={onHide}
-           data-event-element={StringUtils.getRecursiveChildText(title)}>
+           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -55,7 +67,7 @@ const ConfirmDialog = ({
                      submitButtonType="button"
                      disabledSubmit={btnConfirmDisabled}
                      submitButtonText={btnConfirmText}
-                     displayCancel={hideCancelButton} />
+                     displayCancel={hideCancelButton as any} />
       </Modal.Footer>
     </Modal>
   );
