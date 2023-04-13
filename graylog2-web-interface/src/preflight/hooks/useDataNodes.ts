@@ -17,18 +17,15 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import { qualifyUrl } from 'util/URLUtils';
+import { Builder } from 'logic/rest/FetchProvider';
 import type { DataNodes } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
 
-const availableDataNodes = [
-  { id: 'data-node-id-1', transportAddress: 'transport.address1', isSecured: false },
-  { id: 'data-node-id-2', transportAddress: 'transport.address2', isSecured: false },
-  { id: 'data-node-id-3', transportAddress: 'transport.address3', isSecured: false },
-];
-
-const fetchDataNodes = async (): Promise<DataNodes> => (
-  // fetch('GET', qualifyUrl('/api/preflight/datanodes'))
-  Promise.resolve(availableDataNodes)
+const fetchDataNodes = () => (
+  new Builder('GET', qualifyUrl('/api/data_nodes'))
+    .json()
+    .build()
 );
 
 const useDataNodes = (): {
@@ -42,12 +39,13 @@ const useDataNodes = (): {
     isFetching,
     error,
     isInitialLoading,
-  } = useQuery<DataNodes, FetchError>({
-    queryKey: ['data-nodes', 'overview'],
-    queryFn: fetchDataNodes,
-    initialData: [],
-    retry: 3000,
-  });
+  } = useQuery<DataNodes, FetchError>(
+    ['data-nodes', 'overview'],
+    fetchDataNodes,
+    {
+      initialData: [],
+      retry: 3000,
+    });
 
   return { data, isFetching, isInitialLoading, error };
 };
