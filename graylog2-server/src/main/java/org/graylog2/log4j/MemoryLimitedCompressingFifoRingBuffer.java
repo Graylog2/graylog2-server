@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -102,11 +103,18 @@ public class MemoryLimitedCompressingFifoRingBuffer {
      * @param outputStream The OutputStream to write the entries into.
      * @param limit    limit the returned entries. This is only a rough estimate and will be rounded to the nearest batch size.
      */
-    public synchronized void streamContent(OutputStream outputStream, int limit) {
+    public void streamContent(OutputStream outputStream, int limit) {
+        // stream content with copies to avoid blocking add() for too long
+        List<byte[]> current;
+        List<byte[]> compressed;
+        synchronized (this) {
+            current = List.copyOf(currentBatch);
+            compressed = List.copyOf(compressedRingBuffer);
+        }
         limit = limit == 0 ? Integer.MAX_VALUE : limit;
 
         // The uncompressed currentBatch entries can be limited exactly
-        final int currentBatchSize = currentBatch.size();
+        final int currentBatchSize = current.size();
         int skipFromCurrent = limit - currentBatchSize;
         skipFromCurrent = skipFromCurrent > 0 ? 0 : skipFromCurrent * -1;
 
@@ -114,10 +122,10 @@ public class MemoryLimitedCompressingFifoRingBuffer {
 
         // The compressed batches are returned in full
         final long getCompressedBatches = limit > 0 ? limit / BATCHSIZE + 1 : 0;
-        long skipFromCompressed = getCompressedBatches - compressedRingBuffer.size();
+        long skipFromCompressed = getCompressedBatches - compressed.size();
         skipFromCompressed = skipFromCompressed > 0 ? 0 : skipFromCompressed * -1;
 
-        compressedRingBuffer.stream()
+        compressed.stream()
                 .skip(skipFromCompressed)
                 .map(input -> {
                     try {
@@ -133,7 +141,7 @@ public class MemoryLimitedCompressingFifoRingBuffer {
                         throw new RuntimeException(e);
                     }
                 });
-        currentBatch.stream().skip(skipFromCurrent).forEach(b -> {
+        current.stream().skip(skipFromCurrent).forEach(b -> {
             try {
                 outputStream.write(b);
             } catch (IOException e) {
