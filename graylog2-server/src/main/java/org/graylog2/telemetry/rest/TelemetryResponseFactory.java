@@ -91,7 +91,7 @@ class TelemetryResponseFactory {
         clusterInfo.put("nodes_count", nodes.size());
         clusterInfo.put("average_last_month_traffic", averageLastMonthTraffic);
         clusterInfo.put("users_count", usersCount);
-        clusterInfo.putAll(flatten(Map.of(CLUSTER, nodes)));
+        clusterInfo.put("nodes", nodes);
         return clusterInfo;
 
     }
