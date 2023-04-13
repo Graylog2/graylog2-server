@@ -104,7 +104,9 @@ const InputListItem = createReactClass({
               appSection: 'inputs',
               eventElement: 'show-received-messages',
             });
-          }}>Show received messages</Button>
+          }}>
+            Show received messages
+          </Button>
         </LinkContainer>,
       );
     }
@@ -126,7 +128,9 @@ const InputListItem = createReactClass({
                 appSection: 'inputs',
                 eventElement: 'manage-extractors',
               });
-            }}>Manage extractors</Button>
+            }}>
+              Manage extractors
+            </Button>
           </LinkContainer>,
         );
       }
@@ -145,7 +149,9 @@ const InputListItem = createReactClass({
                         appSection: 'inputs',
                         eventElement: 'show-metrics',
                       });
-                    }}>Show metrics</MenuItem>
+                    }}>
+            Show metrics
+          </MenuItem>
         </LinkContainer>
       );
     }

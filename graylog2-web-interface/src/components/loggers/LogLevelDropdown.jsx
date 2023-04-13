@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import capitalize from 'lodash/capitalize';
@@ -25,8 +26,10 @@ import { LoggersActions, LoggersStore } from 'stores/system/LoggersStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const LogLevelDropdown = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'LogLevelDropdown',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     name: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,

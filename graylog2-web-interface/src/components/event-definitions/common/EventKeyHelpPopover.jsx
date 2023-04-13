@@ -19,32 +19,30 @@ import PropTypes from 'prop-types';
 
 import { Popover } from 'components/bootstrap';
 
-class EventKeyHelpPopover extends React.Component {
-  static propTypes = {
-    id: PropTypes.string.isRequired,
-  };
+const EventKeyHelpPopover = (props) => {
+  const { id, ...otherProps } = props;
+  const title = 'More about Event Keys';
 
-  render() {
-    const { id, ...otherProps } = this.props;
-    const title = 'More about Event Keys';
+  return (
+    <Popover id={id}
+             title={title}
+             data-app-section="event_key_helper"
+             data-event-element={title}
+             {...otherProps}>
+      <p>
+        Event Keys are Fields used to arrange Events into groups. A group is created for each unique Key, so
+        Graylog will generate as many Events as unique Keys are found. Example:
+      </p>
+      <p>
+        <b>No Event Keys:</b> One Event for each <em>Login failure</em> message.<br />
+        <b>Event Key <code>username</code>:</b> One Event for each username with a <em>Login failure</em> message.
+      </p>
+    </Popover>
+  );
+};
 
-    return (
-      <Popover id={id}
-               title={title}
-               data-app-section="event_key_helper"
-               data-event-element={title}
-               {...otherProps}>
-        <p>
-          Event Keys are Fields used to arrange Events into groups. A group is created for each unique Key, so
-          Graylog will generate as many Events as unique Keys are found. Example:
-        </p>
-        <p>
-          <b>No Event Keys:</b> One Event for each <em>Login failure</em> message.<br />
-          <b>Event Key <code>username</code>:</b> One Event for each username with a <em>Login failure</em> message.
-        </p>
-      </Popover>
-    );
-  }
-}
+EventKeyHelpPopover.propTypes = {
+  id: PropTypes.string.isRequired,
+};
 
 export default EventKeyHelpPopover;
