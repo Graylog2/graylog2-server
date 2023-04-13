@@ -12,7 +12,7 @@
         <!-- Application Loggers -->
         <Logger name="org.graylog" level="info"/>
         <Logger name="org.graylog2" level="info"/>
-        <Logger name="org.graylog2.datanode" level="info"/>
+        <Logger name="org.graylog.datanode" level="info"/>
         <Logger name="com.github.joschi.jadconfig" level="warn"/>
         <!-- Disable messages from the version check -->
         <Logger name="org.graylog2.periodical.VersionCheckThread" level="off"/>

@@ -21,6 +21,7 @@ import com.floreysoft.jmte.template.Template;
 import com.floreysoft.jmte.template.VariableDescription;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -104,6 +105,7 @@ public class FormatStringDecorator implements SearchResponseDecorator {
         usedVariables = template.getUsedVariableDescriptions();
     }
 
+    @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()

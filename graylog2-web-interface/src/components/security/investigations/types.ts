@@ -21,12 +21,14 @@ export type AddEvidenceProps = {
   index?: string,
   id: string,
   type: EvidenceTypes,
-  children: React.ReactElement,
+  children?: React.ReactElement,
+  ref?: React.MutableRefObject<{ toggle: () => void }>
 };
 
 export type InvestigationsPlugin = {
   components: {
     AddEvidence: React.ComponentType<AddEvidenceProps>,
+    AddEvidenceModal: React.ComponentType<AddEvidenceProps>,
   },
   hooks: {
     useInvestigationDrawer: () => ({

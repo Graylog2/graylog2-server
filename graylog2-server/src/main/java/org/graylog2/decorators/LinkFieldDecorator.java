@@ -18,6 +18,7 @@ package org.graylog2.decorators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -83,12 +84,13 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
                                                    CK_LINK_FIELD + " cannot be null");
     }
 
+    @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
                     if (!summary.message().containsKey(linkField)) {
-                      return summary;
+                        return summary;
                     }
                     final Message message = new Message(ImmutableMap.copyOf(summary.message()));
                     final String href = (String) summary.message().get(linkField);

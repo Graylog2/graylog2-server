@@ -79,6 +79,19 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-semconv</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.rvesse</groupId>
             <artifactId>airline</artifactId>
         </dependency>
@@ -750,6 +763,10 @@
                 <targetPath>web-interface/assets</targetPath>
             </resource>
             <resource>
+                <directory>${webInterface.path}/target/preflight/build</directory>
+                <targetPath>preflight/assets</targetPath>
+            </resource>
+            <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>**/*.properties</exclude>
@@ -1072,6 +1089,17 @@
                             </execution>
 
                             <execution>
+                                <id>preflight: yarn run build</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build:preflight</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>yarn run check-production-build</id>
                                 <phase>verify</phase>
                                 <goals>
@@ -1108,6 +1136,7 @@
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
+                                <id>copy-web-ui-assets</id>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -1117,6 +1146,21 @@
                                     <resources>
                                         <resource>
                                             <directory>${webInterface.path}/target/web/build</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-preflight-ui-assets</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/classes/preflight/assets</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${webInterface.path}/target/preflight/build</directory>
                                         </resource>
                                     </resources>
                                 </configuration>
