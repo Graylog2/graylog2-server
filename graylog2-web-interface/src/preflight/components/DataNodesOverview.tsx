@@ -50,7 +50,7 @@ const DataNodesOverview = () => {
                 <th>Short Node Id</th>
                 <th>Is Leader</th>
                 <th>Is Master</th>
-                <th>Last seen</th>
+                <th>Last Seen</th>
               </tr>
             </thead>
             <tbody>

@@ -15,30 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { AppShell, Space } from '@mantine/core';
+import { AppShell, Title, Space } from '@mantine/core';
 
 import Section from 'preflight/components/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/components/DataNodesOverview';
-import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
 import { Button } from 'preflight/components/common';
+import { Builder } from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
-const App = () => (
-  <AppShell padding="md" header={<Navigation />}>
-    <Section title="Welcome!" titleOrder={1}>
-      <p>
-        It looks like you are starting Graylog for the first time.
-        Through this wizard, you can configure and secure your data nodes.<br />
-        You can always skip the configuration and <Button variant="light" compact size="xs">resume startup</Button>.
-      </p>
-    </Section>
+const App = () => {
+  const resumeStartup = () => {
+    return new Builder('POST', qualifyUrl('/api/status/finish-config'))
+      .json()
+      .build();
+  };
 
-    <Section title="Data Node Configuration">
-      <DataNodesOverview />
-      <Space h="lg" />
-      <ConfigurationWizard />
-    </Section>
-  </AppShell>
-);
+  return (
+    <AppShell padding="md" header={<Navigation />}>
+      <Section title="Welcome!" titleOrder={1}>
+        <p>
+          It looks like you are starting Graylog for the first time.
+          This pages gives you an overview of the available
+        </p>
+        <Space h="md" />
+        <Title order={2}>Data Nodes Overview</Title>
+        <DataNodesOverview />
+        <Space h="md" />
+        <Button onClick={resumeStartup}>Resume startup</Button>
+      </Section>
+    </AppShell>
+  );
+};
 
 export default App;
