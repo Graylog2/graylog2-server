@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import objectHas from 'lodash/has';
 import mapValues from 'lodash/mapValues';
 
@@ -94,11 +94,14 @@ const useModalReducer = (modalData : ModalData): [State, ({ type, payload }: { t
   const [state, dispatch] = useReducer(reducer, initState);
   const dispatchWithData = useCallback(({ type, payload }: { type: string, payload?: Checked }) => {
     const possibleKeys = mapValues(modalData, (v) => !!v);
-
     dispatch({ type, payload, possibleKeys });
   }, [modalData]);
 
-  return [state, dispatchWithData];
+  useEffect(() => {
+    dispatchWithData({ type: 'SET_EXACT_STRATEGY' });
+  }, [dispatchWithData]);
+
+  return useMemo(() => [state, dispatchWithData], [state, dispatchWithData]);
 };
 
 export default useModalReducer;

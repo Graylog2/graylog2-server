@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -49,10 +49,6 @@ const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | n
 const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { mappedData: MappedData, modalData: ModalData, show: boolean, onClose: () => void }) => {
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
   const urlConfig = useUrlConfigData({ mappedData, checked });
-
-  useEffect(() => {
-    dispatchWithData({ type: 'SET_EXACT_STRATEGY' });
-  }, [dispatchWithData]);
 
   const onCheckboxChange = useCallback((updates) => {
     dispatchWithData({ type: 'UPDATE_CHECKED_ITEMS', payload: updates });
