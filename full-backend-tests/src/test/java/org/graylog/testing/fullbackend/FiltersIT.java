@@ -21,6 +21,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.shared.rest.CSPResponseFilter;
+import org.graylog2.shared.rest.resources.annotations.CSP;
 import org.hamcrest.Matchers;
 
 import static io.restassured.RestAssured.given;
@@ -42,7 +43,7 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo("style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:;"));
+                        Matchers.equalTo(CSP.CSP_SWAGGER));
     }
 
     @ContainerMatrixTest
@@ -55,6 +56,18 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo("default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;"));
+                        Matchers.equalTo(CSP.CSP_DEFAULT));
+    }
+
+    @ContainerMatrixTest
+    void cspWebAppNotFound() {
+        given()
+                .spec(api.requestSpecification())
+                .basePath("/")
+                .when()
+                .get("streams")
+                .then()
+                .assertThat().header(CSPResponseFilter.CSP_HEADER,
+                        Matchers.equalTo(CSP.CSP_DEFAULT));
     }
 }

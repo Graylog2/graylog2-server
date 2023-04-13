@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 @Path("/config.js")
-@CSP(value = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;")
+@CSP(value = CSP.CSP_DEFAULT)
 public class AppConfigResource {
     private final Configuration configuration;
     private final HttpConfiguration httpConfiguration;
