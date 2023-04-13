@@ -33,6 +33,9 @@ const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 const mode = TARGET.startsWith('build') ? 'production' : 'development';
 
+const DEFAULT_API_URL = 'http://localhost:9000';
+const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
+
 const baseConfig = {
   mode,
   name: 'preflight',
@@ -67,6 +70,17 @@ let webpackConfig;
 
 if (mode === 'development') {
   webpackConfig = merge(baseConfig, {
+    devServer: {
+      hot: false,
+      liveReload: true,
+      compress: true,
+      historyApiFallback: true,
+      proxy: {
+        '/api': {
+          target: apiUrl,
+        },
+      },
+    },
     devtool: 'cheap-module-source-map',
     output: {
       filename: '[name].js',
