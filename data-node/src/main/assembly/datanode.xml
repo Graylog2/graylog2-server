@@ -10,7 +10,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/../data-node</directory>
+            <directory>${project.basedir}</directory>
             <outputDirectory>.</outputDirectory>
             <includes>
                 <include>README.md</include>
@@ -19,14 +19,14 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../data-node/target/opensearch</directory>
+            <directory>${project.build.directory}/opensearch</directory>
             <outputDirectory>dist</outputDirectory>
             <includes>
                 <include>*/**</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../data-node/target/lib</directory>
+            <directory>${project.build.directory}/lib</directory>
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>*/**</include>
@@ -44,25 +44,25 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.basedir}/../data-node/bin/graylog-datanode.sh</source>
+            <source>${project.basedir}/bin/graylog-datanode.sh</source>
             <destName>graylog-datanode</destName>
             <outputDirectory>bin</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
         <file>
-            <source>${project.basedir}/../data-node/config/jvm.options</source>
+            <source>${project.basedir}/config/jvm.options</source>
             <destName>jvm.options</destName>
             <outputDirectory>config</outputDirectory>
             <fileMode>0644</fileMode>
         </file>
         <file>
-            <source>${project.basedir}/../data-node/config/log4j2.xml</source>
+            <source>${project.basedir}/config/log4j2.xml</source>
             <destName>log4j2.xml</destName>
             <outputDirectory>config</outputDirectory>
             <fileMode>0644</fileMode>
         </file>
         <file>
-            <source>${project.basedir}/../data-node/target/graylog-datanode-${project.version}.jar</source>
+            <source>${project.build.directory}/graylog-datanode-${project.version}.jar</source>
             <destName>graylog-datanode.jar</destName>
             <outputDirectory>.</outputDirectory>
         </file>

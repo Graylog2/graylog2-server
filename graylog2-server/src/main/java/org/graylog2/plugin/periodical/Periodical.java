@@ -16,6 +16,9 @@
  */
 package org.graylog2.plugin.periodical;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import org.graylog.tracing.GraylogSemanticAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,8 +91,10 @@ public abstract class Periodical implements Runnable {
     public void initialize() {
     }
 
+    @WithSpan
     @Override
     public void run() {
+        Span.current().setAttribute(GraylogSemanticAttributes.PERIODICAL_TYPE, this.getClass().getCanonicalName());
         try {
             doRun();
         } catch (RuntimeException e) {

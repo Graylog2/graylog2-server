@@ -24,6 +24,7 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Resources;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.plugin.Plugin;
+import org.graylog2.shared.rest.resources.annotations.CSP;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
 
@@ -66,6 +67,7 @@ import static java.util.Objects.requireNonNull;
 
 @Singleton
 @Path("")
+@CSP(value = CSP.CSP_DEFAULT)
 public class WebInterfaceAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final IndexHtmlGenerator indexHtmlGenerator;
