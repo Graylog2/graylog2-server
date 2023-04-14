@@ -26,6 +26,7 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.resources.annotations.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
 
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 @Path("/config.js")
+@CSP(value = CSP.CSP_DEFAULT)
 public class AppConfigResource {
     private final Configuration configuration;
     private final HttpConfiguration httpConfiguration;

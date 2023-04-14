@@ -138,8 +138,8 @@ const SchedulingCell = ({ definition } : Props) => {
   const {
     title,
     config: {
-      search_within_ms: executeEveryMs,
-      execute_every_ms: searchWithinMs,
+      search_within_ms: searchWithinMs,
+      execute_every_ms: executeEveryMs,
     },
     scheduler,
   } = definition;
