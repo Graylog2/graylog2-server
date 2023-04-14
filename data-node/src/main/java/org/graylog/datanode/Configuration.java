@@ -167,6 +167,7 @@ public class Configuration extends BaseConfiguration {
         final var osArch = System.getProperty("os.arch");
         return switch (osArch) {
             case "amd64" -> f("%s-linux-x64", opensearchLocation);
+            case "x86_64" -> f("%s-linux-x64", opensearchLocation);
             case "aarch64" -> f("%s-linux-aarch64", opensearchLocation);
             default ->
                     throw new UnsupportedOperationException("Unsupported OpenSearch distribution architecture: " + osArch);

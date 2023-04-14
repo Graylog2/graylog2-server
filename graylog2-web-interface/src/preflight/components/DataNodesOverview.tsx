@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Badge, List, Button } from 'preflight/components/common';
-import { Builder } from 'logic/rest/FetchProvider';
+import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
 const P = styled.p`
@@ -40,17 +40,15 @@ const DataNodesOverview = () => {
     isInitialLoading: isInitialLoadingDataNodes,
   } = useDataNodes();
 
-  const resumeStartup = () => {
-    return new Builder('POST', qualifyUrl('/api/status/finish-config'))
-      .json()
-      .build();
-  };
+  const resumeStartup = () => (
+    fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
+  );
 
   return (
     <>
       <P>
         Graylog data nodes offer a better integration with Graylog and simplify future updates.
-        Once the Graylog data node is running, you can click on "Resume startup".
+        Once the Graylog data node is running, you can click on &quot;Resume startup&quot;.
       </P>
       <P>
         These are the data nodes which are currently registered.

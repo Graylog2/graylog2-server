@@ -22,6 +22,8 @@ import Section from 'preflight/components/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/components/DataNodesOverview';
 
+import DocumentationLink from '../components/support/DocumentationLink';
+
 const P = styled.p`
   max-width: 700px;
 `;
@@ -35,7 +37,7 @@ const App = () => {
           Data nodes allow you to index and search through all the messages in your Graylog message database.
         </P>
         <P>
-          You can either implement a Graylog data node (recommended) or you can configure an Elasticsearch or OpenSearch node manually.
+          You can either implement a <DocumentationLink page="" text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page="" text="Elasticsearch" /> or <DocumentationLink page="" text="OpenSearch" /> node manually.
         </P>
 
         <Space h="md" />
