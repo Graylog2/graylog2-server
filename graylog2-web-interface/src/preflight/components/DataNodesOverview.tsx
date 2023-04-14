@@ -60,7 +60,7 @@ const DataNodesOverview = () => {
     <>
       <P>
         Graylog data nodes offer a better integration with Graylog and simplify future updates.
-        Once the Graylog data node is running, you can click on &quot;Resume startup&quot;.
+        Once a Graylog data node is running, you can click on &quot;Resume startup&quot;.
       </P>
       <P>
         These are the data nodes which are currently registered.
