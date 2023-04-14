@@ -142,7 +142,9 @@ const HighlightForm = ({ onClose, rule }: Props) => {
 
         return (
           <BootstrapModalWrapper showModal
-                                 onHide={onClose}>
+                                 onHide={onClose}
+                                 data-app-section="sidebar_highlighting"
+                                 data-event-element={`${headerPrefix} Highlighting Rule`}>
             <Form className="form"
                   data-testid={`${headerPrefix}-highlighting-rule-dialog`}>
               <Modal.Header>

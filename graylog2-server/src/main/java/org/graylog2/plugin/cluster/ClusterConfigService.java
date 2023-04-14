@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin.cluster;
 
+import org.graylog2.cluster.ClusterConfig;
+
 import java.util.Set;
 
 /**
@@ -31,6 +33,8 @@ public interface ClusterConfigService {
      */
     <T> T get(Class<T> type);
 
+    <T> T extractPayload(Object payload, Class<T> type);
+
     /**
      * Retrieve Java class of a certain type for the given key from the cluster configuration.
      *
@@ -40,6 +44,14 @@ public interface ClusterConfigService {
      * @return An instance of the requested type or {@code null} if it couldn't be retrieved.
      */
     <T> T get(String key, Class<T> type);
+
+    /**
+     * Retrieve raw persisted Java class.
+     *
+     * @param key The key/type that is used to find the cluster config object in the database.
+     * @return An instance of the raw persisted Java class or {@code null} if it couldn't be retrieved.
+     */
+    ClusterConfig getRaw(Class<?> key);
 
     /**
      * Retrieve Java class of a certain type from the cluster configuration or return a default value

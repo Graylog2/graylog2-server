@@ -56,13 +56,16 @@ class ContentPackDownloadControl extends React.Component {
 
   render() {
     const infoText = 'Please right click the download link below and choose "Save Link As..." to download the JSON file.';
+    const modalTitle = 'Download Content Pack';
 
     return (
       <BootstrapModalWrapper showModal={this.state.showDownloadModal}
                              onHide={this._closeModal}
-                             bsSize="large">
+                             bsSize="large"
+                             data-app-section="content_pack_actions"
+                             data-event-element={modalTitle}>
         <Modal.Header closeButton>
-          <Modal.Title>Download Content Pack</Modal.Title>
+          <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>{infoText}</p>

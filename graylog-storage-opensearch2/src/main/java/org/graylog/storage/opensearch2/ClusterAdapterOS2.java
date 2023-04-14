@@ -45,6 +45,7 @@ import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
+import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
@@ -53,12 +54,15 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class ClusterAdapterOS2 implements ClusterAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterOS2.class);
@@ -257,6 +261,28 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     public JsonNode rawClusterStats() {
         final Request request = new Request("GET", "/_cluster/stats/nodes/*");
         return jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
+    }
+
+    @Override
+    public Map<String, NodeInfo> nodesInfo() {
+        final Request request = new Request("GET", "/_nodes");
+        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Opensearch nodes data!");
+
+        return toStream(nodesJson.at("/nodes").fields())
+                .collect(Collectors.toMap(Map.Entry::getKey, o -> createNodeInfo(o.getValue())));
+    }
+
+    private NodeInfo createNodeInfo(JsonNode nodesJson) {
+        return NodeInfo.builder()
+                .version(nodesJson.at("/version").asText())
+                .os(nodesJson.at("/os"))
+                .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
+                .jvmMemHeapMaxInBytes(nodesJson.at("/jvm/mem/heap_max_in_bytes").asLong())
+                .build();
+    }
+
+    public <T> Stream<T> toStream(Iterator<T> iterator) {
+        return StreamSupport.stream(((Iterable<T>) () -> iterator).spliterator(), false);
     }
 
     @Override

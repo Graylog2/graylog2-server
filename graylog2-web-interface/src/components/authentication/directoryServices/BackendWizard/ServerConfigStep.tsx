@@ -23,6 +23,7 @@ import { Formik, Form, Field } from 'formik';
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Input, Button, ButtonToolbar } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import type { WizardFormValues } from './BackendWizardContext';
 import BackendWizardContext from './BackendWizardContext';
@@ -93,6 +94,8 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendValidationErrors, authBackendMeta: { backendHasPassword } } = stepsState;
 
+  const sendTelemetry = useSendTelemetry();
+
   const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
     const currentValue = values.transportSecurity;
     const newValue = event.target.value;
@@ -111,6 +114,11 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   };
 
   const _onSubmitAll = (validateForm) => {
+    sendTelemetry('click', {
+      appSection: 'authentication_services_server_config_step',
+      eventElement: 'finish-and-save-service',
+    });
+
     validateForm().then((errors) => {
       if (!formHasErrors(errors)) {
         onSubmitAll();
@@ -244,6 +252,12 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             </Button>
             <Button bsStyle="primary"
                     disabled={isSubmitting}
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        appSection: 'authentication_services_server_config_step',
+                        eventElement: 'next-user-synchronization',
+                      });
+                    }}
                     type="submit">
               Next: User Synchronization
             </Button>

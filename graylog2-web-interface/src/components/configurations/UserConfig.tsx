@@ -30,6 +30,7 @@ import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted, ISODurationInput } from 'components/common';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const StyledDefList = styled.dl.attrs({
   className: 'deflist',
@@ -53,6 +54,8 @@ const UserConfig = () => {
   const [formConfig, setFormConfig] = useState<UserConfigType | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG).then(() => {
       const config = getConfig(ConfigurationType.USER_CONFIG, configuration);
@@ -63,6 +66,11 @@ const UserConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values) => {
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_user',
+      eventElement: 'update_configuration_button',
+    });
+
     ConfigurationsActions.update(ConfigurationType.USER_CONFIG, values).then(() => {
       setShowModal(false);
     });
@@ -76,6 +84,8 @@ const UserConfig = () => {
   const timeoutIntervalValidator = (milliseconds: number) => {
     return milliseconds >= 1000;
   };
+
+  const modalTitle = 'Update User Configuration';
 
   return (
     <div>
@@ -104,13 +114,18 @@ const UserConfig = () => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal && formConfig} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal && formConfig}
+                 onHide={resetConfig}
+                 aria-modal="true"
+                 aria-labelledby="dialog_label"
+                 data-app-section="configurations_user"
+                 data-event-element={modalTitle}>
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ isSubmitting, values, setFieldValue }) => {
                 return (
                   <Form>
                     <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">Update User Configuration</Modal.Title>
+                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body>

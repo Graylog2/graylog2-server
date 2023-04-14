@@ -321,6 +321,14 @@ const ApiRoutes = {
     urlWhitelistCheck: () => { return { url: '/system/urlwhitelist/check' }; },
     urlWhitelistGenerateRegex: () => { return { url: '/system/urlwhitelist/generate_regex' }; },
   },
+  TelemetryApiController: {
+    info: () => {
+      return { url: '/telemetry' };
+    },
+    setting: () => {
+      return { url: '/telemetry/user/settings' };
+    },
+  },
   UniversalSearchApiController: {
     _streamFilter(streamId: string) {
       return (streamId ? { filter: `streams:${streamId}` } : {});

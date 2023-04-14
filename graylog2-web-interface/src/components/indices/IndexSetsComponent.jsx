@@ -30,11 +30,13 @@ import NumberUtils from 'util/NumberUtils';
 import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const IndexSetsComponent = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     paginationQueryParameter: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connect(IndexSetsStore)],
@@ -64,7 +66,14 @@ const IndexSetsComponent = createReactClass({
 
   _onSetDefault(indexSet) {
     return () => {
-      IndexSetsActions.setDefault(indexSet).then(() => this.loadData(this.currentPageNo, this.currentPageSize));
+      this.props.sendTelemetry('click', {
+        appSection: 'index_sets',
+        eventElement: 'set-default-index-set',
+      });
+
+      IndexSetsActions.setDefault(indexSet).then(() => {
+        this.loadData(this.currentPageNo, this.currentPageSize);
+      });
     };
   },
 
@@ -76,6 +85,11 @@ const IndexSetsComponent = createReactClass({
 
   _deleteIndexSet(indexSet, deleteIndices) {
     this.props.paginationQueryParameter.resetPage();
+
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'index_sets',
+      eventElement: 'delete-index-set',
+    });
 
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
       this.loadData(1, this.PAGE_SIZE);
@@ -183,4 +197,4 @@ const IndexSetsComponent = createReactClass({
   },
 });
 
-export default withPaginationQueryParameter(IndexSetsComponent);
+export default withPaginationQueryParameter(withTelemetry(IndexSetsComponent));

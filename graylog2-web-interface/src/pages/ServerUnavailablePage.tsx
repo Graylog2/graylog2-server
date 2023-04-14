@@ -105,12 +105,16 @@ const ServerUnavailablePage = ({ server }: Props) => {
     );
   };
 
+  const modalTitle = 'Server currently unavailable';
+
   return (
     <DocumentTitle title="Server unavailable">
       <LoginChrome>
-        <Modal show>
+        <Modal show
+               data-app-section="server_unavailable"
+               data-event-element={modalTitle}>
           <Modal.Header>
-            <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
+            <Modal.Title><Icon name="exclamation-triangle" /> {modalTitle}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div>
