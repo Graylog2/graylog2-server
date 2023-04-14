@@ -24,13 +24,20 @@ import { ApiContext } from 'aws/context/Api';
 import { StepsContext } from 'aws/context/Steps';
 import { SidebarContext } from 'aws/context/Sidebar';
 import Routes from 'routing/Routes';
-import mockHistory from 'helpers/mocking/mockHistory';
-import { asMock } from 'helpers/mocking';
-import useHistory from 'routing/useHistory';
 
 import CloudWatch from './CloudWatch';
 
-jest.mock('routing/useHistory');
+const mockNavigate = jest.fn();
+
+jest.mock('react-router-dom', () => {
+  const original = jest.requireActual('react-router-dom');
+
+  return {
+    __esModule: true,
+    ...original,
+    useNavigate: jest.fn(() => mockNavigate),
+  };
+});
 
 // eslint-disable-next-line react/prop-types
 const TestCommonProviders = ({ children }) => (
@@ -55,13 +62,6 @@ const TestCommonProviders = ({ children }) => (
 );
 
 describe('<CloudWatch>', () => {
-  let history;
-
-  beforeEach(() => {
-    history = mockHistory();
-    asMock(useHistory).mockReturnValue(history);
-  });
-
   it('redirects to system/inputs after input is created', async () => {
     render(
       <TestCommonProviders>
@@ -75,9 +75,9 @@ describe('<CloudWatch>', () => {
 
     userEvent.click(submitButton);
 
-    await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1));
 
-    expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.INPUTS);
+    expect(mockNavigate).toHaveBeenCalledWith(Routes.SYSTEM.INPUTS);
   });
 
   it('calls onSubmit when input is submitted externally', async () => {
