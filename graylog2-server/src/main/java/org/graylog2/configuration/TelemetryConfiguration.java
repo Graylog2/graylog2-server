@@ -26,10 +26,10 @@ public class TelemetryConfiguration {
     public static final String TELEMETRY_ENABLED = "telemetry_enabled";
 
     @Parameter(value = "telemetry_api_key", required = true)
-    private String telemetryApiKey;
+    private String telemetryApiKey = "phc_fmJsCXBb0sqPpUCAJ51C0sT933i8LHUT6Zqm4oCGuK7";
 
     @Parameter(value = "telemetry_host")
-    private String telemetryApiHost = "https://eu.posthog.com";
+    private String telemetryApiHost = "https://telemetry.graylog.cloud";
 
     @Parameter(value = TELEMETRY_ENABLED)
     private boolean telemetryEnabled = true;
