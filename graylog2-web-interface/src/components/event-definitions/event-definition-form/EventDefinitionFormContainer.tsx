@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import cloneDeep from 'lodash/cloneDeep';
 
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
@@ -75,7 +76,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
     setEventDefinition((prev) => ({ ...prev, [key]: value }));
     onEventDefinitionChange({ ...eventDefinition, [key]: value });
     setIsDirty(true);
-  }, [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty]);r
+  }, [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty]);
 
   useEffect(() => {
     fetchClusterConfig();
