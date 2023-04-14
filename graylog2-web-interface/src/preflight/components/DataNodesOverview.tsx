@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { Space } from '@mantine/core';
 import styled from 'styled-components';
+import { useState } from 'react';
 
+import UserNotification from 'util/UserNotification';
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Badge, List, Button } from 'preflight/components/common';
@@ -33,6 +35,7 @@ const NodeId = styled(Badge)`
 `;
 
 const DataNodesOverview = () => {
+  const [resumingStartup, setResumingStartup] = useState(false);
   const {
     data: dataNodes,
     isFetching: isFetchingDataNodes,
@@ -42,6 +45,15 @@ const DataNodesOverview = () => {
 
   const resumeStartup = () => (
     fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
+      .then(() => {
+        setResumingStartup(true);
+      })
+      .catch((error) => {
+        setResumingStartup(false);
+
+        UserNotification.error(`Resuming startup failed with: ${error}`,
+          'Could not resume startup');
+      })
   );
 
   return (
@@ -84,7 +96,9 @@ const DataNodesOverview = () => {
         </Alert>
       )}
       <Space h="md" />
-      <Button onClick={resumeStartup} disabled={!dataNodes.length} size="xs">Resume startup</Button>
+      <Button onClick={resumeStartup} disabled={!dataNodes.length || resumingStartup} size="xs">
+        {resumingStartup ? <Spinner delay={0} text="Resuming startup..." /> : 'Resume startup'}
+      </Button>
     </>
   );
 };
