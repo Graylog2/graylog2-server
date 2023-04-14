@@ -19,9 +19,10 @@ import { useMemo } from 'react';
 
 import type { Checked, MappedData } from 'views/logic/valueactions/createEventDefinition/types';
 import type { EventDefinitionURLConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
+import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 
 const concatQuery = (queryParts: Array<string>) => {
-  return queryParts.filter((queryPart) => !!queryPart).map((part) => `(${part})`).join(' AND ');
+  return concatQueryStrings(queryParts.filter((queryPart) => !!queryPart));
 };
 
 const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, checked: Checked }) => useMemo<EventDefinitionURLConfig>(() => {

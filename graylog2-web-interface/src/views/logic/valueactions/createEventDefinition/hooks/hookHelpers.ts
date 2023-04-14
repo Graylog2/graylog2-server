@@ -28,6 +28,7 @@ import type ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { FiltersType } from 'views/types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 
 export const getStreams = (filter: FilterType): Array<string> => {
   if (!filter) return [];
@@ -39,14 +40,15 @@ export const getStreams = (filter: FilterType): Array<string> => {
 };
 
 export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) => {
-  return valuePath.reduce((res, path) => {
+  return concatQueryStrings(valuePath.filter((path) => {
     const key = Object.keys(path)[0];
-    if (key === '_exists_') return res;
 
+    return key !== '_exists_';
+  }).map((path) => {
     const [field, value] = Object.entries(path)[0];
 
-    return `${res}${res ? ' AND ' : ''}${field}:${value}`;
-  }, '');
+    return `${field}:${value}`;
+  }), { withBrackets: false });
 };
 
 export const getFlattenPivots = (pivots: Array<Pivot>): Set<string> => {
@@ -151,10 +153,9 @@ export const getRestParameterValues = (
 }, {});
 
 export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => {
-  return filters
+  return concatQueryStrings(filters
     .filter((filter) => (filter.queryString && !filter.disabled))
-    .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`)
-    .join(' AND ');
+    .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`).toJS(), { withBrackets: false });
 };
 
 export const replaceParametersInQueryString = ({ query, restParameterValues }: {
