@@ -84,7 +84,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @ApiOperation(value = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Optional<Map<String, List<SystemJobSummary>>>> list(@Context UserContext userContext) throws IOException, NodeNotFoundException {
-        final Map<String, Optional<Map<String, List<SystemJobSummary>>>> forAllNodes = getForAllNodes(RemoteSystemJobResource::list, createRemoteInterfaceProvider(RemoteSystemJobResource.class));
+        final Map<String, Optional<Map<String, List<SystemJobSummary>>>> forAllNodes = stripCallResult(requestOnAllNodes(RemoteSystemJobResource.class, RemoteSystemJobResource::list));
 
         final List<SystemJobSummary> jobsFromScheduler = jobResourceHandlerService.listJobsAsSystemJobSummary(userContext);
         final String thisNodeId = serverStatus.getNodeId().toString();

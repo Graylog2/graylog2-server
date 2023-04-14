@@ -74,4 +74,8 @@ public class StatsService {
     public SystemStats systemStats() {
         return SystemStats.create(fsStats(), jvmStats(), networkStats(), osStats(), processStats());
     }
+
+    public SystemStats systemStatsWithoutNetwork() {
+        return SystemStats.create(fsStats(), jvmStats(), null, osStats(), processStats());
+    }
 }

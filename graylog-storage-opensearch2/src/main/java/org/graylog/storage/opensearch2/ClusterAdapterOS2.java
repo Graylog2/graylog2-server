@@ -28,12 +28,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.IndexSummaryResponse;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
@@ -222,10 +219,7 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
 
     @Override
     public ClusterStats clusterStats() {
-        final Request request = new Request("GET", "/_cluster/stats/nodes/*");
-
-        final JsonNode clusterStatsResponseJson = jsonApi.perform(request,
-                "Couldn't read Elasticsearch cluster stats");
+        final JsonNode clusterStatsResponseJson = rawClusterStats();
         final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
 
         String clusterVersion = null;
@@ -257,6 +251,12 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         );
 
         return ClusterStats.create(clusterName, clusterVersion, nodesStats, indicesStats);
+    }
+
+    @Override
+    public JsonNode rawClusterStats() {
+        final Request request = new Request("GET", "/_cluster/stats/nodes/*");
+        return jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
     }
 
     @Override

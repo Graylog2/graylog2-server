@@ -77,10 +77,8 @@ public class ClusterMetricsResource extends ProxiedResource {
     public void multipleMetricsAllNodes(@ApiParam(name = "Requested metrics", required = true)
                                         @Valid @NotNull MetricsReadRequest request,
                                         @Suspended AsyncResponse asyncResponse) {
-        processAsync(asyncResponse, () -> getForAllNodes(
-                remoteMetricsResource -> remoteMetricsResource.multipleMetrics(request),
-                createRemoteInterfaceProvider(RemoteMetricsResource.class),
-                callTimeout
-        ));
+        processAsync(asyncResponse,
+                () -> stripCallResult(requestOnAllNodes(RemoteMetricsResource.class, r -> r.multipleMetrics(request), callTimeout))
+        );
     }
 }

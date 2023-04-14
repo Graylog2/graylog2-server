@@ -14,27 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.loggers.responses;
+package org.graylog2.rest.resources.system.debug.bundle;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.Collection;
+import java.util.List;
 
-@AutoValue
-@WithBeanGetter
 @JsonAutoDetect
-public abstract class LogMessagesSummary {
-
-    @JsonProperty
-    public abstract Collection<InternalLogMessage> messages();
-
-    @JsonCreator
-    public static LogMessagesSummary create(@JsonProperty("messages") Collection<InternalLogMessage> messages) {
-        return new AutoValue_LogMessagesSummary(messages);
-    }
-
-}
+public record BundleEntries(@JsonProperty("logfiles") List<LogFile> logfiles) {}

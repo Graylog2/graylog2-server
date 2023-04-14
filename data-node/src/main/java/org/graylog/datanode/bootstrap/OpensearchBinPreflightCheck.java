@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.bootstrap;
 
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
@@ -37,8 +37,8 @@ public class OpensearchBinPreflightCheck implements PreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchBinPreflightCheck.class);
 
     @Inject
-    public OpensearchBinPreflightCheck(Configuration configuration) {
-        this(Path.of(configuration.getOpensearchLocation()));
+    public OpensearchBinPreflightCheck(OpensearchDistribution opensearchDistribution) {
+        this(opensearchDistribution.directory());
     }
 
     protected OpensearchBinPreflightCheck(Path opensearchBaseDirectory) {

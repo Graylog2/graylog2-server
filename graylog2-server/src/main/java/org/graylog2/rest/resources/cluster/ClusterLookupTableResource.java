@@ -81,7 +81,6 @@ public class ClusterLookupTableResource extends ProxiedResource {
     public Map<String, CallResult<Void>> performPurge(
             @ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
             @ApiParam(name = "key") @QueryParam("key") String key) {
-        return requestOnAllNodes(createRemoteInterfaceProvider(RemoteLookupTableResource.class),
-                client -> client.performPurge(idOrName, key));
+        return requestOnAllNodes(RemoteLookupTableResource.class, client -> client.performPurge(idOrName, key));
     }
 }
