@@ -39,7 +39,6 @@ import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetPaginationResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -126,78 +125,14 @@ public class IndexSetsResource extends RestResource {
                                  @QueryParam("limit") @DefaultValue("0") int limit,
                                  @ApiParam(name = "stats", value = "Include index set stats.")
                                  @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
+
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-
-        List<IndexSetSummary> indexSets;
-        int count;
-
         List<IndexSetConfig> allowedConfigurations = indexSetService.findAll()
                 .stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
                 .toList();
 
-        List<IndexSetConfig> pagedConfigs;
-        Comparator<IndexSetConfig> titleComparator = Comparator.comparing(IndexSetConfig::title, String.CASE_INSENSITIVE_ORDER);
-
-        if (limit > 0) {
-            pagedConfigs = allowedConfigurations.stream()
-                    .sorted(titleComparator)
-                    .skip(skip)
-                    .limit(limit)
-                    .toList();
-        } else {
-            pagedConfigs = allowedConfigurations.stream()
-                    .sorted(titleComparator)
-                    .toList();
-        }
-
-        indexSets = pagedConfigs.stream()
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
-                .toList();
-
-        count = allowedConfigurations.size();
-
-        final Map<String, IndexSetStats> stats;
-        if (computeStats) {
-            stats = indexSetRegistry.getForIndexConfig(pagedConfigs).stream()
-                    .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
-        } else {
-            stats = Collections.emptyMap();
-        }
-
-        return IndexSetResponse.create(count, indexSets, stats);
-    }
-
-    @GET
-    @Path("paginated")
-    @Timed
-    @ApiOperation(value = "Get a paginated list of all index sets")
-    @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
-    })
-    public IndexSetPaginationResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).")
-                                           @QueryParam("skip") String skip,
-                                           @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                           @QueryParam("limit") @DefaultValue("0") int limit,
-                                           @ApiParam(name = "stats", value = "Include index set stats.")
-                                           @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
-        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-
-        List<IndexSetConfig> permittedConfigs = indexSetService.findPaginated(skip, limit).stream()
-                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id())).collect(Collectors.toList());
-        List<IndexSetSummary> indexSets = permittedConfigs.stream()
-                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
-                .toList();
-
-        Map<String, IndexSetStats> statsMap = Collections.emptyMap();
-
-        if (computeStats) {
-            statsMap = indexSetRegistry.getForIndexConfig(permittedConfigs).stream()
-                    .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
-        }
-
-        int lastIndex = limit != 0 ? (limit - 1) : limit;
-        return IndexSetPaginationResponse.create(indexSets, statsMap, indexSets.get(lastIndex).id());
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
     }
 
     @GET
@@ -208,14 +143,45 @@ public class IndexSetsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
     public IndexSetResponse search(@ApiParam(name = "searchTitle", value = "The number of elements to skip (offset).")
-                                   @QueryParam("searchTitle") String searchTitle) {
+                                   @QueryParam("searchTitle") String searchTitle,
+                                   @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+                                   @QueryParam("skip") @DefaultValue("0") int skip,
+                                   @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                   @QueryParam("limit") @DefaultValue("0") int limit,
+                                   @ApiParam(name = "stats", value = "Include index set stats.")
+                                   @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-        List<IndexSetSummary> indexSets = indexSetService.searchByTitle(searchTitle).stream()
-                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+        List<IndexSetConfig> allowedConfigurations = indexSetService.searchByTitle(searchTitle).stream()
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id())).toList();
+
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
+    }
+
+    private IndexSetResponse getPagedIndexSetResponse(int skip, int limit, boolean computeStats, IndexSetConfig defaultIndexSet, List<IndexSetConfig> allowedConfigurations) {
+        int calculatedLimit = limit > 0 ? limit : allowedConfigurations.size();
+        Comparator<IndexSetConfig> titleComparator = Comparator.comparing(IndexSetConfig::title, String.CASE_INSENSITIVE_ORDER);
+
+        List<IndexSetConfig> pagedConfigs = allowedConfigurations.stream()
+                .sorted(titleComparator)
+                .skip(skip)
+                .limit(calculatedLimit)
+                .toList();
+
+        List<IndexSetSummary> indexSets = pagedConfigs.stream()
                 .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
                 .toList();
-        return IndexSetResponse.create(indexSets.size(), indexSets, Collections.emptyMap());
+
+
+        Map<String, IndexSetStats> stats = Collections.emptyMap();
+
+        if (computeStats) {
+            stats = indexSetRegistry.getForIndexConfig(pagedConfigs).stream()
+                    .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
+        }
+
+        return IndexSetResponse.create(allowedConfigurations.size(), indexSets, stats);
     }
+
 
     @GET
     @Path("stats")
