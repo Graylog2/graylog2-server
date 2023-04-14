@@ -189,7 +189,7 @@ const WidgetActionsMenu = ({
   const focusWidget = useCallback(() => {
     sendTelemetry('click', {
       appSection: 'search-widget',
-      eventElement: 'widget-delete-button',
+      eventElement: 'widget-focus-button',
     });
 
     return setWidgetFocusing(widget.id);
