@@ -109,6 +109,9 @@ class Parameter {
   static registerSubtype(type: string, implementingClass: ParameterSubClass) {
     this.__registrations[type.toLowerCase()] = implementingClass;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  toJSON() { throw new Error('Method toJSON has no implementation'); }
 }
 
 const SingletonParameter = singleton('views.logic.parameters.Parameter', () => Parameter);
