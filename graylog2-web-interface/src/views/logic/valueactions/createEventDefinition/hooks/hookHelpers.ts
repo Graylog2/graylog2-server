@@ -36,7 +36,7 @@ export const getStreams = (filter: FilterType): Array<string> => {
   return filter.get('filters')
     .filter((curFilter) => curFilter.get('type') === 'stream')
     .map((curFilter) => curFilter.get('id'))
-    .toJS();
+    .toArray();
 };
 
 export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) => {
@@ -155,7 +155,7 @@ export const getRestParameterValues = (
 export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => {
   return concatQueryStrings(filters
     .filter((filter) => (filter.queryString && !filter.disabled))
-    .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`).toJS(), { withBrackets: false });
+    .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`).toArray(), { withBrackets: false });
 };
 
 export const replaceParametersInQueryString = ({ query, restParameterValues }: {
