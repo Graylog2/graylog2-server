@@ -48,11 +48,13 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type SearchResult from 'views/logic/SearchResult';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { Event } from 'components/events/events/types';
+import type Parameter from 'views/logic/parameters/Parameter';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -217,6 +219,8 @@ export interface ActionContexts {
   message: Message,
   valuePath: ValuePath,
   isLocalNode: boolean,
+  parameters?: Immutable.Set<Parameter>,
+  parameterBindings?: ParameterBindings,
 }
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
