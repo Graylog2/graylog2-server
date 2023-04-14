@@ -79,8 +79,6 @@ public interface IndexSetService {
      */
     List<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip);
 
-    List<IndexSetConfig> findPaginated(String skip, int limit);
-
     List<IndexSetConfig> searchByTitle(String searchString);
 
     /**
