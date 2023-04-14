@@ -21,7 +21,6 @@ import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
 import GlobalThemeStyles from 'preflight/theme/GlobalThemeStyles';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import ThemeWrapper from 'preflight/theme/ThemeWrapper';
-import TimezoneProvider from 'preflight/contexts/TimezoneProvider';
 
 import App from './App';
 
@@ -31,9 +30,7 @@ ReactDOM.render((
       <GlobalThemeStyles />
       <DefaultQueryClientProvider>
         <ThemeWrapper>
-          <TimezoneProvider>
-            <App />
-          </TimezoneProvider>
+          <App />
         </ThemeWrapper>
       </DefaultQueryClientProvider>
     </PreflightThemeProvider>

@@ -28,7 +28,7 @@ type Props = {
   tz?: string,
 };
 
-export const getUserTimezone = (userTimezone?: string, tzOverride?: string) => {
+const getUserTimezone = (userTimezone?: string, tzOverride?: string) => {
   if (tzOverride) {
     return tzOverride;
   }
@@ -41,7 +41,7 @@ export const getUserTimezone = (userTimezone?: string, tzOverride?: string) => {
  * Should be used when displaying times and the related components are not a suitable option.
  */
 
-export const StaticTimezoneProvider = ({ children, tz }: Required<Props>) => {
+const StaticTimezoneProvider = ({ children, tz }: Required<Props>) => {
   const toUserTimezone = useCallback((time: DateTime) => {
     return toDateObject(time, undefined, tz);
   }, [tz]);
