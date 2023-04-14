@@ -19,6 +19,7 @@ import { useMemo } from 'react';
 import pickBy from 'lodash/pickBy';
 import isArray from 'lodash/isArray';
 import isNumber from 'lodash/isNumber';
+import type Immutable from 'immutable';
 
 import type { MappedData } from 'views/logic/valueactions/createEventDefinition/types';
 import type { ActionContexts } from 'views/types';
@@ -32,6 +33,8 @@ import {
   replaceParametersInQueryString,
   getStreams,
 } from 'views/logic/valueactions/createEventDefinition/hooks/hookHelpers';
+import type ValueParameter from 'views/logic/parameters/ValueParameter';
+import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
 type HookProps = Pick<ActionComponentProps, 'field' | 'queryId' | 'value'> & { contexts: ActionContexts }
 const useMappedData = ({ contexts, field, queryId, value }: HookProps) => useMemo<MappedData>(() => {
@@ -40,9 +43,7 @@ const useMappedData = ({ contexts, field, queryId, value }: HookProps) => useMem
   const { parameters, parameterBindings } = contexts;
   const searchWithinMs = curQuery.timerange.type === 'relative' ? (curQuery.timerange as RelativeTimeRangeWithEnd).from * 1000 : undefined;
   const lutParameters = getLutParameters(parameters);
-  // TODO fix type problem
-  // @ts-ignore
-  const restParameterValues = getRestParameterValues({ parameters, parameterBindings });
+  const restParameterValues = getRestParameterValues({ parameters: parameters as Immutable.Set<ValueParameter | LookupTableParameter>, parameterBindings });
   const searchFilterQuery = transformSearchFiltersToQuery(curQuery.filters);
   const queryWithReplacedParams = replaceParametersInQueryString({ query: curQuery.query.query_string, restParameterValues });
   const streams = getStreams(curQuery.filter);
