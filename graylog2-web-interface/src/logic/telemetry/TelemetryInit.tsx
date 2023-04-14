@@ -27,9 +27,7 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 type PostHogSettings = {
   host: string;
   key: string;
-  debug: boolean;
 }
-const POSTHOG_DEBUG = true;
 
 const getPostHogSettings = (): PostHogSettings => {
   const { host, api_key: key } = AppConfig.telemetry() || {};
@@ -37,12 +35,11 @@ const getPostHogSettings = (): PostHogSettings => {
   return {
     host: host,
     key: key,
-    debug: POSTHOG_DEBUG,
   };
 };
 
 const init = () => {
-  const { host, key, debug } = getPostHogSettings();
+  const { host, key } = getPostHogSettings();
 
   posthog.init(
     key,
@@ -53,18 +50,6 @@ const init = () => {
       capture_pageleave: false,
     },
   );
-
-  if (debug) {
-    posthog.debug();
-  } else {
-    // There is no way to disable debug mode in posthog.js once it has been enabled,
-    // so we need to do it manually by removing the localStorage key.
-    try {
-      window.localStorage.removeItem('ph_debug');
-    } catch (e) {
-      // ignore
-    }
-  }
 
   return posthog;
 };
