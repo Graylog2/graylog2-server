@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>5.0.6-SNAPSHOT</version>
+    <version>5.0.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -132,7 +132,7 @@
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.10.6</joda-time.version>
         <jool.version>0.9.14</jool.version>
-        <json-path.version>2.7.0</json-path.version>
+        <json-path.version>2.8.0</json-path.version>
         <kafka.version>2.7.0</kafka.version>
         <kafka09.version>0.9.0.1-6</kafka09.version>
         <log4j.version>2.17.1</log4j.version>
@@ -141,8 +141,8 @@
         <mongodb-driver.version>4.7.1</mongodb-driver.version>
         <mongojack.version>2.10.1.2</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.84.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.54.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.91.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.59.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
         <okta-sdk.version>8.2.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
