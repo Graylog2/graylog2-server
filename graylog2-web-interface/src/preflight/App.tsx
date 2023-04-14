@@ -36,7 +36,7 @@ const App = () => {
       <Section title="Welcome!" titleOrder={1}>
         <p>
           It looks like you are starting Graylog for the first time.
-          This pages gives you an overview of the available
+          This page gives you an overview of the available graylog data nodes.
         </p>
         <Space h="md" />
         <Title order={2}>Data Nodes Overview</Title>

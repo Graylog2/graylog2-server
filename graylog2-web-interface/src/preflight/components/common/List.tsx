@@ -14,16 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as Alert } from './Alert';
-export { default as Badge } from './Badge';
-export { default as Button } from './Button';
-export { default as Col } from './Col';
-export { default as Icon } from './Icon';
-export { default as Menu } from './Menu';
-export { default as MenuItem } from './MenuItem';
-export { default as Row } from './Row';
-export { default as Section } from './Section';
-export { default as List } from './List';
-export { default as MenuTarget } from './mantine/MenuTarget';
-export { default as MenuDropdownWrapper } from './mantine/MenuDropdownWrapper';
-export * from './mantine/imports';
+import * as React from 'react';
+import styled, { css } from 'styled-components';
+import type { ListProps } from '@mantine/core';
+import { List as MantineList } from '@mantine/core';
+
+const StyledList = styled(MantineList)(({ theme }) => css`
+  color: ${theme.colors.global.textDefault};
+`);
+
+type ListComponent = ((props: ListProps) => React.ReactElement) & {
+  Item: typeof MantineList.Item
+}
+
+const List: ListComponent = ({ children, ...props }: ListProps) => (
+  <StyledList {...props}>
+    {children}
+  </StyledList>
+);
+
+List.Item = MantineList.Item;
+export default List;

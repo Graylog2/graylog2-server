@@ -15,18 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
-import type { TableProps } from '@mantine/core';
-import { Table as MantineTable } from '@mantine/core';
+import type { BadgeProps } from '@mantine/core';
+import { Badge as MantineBadge } from '@mantine/core';
 
-const StyledTable = styled(MantineTable)(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-`);
+type Props = BadgeProps & {
+  title: string,
+}
 
-const Table = ({ children, ...props }: TableProps) => (
-  <StyledTable {...props}>
+const Badge = ({ children, ...props }: Props) => (
+  <MantineBadge {...props}>
     {children}
-  </StyledTable>
+  </MantineBadge>
 );
-
-export default Table;
+export default Badge;

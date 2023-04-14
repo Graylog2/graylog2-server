@@ -16,11 +16,15 @@
  */
 import * as React from 'react';
 import { Space } from '@mantine/core';
+import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { Alert, Table } from 'preflight/components/common';
-import Timestamp from 'components/common/Timestamp';
+import { Alert, Badge, List } from 'preflight/components/common';
+
+const NodeId = styled(Badge)`
+  margin-right: 3px;
+`;
 
 const DataNodesOverview = () => {
   const {
@@ -40,43 +44,19 @@ const DataNodesOverview = () => {
       {!!dataNodes.length && (
         <>
           <Space h="sm" />
-          <Table verticalSpacing="xxs" fontSize="md">
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Hostname</th>
-                <th>Transport Address</th>
-                <th>Node Id</th>
-                <th>Short Node Id</th>
-                <th>Is Leader</th>
-                <th>Is Master</th>
-                <th>Last Seen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dataNodes.map(({
-                id,
-                hostname,
-                transport_address,
-                node_id,
-                short_node_id,
-                is_leader,
-                is_master,
-                last_seen,
-              }) => (
-                <tr key={id}>
-                  <td>{id}</td>
-                  <td>{hostname}</td>
-                  <td>{transport_address}</td>
-                  <td>{node_id}</td>
-                  <td>{short_node_id}</td>
-                  <td>{is_leader ? 'yes' : 'no'}</td>
-                  <td>{is_master ? 'yes' : 'no'}</td>
-                  <td><Timestamp dateTime={last_seen} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <List spacing="xs">
+            {dataNodes.map(({
+              hostname,
+              transport_address,
+              short_node_id,
+            }) => (
+              <List.Item key={short_node_id}>
+                <NodeId title="Short node id">{short_node_id}</NodeId>
+                <span title="Transport address">{transport_address}</span>{' – '}
+                <span title="Hostname">{hostname}</span>
+              </List.Item>
+            ))}
+          </List>
         </>
       )}
       {(!dataNodes.length && !isInitialLoadingDataNodes) && (
