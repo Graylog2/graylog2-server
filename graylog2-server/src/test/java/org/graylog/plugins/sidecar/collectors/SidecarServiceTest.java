@@ -31,6 +31,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.jukito.JukitoRunner;
@@ -66,7 +67,11 @@ public class SidecarServiceTest {
     @Mock
     private CollectorService collectorService;
 
-    @Mock private ConfigurationService configurationService;
+    @Mock
+    private ConfigurationService configurationService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -76,7 +81,7 @@ public class SidecarServiceTest {
     @Before
     public void setUp(MongoJackObjectMapperProvider mapperProvider,
                       Validator validator) throws Exception {
-        this.sidecarService = new SidecarService(collectorService, configurationService,  mongodb.mongoConnection(), mapperProvider, validator);
+        this.sidecarService = new SidecarService(collectorService, configurationService, mongodb.mongoConnection(), mapperProvider, notificationService, validator);
     }
 
     @Test

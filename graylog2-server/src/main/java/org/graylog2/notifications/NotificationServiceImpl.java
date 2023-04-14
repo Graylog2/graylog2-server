@@ -191,7 +191,13 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         return true;
     }
 
-    private void createSystemEvent(Notification notification) throws EventProcessorException {
+    /**
+     * Creates a system event only, without creating an actual system notification.
+     *
+     * @param notification notification details
+     */
+    @Override
+    public void createSystemEvent(Notification notification) throws EventProcessorException {
         final EventDefinitionDto systemEventDefinition =
                 dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
                         .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
