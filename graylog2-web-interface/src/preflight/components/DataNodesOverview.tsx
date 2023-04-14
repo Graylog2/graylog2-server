@@ -20,7 +20,13 @@ import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { Alert, Badge, List } from 'preflight/components/common';
+import { Alert, Badge, List, Button } from 'preflight/components/common';
+import { Builder } from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+
+const P = styled.p`
+  max-width: 700px;
+`;
 
 const NodeId = styled(Badge)`
   margin-right: 3px;
@@ -34,12 +40,22 @@ const DataNodesOverview = () => {
     isInitialLoading: isInitialLoadingDataNodes,
   } = useDataNodes();
 
+  const resumeStartup = () => {
+    return new Builder('POST', qualifyUrl('/api/status/finish-config'))
+      .json()
+      .build();
+  };
+
   return (
     <>
-      <p>
-        These are the data nodes which are currently registered. The list is constantly updated.
-        {isFetchingDataNodes && <Spinner text="" />}
-      </p>
+      <P>
+        Graylog data nodes offer a better integration with Graylog and simplify future updates.
+        Once the Graylog data node is running, you can click on "Resume startup".
+      </P>
+      <P>
+        These are the data nodes which are currently registered.
+        The list is constantly updated. {isFetchingDataNodes && <Spinner text="" />}
+      </P>
 
       {!!dataNodes.length && (
         <>
@@ -69,6 +85,8 @@ const DataNodesOverview = () => {
           There was an error fetching the data nodes: {dataNodesFetchError.message}
         </Alert>
       )}
+      <Space h="md" />
+      <Button onClick={resumeStartup} disabled={!dataNodes.length} size="xs">Resume startup</Button>
     </>
   );
 };

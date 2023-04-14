@@ -16,33 +16,38 @@
  */
 import * as React from 'react';
 import { AppShell, Title, Space } from '@mantine/core';
+import styled from 'styled-components';
 
 import Section from 'preflight/components/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/components/DataNodesOverview';
-import { Button } from 'preflight/components/common';
-import { Builder } from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+
+const P = styled.p`
+  max-width: 700px;
+`;
 
 const App = () => {
-  const resumeStartup = () => {
-    return new Builder('POST', qualifyUrl('/api/status/finish-config'))
-      .json()
-      .build();
-  };
-
   return (
     <AppShell padding="md" header={<Navigation />}>
       <Section title="Welcome!" titleOrder={1}>
-        <p>
-          It looks like you are starting Graylog for the first time.
-          This page gives you an overview of the available graylog data nodes.
-        </p>
+        <P>
+          It looks like you are starting Graylog for the first time and have not configured a data node.<br />
+          Data nodes allow you to index and search through all the messages in your Graylog message database.
+        </P>
+        <P>
+          You can either implement a Graylog data node (recommended) or you can configure an Elasticsearch or OpenSearch node manually.
+        </P>
+
         <Space h="md" />
-        <Title order={2}>Data Nodes Overview</Title>
+        <Title order={2}>Graylog Data Nodes</Title>
         <DataNodesOverview />
+
         <Space h="md" />
-        <Button onClick={resumeStartup}>Resume startup</Button>
+        <Title order={2}>Manual Data Node Configuration</Title>
+        <P>
+          If you want to configure an Elasticsearch or OpenSearch node manually, you need to adjust the Graylog configuration and restart the Graylog server.
+          After the restart this page will not show up again.
+        </P>
       </Section>
     </AppShell>
   );
