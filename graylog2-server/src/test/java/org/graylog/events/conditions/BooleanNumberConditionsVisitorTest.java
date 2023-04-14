@@ -46,29 +46,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class BooleanNumberConditionsVisitorTest {
     private static ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    @BeforeClass
-    public static void classSetUp() {
-        Configuration.setDefaults(new Configuration.Defaults() {
-            private final JsonProvider jsonProvider = new JacksonJsonProvider(objectMapper);
-            private final MappingProvider mappingProvider = new JacksonMappingProvider(objectMapper);
-
-            @Override
-            public JsonProvider jsonProvider() {
-                return jsonProvider;
-            }
-
-            @Override
-            public Set<Option> options() {
-                return EnumSet.noneOf(Option.class);
-            }
-
-            @Override
-            public MappingProvider mappingProvider() {
-                return mappingProvider;
-            }
-        });
-    }
-
     @Test
     public void testTrue() throws Exception {
         assertThat(Expr.True.create().accept(new BooleanNumberConditionsVisitor())).isTrue();

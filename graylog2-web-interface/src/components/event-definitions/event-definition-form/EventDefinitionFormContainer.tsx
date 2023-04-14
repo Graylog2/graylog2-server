@@ -16,7 +16,6 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import cloneDeep from 'lodash/cloneDeep';
 import { useNavigate } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -73,15 +72,10 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   }, []);
 
   const handleChange = useCallback((key: string, value: unknown) => {
-    setEventDefinition((curState) => {
-      const nextEventDefinition = cloneDeep(curState);
-      nextEventDefinition[key] = value;
-      onEventDefinitionChange(nextEventDefinition);
-      setIsDirty(true);
-
-      return nextEventDefinition;
-    });
-  }, [onEventDefinitionChange]);
+    setEventDefinition((prev) => ({ ...prev, [key]: value }));
+    onEventDefinitionChange({ ...eventDefinition, [key]: value });
+    setIsDirty(true);
+  }, [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty]);r
 
   useEffect(() => {
     fetchClusterConfig();
