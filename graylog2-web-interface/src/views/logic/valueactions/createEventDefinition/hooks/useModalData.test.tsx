@@ -17,10 +17,20 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
+import MockStore from 'helpers/mocking/StoreMock';
 import {
   ltParamJSON, modalDataResult,
 } from 'fixtures/createEventDefinitionFromValue';
 import useModalData from 'views/logic/valueactions/createEventDefinition/hooks/useModalData';
+
+jest.mock('views/stores/StreamsStore', () => ({
+  StreamsStore: MockStore(['getInitialState', () => ({
+    streams: [
+      { title: 'streamId-1-title', id: 'streamId-1' },
+      { title: 'streamId-2-title', id: 'streamId-2' },
+    ],
+  })]),
+}));
 
 const wrapper = ({ children }) => (
   <div>

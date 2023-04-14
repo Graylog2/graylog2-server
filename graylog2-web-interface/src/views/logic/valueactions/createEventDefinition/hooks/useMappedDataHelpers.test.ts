@@ -29,6 +29,7 @@ import {
   getRestParameterValues,
   transformSearchFiltersToQuery,
   replaceParametersInQueryString,
+  getStreams,
 } from 'views/logic/valueactions/createEventDefinition/hooks/hookHelpers';
 import {
   disabledSearchFilter,
@@ -218,5 +219,16 @@ describe('useMappedData helper function', () => {
     });
 
     expect(result).toEqual('http_Method:POST or http_Method:GET');
+  });
+
+  it('getStreams return only  streams ids', async () => {
+    const result = getStreams(Immutable.Map([
+      ['filters', [
+        Immutable.Map([['type', 'stream'], ['id', 'stream-id']]),
+        Immutable.Map([['type', 'some-type'], ['id', 'non-stream-id']]),
+      ]],
+    ]));
+
+    expect(result).toEqual(['stream-id']);
   });
 });

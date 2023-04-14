@@ -21,15 +21,7 @@ import type { Checked, MappedData } from 'views/logic/valueactions/createEventDe
 import type { EventDefinitionURLConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
 
 const concatQuery = (queryParts: Array<string>) => {
-  return queryParts.reduce((res, queryPart) => {
-    let curRes = res;
-
-    if (queryPart) {
-      curRes = `${res}${res ? ' AND ' : ' '}(${queryPart})`;
-    }
-
-    return curRes;
-  }, '');
+  return queryParts.filter((queryPart) => !!queryPart).join(' AND ');
 };
 
 const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, checked: Checked }) => useMemo<EventDefinitionURLConfig>(() => {
@@ -51,11 +43,7 @@ const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, che
 
   const queries: Array<string> = Object.entries({
     queryWithReplacedParams, searchFilterQuery, searchFromValue, columnValuePath, rowValuePath,
-  }).reduce((res, [key, search]) => {
-    if (checked[key]) res.push(search);
-
-    return res;
-  }, []);
+  }).filter(([key]) => checked[key]).map(([_, search]) => search);
 
   const getAggregations = (): Partial<EventDefinitionURLConfig> => {
     const res: Partial<EventDefinitionURLConfig> = {};

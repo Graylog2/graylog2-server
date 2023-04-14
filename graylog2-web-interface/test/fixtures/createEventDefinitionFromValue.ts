@@ -207,5 +207,5 @@ export const modalDataResult = {
   searchFilterQuery: '(http_method:GET)',
   searchFromValue: 'action:show',
   searchWithinMs: 300000,
-  streams: 'streamId-1, streamId-2',
+  streams: 'streamId-1-title, streamId-2-title',
 };

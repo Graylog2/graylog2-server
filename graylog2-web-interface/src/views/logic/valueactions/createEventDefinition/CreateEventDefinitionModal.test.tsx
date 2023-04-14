@@ -22,6 +22,7 @@ import CreateEventDefinitionModal from 'views/logic/valueactions/createEventDefi
 import asMock from 'helpers/mocking/AsMock';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
 
+const mockedOpen = jest.fn();
 jest.mock('views/logic/valueactions/createEventDefinition/hooks/useModalReducer', () => jest.fn());
 
 const checked = {
@@ -53,6 +54,17 @@ const renderWithAllChecked = () => renderCreateDefinitionModal({
 const mockedDispatch = jest.fn();
 
 describe('CreateEventDefinitionModal', () => {
+  let originalWindowOpen;
+
+  beforeAll(() => {
+    originalWindowOpen = window.open;
+    window.open = mockedOpen;
+  });
+
+  afterAll(() => {
+    window.open = originalWindowOpen;
+  });
+
   it('shows strategies and show details button', async () => {
     asMock(useModalReducer).mockReturnValue([
       {
@@ -71,10 +83,10 @@ describe('CreateEventDefinitionModal', () => {
       },
     });
 
-    await screen.findByText('All searches');
-    await screen.findByText('Row pivots');
-    await screen.findByText('Column pivots');
-    await screen.findByText('Widget');
+    await screen.findByText('Exactly this value');
+    await screen.findByText('Any in row');
+    await screen.findByText('Any in column');
+    await screen.findByText('Any in widget');
     await screen.findByText('Custom');
     await screen.findByText('Show strategy details');
 
@@ -97,7 +109,7 @@ describe('CreateEventDefinitionModal', () => {
     await screen.findByText('count(action): 400');
   });
 
-  it('doesnt show Row pivots and Column pivots when no rowValuePath and columnValuePath', async () => {
+  it('doesnt show Any in row and Any in column when no rowValuePath and columnValuePath', async () => {
     asMock(useModalReducer).mockReturnValue([
       {
         strategy: 'EXACT',
@@ -109,17 +121,17 @@ describe('CreateEventDefinitionModal', () => {
 
     renderCreateDefinitionModal({});
 
-    await screen.findByText('All searches');
-    await screen.findByText('Widget');
+    await screen.findByText('Exactly this value');
+    await screen.findByText('Any in widget');
     await screen.findByText('Custom');
     await screen.findByText('Show strategy details');
 
-    expect(screen.queryByText('Row pivots')).not.toBeInTheDocument();
-    expect(screen.queryByText('Column pivots')).not.toBeInTheDocument();
+    expect(screen.queryByText('Any in row')).not.toBeInTheDocument();
+    expect(screen.queryByText('Any in column')).not.toBeInTheDocument();
   });
 
   describe('run dispatch for', () => {
-    it('All searches', async () => {
+    it('Exactly this value', async () => {
       asMock(useModalReducer).mockReturnValue([
         {
           strategy: 'ALL',
@@ -131,7 +143,7 @@ describe('CreateEventDefinitionModal', () => {
 
       renderWithAllChecked();
 
-      const allButton = await screen.findByText('All searches');
+      const allButton = await screen.findByText('Exactly this value');
       await fireEvent.click(allButton);
 
       await expect(mockedDispatch).toHaveBeenCalledWith({
@@ -139,7 +151,7 @@ describe('CreateEventDefinitionModal', () => {
       });
     });
 
-    it('Row pivots', async () => {
+    it('Any in row', async () => {
       asMock(useModalReducer).mockReturnValue([
         {
           strategy: 'EXACT',
@@ -151,7 +163,7 @@ describe('CreateEventDefinitionModal', () => {
 
       renderWithAllChecked();
 
-      const rowButton = await screen.findByText('Row pivots');
+      const rowButton = await screen.findByText('Any in row');
       await fireEvent.click(rowButton);
 
       await expect(mockedDispatch).toHaveBeenCalledWith({
@@ -159,7 +171,7 @@ describe('CreateEventDefinitionModal', () => {
       });
     });
 
-    it('Column pivots', async () => {
+    it('Any in column', async () => {
       asMock(useModalReducer).mockReturnValue([
         {
           strategy: 'EXACT',
@@ -171,7 +183,7 @@ describe('CreateEventDefinitionModal', () => {
 
       renderWithAllChecked();
 
-      const colButton = await screen.findByText('Column pivots');
+      const colButton = await screen.findByText('Any in column');
       await fireEvent.click(colButton);
 
       await expect(mockedDispatch).toHaveBeenCalledWith({
@@ -179,7 +191,7 @@ describe('CreateEventDefinitionModal', () => {
       });
     });
 
-    it('Widget', async () => {
+    it('Any in widget', async () => {
       asMock(useModalReducer).mockReturnValue([
         {
           strategy: 'EXACT',
@@ -191,7 +203,7 @@ describe('CreateEventDefinitionModal', () => {
 
       renderWithAllChecked();
 
-      const widgetButton = await screen.findByText('Widget');
+      const widgetButton = await screen.findByText('Any in widget');
       await fireEvent.click(widgetButton);
 
       await expect(mockedDispatch).toHaveBeenCalledWith({
@@ -257,9 +269,11 @@ describe('CreateEventDefinitionModal', () => {
 
     renderWithAllChecked();
 
-    const link = await screen.findByText('Continue configuration');
+    const linkButton = await screen.findByText('Continue configuration');
 
-    expect(link).toHaveAttribute('href', '/alerts/definitions/new?step=condition&config={"type":"aggregation-v1","query":" (http_method:GET) AND ((http_method:GET)) AND (action:show)","group_by":[],"loc_query_parameters":[{"data_type":"any","default_value":"GET","description":"","key":"lt","lookup_table":"http_method","name":"newParameter","optional":false,"title":"lt","type":"lut-parameter-v1"}],"search_within_ms":300000,"streams":["streamId"]}');
+    fireEvent.click(linkButton);
+
+    expect(mockedOpen).toHaveBeenCalledWith('/alerts/definitions/new?step=condition&config={"type":"aggregation-v1","query":" (http_method:GET) AND ((http_method:GET)) AND (action:show)","group_by":[],"loc_query_parameters":[{"data_type":"any","default_value":"GET","description":"","key":"lt","lookup_table":"http_method","name":"newParameter","optional":false,"title":"lt","type":"lut-parameter-v1"}],"search_within_ms":300000,"streams":["streamId"]}', '_blank');
   });
 
   it('takes strategy from hook', () => {

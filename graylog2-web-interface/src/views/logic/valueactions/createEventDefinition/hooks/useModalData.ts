@@ -18,26 +18,50 @@
 import { useMemo } from 'react';
 
 import type { ModalData } from 'views/logic/valueactions/createEventDefinition/types';
+import type { Stream } from 'views/stores/StreamsStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
+import { useStore } from 'stores/connect';
 
-const useModalData = (mappedData) => useMemo<ModalData>(() => {
-  const { aggField = '', aggFunction = '', aggValue = '', columnGroupBy, rowGroupBy, streams, lutParameters, ...rest } = mappedData;
-  const res:ModalData = { ...rest };
+const useModalData = (mappedData) => {
+  const normalizedStreams: {[name: string]: Stream} = useStore(StreamsStore, ({ streams }) => streams.reduce((res, stream) => {
+    res[stream.id] = { id: stream.id, title: stream.title };
 
-  if (aggFunction) {
-    res.aggCondition = `${aggFunction}(${aggField}): ${aggValue}`;
-  }
+    return res;
+  }, {}));
 
-  Object.entries({ columnGroupBy, rowGroupBy, streams }).forEach(([key, entireValue]) => {
-    if (entireValue) {
-      res[key] = entireValue.join(', ');
+  return useMemo<ModalData>(() => {
+    const {
+      aggField = '',
+      aggFunction = '',
+      aggValue = '',
+      columnGroupBy,
+      rowGroupBy,
+      streams,
+      lutParameters,
+      ...rest
+    } = mappedData;
+    const res: ModalData = { ...rest };
+
+    if (aggFunction) {
+      res.aggCondition = `${aggFunction}(${aggField}): ${aggValue}`;
     }
-  });
 
-  if (lutParameters) {
-    res.lutParameters = lutParameters.map((param) => param.name).join(', ');
-  }
+    if (streams?.length) {
+      res.streams = streams.map((id) => normalizedStreams[id].title).join(', ');
+    }
 
-  return res;
-}, [mappedData]);
+    Object.entries({ columnGroupBy, rowGroupBy }).forEach(([key, entireValue]) => {
+      if (entireValue) {
+        res[key] = entireValue.join(', ');
+      }
+    });
+
+    if (lutParameters) {
+      res.lutParameters = lutParameters.map((param) => param.name).join(', ');
+    }
+
+    return res;
+  }, [mappedData, normalizedStreams]);
+};
 
 export default useModalData;

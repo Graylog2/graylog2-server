@@ -45,6 +45,14 @@ type Props = {
   onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
 }
 
+const getConditionPlugin = (edType): any => {
+  if (edType === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {};
+};
+
 const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinitionInitial, onEventDefinitionChange }: Props) => {
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
@@ -74,14 +82,6 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
       return nextEventDefinition;
     });
   }, [onEventDefinitionChange]);
-
-  const getConditionPlugin = (edType): any => {
-    if (edType === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {};
-  };
 
   useEffect(() => {
     fetchClusterConfig();

@@ -26,17 +26,16 @@ import type ValueParameter from 'views/logic/parameters/ValueParameter';
 import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import type ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { FiltersType } from 'views/types';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 export const getStreams = (filter: FilterType): Array<string> => {
   if (!filter) return [];
 
-  return filter.get('filters').reduce((res, curFilter) => {
-    if (curFilter.get('type') === 'stream') {
-      res.push(curFilter.get('id'));
-    }
-
-    return res;
-  }, []);
+  return filter.get('filters')
+    .filter((curFilter) => curFilter.get('type') === 'stream')
+    .map((curFilter) => curFilter.get('id'))
+    .toJS();
 };
 
 export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) => {
@@ -50,12 +49,8 @@ export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: str
   }, '');
 };
 
-export const getFlattenPivots = (pivots): Set<string> => {
-  return pivots.reduce((res, cur) => {
-    cur.fields.forEach((pivotField) => res.add(pivotField));
-
-    return res;
-  }, new Set([]));
+export const getFlattenPivots = (pivots: Array<Pivot>): Set<string> => {
+  return new Set(pivots.flatMap(({ fields }) => fields));
 };
 
 export const filtratePathsByPivot = ({ flattenPivots, valuePath }: {flattenPivots: Set<string>, valuePath: Array<{ [name: string]: string }>}): Array<{[name:string]: string}> => {
@@ -76,7 +71,7 @@ export const filtratePathsByPivot = ({ flattenPivots, valuePath }: {flattenPivot
 export const aggregationMetricValueHandler: AggregationHandler = ({ widget, value, field, valuePath }) => {
   const curSeries = widget.config.series.find((series) => series.function === field);
   const { field: agg_field, function: agg_function } = seriesToMetrics([curSeries])[0];
-  const { rowPivots, columnPivots } = widget.config;
+  const { rowPivots, columnPivots } = widget.config as AggregationWidgetConfig;
   const flattenRowPivots = getFlattenPivots(rowPivots);
   const flattenColumnPivots = getFlattenPivots(columnPivots);
   const rowPaths = filtratePathsByPivot({ flattenPivots: flattenRowPivots, valuePath });
@@ -156,16 +151,10 @@ export const getRestParameterValues = (
 }, {});
 
 export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => {
-  return filters.reduce((res, filter) => {
-    let curRes = res;
-
-    if (filter.queryString && !filter.disabled) {
-      const curPart = `${filter.negation ? 'NOT' : ''}(${filter.queryString})`;
-      curRes = `${res}${res ? ' AND ' : ''}${curPart}`;
-    }
-
-    return curRes;
-  }, '');
+  return filters
+    .filter((filter) => (filter.queryString && !filter.disabled))
+    .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`)
+    .join(' AND ');
 };
 
 export const replaceParametersInQueryString = ({ query, restParameterValues }: {
