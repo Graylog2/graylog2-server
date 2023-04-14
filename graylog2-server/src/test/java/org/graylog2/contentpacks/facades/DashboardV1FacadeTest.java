@@ -59,6 +59,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -104,8 +105,8 @@ public class DashboardV1FacadeTest {
                                   MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                                   ObjectMapper mapper,
                                   ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class));
+            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService,
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class), new MongoCollections(mapper, mongoConnection));
         }
     }
 

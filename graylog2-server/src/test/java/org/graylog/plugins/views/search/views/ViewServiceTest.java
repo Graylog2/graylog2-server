@@ -24,6 +24,7 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -66,11 +67,11 @@ public class ViewServiceTest {
         this.dbService = new ViewService(
                 mongodb.mongoConnection(),
                 objectMapperProvider,
-                mapper.get(),
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityOwnershipService.class),
-                mock(ViewSummaryService.class));
+                mock(ViewSummaryService.class),
+                new MongoCollections(mapper.get(), mongodb.mongoConnection()));
         this.searchUser = TestSearchUser.builder().build();
     }
 

@@ -23,6 +23,7 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.search.SearchQueryParser;
@@ -76,11 +77,11 @@ public class ViewServiceUsesViewRequirementsTest {
         this.viewService = new ViewService(
                 mongodb.mongoConnection(),
                 objectMapperProvider,
-                mapper.get(),
                 clusterConfigService,
                 viewRequirementsFactory,
                 mock(EntityOwnershipService.class),
-                mock(ViewSummaryService.class));
+                mock(ViewSummaryService.class),
+                new MongoCollections(mapper.get(), mongodb.mongoConnection()));
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
         this.searchUser = TestSearchUser.builder().build();
     }

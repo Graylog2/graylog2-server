@@ -24,6 +24,7 @@ import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
@@ -62,7 +63,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
         TestViewService(MongoConnection mongoConnection,
                         MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                         ObjectMapper mapper) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper);
+            super(mongoConnection, mongoJackObjectMapperProvider, new MongoCollections(mapper, mongoConnection));
         }
     }
 

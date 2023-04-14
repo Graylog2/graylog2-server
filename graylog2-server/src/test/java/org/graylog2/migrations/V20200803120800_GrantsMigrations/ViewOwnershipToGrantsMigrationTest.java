@@ -33,6 +33,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -140,7 +141,7 @@ class ViewOwnershipToGrantsMigrationTest {
                                ClusterConfigService clusterConfigService,
                                EntityOwnershipService entityOwnerShipService,
                                ViewSummaryService viewSummaryService) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService);
+            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService, new MongoCollections(mapper, mongoConnection));
         }
     }
 }

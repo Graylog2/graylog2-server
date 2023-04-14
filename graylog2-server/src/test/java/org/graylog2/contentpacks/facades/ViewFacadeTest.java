@@ -68,6 +68,7 @@ import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
@@ -112,8 +113,8 @@ public class ViewFacadeTest {
                                   MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                                   ObjectMapper mapper,
                                   ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class));
+            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService,
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class), new MongoCollections(mapper, mongoConnection));
         }
     }
 
@@ -121,7 +122,8 @@ public class ViewFacadeTest {
         protected TestViewSummaryService(MongoConnection mongoConnection,
                                          MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                                          ObjectMapper mapper) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper);
+            super(mongoConnection, mongoJackObjectMapperProvider, new MongoCollections(mapper, mongoConnection));
+
         }
     }
 
