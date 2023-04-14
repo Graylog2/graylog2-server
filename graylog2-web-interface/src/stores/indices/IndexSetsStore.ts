@@ -47,6 +47,7 @@ export const IndexSetPropType = PropTypes.shape({
   writable: PropTypes.bool.isRequired,
   default: PropTypes.bool.isRequired,
 });
+
 export type IndexSet = {
   can_be_default?: boolean,
   id?: string,
@@ -69,34 +70,41 @@ export type IndexSet = {
   default?: boolean,
 };
 
-type IndexSetStats = {
-  [key: string]: {
-    documents: number,
-    indices: number,
-    size: number,
-  },
+export type IndexSetStats = {
+  documents: number,
+  indices: number,
+  size: number,
 }
+
+type IndexSetsStats = {
+  [key: string]: IndexSetStats
+}
+
 type IndexSetsResponseType = {
   total: number,
   index_sets: Array<IndexSet>,
-  stats: IndexSetStats,
+  stats: IndexSetsStats,
 };
-type IndexSetsStoreState = {
+
+export type IndexSetsStoreState = {
   indexSetsCount: number,
   indexSets: Array<IndexSet>,
-  indexSetStats: IndexSetStats,
+  indexSetStats: IndexSetsStats,
   indexSet: IndexSet,
+  globalIndexSetStats: IndexSetStats
 }
+
 type IndexSetsActionsType = {
   list: (stats: boolean) => Promise<unknown>,
-  listPaginated: () => Promise<unknown>,
+  listPaginated: (skip: number, limit: number, stats: boolean) => Promise<unknown>,
   get: (indexSetId: string) => Promise<unknown>,
   update: (indexSet: IndexSet) => Promise<unknown>,
   create: (indexSet: IndexSet) => Promise<unknown>,
-  delete: () => Promise<unknown>,
-  setDefault: () => Promise<unknown>,
+  delete: (indexSet: IndexSet, deleteIndices: boolean) => Promise<unknown>,
+  setDefault: (indexSet: IndexSet) => Promise<unknown>,
   stats: () => Promise<unknown>,
 };
+
 export const IndexSetsActions = singletonActions(
   'core.IndexSets',
   () => Reflux.createActions<IndexSetsActionsType>({
