@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import type { ButtonProps } from 'components/bootstrap';
 import { Button } from 'components/bootstrap';
@@ -26,10 +27,16 @@ type Props = ButtonProps & {
 }
 
 const LinkButton = ({ to, target, onClick, ...restButtonProps }: Props) => {
+  const navigate = useNavigate();
   const handleOnClick = useCallback((e) => {
-    window.open(to, target);
+    if (target === '_self') {
+      navigate(to);
+    } else {
+      window.open(to, target);
+    }
+
     if (onClick) onClick(e);
-  }, [to, onClick, target]);
+  }, [target, onClick, navigate, to]);
 
   return <Button onClick={handleOnClick} {...restButtonProps} />;
 };

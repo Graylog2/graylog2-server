@@ -33,16 +33,16 @@ export type EventDefinitionURLConfig = {
 }
 
 type EventDefinitionConfigFromUrl = {
-    type: string,
-    query: string,
-    query_parameters: ParameterJson[],
-    streams: string[],
-    group_by?: string[],
-    series?: Array<{ id: string, function: string, field: string }>,
-    search_within_ms: number,
-    conditions?: {
-      expression: {left: any, right: any, expr: any},
-    },
+  type: string,
+  query: string,
+  query_parameters: ParameterJson[],
+  streams: string[],
+  group_by?: string[],
+  series?: Array<{ id: string, function: string, field: string }>,
+  search_within_ms: number,
+  conditions?: {
+    expression: {left: any, right: any, expr: any},
+  },
 }
 
 const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromUrl: EventDefinitionConfigFromUrl } => {

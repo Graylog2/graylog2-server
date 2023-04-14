@@ -40,7 +40,6 @@ import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('views/logic/valueactions/createEventDefinition/hooks/hookHelpers', () => ({
   ...jest.requireActual('views/logic/valueactions/createEventDefinition/hooks/hookHelpers'),
-  // getAggregationHandler: jest.fn(),
   getLutParameters: jest.fn(),
   getRestParameterValues: jest.fn(),
   transformSearchFiltersToQuery: jest.fn(),
@@ -58,7 +57,6 @@ const wrapper = ({ children }) => (
 describe('useMappedData', () => {
   it('runs all he;per functions', async () => {
     asMock(getStreams).mockReturnValue(['streamId']);
-    // asMock(getAggregationHandler).mockReturnValue(aggregationMetricValueHandler);
     asMock(getLutParameters).mockReturnValue([ltParamJSON]);
     asMock(getRestParameterValues).mockReturnValue([valueParameterJSON]);
     asMock(transformSearchFiltersToQuery).mockReturnValue('(http_method:GET)');
@@ -72,21 +70,20 @@ describe('useMappedData', () => {
     }), { wrapper });
     await waitFor(() => !!result.current);
 
-    await expect(getStreams).toHaveBeenCalledWith(mockedFilter);
+    expect(getStreams).toHaveBeenCalledWith(mockedFilter);
 
-    await expect(getLutParameters).toHaveBeenCalledWith(Immutable.Set([ltParam, valueParameter]));
+    expect(getLutParameters).toHaveBeenCalledWith(Immutable.Set([ltParam, valueParameter]));
 
-    await expect(getRestParameterValues).toHaveBeenCalledWith({
+    expect(getRestParameterValues).toHaveBeenCalledWith({
       parameters,
       parameterBindings,
     });
 
-    await expect(transformSearchFiltersToQuery).toHaveBeenCalledWith(mockedSearchFilters);
+    expect(transformSearchFiltersToQuery).toHaveBeenCalledWith(mockedSearchFilters);
 
-    await expect(replaceParametersInQueryString).toHaveBeenCalledWith({
+    expect(replaceParametersInQueryString).toHaveBeenCalledWith({
       query: 'http_method:GET', restParameterValues: [valueParameterJSON],
     });
-    // await expect(getAggregationHandler).toHaveBeenCalled();
 
     expect(result.current).toEqual(mappedDataResult);
   });

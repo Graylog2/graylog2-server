@@ -338,7 +338,6 @@ const exports: PluginExports = {
     {
       type: 'create-event-definition-from-value',
       title: 'Create event definition',
-      // handler: CreateEventDefinition,
       isEnabled: () => true,
       resetFocus: false,
       component: CreateEventDefinition,

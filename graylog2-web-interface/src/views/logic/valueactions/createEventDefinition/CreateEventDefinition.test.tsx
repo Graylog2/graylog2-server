@@ -47,14 +47,14 @@ describe('CreateEventDefinition', () => {
     asMock(useModalData).mockReturnValue(modalDataResult);
     renderCreateDefinitionAction({});
 
-    await expect(useMappedData).toHaveBeenCalledWith({
+    expect(useMappedData).toHaveBeenCalledWith({
       contexts: mockedContexts,
       field: 'field',
       queryId: 'query-id',
       value: 'value',
     });
 
-    await expect(useModalData).toHaveBeenCalledWith(mappedDataResult);
+    expect(useModalData).toHaveBeenCalledWith(mappedDataResult);
 
     await screen.findByText('Configure new event definition');
   });

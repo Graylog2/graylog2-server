@@ -35,7 +35,7 @@ export const aggregationGroup: Array<ItemKey> = ['columnGroupBy', 'rowGroupBy', 
 export const searchGroup: Array<ItemKey> = ['rowValuePath', 'columnValuePath',
   'queryWithReplacedParams', 'searchFilterQuery', 'searchFromValue'];
 export const strategiesLabels: {[key in StrategyId]: { label: string, description: string}} = {
-  EXACT: { label: 'Exactly this value', description: 'Strategy includes all search queries, filters, e.t.c which relate to current search view' },
+  EXACT: { label: 'Exactly this value', description: 'Strategy includes all search queries, filters, etc which relate to current search view' },
   ROW: { label: 'Any in row', description: 'Strategy includes row pivots' },
   COL: { label: 'Any in column', description: 'Strategy includes column pivots' },
   ALL: { label: 'Any in widget', description: 'Strategy includes all row and column pivot values, related to selected value' },

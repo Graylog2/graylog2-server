@@ -144,9 +144,9 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const allButton = await screen.findByText('Exactly this value');
-      await fireEvent.click(allButton);
+      fireEvent.click(allButton);
 
-      await expect(mockedDispatch).toHaveBeenCalledWith({
+      expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_EXACT_STRATEGY',
       });
     });
@@ -164,9 +164,9 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const rowButton = await screen.findByText('Any in row');
-      await fireEvent.click(rowButton);
+      fireEvent.click(rowButton);
 
-      await expect(mockedDispatch).toHaveBeenCalledWith({
+      expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_ROW_STRATEGY',
       });
     });
@@ -184,9 +184,9 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const colButton = await screen.findByText('Any in column');
-      await fireEvent.click(colButton);
+      fireEvent.click(colButton);
 
-      await expect(mockedDispatch).toHaveBeenCalledWith({
+      expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_COL_STRATEGY',
       });
     });
@@ -204,9 +204,9 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const widgetButton = await screen.findByText('Any in widget');
-      await fireEvent.click(widgetButton);
+      fireEvent.click(widgetButton);
 
-      await expect(mockedDispatch).toHaveBeenCalledWith({
+      expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_ALL_STRATEGY',
       });
     });
@@ -224,9 +224,9 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const customButton = await screen.findByText('Custom');
-      await fireEvent.click(customButton);
+      fireEvent.click(customButton);
 
-      await expect(mockedDispatch).toHaveBeenCalledWith({
+      expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_CUSTOM_STRATEGY',
       });
     });
@@ -244,9 +244,9 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const checkbox = await screen.findByText('count(action): 400');
-      await fireEvent.click(checkbox);
+      fireEvent.click(checkbox);
 
-      await expect(mockedDispatch).toHaveBeenCalledWith({
+      expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'UPDATE_CHECKED_ITEMS',
         payload: {
           aggCondition: false,
