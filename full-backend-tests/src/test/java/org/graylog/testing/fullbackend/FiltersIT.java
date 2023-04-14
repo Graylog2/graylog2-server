@@ -16,8 +16,9 @@
  */
 package org.graylog.testing.fullbackend;
 
+import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.shared.rest.CSPResponseFilter;
@@ -28,16 +29,16 @@ import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
-    private final GraylogApis api;
+    private final RequestSpecification requestSpec;
 
-    public FiltersIT(GraylogApis api) {
-        this.api = api;
+    public FiltersIT(RequestSpecification requestSpec) {
+        this.requestSpec = requestSpec;
     }
 
     @ContainerMatrixTest
     void cspDocumentationBrowser() {
         given()
-                .spec(api.requestSpecification())
+                .spec(requestSpec)
                 .when()
                 .get("/api-browser")
                 .then()
@@ -49,10 +50,9 @@ public class FiltersIT {
     @ContainerMatrixTest
     void cspWebInterfaceAssets() {
         given()
-                .spec(api.requestSpecification())
-                .basePath("/")
+                .spec(requestSpec)
                 .when()
-                .get()
+                .get("/")
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
@@ -62,10 +62,9 @@ public class FiltersIT {
     @ContainerMatrixTest
     void cspWebAppNotFound() {
         given()
-                .spec(api.requestSpecification())
-                .basePath("/")
+                .spec(requestSpec)
                 .when()
-                .get("streams")
+                .get("/streams")
                 .then()
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
                         Matchers.equalTo(CSP.CSP_DEFAULT));
