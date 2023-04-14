@@ -27,7 +27,7 @@ import org.hamcrest.Matchers;
 
 import static io.restassured.RestAssured.given;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@ContainerMatrixTestsConfiguration
 public class FiltersIT {
     private final RequestSpecification requestSpec;
 
