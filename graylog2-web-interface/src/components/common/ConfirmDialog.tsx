@@ -28,7 +28,7 @@ type Props = {
   title: string|React.ReactNode,
   children: React.ReactNode,
   btnConfirmDisabled?: boolean,
-  btnConfirmText?: string,
+  btnConfirmText?: string|React.ReactNode,
   hideCancelButton?: boolean,
 };
 
