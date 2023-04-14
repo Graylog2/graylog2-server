@@ -33,6 +33,8 @@ public interface ClusterConfigService {
      */
     <T> T get(Class<T> type);
 
+    <T> T extractPayload(Object payload, Class<T> type);
+
     /**
      * Retrieve Java class of a certain type for the given key from the cluster configuration.
      *

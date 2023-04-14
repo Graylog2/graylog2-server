@@ -97,10 +97,12 @@ public class TelemetryService {
     public Map<String, Object> getTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) {
         TelemetryUserSettings telemetryUserSettings = getTelemetryUserSettings(currentUser);
         if (isTelemetryEnabled && telemetryUserSettings.telemetryEnabled()) {
-            String clusterId = getClusterId();
+            Optional<ClusterConfig> clusterConfig = getClusterConfig();
+            DateTime clusterCreationDate = clusterConfig.map(ClusterConfig::lastUpdated).orElse(null);
+            String clusterId = clusterConfig.map(c -> clusterConfigService.extractPayload(c.payload(), ClusterId.class).clusterId()).orElse(null);
 
             return telemetryResponseFactory.createTelemetryResponse(
-                    getClusterInfo(clusterId, systemOverviewResponses),
+                    getClusterInfo(clusterId, clusterCreationDate, systemOverviewResponses),
                     getUserInfo(currentUser, clusterId),
                     getPluginInfo(),
                     getSearchClusterInfo(),
@@ -164,10 +166,10 @@ public class TelemetryService {
         }
     }
 
-    private Map<String, Object> getClusterInfo(String clusterId, Map<String, SystemOverviewResponse> systemOverviewResponses) {
+    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate, Map<String, SystemOverviewResponse> systemOverviewResponses) {
         return telemetryResponseFactory.createClusterInfo(
                 clusterId,
-                getClusterCreationDate(),
+                clusterCreationDate,
                 systemOverviewResponses,
                 getAverageLastMonthTraffic(),
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count());
@@ -179,12 +181,8 @@ public class TelemetryService {
         return telemetryResponseFactory.createPluginInfo(isEnterprisePluginInstalled, plugins);
     }
 
-    private String getClusterId() {
-        return Optional.ofNullable(clusterConfigService.get(ClusterId.class)).map(ClusterId::clusterId).orElse(null);
-    }
-
-    private DateTime getClusterCreationDate() {
-        return Optional.ofNullable(clusterConfigService.getRaw(ClusterId.class)).map(ClusterConfig::lastUpdated).orElse(null);
+    private Optional<ClusterConfig> getClusterConfig() {
+        return Optional.ofNullable(clusterConfigService.getRaw(ClusterId.class));
     }
 
     private long getAverageLastMonthTraffic() {

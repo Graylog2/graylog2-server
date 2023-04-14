@@ -86,7 +86,8 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         return coll;
     }
 
-    private <T> T extractPayload(Object payload, Class<T> type) {
+    @Override
+    public <T> T extractPayload(Object payload, Class<T> type) {
         try {
             return objectMapper.convertValue(payload, type);
         } catch (IllegalArgumentException e) {
