@@ -223,10 +223,10 @@ describe('useMappedData helper function', () => {
 
   it('getStreams return only  streams ids', async () => {
     const result = getStreams(Immutable.Map([
-      ['filters', [
+      ['filters', Immutable.Set([
         Immutable.Map([['type', 'stream'], ['id', 'stream-id']]),
         Immutable.Map([['type', 'some-type'], ['id', 'non-stream-id']]),
-      ]],
+      ])],
     ]));
 
     expect(result).toEqual(['stream-id']);

@@ -273,7 +273,7 @@ describe('CreateEventDefinitionModal', () => {
 
     fireEvent.click(linkButton);
 
-    expect(mockedOpen).toHaveBeenCalledWith('/alerts/definitions/new?step=condition&config={"type":"aggregation-v1","query":" (http_method:GET) AND ((http_method:GET)) AND (action:show)","group_by":[],"loc_query_parameters":[{"data_type":"any","default_value":"GET","description":"","key":"lt","lookup_table":"http_method","name":"newParameter","optional":false,"title":"lt","type":"lut-parameter-v1"}],"search_within_ms":300000,"streams":["streamId"]}', '_blank');
+    expect(mockedOpen).toHaveBeenCalledWith('/alerts/definitions/new?step=condition&config={"type":"aggregation-v1","query":"(http_method:GET) AND ((http_method:GET)) AND (action:show)","group_by":[],"loc_query_parameters":[{"data_type":"any","default_value":"GET","description":"","key":"lt","lookup_table":"http_method","name":"newParameter","optional":false,"title":"lt","type":"lut-parameter-v1"}],"search_within_ms":300000,"streams":["streamId"]}', '_blank');
   });
 
   it('takes strategy from hook', () => {

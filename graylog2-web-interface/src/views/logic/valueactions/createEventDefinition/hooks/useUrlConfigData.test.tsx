@@ -69,6 +69,7 @@ describe('useUrlConfigData', () => {
       ],
       loc_query_parameters: [
         {
+          binding: undefined,
           data_type: 'any',
           default_value: 'GET',
           description: '',
@@ -80,7 +81,7 @@ describe('useUrlConfigData', () => {
           type: 'lut-parameter-v1',
         },
       ],
-      query: ' (http_method:GET) AND ((http_method:GET)) AND (action:show)',
+      query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
       search_within_ms: 300000,
       streams: [
         'streamId-1',
@@ -123,7 +124,7 @@ describe('useUrlConfigData', () => {
         'action',
         'http_method',
       ],
-      query: ' ((http_method:GET))',
+      query: '((http_method:GET))',
       search_within_ms: 300000,
       streams: [
         'streamId-1',
