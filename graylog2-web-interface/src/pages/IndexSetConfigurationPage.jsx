@@ -70,15 +70,15 @@ class IndexSetConfigurationPage extends React.Component {
       <DocumentTitle title="Configure Index Set">
         <div>
           <PageHeader title="Configure Index Set"
-                      documentationLink={{
-                        title: 'Index model documentation',
-                        path: DocsHelper.PAGES.INDEX_MODEL,
-                      }}
-                      topActions={(
-                        <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                          <Button bsStyle="info">Index sets overview</Button>
-                        </LinkContainer>
-                      )}>
+            documentationLink={{
+              title: 'Index model documentation',
+              path: DocsHelper.PAGES.INDEX_MODEL,
+            }}
+            topActions={(
+              <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                <Button bsStyle="info">Index sets overview</Button>
+              </LinkContainer>
+            )}>
             <span>
               Modify the current configuration for this index set, allowing you to customize the retention, sharding,
               and replication of messages coming from one or more streams.
@@ -88,13 +88,13 @@ class IndexSetConfigurationPage extends React.Component {
           <Row className="content">
             <Col md={12}>
               <IndexSetConfigurationForm indexSet={indexSet}
-                                         retentionStrategiesContext={retentionStrategiesContext}
-                                         rotationStrategies={rotationStrategies}
-                                         retentionStrategies={retentionStrategies}
-                                         submitButtonText="Update index set"
-                                         submitLoadingText="Updating index set..."
-                                         cancelLink={this._formCancelLink()}
-                                         onUpdate={saveConfiguration} />
+                retentionStrategiesContext={retentionStrategiesContext}
+                rotationStrategies={rotationStrategies}
+                retentionStrategies={retentionStrategies}
+                submitButtonText="Update index set"
+                submitLoadingText="Updating index set..."
+                cancelLink={this._formCancelLink()}
+                onUpdate={saveConfiguration} />
             </Col>
           </Row>
         </div>
