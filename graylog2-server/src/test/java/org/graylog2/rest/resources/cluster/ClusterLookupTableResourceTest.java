@@ -45,7 +45,9 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -85,10 +87,10 @@ public class ClusterLookupTableResourceTest {
         when(nodeService.byNodeId("node_1")).thenReturn(node1);
         when(nodeService.byNodeId("node_2")).thenReturn(node2);
 
-        when(remoteInterfaceProvider.get(node1, "TEST_TOKEN", RemoteLookupTableResource.class))
+        when(remoteInterfaceProvider.get(eq(node1), eq("TEST_TOKEN"), eq(RemoteLookupTableResource.class), any(Duration.class)))
                 .thenReturn(remoteLookupTableResource1);
 
-        when(remoteInterfaceProvider.get(node2, "TEST_TOKEN", RemoteLookupTableResource.class))
+        when(remoteInterfaceProvider.get(eq(node2), eq("TEST_TOKEN"), eq(RemoteLookupTableResource.class), any(Duration.class)))
                 .thenReturn(remoteLookupTableResource2);
 
         underTest = new ClusterLookupTableResource(nodeService, remoteInterfaceProvider, httpHeaders,

@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system.logs;
 
-import org.graylog2.rest.models.system.loggers.responses.LogMessagesSummary;
 import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
 import retrofit2.Call;
@@ -36,7 +35,4 @@ public interface RemoteLoggersResource {
 
     @PUT("system/loggers/{loggerName}/level/{level}")
     Call<Void> setSingleLoggerLevel(@Path("loggerName") String loggerName, @Path("level") String level);
-
-    @GET("system/loggers/messages/recent")
-    Call<LogMessagesSummary> messages(int limit, String level);
 }

@@ -19,6 +19,7 @@ package org.graylog.storage.elasticsearch7;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
@@ -105,6 +106,7 @@ public class ElasticsearchClient {
         return execute(fn, "An error occurred: ");
     }
 
+    @WithSpan
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {
         try {
             return fn.apply(client, requestOptions());
@@ -113,6 +115,7 @@ public class ElasticsearchClient {
         }
     }
 
+    @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {
             return fn.apply(client, requestOptions());

@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.os;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -58,17 +59,18 @@ public abstract class Processor {
     @JsonProperty
     public abstract short stolen();
 
-    public static Processor create(String model,
-                                   String vendor,
-                                   int mhz,
-                                   int totalCores,
-                                   int totalSockets,
-                                   int coresPerSocket,
-                                   long cacheSize,
-                                   short sys,
-                                   short user,
-                                   short idle,
-                                   short stolen) {
+    @JsonCreator
+    public static Processor create(@JsonProperty("model") String model,
+                                   @JsonProperty("vendor") String vendor,
+                                   @JsonProperty("mhz") int mhz,
+                                   @JsonProperty("total_cores") int totalCores,
+                                   @JsonProperty("total_sockets") int totalSockets,
+                                   @JsonProperty("cores_per_socket") int coresPerSocket,
+                                   @JsonProperty("cache_size") long cacheSize,
+                                   @JsonProperty("sys") short sys,
+                                   @JsonProperty("user") short user,
+                                   @JsonProperty("idle") short idle,
+                                   @JsonProperty("stolen") short stolen) {
         return new AutoValue_Processor(model, vendor, mhz, totalCores, totalSockets, coresPerSocket, cacheSize,
                 sys, user, idle, stolen);
     }

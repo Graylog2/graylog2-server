@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.process;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -44,11 +45,12 @@ public abstract class ProcessStats {
     @Nullable
     public abstract Memory memory();
 
-    public static ProcessStats create(long pid,
-                                      long openFileDescriptors,
-                                      long maxFileDescriptors,
-                                      Cpu cpu,
-                                      Memory memory) {
+    @JsonCreator
+    public static ProcessStats create(@JsonProperty("pid") long pid,
+                                      @JsonProperty("open_file_descriptors") long openFileDescriptors,
+                                      @JsonProperty("max_file_descriptors") long maxFileDescriptors,
+                                      @JsonProperty("cpu") Cpu cpu,
+                                      @JsonProperty("memory") Memory memory) {
         return new AutoValue_ProcessStats(pid, openFileDescriptors, maxFileDescriptors, cpu, memory);
     }
 
@@ -74,10 +76,11 @@ public abstract class ProcessStats {
         @JsonProperty
         public abstract long total();
 
-        public static Cpu create(short percent,
-                                 long sys,
-                                 long user,
-                                 long total) {
+        @JsonCreator
+        public static Cpu create(@JsonProperty("percent") short percent,
+                                 @JsonProperty("sys") long sys,
+                                 @JsonProperty("user") long user,
+                                 @JsonProperty("total") long total) {
             return new AutoValue_ProcessStats_Cpu(percent, sys, user, total);
         }
     }
@@ -95,9 +98,10 @@ public abstract class ProcessStats {
         @JsonProperty
         public abstract long share();
 
-        public static Memory create(long totalVirtual,
-                                    long resident,
-                                    long share) {
+        @JsonCreator
+        public static Memory create(@JsonProperty("total_virtual") long totalVirtual,
+                                    @JsonProperty("resident") long resident,
+                                    @JsonProperty("share") long share) {
             return new AutoValue_ProcessStats_Memory(totalVirtual, resident, share);
         }
     }

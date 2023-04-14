@@ -16,23 +16,24 @@
  */
 package org.graylog2.log4j;
 
-import org.apache.commons.collections.Buffer;
-import org.apache.commons.collections.BufferUtils;
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.appender.rolling.FileSize;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.Booleans;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A Log4J appender that keeps a configurable number of messages in memory. Used to make recent internal log messages
@@ -40,14 +41,14 @@ import java.util.List;
  */
 @Plugin(name = "Memory", category = "Core", elementType = "appender", printObject = true)
 public class MemoryAppender extends AbstractAppender {
+    private static final Logger LOG = LoggerFactory.getLogger(MemoryAppender.class);
 
-    private Buffer buffer;
-    private int bufferSize;
+    private static final long DEFAULT_BUFFER_SIZE = 50 * 1024 * 1024;
+    private final MemoryLimitedCompressingFifoRingBuffer buffer;
 
-    protected MemoryAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions, int bufferSize) {
-        super(name, filter, layout, ignoreExceptions);
-        this.bufferSize = bufferSize;
-        this.buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(bufferSize));
+    protected MemoryAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions, long bufferSize) {
+        super(name, filter, layout, ignoreExceptions, Property.EMPTY_ARRAY);
+        buffer = new MemoryLimitedCompressingFifoRingBuffer(bufferSize);
     }
 
     @PluginFactory
@@ -55,49 +56,55 @@ public class MemoryAppender extends AbstractAppender {
             @PluginElement("Layout") Layout<? extends Serializable> layout,
             @PluginElement("Filter") final Filter filter,
             @PluginAttribute("name") final String name,
-            @PluginAttribute(value = "bufferSize", defaultInt = 500) final String bufferSize,
+            @PluginAttribute(value = "bufferSize") final String bufSizeLegacy,
+            @PluginAttribute(value = "bufferSizeBytes", defaultString = "50MB") final String bufferSizeBytes,
             @PluginAttribute(value = "ignoreExceptions", defaultBoolean = true) final String ignore) {
         if (name == null) {
             LOGGER.error("No name provided for MemoryAppender");
             return null;
         }
+        if (bufSizeLegacy != null) {
+            LOGGER.error("Deprecated log4j.xml setting detected <{}=\"{}\"> Using default <bufferSizeBytes={}> instead", "bufferSize", bufSizeLegacy, bufferSizeBytes);
+        }
+        final long bufferSize = bufferSizeBytes == null ? DEFAULT_BUFFER_SIZE : FileSize.parse(bufferSizeBytes, DEFAULT_BUFFER_SIZE);
 
         if (layout == null) {
             layout = PatternLayout.createDefaultLayout();
         }
 
-        final int size = Integer.parseInt(bufferSize);
         final boolean ignoreExceptions = Booleans.parseBoolean(ignore, true);
-        return new MemoryAppender(name, filter, layout, ignoreExceptions, size);
+        return new MemoryAppender(name, filter, layout, ignoreExceptions, bufferSize);
     }
 
 
     @Override
     public void append(LogEvent event) {
-        buffer.add(event);
+        try {
+            buffer.add(serializeLogMessage(event.toImmutable())); // only the immutable copy retains potential throwables
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void stop() {
         super.stop();
-        buffer.clear();
+        try {
+            buffer.clear();
+        } catch (IOException e) {
+            LOG.error("Failed to clear in-mem logs buffer", e);
+        }
     }
 
-    public List<LogEvent> getLogMessages(int max) {
-        if (buffer == null) {
-            throw new IllegalStateException("Cannot return log messages: Appender is not initialized.");
-        }
-
-        final List<LogEvent> result = new ArrayList<>(max);
-        final Object[] messages = buffer.toArray();
-        for (int i = messages.length - 1; i >= 0 && i >= messages.length - max; i--) {
-            result.add((LogEvent) messages[i]);
-        }
-
-        return result;
+    private byte[] serializeLogMessage(LogEvent log) {
+        return getLayout().toByteArray(log);
     }
 
-    public int getBufferSize() {
-        return bufferSize;
+    public void streamFormattedLogMessages(OutputStream outputStream, int limit) {
+        buffer.streamContent(outputStream, limit);
+    }
+
+    public long getLogsSize() {
+        return buffer.getLogsSize();
     }
 }

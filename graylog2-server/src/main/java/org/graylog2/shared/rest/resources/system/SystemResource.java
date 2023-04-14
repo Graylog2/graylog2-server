@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -58,12 +59,14 @@ public class SystemResource extends RestResource {
     private final ServerStatus serverStatus;
     private final ClusterId clusterId;
     private final ProcessBuffer processBuffer;
+    private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public SystemResource(ServerStatus serverStatus, ClusterConfigService clusterConfigService, ProcessBuffer processBuffer) {
+    public SystemResource(ServerStatus serverStatus, ClusterConfigService clusterConfigService, ProcessBuffer processBuffer, LeaderElectionService leaderElectionService) {
         this.serverStatus = serverStatus;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
         this.processBuffer = processBuffer;
+        this.leaderElectionService = leaderElectionService;
     }
 
     @GET
@@ -84,7 +87,8 @@ public class SystemResource extends RestResource {
                 serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH),
                 serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH),
                 serverStatus.getTimezone().getID(),
-                System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"));
+                System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"),
+                leaderElectionService.isLeader());
     }
 
     @GET

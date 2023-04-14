@@ -43,6 +43,7 @@ import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
+import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
@@ -191,7 +192,8 @@ public class Server extends ServerBootstrap {
                 new SearchFiltersModule(),
                 new ScopedEntitiesModule(),
                 new ScriptingApiModule(featureFlags),
-                new StreamsModule()
+                new StreamsModule(),
+                new TracingModule()
         );
         return modules.build();
     }

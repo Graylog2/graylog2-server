@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -65,6 +66,7 @@ public class SearchExecutor {
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
+    @WithSpan
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
         final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
 

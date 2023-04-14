@@ -19,11 +19,22 @@ package org.graylog2.shared.rest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class CSPResponseFilter implements ContainerResponseFilter {
+    public final static String CSP_HEADER = "Content-Security-Policy";
+    private String value;
+
+    public CSPResponseFilter(String value) {
+        this.value = value;
+    }
+
     @Override
     public void filter(final ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
-        responseContext.getHeaders().add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;");
+        final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
+        if (!headers.containsKey(CSP_HEADER)) {
+            headers.add(CSP_HEADER, value);
+        }
     }
 }
