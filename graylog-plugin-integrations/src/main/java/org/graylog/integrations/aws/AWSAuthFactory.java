@@ -16,6 +16,8 @@
  */
 package org.graylog.integrations.aws;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -37,24 +39,18 @@ public class AWSAuthFactory {
 
     /**
      * Resolves the appropriate AWS authorization provider based on the input.
-     *
      * If an {@code accessKey} and {@code secretKey} are provided, they will be used explicitly.
      * If not, the default DefaultCredentialsProvider will be used instead. This will resolve the role/policy
      * using Java props, environment variables, EC2 instance roles etc. See the {@link DefaultCredentialsProvider}
      * Javadoc for more information.
      */
-    public static AwsCredentialsProvider create(@Nullable String stsRegion,
+    public static AwsCredentialsProvider create(boolean isCloud,
+                                                @Nullable String stsRegion,
                                                 @Nullable String accessKey,
                                                 @Nullable String secretKey,
                                                 @Nullable String assumeRoleArn) {
-        AwsCredentialsProvider awsCredentials;
-        if (!isNullOrEmpty(accessKey) && !isNullOrEmpty(secretKey)) {
-            LOG.debug("Using explicitly provided key and secret.");
-            awsCredentials = StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
-        } else {
-            LOG.debug("Using default authorization provider chain.");
-            awsCredentials = DefaultCredentialsProvider.create();
-        }
+        AwsCredentialsProvider awsCredentials = isCloud ? getCloudAwsCredentialsProvider(accessKey, secretKey) :
+                getAwsCredentialsProvider(accessKey, secretKey);
 
         // Apply the Assume Role ARN Authorization if specified. All AWSCredentialsProviders support this.
         if (!isNullOrEmpty(assumeRoleArn) && !isNullOrEmpty(stsRegion)) {
@@ -65,9 +61,26 @@ public class AWSAuthFactory {
         return awsCredentials;
     }
 
+    private static AwsCredentialsProvider getAwsCredentialsProvider(String accessKey, String secretKey) {
+        AwsCredentialsProvider awsCredentials;
+        if (!isNullOrEmpty(accessKey) && !isNullOrEmpty(secretKey)) {
+            LOG.debug("Using explicitly provided key and secret.");
+            awsCredentials = StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
+        } else {
+            LOG.debug("Using default authorization provider chain.");
+            awsCredentials = DefaultCredentialsProvider.create();
+        }
+        return awsCredentials;
+    }
+
+    private static AwsCredentialsProvider getCloudAwsCredentialsProvider(String accessKey, String secretKey) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(accessKey), "Access key is required.");
+        Preconditions.checkArgument(StringUtils.isNotBlank(secretKey), "Secret key is required.");
+        return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
+    }
+
     /**
      * Build a new AwsCredentialsProvider instance which will assume the indicated role.
-     *
      * Note: In order to assume a role, a role must be provided to the AWS STS client a role that has the "sts:AssumeRole"
      * permission, which provides authorization for a role to be assumed.
      */
@@ -81,18 +94,18 @@ public class AWSAuthFactory {
         final String roleSessionName;
         if (accessKey != null) {
             roleSessionName = String.format("ACCESS_KEY_%s@ACCOUNT_%s", accessKey,
-                                            stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+                    stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
         } else {
             roleSessionName = String.format("ACCOUNT_%s",
-                                            stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+                    stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
         }
 
         LOG.debug("Cross account role session name: " + roleSessionName);
         return StsAssumeRoleCredentialsProvider.builder().refreshRequest(AssumeRoleRequest.builder()
-                                                                                          .roleSessionName(roleSessionName)
-                                                                                          .roleArn(assumeRoleArn)
-                                                                                          .build())
-                                               .stsClient(stsClient)
-                                               .build();
+                        .roleSessionName(roleSessionName)
+                        .roleArn(assumeRoleArn)
+                        .build())
+                .stsClient(stsClient)
+                .build();
     }
 }

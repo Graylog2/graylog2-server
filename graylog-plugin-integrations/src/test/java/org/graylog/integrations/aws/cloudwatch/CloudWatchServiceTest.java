@@ -16,17 +16,18 @@
  */
 package org.graylog.integrations.aws.cloudwatch;
 
+import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.resources.responses.LogGroupsResponse;
 import org.graylog.integrations.aws.service.CloudWatchService;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClientBuilder;
@@ -40,7 +41,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CloudWatchServiceTest {
@@ -49,36 +52,31 @@ public class CloudWatchServiceTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private CloudWatchLogsClientBuilder logsClientBuilder;
-
-    @Mock
     private CloudWatchLogsClient cloudWatchLogsClient;
-
     @Mock
     private DescribeLogGroupsIterable logGroupsIterable;
+    @Mock
+    private AWSClientBuilderUtil awsClientBuilderUtil;
+    @Mock
+    private EncryptedValue encryptedValue;
 
     private CloudWatchService cloudWatchService;
 
     @Before
     public void setUp() {
-
-        cloudWatchService = new CloudWatchService(logsClientBuilder);
+        cloudWatchService = new CloudWatchService(mock(CloudWatchLogsClientBuilder.class), awsClientBuilderUtil);
     }
 
     @Test
     public void testLogGroupNames() {
-
-        // Perform test setup. Return the builder and client when appropriate.
-        when(logsClientBuilder.region(isA(Region.class))).thenReturn(logsClientBuilder);
-        when(logsClientBuilder.credentialsProvider(isA(AwsCredentialsProvider.class))).thenReturn(logsClientBuilder);
-        when(logsClientBuilder.build()).thenReturn(cloudWatchLogsClient);
+        when(awsClientBuilderUtil.buildClient(any(CloudWatchLogsClientBuilder.class), any())).thenReturn(cloudWatchLogsClient);
 
         // Create a fake response that contains three log groups.
         DescribeLogGroupsResponse fakeLogGroupResponse = DescribeLogGroupsResponse
                 .builder()
                 .logGroups(LogGroup.builder().logGroupName("group-1").build(),
-                           LogGroup.builder().logGroupName("group-2").build(),
-                           LogGroup.builder().logGroupName("group-3").build())
+                        LogGroup.builder().logGroupName("group-2").build(),
+                        LogGroup.builder().logGroupName("group-3").build())
                 .build();
 
         // Mock out the response. When CloudWatchLogsClient.describeLogGroupsPaginator() is called,
@@ -88,15 +86,15 @@ public class CloudWatchServiceTest {
         when(cloudWatchLogsClient.describeLogGroupsPaginator(isA(DescribeLogGroupsRequest.class))).thenReturn(logGroupsIterable);
 
         final AWSRequest awsRequest = AWSRequestImpl.builder()
-                                                    .region(Region.US_EAST_1.id())
-                                                    .awsAccessKeyId("a-key")
-                                                    .awsSecretAccessKey("a-secret")
-                                                    .build();
+                .region(Region.US_EAST_1.id())
+                .awsAccessKeyId("a-key")
+                .awsSecretAccessKey(encryptedValue)
+                .build();
         final LogGroupsResponse logGroupsResponse = cloudWatchService.getLogGroupNames(awsRequest);
 
         // Inspect the log groups returned and verify the contents and size.
         assertEquals("The number of groups should be because the two responses " +
-                     "with 3 groups each were provided.", 6, logGroupsResponse.total());
+                "with 3 groups each were provided.", 6, logGroupsResponse.total());
 
         // Loop example to verify presence of a specific log group.
         boolean foundGroup = false;

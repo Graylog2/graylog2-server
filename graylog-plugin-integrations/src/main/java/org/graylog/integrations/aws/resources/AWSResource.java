@@ -70,9 +70,9 @@ import java.util.concurrent.ExecutionException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AWSResource extends AbstractInputsResource implements PluginRestResource {
 
-    private AWSService awsService;
-    private KinesisService kinesisService;
-    private CloudWatchService cloudWatchService;
+    private final AWSService awsService;
+    private final KinesisService kinesisService;
+    private final CloudWatchService cloudWatchService;
 
     @Inject
     public AWSResource(AWSService awsService, KinesisService kinesisService, CloudWatchService cloudWatchService,

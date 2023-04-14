@@ -90,29 +90,32 @@ public class KinesisService {
 
     private static final int EIGHT_BITS = 8;
     private static final int KINESIS_LIST_STREAMS_MAX_ATTEMPTS = 1000;
-
     private static final int KINESIS_LIST_STREAMS_LIMIT = 400;
     private static final int RECORDS_SAMPLE_SIZE = 10;
     private static final int SHARD_COUNT = 1;
     private static final String ROLE_NAME_FORMAT = "graylog-cloudwatch-role-%s";
     private static final String ROLE_POLICY_NAME_FORMAT = "graylog-cloudwatch-role-policy-%s";
     private static final String UNIQUE_ROLE_DATE_FORMAT = "yyyy-MM-dd-HH-mm-ss";
+    private static final String CONTROL_MESSAGE_TOKEN = "CWL CONTROL MESSAGE";
 
     private final IamClientBuilder iamClientBuilder;
     private final KinesisClientBuilder kinesisClientBuilder;
     private final ObjectMapper objectMapper;
     private final Map<String, Codec.Factory<? extends Codec>> availableCodecs;
-    private static final String CONTROL_MESSAGE_TOKEN = "CWL CONTROL MESSAGE";
+    private final AWSClientBuilderUtil awsClientBuilderUtil;
 
     @Inject
-    public KinesisService(IamClientBuilder iamClientBuilder, KinesisClientBuilder kinesisClientBuilder,
+    public KinesisService(IamClientBuilder iamClientBuilder,
+                          KinesisClientBuilder kinesisClientBuilder,
                           ObjectMapper objectMapper,
-                          Map<String, Codec.Factory<? extends Codec>> availableCodecs) {
+                          Map<String, Codec.Factory<? extends Codec>> availableCodecs,
+                          AWSClientBuilderUtil awsClientBuilderUtil) {
 
         this.iamClientBuilder = iamClientBuilder;
         this.kinesisClientBuilder = kinesisClientBuilder;
         this.objectMapper = objectMapper;
         this.availableCodecs = availableCodecs;
+        this.awsClientBuilderUtil = awsClientBuilderUtil;
     }
 
     /**
@@ -145,7 +148,7 @@ public class KinesisService {
 
         LOG.debug("The stream [{}] exists", request.streamName());
 
-        KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
+        KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         final List<Record> records = retrieveRecords(request.streamName(), kinesisClient);
         if (records.size() == 0) {
@@ -167,7 +170,7 @@ public class KinesisService {
 
         LOG.debug("List Kinesis streams for region [{}]", request.region());
 
-        final KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
+        final KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         ListStreamsRequest streamsRequest = ListStreamsRequest.builder().limit(KINESIS_LIST_STREAMS_LIMIT).build();
         final ListStreamsResponse listStreamsResponse = kinesisClient.listStreams(streamsRequest);
@@ -225,9 +228,9 @@ public class KinesisService {
         // Pick just one log entry.
         Optional<CloudWatchLogEvent> logEntryOptional = data.logEvents().stream().findAny();
 
-        if (!logEntryOptional.isPresent()) {
+        if (logEntryOptional.isEmpty()) {
             throw new BadRequestException("The CloudWatch payload did not contain any messages. This should not happen. " +
-                                          "See https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html");
+                    "See https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html");
         }
 
         CloudWatchLogEvent logEntry = logEntryOptional.get();
@@ -398,7 +401,7 @@ public class KinesisService {
      */
     public KinesisNewStreamResponse createNewKinesisStream(KinesisNewStreamRequest request) {
         LOG.debug("Creating Kinesis client with the provided credentials.");
-        final KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
+        final KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         LOG.debug("Creating new Kinesis stream request [{}].", request.streamName());
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.builder()
@@ -457,7 +460,7 @@ public class KinesisService {
 
         String roleName = String.format(ROLE_NAME_FORMAT, DateTime.now().toString(UNIQUE_ROLE_DATE_FORMAT));
         try {
-            final IamClient iamClient = AWSClientBuilderUtil.buildClient(iamClientBuilder, request);
+            final IamClient iamClient = awsClientBuilderUtil.buildClient(iamClientBuilder, request);
             String createRoleResponse = createRoleForKinesisAutoSetup(iamClient, request.region(), roleName);
             LOG.debug(createRoleResponse);
             setPermissionsForKinesisAutoSetupRole(iamClient, roleName, request.streamArn());

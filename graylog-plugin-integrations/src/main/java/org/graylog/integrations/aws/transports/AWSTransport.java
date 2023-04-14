@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.codecs.AWSCodec;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -30,6 +31,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
+import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Map;
 
-public class AWSTransport extends ThrottleableTransport {
+public class AWSTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(AWSTransport.class);
     public static final String NAME = "aws-transport";
 
@@ -58,12 +60,12 @@ public class AWSTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void doLaunch(MessageInput input) throws MisfireException {
+    public void doLaunch(MessageInput input, InputFailureRecorder inputFailureRecorder) throws MisfireException {
 
         LOG.debug("Start AWS Transport");
         // Load the transport by message type.
         final Transport transport = resolveTransport();
-        transport.launch(input);
+        transport.launch(input, inputFailureRecorder);
 
         // Keep reference to the transport, so it can be stopped later.
         resolvedTransport = transport;
@@ -75,7 +77,7 @@ public class AWSTransport extends ThrottleableTransport {
         LOG.debug("Stop AWS Transport");
         if (resolvedTransport == null) {
             LOG.error("A transport was not found with this [{}] instance.",
-                      configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
+                    configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
         }
         resolvedTransport.stop();
     }
@@ -88,7 +90,7 @@ public class AWSTransport extends ThrottleableTransport {
         final Transport.Factory<? extends Transport> transportFactory = this.availableTransports.get(awsMessageType.getTransportName());
         if (transportFactory == null) {
             throw new MisfireException(String.format("A transport with name [%s] could not be found.",
-                                                     awsMessageType.getTransportName()));
+                    awsMessageType.getTransportName()));
         }
 
         return transportFactory.create(configuration);
