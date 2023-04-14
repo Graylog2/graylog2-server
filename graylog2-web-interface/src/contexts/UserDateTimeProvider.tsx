@@ -28,7 +28,7 @@ type Props = {
   tz?: string,
 };
 
-const getUserTimezone = (userTimezone?: string, tzOverride?: string) => {
+const getUserTimezone = (userTimezone: string, tzOverride?: string) => {
   if (tzOverride) {
     return tzOverride;
   }
