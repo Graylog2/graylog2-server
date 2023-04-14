@@ -140,7 +140,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public Set<IndexSet> getForIndexConfig(Collection<IndexSetConfig> indexSetConfigs) {
+    public Set<IndexSet> getFromIndexConfig(Collection<IndexSetConfig> indexSetConfigs) {
         final ImmutableSet.Builder<MongoIndexSet> mongoIndexSets = ImmutableSet.builder();
         for (IndexSetConfig config : indexSetConfigs) {
             final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(config);

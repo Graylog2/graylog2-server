@@ -62,7 +62,7 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
      * @param indexSetConfigs Collection of index configurations
      * @return Set of index sets which relates to given configurations
      */
-    Set<IndexSet> getForIndexConfig(Collection<IndexSetConfig> indexSetConfigs);
+    Set<IndexSet> getFromIndexConfig(Collection<IndexSetConfig> indexSetConfigs);
 
     /**
      * Returns the {@link IndexSet} that is marked as default.

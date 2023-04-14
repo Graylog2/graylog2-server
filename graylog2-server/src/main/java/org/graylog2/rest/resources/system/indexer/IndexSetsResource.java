@@ -175,7 +175,7 @@ public class IndexSetsResource extends RestResource {
         Map<String, IndexSetStats> stats = Collections.emptyMap();
 
         if (computeStats) {
-            stats = indexSetRegistry.getForIndexConfig(pagedConfigs).stream()
+            stats = indexSetRegistry.getFromIndexConfig(pagedConfigs).stream()
                     .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
         }
 
