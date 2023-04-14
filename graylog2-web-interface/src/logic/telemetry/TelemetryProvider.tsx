@@ -63,7 +63,12 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const TelemetryContextValue = useMemo(() => {
     const sendTelemetry = (eventType: TelemetryEventType, event: TelemetryEvent) => {
       if (posthog) {
-        posthog.capture(eventType, event);
+        try {
+          posthog.capture(eventType, event);
+        } catch {
+          // eslint-disable-next-line no-console
+          console.warn('Could not capture telemetry event.');
+        }
       }
     };
 

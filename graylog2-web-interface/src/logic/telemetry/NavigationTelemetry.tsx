@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -29,9 +29,7 @@ const NavigationTelemetry = () => {
     }
   }, [location.pathname, sendTelemetry]);
 
-  return (
-    <div />
-  );
+  return null;
 };
 
 export default NavigationTelemetry;
