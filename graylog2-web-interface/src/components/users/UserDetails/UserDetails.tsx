@@ -20,6 +20,7 @@ import { IfPermitted, Spinner } from 'components/common';
 import type User from 'logic/users/User';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import TelemetrySettingsDetails from 'logic/telemetry/TelemetrySettingsDetails';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import PreferencesSection from './PreferencesSection';
 import ProfileSection from './ProfileSection';
@@ -35,6 +36,8 @@ type Props = {
 };
 
 const UserDetails = ({ user }: Props) => {
+  const currentUser = useCurrentUser();
+
   if (!user) {
     return <Spinner />;
   }
@@ -58,9 +61,11 @@ const UserDetails = ({ user }: Props) => {
             <IfPermitted permissions={`teams:edit:${user.username}`}>
               <TeamsSection user={user} />
             </IfPermitted>
-            <IfPermitted permissions={`users:edit:${user.username}`}>
-              <TelemetrySettingsDetails />
-            </IfPermitted>
+            {(currentUser.id === user.id) && (
+              <IfPermitted permissions={`users:edit:${user.username}`}>
+                <TelemetrySettingsDetails />
+              </IfPermitted>
+            )}
           </div>
         </IfPermitted>
       </SectionGrid>
