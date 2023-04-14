@@ -40,7 +40,7 @@ class EncodingTest {
     final String jsonString = "{"
             + "\"version\": \"1.1\","
             + "\"" + MSG_FIELD + "\": \"" + MESSAGE + "\","
-            + "\"host\": \"example.org\""
+            + "\"host\": \"example.org\","
             + "}";
     RawMessage rawUTF8 = new RawMessage(jsonString.getBytes(StandardCharsets.UTF_8));
     RawMessage rawUTF16 = new RawMessage(jsonString.getBytes(StandardCharsets.UTF_16));
