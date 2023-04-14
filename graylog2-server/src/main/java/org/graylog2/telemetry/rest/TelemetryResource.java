@@ -120,9 +120,7 @@ public class TelemetryResource extends ProxiedResource {
 
     private Map<String, SystemOverviewResponse> getSystemOverviewResponses() {
         Map<String, SystemOverviewResponse> results = new HashMap<>();
-        requestOnAllNodes(
-                createRemoteInterfaceProvider(RemoteSystemResource.class),
-                RemoteSystemResource::system)
+        requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::system)
                 .forEach((s, r) -> results.put(s, toSystemOverviewResponse(r)));
         return results;
     }
