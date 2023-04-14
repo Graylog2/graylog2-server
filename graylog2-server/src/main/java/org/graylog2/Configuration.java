@@ -27,11 +27,13 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.google.common.collect.Sets;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
@@ -210,6 +212,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
 
+    @Parameter(value = "system_event_excluded_types", converter = TrimmedStringSetConverter.class)
+    private Set<String> systemEventExcludedTypes = Sets.newHashSet(Notification.Type.SIDECAR_STATUS_UNKNOWN.name());
+
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
     }
@@ -253,6 +258,10 @@ public class Configuration extends BaseConfiguration {
 
     public java.time.Duration getLockServiceLockTTL() {
         return lockServiceLockTTL;
+    }
+
+    public Set<String> getSystemEventExcludedTypes() {
+        return systemEventExcludedTypes;
     }
 
     public java.time.Duration getLeaderElectionLockPollingInterval() {
