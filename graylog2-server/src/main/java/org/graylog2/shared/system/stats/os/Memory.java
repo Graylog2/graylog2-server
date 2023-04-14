@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.os;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -46,13 +47,14 @@ public abstract class Memory {
     @JsonProperty
     public abstract long actualUsed();
 
-    public static Memory create(long total,
-                                long free,
-                                short freePercent,
-                                long used,
-                                short usedPercent,
-                                long actualFree,
-                                long actualUsed) {
+    @JsonCreator
+    public static Memory create(@JsonProperty("total") long total,
+                                @JsonProperty("free") long free,
+                                @JsonProperty("free_percent") short freePercent,
+                                @JsonProperty("used") long used,
+                                @JsonProperty("used_percent") short usedPercent,
+                                @JsonProperty("actual_free") long actualFree,
+                                @JsonProperty("actual_used") long actualUsed) {
         return new AutoValue_Memory(total, free, freePercent, used, usedPercent, actualFree, actualUsed);
     }
 }

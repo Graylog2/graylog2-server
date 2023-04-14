@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.os;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -43,11 +44,12 @@ public abstract class OsStats {
     @JsonProperty
     public abstract Swap swap();
 
-    public static OsStats create(double[] loadAverage,
-                                 long uptime,
-                                 Processor processor,
-                                 Memory memory,
-                                 Swap swap) {
+    @JsonCreator
+    public static OsStats create(@JsonProperty("load_average") double[] loadAverage,
+                                 @JsonProperty("uptime") long uptime,
+                                 @JsonProperty("processor") Processor processor,
+                                 @JsonProperty("memory") Memory memory,
+                                 @JsonProperty("swap") Swap swap) {
         return new AutoValue_OsStats(loadAverage, uptime, processor, memory, swap);
     }
 }

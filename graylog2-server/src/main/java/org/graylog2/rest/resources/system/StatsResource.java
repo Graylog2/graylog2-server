@@ -52,7 +52,7 @@ public class StatsResource extends RestResource {
     @ApiOperation(value = "System information about this node.",
             notes = "This resource returns information about the system this node is running on.")
     public SystemStats systemStats() {
-        return statsService.systemStats();
+        return statsService.systemStatsWithoutNetwork();
     }
 
     @GET
