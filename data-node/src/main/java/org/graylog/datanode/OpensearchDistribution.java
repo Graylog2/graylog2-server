@@ -86,6 +86,7 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
             case "amd64" -> "x64";
             case "x86_64" -> "x64";
             case "aarch64" -> "aarch64";
+            case "arm64" -> "aarch64";
             default ->
                     throw new UnsupportedOperationException("Unsupported OpenSearch distribution architecture: " + osArch);
         };
