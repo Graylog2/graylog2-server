@@ -222,10 +222,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     @Override
     public ClusterStats clusterStats() {
-        final Request request = new Request("GET", "/_cluster/stats/nodes/*");
-
-        final JsonNode clusterStatsResponseJson = jsonApi.perform(request,
-                "Couldn't read Elasticsearch cluster stats");
+        final JsonNode clusterStatsResponseJson = rawClusterStats();
         final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
 
         String clusterVersion = null;
@@ -257,6 +254,12 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         );
 
         return ClusterStats.create(clusterName, clusterVersion, nodesStats, indicesStats);
+    }
+
+    @Override
+    public JsonNode rawClusterStats() {
+        final Request request = new Request("GET", "/_cluster/stats/nodes/*");
+        return jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
     }
 
     @Override

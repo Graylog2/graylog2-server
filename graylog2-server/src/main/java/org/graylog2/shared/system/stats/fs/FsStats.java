@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -28,10 +29,11 @@ import java.util.Map;
 @AutoValue
 @WithBeanGetter
 public abstract class FsStats {
-    @JsonProperty
+    @JsonProperty("filesystems")
     public abstract Map<String, Filesystem> filesystems();
 
-    public static FsStats create(Map<String, Filesystem> filesystems) {
+    @JsonCreator
+    public static FsStats create(@JsonProperty("filesystems") Map<String, Filesystem> filesystems) {
         return new AutoValue_FsStats(filesystems);
     }
 
@@ -103,26 +105,27 @@ public abstract class FsStats {
         @JsonProperty
         public abstract double diskServiceTime();
 
-        public static Filesystem create(String path,
-                                        String mount,
-                                        String dev,
-                                        String typeName,
-                                        String sysTypeName,
-                                        long total,
-                                        long free,
-                                        long available,
-                                        long used,
-                                        short usedPercent,
-                                        long inodesTotal,
-                                        long inodesFree,
-                                        long inodesUsed,
-                                        short inodesUsedPercent,
-                                        long diskReads,
-                                        long diskWrites,
-                                        long diskReadBytes,
-                                        long diskWriteBytes,
-                                        double diskQueue,
-                                        double diskServiceTime) {
+        @JsonCreator
+        public static Filesystem create(@JsonProperty("path") String path,
+                                        @JsonProperty("mount") String mount,
+                                        @JsonProperty("dev") String dev,
+                                        @JsonProperty("type_name") String typeName,
+                                        @JsonProperty("sys_type_name") String sysTypeName,
+                                        @JsonProperty("total") long total,
+                                        @JsonProperty("free") long free,
+                                        @JsonProperty("available") long available,
+                                        @JsonProperty("used") long used,
+                                        @JsonProperty("used_percent") short usedPercent,
+                                        @JsonProperty("inodes_total") long inodesTotal,
+                                        @JsonProperty("inodes_free") long inodesFree,
+                                        @JsonProperty("inodes_used") long inodesUsed,
+                                        @JsonProperty("inodes_used_percent") short inodesUsedPercent,
+                                        @JsonProperty("disk_reads") long diskReads,
+                                        @JsonProperty("disk_writes") long diskWrites,
+                                        @JsonProperty("disk_read_bytes") long diskReadBytes,
+                                        @JsonProperty("disk_write_bytes") long diskWriteBytes,
+                                        @JsonProperty("disk_queue") double diskQueue,
+                                        @JsonProperty("disk_service_time") double diskServiceTime) {
             return new AutoValue_FsStats_Filesystem(
                     path, mount, dev, typeName, sysTypeName, total, free, available, used, usedPercent,
                     inodesTotal, inodesFree, inodesUsed, inodesUsedPercent,

@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.jvm;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -135,21 +136,22 @@ public abstract class JvmStats {
     public abstract List<String> memoryPools();
 
 
-    public static JvmStats create(String version,
-                                  String vmName,
-                                  String vmVersion,
-                                  String vmVendor,
-                                  String specName,
-                                  String specVersion,
-                                  String specVendor,
-                                  long startTime,
-                                  JvmStats.Memory mem,
-                                  List<String> inputArguments,
-                                  String bootClassPath,
-                                  String classPath,
-                                  Map<String, String> systemProperties,
-                                  List<String> garbageCollectors,
-                                  List<String> memoryPools) {
+    @JsonCreator
+    public static JvmStats create(@JsonProperty("version") String version,
+                                  @JsonProperty("vm_name") String vmName,
+                                  @JsonProperty("vm_version") String vmVersion,
+                                  @JsonProperty("vm_vendor") String vmVendor,
+                                  @JsonProperty("spec_name") String specName,
+                                  @JsonProperty("spec_version") String specVersion,
+                                  @JsonProperty("spec_vendor") String specVendor,
+                                  @JsonProperty("start_time") long startTime,
+                                  @JsonProperty("mem") JvmStats.Memory mem,
+                                  @JsonProperty("input_arguments") List<String> inputArguments,
+                                  @JsonProperty("boot_class_path") String bootClassPath,
+                                  @JsonProperty("class_path") String classPath,
+                                  @JsonProperty("system_properties") Map<String, String> systemProperties,
+                                  @JsonProperty("garbage_collectors") List<String> garbageCollectors,
+                                  @JsonProperty("memory_pools") List<String> memoryPools) {
         return new AutoValue_JvmStats(
                 version, vmName, vmVersion, vmVendor, specName, specVersion, specVendor,
                 startTime, mem, inputArguments, bootClassPath, classPath, systemProperties,
@@ -175,11 +177,12 @@ public abstract class JvmStats {
         @JsonProperty
         public abstract long directMemoryMax();
 
-        public static Memory create(long heapInit,
-                                    long heapMax,
-                                    long nonHeapInit,
-                                    long nonHeapMax,
-                                    long directMemoryMax) {
+        @JsonCreator
+        public static Memory create(@JsonProperty("heap_init") long heapInit,
+                                    @JsonProperty("heap_max") long heapMax,
+                                    @JsonProperty("non_heap_init") long nonHeapInit,
+                                    @JsonProperty("non_heap_max") long nonHeapMax,
+                                    @JsonProperty("direct_memory_max") long directMemoryMax) {
             return new AutoValue_JvmStats_Memory(heapInit, heapMax, nonHeapInit, nonHeapMax, directMemoryMax);
         }
     }

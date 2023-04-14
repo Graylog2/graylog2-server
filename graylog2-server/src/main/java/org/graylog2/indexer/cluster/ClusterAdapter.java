@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.cluster;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
@@ -50,6 +51,8 @@ public interface ClusterAdapter {
     Optional<ClusterHealth> clusterHealthStats();
 
     ClusterStats clusterStats();
+
+    JsonNode rawClusterStats();
 
     PendingTasksStats pendingTasks();
 

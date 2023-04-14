@@ -144,7 +144,6 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public DateTime touch(AccessToken accessToken) throws ValidationException {
-        LOG.info("touch");
         try {
             return lastAccessCache.get(accessToken.getId());
         } catch (ExecutionException e) {

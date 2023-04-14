@@ -133,6 +133,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String STREAM_START = PREFIX + "stream:start";
     public static final String STREAM_STOP = PREFIX + "stream:stop";
     public static final String STREAM_UPDATE = PREFIX + "stream:update";
+    public static final String SUPPORT_BUNDLE_CREATE = PREFIX + "support_bundle:create";
+    public static final String SUPPORT_BUNDLE_DELETE = PREFIX + "support_bundle:delete";
+    public static final String SUPPORT_BUNDLE_DOWNLOAD = PREFIX + "support_bundle:download";
     public static final String SYSTEM_JOB_START = PREFIX + "system_job:start";
     public static final String SYSTEM_JOB_STOP = PREFIX + "system_job:stop";
 
@@ -261,6 +264,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(STREAM_START)
             .add(STREAM_STOP)
             .add(STREAM_UPDATE)
+            .add(SUPPORT_BUNDLE_CREATE)
+            .add(SUPPORT_BUNDLE_DELETE)
+            .add(SUPPORT_BUNDLE_DOWNLOAD)
             .add(SYSTEM_JOB_START)
             .add(SYSTEM_JOB_STOP)
             .add(SYSTEM_JOB_ACKNOWLEDGE)

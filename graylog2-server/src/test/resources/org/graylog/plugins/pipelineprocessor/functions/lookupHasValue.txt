@@ -1,0 +1,11 @@
+rule "lookupSetValue"
+when
+  true
+then
+  let present = lookup_has_value("table", "present");
+  let absent = lookup_has_value("table", "absent");
+  let empty = lookup_has_value("table", "empty");
+  set_field("check_present", present);
+  set_field("check_absent", absent);
+  set_field("check_empty", empty);
+end

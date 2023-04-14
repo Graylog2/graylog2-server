@@ -6,7 +6,10 @@
         </Console>
 
         <!-- Internal Graylog log appender. Please do not disable. This makes internal log messages available via REST calls. -->
-        <Memory name="graylog-internal-logs" bufferSize="500"/>
+        <Memory name="graylog-internal-logs" bufferSizeBytes="10MB">
+            <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p [%c{1}] %m%n"/>
+        </Memory>
+
     </Appenders>
     <Loggers>
         <!-- Application Loggers -->
