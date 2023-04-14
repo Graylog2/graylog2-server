@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.os;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -34,9 +35,10 @@ public abstract class Swap {
     @JsonProperty
     public abstract long used();
 
-    public static Swap create(long total,
-                              long free,
-                              long used) {
+    @JsonCreator
+    public static Swap create(@JsonProperty("total") long total,
+                              @JsonProperty("free") long free,
+                              @JsonProperty("used") long used) {
         return new AutoValue_Swap(total, free, used);
     }
 }

@@ -82,6 +82,7 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
@@ -267,6 +268,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         // Lookup tables
         addMessageProcessorFunction(Lookup.NAME, Lookup.class);
         addMessageProcessorFunction(LookupValue.NAME, LookupValue.class);
+        addMessageProcessorFunction(LookupHasValue.NAME, LookupHasValue.class);
         addMessageProcessorFunction(LookupStringList.NAME, LookupStringList.class);
         addMessageProcessorFunction(LookupSetValue.NAME, LookupSetValue.class);
         addMessageProcessorFunction(LookupClearKey.NAME, LookupClearKey.class);

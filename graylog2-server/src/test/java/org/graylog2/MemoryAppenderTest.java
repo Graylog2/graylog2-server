@@ -20,73 +20,56 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.message.SimpleMessage;
+import org.bouncycastle.util.Strings;
 import org.graylog2.log4j.MemoryAppender;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.withinPercentage;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class MemoryAppenderTest {
     @Test
-    public void testGetLogMessages() {
-        final int bufferSize = 10;
-        final MemoryAppender appender = MemoryAppender.createAppender(null, null, "memory", String.valueOf(bufferSize), "false");
-        assertThat(appender).isNotNull();
-
-        for (int i = 1; i <= bufferSize; i++) {
-            final LogEvent logEvent = Log4jLogEvent.newBuilder()
-                .setLevel(Level.INFO)
-                .setLoggerName("test")
-                .setLoggerFqcn("com.example.test")
-                .setMessage(new SimpleMessage("Message " + i))
-                .build();
-
-            appender.append(logEvent);
-        }
-
-        assertThat(appender.getLogMessages(bufferSize * 2)).hasSize(bufferSize);
-        assertThat(appender.getLogMessages(bufferSize)).hasSize(bufferSize);
-        assertThat(appender.getLogMessages(bufferSize / 2)).hasSize(bufferSize / 2);
-        assertThat(appender.getLogMessages(0)).isEmpty();
-
-        final List<LogEvent> messages = appender.getLogMessages(5);
-        for (int i = 0; i < messages.size(); i++) {
-            assertThat(messages.get(i).getMessage().getFormattedMessage()).isEqualTo("Message " + (bufferSize - i));
-        }
-    }
-
-    @Test
     public void appenderCanConsumeMoreMessagesThanBufferSize() {
-        final int bufferSize = 10;
-        final MemoryAppender appender = MemoryAppender.createAppender(null, null, "memory", String.valueOf(bufferSize), "false");
+        final int count = 5000;
+        final MemoryAppender appender = MemoryAppender.createAppender(null, null, "memory", null, "100kB", "false");
         assertThat(appender).isNotNull();
 
-        for (int i = 1; i <= bufferSize + 1; i++) {
+        for (int i = 1; i <= count; i++) {
             final LogEvent logEvent = Log4jLogEvent.newBuilder()
                 .setLevel(Level.INFO)
                 .setLoggerName("test")
                 .setLoggerFqcn("com.example.test")
-                .setMessage(new SimpleMessage("Message " + i))
+                .setMessage(new SimpleMessage(f("Message %d: %s", i, getRandomString())))
                 .build();
-
 
             appender.append(logEvent);
         }
 
-        final List<LogEvent> messages = appender.getLogMessages(bufferSize);
-        for (int i = 0; i < messages.size(); i++) {
-            assertThat(messages.get(i).getMessage().getFormattedMessage()).isEqualTo("Message " + (bufferSize - i + 1));
-        }
+        final long logsSize = appender.getLogsSize();
+        assertThat(logsSize).isCloseTo(300 * 1024, withinPercentage(50));
+
+        var outStream = new ByteArrayOutputStream();
+        appender.streamFormattedLogMessages(outStream, 0);
+        List<String> result = List.of(Strings.split(outStream.toString(StandardCharsets.UTF_8), '\n'));
+
+        assertThat(result.stream().findFirst()).isNotEmpty();
+        assertThat(result.stream().findFirst().get()).startsWith("Message ");
+        assertThat(result.stream().findFirst().get()).doesNotContain("Message 1");
+        assertThat(result.get(result.size() -2)).startsWith("Message " + count);
     }
 
     @Test
     public void appenderIsThreadSafe() throws Exception {
-        final int bufferSize = 1;
-        final MemoryAppender appender = MemoryAppender.createAppender(null, null, "memory", String.valueOf(bufferSize), "false");
+        final MemoryAppender appender = MemoryAppender.createAppender(null, null, "memory", null, "100kB", "false");
         assertThat(appender).isNotNull();
 
         final LogEvent logEvent = Log4jLogEvent.newBuilder()
@@ -141,5 +124,14 @@ public class MemoryAppenderTest {
         public AtomicInteger getExceptionsInThreads() {
             return exceptionsInThreads;
         }
+    }
+
+    private String getRandomString() {
+        var random = new Random();
+        String randomString = random.ints(97, 122 + 1)
+                .limit(100)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        return randomString;
     }
 }

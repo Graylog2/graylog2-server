@@ -22,7 +22,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.shared.rest.resources.ProxiedResource;
@@ -30,19 +29,15 @@ import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Function;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -65,7 +60,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @Path("/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public void cycle() throws IOException {
-        getDeflectorResource().cycle().execute();
+        requestOnLeader(RemoteDeflectorResource::cycle, RemoteDeflectorResource.class);
     }
 
     @POST
@@ -74,22 +69,6 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @Path("/{indexSetId}/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public void cycle(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws IOException {
-        getDeflectorResource().cycleIndexSet(indexSetId).execute();
-    }
-
-    private RemoteDeflectorResource getDeflectorResource() {
-        final Node leader = findLeaderNode();
-        final Function<String, Optional<RemoteDeflectorResource>> remoteInterfaceProvider = createRemoteInterfaceProvider(RemoteDeflectorResource.class);
-        final Optional<RemoteDeflectorResource> deflectorResource = remoteInterfaceProvider.apply(leader.getNodeId());
-
-        return deflectorResource
-                .orElseThrow(() -> new InternalServerErrorException("Unable to get remote deflector resource."));
-    }
-
-    private Node findLeaderNode() {
-        return nodeService.allActive().values().stream()
-                .filter(Node::isLeader)
-                .findFirst()
-                .orElseThrow(() -> new ServiceUnavailableException("No leader present."));
+        requestOnLeader(c -> c.cycleIndexSet(indexSetId), RemoteDeflectorResource.class);
     }
 }

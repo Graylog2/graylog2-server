@@ -1,0 +1,5 @@
+type = "added"
+message = 'Introduces a new pipeline function "lookup_has_value" to determine if a given key is present in the lookup table.'
+
+issues = ["9173"]
+pulls = ["15143"]

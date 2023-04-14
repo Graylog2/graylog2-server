@@ -16,7 +16,6 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import cloneDeep from 'lodash/cloneDeep';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
@@ -61,12 +60,10 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   }, []);
 
   const handleChange = useCallback((key: string, value: unknown) => {
-    const nextEventDefinition = cloneDeep(eventDefinition);
-    nextEventDefinition[key] = value;
-    setEventDefinition(nextEventDefinition);
-    onEventDefinitionChange(eventDefinition);
+    setEventDefinition((prev) => ({ ...prev, [key]: value }));
+    onEventDefinitionChange({ ...eventDefinition, [key]: value });
     setIsDirty(true);
-  }, [eventDefinition, onEventDefinitionChange]);
+  }, [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty]);
 
   useEffect(() => {
     fetchClusterConfig();
