@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Unable to add custom field when creating event definition"
+
+issues = ["15209"]
+pulls = ["15226"]
