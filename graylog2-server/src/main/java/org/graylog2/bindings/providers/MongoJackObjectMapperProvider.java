@@ -49,6 +49,12 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
 
     @Inject
     public MongoJackObjectMapperProvider(ObjectMapper objectMapper) {
+
+        // *********************************** WARNING: **********************************************
+        // * If you change anything here, make sure to also adjust the ObjectMapper configuration in *
+        // * MongoCollections#configuredObjectMapper, if necessary.                                  *
+        // *******************************************************************************************
+
         // add the mongojack specific stuff on a copy of the original ObjectMapper to avoid changing the singleton instance
         this.objectMapper = objectMapper.copy()
                 .addHandler(new ReplaceUnknownSubtypesWithFallbackHandler())
