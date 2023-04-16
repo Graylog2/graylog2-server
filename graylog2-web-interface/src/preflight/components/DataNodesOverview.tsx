@@ -43,18 +43,20 @@ const DataNodesOverview = () => {
     isInitialLoading: isInitialLoadingDataNodes,
   } = useDataNodes();
 
-  const resumeStartup = () => (
-    fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
-      .then(() => {
-        setResumingStartup(true);
-      })
-      .catch((error) => {
-        setResumingStartup(false);
+  const resumeStartup = () => {
+    if (!dataNodes?.length && window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
+      fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
+        .then(() => {
+          setResumingStartup(true);
+        })
+        .catch((error) => {
+          setResumingStartup(false);
 
-        UserNotification.error(`Resuming startup failed with: ${error}`,
-          'Could not resume startup');
-      })
-  );
+          UserNotification.error(`Resuming startup failed with: ${error}`,
+            'Could not resume startup');
+        });
+    }
+  };
 
   return (
     <>
@@ -96,7 +98,7 @@ const DataNodesOverview = () => {
         </Alert>
       )}
       <Space h="md" />
-      <Button onClick={resumeStartup} disabled={!dataNodes.length || resumingStartup} size="xs">
+      <Button onClick={resumeStartup} size="xs">
         {resumingStartup ? <Spinner delay={0} text="Resuming startup..." /> : 'Resume startup'}
       </Button>
     </>
