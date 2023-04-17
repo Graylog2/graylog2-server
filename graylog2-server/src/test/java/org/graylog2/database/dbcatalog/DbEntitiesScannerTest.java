@@ -17,10 +17,12 @@
 package org.graylog2.database.dbcatalog;
 
 
+import org.graylog2.cluster.NodeImpl;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 
+import static org.graylog2.database.DbEntity.NOBODY_ALOWED;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +41,19 @@ class DbEntitiesScannerTest {
         assertSame(entryByCollectionName, entryByModelClass);
 
         assertEquals(new DbEntityCatalogEntry("index_sets", "title", IndexSetConfig.class, INDEXSETS_READ), entryByCollectionName);
+    }
+
+    @Test
+    void testScansEntitiesWithDefaultReadPermissionFieldProperly() {
+        DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.cluster"});
+        final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
+
+        final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("nodes").get();
+        final DbEntityCatalogEntry entryByModelClass = dbEntitiesCatalog.getByModelClass(NodeImpl.class).get();
+
+        assertSame(entryByCollectionName, entryByModelClass);
+
+        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", NodeImpl.class, NOBODY_ALOWED), entryByCollectionName);
     }
 
     @Test
