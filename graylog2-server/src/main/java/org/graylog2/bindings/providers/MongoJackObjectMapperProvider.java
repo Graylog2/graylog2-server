@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.type.SimpleType;
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.mongojack.internal.MongoJackModule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,14 +37,12 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
     private final ObjectMapper objectMapper;
 
     @Inject
-    public MongoJackObjectMapperProvider(CommonMongoJackObjectMapperProvider objectMapperProvider) {
-        this.objectMapper = objectMapperProvider.get()
+    public MongoJackObjectMapperProvider(ObjectMapper objectMapper) {
+        this.objectMapper = CommonMongoJackObjectMapperProvider.configure(objectMapper)
                 .addHandler(new ReplaceUnknownSubtypesWithFallbackHandler())
                 .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy());
-    }
 
-    public MongoJackObjectMapperProvider(ObjectMapper objectMapper) {
-        this.objectMapper = CommonMongoJackObjectMapperProvider.configure(objectMapper);
+        MongoJackModule.configure(this.objectMapper);
     }
 
     @Override

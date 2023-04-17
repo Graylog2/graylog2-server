@@ -28,7 +28,6 @@ import org.graylog2.jackson.MongoZonedDateTimeDeserializer;
 import org.graylog2.jackson.MongoZonedDateTimeSerializer;
 import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.joda.time.DateTime;
-import org.mongojack.internal.MongoJackModule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -65,7 +64,6 @@ public class CommonMongoJackObjectMapperProvider implements Provider<ObjectMappe
                 .setAnnotationIntrospector(customAnnotationIntrospector)
                 .registerModule(serializationModule);
 
-        MongoJackModule.configure(configuredObjectMapper);
         EncryptedValueMapperConfig.enableDatabase(configuredObjectMapper);
 
         return configuredObjectMapper;

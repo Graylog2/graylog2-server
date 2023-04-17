@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import org.bson.UuidRepresentation;
 import org.graylog.shaded.mongojack4.org.mongojack.JacksonMongoCollection;
+import org.graylog.shaded.mongojack4.org.mongojack.internal.MongoJackModule;
 import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 
 import javax.inject.Inject;
@@ -35,6 +36,8 @@ public class MongoCollections {
     public MongoCollections(CommonMongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
+
+        MongoJackModule.configure(this.objectMapper);
     }
 
     /**
