@@ -36,6 +36,7 @@ public class FiltersIT {
 
     @ContainerMatrixTest
     void cspDocumentationBrowser() {
+        String expected = CSP.CSP_SWAGGER + "connect-src https://telemetry.graylog.cloud;";
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -43,11 +44,12 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(CSP.CSP_SWAGGER));
+                        Matchers.equalTo(expected));
     }
 
     @ContainerMatrixTest
     void cspWebInterfaceAssets() {
+        String expected = CSP.CSP_DEFAULT + "connect-src https://telemetry.graylog.cloud;";
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -56,11 +58,12 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(CSP.CSP_DEFAULT));
+                        Matchers.equalTo(expected));
     }
 
     @ContainerMatrixTest
     void cspWebAppNotFound() {
+        String expected = CSP.CSP_DEFAULT + "connect-src https://telemetry.graylog.cloud;";
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -68,6 +71,6 @@ public class FiltersIT {
                 .get("streams")
                 .then()
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(CSP.CSP_DEFAULT));
+                        Matchers.equalTo(expected));
     }
 }
