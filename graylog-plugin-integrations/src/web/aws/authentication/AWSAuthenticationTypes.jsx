@@ -43,16 +43,18 @@ const AWSAuthenticationTypes = ({ onChange }) => {
     awsCloudWatchAssumeARN,
   } = formData;
 
-  const defaultAuthTypeValue = awsAuthenticationType ? awsAuthenticationType.value : AWS_AUTH_TYPES.automatic;
+  let defaultAuthTypeValue;
+
+  if (AppConfig.isCloud()) {
+    defaultAuthTypeValue = AWS_AUTH_TYPES.keysecret;
+  } else {
+    defaultAuthTypeValue = awsAuthenticationType ? awsAuthenticationType.value : AWS_AUTH_TYPES.automatic;
+  }
+
   const [currentType, setCurrenType] = useState(defaultAuthTypeValue);
 
   useEffect(() => {
-    onChange({
-      target: {
-        name: 'awsAuthenticationType',
-        value: AppConfig.isCloud ? AWS_AUTH_TYPES.keysecret : defaultAuthTypeValue,
-      },
-    });
+    onChange({ target: { name: 'awsAuthenticationType', value: defaultAuthTypeValue } });
   }, []);
 
   const isType = (type) => {
@@ -96,9 +98,9 @@ const AWSAuthenticationTypes = ({ onChange }) => {
               {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
               {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret awsKey={awsCloudWatchAwsKey}
-                         awsSecret={awsCloudWatchAwsSecret}
-                         onChange={onChange} />
+                <KeySecret awsKey={awsCloudWatchAwsKey}
+                           awsSecret={awsCloudWatchAwsSecret}
+                           onChange={onChange} />
               )}
             </AuthWrapper>
           </>
