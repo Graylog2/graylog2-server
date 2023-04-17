@@ -91,6 +91,8 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.telemetry.enterprise.DefaultTelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.graylog2.users.GrantsCleanupListener;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
@@ -195,6 +197,7 @@ public class ServerBindings extends Graylog2Module {
 
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
+        OptionalBinder.newOptionalBinder(binder(), TelemetryEnterpriseDataProvider.class).setDefault().to(DefaultTelemetryEnterpriseDataProvider.class);
     }
 
     private void bindDynamicFeatures() {

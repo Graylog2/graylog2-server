@@ -28,8 +28,8 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
-
 import 'stylesheets/typeahead.less';
+import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 
 const AppLayout = styled.div`
   display: flex;
@@ -71,6 +71,7 @@ const App = () => (
 
         return (
           <ScratchpadProvider loginName={currentUser.username}>
+            <NavigationTelemetry />
             <AppLayout>
               <Navigation />
               <ScrollToHint id="scroll-to-hint">

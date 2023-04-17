@@ -30,6 +30,7 @@ import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const StyledDefList = styled.dl.attrs({
   className: 'deflist',
@@ -52,6 +53,8 @@ const PermissionsConfig = () => {
   const [config, setConfig] = useState<PermissionsConfigType | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG).then(() => {
       setConfig(getConfig(ConfigurationType.PERMISSIONS_CONFIG, configuration));
@@ -59,6 +62,11 @@ const PermissionsConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values: PermissionsConfigType) => {
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_permissions',
+      eventElement: 'update_configuration_button',
+    });
+
     ConfigurationsActions.update(ConfigurationType.PERMISSIONS_CONFIG, values).then(() => {
       setShowModal(false);
     });
@@ -67,6 +75,8 @@ const PermissionsConfig = () => {
   const resetConfig = () => {
     setShowModal(false);
   };
+
+  const modalTitle = 'Configure Permissions';
 
   return (
     <div>
@@ -95,14 +105,19 @@ const PermissionsConfig = () => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal}
+                 onHide={resetConfig}
+                 aria-modal="true"
+                 aria-labelledby="dialog_label"
+                 data-app-section="configurations_permissions"
+                 data-event-element={modalTitle}>
             <Formik onSubmit={saveConfig} initialValues={config}>
 
               {({ isSubmitting }) => {
                 return (
                   <Form>
                     <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">Configure Permissions</Modal.Title>
+                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body>

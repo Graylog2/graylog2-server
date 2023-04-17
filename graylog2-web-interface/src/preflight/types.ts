@@ -14,13 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as Button } from './Button';
-export { default as Col } from './Col';
-export { default as Icon } from './Icon';
-export { default as Menu } from './Menu';
-export { default as MenuItem } from './MenuItem';
-export { default as Row } from './Row';
-export { default as Section } from './Section';
-export { default as MenuTarget } from './mantine/MenuTarget';
-export { default as MenuDropdownWrapper } from './mantine/MenuDropdownWrapper';
-export * from './mantine/imports';
+
+export type DataNode = {
+  hostname: string,
+  id: string,
+  is_leader: boolean,
+  is_master: boolean,
+  last_seen: string,
+  node_id: string,
+  short_node_id: string,
+  transport_address: string,
+  type: string,
+}
+
+export type DataNodes = Array<DataNode>;

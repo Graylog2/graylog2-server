@@ -14,5 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as AddEvidence } from './AddEvidence';
-export { default as AddEvidenceModal } from './AddEvidenceModal';
+import { useContext } from 'react';
+
+import TelemetryContext from 'logic/telemetry/TelemetryContext';
+
+const useSendTelemetry = () => {
+  const { sendTelemetry } = useContext(TelemetryContext);
+
+  return sendTelemetry;
+};
+
+export default useSendTelemetry;

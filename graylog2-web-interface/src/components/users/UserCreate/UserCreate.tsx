@@ -34,6 +34,7 @@ import debounceWithPromise from 'views/logic/debounceWithPromise';
 import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -161,6 +162,7 @@ const UserCreate = () => {
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
   const history = useHistory();
 
+  const sendTelemetry = useSendTelemetry();
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
@@ -190,7 +192,14 @@ const UserCreate = () => {
     return errors?.additional?.res?.text;
   };
 
-  const onSubmit = (data) => _onSubmit(history, data, user.roles, setSubmitError);
+  const onSubmit = (data) => {
+    _onSubmit(history, data, user.roles, setSubmitError);
+
+    sendTelemetry('submit_form', {
+      appSection: 'users_overview',
+      eventElement: 'create-user',
+    });
+  };
 
   return (
     <Row className="content">

@@ -90,7 +90,9 @@ class SourceViewModal extends React.Component {
   render() {
     return (
       <BootstrapModalWrapper showModal={this.props.showModal}
-                             onHide={this.props.onHide}>
+                             onHide={this.props.onHide}
+                             data-app-section="collector_configuration_form"
+                             data-event-element="Preview Configuration">
         <Modal.Header closeButton>
           <Modal.Title><span>Configuration <em>{this.state.name}</em></span></Modal.Title>
         </Modal.Header>

@@ -35,6 +35,7 @@ import { Button, Col, Modal, Row } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import FormikInput from '../common/FormikInput';
 
@@ -78,6 +79,8 @@ const IndexSetsDefaultsConfig = () => {
     ConfigurationsActions.updateIndexSetDefaults(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configToSave)
   );
 
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG).then(() => {
       IndicesConfigurationActions.loadRotationStrategies().then((loadedRotationStrategies) => {
@@ -104,6 +107,11 @@ const IndexSetsDefaultsConfig = () => {
 
     delete defaultIndexValues?.rotation_strategy;
     delete defaultIndexValues?.retention_strategy;
+
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_index_defaults',
+      eventElement: 'update_configuration_button',
+    });
 
     handleSaveConfig(defaultIndexValues)
       .then(() => {
@@ -147,6 +155,8 @@ const IndexSetsDefaultsConfig = () => {
     };
   };
 
+  const modalTitle = 'Configure Index Set Defaults';
+
   return (
     <div>
       <h2>Index Set Defaults Configuration</h2>
@@ -184,13 +194,18 @@ const IndexSetsDefaultsConfig = () => {
             </IfPermitted>
           </p>
 
-          <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal}
+                 onHide={resetConfig}
+                 aria-modal="true"
+                 aria-labelledby="dialog_label"
+                 data-app-section="configurations_index_defaults"
+                 data-event-element={modalTitle}>
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ values, setFieldValue, isSubmitting }) => {
                 return (
                   <Form>
                     <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">Configure Index Set Defaults</Modal.Title>
+                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body>

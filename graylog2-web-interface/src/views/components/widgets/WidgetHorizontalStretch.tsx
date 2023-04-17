@@ -22,6 +22,7 @@ import Spinner from 'components/common/Spinner';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { IconButton } from 'components/common';
 import { Position } from 'views/components/widgets/WidgetPropTypes';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type PositionType = {
   col: number,
@@ -38,6 +39,8 @@ type Props = {
 }
 
 const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: Props) => {
+  const sendTelemetry = useSendTelemetry();
+
   const onClick = useCallback(() => {
     const { col, row, height, width } = position;
     const { defaultWidth } = widgetDefinition(widgetType);
@@ -45,7 +48,12 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     onStretch({
       id: widgetId, col, row, height, width: width === Infinity ? defaultWidth : Infinity,
     });
-  }, [onStretch, position, widgetId, widgetType]);
+
+    sendTelemetry('click', {
+      appSection: 'search-widget',
+      eventElement: 'widget-stretch-button',
+    });
+  }, [onStretch, position, sendTelemetry, widgetId, widgetType]);
 
   if (!position) {
     return <Spinner />;

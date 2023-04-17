@@ -40,7 +40,11 @@ const ScrollContainer = styled.div`
 `;
 
 const buildHelpPopover = () => (
-  <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+  <Popover id="search-query-help"
+           className={Styles.popoverWide}
+           title="Search Syntax Help"
+           data-app-section="caches_query_helper"
+           data-event-element="Available search fields">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>

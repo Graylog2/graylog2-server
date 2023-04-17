@@ -152,6 +152,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_PERMISSIONS_DELETE = PREFIX + "user_permissions:delete";
     public static final String USER_PREFERENCES_UPDATE = PREFIX + "user_preferences:update";
     public static final String USER_UPDATE = PREFIX + "user:update";
+    public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
@@ -281,6 +282,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(USER_PERMISSIONS_DELETE)
             .add(USER_PREFERENCES_UPDATE)
             .add(USER_UPDATE)
+            .add(TELEMETRY_USER_SETTINGS_UPDATE)
             .build();
 
     @Override

@@ -27,6 +27,7 @@ import Spinner from 'components/common/Spinner';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const UrlWhiteListConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -34,6 +35,8 @@ const UrlWhiteListConfig = () => {
   const [viewConfig, setViewConfig] = useState<WhiteListConfig | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<WhiteListConfig | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
+
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.URL_WHITELIST_CONFIG).then(() => {
@@ -70,6 +73,11 @@ const UrlWhiteListConfig = () => {
   };
 
   const saveConfig = () => {
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_url_whitelist',
+      eventElement: 'update_configuration_button',
+    });
+
     ConfigurationsActions.updateWhitelist(ConfigurationType.URL_WHITELIST_CONFIG, formConfig).then(() => {
       closeModal();
     });

@@ -51,4 +51,8 @@ const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND')
   return `${oldQuery} ${operator} ${newTerm}`;
 };
 
-export { isPhrase, escape, addToQuery };
+const concatQueryStrings = (queryStrings: Array<string>, { operator = 'AND', withBrackets = true } = {}): string => {
+  return queryStrings.map((s) => (withBrackets ? `(${s})` : s)).join(` ${operator} `);
+};
+
+export { isPhrase, escape, addToQuery, concatQueryStrings };

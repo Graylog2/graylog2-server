@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
@@ -53,6 +54,7 @@ public class AppConfigResource {
     private final Map<String, PluginUISettingsProvider> settingsProviders;
     private final ObjectMapper objectMapper;
     private final FeatureFlags featureFlags;
+    private final TelemetryConfiguration telemetryConfiguration;
 
     @Inject
     public AppConfigResource(Configuration configuration,
@@ -60,13 +62,15 @@ public class AppConfigResource {
                              Engine templateEngine,
                              Map<String, PluginUISettingsProvider> settingsProviders,
                              ObjectMapper objectMapper,
-                             FeatureFlags featureFlags) {
+                             FeatureFlags featureFlags,
+                             TelemetryConfiguration telemetryConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
         this.settingsProviders = requireNonNull(settingsProviders);
         this.objectMapper = objectMapper;
         this.featureFlags = featureFlags;
+        this.telemetryConfiguration = telemetryConfiguration;
     }
 
     @GET
@@ -88,6 +92,7 @@ public class AppConfigResource {
                 .put("isCloud", configuration.isCloud())
                 .put("pluginUISettings", buildPluginUISettings())
                 .put("featureFlags", toPrettyJsonString(featureFlags.getAll()))
+                .put("telemetry", toPrettyJsonString(telemetryConfiguration.toMap()))
                 .build();
         return templateEngine.transform(template, model);
     }

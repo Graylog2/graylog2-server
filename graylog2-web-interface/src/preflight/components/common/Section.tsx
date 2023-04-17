@@ -18,10 +18,10 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { Box, Title } from '@mantine/core';
-import type { BoxProps } from '@mantine/core';
+import type { BoxProps, TitleOrder } from '@mantine/core';
 
-import Col from 'preflight/common/Col';
-import Row from 'preflight/common/Row';
+import Col from 'preflight/components/common/Col';
+import Row from 'preflight/components/common/Row';
 
 type ContainerType = BoxProps & {
   theme: DefaultTheme,
@@ -42,23 +42,19 @@ const SectionContainer = styled(SubsectionContainer)(({ theme }: ContainerType) 
   background-color: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.variant.lighter.default};
   border-radius: 4px;
-  min-height: 80vh;
-`);
-
-const SectionTitle = styled(Title)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
 `);
 
 type Props = {
   title: React.ReactNode,
   actions?: React.ReactNode,
+  titleOrder?: TitleOrder
 };
 
-const SectionHeader = ({ title, actions }: Props) => {
+const SectionHeader = ({ title, actions, titleOrder }: Props) => {
   return (
     <Row>
       <Col lg={6} md={6}>
-        <SectionTitle order={2}>{title}</SectionTitle>
+        <Title order={titleOrder}>{title}</Title>
       </Col>
       <Col lg={6} md={6}>
         <TitleActionContainer>{actions}</TitleActionContainer>
@@ -69,12 +65,13 @@ const SectionHeader = ({ title, actions }: Props) => {
 
 SectionHeader.defaultProps = {
   actions: undefined,
+  titleOrder: 2,
 };
 
-export const Subsection = ({ title, children, actions }: React.PropsWithChildren<Props>) => {
+export const Subsection = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => {
   return (
     <SubsectionContainer component="section">
-      <SectionHeader title={title} actions={actions} />
+      <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
       {children}
     </SubsectionContainer>
   );
@@ -82,12 +79,13 @@ export const Subsection = ({ title, children, actions }: React.PropsWithChildren
 
 Subsection.defaultProps = {
   actions: undefined,
+  titleOrder: undefined,
 };
 
-const Section = ({ title, children, actions }: React.PropsWithChildren<Props>) => {
+const Section = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => {
   return (
     <SectionContainer component="section">
-      <SectionHeader title={title} actions={actions} />
+      <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
       {children}
     </SectionContainer>
   );
@@ -95,6 +93,7 @@ const Section = ({ title, children, actions }: React.PropsWithChildren<Props>) =
 
 Section.defaultProps = {
   actions: undefined,
+  titleOrder: undefined,
 };
 
 export default Section;
