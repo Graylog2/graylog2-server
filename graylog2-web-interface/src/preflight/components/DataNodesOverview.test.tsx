@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -23,7 +23,6 @@ import DataNodesOverview from 'preflight/components/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
-import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -84,14 +83,14 @@ describe('DataNodesOverview', () => {
   });
 
   it('should list available data nodes', async () => {
-    render(<DataNodesOverview />);
+    renderPreflight(<DataNodesOverview />);
 
     await screen.findByText('node-id-3');
     await screen.findByText('http://localhost:9200');
   });
 
   it('should resume startup', async () => {
-    render(<DataNodesOverview />);
+    renderPreflight(<DataNodesOverview />);
 
     await screen.findByText('node-id-3');
 
@@ -112,11 +111,7 @@ describe('DataNodesOverview', () => {
       error: undefined,
     });
 
-    render(
-      <PreflightThemeProvider>
-        <DataNodesOverview />
-      </PreflightThemeProvider>,
-    );
+    renderPreflight(<DataNodesOverview />);
 
     const resumeStartupButton = screen.getByRole('button', {
       name: /resume startup/i,
@@ -125,7 +120,6 @@ describe('DataNodesOverview', () => {
     userEvent.click(resumeStartupButton);
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node?'));
-
     await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
   });
 });
