@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import DataNodesOverview from 'preflight/components/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
-import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
+import FetchError from 'logic/errors/FetchError';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -121,5 +121,18 @@ describe('DataNodesOverview', () => {
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node?'));
     await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+  });
+
+  it('should display error message when there was an error fetching data nodes', async () => {
+    asMock(useDataNodes).mockReturnValue({
+      data: [],
+      isFetching: false,
+      isInitialLoading: false,
+      error: new FetchError('The request error message', 500, { status: 500, body: { message: 'The request error message' } }),
+    });
+
+    renderPreflight(<DataNodesOverview />);
+    await screen.findByText(/There was an error fetching the data nodes:/);
+    await screen.findByText(/There was an error fetching a resource: The request error message. Additional information: Not available/);
   });
 });
