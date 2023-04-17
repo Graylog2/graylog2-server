@@ -22,6 +22,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonType;
+import org.bson.Document;
+import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
@@ -38,6 +40,7 @@ import org.mongojack.ObjectId;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +60,10 @@ class MongoCollectionsTest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     record Secret(@JsonProperty("encrypted_value") EncryptedValue encryptedValue) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record IgnoreTest(@JsonProperty("ignore_me_not") String ignoreMeNot,
+                      @MongoIgnore @JsonProperty("ignore_me") String ignoreMe) {}
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) {
@@ -98,4 +105,20 @@ class MongoCollectionsTest {
         });
     }
 
+    @Test
+    void testMongoIgnore() {
+        // @MongoIgnore should prevent a property from being written to Mongo. But if it's returned from Mongo,
+        // e.g. because it was calculated by an aggregation, it should be populated in the returned object.
+        final MongoCollection<IgnoreTest> collection = collections.get("ignoreTest", IgnoreTest.class);
+        collection.insertOne(new IgnoreTest("I should be present", "I should be gone"));
+        assertThat(collection.find().first()).isEqualTo(new IgnoreTest("I should be present", null));
+
+        final MongoCollection<Document> rawCollection = collections.get("alsoIgnoreTest", Document.class);
+        rawCollection.insertOne(new Document(Map.of(
+                "ignore_me_not", "I should be present",
+                "ignore_me", "I sneaked in")));
+
+        final MongoCollection<IgnoreTest> collection2 = collections.get("alsoIgnoreTest", IgnoreTest.class);
+        assertThat(collection2.find().first()).isEqualTo(new IgnoreTest("I should be present", "I sneaked in"));
+    }
 }

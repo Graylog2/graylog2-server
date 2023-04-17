@@ -16,11 +16,12 @@
  */
 package org.graylog2.bindings.providers;
 
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
 import org.graylog2.jackson.MongoJodaDateTimeSerializer;
@@ -32,14 +33,17 @@ import org.joda.time.DateTime;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 public class CommonMongoJackObjectMapperProvider implements Provider<ObjectMapper> {
     private final Provider<ObjectMapper> objectMapperProvider;
 
-    private static final AnnotationIntrospector customAnnotationIntrospector = new JacksonAnnotationIntrospector() {
+    private static final BeanSerializerModifier customBeanSerializerModifier = new BeanSerializerModifier() {
         @Override
-        public boolean hasIgnoreMarker(final AnnotatedMember member) {
-            return super.hasIgnoreMarker(member) || member.hasAnnotation(MongoIgnore.class);
+        public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc,
+                                                         List<BeanPropertyWriter> beanProperties) {
+            beanProperties.removeIf(prop -> prop.getAnnotation(MongoIgnore.class) != null);
+            return beanProperties;
         }
     };
 
@@ -47,7 +51,8 @@ public class CommonMongoJackObjectMapperProvider implements Provider<ObjectMappe
             .addSerializer(ZonedDateTime.class, new MongoZonedDateTimeSerializer())
             .addDeserializer(ZonedDateTime.class, new MongoZonedDateTimeDeserializer())
             .addSerializer(DateTime.class, new MongoJodaDateTimeSerializer())
-            .addDeserializer(DateTime.class, new MongoJodaDateTimeDeserializer());
+            .addDeserializer(DateTime.class, new MongoJodaDateTimeDeserializer())
+            .setSerializerModifier(customBeanSerializerModifier);
 
     @Inject
     public CommonMongoJackObjectMapperProvider(Provider<ObjectMapper> objectMapperProvider) {
@@ -61,7 +66,6 @@ public class CommonMongoJackObjectMapperProvider implements Provider<ObjectMappe
 
     public static ObjectMapper configure(ObjectMapper objectMapper) {
         var configuredObjectMapper = objectMapper.copy()
-                .setAnnotationIntrospector(customAnnotationIntrospector)
                 .registerModule(serializationModule);
 
         EncryptedValueMapperConfig.enableDatabase(configuredObjectMapper);
