@@ -17,24 +17,13 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.mongodb.client.MongoCollection;
 import org.bson.UuidRepresentation;
-import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.shaded.mongojack4.org.mongojack.JacksonMongoCollection;
-import org.graylog.shaded.mongojack4.org.mongojack.internal.MongoJackModule;
-import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
-import org.graylog2.jackson.MongoJodaDateTimeSerializer;
-import org.graylog2.jackson.MongoZonedDateTimeDeserializer;
-import org.graylog2.jackson.MongoZonedDateTimeSerializer;
-import org.graylog2.security.encryption.EncryptedValueMapperConfig;
-import org.joda.time.DateTime;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.time.ZonedDateTime;
 
 @Singleton
 public class MongoCollections {
@@ -43,28 +32,9 @@ public class MongoCollections {
     private final MongoConnection mongoConnection;
 
     @Inject
-    public MongoCollections(ObjectMapper objectMapper, MongoConnection mongoConnection) {
-        this.objectMapper = configuredObjectMapper(objectMapper);
+    public MongoCollections(CommonMongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
+        this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
-    }
-
-    private static ObjectMapper configuredObjectMapper(ObjectMapper original) {
-        final ObjectMapper configuredMapper = original.copy()
-                .setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
-                    @Override
-                    public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                        return super.hasIgnoreMarker(member) || member.hasAnnotation(MongoIgnore.class);
-                    }
-                })
-                .registerModule(new SimpleModule("JSR-310-MongoJack")
-                        .addSerializer(ZonedDateTime.class, new MongoZonedDateTimeSerializer())
-                        .addDeserializer(ZonedDateTime.class, new MongoZonedDateTimeDeserializer())
-                        .addSerializer(DateTime.class, new MongoJodaDateTimeSerializer())
-                        .addDeserializer(DateTime.class, new MongoJodaDateTimeDeserializer()));
-
-        MongoJackModule.configure(configuredMapper);
-        EncryptedValueMapperConfig.enableDatabase(configuredMapper);
-        return configuredMapper;
     }
 
     /**

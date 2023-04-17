@@ -24,6 +24,7 @@ import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonType;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -59,7 +60,7 @@ class MongoCollectionsTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) {
-        collections = new MongoCollections(new ObjectMapperProvider().get(), mongoDBTestService.mongoConnection());
+        collections = new MongoCollections(new CommonMongoJackObjectMapperProvider(new ObjectMapperProvider()), mongoDBTestService.mongoConnection());
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
     }
 
