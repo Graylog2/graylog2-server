@@ -52,7 +52,7 @@ const DataNodesOverview = () => {
         .catch((error) => {
           setResumingStartup(false);
 
-          UserNotification.error(`Resuming startup failed with: ${error}`,
+          UserNotification.error(`Resuming startup failed with error: ${error}`,
             'Could not resume startup');
         });
     }

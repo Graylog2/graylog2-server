@@ -22,6 +22,8 @@ import fetch from 'logic/rest/FetchProvider';
 import DataNodesOverview from 'preflight/components/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
+import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
+import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -63,6 +65,8 @@ const availableDataNodes = [
 ];
 
 describe('DataNodesOverview', () => {
+  let oldConfirm;
+
   beforeEach(() => {
     asMock(useDataNodes).mockReturnValue({
       data: availableDataNodes,
@@ -70,6 +74,13 @@ describe('DataNodesOverview', () => {
       isInitialLoading: false,
       error: undefined,
     });
+
+    oldConfirm = window.confirm;
+    window.confirm = jest.fn(() => true);
+  });
+
+  afterEach(() => {
+    window.confirm = oldConfirm;
   });
 
   it('should list available data nodes', async () => {
@@ -89,6 +100,31 @@ describe('DataNodesOverview', () => {
     });
 
     userEvent.click(resumeStartupButton);
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+  });
+
+  it('should display confirm dialog on resume startup when there is no Graylog data node', async () => {
+    asMock(useDataNodes).mockReturnValue({
+      data: [],
+      isFetching: false,
+      isInitialLoading: false,
+      error: undefined,
+    });
+
+    render(
+      <PreflightThemeProvider>
+        <DataNodesOverview />
+      </PreflightThemeProvider>,
+    );
+
+    const resumeStartupButton = screen.getByRole('button', {
+      name: /resume startup/i,
+    });
+
+    userEvent.click(resumeStartupButton);
+
+    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node?'));
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
   });
