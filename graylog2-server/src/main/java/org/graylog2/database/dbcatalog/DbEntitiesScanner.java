@@ -42,7 +42,7 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
     @Inject
     public DbEntitiesScanner(final ChainingClassLoader chainingClassLoader) {
         this.chainingClassLoader = chainingClassLoader;
-        this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
+        this.packagesToScan = new String[]{"org.graylog2", "org.graylog.plugins"};
     }
 
     DbEntitiesScanner(String[] packagesToScan) {
