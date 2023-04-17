@@ -19,7 +19,7 @@ import { Space } from '@mantine/core';
 import styled from 'styled-components';
 import { useState } from 'react';
 
-import UserNotification from 'util/UserNotification';
+import UserNotification from 'preflight/util/UserNotification';
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Badge, List, Button } from 'preflight/components/common';
