@@ -18,6 +18,7 @@ import * as React from 'react';
 import { AppShell, Title, Space } from '@mantine/core';
 import styled from 'styled-components';
 
+import DocsHelper from 'util/DocsHelper';
 import Section from 'preflight/components/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
 import DataNodesOverview from 'preflight/components/DataNodesOverview';
@@ -36,7 +37,7 @@ const App = () => (
         Data nodes allow you to index and search through all the messages in your Graylog message database.
       </P>
       <P>
-        You can either implement a <DocumentationLink page="" text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page="" text="Elasticsearch" /> or <DocumentationLink page="" text="OpenSearch" /> node manually.
+        You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
       </P>
 
       <Space h="md" />

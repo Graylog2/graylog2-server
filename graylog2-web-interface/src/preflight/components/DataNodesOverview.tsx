@@ -44,7 +44,7 @@ const DataNodesOverview = () => {
   } = useDataNodes();
 
   const resumeStartup = () => {
-    if (!dataNodes?.length && window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
+    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
       fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
         .then(() => {
           setResumingStartup(true);
