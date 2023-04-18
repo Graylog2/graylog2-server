@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Add events roup by fields as part of the search query"
+
+issues = ["14813"]
+pulls = ["15265" ]
