@@ -43,6 +43,7 @@ import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
+import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
@@ -69,6 +70,7 @@ import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
@@ -114,9 +116,8 @@ import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
 
 @Command(name = "server", description = "Start the Graylog server")
 public class Server extends ServerBootstrap {
-    private static final Logger LOG = LoggerFactory.getLogger(Server.class);
-
     protected static final Configuration configuration = new Configuration();
+    private static final Logger LOG = LoggerFactory.getLogger(Server.class);
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private final ElasticsearchClientConfiguration elasticsearchClientConfiguration = new ElasticsearchClientConfiguration();
@@ -133,6 +134,10 @@ public class Server extends ServerBootstrap {
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
     private final GeoIpProcessorConfig geoIpProcessorConfig = new GeoIpProcessorConfig();
 
+    private final TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
+    @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
+    private boolean local = false;
+
     public Server() {
         super("server", configuration);
     }
@@ -140,9 +145,6 @@ public class Server extends ServerBootstrap {
     public Server(String commandName) {
         super(commandName, configuration);
     }
-
-    @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
-    private boolean local = false;
 
     public boolean isLocal() {
         return local;
@@ -191,7 +193,8 @@ public class Server extends ServerBootstrap {
                 new SearchFiltersModule(),
                 new ScopedEntitiesModule(),
                 new ScriptingApiModule(featureFlags),
-                new StreamsModule()
+                new StreamsModule(),
+                new TracingModule()
         );
         return modules.build();
     }
@@ -213,7 +216,8 @@ public class Server extends ServerBootstrap {
                 jobSchedulerConfiguration,
                 prometheusExporterConfiguration,
                 tlsConfiguration,
-                geoIpProcessorConfig);
+                geoIpProcessorConfig,
+                telemetryConfiguration);
     }
 
     @Override
@@ -258,6 +262,34 @@ public class Server extends ServerBootstrap {
             } else {
                 LOG.warn("Stale leader has gone. Starting as leader.");
             }
+        }
+    }
+
+    @Override
+    protected Class<? extends Runnable> shutdownHook() {
+        return ShutdownHook.class;
+    }
+
+    @Override
+    protected void annotateInjectorExceptions(Collection<Message> messages) {
+        super.annotateInjectorExceptions(messages);
+        for (Message message : messages) {
+            if (message.getCause() instanceof MongoException) {
+                MongoException e = (MongoException) message.getCause();
+                LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?\n" +
+                        "Details: " + e.getMessage()));
+                System.exit(-1);
+            }
+        }
+    }
+
+    @Override
+    protected Set<ServerStatus.Capability> capabilities() {
+        if (configuration.isLeader()) {
+            //noinspection deprecation
+            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
+        } else {
+            return EnumSet.of(ServerStatus.Capability.SERVER);
         }
     }
 
@@ -306,34 +338,6 @@ public class Server extends ServerBootstrap {
             // right before shutting down to avoid repetitive processing
             // and duplicates.
             journal.flush();
-        }
-    }
-
-    @Override
-    protected Class<? extends Runnable> shutdownHook() {
-        return ShutdownHook.class;
-    }
-
-    @Override
-    protected void annotateInjectorExceptions(Collection<Message> messages) {
-        super.annotateInjectorExceptions(messages);
-        for (Message message : messages) {
-            if (message.getCause() instanceof MongoException) {
-                MongoException e = (MongoException) message.getCause();
-                LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?\n" +
-                        "Details: " + e.getMessage()));
-                System.exit(-1);
-            }
-        }
-    }
-
-    @Override
-    protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isLeader()) {
-            //noinspection deprecation
-            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
-        } else {
-            return EnumSet.of(ServerStatus.Capability.SERVER);
         }
     }
 }

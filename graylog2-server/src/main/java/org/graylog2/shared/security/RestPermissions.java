@@ -139,6 +139,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String SYSTEMJOBS_DELETE = "systemjobs:delete";
     public static final String SYSTEMJOBS_READ = "systemjobs:read";
     public static final String SYSTEMMESSAGES_READ = "systemmessages:read";
+    public static final String SUPPORTBUNDLE_READ = "supportbundle:read";
+    public static final String SUPPORTBUNDLE_CREATE = "supportbundle:create";
     public static final String THREADS_DUMP = "threads:dump";
     public static final String PROCESSBUFFER_DUMP = "processbuffer:dump";
     public static final String THROUGHPUT_READ = "throughput:read";
@@ -263,6 +265,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(SYSTEMJOBS_DELETE, ""))
             .add(create(SYSTEMJOBS_READ, ""))
             .add(create(SYSTEMMESSAGES_READ, ""))
+            .add(create(SUPPORTBUNDLE_READ, ""))
+            .add(create(SUPPORTBUNDLE_CREATE, ""))
             .add(create(THREADS_DUMP, ""))
             .add(create(PROCESSBUFFER_DUMP, ""))
             .add(create(THROUGHPUT_READ, ""))

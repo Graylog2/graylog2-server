@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -70,6 +71,7 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
+    @WithSpan
     public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {
         final Set<Query> validQueries = searchJob.getSearch().queries()
                 .stream()

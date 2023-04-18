@@ -23,6 +23,7 @@ import { EnterprisePluginNotFound } from 'components/common';
 import type Role from 'logic/roles/Role';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import type { WizardFormValues } from './BackendWizardContext';
 
@@ -49,6 +50,8 @@ const GroupSyncStep = ({
   help,
   excludedFields,
 }: Props) => {
+  const sendTelemetry = useSendTelemetry();
+
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
 
@@ -62,7 +65,14 @@ const GroupSyncStep = ({
         </Row>
         <ButtonToolbar className="pull-right">
           <Button bsStyle="primary"
-                  onClick={() => onSubmitAll(false)}>
+                  onClick={() => {
+                    sendTelemetry('click', {
+                      appSection: 'authentication_services_group_sync_step',
+                      eventElement: 'finish-and-save-service',
+                    });
+
+                    onSubmitAll(false);
+                  }}>
             Finish & Save Service
           </Button>
         </ButtonToolbar>

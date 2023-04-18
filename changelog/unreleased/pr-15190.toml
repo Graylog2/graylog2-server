@@ -1,0 +1,4 @@
+type = "s"
+message = "Update json-path to 2.8.0 to fix a security issue in json-smart."
+
+pulls = ["15190"]

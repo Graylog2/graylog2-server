@@ -1,0 +1,5 @@
+type = "added"
+message = "Add functionality which allows user create event definition from values"
+
+issues = ["14544"]
+pulls = ["15054"]

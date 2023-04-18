@@ -54,7 +54,7 @@ public class ClusterProcessingStatusResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Get processing status from all nodes in the cluster")
     public Map<String, Optional<ProcessingStatusSummary>> getStatus() {
-        return getForAllNodes(RemoteSystemProcessingStatusResource::getStatus, createRemoteInterfaceProvider(RemoteSystemProcessingStatusResource.class));
+        return stripCallResult(requestOnAllNodes(RemoteSystemProcessingStatusResource.class, RemoteSystemProcessingStatusResource::getStatus));
     }
 
     @GET
@@ -62,6 +62,6 @@ public class ClusterProcessingStatusResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Get persisted processing status from all nodes in the cluster")
     public Map<String, Optional<ProcessingStatusSummary>> getPersistedStatus() {
-        return getForAllNodes(RemoteSystemProcessingStatusResource::getPersistedStatus, createRemoteInterfaceProvider(RemoteSystemProcessingStatusResource.class));
+        return stripCallResult(requestOnAllNodes(RemoteSystemProcessingStatusResource.class, RemoteSystemProcessingStatusResource::getPersistedStatus));
     }
 }

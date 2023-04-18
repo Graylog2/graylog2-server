@@ -33,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -163,12 +164,13 @@ public class AccessTokenServiceImplTest {
     @Test
     @MongoDBFixtures("accessTokensSingleToken.json")
     public void testTouch() throws Exception {
+        accessTokenService.setLastAccessCache(1, TimeUnit.NANOSECONDS);
         final AccessToken token = accessTokenService.load("foobar");
-        final DateTime initialLastAccess = token.getLastAccess();
+        final DateTime firstAccess = accessTokenService.touch(token);
 
-        accessTokenService.touch(token);
-
-        assertThat(token.getLastAccess()).isGreaterThan(initialLastAccess);
+        Thread.sleep(1,0);
+        final DateTime secondAccess = accessTokenService.touch(token);
+        assertThat(secondAccess).isGreaterThan(firstAccess);
     }
 
     @Test

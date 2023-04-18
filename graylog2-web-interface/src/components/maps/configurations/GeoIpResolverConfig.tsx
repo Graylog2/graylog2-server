@@ -21,6 +21,7 @@ import { IfPermitted, Select, TimeUnitInput, ModalSubmit } from 'components/comm
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 export type GeoVendorType = 'MAXMIND' | 'IPINFO'
 export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS'
@@ -63,6 +64,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     return { ...defaultConfig };
   });
 
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     setCurConfig({ ...config });
   }, [config]);
@@ -73,7 +76,12 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   };
 
   const handleSubmit = (values: GeoIpConfigType) => {
-    return updateConfig(values)
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_geolocation_processor',
+      eventElement: 'update_configuration_button',
+    });
+
+    updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
           setShowModal(false);
@@ -92,9 +100,11 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     return availableVendorTypes().filter((t) => t.value === type)[0].label;
   };
 
+  const modalTitle = 'Update Geo-Location Processor Configuration';
+
   return (
     <div>
-      <h3>Geo-Location Processor</h3>
+      <h3>Geo-Location Processor Configuration</h3>
 
       <p>
         The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an
@@ -132,13 +142,18 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
           Edit configuration
         </Button>
       </IfPermitted>
-      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+      <Modal show={showModal}
+             onHide={resetConfig}
+             aria-modal="true"
+             aria-labelledby="dialog_label"
+             data-app-section="configurations_geolocation_processor"
+             data-event-element={modalTitle}>
         <Formik onSubmit={handleSubmit} initialValues={curConfig}>
           {({ values, setFieldValue, isSubmitting }) => {
             return (
               <Form>
                 <Modal.Header>
-                  <Modal.Title id="dialog_label">Update Geo-Location Processor Configuration</Modal.Title>
+                  <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                   <Row>

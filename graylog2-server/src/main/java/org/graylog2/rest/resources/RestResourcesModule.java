@@ -67,6 +67,8 @@ import org.graylog2.rest.resources.system.contentpacks.CatalogResource;
 import org.graylog2.rest.resources.system.contentpacks.ContentPackResource;
 import org.graylog2.rest.resources.system.debug.DebugEventsResource;
 import org.graylog2.rest.resources.system.debug.DebugStreamsResource;
+import org.graylog2.rest.resources.system.debug.bundle.SupportBundleClusterResource;
+import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
@@ -97,6 +99,7 @@ import org.graylog2.rest.resources.tools.RegexTesterResource;
 import org.graylog2.rest.resources.tools.SplitAndIndexTesterResource;
 import org.graylog2.rest.resources.tools.SubstringTesterResource;
 import org.graylog2.rest.resources.users.UsersResource;
+import org.graylog2.telemetry.rest.TelemetryResource;
 
 public class RestResourcesModule extends Graylog2Module {
     private final Configuration configuration;
@@ -123,6 +126,8 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(ClusterStatsResource.class);
         addSystemRestResource(ConfigurationResource.class);
         addSystemRestResource(DebugEventsResource.class);
+        addSystemRestResource(SupportBundleResource.class);
+        addSystemRestResource(SupportBundleClusterResource.class);
         addSystemRestResource(GettingStartedResource.class);
         addSystemRestResource(ServiceManagerResource.class);
         addSystemRestResource(SystemJobResource.class);
@@ -135,6 +140,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TrafficResource.class);
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
+        addSystemRestResource(TelemetryResource.class);
     }
 
     private void addDebugResources() {

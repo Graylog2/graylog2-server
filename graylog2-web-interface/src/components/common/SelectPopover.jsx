@@ -199,7 +199,8 @@ class SelectPopover extends React.Component {
       <Popover id={id}
                title={title}
                placement={placement}
-               className={style.customPopover}>
+               className={style.customPopover}
+               data-event-element={title}>
         {displayDataFilter && this.renderDataFilter(items)}
         {selectedItems.length > 0 && this.renderClearSelectionItem()}
         <IsolatedScroll className={style.scrollableList}>

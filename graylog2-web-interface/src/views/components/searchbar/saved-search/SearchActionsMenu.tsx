@@ -16,12 +16,11 @@
  */
 import * as React from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useCallback, useState, useContext, useRef } from 'react';
+import { useCallback, useState, useContext, useRef, useMemo } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
-import AddEvidence from 'components/security/investigations/AddEvidence';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
@@ -47,6 +46,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -67,12 +67,6 @@ const _extractErrorMessage = (error: FetchError) => {
     && error.additional.body
     && error.additional.body.message) ? error.additional.body.message : error;
 };
-
-const addToInvestigation = ({ investigationSelected }) => (
-  <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
-    Add to investigation
-  </MenuItem>
-);
 
 const SearchActionsMenu = () => {
   const theme = useTheme();
@@ -106,6 +100,9 @@ const SearchActionsMenu = () => {
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
+
+  const pluggableSearchActions = usePluginEntities('views.components.searchActions');
+  const searchActions = useMemo(() => pluggableSearchActions.map((PluggableSearchAction) => <PluggableSearchAction loaded={loaded} view={view} />), [pluggableSearchActions, loaded, view]);
 
   const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {
@@ -207,10 +204,12 @@ const SearchActionsMenu = () => {
         <MenuItem disabled={disableReset} onSelect={loadNewView} icon="eraser">
           Reset search
         </MenuItem>
-        <MenuItem divider />
-        {loaded && (
-          <AddEvidence id={view.id} type="searches" child={addToInvestigation} />
-        )}
+        {searchActions.length > 0 ? (
+          <>
+            <MenuItem divider />
+            {searchActions}
+          </>
+        ) : null}
       </DropdownButton>
       {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}
       {showMetadataEdit && (

@@ -16,20 +16,25 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import capitalize from 'lodash/capitalize';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { LoggersActions, LoggersStore } from 'stores/system/LoggersStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const LogLevelDropdown = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'LogLevelDropdown',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     name: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
     subsystem: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connect(LoggersStore)],
@@ -42,6 +47,12 @@ const LogLevelDropdown = createReactClass({
     return (event) => {
       event.preventDefault();
       this._changeLoglevel(loglevel);
+
+      this.props.sendTelemetry('change_input_value', {
+        appSection: 'logging',
+        eventElement: 'change-log-level',
+        eventInfo: { value: loglevel },
+      });
     };
   },
 
@@ -66,4 +77,4 @@ const LogLevelDropdown = createReactClass({
   },
 });
 
-export default LogLevelDropdown;
+export default withTelemetry(LogLevelDropdown);

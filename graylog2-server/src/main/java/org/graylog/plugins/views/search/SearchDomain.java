@@ -59,8 +59,9 @@ public class SearchDomain {
     }
 
     private void checkPermission(SearchUser searchUser, Search search) {
-        if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search))
+        if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search)) {
             throw new PermissionException("User " + searchUser.username() + " does not have permission to load search " + search.id());
+        }
     }
 
     public List<Search> getAllForUser(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission) {
@@ -90,8 +91,9 @@ public class SearchDomain {
         views.addAll(viewService.forSearch(search.id()));
         views.addAll(viewResolvers.values().stream()
                 .flatMap(viewResolver -> viewResolver.getBySearchId(search.id()).stream()).collect(Collectors.toSet()));
-        if (views.isEmpty())
+        if (views.isEmpty()) {
             return false;
+        }
 
         return views.stream().anyMatch(viewReadPermission);
     }

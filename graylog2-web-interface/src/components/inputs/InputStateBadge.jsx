@@ -27,8 +27,10 @@ import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
 const InputStateBadge = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'InputStateBadge',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     input: PropTypes.object.isRequired,
   },
@@ -111,7 +113,10 @@ const InputStateBadge = createReactClass({
         });
       });
       const popover = (
-        <Popover id="inputstate-badge-details" title={`Input States for ${input.title}`}>
+        <Popover id="inputstate-badge-details"
+                 title={`Input States for ${input.title}`}
+                 data-app-section="input_state_badge"
+                 data-event-element="Input States">
           {popOverText}
         </Popover>
       );

@@ -77,6 +77,7 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.shared.rest.resources.annotations.CSPDynamicFeature;
 import org.graylog2.shared.security.RestrictToLeaderFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.SupportedSearchVersionDynamicFeature;
@@ -90,6 +91,8 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.telemetry.enterprise.DefaultTelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
 import org.graylog2.users.GrantsCleanupListener;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
@@ -194,6 +197,7 @@ public class ServerBindings extends Graylog2Module {
 
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
+        OptionalBinder.newOptionalBinder(binder(), TelemetryEnterpriseDataProvider.class).setDefault().to(DefaultTelemetryEnterpriseDataProvider.class);
     }
 
     private void bindDynamicFeatures() {
@@ -201,6 +205,7 @@ public class ServerBindings extends Graylog2Module {
         dynamicFeatures.addBinding().toInstance(MetricsDynamicBinding.class);
         dynamicFeatures.addBinding().toInstance(RestrictToLeaderFeature.class);
         dynamicFeatures.addBinding().toInstance(SupportedSearchVersionDynamicFeature.class);
+        dynamicFeatures.addBinding().toInstance(CSPDynamicFeature.class);
     }
 
     private void bindExceptionMappers() {

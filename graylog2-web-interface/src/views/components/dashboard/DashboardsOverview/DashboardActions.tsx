@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -22,13 +22,13 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { ShareButton } from 'components/common';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MenuItem } from 'components/bootstrap';
-import AddEvidence from 'components/security/investigations/AddEvidence';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -42,15 +42,19 @@ const DeleteItem = styled.span(({ theme }: { theme: DefaultTheme }) => css`
   color: ${theme.colors.variant.danger};
 `);
 
-const addToInvestigation = ({ investigationSelected }) => (
-  <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
-    Add to investigation
-  </MenuItem>
-);
-
 const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const paginationQueryParameter = usePaginationQueryParameter();
+  const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
+  const modalRefs = useRef({});
+  const dashboardActions = useMemo(() => pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
+    <PluggableDashboardAction key={`dashboard-action-${key}`} dashboard={dashboard} modalRef={() => modalRefs.current[key]} />
+  )), [pluggableDashboardActions, dashboard]);
+  const dashboardActionModals = useMemo(() => pluggableDashboardActions
+    .filter(({ modal }) => !!modal)
+    .map(({ modal: ActionModal, key }) => (
+      <ActionModal key={`dashboard-action-modal-${key}`} dashboard={dashboard} ref={(r) => { modalRefs.current[key] = r; }} />
+    )), [pluggableDashboardActions, dashboard]);
 
   const onDashboardDelete = useCallback(async () => {
     const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
@@ -70,9 +74,13 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    entityId={dashboard.id}
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
-      <OverlayDropdownButton bsSize="xsmall" title="More" closeOnSelect>
-        <AddEvidence id={dashboard.id} type="dashboards" child={addToInvestigation} />
-        <MenuItem divider />
+      <OverlayDropdownButton bsSize="xsmall" title="More">
+        {dashboardActions.length > 0 ? (
+          <>
+            {dashboardActions}
+            <MenuItem divider />
+          </>
+        ) : null}
         <MenuItem onClick={onDashboardDelete}>
           <DeleteItem role="button">Delete</DeleteItem>
         </MenuItem>
@@ -84,6 +92,7 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                           entityTitle={dashboard.title}
                           onClose={() => setShowShareModal(false)} />
       )}
+      {dashboardActionModals}
     </>
   );
 };

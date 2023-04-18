@@ -24,6 +24,7 @@ import { Icon, Pluralize } from 'components/common';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -43,25 +44,29 @@ const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: { refreshConfigE
   return <>{buttonText}</>;
 };
 
-const _onChange = (interval: number) => {
-  RefreshActions.setInterval(interval);
-};
-
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
 const RefreshControls = () => {
   const refreshConfig = useRefreshConfig();
+  const sendTelemetry = useSendTelemetry();
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
+
+  const _onChange = (interval: number) => {
+    sendTelemetry('change_input_value', { appSection: 'search_bar', eventElement: 'refresh-search-control-dropdown', eventInfo: { interval: interval } });
+    RefreshActions.setInterval(interval);
+  };
 
   useEffect(() => () => RefreshActions.disable(), []);
 
   const _toggleEnable = useCallback(() => {
+    sendTelemetry('toggle_input_button', { appSection: 'search_bar', eventElement: 'refresh-search-control-enable', eventInfo: { enabled: !refreshConfig.enabled } });
+
     if (refreshConfig.enabled) {
       RefreshActions.disable();
     } else {
       RefreshActions.enable();
     }
-  }, [refreshConfig?.enabled]);
+  }, [refreshConfig?.enabled, sendTelemetry]);
 
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
     <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>

@@ -76,7 +76,9 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
   };
 
   return (
-    <Modal show>
+    <Modal show
+           data-app-section="dashboards"
+           data-event-element="CopyToDashboardForm">
       <Modal.Body>
         {isLoadingDashboards && <Spinner />}
         {!isLoadingDashboards && (

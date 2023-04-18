@@ -213,6 +213,12 @@ const ApiRoutes = {
     subsystems: () => { return { url: '/cluster/system/loggers/subsystems' }; },
     setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => { return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }; },
   },
+  ClusterSupportBundleController: {
+    delete: (filename: string) => { return { url: `/cluster/debug/support/bundle/${filename}` }; },
+    download: (filename: string) => { return { url: `/cluster/debug/support/bundle/download/${filename}` }; },
+    list: () => { return { url: '/cluster/debug/support/bundle/list' }; },
+    create: () => { return { url: '/cluster/debug/support/bundle/build' }; },
+  },
   MessageFieldsApiController: {
     list: () => { return { url: '/system/fields' }; },
     types: () => ({ url: 'views/fields' }),
@@ -314,6 +320,14 @@ const ApiRoutes = {
     lookupTableTest: () => { return { url: '/tools/lookup_table_tester' }; },
     urlWhitelistCheck: () => { return { url: '/system/urlwhitelist/check' }; },
     urlWhitelistGenerateRegex: () => { return { url: '/system/urlwhitelist/generate_regex' }; },
+  },
+  TelemetryApiController: {
+    info: () => {
+      return { url: '/telemetry' };
+    },
+    setting: () => {
+      return { url: '/telemetry/user/settings' };
+    },
   },
   UniversalSearchApiController: {
     _streamFilter(streamId: string) {
@@ -433,6 +447,7 @@ const ApiRoutes = {
     multiple: () => { return { url: '/system/pipelines/rule/multiple' }; },
     functions: () => { return { url: '/system/pipelines/rule/functions' }; },
     parse: () => { return { url: '/system/pipelines/rule/parse' }; },
+    simulate: () => { return { url: '/system/pipelines/rule/simulate' }; },
     metricsConfig: () => { return { url: '/system/pipelines/rule/config/metrics' }; },
   },
   ConnectionsController: {

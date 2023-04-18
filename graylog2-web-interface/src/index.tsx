@@ -19,6 +19,7 @@ import 'webpack-entry';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
@@ -27,6 +28,10 @@ import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+import CancellablePromise from 'logic/rest/CancellablePromise';
+import TelemetryInit from 'logic/telemetry/TelemetryInit';
+
+Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
@@ -34,21 +39,16 @@ PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
 function renderAppContainer(appContainer) {
   ReactDOM.render(
     <CustomizationProvider>
-      <GraylogThemeProvider>
-        <GlobalThemeStyles />
-        <AppFacade />
-      </GraylogThemeProvider>
+      <TelemetryInit>
+        <GraylogThemeProvider>
+          <GlobalThemeStyles />
+          <AppFacade />
+        </GraylogThemeProvider>
+      </TelemetryInit>
     </CustomizationProvider>,
     appContainer,
   );
 }
 
-window.onload = () => {
-  const appContainer = document.createElement('div');
-
-  appContainer.id = 'app-root';
-
-  document.body.appendChild(appContainer);
-
-  renderAppContainer(appContainer);
-};
+const appContainer = document.querySelector('div#app-root');
+renderAppContainer(appContainer);

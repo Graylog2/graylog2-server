@@ -29,6 +29,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
+import org.graylog.datanode.bindings.OpensearchDistributionBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
@@ -146,7 +147,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             throw e;
         }
 
-        if (mongoDBPreflightCheck.dbIsEmpty()) {
+        if (mongoDBPreflightCheck.isFreshInstallation()) {
             registerFreshInstallation();
         }
     }
@@ -155,7 +156,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
-                new ConfigurationModule(configuration)
+                new ConfigurationModule(configuration),
+                new OpensearchDistributionBindings()
+
         );
     }
 
@@ -165,6 +168,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(),
+                new OpensearchDistributionBindings(),
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
@@ -200,8 +204,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
-
-        startNodeRegistration(injector);
 
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
@@ -279,6 +281,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 //        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
+        result.add(new OpensearchDistributionBindings());
 //        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;

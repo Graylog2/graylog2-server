@@ -1,0 +1,5 @@
+type = "changed"
+message = "Instead of showing all configurations on one page it is now seperated into sections with a sidebar navigation."
+
+issues = ["14735"]
+pulls = ["15025"]

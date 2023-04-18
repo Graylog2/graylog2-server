@@ -97,6 +97,7 @@ import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
+import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -333,6 +334,13 @@ const exports: PluginExports = {
       handler: CopyValueToClipboard,
       isEnabled: () => true,
       resetFocus: false,
+    },
+    {
+      type: 'create-event-definition-from-value',
+      title: 'Create event definition',
+      isEnabled: () => true,
+      resetFocus: false,
+      component: CreateEventDefinition,
     },
   ], ['create-extractor']),
   visualizationTypes: visualizationBindings,

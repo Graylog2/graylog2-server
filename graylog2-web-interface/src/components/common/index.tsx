@@ -68,6 +68,7 @@ export { default as InteractableModal } from './InteractableModal';
 export { default as JSONValueInput } from './JSONValueInput';
 export { default as KeyCapture } from './KeyCapture';
 export { default as KeyValueTable } from './KeyValueTable';
+export { default as LinkButton } from './LinkButton';
 export { default as LinkToNode } from './LinkToNode';
 export { default as ListingWithCount } from './ListingWithCount';
 export { default as LoadingIndicator } from './LoadingIndicator';

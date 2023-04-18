@@ -46,8 +46,7 @@ public class DatanodeContainerizedBackend {
         this.datanodeContainer = createDatanodeContainer(
                 "node1",
                 hooks, createDockerImageFile(getOpensearchVersion()),
-                getDatanodeVersion(),
-                getOpensearchVersion());
+                getDatanodeVersion());
     }
 
     public DatanodeContainerizedBackend(Network network, GenericContainer<?> mongodbContainer, String nodeName, DatanodeDockerHooks hooks) {
@@ -57,16 +56,15 @@ public class DatanodeContainerizedBackend {
                 nodeName,
                 hooks,
                 createDockerImageFile(getOpensearchVersion()),
-                getDatanodeVersion(),
-                getOpensearchVersion());
+                getDatanodeVersion());
     }
 
-    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion, String opensearchVersion) {
+    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion) {
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
 
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR + "/opensearch-" + opensearchVersion)
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")

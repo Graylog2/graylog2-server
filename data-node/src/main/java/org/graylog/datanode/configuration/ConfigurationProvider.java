@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 
 import javax.inject.Inject;
@@ -45,6 +47,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Singleton
@@ -53,10 +56,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
     private final OpensearchConfiguration configuration;
 
     @Inject
-    public ConfigurationProvider(Configuration localConfiguration, DataNodeConfig sharedConfiguration) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    public ConfigurationProvider(Configuration localConfiguration, DataNodeConfig sharedConfiguration, OpensearchDistribution opensearchDistribution) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
         final var cfg = sharedConfiguration.test();
 
-        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchLocation()).resolve("config");
+        final Path opensearchConfigDir = opensearchDistribution.directory().resolve("config");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
@@ -86,6 +89,15 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             config.put("plugins.security.ssl.http.enabled", "true");
 
             final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
+
+            Objects.requireNonNull(localConfiguration.getRestApiUsername(),
+                    "rest_api_username has to be configured the usage of secured Opensearch REST api"
+            );
+
+            Objects.requireNonNull(localConfiguration.getRestApiPassword(),
+                    "rest_api_password has to be configured the usage of secured Opensearch REST api"
+            );
+
             configureInitialAdmin(internalUsersFile, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
 
         } else {
@@ -95,6 +107,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
 
         if (Files.exists(transportKeystorePath)) {
+
+            Objects.requireNonNull(localConfiguration.getDatanodeTransportCertificatePassword(),
+                    "transport_certificate_password has to be configured for the keystore " + transportKeystorePath
+            );
 
             KeyStore nodeKeystore = loadKeystore(transportKeystorePath, localConfiguration.getDatanodeTransportCertificatePassword());
             extractCertificates(opensearchConfigDir, "transport", nodeKeystore, localConfiguration.getDatanodeTransportCertificatePassword());
@@ -117,6 +133,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         if (Files.exists(httpKeystorePath)) {
 
+            Objects.requireNonNull(localConfiguration.getDatanodeHttpCertificatePassword(),
+                    "http_certificate_password has to be configured for the keystore " + httpKeystorePath
+            );
+
             KeyStore httpKeystore = loadKeystore(httpKeystorePath, localConfiguration.getDatanodeHttpCertificatePassword());
 
             final String truststorePassword = UUID.randomUUID().toString();
@@ -131,9 +151,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             config.put("plugins.security.ssl.http.pemtrustedcas_filepath", "http-ca.pem");
         }
 
+
         configuration = new OpensearchConfiguration(
-                localConfiguration.getOpensearchVersion(),
-                Path.of(localConfiguration.getOpensearchLocation()),
+                opensearchDistribution.version(),
+                opensearchDistribution.directory(),
                 localConfiguration.getOpensearchHttpPort(),
                 localConfiguration.getOpensearchTransportPort(),
                 localConfiguration.getRestApiUsername(),
@@ -148,17 +169,19 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
     private void configureInitialAdmin(Path internalUsersFile, String adminUsername, String adminPassword) throws IOException {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), Map.class);
-        final Map<String, Object> admin = (Map) map.get("admin");
+        final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), TypeReferences.MAP_STRING_OBJECT);
+        final Map<String, Object> adminUserConfig = (Map) map.get("admin");
 
-        // todo: compute bcrypt hash
+        map.remove("admin");
+        map.put(adminUsername, adminUserConfig);
 
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(12);
         final String hashWithPrefix = passwordAlgorithm.hash(adminPassword);
 
         // remove the prefix and suffix, we need just the hash itself
         final String hash = hashWithPrefix.substring("{bcrypt}".length(), hashWithPrefix.indexOf("{salt}"));
-        admin.put("hash", hash);
+        adminUserConfig.put("hash", hash);
+
         final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
         mapper.writeValue(fos, map);
     }

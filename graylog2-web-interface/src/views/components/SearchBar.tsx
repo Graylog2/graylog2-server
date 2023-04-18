@@ -147,7 +147,6 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   }
 
   const { query } = currentQuery;
-
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   return (

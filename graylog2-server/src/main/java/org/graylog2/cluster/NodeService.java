@@ -33,6 +33,11 @@ public interface NodeService extends PersistedService {
 
     Map<String, Node> allActive(Node.Type type);
 
+    /**
+     * Please use the {@link #allActive(Node.Type)} method and provide explicit type of the node. Otherwise,
+     * the implementation will fall back to {@link #type()} and provide only nodes of this type.
+     */
+    @Deprecated
     Map<String, Node> allActive();
 
     void dropOutdated();

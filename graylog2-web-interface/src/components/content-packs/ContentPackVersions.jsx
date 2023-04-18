@@ -134,7 +134,9 @@ class ContentPackVersions extends React.Component {
     const modal = (
       <BootstrapModalWrapper showModal={this.state.showModal}
                              onHide={closeModal}
-                             bsSize="large">
+                             bsSize="large"
+                             data-app-section="content_pack_versions"
+                             data-event-element="Install">
         <Modal.Header closeButton>
           <Modal.Title>Install</Modal.Title>
         </Modal.Header>

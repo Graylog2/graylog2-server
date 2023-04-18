@@ -129,12 +129,18 @@ const routeHasAppParent = (route: PluginRoute) => route.parentComponent === App;
 
 const AppRouter = () => {
   const pluginRoutes = usePluginEntities('routes');
-  const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map(renderPluginRoute);
+  const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((route) => renderPluginRoute({ ...route, parentComponent: GlobalContextProviders }));
   const pluginRoutesWithAppParent = pluginRoutes.filter((route) => routeHasAppParent(route)).map((route) => renderPluginRoute({ ...route, parentComponent: null }));
   const pluginRoutesWithParent = pluginRoutes.filter((route) => (route.parentComponent && !routeHasAppParent(route))).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
 
   const isCloud = AppConfig.isCloud();
+
+  let enableInputsRoute = true;
+
+  if (AppConfig.isCloud()) {
+    enableInputsRoute = AppConfig.isFeatureEnabled('cloud_inputs');
+  }
 
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
@@ -179,7 +185,7 @@ const AppRouter = () => {
               element: <ShowEventNotificationPage />,
             },
 
-            !isCloud && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
+            enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
             !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
             !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
