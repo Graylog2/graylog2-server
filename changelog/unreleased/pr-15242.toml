@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix OSHI system stats on docker cgroupv2."
+
+issues = [""]
+pulls = ["15242"]
+
