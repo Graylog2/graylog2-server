@@ -18,9 +18,8 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import ObjectID from 'bson-objectid';
 
 import {
-  mockedMappedAggregation, mockedViewWithOneAggregation,
-  mockedViewWithTwoAggregations,
-  mockEventData, mockEventDefinitionOneAggregation,
+  mockedViewWithMessageAndBarWidget,
+  mockEventData,
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import { UseCreateViewForEvent } from 'views/logic/views/UseCreateViewForEvent';
@@ -41,11 +40,9 @@ const counter = () => {
 
 const generateIdCounterTwoAggregations = counter();
 const objectIdCounterTwoAggregations = counter();
-const generateIdCounterOneAggregation = counter();
-const objectIdCounterOneAggregations = counter();
 
 const mockedGenerateIdTwoAggregations = () => {
-  const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id', 'field1-widget-id', 'field2-widget-id', 'summary-widget-id'];
+  const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id'];
   const index = generateIdCounterTwoAggregations();
 
   return idSet[index];
@@ -54,20 +51,6 @@ const mockedGenerateIdTwoAggregations = () => {
 const mockedObjectIdTwoAggregations = () => {
   const idSet = ['', 'view-id', 'search-id'];
   const index = objectIdCounterTwoAggregations();
-
-  return idSet[index];
-};
-
-const mockedObjectIdOneAggregation = () => {
-  const idSet = ['', 'view-id', 'search-id'];
-  const index = objectIdCounterOneAggregations();
-
-  return idSet[index];
-};
-
-const mockedGenerateIdOneAggregation = () => {
-  const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id', 'field1-widget-id'];
-  const index = generateIdCounterOneAggregation();
 
   return idSet[index];
 };
@@ -98,29 +81,16 @@ describe('UseCreateViewForEvent', () => {
     jest.clearAllMocks();
   });
 
-  it('should create view with 2 aggregation widgets and one summary', async () => {
+  it('should create view with message and message count widgets', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
 
     asMock(ObjectID).mockImplementation(() => ({
       toString: () => mockedObjectIdTwoAggregations(),
     }) as ObjectID);
 
-    const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation }));
+    const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionTwoAggregations }));
     const view = await result.current.then((r) => r);
 
-    expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithTwoAggregations));
-  });
-
-  it('should create view with 1 aggregation widgets and without summary', async () => {
-    asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
-
-    asMock(ObjectID).mockImplementation(() => ({
-      toString: () => mockedObjectIdOneAggregation(),
-    }) as ObjectID);
-
-    const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionOneAggregation, aggregations: [mockedMappedAggregation[0]] }));
-    const view = await result.current.then((r) => r);
-
-    expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithOneAggregation));
+    expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithMessageAndBarWidget));
   });
 });

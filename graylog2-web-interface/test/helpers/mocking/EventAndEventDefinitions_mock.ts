@@ -63,7 +63,7 @@ export const mockEventData = {
         '001',
       ],
     },
-    group_by_fields: [{}],
+    group_by_fields: { field4: 'value4' },
 
   } as Event,
 };
@@ -267,10 +267,32 @@ const widgetsWithTwoAggregations = [
   messageTable,
   summaryWidget,
 ];
+
+const widgetsWithMessageAndBar = [
+  histogram,
+  messageTable,
+];
 const searchTwoAggregations = Search.create().toBuilder().id('search-id').queries([
   query
     .toBuilder()
     .searchTypes(Array(5).fill({
+      filters: [],
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    })).build()])
+  .build();
+const queryForEvent = QueryGenerator(eventData.replay_info.streams, 'query-id', {
+  type: 'absolute',
+  from: eventData?.replay_info?.timerange_start,
+  to: eventData?.replay_info?.timerange_end,
+}, {
+  type: 'elasticsearch',
+  query_string: `(${eventData.replay_info.query}) AND (field4:value4)`,
+});
+const searchMessageAndBar = Search.create().toBuilder().id('search-id').queries([
+  queryForEvent
+    .toBuilder()
+    .searchTypes(Array(2).fill({
       filters: [],
       type: 'AGGREGATION',
       typeDefinition: {},
@@ -306,6 +328,32 @@ export const mockedViewWithTwoAggregations = View.create()
       .build(),
   })
   .search(searchTwoAggregations)
+  .build();
+
+export const mockedViewWithMessageAndBarWidget = View.create()
+  .toBuilder()
+  .id('view-id')
+  .type(View.Type.Search)
+  .state({
+    'query-id': ViewState.create()
+      .toBuilder()
+      .titles({
+        widget: {
+          'mc-widget-id': 'Message Count',
+          'allm-widget-id': 'All Messages',
+        },
+      })
+      .widgetMapping(Immutable.Map(
+        ['mc-widget-id', 'allm-widget-id'].map((item) => [item, Immutable.Set([undefined])]),
+      ))
+      .widgets(widgetsWithMessageAndBar)
+      .widgetPositions({
+        'mc-widget-id': new WidgetPosition(1, 1, 2, Infinity),
+        'allm-widget-id': new WidgetPosition(1, 3, 6, Infinity),
+      })
+      .build(),
+  })
+  .search(searchMessageAndBar)
   .build();
 
 const searchOneAggregation = Search.create().toBuilder().id('search-id').queries([query.toBuilder().searchTypes(Array(3).fill({

@@ -28,8 +28,8 @@ import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 
 const EventView = () => {
-  const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
-  const view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
+  const { eventData, eventDefinition } = useAlertAndEventDefinitionData();
+  const view = useCreateViewForEvent({ eventData, eventDefinition });
 
   return (
     <SearchPage view={view}

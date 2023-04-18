@@ -17,7 +17,7 @@
 import React from 'react';
 
 type Props = {
-  fields: Object[],
+  fields: {[key: string]: string} | Object[],
 };
 
 const EventFields = ({ fields }: Props) => {

@@ -40,12 +40,12 @@ export const conditionToExprMapper: {[name: string]: ValueExpr} = {
   equal: '==',
 };
 
-const useHighlightValuesForEventDefinition = () => {
+const useHighlightValuesForEventDefinition = (shouldRun: boolean) => {
   const dispatch = useAppDispatch();
   const { aggregations } = useAlertAndEventDefinitionData();
 
   return useEffect(() => {
-    if (aggregations?.length) {
+    if (aggregations?.length && shouldRun) {
       const valuesToHighlight = aggregations.map(({ fnSeries, value, expr }) => ({
         value,
         field: fnSeries,
@@ -54,7 +54,7 @@ const useHighlightValuesForEventDefinition = () => {
       }));
       if (valuesToHighlight.length) dispatch(createHighlightingRules(valuesToHighlight));
     }
-  }, [aggregations, dispatch]);
+  }, [aggregations, dispatch, shouldRun]);
 };
 
 export default useHighlightValuesForEventDefinition;
