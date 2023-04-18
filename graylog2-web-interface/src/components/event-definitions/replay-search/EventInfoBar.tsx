@@ -56,8 +56,8 @@ const Value = styled.div`
 `;
 
 const EventInfoBar = () => {
-  useHighlightValuesForEventDefinition();
   const { isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
+  useHighlightValuesForEventDefinition(isEventDefinition);
   const [open, setOpen] = useState<boolean>(true);
 
   const toggleOpen = useCallback((e: SyntheticEvent) => {

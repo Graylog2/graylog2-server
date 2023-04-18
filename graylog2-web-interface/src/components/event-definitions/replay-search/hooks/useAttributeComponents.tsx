@@ -26,6 +26,7 @@ import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Timestamp, HoverForHelp } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 
 import AggregationConditions from '../AggreagtionConditions';
 import Notifications from '../Notifications';
@@ -35,11 +36,12 @@ const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
 `);
 
 const useAttributeComponents = () => {
-  const { eventData, eventDefinition, isEventDefinition } = useAlertAndEventDefinitionData();
+  const { eventData, eventDefinition, isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
 
   const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
   const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
+  const queryStringFromGrouping = (isEvent || isAlert) && concatQueryStrings(Object.entries(eventData.group_by_fields).map(([field, value]) => `${field}:${value}`), { withBrackets: false });
 
   return useMemo(() => [
     { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
@@ -80,17 +82,14 @@ const useAttributeComponents = () => {
     {
       title: 'Aggregation conditions',
       content: <AggregationConditions />,
+      show: isEventDefinition,
     },
-  ], [
-    eventData?.timestamp,
-    eventDefinition,
-    executeEvery?.duration,
-    executeEvery?.unit,
-    isEDUpdatedAfterEvent,
-    isEventDefinition,
-    searchWithin?.duration,
-    searchWithin?.unit,
-  ]);
+    {
+      title: 'Group-By Fields',
+      content: queryStringFromGrouping,
+      show: !!queryStringFromGrouping,
+    },
+  ], [eventData?.timestamp, eventDefinition.description, eventDefinition.id, eventDefinition.priority, eventDefinition.title, eventDefinition.updated_at, executeEvery.duration, executeEvery.unit, isEDUpdatedAfterEvent, isEventDefinition, queryStringFromGrouping, searchWithin.duration, searchWithin.unit]);
 };
 
 export default useAttributeComponents;

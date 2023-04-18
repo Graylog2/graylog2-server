@@ -104,9 +104,9 @@ describe('<EventInfoBar />', () => {
       );
   });
 
-  it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Aggregation conditions', async () => {
+  it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Aggregation conditions for event definitions', async () => {
     setMockedHookCache({
-      isEvent: true,
+      isEventDefinition: true,
     });
 
     render(<EventInfoComponent />);
@@ -129,6 +129,28 @@ describe('<EventInfoBar />', () => {
 
     expect(field1Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
     expect(field2Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
+  });
+
+  it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Group-By Fields for event', async () => {
+    setMockedHookCache({
+      isEvent: true,
+    });
+
+    render(<EventInfoComponent />);
+
+    const priority = await screen.findByTitle('Priority');
+    const execution = await screen.findByTitle('Execute search every');
+    const searchWithin = await screen.findByTitle('Search within');
+    const description = await screen.findByTitle('Description');
+    const notifications = await screen.findByTitle('Notifications');
+    const aggregationConditions = await screen.findByTitle('Group-By Fields');
+
+    expect(priority).toHaveTextContent('Normal');
+    expect(execution).toHaveTextContent('1 minute');
+    expect(searchWithin).toHaveTextContent('1 minute');
+    expect(description).toHaveTextContent('Test description');
+    expect(notifications).toHaveTextContent('Email notification');
+    expect(aggregationConditions).toHaveTextContent('field4:value4');
   });
 
   it('Shows event timestamp and event definition link for event', async () => {
