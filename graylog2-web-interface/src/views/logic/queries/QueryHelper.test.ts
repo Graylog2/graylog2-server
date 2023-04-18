@@ -14,10 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { escape } from './QueryHelper';
+import { concatQueryStrings, escape } from './QueryHelper';
 
 describe('QueryHelper', () => {
   it('quotes $ in values', () => {
     expect(escape('foo$bar$')).toEqual('foo\\$bar\\$');
+  });
+
+  describe('concatQueryStrings', () => {
+    it('concat queries by default with AND and brackets', () => {
+      const result = concatQueryStrings(['filed1:value1 OR field2:value2', 'field3:value3']);
+
+      expect(result).toEqual('(filed1:value1 OR field2:value2) AND (field3:value3)');
+    });
+
+    it('concat queries with custom operator and without brackets', () => {
+      const result = concatQueryStrings(['filed1:value1 OR field2:value2', 'field3:value3'], { operator: 'OR', withBrackets: false });
+
+      expect(result).toEqual('filed1:value1 OR field2:value2 OR field3:value3');
+    });
+
+    it('filtrate empty query strings', () => {
+      const result = concatQueryStrings(['     ', 'filed1:value1 OR field2:value2', ' ', 'field3:value3', '']);
+
+      expect(result).toEqual('(filed1:value1 OR field2:value2) AND (field3:value3)');
+    });
+
+    it('doesnt wrap in brackets if we have only one query string', () => {
+      const result = concatQueryStrings(['     ', 'filed1:value1 OR field2:value2', ' ', '']);
+
+      expect(result).toEqual('filed1:value1 OR field2:value2');
+    });
   });
 });
