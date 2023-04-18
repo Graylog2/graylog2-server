@@ -31,7 +31,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import Parameter from 'views/logic/parameters/Parameter';
-import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
+import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 
 export const WidgetsGenerator = async ({ streams }) => {
   const decorators = await DecoratorsActions.list();
@@ -102,7 +102,7 @@ export const ViewGenerator = async ({
 export const UseCreateViewForEvent = (
   { eventData, eventDefinition }: { eventData: Event, eventDefinition: EventDefinition },
 ) => {
-  const queryStringFromGrouping = concatQueryStrings(Object.entries(eventData.group_by_fields).map(([field, value]) => `${field}:${value}`), { withBrackets: false });
+  const queryStringFromGrouping = concatQueryStrings(Object.entries(eventData.group_by_fields).map(([field, value]) => `${field}:${escape(value)}`), { withBrackets: false });
   const eventQueryString = eventData?.replay_info?.query || '';
   const { streams } = eventData.replay_info;
   const timeRange: AbsoluteTimeRange = {
