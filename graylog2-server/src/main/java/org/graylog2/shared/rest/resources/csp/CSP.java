@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.rest.resources.annotations;
+package org.graylog2.shared.rest.resources.csp;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

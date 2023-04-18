@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.plugin.rest.ValidationResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -35,6 +38,11 @@ public interface AuthServiceBackendConfig {
 
     @JsonIgnore
     default void validate(ValidationResult result) {
+    }
+
+    @JsonIgnore
+    default List<String> hostAllowList() {
+        return new ArrayList<>();
     }
 
     interface Builder<SELF> {

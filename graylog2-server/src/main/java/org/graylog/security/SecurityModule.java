@@ -41,6 +41,8 @@ import org.graylog.security.rest.GrantsOverviewResource;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.shared.rest.resources.csp.CSPService;
+import org.graylog2.shared.rest.resources.csp.CSPServiceImpl;
 
 public class SecurityModule extends PluginModule {
     @Override
@@ -85,5 +87,7 @@ public class SecurityModule extends PluginModule {
                 ADAuthServiceBackend.class,
                 ADAuthServiceBackend.Factory.class,
                 ADAuthServiceBackendConfig.class);
+
+        bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
     }
 }

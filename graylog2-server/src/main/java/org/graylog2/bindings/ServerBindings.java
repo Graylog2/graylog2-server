@@ -77,7 +77,7 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.shared.rest.resources.annotations.CSPDynamicFeature;
+import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.shared.security.RestrictToLeaderFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.SupportedSearchVersionDynamicFeature;
