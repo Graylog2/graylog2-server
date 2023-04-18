@@ -53,6 +53,7 @@ import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type SearchResult from 'views/logic/SearchResult';
 import type { WidgetMapping } from 'views/logic/views/types';
+import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
@@ -249,6 +250,36 @@ type MessageDetailContextProviderProps = {
   message: Message,
 }
 
+type DashboardActionComponentProps = {
+  dashboard: View,
+  modalRef: () => unknown,
+}
+
+type DashboardActionModalProps = {
+  dashboard: View,
+  ref: React.Ref<unknown>,
+}
+
+type DashboardAction = {
+  key: string,
+  component: React.ComponentType<DashboardActionComponentProps>,
+  modal?: React.ComponentType<DashboardActionModalProps>,
+}
+
+type EventActionComponentProps = {
+  event: Event,
+}
+
+type MessageActionComponentProps = {
+  index: string,
+  id: string,
+}
+
+type SearchActionComponentProps = {
+  loaded: boolean,
+  view: View,
+}
+
 export type CopyParamsToView = (sourceView: View, targetView: View) => View;
 
 type RemovingWidgetHook = (widgetId: string, dashboardId: string) => boolean;
@@ -365,10 +396,14 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
+    'views.components.dashboardActions'?: Array<DashboardAction>;
+    'views.components.eventActions'?: Array<React.ComponentType<EventActionComponentProps>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
+    'views.components.widgets.messageTable.messageActions'?: Array<React.ComponentType<MessageActionComponentProps>>;
+    'views.components.searchActions'?: Array<React.ComponentType<SearchActionComponentProps>>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
