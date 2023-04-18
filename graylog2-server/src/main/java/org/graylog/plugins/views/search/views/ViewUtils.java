@@ -39,15 +39,29 @@ public interface ViewUtils<T> {
     MongoCollection<Document> collection();
     Class<T> type();
 
+    private void replaceId(final Document document) {
+        // replace "_id" with "id", because the ViewDTO depends on it
+        if(document.containsKey("_id")) {
+            final var id = document.get("_id");
+            document.remove("_id");
+            document.put("id", id);
+        }
+        document.values().forEach(value -> {
+            if(value instanceof Document) {
+                replaceId((Document)value);
+            }
+            if(value instanceof Iterable<?>) {
+                ((Iterable<?>) value).forEach(x -> {
+                    if(x instanceof Document) replaceId((Document)x);
+                });
+            }
+        });
+    }
+
     default T deserialize(final Document document) {
         try {
-            // replace "_id" with "id", because the ViewDTO depends on it
-            if(document.containsKey("_id")) {
-                final var id = document.get("_id");
-                document.remove("_id");
-                document.put("id", id);
-            }
-            var json = mapper().writeValueAsString(document);
+            replaceId(document);
+            final var json = mapper().writeValueAsString(document);
             return mapper().readValue(json, type());
         } catch (JsonProcessingException jpe) {
             throw new RuntimeException("Could not deserialize view: " + jpe.getMessage(), jpe);
