@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
@@ -62,8 +63,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
     static class TestViewService extends ViewSummaryService {
         TestViewService(MongoConnection mongoConnection,
                         MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                        ObjectMapper mapper) {
-            super(mongoConnection, mongoJackObjectMapperProvider, new MongoCollections(mapper, mongoConnection));
+                        MongoCollections mongoCollections) {
+            super(mongoConnection, mongoJackObjectMapperProvider, mongoCollections);
         }
     }
 
@@ -71,10 +72,11 @@ public class SearchesCleanUpJobWithDBServicesTest {
     public void setup(MongoJackObjectMapperProvider mapperProvider, ObjectMapper mapper) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
+
         final ViewSummaryService viewService = new TestViewService(
                 mongodb.mongoConnection(),
                 mapperProvider,
-                mapper
+                new MongoCollections(new CommonMongoJackObjectMapperProvider(() -> mapper), mongodb.mongoConnection())
         );
         this.searchDbService = spy(
                 new SearchDbService(

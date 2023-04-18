@@ -23,18 +23,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchRequirements;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewRequirements;
-import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
-import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
@@ -45,9 +39,9 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramC
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
-import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardWidgetConverter;
@@ -93,23 +87,6 @@ public class DashboardV1FacadeTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    public static class TestSearchDBService extends SearchDbService {
-        protected TestSearchDBService(MongoConnection mongoConnection,
-                                      MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
-        }
-    }
-
-    public static class TestViewService extends ViewService {
-        protected TestViewService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                  ObjectMapper mapper,
-                                  ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class), new MongoCollections(mapper, mongoConnection));
-        }
-    }
-
     private DashboardV1Facade facade;
     private ViewFacadeTest.TestViewService viewService;
     private ViewFacadeTest.TestSearchDBService searchDbService;
@@ -141,8 +118,10 @@ public class DashboardV1FacadeTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
         searchDbService = new ViewFacadeTest.TestSearchDBService(mongoConnection, mapper);
-        viewService = new ViewFacadeTest.TestViewService(mongoConnection, mapper, objectMapper,null);
-        viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, objectMapper);
+        final MongoCollections mongoCollections = new MongoCollections(
+                new CommonMongoJackObjectMapperProvider(() -> objectMapper), mongoConnection);
+        viewService = new ViewFacadeTest.TestViewService(mongoConnection, mapper, null, mongoCollections);
+        viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, mongoCollections);
         userService = mock(UserService.class);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
                 mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));

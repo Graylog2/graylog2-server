@@ -37,6 +37,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
@@ -96,7 +97,8 @@ class ViewSharingToGrantsMigrationTest {
         });
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
-        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, mapper, clusterConfigService, entityOwnershipService);
+        final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongodb.mongoConnection());
+        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService, mongoCollections);
 
         this.migration = new ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService, grnRegistry);
     }
@@ -206,12 +208,11 @@ class ViewSharingToGrantsMigrationTest {
     public static class TestViewService extends ViewService {
         public TestViewService(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                               ObjectMapper mapper,
                                ClusterConfigService clusterConfigService,
-                               EntityOwnershipService entityOwnerShipService) {
+                               EntityOwnershipService entityOwnerShipService, MongoCollections mongoCollections) {
             super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService,
                     view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService,
-                    mock(ViewSummaryService.class), new MongoCollections(mapper, mongoConnection));
+                    mock(ViewSummaryService.class), mongoCollections);
         }
     }
 }
