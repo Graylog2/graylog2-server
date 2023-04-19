@@ -108,6 +108,10 @@ const useEventDefinition = (definitionId: string): {
       },
       keepPreviousData: true,
       enabled: !!definitionId,
+      initialData: {
+        eventDefinition: null,
+        aggregations: [],
+      },
     },
   );
 
