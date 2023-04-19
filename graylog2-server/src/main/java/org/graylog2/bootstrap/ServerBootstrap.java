@@ -38,9 +38,9 @@ import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
+import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.configuration.IndexDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -181,9 +181,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private void doRunWithPreflightInjector(Injector preflightInjector) {
-        final PreflightConfigService preflightConfigService = preflightInjector.getInstance(PreflightConfigService.class);
+        final PreflightBoot preflightBoot = preflightInjector.getInstance(PreflightBoot.class);
 
-        final Supplier<Boolean> shouldRun = () -> preflightConfigService.getPersistedConfig().isEmpty() || configuration.enablePreflightWebserver();
+        final Supplier<Boolean> shouldRun = preflightBoot::shouldRunPreflightWeb;
 
         if (!shouldRun.get()) {
             return;

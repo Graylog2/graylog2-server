@@ -17,15 +17,16 @@
 package org.graylog2.bootstrap.preflight;
 
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
-@CollectionName("preflight")
+@DbEntity(collection = "preflight")
 public class PreflightConfig extends PersistedImpl {
 
     protected PreflightConfig(@Nullable Map<String, Object> fields) {
@@ -34,6 +35,12 @@ public class PreflightConfig extends PersistedImpl {
 
     protected PreflightConfig(ObjectId id, @Nullable Map<String, Object> fields) {
         super(id, fields);
+    }
+
+    public PreflightConfigResult result() {
+        return Optional.ofNullable(getFields().get("result"))
+                .map(v -> PreflightConfigResult.valueOf((String) v))
+                .orElse(PreflightConfigResult.UNKNOWN);
     }
 
     @Override

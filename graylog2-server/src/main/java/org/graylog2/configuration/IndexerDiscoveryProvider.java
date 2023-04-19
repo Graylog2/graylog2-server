@@ -18,6 +18,9 @@ package org.graylog2.configuration;
 
 import com.google.common.base.Suppliers;
 import com.google.inject.Provider;
+import org.graylog2.bootstrap.preflight.PreflightConfig;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 
@@ -34,12 +37,17 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
 
     public static final URI DEFAULT_INDEXER_HOST = URI.create("http://127.0.0.1:9200");
     private final List<URI> hosts;
+    private final PreflightConfigService preflightConfigService;
     private final NodeService nodeService;
     private final Supplier<List<URI>> supplier;
 
     @Inject
-    public IndexerDiscoveryProvider(@Named("elasticsearch_hosts") List<URI> hosts, NodeService nodeService) {
+    public IndexerDiscoveryProvider(
+            @Named("elasticsearch_hosts") List<URI> hosts,
+            PreflightConfigService preflightConfigService,
+            NodeService nodeService) {
         this.hosts = hosts;
+        this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;
         this.supplier = Suppliers.memoize(this::doGet);
     }
@@ -50,15 +58,31 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     }
 
     private List<URI> doGet() {
+
+        // configured hosts, just use these and don't try any detection
         if (hosts != null && !hosts.isEmpty()) {
             return hosts;
         }
 
-        final List<URI> discovered = discover();
-        if (!discovered.isEmpty()) {
-            return discovered;
+        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
+                .map(PreflightConfig::result)
+                .orElse(PreflightConfigResult.UNKNOWN);
+
+        // if preflight is finished, we assume that there will be some datanode registered via node-service.
+        if (preflightResult == PreflightConfigResult.FINISHED) {
+            final List<URI> discovered = discover();
+            if (!discovered.isEmpty()) {
+                return discovered;
+            } else {
+                // TODO: we could wait here(or in the preflight check) for a datanode to register.
+                throw new IllegalStateException("No Datanode available, terminating.");
+            }
         }
+
+        // if there are no configured hosts and the preflight never has run or was skipped, we should fallback
+        // to our old default localhost:9200 to preserve backwards compatibility.
         return Collections.singletonList(DEFAULT_INDEXER_HOST);
+
     }
 
     private List<URI> discover() {
