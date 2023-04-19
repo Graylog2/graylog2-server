@@ -65,7 +65,7 @@ const TelemetryInit = ({ children }: { children: React.ReactElement }) => {
     }
   }, [currentUser]);
 
-  if ((settings && !settings.telemetry_enabled) || !host || !key) {
+  if ((!settings?.telemetry_enabled) || !host || !key) {
     return children;
   }
 
