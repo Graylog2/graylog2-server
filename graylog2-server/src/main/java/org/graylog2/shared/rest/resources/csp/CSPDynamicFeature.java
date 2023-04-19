@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
@@ -30,7 +31,7 @@ public class CSPDynamicFeature implements DynamicFeature {
     private final CSPService cspService;
 
     @Inject
-    public CSPDynamicFeature(CSPService cspService) {
+    public CSPDynamicFeature(@Context CSPService cspService) {
         this.cspService = cspService;
     }
 
