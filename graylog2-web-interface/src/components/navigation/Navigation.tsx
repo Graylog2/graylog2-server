@@ -184,15 +184,15 @@ const Navigation = React.memo(({ pathname }: Props) => {
             <DevelopmentHeaderBadge />
             {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
-
-          <LinkContainer relativeActive to={Routes.WELCOME}>
-            <NavItem id="welcome-nav-link" aria-label="Welcome">
-              <Icon size="lg" fixedWidth title="Welcome" name="table-columns" />
-            </NavItem>
-          </LinkContainer>
           <ScratchpadToggle />
 
           <HelpMenu active={_isActive(pathname, Routes.WELCOME)} />
+
+          <LinkContainer relativeActive to={Routes.WELCOME}>
+            <NavItem id="welcome-nav-link" aria-label="Welcome">
+              <Icon size="lg" fixedWidth title="Welcome" name="home" />
+            </NavItem>
+          </LinkContainer>
 
           <UserMenu fullName={fullName} readOnly={readOnly} userId={userId} />
         </Nav>
