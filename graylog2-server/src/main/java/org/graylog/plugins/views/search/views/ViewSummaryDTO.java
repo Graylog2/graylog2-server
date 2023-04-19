@@ -16,13 +16,13 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.bson.Document;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -99,6 +99,7 @@ public abstract class ViewSummaryDTO implements ViewLike {
         @ObjectId
         @Id
         @JsonProperty(ViewDTO.FIELD_ID)
+        @JsonAlias("_" + ViewDTO.FIELD_ID)
         public abstract Builder id(String id);
 
         @JsonProperty(ViewDTO.FIELD_TYPE)

@@ -41,12 +41,6 @@ public interface ViewUtils<T> {
 
     default T deserialize(final Document document) {
         try {
-            // replace "_id" with "id", because the ViewDTO depends on it
-            if(document.containsKey("_id")) {
-                final var id = document.get("_id");
-                document.remove("_id");
-                document.put("id", id);
-            }
             var json = mapper().writeValueAsString(document);
             return mapper().readValue(json, type());
         } catch (JsonProcessingException jpe) {

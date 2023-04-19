@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -167,6 +168,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         @ObjectId
         @Id
         @JsonProperty(FIELD_ID)
+        @JsonAlias("_" + FIELD_ID)
         public abstract Builder id(String id);
 
         @JsonProperty(FIELD_TYPE)

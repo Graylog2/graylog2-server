@@ -1,0 +1,420 @@
+{
+  "searches" : [
+    {
+      "_id": {
+        "$oid": "643e60b13c985e899977ba21"
+      },
+      "queries" : [
+        {
+          "id" : "fb6e4324-d24d-4308-ab98-b0b9c46f15e6",
+          "timerange" : {
+            "from" : 300,
+            "type" : "relative"
+          },
+          "filters" : [
+
+          ],
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : ""
+          },
+          "search_types" : [
+            {
+              "timerange" : null,
+              "query" : null,
+              "streams" : [
+
+              ],
+              "id" : "ae5330b1-9c74-40f9-b4f2-9b0ce25124bb",
+              "name" : null,
+              "limit" : 150,
+              "offset" : 0,
+              "sort" : [
+                {
+                  "field" : "timestamp",
+                  "order" : "DESC"
+                }
+              ],
+              "fields" : [
+
+              ],
+              "decorators" : [
+                {
+                  "_id" : "643e60b13c985e899977ba20",
+                  "type" : "org.graylog2.decorators.FormatStringDecorator",
+                  "config" : {
+                    "format_string" : "${source} - ${message}",
+                    "require_all_fields" : false,
+                    "target_field" : "message"
+                  },
+                  "stream" : null,
+                  "order" : 0
+                }
+              ],
+              "type" : "messages",
+              "filters" : [
+
+              ]
+            },
+            {
+              "timerange" : null,
+              "query" : null,
+              "streams" : [
+
+              ],
+              "id" : "bbb2d64d-99f4-47fb-b1a4-9127ce8513ab",
+              "name" : "chart",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [
+
+              ],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "fields" : [
+                    "timestamp"
+                  ],
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : [
+
+              ],
+              "filters" : [
+
+              ]
+            }
+          ]
+        }
+      ],
+      "parameters" : [
+
+      ],
+      "requires" : {
+
+      },
+      "owner" : "admin",
+      "created_at" : "2023-04-18T09:19:45.573+0000"
+    }
+  ],
+  "views": [
+    {
+      "_id": {
+        "$oid": "63e0f94c17263921e7fefeb3"
+      },
+      "type": "DASHBOARD",
+      "title": "issue15086Dashboard",
+      "summary": "Read Only Overview",
+      "description": "",
+      "search_id": "643f9ee05ceda4d926efac80",
+      "properties": [
+      ],
+      "requires": {
+        "parameters": {
+          "name": "Graylog Enterprise",
+          "version": "3.1.0",
+          "url": "https://www.graylog.org/enterprise",
+          "description": "Graylog Enterprise",
+          "author": "Graylog, Inc.",
+          "unique_id": "org.graylog.plugins.enterprise.EnterprisePlugin"
+        }
+      },
+      "state": {
+        "3c29bed6-8c61-4d54-abbf-337065060a89": {
+          "titles": {
+          },
+          "widgets": [
+            {
+              "id": "fe0fd2fa-371c-42a8-b20e-39471320fb6e",
+              "type": "logs",
+              "filters": [
+              ],
+              "timerange": null,
+              "query": null,
+              "streams": [
+              ],
+              "config": {
+                "fields": [
+                  "timestamp",
+                  "source",
+                  "message",
+                  "action"
+                ],
+                "size": 100,
+                "after": null,
+                "sort": "DESC",
+                "tie_breaker": null
+              }
+            },
+            {
+              "id": "8cf9856b-52b0-4e01-8453-e936c34613c3",
+              "type": "messages",
+              "filters": [
+              ],
+              "timerange": null,
+              "query": null,
+              "streams": [
+              ],
+              "config": {
+                "fields": [
+                  "timestamp",
+                  "source"
+                ],
+                "show_message_row": true,
+                "show_summary": true,
+                "decorators": [
+                  {
+                    "_id": "643f9ee05ceda4d926efac7f",
+                    "type": "org.graylog2.decorators.FormatStringDecorator",
+                    "config": {
+                      "format_string": "${source} - ${message}",
+                      "require_all_fields": false,
+                      "target_field": "message"
+                    },
+                    "stream": null,
+                    "order": 0
+                  }
+                ],
+                "sort": [
+                  {
+                    "type": "pivot",
+                    "field": "timestamp",
+                    "direction": "Descending"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "835e6fe0-8fe1-4842-927f-119ac0dc8e9c",
+              "type": "aggregation",
+              "filters": [
+              ],
+              "timerange": {
+                "from": 300,
+                "type": "relative"
+              },
+              "query": null,
+              "streams": [
+              ],
+              "config": {
+                "row_pivots": [
+                ],
+                "column_pivots": [
+                ],
+                "series": [
+                ],
+                "sort": [
+                ],
+                "visualization": "table",
+                "rollup": false,
+                "event_annotation": false,
+                "column_limit": null,
+                "row_limit": null
+              }
+            }
+          ],
+          "widget_mapping": {
+            "fe0fd2fa-371c-42a8-b20e-39471320fb6e": [
+              "4fb8dfd5-ea8f-4fab-b7c0-22e840d4de5c"
+            ],
+            "8cf9856b-52b0-4e01-8453-e936c34613c3": [
+              "a34d22ae-b4ca-4551-baed-de4ea0a147ca"
+            ],
+            "835e6fe0-8fe1-4842-927f-119ac0dc8e9c": [
+              "6cbe6f90-47f5-4743-bd04-d8043f285ee6"
+            ]
+          },
+          "positions": {
+            "8cf9856b-52b0-4e01-8453-e936c34613c3": {
+              "col": 5,
+              "row": 5,
+              "height": 4,
+              "width": 8
+            },
+            "835e6fe0-8fe1-4842-927f-119ac0dc8e9c": {
+              "col": 1,
+              "row": 5,
+              "height": 4,
+              "width": 4
+            },
+            "fe0fd2fa-371c-42a8-b20e-39471320fb6e": {
+              "col": 1,
+              "row": 1,
+              "height": 4,
+              "width": "Infinity"
+            }
+          },
+          "formatting": {
+            "highlighting": [
+            ]
+          },
+          "display_mode_settings": {
+            "positions": {
+            }
+          }
+        }
+      },
+      "owner": "admin",
+      "created_at": "2023-02-06T12:57:40.312+0000"
+    },
+    {
+      "_id": {
+        "$oid": "643e60873c985e899977ba1c"
+      },
+      "type" : "SEARCH",
+      "title" : "issue15086Search",
+      "summary" : "",
+      "description" : "",
+      "search_id" : "643e60b13c985e899977ba21",
+      "properties" : [
+
+      ],
+      "requires" : {
+
+      },
+      "state" : {
+        "fb6e4324-d24d-4308-ab98-b0b9c46f15e6" : {
+          "titles" : {
+            "widget" : {
+              "974626ff-f10e-42ec-9b7f-2fa472e14f00" : "Message Count",
+              "9c247ed5-ce12-49f3-8a2d-23f5851b9283" : "All Messages"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "9c247ed5-ce12-49f3-8a2d-23f5851b9283",
+              "type" : "messages",
+              "filters" : [
+
+              ],
+              "timerange" : null,
+              "query" : null,
+              "streams" : [
+
+              ],
+              "config" : {
+                "fields" : [
+                  "timestamp",
+                  "source"
+                ],
+                "show_message_row" : true,
+                "show_summary" : true,
+                "decorators" : [
+                  {
+                    "_id" : "643e60b13c985e899977ba20",
+                    "type" : "org.graylog2.decorators.FormatStringDecorator",
+                    "config" : {
+                      "format_string" : "${source} - ${message}",
+                      "require_all_fields" : false,
+                      "target_field" : "message"
+                    },
+                    "stream" : null,
+                    "order" : 0
+                  }
+                ],
+                "sort" : [
+                  {
+                    "type" : "pivot",
+                    "field" : "timestamp",
+                    "direction" : "Descending"
+                  }
+                ]
+              }
+            },
+            {
+              "id" : "974626ff-f10e-42ec-9b7f-2fa472e14f00",
+              "type" : "aggregation",
+              "filters" : [
+
+              ],
+              "timerange" : null,
+              "query" : null,
+              "streams" : [
+
+              ],
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "fields" : [
+                      "timestamp"
+                    ],
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : 1.0
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [
+
+                ],
+                "series" : [
+                  {
+                    "config" : {
+
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [
+
+                ],
+                "visualization" : "bar",
+                "rollup" : true,
+                "event_annotation" : false,
+                "row_limit" : null,
+                "column_limit" : null
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "9c247ed5-ce12-49f3-8a2d-23f5851b9283" : [
+              "ae5330b1-9c74-40f9-b4f2-9b0ce25124bb"
+            ],
+            "974626ff-f10e-42ec-9b7f-2fa472e14f00" : [
+              "bbb2d64d-99f4-47fb-b1a4-9127ce8513ab"
+            ]
+          },
+          "positions" : {
+            "974626ff-f10e-42ec-9b7f-2fa472e14f00" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : "Infinity"
+            },
+            "9c247ed5-ce12-49f3-8a2d-23f5851b9283" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 6,
+              "width" : "Infinity"
+            }
+          },
+          "formatting" : {
+            "highlighting" : [
+
+            ]
+          },
+          "display_mode_settings" : {
+            "positions" : {
+
+            }
+          }
+        }
+      },
+      "owner" : "admin",
+      "created_at" : "2023-04-18T09:18:22.101+0000"
+    }
+  ]
+}
