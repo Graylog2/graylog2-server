@@ -1,5 +1,0 @@
-type = "fixed"
-message = "Add events group by fields as part of the search query"
-
-issues = ["14813"]
-pulls = ["15270" ]
