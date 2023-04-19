@@ -63,7 +63,7 @@ export const mockEventData = {
         '001',
       ],
     },
-    group_by_fields: [{}],
+    group_by_fields: { field4: 'value4' },
 
   } as Event,
 };
@@ -205,7 +205,7 @@ const query = QueryGenerator(eventData.replay_info.streams, 'query-id', {
   to: eventData?.replay_info?.timerange_end,
 }, {
   type: 'elasticsearch',
-  query_string: eventData?.replay_info?.query || '',
+  query_string: '(http_method: GET) AND (field4:value4)',
 });
 
 const histogram = resultHistogram('mc-widget-id');

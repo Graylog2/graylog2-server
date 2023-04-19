@@ -110,7 +110,10 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
         const setSelectedFields = (newFields) => setFieldValue('selectedFields', newFields);
 
         return (
-          <BootstrapModalWrapper showModal onHide={closeModal}>
+          <BootstrapModalWrapper showModal
+                                 onHide={closeModal}
+                                 data-app-section="dashboard_export"
+                                 data-event-element={title}>
             <Form>
               <Modal.Header>
                 <Modal.Title>{title}</Modal.Title>

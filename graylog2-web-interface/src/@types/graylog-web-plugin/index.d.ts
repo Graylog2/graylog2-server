@@ -117,8 +117,14 @@ declare module 'graylog-web-plugin/plugin' {
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
   }
-
+  interface PluginMetadata {
+    name?: string,
+    author?: string,
+    description?: string,
+    license?: string,
+  }
   interface PluginRegistration {
+    metadata?: PluginMetadata
     exports: PluginExports;
   }
 
@@ -130,6 +136,7 @@ declare module 'graylog-web-plugin/plugin' {
     register: (manifest: PluginRegistration) => void;
     exports: <T extends keyof PluginExports>(key: T) => PluginExports[T];
     unregister: (manifest: PluginRegistration) => void;
+    get: () => Array<PluginRegistration>
   }
 
   const PluginStore: PluginStore;

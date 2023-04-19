@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
@@ -26,6 +27,7 @@ import { ExternalLinkButton, Select } from 'components/common';
 import { InputForm } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesActions, InputTypesStore } from 'stores/inputs/InputTypesStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const NewInputRow = styled(Row)`
   margin-bottom: 8px;
@@ -34,6 +36,12 @@ const NewInputRow = styled(Row)`
 const CreateInputControl = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateInputControl',
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    sendTelemetry: PropTypes.func.isRequired,
+  },
+
   mixins: [Reflux.connect(InputTypesStore)],
 
   getInitialState() {
@@ -69,6 +77,13 @@ const CreateInputControl = createReactClass({
     }
 
     this.setState({ selectedInput: selectedInput });
+
+    this.props.sendTelemetry('change_input_value', {
+      appSection: 'inputs',
+      eventElement: 'select-input',
+      eventInfo: { value: selectedInput },
+    });
+
     InputTypesActions.get.triggerPromise(selectedInput).then((inputDefinition) => this.setState({ selectedInputDefinition: inputDefinition }));
   },
 
@@ -92,6 +107,11 @@ const CreateInputControl = createReactClass({
   },
 
   _createInput(data) {
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'inputs',
+      eventElement: 'create-input',
+    });
+
     InputsActions.create(data).then(() => {
       this.setState(this.getInitialState());
     });
@@ -131,6 +151,12 @@ const CreateInputControl = createReactClass({
             <Button bsStyle="success" type="submit" disabled={!selectedInput}>Launch new input</Button>
             <ExternalLinkButton href="https://marketplace.graylog.org/"
                                 bsStyle="info"
+                                onClick={() => {
+                                  this.props.sendTelemetry('click', {
+                                    appSection: 'inputs',
+                                    eventElement: 'find-more-inputs',
+                                  });
+                                }}
                                 style={{ marginLeft: 10 }}>
               Find more inputs
             </ExternalLinkButton>
@@ -142,4 +168,4 @@ const CreateInputControl = createReactClass({
   },
 });
 
-export default CreateInputControl;
+export default withTelemetry(CreateInputControl);

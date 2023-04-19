@@ -22,7 +22,7 @@ import styled, { css, withTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
 import ThemePropTypes from 'preflight/theme/types';
-import { Icon } from 'preflight/common';
+import { Icon } from 'preflight/components/common';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,

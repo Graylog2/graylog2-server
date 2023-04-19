@@ -42,7 +42,10 @@ const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => 
       <OverlayTrigger trigger={['hover', 'focus']}
                       placement="right"
                       overlay={(
-                        <Popover id="session-badge-details" title={sessionActive ? 'Logged in' : ''}>
+                        <Popover id="session-badge-details"
+                                 title={sessionActive ? 'Logged in' : ''}
+                                 data-app-section="users_overview_item"
+                                 data-event-element="Logged In">
                           {sessionActive ? (
                             <>
                               <div>Last activity: {lastActivity

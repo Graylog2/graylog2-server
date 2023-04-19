@@ -30,6 +30,7 @@ import { IndexSetsActions, IndexSetsStore, IndexSetPropType } from 'stores/indic
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
 import withHistory from 'routing/withHistory';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const _saveConfiguration = (history, indexSet) => IndexSetsActions.update(indexSet).then(() => {
   history.push(Routes.SYSTEM.INDICES.LIST);
@@ -63,8 +64,16 @@ class IndexSetConfigurationPage extends React.Component {
       return <Spinner />;
     }
 
-    const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies, history } = this.props;
-    const saveConfiguration = (newIndexSet) => _saveConfiguration(history, newIndexSet);
+    const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies, history, sendTelemetry } = this.props;
+
+    const saveConfiguration = (newIndexSet) => {
+      _saveConfiguration(history, newIndexSet);
+
+      sendTelemetry('submit_form', {
+        appSection: 'index_sets',
+        eventElement: 'update-index-set',
+      });
+    };
 
     return (
       <DocumentTitle title="Configure Index Set">
@@ -113,6 +122,7 @@ IndexSetConfigurationPage.propTypes = {
     max_index_retention_period: PropTypes.string,
   }),
   history: PropTypes.object.isRequired,
+  sendTelemetry: PropTypes.func.isRequired,
 };
 
 IndexSetConfigurationPage.defaultProps = {
@@ -125,7 +135,7 @@ IndexSetConfigurationPage.defaultProps = {
 };
 
 export default connect(
-  withHistory(withParams(withLocation(IndexSetConfigurationPage))),
+  withHistory(withParams(withLocation(withTelemetry(IndexSetConfigurationPage)))),
   {
     indexSets: IndexSetsStore,
     indicesConfigurations: IndicesConfigurationStore,

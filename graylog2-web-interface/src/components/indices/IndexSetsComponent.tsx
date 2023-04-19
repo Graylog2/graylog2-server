@@ -29,13 +29,14 @@ import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSetsStoreState, IndexSet, IndexSetStats } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const IndexSetsComponent = () => {
   const DEFAULT_PAGE_NUMBER = 1;
   const DEFAULT_PAGE_SIZE = 10;
-
   const { indexSetsCount, indexSets, globalIndexSetStats, indexSetStats } = useStore<IndexSetsStoreState>(IndexSetsStore);
   const { page, resetPage } : PaginationQueryParameterResult = usePaginationQueryParameter();
+  const sendTelemetry = useSendTelemetry();
 
   // indexSets = paginated call
   // globalIndexSetStats = call to get all stats
@@ -67,6 +68,11 @@ const IndexSetsComponent = () => {
 
   const onSetDefault = (indexSet: IndexSet) => {
     return () => {
+      sendTelemetry('click', {
+        appSection: 'index_sets',
+        eventElement: 'set-default-index-set',
+      });
+
       IndexSetsActions.setDefault(indexSet).then(() => loadData(currentPageNumber, currentPageSize));
     };
   };
@@ -79,6 +85,11 @@ const IndexSetsComponent = () => {
 
   const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
     resetPage();
+
+    sendTelemetry('submit_form', {
+      appSection: 'index_sets',
+      eventElement: 'delete-index-set',
+    });
 
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
       loadData(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);

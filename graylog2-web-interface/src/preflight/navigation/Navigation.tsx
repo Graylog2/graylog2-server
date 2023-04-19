@@ -20,7 +20,7 @@ import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import HelpMenu from 'preflight/navigation/HelpMenu';
-import { Group, Header, Text } from 'preflight/common';
+import { Group, Header, Text } from 'preflight/components/common';
 
 import NavigationBrand from './NavigationBrand';
 import ThemeModeToggle from './ThemeModeToggle';

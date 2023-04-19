@@ -80,6 +80,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
@@ -275,6 +276,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LookupAddStringList.NAME, LookupAddStringList.class);
         addMessageProcessorFunction(LookupRemoveStringList.NAME, LookupRemoveStringList.class);
         addMessageProcessorFunction(LookupStringListContains.NAME, LookupStringListContains.class);
+        addMessageProcessorFunction(LookupAssignTtl.NAME, LookupAssignTtl.class);
 
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);

@@ -20,7 +20,10 @@ import { Popover, Table, Button } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 
 const sharedEntitiesQueryHelperPopover = (
-  <Popover id="shared-entities-search-query-help" title="Search Syntax Help">
+  <Popover id="shared-entities-search-query-help"
+           title="Search Syntax Help"
+           data-app-section="shared_entities_query_helper"
+           data-event-element="Available search fields">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>

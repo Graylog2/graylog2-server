@@ -42,6 +42,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import Parameter from 'views/logic/parameters/Parameter';
+import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
@@ -202,6 +203,8 @@ export const ViewGenerator = async ({
 export const UseCreateViewForEvent = (
   { eventData, eventDefinition, aggregations }: { eventData: Event, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
+  const queryStringFromGrouping = concatQueryStrings(Object.entries(eventData.group_by_fields).map(([field, value]) => `${field}:${escape(value)}`), { withBrackets: false });
+  const eventQueryString = eventData?.replay_info?.query || '';
   const { streams } = eventData.replay_info;
   const timeRange: AbsoluteTimeRange = {
     type: 'absolute',
@@ -210,7 +213,7 @@ export const UseCreateViewForEvent = (
   };
   const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
-    query_string: eventData?.replay_info?.query || '',
+    query_string: concatQueryStrings([eventQueryString, queryStringFromGrouping]),
   };
 
   const queryParameters = eventDefinition?.config?.query_parameters || [];

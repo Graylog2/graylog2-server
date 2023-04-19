@@ -99,6 +99,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
       </Button>
       <BootstrapModalForm show={showModal}
                           title={<span>Edit connections for <em>{pipeline.title}</em></span>}
+                          data-telemetry-title="Edit connections for pipeline"
                           onSubmitForm={_save}
                           onCancel={_closeModal}
                           submitButtonText="Update connections">

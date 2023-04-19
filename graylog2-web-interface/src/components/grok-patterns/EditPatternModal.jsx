@@ -160,6 +160,7 @@ class EditPatternModal extends React.Component {
         </Button>
         <BootstrapModalForm show={showModal}
                             title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
+                            data-telemetry-title={`${create ? 'Create' : 'Edit'} Grok Pattern`}
                             bsSize="large"
                             onSubmitForm={this._save}
                             onCancel={this._closeModal}

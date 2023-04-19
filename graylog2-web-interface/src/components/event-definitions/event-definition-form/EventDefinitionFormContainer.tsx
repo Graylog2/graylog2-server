@@ -16,8 +16,9 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import cloneDeep from 'lodash/cloneDeep';
 import { useNavigate } from 'react-router-dom';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import cloneDeep from 'lodash/cloneDeep';
 
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
@@ -30,6 +31,7 @@ import { EventNotificationsActions, EventNotificationsStore } from 'stores/event
 import 'components/event-notifications/event-notification-types';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useEventDefinitionConfigFromUrl from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
 
 import EventDefinitionForm from './EventDefinitionForm';
 
@@ -43,11 +45,21 @@ type Props = {
   onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
 }
 
+const getConditionPlugin = (edType): any => {
+  if (edType === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {};
+};
+
 const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinitionInitial, onEventDefinitionChange }: Props) => {
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
+  const { configFromUrl, hasUrlConfig } = useEventDefinitionConfigFromUrl();
+
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
   const currentUser = useCurrentUser();
@@ -61,17 +73,33 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   }, []);
 
   const handleChange = useCallback((key: string, value: unknown) => {
-    const nextEventDefinition = cloneDeep(eventDefinition);
-    nextEventDefinition[key] = value;
-    setEventDefinition(nextEventDefinition);
-    onEventDefinitionChange(eventDefinition);
+    setEventDefinition((prev) => ({ ...prev, [key]: value }));
+    onEventDefinitionChange({ ...eventDefinition, [key]: value });
     setIsDirty(true);
-  }, [eventDefinition, onEventDefinitionChange]);
+  }, [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty]);
 
   useEffect(() => {
     fetchClusterConfig();
     fetchNotifications();
-  }, [fetchClusterConfig]);
+
+    if (hasUrlConfig) {
+      const conditionPlugin = getConditionPlugin(configFromUrl.type);
+      const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
+
+      setEventDefinition((cur) => {
+        const cloned = cloneDeep(cur);
+
+        return ({
+          ...cloned,
+          config: {
+            ...defaultConfig,
+            ...cloned.config,
+            ...configFromUrl,
+          },
+        });
+      });
+    }
+  }, [configFromUrl, fetchClusterConfig, hasUrlConfig]);
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);

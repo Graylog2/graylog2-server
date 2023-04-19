@@ -26,6 +26,7 @@ import { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type Role from 'logic/roles/Role';
 import type { PaginatedList } from 'stores/PaginationTypes';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import UsersSelector from './UsersSelector';
 
@@ -42,6 +43,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedList<UserOverview>>();
   const [errors, setErrors] = useState<string | undefined>();
+  const sendTelemetry = useSendTelemetry();
 
   const _onLoad = useCallback((pagination) => {
     setLoading(true);
@@ -54,15 +56,27 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       });
   }, [id, name]);
 
-  const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => AuthzRolesDomain.addMembers(id,
-    newUsers.map((u) => u.username).toSet()).then(() => _onLoad(DEFAULT_PAGINATION)
-    .then((result) => {
-      setPaginatedUsers(result);
+  const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => {
+    sendTelemetry('click', {
+      appSection: 'edit_role',
+      eventElement: 'assign-user',
+    });
 
-      return result;
-    }));
+    return AuthzRolesDomain.addMembers(id,
+      newUsers.map((u) => u.username).toSet()).then(() => _onLoad(DEFAULT_PAGINATION)
+      .then((result) => {
+        setPaginatedUsers(result);
+
+        return result;
+      }));
+  };
 
   const _onUnassignUser = (user) => {
+    sendTelemetry('click', {
+      appSection: 'edit_role',
+      eventElement: 'unassign-user',
+    });
+
     if ((role.name === 'Reader' || role.name === 'Admin')
       && (!user.roles.includes('Reader') || !user.roles.includes('Admin'))) {
       setErrors(`User '${user.name}' needs at least a Reader or Admin role.`);

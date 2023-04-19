@@ -39,6 +39,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import { setTitle } from 'views/logic/slices/titlesActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -99,7 +100,17 @@ type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
   fields: FieldTypeMappingsList,
 };
 
-const Visualization = ({ title, id, widget, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
+const Visualization = ({
+  title,
+  id,
+  widget,
+  fields,
+  queryId,
+  editing,
+  setLoadingState,
+  onToggleEdit,
+  onWidgetConfigChange,
+}: VisualizationProps) => {
   const VisComponent = useMemo(() => _visualizationForType(widget.type), [widget.type]);
   const { error: errors, widgetData: data } = useWidgetResults(id);
 
@@ -141,7 +152,17 @@ type EditWrapperProps = {
   type: string,
 };
 
-const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCancelEdit, onWidgetConfigChange, type }: EditWrapperProps) => {
+const EditWrapper = ({
+  children,
+  config,
+  editing,
+  fields,
+  id,
+  onToggleEdit,
+  onCancelEdit,
+  onWidgetConfigChange,
+  type,
+}: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
 
@@ -173,7 +194,14 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
   const dispatch = useAppDispatch();
+  const sendTelemetry = useSendTelemetry();
+
   const onToggleEdit = useCallback(() => {
+    sendTelemetry('toggle_input_button', {
+      appSection: 'search-widget',
+      eventElement: 'widget-edit-button',
+    });
+
     if (editing) {
       unsetWidgetEditing();
       setOldWidget(undefined);
@@ -182,16 +210,22 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       setWidgetEditing(widget.id);
       setOldWidget(widget);
     }
-  }, [editing, setWidgetEditing, unsetWidgetEditing, widget]);
+  }, [editing, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'search-widget',
+      eventElement: 'widget-edit-cancel-button',
+    });
+
     if (oldWidget) {
       dispatch(updateWidget(id, oldWidget));
     }
 
     onToggleEdit();
-  }, [dispatch, id, oldWidget, onToggleEdit]);
+  }, [dispatch, id, oldWidget, onToggleEdit, sendTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
-  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {}), [dispatch, id]);
+  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
+  }), [dispatch, id]);
   const activeQuery = useActiveQueryId();
 
   const { config } = widget;

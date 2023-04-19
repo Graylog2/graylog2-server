@@ -23,6 +23,7 @@ import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
@@ -71,8 +72,8 @@ const UserEdit = ({ user }: Props) => {
             </SectionComponent>
           )}
           {!user.external && (
-          <ProfileSection user={user}
-                          onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
+            <ProfileSection user={user}
+                            onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           )}
           <SettingsSection user={user}
                            onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
@@ -90,6 +91,11 @@ const UserEdit = ({ user }: Props) => {
           <IfPermitted permissions="teams:edit">
             <TeamsSection user={user} />
           </IfPermitted>
+          {(currentUser.id === user.id) && (
+            <IfPermitted permissions={`users:edit:${user.username}`}>
+              <TelemetrySettingsConfig />
+            </IfPermitted>
+          )}
         </div>
       </IfPermitted>
     </SectionGrid>
