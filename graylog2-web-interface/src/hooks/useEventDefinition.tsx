@@ -83,7 +83,9 @@ const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinit
 
 const eventDefinitionDataMapper = (data: EventDefinition): { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>} => ({
   eventDefinition: data,
-  aggregations: uniqWith(transformExpressionsToArray({ series: data.config.series, conditions: data.config.conditions }), isEqual),
+  aggregations: (data?.config?.series && data?.config?.conditions)
+    ? uniqWith(transformExpressionsToArray({ series: data.config.series, conditions: data.config.conditions }), isEqual)
+    : [],
 });
 
 const fetchDefinition = (definitionId: string) => {
