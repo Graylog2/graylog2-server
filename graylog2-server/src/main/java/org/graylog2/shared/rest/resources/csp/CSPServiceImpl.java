@@ -40,7 +40,7 @@ public class CSPServiceImpl implements CSPService {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
                 .map(dto -> String.join(" ", dto.config().hostAllowList()))
                 .collect(Collectors.joining(" "));
-        connectSrcValue = telemetryApiHost + " " + hostList;
+        connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
     }
 
     @Override
