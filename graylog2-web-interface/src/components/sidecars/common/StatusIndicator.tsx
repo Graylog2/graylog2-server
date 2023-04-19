@@ -63,7 +63,9 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
 
   if (message && id) {
     const popover = (
-      <Popover id={`${id}-status-tooltip`}>
+      <Popover id={`${id}-status-tooltip`}
+               data-app-section="sidecars"
+               data-event-element="Status Indicator">
         {message}
       </Popover>
     );

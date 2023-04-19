@@ -25,6 +25,7 @@ import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { Icon, FormikFormGroup, Select, InputList } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import type { WizardFormValues } from './BackendWizardContext';
 import BackendWizardContext from './BackendWizardContext';
@@ -62,7 +63,14 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
   const { backendValidationErrors } = stepsState;
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
 
+  const sendTelemetry = useSendTelemetry();
+
   const _onSubmitAll = (validateForm) => {
+    sendTelemetry('click', {
+      appSection: 'authentication_services_user_sync_step',
+      eventElement: 'finish-and-save-service',
+    });
+
     validateForm().then((errors) => {
       if (!formHasErrors(errors)) {
         onSubmitAll();
@@ -189,6 +197,12 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
             </Button>
             <Button bsStyle="success"
                     disabled={isSubmitting}
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        appSection: 'authentication_services_user_sync_step',
+                        eventElement: 'next-group-synchronization',
+                      });
+                    }}
                     type="submit">
               Next: Group Synchronization
             </Button>

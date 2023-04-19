@@ -179,7 +179,9 @@ class ConfigurationVariablesHelper extends React.Component {
         </div>
 
         <BootstrapModalWrapper showModal={showModal}
-                               onHide={this._closeErrorModal}>
+                               onHide={this._closeErrorModal}
+                               data-app-section="collector_configuration_form"
+                               data-event-element="Error deleting configuration variable">
           <Modal.Header>
             <Modal.Title>Error deleting configuration variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong></Modal.Title>
           </Modal.Header>

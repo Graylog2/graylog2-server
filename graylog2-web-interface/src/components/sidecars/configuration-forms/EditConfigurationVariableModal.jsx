@@ -170,6 +170,7 @@ class EditConfigurationVariableModal extends React.Component {
         </Button>
         <BootstrapModalForm show={showModal}
                             title={<>{create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;</>}
+                            data-telemetry-title={`${create ? 'Create' : 'Edit'} Variable user`}
                             onSubmitForm={this._save}
                             onCancel={this.closeModal}
                             submitButtonDisabled={this._hasErrors()}

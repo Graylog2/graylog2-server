@@ -100,6 +100,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
         </Button>
         <BootstrapModalForm show={showModal}
                             title={`${create ? 'Add new' : 'Edit'} pipeline ${nextPipeline.title}`}
+                            data-telemetry-title={`${create ? 'Add new' : 'Edit'} pipeline`}
                             onSubmitForm={_handleSubmit}
                             onCancel={_closeModal}
                             submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}>

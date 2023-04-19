@@ -143,6 +143,7 @@ class IndexSetDeletionForm extends React.Component {
     return (
       <BootstrapModalForm show={this.state.showModal}
                           title={`Delete index set "${this.props.indexSet.title}"?`}
+                          data-telemetry-title="Delete index set"
                           onCancel={this.close}
                           onSubmitForm={this._onDelete}
                           submitButtonText="Delete"

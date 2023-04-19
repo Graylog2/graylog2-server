@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.lookup.LookupTableService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -37,6 +38,7 @@ public class LookupSetStringList extends AbstractFunction<Object> {
     private final ParameterDescriptor<Object, Object> keyParam;
     @SuppressWarnings("rawtypes")
     private final ParameterDescriptor<List, List> valueParam;
+    private final ParameterDescriptor<Long, Long> ttlSecondsParam;
 
     @Inject
     public LookupSetStringList(LookupTableService lookupTableService) {
@@ -49,6 +51,10 @@ public class LookupSetStringList extends AbstractFunction<Object> {
                 .build();
         valueParam = ParameterDescriptor.type("value", List.class)
                 .description("The list value that should be set into the lookup table")
+                .build();
+        ttlSecondsParam = ParameterDescriptor.integer("ttl")
+                .optional()
+                .description("The time to live in seconds to assign to this entry")
                 .build();
     }
 
@@ -66,7 +72,12 @@ public class LookupSetStringList extends AbstractFunction<Object> {
         if (value == null) {
             return null;
         }
-        return table.setStringList(key, value).stringListValue();
+        final Optional<Long> ttlSec = ttlSecondsParam.optional(args, context);
+        if (ttlSec.isPresent()) {
+            return table.setStringListWithTtl(key, value, ttlSec.get()).stringListValue();
+        } else {
+            return table.setStringList(key, value).stringListValue();
+        }
     }
 
     @Override
@@ -74,7 +85,7 @@ public class LookupSetStringList extends AbstractFunction<Object> {
         return FunctionDescriptor.builder()
                 .name(NAME)
                 .description("Set a string list in the named lookup table. Returns the new value on success, null on failure.")
-                .params(lookupTableParam, keyParam, valueParam)
+                .params(lookupTableParam, keyParam, valueParam, ttlSecondsParam)
                 .returnType(List.class)
                 .build();
     }

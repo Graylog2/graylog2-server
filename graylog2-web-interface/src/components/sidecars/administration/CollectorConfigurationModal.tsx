@@ -215,7 +215,10 @@ const CollectorConfigurationModal = ({
   });
 
   return (
-    <BootstrapModalWrapper showModal={show} onHide={onCancel}>
+    <BootstrapModalWrapper showModal={show}
+                           onHide={onCancel}
+                           data-app-section="collectors_administration_assign_configurations"
+                           data-event-element={`Edit ${selectedCollectorName} Configurations`}>
       <Modal.Header>
         <ModalTitle>
           Edit <b>{selectedCollectorName}</b> Configurations

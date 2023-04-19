@@ -35,13 +35,15 @@ const BootstrapModalWrapper = ({
   bsSize,
   backdrop,
   role,
+  ...restProps
 }: Props) => {
   return (
     <Modal show={showModal}
            onHide={onHide}
            bsSize={bsSize}
            backdrop={backdrop}
-           role={role}>
+           role={role}
+           {...restProps}>
       {children}
     </Modal>
   );

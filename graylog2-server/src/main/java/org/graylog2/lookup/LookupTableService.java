@@ -665,12 +665,28 @@ public class LookupTableService extends AbstractIdleService {
             return lookupTable.setValue(requireValidKey(key), requireNonNull(value, "value cannot be null"));
         }
 
+        public LookupResult setValueWithTtl(Object key, Object value, Long ttlSec) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setValueWithTtl(requireValidKey(key), requireNonNull(value, "value cannot be null"), ttlSec);
+        }
+
         public LookupResult setStringList(Object key, List<String> value) {
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
                 return LookupResult.withError();
             }
             return lookupTable.setStringList(requireValidKey(key), requireValidStringList(value));
+        }
+
+        public LookupResult setStringListWithTtl(Object key, List<String> value, Long ttlSec) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setStringListWithTtl(requireValidKey(key), requireValidStringList(value), ttlSec);
         }
 
         public LookupResult addStringList(Object key, List<String> value, boolean keepDuplicates) {
@@ -699,6 +715,14 @@ public class LookupTableService extends AbstractIdleService {
 
         public LookupTable getTable() {
             return lookupTableService.getTable(lookupTableName);
+        }
+
+        public LookupResult assignTtl(Object key, Long ttlSec) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.assignTtl(requireValidKey(key), ttlSec);
         }
     }
 }

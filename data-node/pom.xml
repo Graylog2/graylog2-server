@@ -44,8 +44,18 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.4.1</opensearch.version>
+        <opensearch.version>2.5.0</opensearch.version>
         <opensearch.rest.client.version>2.2.0-1</opensearch.rest.client.version>
+
+        <!--
+           We don't need to sign anything in this module. This fixes a release build error related to setting
+           the <outputDirectory> to a different path: https://issues.apache.org/jira/browse/MGPG-44
+        -->
+        <gpg.skip>true</gpg.skip>
+        <maven.source.skip>true</maven.source.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
@@ -478,7 +488,7 @@
                 <executions>
                     <execution>
                         <id>download-opensearch-tar-linux-x64</id>
-                        <phase>process-resources</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
@@ -493,7 +503,7 @@
                     </execution>
                     <execution>
                         <id>unpack-opensearch-tar-linux-x64</id>
-                        <phase>process-resources</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
@@ -514,7 +524,7 @@
                     </execution>
                     <execution>
                         <id>download-opensearch-tar-linux-aarch64</id>
-                        <phase>process-resources</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
@@ -529,7 +539,7 @@
                     </execution>
                     <execution>
                         <id>unpack-opensearch-tar-linux-aarch64</id>
-                        <phase>process-resources</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
@@ -608,6 +618,30 @@
                             <mainClass>${mainClass}</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-data-node-artifact</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <attach>true</attach>
+                    <appendAssemblyId>true</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/datanode.xml</descriptor>
+                    </descriptors>
+                    <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
+                    <outputDirectory>${project.basedir}/../target/assembly</outputDirectory>
+                    <finalName>datanode-${project.version}-${maven.build.timestamp}</finalName>
                 </configuration>
             </plugin>
 

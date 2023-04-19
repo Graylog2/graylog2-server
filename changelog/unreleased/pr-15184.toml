@@ -1,0 +1,5 @@
+type = "c"
+message = "Set a specific Content Security Policy header for API-Browser responses."
+
+pulls = ["15184"]
+issues = ["Graylog2/graylog-plugin-enterprise#4887"]

@@ -1,0 +1,7 @@
+rule "lookupSetStringListWithTtl"
+when
+  true
+then
+  let newValue = lookup_set_string_list("table", "key", ["foo", "bar"], 123);
+  set_field("new_value", newValue);
+end

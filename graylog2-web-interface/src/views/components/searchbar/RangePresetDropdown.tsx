@@ -22,6 +22,7 @@ import styled, { css } from 'styled-components';
 import { Icon, IfPermitted } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   onToggle?: (open: boolean) => void,
@@ -43,6 +44,7 @@ const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
 
 const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
   const { config } = useSearchConfiguration();
+  const sendTelemetry = useSendTelemetry();
   const availableOptions = config?.relative_timerange_options;
   const timeRangeLimit = moment.duration(config?.query_time_range_limit);
   const title = displayTitle && (availableOptions ? 'Preset Times' : 'Loading Ranges...');
@@ -80,6 +82,7 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
 
   const _onChange = (range) => {
     if (range !== null && range !== undefined) {
+      sendTelemetry('change_input_value', { appSection: 'search_bar', eventElement: 'relative-timerange-selector', eventInfo: { range } });
       onChange(parseInt(range, 10));
     }
   };

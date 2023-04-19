@@ -35,12 +35,9 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
-import org.graylog2.bindings.ElasticsearchModule;
-import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
@@ -82,7 +79,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -177,23 +173,29 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         final Injector preflightInjector = getPreflightInjector(modules);
         GuiceInjectorHolder.setInjector(preflightInjector);
+        try {
+            doRunWithPreflightInjector(preflightInjector);
+        } finally {
+            GuiceInjectorHolder.resetInjector();
+        }
+    }
 
+    private void doRunWithPreflightInjector(Injector preflightInjector) {
         final PreflightConfigService preflightConfigService = preflightInjector.getInstance(PreflightConfigService.class);
 
         final Supplier<Boolean> shouldRun = () -> preflightConfigService.getPersistedConfig().isEmpty() || configuration.enablePreflightWebserver();
 
-        if(!shouldRun.get()) {
+        if (!shouldRun.get()) {
             return;
         }
 
         LOG.info("Fresh installation detected, starting configuration webserver");
 
-
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         try {
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
-            while(shouldRun.get()) {
+            while (shouldRun.get()) {
                 try {
                     LOG.debug("Preflight config still in progress, waiting for the marker document");
                     Thread.sleep(1000);
@@ -201,10 +203,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
                     throw new RuntimeException(e);
                 }
             }
-
         } finally {
             serviceManager.stopAsync().awaitStopped();
-            GuiceInjectorHolder.resetInjector();
         }
     }
 

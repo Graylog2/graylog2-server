@@ -28,6 +28,7 @@ import { IfPermitted, ISODurationInput } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import type { SearchConfig } from 'components/search';
 import Select from 'components/common/Select/Select';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import 'moment-duration-format';
 
@@ -74,6 +75,8 @@ const SearchesConfig = () => {
   const [surroundingFilterFieldsUpdate, setSurroundingFilterFieldsUpdate] = useState<string | undefined>(undefined);
   const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState<string | undefined>(undefined);
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
+
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
@@ -149,6 +152,11 @@ const SearchesConfig = () => {
 
   const saveConfig = () => {
     const update = { ...formConfig };
+
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_search',
+      eventElement: 'update_configuration_button',
+    });
 
     if (relativeTimeRangeOptionsUpdate) {
       update.relative_timerange_options = {};

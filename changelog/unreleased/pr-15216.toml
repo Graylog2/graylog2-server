@@ -1,0 +1,4 @@
+type = "a"
+message = "Added autodetection of opensearch distribution in datanode."
+
+pulls = ["15216"]

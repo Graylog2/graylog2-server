@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
@@ -55,10 +56,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
     private final OpensearchConfiguration configuration;
 
     @Inject
-    public ConfigurationProvider(Configuration localConfiguration, DataNodeConfig sharedConfiguration) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    public ConfigurationProvider(Configuration localConfiguration, DataNodeConfig sharedConfiguration, OpensearchDistribution opensearchDistribution) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
         final var cfg = sharedConfiguration.test();
 
-        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchLocation()).resolve("config");
+        final Path opensearchConfigDir = opensearchDistribution.directory().resolve("config");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
@@ -150,9 +151,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             config.put("plugins.security.ssl.http.pemtrustedcas_filepath", "http-ca.pem");
         }
 
+
         configuration = new OpensearchConfiguration(
-                localConfiguration.getOpensearchVersion(),
-                Path.of(localConfiguration.getOpensearchLocation()),
+                opensearchDistribution.version(),
+                opensearchDistribution.directory(),
                 localConfiguration.getOpensearchHttpPort(),
                 localConfiguration.getOpensearchTransportPort(),
                 localConfiguration.getRestApiUsername(),

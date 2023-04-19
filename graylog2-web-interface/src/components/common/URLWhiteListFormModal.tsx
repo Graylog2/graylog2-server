@@ -28,6 +28,7 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
 import generateId from 'logic/generateId';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
@@ -48,6 +49,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
 
   const currentUser = useCurrentUser();
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
@@ -101,6 +103,11 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
       event.preventDefault();
       event.stopPropagation();
     }
+
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_url_whitelist',
+      eventElement: 'update_configuration_button',
+    });
 
     if (isValid) {
       ConfigurationsActions.updateWhitelist(URL_WHITELIST_CONFIG, config).then(() => {
