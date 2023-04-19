@@ -36,8 +36,8 @@ const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride
   if (viewType === View.Type.Dashboard) {
     const { streams, timerange, query } = widget;
     const dashboardAndWidgetQueryString = globalOverride?.query?.query_string
-      ? concatQueryStrings([query.query_string, globalOverride?.query.query_string])
-      : query.query_string;
+      ? concatQueryStrings([query?.query_string, globalOverride.query.query_string])
+      : query?.query_string;
 
     return ({
       streams,
