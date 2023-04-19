@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import groupBy from 'lodash/groupBy';
 
 import { Button } from 'components/bootstrap';
@@ -26,15 +26,16 @@ import { StreamsActions } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
-import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
+import { DEFAULT_SEARCH_ID } from './decorators/StreamSelect';
 import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState<Array<Stream> | undefined>();
-  const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
+  const streamsMap = useMemo(() => Object.fromEntries(streams?.map((s) => [s.id, s]) ?? []), [streams]);
   const [decorators, setDecorators] = useState<Array<Decorator> | undefined>();
   const [types, setTypes] = useState();
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -50,7 +51,7 @@ const DecoratorsConfig = () => {
     return <Spinner />;
   }
 
-  const onSave = (newDecorators) => DecoratorsUpdater(newDecorators, decorators)
+  const onSave = (newDecorators: Array<Decorator>) => DecoratorsUpdater(newDecorators, decorators)
     .then(
       () => UserNotification.success('Updated decorators configuration.', 'Success!'),
       (error) => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
@@ -61,19 +62,28 @@ const DecoratorsConfig = () => {
 
   const decoratorsGroupedByStream = groupBy(decorators, (decorator) => (decorator.stream || DEFAULT_SEARCH_ID));
 
-  const currentDecorators = decoratorsGroupedByStream[currentStream] || [];
-  const sortedDecorators = currentDecorators
-    .sort((d1, d2) => d1.order - d2.order);
-  const readOnlyDecoratorItems = sortedDecorators.map((decorator) => formatDecorator(decorator, currentDecorators, types));
-
-  const streamOptions = streams.filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id));
+  const decoratorMap = decorators.length > 0
+    ? Object.entries(decoratorsGroupedByStream)
+      .map(([id, _decorators]) => [
+        streamsMap[id]?.title ?? id,
+        _decorators.sort((d1, d2) => d1.order - d2.order).map((decorator) => formatDecorator(decorator, _decorators, types)),
+      ] as const)
+      .sort((entry1, entry2) => defaultCompare(entry1[0], entry2[0]))
+      .map(([streamName, _decorators]) => (
+        <>
+          <dt>{streamName}</dt>
+          <dd><DecoratorList decorators={_decorators} disableDragging /></dd>
+        </>
+      ))
+    : <i>No decorators currently configured.</i>;
 
   return (
     <div>
       <h2>Decorators Configuration</h2>
-      <p>Select the stream for which you want to see the set of default decorators.</p>
-      <StreamSelect streams={streamOptions} onChange={setCurrentStream} value={currentStream} />
-      <DecoratorList decorators={readOnlyDecoratorItems} disableDragging />
+      <p>These are the currently configured decorators grouped by stream:</p>
+      <p>
+        {decoratorMap}
+      </p>
       <IfPermitted permissions="decorators:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
@@ -86,7 +96,5 @@ const DecoratorsConfig = () => {
     </div>
   );
 };
-
-DecoratorsConfig.propTypes = {};
 
 export default DecoratorsConfig;
