@@ -14,18 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.rest.resources.csp;
+package org.graylog.security.events;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface CSP {
-    final String CSP_DEFAULT = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;";
-    final String CSP_SWAGGER = "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:;";
+@AutoValue
+public abstract class AuthServiceBackendSavedEvent {
+    private static final String FIELD_AUTH_SERVICE_ID = "auth_service_id";
 
-    String value();
+    @JsonProperty(FIELD_AUTH_SERVICE_ID)
+    public abstract String authServiceId();
+
+    @JsonCreator
+    public static AuthServiceBackendSavedEvent create(@JsonProperty(FIELD_AUTH_SERVICE_ID) String authServiceId) {
+        return new AutoValue_AuthServiceBackendSavedEvent(authServiceId);
+    }
 }

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.plugin.rest.ValidationResult;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonTypeInfo(
@@ -41,9 +40,7 @@ public interface AuthServiceBackendConfig {
     }
 
     @JsonIgnore
-    default List<String> hostAllowList() {
-        return new ArrayList<>();
-    }
+    List<String> hostAllowList();
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
@@ -53,6 +50,11 @@ public interface AuthServiceBackendConfig {
     class FallbackConfig implements AuthServiceBackendConfig {
         @Override
         public String type() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<String> hostAllowList() {
             throw new UnsupportedOperationException();
         }
     }

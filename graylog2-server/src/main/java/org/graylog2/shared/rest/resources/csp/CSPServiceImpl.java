@@ -5,10 +5,8 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.rest.PaginationParameters;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.stream.Collectors;
 
-@Singleton
 public class CSPServiceImpl implements CSPService {
     private final String telemetryApiHost;
     private final DBAuthServiceBackendService dbService;
