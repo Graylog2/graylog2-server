@@ -1,0 +1,5 @@
+type = "f"
+message = "Combine dashboard and widget query when replaying search for dashboard widget."
+
+issues = ["14885"]
+pulls = ["15285"]
