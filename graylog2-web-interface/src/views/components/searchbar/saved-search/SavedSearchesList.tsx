@@ -94,8 +94,8 @@ const SavedSearchesList = ({
   );
 
   const onPageSizeChange = useCallback((newPageSize: number) => {
-    setActivePage(newPageSize);
-  }, []);
+    updateTableLayout({ perPage: newPageSize });
+  }, [updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
     setActivePage(1);
