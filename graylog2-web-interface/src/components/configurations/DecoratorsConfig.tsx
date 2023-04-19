@@ -75,7 +75,7 @@ const DecoratorsConfig = () => {
           <dd><DecoratorList decorators={_decorators} disableDragging /></dd>
         </>
       ));
-  }, [decorators, streamsMap, types]);
+  }, [decorators, decoratorsLoading, streamsMap, types, typesLoading]);
 
   if (streamsLoading || typesLoading || decoratorsLoading) {
     return <Spinner />;
