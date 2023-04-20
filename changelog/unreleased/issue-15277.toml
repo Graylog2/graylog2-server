@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix ConcurrentModificationException when listing input states."
+
+issues = ["15277"]
