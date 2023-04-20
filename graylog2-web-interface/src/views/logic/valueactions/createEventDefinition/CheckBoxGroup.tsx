@@ -15,47 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
 import mapValues from 'lodash/mapValues';
 
-import { Checkbox } from 'components/bootstrap';
 import type { Checked } from 'views/logic/valueactions/createEventDefinition/types';
+import { ExpandableList, ExpandableListItem } from 'components/common';
 
 const CHECKBOX_STATES = {
   Checked: 'Checked',
   Empty: 'Empty',
   Indeterminate: 'Indeterminate',
-};
-
-type CheckboxProps = {
-  label: string,
-  value: string,
-  onChange: () => void,
-}
-
-const NestedWrapper = styled.div`
-  margin-left: 15px;
-`;
-
-const CheckboxWithIndeterminate = ({ label, children, value, onChange }: React.PropsWithChildren<CheckboxProps>) => {
-  const checkboxRef = React.useRef(null);
-
-  React.useEffect(() => {
-    if (value === CHECKBOX_STATES.Checked) {
-      checkboxRef.current.checked = true;
-      checkboxRef.current.indeterminate = false;
-    } else if (value === CHECKBOX_STATES.Empty) {
-      checkboxRef.current.checked = false;
-      checkboxRef.current.indeterminate = false;
-    } else if (value === CHECKBOX_STATES.Indeterminate) {
-      checkboxRef.current.checked = false;
-      checkboxRef.current.indeterminate = true;
-    }
-  }, [value]);
-
-  return (
-    <Checkbox label={label} checked={value === CHECKBOX_STATES.Checked} inputRef={(ref) => { checkboxRef.current = ref; }} onChange={onChange}>{children}</Checkbox>
-  );
 };
 
 type Props = {
@@ -99,20 +67,25 @@ const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
   }, [checked, onChange]);
 
   return (
-    <div>
-      <CheckboxWithIndeterminate label={groupLabel} value={value} onChange={groupOnChange}><b>{groupLabel}</b></CheckboxWithIndeterminate>
-      <div>
+    <ExpandableListItem header={groupLabel}
+                        expanded
+                        padded={false}
+                        checked={value === CHECKBOX_STATES.Checked}
+                        indetermined={value === CHECKBOX_STATES.Indeterminate}
+                        onChange={groupOnChange}>
+      <ExpandableList>
         {
-          Object.entries(checked).map(([key, val]) => (
-            <NestedWrapper key={key}>
-              <Checkbox checked={val} onChange={(e) => itemOnChange(key, e)}>
-                {labels[key]}
-              </Checkbox>
-            </NestedWrapper>
-          ))
-        }
-      </div>
-    </div>
+            Object.entries(checked).map(([key, isChecked]) => (
+              <ExpandableListItem expandable={false}
+                                  header={labels[key]}
+                                  padded={false}
+                                  key={key}
+                                  checked={isChecked}
+                                  onChange={(e) => itemOnChange(key, e)} />
+            ))
+          }
+      </ExpandableList>
+    </ExpandableListItem>
   );
 };
 
