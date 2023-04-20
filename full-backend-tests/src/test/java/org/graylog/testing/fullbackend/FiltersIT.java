@@ -20,14 +20,15 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.shared.rest.CSPResponseFilter;
-import org.graylog2.shared.rest.resources.annotations.CSP;
+import org.graylog2.shared.rest.resources.csp.CSP;
+import org.graylog2.shared.rest.resources.csp.CSPResponseFilter;
 import org.hamcrest.Matchers;
 
 import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
+    private static final String CONNECT_SRC = "connect-src 'self' https://telemetry.graylog.cloud";
     private final GraylogApis api;
 
     public FiltersIT(GraylogApis api) {
@@ -36,6 +37,7 @@ public class FiltersIT {
 
     @ContainerMatrixTest
     void cspDocumentationBrowser() {
+        String expected = CSP.CSP_SWAGGER + CONNECT_SRC;
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -43,11 +45,12 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(CSP.CSP_SWAGGER));
+                        Matchers.equalTo(expected));
     }
 
     @ContainerMatrixTest
     void cspWebInterfaceAssets() {
+        String expected = CSP.CSP_DEFAULT + CONNECT_SRC;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -56,11 +59,12 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(CSP.CSP_DEFAULT));
+                        Matchers.equalTo(expected));
     }
 
     @ContainerMatrixTest
     void cspWebAppNotFound() {
+        String expected = CSP.CSP_DEFAULT + CONNECT_SRC;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -68,6 +72,6 @@ public class FiltersIT {
                 .get("streams")
                 .then()
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(CSP.CSP_DEFAULT));
+                        Matchers.equalTo(expected));
     }
 }
