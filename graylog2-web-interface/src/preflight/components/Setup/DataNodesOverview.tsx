@@ -17,14 +17,10 @@
 import * as React from 'react';
 import { Space } from '@mantine/core';
 import styled from 'styled-components';
-import { useState } from 'react';
 
-import UserNotification from 'preflight/util/UserNotification';
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Badge, List, Button } from 'preflight/components/common';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 
 const P = styled.p`
   max-width: 700px;
@@ -34,29 +30,17 @@ const NodeId = styled(Badge)`
   margin-right: 3px;
 `;
 
-const DataNodesOverview = () => {
-  const [resumingStartup, setResumingStartup] = useState(false);
+type Props = {
+  onResumeStartup: () => void
+}
+
+const DataNodesOverview = ({ onResumeStartup }: Props) => {
   const {
     data: dataNodes,
     isFetching: isFetchingDataNodes,
     error: dataNodesFetchError,
     isInitialLoading: isInitialLoadingDataNodes,
   } = useDataNodes();
-
-  const resumeStartup = () => {
-    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
-      fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
-        .then(() => {
-          setResumingStartup(true);
-        })
-        .catch((error) => {
-          setResumingStartup(false);
-
-          UserNotification.error(`Resuming startup failed with error: ${error}`,
-            'Could not resume startup');
-        });
-    }
-  };
 
   return (
     <>
@@ -98,8 +82,8 @@ const DataNodesOverview = () => {
         </Alert>
       )}
       <Space h="md" />
-      <Button onClick={resumeStartup} size="xs">
-        {resumingStartup ? <Spinner delay={0} text="Resuming startup..." /> : 'Resume startup'}
+      <Button onClick={onResumeStartup} size="xs">
+        Resume startup
       </Button>
     </>
   );

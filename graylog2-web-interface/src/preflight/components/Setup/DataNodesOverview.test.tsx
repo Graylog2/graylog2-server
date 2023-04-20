@@ -19,7 +19,7 @@ import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import fetch from 'logic/rest/FetchProvider';
-import DataNodesOverview from 'preflight/components/DataNodesOverview';
+import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
 import FetchError from 'logic/errors/FetchError';
@@ -83,14 +83,14 @@ describe('DataNodesOverview', () => {
   });
 
   it('should list available data nodes', async () => {
-    renderPreflight(<DataNodesOverview />);
+    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
 
     await screen.findByText('node-id-3');
     await screen.findByText('http://localhost:9200');
   });
 
   it('should resume startup', async () => {
-    renderPreflight(<DataNodesOverview />);
+    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
 
     await screen.findByText('node-id-3');
 
@@ -111,7 +111,7 @@ describe('DataNodesOverview', () => {
       error: undefined,
     });
 
-    renderPreflight(<DataNodesOverview />);
+    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
 
     const resumeStartupButton = screen.getByRole('button', {
       name: /resume startup/i,
@@ -131,7 +131,7 @@ describe('DataNodesOverview', () => {
       error: new FetchError('The request error message', 500, { status: 500, body: { message: 'The request error message' } }),
     });
 
-    renderPreflight(<DataNodesOverview />);
+    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
     await screen.findByText(/There was an error fetching the data nodes:/);
     await screen.findByText(/There was an error fetching a resource: The request error message. Additional information: Not available/);
   });
