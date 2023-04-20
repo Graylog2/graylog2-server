@@ -16,6 +16,7 @@
  */
 package org.graylog2.decorators;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -82,17 +83,17 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static DecoratorImpl create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
+    public static DecoratorImpl create(@JsonProperty(FIELD_ID) @JsonAlias("_" + FIELD_ID) @Id @ObjectId @Nullable String id,
                                        @JsonProperty(FIELD_TYPE) String type,
                                        @JsonProperty(FIELD_CONFIG) Map<String, Object> config,
                                        @JsonProperty(FIELD_STREAM) Optional<String> stream,
                                        @JsonProperty(FIELD_ORDER) int order) {
         return new AutoValue_DecoratorImpl.Builder()
-            .id(id)
-            .type(type)
-            .config(config)
-            .stream(stream)
-            .order(order)
+                .id(id)
+                .type(type)
+                .config(config)
+                .stream(stream)
+                .order(order)
             .build();
     }
 
