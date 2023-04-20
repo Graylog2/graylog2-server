@@ -51,7 +51,7 @@ const SecurityPage = () => {
       <ThemeModeContext.Consumer>
         {(theme: ThemeMode) => (
           <div>
-            <a href="https://www.graylog.org/products/security" target="_blank" rel="noreferrer">
+            <a href="https://www.graylog.org/explore-security/" target="_blank" rel="noreferrer">
               <img style={{ height: '500px' }} src={theme === 'noir' ? SecurityNoLicenseOverlayDark : SecurityNoLicenseOverlay} alt="security-overlay" />
             </a>
           </div>

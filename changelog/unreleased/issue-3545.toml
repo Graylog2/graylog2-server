@@ -1,0 +1,5 @@
+type = "added"
+message = "Added fallback for securit page when no license is present."
+
+issues = ["3545"]
+pulls = ["15300"]
