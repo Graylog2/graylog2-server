@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.security.events.AuthServiceBackendDeletedEvent;
+import org.graylog.security.events.AuthServiceBackendSavedEvent;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -60,7 +61,9 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
 
     @Override
     public AuthServiceBackendDTO save(AuthServiceBackendDTO newBackend) {
-        return super.save(prepareUpdate(newBackend));
+        AuthServiceBackendDTO authServiceBackendDTO = super.save(prepareUpdate(newBackend));
+        eventBus.post(AuthServiceBackendSavedEvent.create(authServiceBackendDTO.id()));
+        return authServiceBackendDTO;
     }
 
     @Override
