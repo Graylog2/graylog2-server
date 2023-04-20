@@ -45,9 +45,8 @@ public class CommandFactory {
                 .fieldsInOrder(request.fieldsInOrder())
                 .chunkSize(request.chunkSize());
 
-        if (request.limit().isPresent()) {
-            builder.limit(request.limit().getAsInt());
-        }
+        request.timeZone().ifPresent(tz -> builder.timeZone(tz));
+        request.limit().ifPresent(l -> builder.limit(l));
 
         return builder.build();
     }
