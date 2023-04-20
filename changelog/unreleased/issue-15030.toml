@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Adds (now always missing) timezone to the export command, if set in the REST call."
+
+issues = ["15030"]
+pulls = ["15296"]
