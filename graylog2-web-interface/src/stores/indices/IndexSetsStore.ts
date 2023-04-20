@@ -101,6 +101,7 @@ type IndexSetsActionsType = {
   update: (indexSet: IndexSet) => Promise<unknown>,
   create: (indexSet: IndexSet) => Promise<unknown>,
   delete: (indexSet: IndexSet, deleteIndices: boolean) => Promise<unknown>,
+  searchPaginated: (searchTerm: string, skip: number, limit: number, stats: boolean) => Promise<unknown>,
   setDefault: (indexSet: IndexSet) => Promise<unknown>,
   stats: () => Promise<unknown>,
 };
@@ -114,6 +115,7 @@ export const IndexSetsActions = singletonActions(
     update: { asyncResult: true },
     create: { asyncResult: true },
     delete: { asyncResult: true },
+    searchPaginated: { asyncResult: true },
     setDefault: { asyncResult: true },
     stats: { asyncResult: true },
   }),
@@ -127,25 +129,41 @@ export const IndexSetsStore = singletonStore(
     indexSets: undefined,
     indexSetStats: undefined,
     indexSet: undefined,
+    globalIndexSetStats: undefined,
 
     getInitialState() {
+      return this.getState();
+    },
+
+    getState() {
       return {
         indexSetsCount: this.indexSetsCount,
         indexSets: this.indexSets,
         indexSetStats: this.indexSetStats,
+        indexSet: this.indexSet,
+        globalIndexSetStats: this.globalIndexSetStats,
       };
     },
+
+    propagateChanges() {
+      this.trigger(this.getState());
+    },
+
     list(stats: boolean) {
       const url = qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
       const promise = fetch('GET', url);
 
       promise
         .then(
-          (response: IndexSetsResponseType) => this.trigger({
-            indexSetsCount: response.total,
-            indexSets: response.index_sets,
-            indexSetStats: response.stats,
-          }),
+          (response: IndexSetsResponseType) => {
+            this.indexSetsCount = response.total;
+            this.indexSets = response.index_sets;
+            this.indexSetStats = response.stats;
+
+            this.propagateChanges();
+
+            return response;
+          },
           (error) => {
             UserNotification.error(`Fetching index sets list failed: ${error.message}`,
               'Could not retrieve index sets.');
@@ -161,11 +179,15 @@ export const IndexSetsStore = singletonStore(
 
       promise
         .then(
-          (response: IndexSetsResponseType) => this.trigger({
-            indexSetsCount: response.total,
-            indexSets: response.index_sets,
-            indexSetStats: response.stats,
-          }),
+          (response: IndexSetsResponseType) => {
+            this.indexSetsCount = response.total;
+            this.indexSets = response.index_sets;
+            this.indexSetStats = response.stats;
+
+            this.propagateChanges();
+
+            return response;
+          },
           (error) => {
             UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
               'Could not retrieve index sets.');
@@ -175,13 +197,39 @@ export const IndexSetsStore = singletonStore(
       IndexSetsActions.listPaginated.promise(promise);
     },
 
+    searchPaginated(searchTerm: string, skip: number, limit: number, stats: boolean) {
+      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.searchPaginated(searchTerm, skip, limit, stats).url);
+      const promise = fetch('GET', url);
+
+      promise
+        .then(
+          (response: IndexSetsResponseType) => {
+            this.indexSetsCount = response.total;
+            this.indexSets = response.index_sets;
+            this.indexSetStats = response.stats;
+
+            this.propagateChanges();
+
+            return response;
+          },
+          (error) => {
+            UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
+              'Could not retrieve index sets.');
+          },
+        );
+
+      IndexSetsActions.searchPaginated.promise(promise);
+    },
+
     get(indexSetId: string) {
       const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url);
       const promise = fetch('GET', url);
 
       promise.then(
         (response: IndexSet) => {
-          this.trigger({ indexSet: response });
+          this.indexSet = response;
+
+          this.propagateChanges();
 
           return response;
         },
@@ -200,7 +248,10 @@ export const IndexSetsStore = singletonStore(
       promise.then(
         (response: IndexSet) => {
           UserNotification.success(`Successfully updated index set '${indexSet.title}'`, 'Success');
-          this.trigger({ indexSet: response });
+
+          this.indexSet = response;
+
+          this.propagateChanges();
 
           return response;
         },
@@ -219,7 +270,10 @@ export const IndexSetsStore = singletonStore(
       promise.then(
         (response: IndexSet) => {
           UserNotification.success(`Successfully created index set '${indexSet.title}'`, 'Success');
-          this.trigger({ indexSet: response });
+
+          this.indexSet = response;
+
+          this.propagateChanges();
 
           return response;
         },
@@ -269,13 +323,17 @@ export const IndexSetsStore = singletonStore(
 
       promise
         .then(
-          (response) => this.trigger({
-            globalIndexSetStats: {
+          (response) => {
+            this.globalIndexSetStats = {
               indices: response.indices,
               documents: response.documents,
               size: response.size,
-            },
-          }),
+            };
+
+            this.propagateChanges();
+
+            return response;
+          },
           (error) => {
             UserNotification.error(`Fetching global index stats failed: ${error.message}`,
               'Could not retrieve global index stats.');

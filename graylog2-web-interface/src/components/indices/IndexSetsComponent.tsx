@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import { Link, LinkContainer } from 'components/common/router';
-import { Button, Col, DropdownButton, Label, MenuItem } from 'components/bootstrap';
-import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
+import { Button, Col, DropdownButton, Input, Label, MenuItem, Row } from 'components/bootstrap';
+import { EntityList, EntityListItem, PaginatedList, SearchForm, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
@@ -34,37 +34,54 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 const IndexSetsComponent = () => {
   const DEFAULT_PAGE_NUMBER = 1;
   const DEFAULT_PAGE_SIZE = 10;
-  const { indexSetsCount, indexSets, globalIndexSetStats, indexSetStats } = useStore<IndexSetsStoreState>(IndexSetsStore);
+  const SEARCH_MIN_TERM_LENGTH = 3;
+  const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } = useStore<IndexSetsStoreState>(IndexSetsStore);
   const { page, resetPage } : PaginationQueryParameterResult = usePaginationQueryParameter();
   const sendTelemetry = useSendTelemetry();
 
-  // indexSets = paginated call
-  // globalIndexSetStats = call to get all stats
-  // indexSetStats = call for each set
-  // indexSetsCount = number of all indexSets
-
-  // boolean to enable/disable stats fetching -> list call stats true oder false
-  // search index sets
-  // index_sets/search?searchTitle=blabla&skip=1&limit=2&stats=false
-
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(DEFAULT_PAGE_NUMBER);
   const [currentPageSize, setCurrentPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
-  const [forms, setForms] = useState<{[key: string]: { open:() => void }}>({});
+  const [statsEnabled, setStatsEnabled] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>(undefined);
 
-  const loadData = (pageNumber: number, limit: number) => {
+  const formsRef = useRef<{[key: string]: { open:() => void }}>();
+
+  const loadData = useCallback((pageNumber: number, limit: number) => {
     setCurrentPageNumber(pageNumber);
     setCurrentPageSize(limit);
-    IndexSetsActions.listPaginated((pageNumber - 1) * limit, limit, true);
-    IndexSetsActions.stats();
-  };
+
+    if (searchTerm) {
+      IndexSetsActions.searchPaginated(searchTerm, (pageNumber - 1) * limit, limit, statsEnabled);
+    } else {
+      IndexSetsActions.listPaginated((pageNumber - 1) * limit, limit, statsEnabled);
+    }
+  }, [statsEnabled, searchTerm]);
 
   useEffect(() => {
     loadData(page, DEFAULT_PAGE_SIZE);
-  }, [page]);
+  }, [loadData, page]);
+
+  useEffect(() => {
+    if (statsEnabled) {
+      IndexSetsActions.stats();
+    }
+  }, [statsEnabled]);
 
   const onChangePaginatedList = (newPage: number, newSize: number) => {
     loadData(newPage, newSize);
   };
+
+  const onSearch = (query) => {
+    if (query && query.length >= SEARCH_MIN_TERM_LENGTH) {
+      setSearchTerm(query);
+    } else if (!query || query.length === 0) {
+      setSearchTerm(query);
+    }
+  };
+
+  const onSearchReset = () => { setSearchTerm(undefined); };
+
+  const onToggleStats = () => { setStatsEnabled(!statsEnabled); };
 
   const onSetDefault = (indexSet: IndexSet) => {
     return () => {
@@ -79,7 +96,7 @@ const IndexSetsComponent = () => {
 
   const onDelete = (indexSet: IndexSet) => {
     return () => {
-      forms[`index-set-deletion-form-${indexSet.id}`].open();
+      formsRef.current[`index-set-deletion-form-${indexSet.id}`].open();
     };
   };
 
@@ -97,7 +114,7 @@ const IndexSetsComponent = () => {
   };
 
   const formatStatsString = (stats: IndexSetStats) => {
-    if (!stats) {
+    if (!statsEnabled || !stats) {
       return 'N/A';
     }
 
@@ -129,7 +146,7 @@ const IndexSetsComponent = () => {
         <IndexSetDetails indexSet={indexSet} />
 
         <IndexSetDeletionForm ref={
-          (elem) => { setForms({ ...forms, [`index-set-deletion-form-${indexSet.id}`]: elem }); }
+          (elem) => { formsRef.current = { ...formsRef.current, [`index-set-deletion-form-${indexSet.id}`]: elem }; }
 }
                               indexSet={indexSet}
                               onDelete={deleteIndexSet} />
@@ -174,20 +191,50 @@ const IndexSetsComponent = () => {
   }
 
   return (
-    <div>
-      <h4><strong>Total:</strong> {formatStatsString(globalIndexSetStats)}</h4>
+    <>
+      <Row>
+        <Col md={1}>
+          <Input id="enable-stats"
+                 type="checkbox"
+                 checked={statsEnabled}
+                 onClick={onToggleStats}
+                 label="Calculate stats" />
 
-      <hr style={{ marginBottom: 0 }} />
+        </Col>
+        <Col md={3}>
+          <SearchForm onSearch={onSearch}
+                      label="Search Index Sets"
+                      queryWidth={300}
+                      wrapperClass="has-bm"
+                      onReset={onSearchReset}
+                      placeholder="Enter query to search" />
 
-      <PaginatedList pageSize={DEFAULT_PAGE_SIZE}
-                     totalItems={indexSetsCount}
-                     onChange={onChangePaginatedList}
-                     showPageSizeSelect={false}>
-        <EntityList bsNoItemsStyle="info"
-                    noItemsText="There are no index sets to display"
-                    items={indexSets.map((indexSet) => formatIndexSet(indexSet))} />
-      </PaginatedList>
-    </div>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={1}>
+          <h4><strong>Total:</strong> {formatStatsString(globalIndexSetStats)}</h4>
+
+        </Col>
+
+      </Row>
+
+      <Row>
+        <Col md={12}>
+
+          <hr style={{ marginBottom: 0 }} />
+
+          <PaginatedList pageSize={DEFAULT_PAGE_SIZE}
+                         totalItems={indexSetsCount}
+                         onChange={onChangePaginatedList}
+                         showPageSizeSelect={false}>
+            <EntityList bsNoItemsStyle="info"
+                        noItemsText="There are no index sets to display"
+                        items={indexSets.map((indexSet) => formatIndexSet(indexSet))} />
+          </PaginatedList>
+        </Col>
+      </Row>
+    </>
   );
 };
 
