@@ -58,7 +58,7 @@ public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
                 && responseStatus == Response.Status.NOT_FOUND
                 && acceptsHtml
                 && !requestPath.startsWith("/" + HttpConfiguration.PATH_API)) {
-            final String entity = indexHtmlGenerator.get(requestContext.getHeaders());
+            final String entity = indexHtmlGenerator.get(requestContext.getHeaders(), (String) requestContext.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
             responseContext.setStatusInfo(Response.Status.OK);
             responseContext.setEntity(entity, new Annotation[0], MediaType.TEXT_HTML_TYPE);
 
