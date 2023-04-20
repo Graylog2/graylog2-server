@@ -141,6 +141,7 @@ public class WebInterfaceAssetsResource {
     }
 
     @GET
+    @Path("{filename:.*}")
     public Response getIndex(@Context ContainerRequest request, @Context HttpHeaders headers) {
         final URI originalLocation = request.getRequestUri();
         if (originalLocation.getPath().endsWith("/")) {
