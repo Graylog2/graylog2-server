@@ -39,17 +39,12 @@ const IndexSetsComponent = () => {
   const { page, resetPage } : PaginationQueryParameterResult = usePaginationQueryParameter();
   const sendTelemetry = useSendTelemetry();
 
-  const [currentPageNumber, setCurrentPageNumber] = useState<number>(DEFAULT_PAGE_NUMBER);
-  const [currentPageSize, setCurrentPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [statsEnabled, setStatsEnabled] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>(undefined);
 
   const formsRef = useRef<{[key: string]: { open:() => void }}>();
 
-  const loadData = useCallback((pageNumber: number, limit: number) => {
-    setCurrentPageNumber(pageNumber);
-    setCurrentPageSize(limit);
-
+  const loadData = useCallback((pageNumber: number = DEFAULT_PAGE_NUMBER, limit: number = DEFAULT_PAGE_SIZE) => {
     if (searchTerm) {
       IndexSetsActions.searchPaginated(searchTerm, (pageNumber - 1) * limit, limit, statsEnabled);
     } else {
@@ -58,7 +53,7 @@ const IndexSetsComponent = () => {
   }, [statsEnabled, searchTerm]);
 
   useEffect(() => {
-    loadData(page, DEFAULT_PAGE_SIZE);
+    loadData(page);
   }, [loadData, page]);
 
   useEffect(() => {
@@ -67,15 +62,13 @@ const IndexSetsComponent = () => {
     }
   }, [statsEnabled]);
 
-  const onChangePaginatedList = (newPage: number, newSize: number) => {
-    loadData(newPage, newSize);
-  };
-
   const onSearch = (query) => {
     if (query && query.length >= SEARCH_MIN_TERM_LENGTH) {
       setSearchTerm(query);
+      resetPage();
     } else if (!query || query.length === 0) {
       setSearchTerm(query);
+      resetPage();
     }
   };
 
@@ -90,7 +83,7 @@ const IndexSetsComponent = () => {
         eventElement: 'set-default-index-set',
       });
 
-      IndexSetsActions.setDefault(indexSet).then(() => loadData(currentPageNumber, currentPageSize));
+      IndexSetsActions.setDefault(indexSet).then(() => loadData());
     };
   };
 
@@ -101,15 +94,13 @@ const IndexSetsComponent = () => {
   };
 
   const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
-    resetPage();
-
     sendTelemetry('submit_form', {
       appSection: 'index_sets',
       eventElement: 'delete-index-set',
     });
 
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
-      loadData(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
+      resetPage();
     });
   };
 
@@ -226,7 +217,6 @@ const IndexSetsComponent = () => {
 
           <PaginatedList pageSize={DEFAULT_PAGE_SIZE}
                          totalItems={indexSetsCount}
-                         onChange={onChangePaginatedList}
                          showPageSizeSelect={false}>
             <EntityList bsNoItemsStyle="info"
                         noItemsText="There are no index sets to display"
