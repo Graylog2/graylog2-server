@@ -84,7 +84,7 @@ const WelcomeMessage = styled.strong(({ theme }) => css`
 `);
 
 const Claim = styled.h1(({ theme }) => css`
-  color: ${theme.colors.brand.secondary};
+  color: #fcfcfc;
   text-transform: uppercase;
   font-size: ${theme.fonts.size.huge};
   line-height: 1;
