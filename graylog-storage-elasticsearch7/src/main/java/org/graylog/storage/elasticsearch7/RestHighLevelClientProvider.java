@@ -72,41 +72,24 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     muteElasticsearchDeprecationWarnings,
                 credentialsProvider);
 
+            var sniffer = SnifferWrapper.create(
+                    client.getLowLevelClient(),
+                    TimeUnit.SECONDS.toMillis(5),
+                    discoveryFrequency,
+                    mapDefaultScheme(defaultSchemeForDiscoveredNodes)
+            );
+
             if (discoveryEnabled) {
-                final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
-                shutdownService.register(sniffer::close);
-            } else if(nodeActivity) {
-                final Sniffer nodes = createNodeListSniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes);
-                shutdownService.register(nodes::close);
+                sniffer.add(FilteredElasticsearchNodesSniffer.create(discoveryFilter));
             }
+            if(nodeActivity) {
+                sniffer.add(NodeListSniffer.create());
+            }
+
+            sniffer.build().ifPresent(s -> shutdownService.register(s::close));
 
             return client;
         });
-    }
-
-    private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
-        final NodesSniffer nodesSniffer = FilteredElasticsearchNodesSniffer.create(
-                restClient,
-                TimeUnit.SECONDS.toMillis(5),
-                mapDefaultScheme(defaultSchemeForDiscoveredNodes),
-                discoveryFilter
-        );
-        return Sniffer.builder(restClient)
-                .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
-                .setNodesSniffer(new NodeListSniffer(nodesSniffer))
-                .build();
-    }
-
-    private Sniffer createNodeListSniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes) {
-        final NodesSniffer nodesSniffer = NodeListSniffer.create(
-                restClient,
-                TimeUnit.SECONDS.toMillis(5),
-                mapDefaultScheme(defaultSchemeForDiscoveredNodes)
-        );
-        return Sniffer.builder(restClient)
-                .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
-                .setNodesSniffer(nodesSniffer)
-                .build();
     }
 
     private ElasticsearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
