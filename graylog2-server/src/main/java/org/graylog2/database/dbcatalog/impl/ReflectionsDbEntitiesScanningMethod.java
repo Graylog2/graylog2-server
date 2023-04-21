@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Deprecated
+/**
+ * @deprecated {@link ClassGraphDbEntitiesScanningMethod} performs better
+ */
 public class ReflectionsDbEntitiesScanningMethod implements DbEntitiesScanningMethod {
 
     @Override
