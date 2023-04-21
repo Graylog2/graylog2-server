@@ -26,6 +26,8 @@ import { EventNotificationsActions } from 'stores/event-notifications/EventNotif
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
+import ErrorsActions from 'actions/errors/ErrorsActions';
 
 const EventView = () => {
   const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
@@ -40,10 +42,16 @@ const EventView = () => {
   );
 };
 
+export const onErrorHandler = (error) => {
+  if (error.status === 404) {
+    ErrorsActions.report(createFromFetchError(error));
+  }
+};
+
 const EventReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
   const { alertId } = useParams<{ alertId?: string }>();
-  const { data: eventData, isLoading: eventIsLoading, isFetched: eventIsFetched } = useEventById(alertId);
+  const { data: eventData, isLoading: eventIsLoading, isFetched: eventIsFetched } = useEventById(alertId, { onErrorHandler });
   const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(eventData?.event_definition_id);
 
   useEffect(() => {

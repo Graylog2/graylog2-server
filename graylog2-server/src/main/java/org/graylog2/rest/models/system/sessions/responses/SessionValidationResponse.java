@@ -48,14 +48,18 @@ public abstract class SessionValidationResponse {
     }
 
     public static SessionValidationResponse valid() {
-        return new AutoValue_SessionValidationResponse(true, null, null);
+        return create(true, null, null);
     }
 
     public static SessionValidationResponse validWithNewSession(String newSessionId, String username) {
-        return new AutoValue_SessionValidationResponse(true, newSessionId, username);
+        return create(true, newSessionId, username);
     }
 
     public static SessionValidationResponse invalid() {
-        return new AutoValue_SessionValidationResponse(false, null, null);
+        return create(false, null, null);
+    }
+
+    public static SessionValidationResponse authenticatedWithNoSession(String username) {
+        return create(false, null, username);
     }
 }

@@ -37,59 +37,62 @@ const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
 const useAttributeComponents = () => {
   const { eventData, eventDefinition, isEventDefinition } = useAlertAndEventDefinitionData();
 
-  const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
-  const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
-  const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
+  return useMemo(() => {
+    if (!eventDefinition) {
+      return [
+        { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
+      ];
+    }
 
-  return useMemo(() => [
-    { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
-    {
-      title: 'Event definition updated at',
-      content: (
-        <>
-          <AlertTimestamp dateTime={eventDefinition.updated_at} />
-          <HoverForHelp displayLeftMargin iconSize="xs">
-            Event definition <i>{eventDefinition.title}</i> was edited after this event happened.
-            Some of aggregations widgets might not be representative for this event.
-          </HoverForHelp>
-        </>
-      ),
-      show: isEDUpdatedAfterEvent,
-    },
-    {
-      title: 'Event definition',
-      content: (
-        <Link target="_blank"
-              to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
-          {eventDefinition.title}
-        </Link>
-      ),
-      show: !isEventDefinition,
-    },
-    {
-      title: 'Priority',
-      content: upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
-    },
-    { title: 'Execute search every', content: executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}` },
-    { title: 'Search within', content: searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}` },
-    { title: 'Description', content: eventDefinition.description },
-    {
-      title: 'Notifications',
-      content: <Notifications />,
-    },
-    {
-      title: 'Aggregation conditions',
-      content: <AggregationConditions />,
-    },
-  ], [
+    const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
+    const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
+    const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
+
+    return [
+      { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
+      {
+        title: 'Event definition updated at',
+        content: (
+          <>
+            <AlertTimestamp dateTime={eventDefinition.updated_at} />
+            <HoverForHelp displayLeftMargin iconSize="xs">
+              Event definition <i>{eventDefinition.title}</i> was edited after this event happened.
+              Some of aggregations widgets might not be representative for this event.
+            </HoverForHelp>
+          </>
+        ),
+        show: isEDUpdatedAfterEvent,
+      },
+      {
+        title: 'Event definition',
+        content: (
+          <Link target="_blank"
+                to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
+            {eventDefinition.title}
+          </Link>
+        ),
+        show: !isEventDefinition,
+      },
+      {
+        title: 'Priority',
+        content: upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
+      },
+      { title: 'Execute search every', content: executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}` },
+      { title: 'Search within', content: searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}` },
+      { title: 'Description', content: eventDefinition.description },
+      {
+        title: 'Notifications',
+        content: <Notifications />,
+      },
+      {
+        title: 'Aggregation conditions',
+        content: <AggregationConditions />,
+      },
+    ];
+  }, [
     eventData?.timestamp,
     eventDefinition,
-    executeEvery?.duration,
-    executeEvery?.unit,
-    isEDUpdatedAfterEvent,
     isEventDefinition,
-    searchWithin?.duration,
-    searchWithin?.unit,
   ]);
 };
 

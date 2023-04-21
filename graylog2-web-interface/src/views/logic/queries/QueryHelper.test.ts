@@ -23,27 +23,33 @@ describe('QueryHelper', () => {
 
   describe('concatQueryStrings', () => {
     it('concat queries by default with AND and brackets', () => {
-      const result = concatQueryStrings(['filed1:value1 OR field2:value2', 'field3:value3']);
+      const result = concatQueryStrings(['field1:value1 OR field2:value2', 'field3:value3']);
 
-      expect(result).toEqual('(filed1:value1 OR field2:value2) AND (field3:value3)');
+      expect(result).toEqual('(field1:value1 OR field2:value2) AND (field3:value3)');
     });
 
     it('concat queries with custom operator and without brackets', () => {
-      const result = concatQueryStrings(['filed1:value1 OR field2:value2', 'field3:value3'], { operator: 'OR', withBrackets: false });
+      const result = concatQueryStrings(['field1:value1 OR field2:value2', 'field3:value3'], { operator: 'OR', withBrackets: false });
 
-      expect(result).toEqual('filed1:value1 OR field2:value2 OR field3:value3');
+      expect(result).toEqual('field1:value1 OR field2:value2 OR field3:value3');
     });
 
     it('filtrate empty query strings', () => {
-      const result = concatQueryStrings(['     ', 'filed1:value1 OR field2:value2', ' ', 'field3:value3', '']);
+      const result = concatQueryStrings(['     ', 'field1:value1 OR field2:value2', ' ', 'field3:value3', '']);
 
-      expect(result).toEqual('(filed1:value1 OR field2:value2) AND (field3:value3)');
+      expect(result).toEqual('(field1:value1 OR field2:value2) AND (field3:value3)');
     });
 
     it('doesnt wrap in brackets if we have only one query string', () => {
-      const result = concatQueryStrings(['     ', 'filed1:value1 OR field2:value2', ' ', '']);
+      const result = concatQueryStrings(['     ', 'field1:value1 OR field2:value2', ' ', '']);
 
-      expect(result).toEqual('filed1:value1 OR field2:value2');
+      expect(result).toEqual('field1:value1 OR field2:value2');
+    });
+
+    it('handles null query strings', () => {
+      const result = concatQueryStrings([undefined, 'field1:value1 OR field2:value2', null, '']);
+
+      expect(result).toEqual('field1:value1 OR field2:value2');
     });
   });
 });
