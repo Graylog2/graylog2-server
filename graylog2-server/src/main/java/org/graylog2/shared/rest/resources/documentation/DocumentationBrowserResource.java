@@ -23,7 +23,7 @@ import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.rest.resources.annotations.CSP;
+import org.graylog2.shared.rest.resources.csp.CSP;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.inject.Inject;

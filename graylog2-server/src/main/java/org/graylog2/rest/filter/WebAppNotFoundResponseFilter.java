@@ -17,7 +17,7 @@
 package org.graylog2.rest.filter;
 
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.shared.rest.resources.annotations.CSP;
+import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
 
 import javax.annotation.Priority;
@@ -32,15 +32,17 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import static org.graylog2.shared.rest.CSPResponseFilter.CSP_HEADER;
+import static org.graylog2.shared.rest.resources.csp.CSPResponseFilter.CSP_HEADER;
 
 @Priority(Priorities.ENTITY_CODER)
 public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
     private final IndexHtmlGenerator indexHtmlGenerator;
+    private final CSPDynamicFeature cspDynamicFeature;
 
     @Inject
-    public WebAppNotFoundResponseFilter(IndexHtmlGenerator indexHtmlGenerator) {
+    public WebAppNotFoundResponseFilter(IndexHtmlGenerator indexHtmlGenerator, CSPDynamicFeature cspDynamicFeature) {
         this.indexHtmlGenerator = indexHtmlGenerator;
+        this.cspDynamicFeature = cspDynamicFeature;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
             responseContext.getHeaders().putSingle("X-UA-Compatible", "IE=edge");
         }
         if (!responseContext.getHeaders().containsKey(CSP_HEADER)) {
-            responseContext.getHeaders().add(CSP_HEADER, CSP.CSP_DEFAULT);
+            responseContext.getHeaders().add(CSP_HEADER, cspDynamicFeature.dynamicCspString());
         }
     }
 }

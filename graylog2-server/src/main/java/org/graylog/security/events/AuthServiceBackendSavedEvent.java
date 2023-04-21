@@ -14,24 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.security.events;
 
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-export type Drilldown = {
-  query: QueryString,
-  streams: Array<string>,
-  timerange: TimeRange,
-};
+@AutoValue
+public abstract class AuthServiceBackendSavedEvent {
+    private static final String FIELD_AUTH_SERVICE_ID = "auth_service_id";
 
-const defaultValue: Drilldown = {
-  query: createElasticsearchQueryString(''),
-  streams: [],
-  timerange: DEFAULT_TIMERANGE,
-};
+    @JsonProperty(FIELD_AUTH_SERVICE_ID)
+    public abstract String authServiceId();
 
-const DrilldownContext = React.createContext<Drilldown>(defaultValue);
-
-export default DrilldownContext;
+    @JsonCreator
+    public static AuthServiceBackendSavedEvent create(@JsonProperty(FIELD_AUTH_SERVICE_ID) String authServiceId) {
+        return new AutoValue_AuthServiceBackendSavedEvent(authServiceId);
+    }
+}

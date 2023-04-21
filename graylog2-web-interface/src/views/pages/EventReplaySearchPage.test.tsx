@@ -26,7 +26,7 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import EventReplaySearchPage from 'views/pages/EventReplaySearchPage';
+import EventReplaySearchPage, { onErrorHandler } from 'views/pages/EventReplaySearchPage';
 import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'hooks/useEventDefinition';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
@@ -113,7 +113,7 @@ describe('EventReplaySearchPage', () => {
     }));
 
     render(<SimpleReplaySearchPage />);
-    await waitFor(() => expect(useEventById).toHaveBeenCalledWith(mockEventData.event.id));
+    await waitFor(() => expect(useEventById).toHaveBeenCalledWith(mockEventData.event.id, { onErrorHandler }));
     await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventData.event.event_definition_id));
 
     await expect(UseCreateViewForEvent).toHaveBeenCalledWith({

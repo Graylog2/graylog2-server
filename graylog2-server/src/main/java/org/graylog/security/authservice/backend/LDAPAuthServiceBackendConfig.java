@@ -115,6 +115,11 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
     }
 
     @Override
+    public List<String> hostAllowList() {
+        return servers().stream().map(HostAndPort::host).toList();
+    }
+
+    @Override
     public LDAPConnectorConfig getLDAPConnectorConfig() {
         return LDAPConnectorConfig.builder()
                 .serverList(servers().stream()
