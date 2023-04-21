@@ -37,7 +37,7 @@ public class ClassGraphDbEntitiesScanningMethod implements DbEntitiesScanningMet
 
         List<DbEntityCatalogEntry> dbEntities = new LinkedList<>();
         ClassGraph classGraph = new ClassGraph()
-                .enableAllInfo()
+                .enableAnnotationInfo()
                 .acceptPackages(packagesToScan);
         if (chainingClassLoader != null) {
             //Unfortunately, ClassGraph does not work correctly if provided with ChainingClassLoader as a whole
