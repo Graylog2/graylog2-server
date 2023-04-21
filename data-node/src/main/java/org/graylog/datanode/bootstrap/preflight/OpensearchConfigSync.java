@@ -37,14 +37,14 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 
-public class OpensearchConfigCheck implements PreflightCheck {
+public class OpensearchConfigSync implements PreflightCheck {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigCheck.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigSync.class);
 
     private final Configuration configuration;
 
     @Inject
-    public OpensearchConfigCheck(Configuration configuration) {
+    public OpensearchConfigSync(Configuration configuration) {
         this.configuration = configuration;
     }
 
@@ -63,7 +63,7 @@ public class OpensearchConfigCheck implements PreflightCheck {
     }
 
     public void synchronizeConfig(Path configRelativePath, final Path target) throws URISyntaxException, IOException {
-        final URI uriToConfig = OpensearchConfigCheck.class.getResource("/" + configRelativePath.toString()).toURI();
+        final URI uriToConfig = OpensearchConfigSync.class.getResource("/" + configRelativePath.toString()).toURI();
         if ("jar".equals(uriToConfig.getScheme())) {
             copyFromJar(configRelativePath, target, uriToConfig);
         } else {
@@ -83,7 +83,7 @@ public class OpensearchConfigCheck implements PreflightCheck {
     }
 
     private static void copyFromLocalFs(Path configRelativePath, Path target) throws URISyntaxException, IOException {
-        final Path resourcesRoot = Paths.get(OpensearchConfigCheck.class.getResource("/").toURI());
+        final Path resourcesRoot = Paths.get(OpensearchConfigSync.class.getResource("/").toURI());
         final Path source = resourcesRoot.resolve(configRelativePath);
         copyRecursively(source, target);
     }

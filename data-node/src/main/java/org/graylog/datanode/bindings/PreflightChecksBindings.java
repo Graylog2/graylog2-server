@@ -19,7 +19,7 @@ package org.graylog.datanode.bindings;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
-import org.graylog.datanode.bootstrap.preflight.OpensearchConfigCheck;
+import org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 
 public class PreflightChecksBindings extends AbstractModule {
@@ -27,7 +27,7 @@ public class PreflightChecksBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        addPreflightCheck(OpensearchConfigCheck.class);
+        addPreflightCheck(OpensearchConfigSync.class);
         addPreflightCheck(OpensearchBinPreflightCheck.class);
     }
 
