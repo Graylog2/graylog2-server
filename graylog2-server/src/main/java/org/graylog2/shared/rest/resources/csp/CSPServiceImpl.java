@@ -19,11 +19,14 @@ package org.graylog2.shared.rest.resources.csp;
 import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.rest.PaginationParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.stream.Collectors;
 
 public class CSPServiceImpl implements CSPService {
+    private static final Logger LOG = LoggerFactory.getLogger(CSPServiceImpl.class);
     private final String telemetryApiHost;
     private final DBAuthServiceBackendService dbService;
     private String connectSrcValue;
@@ -41,6 +44,7 @@ public class CSPServiceImpl implements CSPService {
                 .map(dto -> String.join(" ", dto.config().hostAllowList()))
                 .collect(Collectors.joining(" "));
         connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
+        LOG.info("Updated CSP: {}", connectSrcValue);
     }
 
     @Override

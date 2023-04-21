@@ -78,6 +78,7 @@ import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
+import org.graylog2.shared.rest.resources.csp.CSPEventListener;
 import org.graylog2.shared.rest.resources.csp.CSPService;
 import org.graylog2.shared.rest.resources.csp.CSPServiceImpl;
 import org.graylog2.shared.security.RestrictToLeaderFeature;
@@ -202,6 +203,7 @@ public class ServerBindings extends Graylog2Module {
         OptionalBinder.newOptionalBinder(binder(), TelemetryEnterpriseDataProvider.class).setDefault().to(DefaultTelemetryEnterpriseDataProvider.class);
 
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
+        bind(CSPEventListener.class).asEagerSingleton();
     }
 
     private void bindDynamicFeatures() {
