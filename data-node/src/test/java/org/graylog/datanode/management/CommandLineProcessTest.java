@@ -21,16 +21,13 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.ProcessProvidingExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -93,13 +90,11 @@ class CommandLineProcessTest {
                 LOG.info("On process failed:", e);
             }
         };
-        final TestExecutor testExecutor = new TestExecutor();
         final CommandLineProcess process = new CommandLineProcess(
                 binPath,
                 Collections.emptyList(),
                 listener,
-                () -> testExecutor,
-                () -> Map.of("USER", "test", "JAVA_HOME", "/path/to/jre")
+                new Environment(() -> Map.of("USER", "test", "JAVA_HOME", "/path/to/jre"))
         );
         process.start();
 
@@ -117,8 +112,6 @@ class CommandLineProcessTest {
                 .hasSize(1)
                 .contains("This message goes to stderr");
 
-        Assertions.assertThat(testExecutor.getEnvironment())
-                .doesNotContainKey("JAVA_HOME");
     }
 
     private void waitTillLogsAreAvailable(List<String> logs, int expectedLinesCount) throws ExecutionException, RetryException {
@@ -161,28 +154,11 @@ class CommandLineProcessTest {
                 exitCodeFuture.complete(e.getExitValue());
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener);
+        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener, new Environment(System::getenv));
         process.start();
 
         final Integer exitCode = exitCodeFuture.get(10, TimeUnit.SECONDS);
 
         Assertions.assertThat(exitCode).isEqualTo(143);
-    }
-
-    /**
-     * Implementation that allows access to the environment argument.
-     */
-    private static class TestExecutor extends ProcessProvidingExecutor {
-        private Map<String, String> environment = Map.of();
-
-        @Override
-        protected Process launch(CommandLine command, Map<String, String> env, File dir) throws IOException {
-            this.environment = env;
-            return super.launch(command, env, dir);
-        }
-
-        public Map<String, String> getEnvironment() {
-            return environment;
-        }
     }
 }

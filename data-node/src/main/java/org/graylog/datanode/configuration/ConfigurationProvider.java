@@ -155,6 +155,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         configuration = new OpensearchConfiguration(
                 opensearchDistribution.version(),
                 opensearchDistribution.directory(),
+                Path.of(localConfiguration.getOpensearchConfigLocation()),
                 localConfiguration.getOpensearchHttpPort(),
                 localConfiguration.getOpensearchTransportPort(),
                 localConfiguration.getRestApiUsername(),
