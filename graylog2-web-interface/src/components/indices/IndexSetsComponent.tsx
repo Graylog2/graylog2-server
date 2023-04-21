@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import { Link, LinkContainer } from 'components/common/router';
-import { Button, Col, DropdownButton, Input, Label, MenuItem, Row } from 'components/bootstrap';
+import { Button, Col, DropdownButton, Label, MenuItem, Row } from 'components/bootstrap';
 import { EntityList, EntityListItem, PaginatedList, SearchForm, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
@@ -105,7 +107,7 @@ const IndexSetsComponent = () => {
   };
 
   const formatStatsString = (stats: IndexSetStats) => {
-    if (!statsEnabled || !stats) {
+    if (!stats) {
       return 'N/A';
     }
 
@@ -115,6 +117,29 @@ const IndexSetsComponent = () => {
 
     return `${indices}, ${documents}, ${size}`;
   };
+
+  const Toolbar = styled(Row)(({ theme }) => css`
+    border-bottom: 1px solid ${theme.colors.gray[90]};
+    padding-bottom: 10px;
+    padding-top: 10px;
+  `);
+
+  const GlobalStatsCol = styled(Col)`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  `;
+
+  const GlobalStats = styled.p`
+    margin-bottom: 0;
+  `;
+
+  const StatsInfoText = styled.span(({ theme }: {theme: DefaultTheme }) => css`
+    color: ${theme.colors.textAlt};
+    font-style: italic;
+  `);
+
+  const statsDisabledText = 'Stats are disabled by default';
 
   const formatIndexSet = (indexSet: IndexSet) => {
     const actions = (
@@ -168,7 +193,7 @@ const IndexSetsComponent = () => {
     return (
       <EntityListItem key={`index-set-${indexSet.id}`}
                       title={indexSetTitle}
-                      titleSuffix={<span>{statsString} {isDefault} {isReadOnly}</span>}
+                      titleSuffix={<span>{statsEnabled ? statsString : <StatsInfoText>{statsDisabledText}</StatsInfoText>} {isDefault} {isReadOnly}</span>}
                       description={description}
                       actions={actions}
                       contentRow={content} />
@@ -177,51 +202,41 @@ const IndexSetsComponent = () => {
 
   const isLoading = !indexSets;
 
-  if (isLoading) {
-    return <Spinner />;
-  }
-
   return (
     <>
-      <Row>
-        <Col md={1}>
-          <Input id="enable-stats"
-                 type="checkbox"
-                 checked={statsEnabled}
-                 onClick={onToggleStats}
-                 label="Calculate stats" />
-
-        </Col>
+      <Toolbar>
+        <GlobalStatsCol md={3}>
+          <GlobalStats><strong>Stats for all indices:</strong> {statsEnabled
+            ? formatStatsString(globalIndexSetStats)
+            : <StatsInfoText>{statsDisabledText}</StatsInfoText>}
+          </GlobalStats>
+          <Button onClick={onToggleStats}>{statsEnabled ? 'Disable stats' : 'Enable stats'}</Button>
+        </GlobalStatsCol>
         <Col md={3}>
           <SearchForm onSearch={onSearch}
-                      label="Search Index Sets"
+                      label="Search"
                       queryWidth={300}
                       wrapperClass="has-bm"
                       onReset={onSearchReset}
-                      placeholder="Enter query to search" />
+                      query={searchTerm}
+                      placeholder="Enter query to search index sets" />
 
         </Col>
-      </Row>
-      <Row>
-        <Col md={1}>
-          <h4><strong>Total:</strong> {formatStatsString(globalIndexSetStats)}</h4>
-
-        </Col>
-
-      </Row>
+      </Toolbar>
 
       <Row>
         <Col md={12}>
+          {isLoading
+            ? <Spinner /> : (
 
-          <hr style={{ marginBottom: 0 }} />
-
-          <PaginatedList pageSize={DEFAULT_PAGE_SIZE}
-                         totalItems={indexSetsCount}
-                         showPageSizeSelect={false}>
-            <EntityList bsNoItemsStyle="info"
-                        noItemsText="There are no index sets to display"
-                        items={indexSets.map((indexSet) => formatIndexSet(indexSet))} />
-          </PaginatedList>
+              <PaginatedList pageSize={DEFAULT_PAGE_SIZE}
+                             totalItems={indexSetsCount}
+                             showPageSizeSelect={false}>
+                <EntityList bsNoItemsStyle="info"
+                            noItemsText="There are no index sets to display"
+                            items={indexSets.map((indexSet) => formatIndexSet(indexSet))} />
+              </PaginatedList>
+            )}
         </Col>
       </Row>
     </>
