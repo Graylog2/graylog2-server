@@ -133,6 +133,11 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     }
 
     @Override
+    public <T> T getOrDefault(String key, Class<T> type, T defaultValue) {
+        return firstNonNull(get(key, type), defaultValue);
+    }
+
+    @Override
     public <T> void write(T payload) {
         if (payload == null) {
             LOG.debug("Payload was null. Skipping.");
