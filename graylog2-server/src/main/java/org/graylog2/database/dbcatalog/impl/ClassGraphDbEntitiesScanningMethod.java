@@ -41,7 +41,9 @@ public class ClassGraphDbEntitiesScanningMethod implements DbEntitiesScanningMet
         ClassGraph classGraph = new ClassGraph()
                 .enableAnnotationInfo()
                 .acceptPackages(packagesToScan)
-                .rejectPackages(packagesToExclude);
+                .rejectPackages(packagesToExclude)
+                .filterClasspathElements(classpathElementPathStr -> classpathElementPathStr.contains("graylog"))
+                .disableRuntimeInvisibleAnnotations();
 
         if (chainingClassLoader != null) {
             //Unfortunately, ClassGraph does not work correctly if provided with ChainingClassLoader as a whole

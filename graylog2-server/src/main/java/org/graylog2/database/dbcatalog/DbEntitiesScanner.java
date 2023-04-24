@@ -38,7 +38,7 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
     public DbEntitiesScanner(final ChainingClassLoader chainingClassLoader) {
         this.chainingClassLoader = chainingClassLoader;
         this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
-        this.packagesToExclude = new String[]{"org.graylog.shaded", "org.graylog.storage"};
+        this.packagesToExclude = new String[]{"org.graylog.shaded", "org.graylog.storage", "org.graylog2.migrations"};
     }
 
     DbEntitiesScanner(final String[] packagesToScan, String[] packagesToExclude) {
