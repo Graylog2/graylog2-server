@@ -18,7 +18,6 @@ values. Please see the sample [graylog.conf](https://github.com/Graylog2/graylog
 - `elasticsearch_replicas`
 - `disable_index_optimization`
 - `index_optimization_max_num_segments`
-- `index_field_type_periodical_full_refresh_interval`
 - `rotation_strategy`
 - `elasticsearch_max_docs_per_index`
 - `elasticsearch_max_size_per_index`
