@@ -184,18 +184,22 @@ public class SessionsResource extends RestResource {
                     .build();
         }
 
-        final Session session = retrieveOrCreateSession(subject);
+        final Optional<Session> optionalSession = Optional.ofNullable(retrieveOrCreateSession(subject));
 
         final User user = getCurrentUser();
-        final SessionResponse response = sessionResponseFactory.forSession(session);
+        return optionalSession.map(session -> {
+            final SessionResponse response = sessionResponseFactory.forSession(session);
 
-        return Response.ok(
-                        SessionValidationResponse.validWithNewSession(
-                                String.valueOf(session.getId()),
-                                String.valueOf(user.getName())
-                        ))
-                .cookie(cookieFactory.createAuthenticationCookie(response, requestContext))
-                .build();
+            return Response.ok(
+                            SessionValidationResponse.validWithNewSession(
+                                    String.valueOf(session.getId()),
+                                    String.valueOf(user.getName())
+                            ))
+                    .cookie(cookieFactory.createAuthenticationCookie(response, requestContext))
+                    .build();
+        }).orElseGet(() -> Response.ok(SessionValidationResponse.authenticatedWithNoSession(user.getName()))
+                .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
+                .build());
     }
 
     private Session retrieveOrCreateSession(Subject subject) {

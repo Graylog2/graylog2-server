@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix show telemetry settings for local admin."
+
+issues = ["15244"]
+pulls = ["15247"]
