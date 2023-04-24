@@ -133,11 +133,6 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     }
 
     @Override
-    public <T> T getOrDefault(String key, Class<T> type, T defaultValue) {
-        return firstNonNull(get(key, type), defaultValue);
-    }
-
-    @Override
     public <T> void write(T payload) {
         if (payload == null) {
             LOG.debug("Payload was null. Skipping.");
@@ -166,8 +161,12 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
 
     @Override
     public <T> int remove(Class<T> type) {
-        final String canonicalName = type.getCanonicalName();
-        final WriteResult<ClusterConfig, String> result = dbCollection.remove(DBQuery.is("type", canonicalName));
+        return remove(type.getCanonicalName());
+    }
+
+    @Override
+    public <T> int remove(String key) {
+        final WriteResult<ClusterConfig, String> result = dbCollection.remove(DBQuery.is("type", key));
         return result.getN();
     }
 

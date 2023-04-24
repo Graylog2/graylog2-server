@@ -1,2 +1,2 @@
 org.graylog.plugins.threatintel.ThreatIntelPlugin
-org.graylog.plugins.aws.AWSPlugin
+org.graylog.aws.AWSPlugin
