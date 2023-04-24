@@ -29,6 +29,7 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
     private static final Logger LOG = LoggerFactory.getLogger(DbEntitiesScanner.class);
 
     private final String[] packagesToScan;
+    private final String[] packagesToExclude;
     private final ChainingClassLoader chainingClassLoader;
     private final DbEntitiesScanningMethod dbEntitiesScanningMethod = new ClassGraphDbEntitiesScanningMethod();
 
@@ -36,18 +37,20 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
     @Inject
     public DbEntitiesScanner(final ChainingClassLoader chainingClassLoader) {
         this.chainingClassLoader = chainingClassLoader;
-        this.packagesToScan = new String[]{"org.graylog2", "org.graylog.plugins"};
+        this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
+        this.packagesToExclude = new String[]{"org.graylog.shaded", "org.graylog.storage"};
     }
 
-    DbEntitiesScanner(String[] packagesToScan) {
+    DbEntitiesScanner(final String[] packagesToScan, String[] packagesToExclude) {
         this.chainingClassLoader = null;
         this.packagesToScan = packagesToScan;
+        this.packagesToExclude = packagesToExclude;
     }
 
     @Override
     public DbEntitiesCatalog get() {
         long startTimeMs = System.currentTimeMillis();
-        final DbEntitiesCatalog catalog = dbEntitiesScanningMethod.scan(packagesToScan, chainingClassLoader);
+        final DbEntitiesCatalog catalog = dbEntitiesScanningMethod.scan(packagesToScan, packagesToExclude, chainingClassLoader);
         LOG.info(catalog.size() + " entities have been scanned and added to DB Entity Catalog, it took " + (System.currentTimeMillis() - startTimeMs) + " ms");
         return catalog;
     }

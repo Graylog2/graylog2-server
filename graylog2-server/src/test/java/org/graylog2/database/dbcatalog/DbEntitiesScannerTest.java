@@ -22,17 +22,20 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.graylog2.database.DbEntity.NOBODY_ALOWED;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 class DbEntitiesScannerTest {
 
     @Test
     void testScansEntitiesWithDefaultTitleFieldProperly() {
-        DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.indexer.indexset"});
+        DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.indexer.indexset"}, new String[]{});
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("index_sets").get();
@@ -44,8 +47,24 @@ class DbEntitiesScannerTest {
     }
 
     @Test
+    void testExcludingPackagesWorkCorrectly() {
+        DbEntitiesScanner scanner = new DbEntitiesScanner(
+                new String[]{"org.graylog2.indexer"},
+                new String[]{"org.graylog2.indexer.indexset"}
+        );
+        final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
+
+        final Optional<DbEntityCatalogEntry> entryByCollectionName = dbEntitiesCatalog.getByCollectionName("index_sets");
+        final Optional<DbEntityCatalogEntry> entryByModelClass = dbEntitiesCatalog.getByModelClass(IndexSetConfig.class);
+
+        assertFalse(entryByCollectionName.isPresent());
+        assertFalse(entryByModelClass.isPresent());
+
+    }
+
+    @Test
     void testScansEntitiesWithDefaultReadPermissionFieldProperly() {
-        DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.cluster"});
+        DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.cluster"}, new String[]{});
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("nodes").get();
@@ -58,7 +77,7 @@ class DbEntitiesScannerTest {
 
     @Test
     void testScansEntitiesWithCustomTitleFieldProperly() {
-        DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.users"});
+        DbEntitiesScanner scanner = new DbEntitiesScanner(new String[]{"org.graylog2.users"}, new String[]{});
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName(UserImpl.COLLECTION_NAME).get();

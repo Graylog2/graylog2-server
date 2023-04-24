@@ -33,12 +33,16 @@ import java.util.List;
 public class ClassGraphDbEntitiesScanningMethod implements DbEntitiesScanningMethod {
 
     @Override
-    public DbEntitiesCatalog scan(final String[] packagesToScan, final ChainingClassLoader chainingClassLoader) {
+    public DbEntitiesCatalog scan(final String[] packagesToScan,
+                                  final String[] packagesToExclude,
+                                  final ChainingClassLoader chainingClassLoader) {
 
         List<DbEntityCatalogEntry> dbEntities = new LinkedList<>();
         ClassGraph classGraph = new ClassGraph()
                 .enableAnnotationInfo()
-                .acceptPackages(packagesToScan);
+                .acceptPackages(packagesToScan)
+                .rejectPackages(packagesToExclude);
+
         if (chainingClassLoader != null) {
             //Unfortunately, ClassGraph does not work correctly if provided with ChainingClassLoader as a whole
             //You have to manually add all class loaders from ChainingClassLoader

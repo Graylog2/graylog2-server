@@ -30,12 +30,15 @@ import java.util.stream.Stream;
 
 @Deprecated
 /**
+ * Exluding packages not implemented, as this method is deprecated.
  * @deprecated {@link ClassGraphDbEntitiesScanningMethod} performs better
  */
 public class ReflectionsDbEntitiesScanningMethod implements DbEntitiesScanningMethod {
 
     @Override
-    public DbEntitiesCatalog scan(final String[] packagesToScan, final ChainingClassLoader chainingClassLoader) {
+    public DbEntitiesCatalog scan(final String[] packagesToScan,
+                                  final String[] packagesToExclude,
+                                  final ChainingClassLoader chainingClassLoader) {
         final ConfigurationBuilder configuration = new ConfigurationBuilder();
         if (chainingClassLoader != null) {
             configuration.setClassLoaders(new ClassLoader[]{chainingClassLoader});

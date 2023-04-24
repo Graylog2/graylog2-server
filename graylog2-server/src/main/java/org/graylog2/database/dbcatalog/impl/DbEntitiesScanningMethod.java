@@ -21,5 +21,7 @@ import org.graylog2.shared.plugins.ChainingClassLoader;
 
 public interface DbEntitiesScanningMethod {
 
-    DbEntitiesCatalog scan(final String[] packagesToScan, final ChainingClassLoader chainingClassLoader);
+    DbEntitiesCatalog scan(final String[] packagesToScan,
+                           final String[] packagesToExclude,
+                           final ChainingClassLoader chainingClassLoader);
 }
