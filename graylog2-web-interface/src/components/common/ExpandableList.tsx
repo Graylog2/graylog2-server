@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import style from './ExpandableList.css';
 
-type Props = {
-  children?: React.ReactNode,
+type Props = PropsWithChildren<{
   className?: string,
-};
+}>;
 
 /**
  * The ExpandableList will take a array or one of ExpandableListItem to render
@@ -39,7 +39,6 @@ const ExpandableList = ({ children, className }: Props) => {
 };
 
 ExpandableList.defaultProps = {
-  children: [],
   className: undefined,
 };
 
@@ -47,10 +46,6 @@ ExpandableList.propTypes = {
   /**
    * One or more elements of ExpandableListItem
    */
-  children: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.arrayOf(PropTypes.element),
-  ]),
   className: PropTypes.string,
 };
 
