@@ -18,7 +18,7 @@ import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import {
-  ltParamJSON,
+  ltParamJSON, urlConfigWithAgg,
 } from 'fixtures/createEventDefinitionFromValue';
 import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
 
@@ -58,37 +58,7 @@ describe('useUrlConfigData', () => {
     }), { wrapper });
     await waitFor(() => !!result.current);
 
-    expect(result.current).toEqual({
-      agg_field: 'action',
-      agg_function: 'count',
-      agg_value: 400,
-      group_by: [
-        'action',
-        'action',
-        'http_method',
-      ],
-      loc_query_parameters: [
-        {
-          binding: undefined,
-          data_type: 'any',
-          default_value: 'GET',
-          description: '',
-          key: 'lt',
-          lookup_table: 'http_method',
-          name: 'newParameter',
-          optional: false,
-          title: 'lt',
-          type: 'lut-parameter-v1',
-        },
-      ],
-      query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
-      search_within_ms: 300000,
-      streams: [
-        'streamId-1',
-        'streamId-2',
-      ],
-      type: 'aggregation-v1',
-    });
+    expect(result.current).toEqual(urlConfigWithAgg);
   });
 
   it('ignore non-selected values', async () => {
