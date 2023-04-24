@@ -19,7 +19,6 @@ package org.graylog.datanode.management;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
@@ -28,11 +27,11 @@ public class Environment {
 
     private static final String JAVA_HOME_ENV = "JAVA_HOME";
 
-    private final Supplier<Map<String, String>> environmentSupplier;
+    private final Map<String, String> env;
     private final Map<String, String> additionalVariables = new HashMap<>();
 
-    public Environment(Supplier<Map<String, String>> environmentSupplier) {
-        this.environmentSupplier = environmentSupplier;
+    public Environment(Map<String, String> env) {
+        this.env = env;
     }
 
     public Environment put(String key, String value) {
@@ -42,7 +41,7 @@ public class Environment {
 
     public Map<String, String> getEnv() {
         Map<String, String> env = new HashMap<>();
-        env.putAll(cleanEnvironment(environmentSupplier.get()));
+        env.putAll(cleanEnvironment(env));
         env.putAll(additionalVariables);
         return Collections.unmodifiableMap(env);
     }

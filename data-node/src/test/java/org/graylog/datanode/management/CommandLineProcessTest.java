@@ -59,7 +59,7 @@ class CommandLineProcessTest {
     }
 
     @Test
-    void testManualStop() throws IOException, ExecutionException, RetryException, URISyntaxException {
+    void testManualStop() throws IOException, ExecutionException, RetryException {
         List<String> stdout = new LinkedList<>();
         List<String> stdErr = new LinkedList<>();
 
@@ -94,7 +94,7 @@ class CommandLineProcessTest {
                 binPath,
                 Collections.emptyList(),
                 listener,
-                new Environment(() -> Map.of("USER", "test", "JAVA_HOME", "/path/to/jre"))
+                new Environment(Map.of("USER", "test", "JAVA_HOME", "/path/to/jre"))
         );
         process.start();
 
@@ -154,7 +154,7 @@ class CommandLineProcessTest {
                 exitCodeFuture.complete(e.getExitValue());
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener, new Environment(System::getenv));
+        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener, new Environment(System.getenv()));
         process.start();
 
         final Integer exitCode = exitCodeFuture.get(10, TimeUnit.SECONDS);

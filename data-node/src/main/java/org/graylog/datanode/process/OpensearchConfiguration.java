@@ -60,7 +60,7 @@ public record OpensearchConfiguration(
     }
 
     public Environment getEnv() {
-        final Environment env = new Environment(System::getenv);
+        final Environment env = new Environment(System.getenv());
         env.put("OPENSEARCH_PATH_CONF", opensearchConfigDir.resolve("opensearch").toAbsolutePath().toString());
         return env;
     }
