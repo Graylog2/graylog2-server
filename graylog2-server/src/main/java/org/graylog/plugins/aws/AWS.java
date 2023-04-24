@@ -21,6 +21,8 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 /**
  * A common utils class for the AWS plugin.
  */
@@ -45,7 +47,7 @@ public class AWS {
         Map<String, String> regions = Maps.newHashMap();
         for (Regions region : Regions.values()) {
 
-            String displayValue = String.format("%s: %s", region.getDescription(), region.getName());
+            String displayValue = f("%s: %s", region.getDescription(), region.getName());
             regions.put(region.getName(), displayValue);
         }
         return regions;
