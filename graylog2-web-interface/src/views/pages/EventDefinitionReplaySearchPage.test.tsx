@@ -26,7 +26,7 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import EventDefinitionReplaySearchPage from 'views/pages/EventDefinitionReplaySearchPage';
+import EventDefinitionReplaySearchPage, { onErrorHandler } from 'views/pages/EventDefinitionReplaySearchPage';
 import useEventDefinition from 'hooks/useEventDefinition';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import {
@@ -105,7 +105,9 @@ describe('EventDefinitionReplaySearchPage', () => {
 
     render(<SimpleReplaySearchPage />);
 
-    await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id));
+    await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id, {
+      onErrorHandler,
+    }));
 
     await expect(UseCreateViewForEventDefinition).toHaveBeenCalledWith({
       eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
