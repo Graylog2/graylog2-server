@@ -33,6 +33,7 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.security.encryption.EncryptedValue;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -115,8 +116,8 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
     }
 
     @Override
-    public List<String> hostAllowList() {
-        return servers().stream().map(HostAndPort::host).toList();
+    public Optional<List<String>> hostAllowList() {
+        return Optional.empty();
     }
 
     @Override

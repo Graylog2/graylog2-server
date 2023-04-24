@@ -40,10 +40,10 @@ public class CSPEventListener {
     @Subscribe
     public void handleBackendCreated(AuthServiceBackendSavedEvent event) {
         try {
-            LOG.info("Updating CSP for authentication service <{}>", event.authServiceId());
+            LOG.debug("Updating CSP for authentication service <{}>", event.authServiceId());
             cspService.buildConnectSrc();
         } catch (Exception e) {
-            LOG.warn("Failed to update CSP for authentication service <{}>", event.authServiceId());
+            LOG.warn("Failed to update CSP for authentication service <{}>", event.authServiceId(), e);
         }
     }
 }

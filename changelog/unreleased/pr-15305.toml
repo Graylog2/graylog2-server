@@ -1,5 +1,5 @@
 type = "c"
-message = "In GL Open, update Content Security Policy on the fly, when an authentication backend is created."
+message = "Update Content Security Policy on the fly, when an authentication backend is created."
 
 issues = [""]
 pulls = ["15305"]

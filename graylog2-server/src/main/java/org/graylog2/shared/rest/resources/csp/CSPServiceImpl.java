@@ -39,12 +39,14 @@ public class CSPServiceImpl implements CSPService {
     }
 
     @Override
-    public void buildConnectSrc() {
+    public synchronized void buildConnectSrc() {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
-                .map(dto -> String.join(" ", dto.config().hostAllowList()))
+                .map(dto -> dto.config().hostAllowList())
+                .filter(optList -> optList.isPresent())
+                .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));
         connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
-        LOG.info("Updated CSP: {}", connectSrcValue);
+        LOG.debug("Updated CSP: {}", connectSrcValue);
     }
 
     @Override
