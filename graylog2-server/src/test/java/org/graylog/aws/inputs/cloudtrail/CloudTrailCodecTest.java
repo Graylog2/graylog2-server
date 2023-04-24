@@ -22,6 +22,8 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -61,7 +63,7 @@ public class CloudTrailCodecTest {
                 "\"eventID\": \"df38ed44-32d4-43f6-898f-5a55d260a2bb\",\n" +
                 "\"eventType\": \"AwsConsoleSignIn\",\n" +
                 "\"recipientAccountId\": \"1111122221111\"\n" +
-        "}").getBytes());
+                "}").getBytes(StandardCharsets.UTF_8));
         Message message = codec.decode(rawMessage);
         String additional_event_data = message.getField("additional_event_data").toString();
 
@@ -98,7 +100,7 @@ public class CloudTrailCodecTest {
                 "\"eventID\": \"df38ed44-32d4-43f6-898f-5a55d260a2bb\",\n" +
                 "\"eventType\": \"AwsConsoleSignIn\",\n" +
                 "\"recipientAccountId\": \"1111122221111\"\n" +
-        "}").getBytes());
+                "}").getBytes(StandardCharsets.UTF_8));
         Message message = codec.decode(rawMessage);
         assertNull(message.getField("additional_event_data"));
     }

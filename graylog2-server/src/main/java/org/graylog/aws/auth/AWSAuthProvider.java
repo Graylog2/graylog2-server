@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class AWSAuthProvider implements AWSCredentialsProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AWSAuthProvider.class);
@@ -101,7 +102,7 @@ public class AWSAuthProvider implements AWSCredentialsProvider {
                 .withRegion(region)
                 .withCredentials(awsCredentials)
                 .build();
-        String roleSessionName = String.format("API_KEY_%s@ACCOUNT_%s",
+        String roleSessionName = f("API_KEY_%s@ACCOUNT_%s",
                 awsCredentials.getCredentials().getAWSAccessKeyId(),
                 stsClient.getCallerIdentity(new GetCallerIdentityRequest()).getAccount());
         LOG.debug("Cross account role session name: " + roleSessionName);
