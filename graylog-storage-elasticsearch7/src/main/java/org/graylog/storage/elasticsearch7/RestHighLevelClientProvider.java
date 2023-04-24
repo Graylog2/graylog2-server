@@ -20,6 +20,11 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
 import org.graylog.shaded.elasticsearch7.org.apache.http.HttpHost;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.elasticsearch7.org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.graylog.shaded.elasticsearch7.org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
+import org.graylog.shaded.elasticsearch7.org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.graylog.shaded.elasticsearch7.org.apache.http.nio.reactor.IOReactorException;
+import org.graylog.shaded.elasticsearch7.org.apache.http.nio.reactor.IOReactorExceptionHandler;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClientBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
@@ -27,12 +32,15 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Elastics
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Sniffer;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +49,7 @@ import java.util.function.Supplier;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
+    private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
     private final Supplier<RestHighLevelClient> clientSupplier;
 
     @SuppressWarnings("unused")
@@ -106,6 +115,38 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
         return this.clientSupplier.get();
     }
 
+    public static class CustomHttpClientConfigCallback implements RestClientBuilder.HttpClientConfigCallback {
+        @Override
+        public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+
+            // Add custom exception handler.
+            // - https://hc.apache.org/httpcomponents-core-ga/tutorial/html/nio.html#d5e601
+            // - This always handles the exception and just logs a warning.
+            try {
+                DefaultConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
+                ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+                    @Override
+                    public boolean handle(IOException e) {
+                        LOG.warn("System may be unstable: IOReactor encountered a checked exception : " + e.getMessage(), e);
+                        return true; // Return true to note this exception as handled, it will not be re-thrown
+                    }
+
+                    @Override
+                    public boolean handle(RuntimeException e) {
+                        LOG.warn("System may be unstable: IOReactor encountered a runtime exception : " + e.getMessage(), e);
+                        return true; // Return true to note this exception as handled, it will not be re-thrown
+                    }
+                });
+
+                httpClientBuilder.setConnectionManager(new PoolingNHttpClientConnectionManager(ioReactor));
+            } catch (IOReactorException e) {
+                throw new RuntimeException(e);
+            }
+
+            return httpClientBuilder;
+        }
+    }
+
     private RestHighLevelClient buildClient(
             List<URI> hosts,
             Duration connectTimeout,
@@ -117,6 +158,20 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             CredentialsProvider credentialsProvider) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
 
+        CustomHttpClientConfigCallback configurationCallback = new CustomHttpClientConfigCallback();
+
+        HttpAsyncClientBuilder httpClientConfig = HttpAsyncClientBuilder.create();
+
+        httpClientConfig.setMaxConnTotal(maxTotalConnections)
+                .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
+                .setDefaultCredentialsProvider(credentialsProvider);
+
+        if (muteElasticsearchDeprecationWarnings) {
+            httpClientConfig.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor());
+        }
+
+        configurationCallback.customizeHttpClient(httpClientConfig);
+
         final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
                 .setRequestConfigCallback(requestConfig -> requestConfig
                         .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
@@ -124,18 +179,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         .setExpectContinueEnabled(useExpectContinue)
                         .setAuthenticationEnabled(true)
                 )
-                .setHttpClientConfigCallback(httpClientConfig -> {
-                    httpClientConfig
-                        .setMaxConnTotal(maxTotalConnections)
-                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
-                        .setDefaultCredentialsProvider(credentialsProvider);
-
-                    if(muteElasticsearchDeprecationWarnings) {
-                        httpClientConfig.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor());
-                    }
-
-                    return httpClientConfig;
-                });
+                .setHttpClientConfigCallback(configurationCallback);
 
         return new RestHighLevelClient(restClientBuilder);
     }
