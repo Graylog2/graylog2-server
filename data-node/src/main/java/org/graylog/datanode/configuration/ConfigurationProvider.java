@@ -59,7 +59,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
     public ConfigurationProvider(Configuration localConfiguration, DataNodeConfig sharedConfiguration, OpensearchDistribution opensearchDistribution) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
         final var cfg = sharedConfiguration.test();
 
-        final Path opensearchConfigDir = opensearchDistribution.directory().resolve("config");
+        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
