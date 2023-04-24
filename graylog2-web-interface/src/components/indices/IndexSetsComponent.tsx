@@ -74,7 +74,9 @@ const IndexSetsComponent = () => {
     }
   };
 
-  const onSearchReset = () => { setSearchTerm(undefined); };
+  const onSearchReset = () => {
+    setSearchTerm(undefined); resetPage();
+  };
 
   const onToggleStats = () => { setStatsEnabled(!statsEnabled); };
 
