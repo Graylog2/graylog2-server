@@ -219,18 +219,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                                     .build();
                             save(toSave);
 
-                            Notification notification = notificationService.buildNow();
-                            notification.addType(Notification.Type.SIDECAR_STATUS_UNKNOWN);
-                            notification.addSeverity(Notification.Severity.NORMAL);
-                            notification.addKey(toSave.nodeId());
-                            notification.addDetail("message", message);
-                            notification.addDetail("sidecar_name", toSave.nodeName());
-                            notification.addDetail("sidecar_id", toSave.nodeId());
-                            try {
-                                notificationService.createSystemEvent(notification);
-                            } catch (EventProcessorException e) {
-                                throw new RuntimeException(e);
-                            }
+                            createSystemNotification(message, toSave);
 
                             return 1;
 
@@ -241,6 +230,21 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
         }
 
         return count;
+    }
+
+    private void createSystemNotification(String message, Sidecar toSave) {
+        Notification notification = notificationService.buildNow();
+        notification.addType(Notification.Type.SIDECAR_STATUS_UNKNOWN);
+        notification.addSeverity(Notification.Severity.NORMAL);
+        notification.addKey(toSave.nodeId());
+        notification.addDetail("message", message);
+        notification.addDetail("sidecar_name", toSave.nodeName());
+        notification.addDetail("sidecar_id", toSave.nodeId());
+        try {
+            notificationService.createSystemEvent(notification);
+        } catch (EventProcessorException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Sidecar fromRequest(String nodeId, RegistrationRequest request, String collectorVersion) {
