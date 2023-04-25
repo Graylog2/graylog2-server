@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix sidecar process button position issue on safari"
+
+issues = ["14939"]
+pulls = ["15293"]
