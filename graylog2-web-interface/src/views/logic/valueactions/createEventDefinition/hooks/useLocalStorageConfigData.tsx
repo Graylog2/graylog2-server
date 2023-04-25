@@ -18,14 +18,14 @@
 import { useMemo } from 'react';
 
 import type { Checked, MappedData } from 'views/logic/valueactions/createEventDefinition/types';
-import type { EventDefinitionURLConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
+import type { EventDefinitionLocalStorageConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 
 const concatQuery = (queryParts: Array<string>) => {
   return concatQueryStrings(queryParts.filter((queryPart) => !!queryPart));
 };
 
-const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, checked: Checked }) => useMemo<EventDefinitionURLConfig>(() => {
+const useLocalStorageConfigData = ({ mappedData, checked }: { mappedData: MappedData, checked: Checked }) => useMemo<EventDefinitionLocalStorageConfig>(() => {
   const {
     queryWithReplacedParams,
     searchFilterQuery,
@@ -46,8 +46,8 @@ const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, che
     queryWithReplacedParams, searchFilterQuery, searchFromValue, columnValuePath, rowValuePath,
   }).filter(([key]) => checked[key]).map(([_, search]) => search);
 
-  const getAggregations = (): Partial<EventDefinitionURLConfig> => {
-    const res: Partial<EventDefinitionURLConfig> = {};
+  const getAggregations = (): Partial<EventDefinitionLocalStorageConfig> => {
+    const res: Partial<EventDefinitionLocalStorageConfig> = {};
 
     if (checked.aggCondition) {
       res.agg_field = aggField;
@@ -67,7 +67,7 @@ const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, che
   };
 
   const getRest = () => {
-    const res: Partial<EventDefinitionURLConfig> = {};
+    const res: Partial<EventDefinitionLocalStorageConfig> = {};
     if (checked.lutParameters && lutParameters && lutParameters.length) res.loc_query_parameters = lutParameters;
     if (checked.searchWithinMs && searchWithinMs) res.search_within_ms = searchWithinMs;
     if (checked.streams && streams && streams.length) res.streams = streams;
@@ -83,4 +83,4 @@ const useUrlConfigData = ({ mappedData, checked }: { mappedData: MappedData, che
   });
 }, [checked, mappedData]);
 
-export default useUrlConfigData;
+export default useLocalStorageConfigData;

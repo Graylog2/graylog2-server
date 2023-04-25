@@ -34,7 +34,7 @@ import {
 } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
 import { Icon, LinkButton } from 'components/common';
-import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
+import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
 import generateId from 'logic/generateId';
@@ -48,7 +48,7 @@ const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | n
 
 const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { mappedData: MappedData, modalData: ModalData, show: boolean, onClose: () => void }) => {
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
-  const urlConfig = useUrlConfigData({ mappedData, checked });
+  const localStorageConfig = useLocalStorageConfigData({ mappedData, checked });
   const sessionId = useMemo(() => `cedfv-${generateId()}`, []);
   const onCheckboxChange = useCallback((updates) => {
     dispatchWithData({ type: 'UPDATE_CHECKED_ITEMS', payload: updates });
@@ -97,8 +97,8 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   }, [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
 
   const onContinueConfigurationClick = useCallback(() => {
-    localStorage.setItem(sessionId, JSON.stringify(urlConfig));
-  }, [sessionId, urlConfig]);
+    localStorage.setItem(sessionId, JSON.stringify(localStorageConfig));
+  }, [sessionId, localStorageConfig]);
 
   return (
     <Modal onHide={onClose} show={show}>

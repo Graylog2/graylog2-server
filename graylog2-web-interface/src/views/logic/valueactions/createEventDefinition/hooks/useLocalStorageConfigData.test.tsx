@@ -20,7 +20,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import {
   ltParamJSON, urlConfigWithAgg,
 } from 'fixtures/createEventDefinitionFromValue';
-import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
+import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
 
 const wrapper = ({ children }) => (
   <div>
@@ -30,7 +30,7 @@ const wrapper = ({ children }) => (
 
 describe('useUrlConfigData', () => {
   it('concat all query values correct and return rest', async () => {
-    const { result, waitFor } = renderHook(() => useUrlConfigData({
+    const { result, waitFor } = renderHook(() => useLocalStorageConfigData({
       mappedData: {
         searchWithinMs: 300000,
         searchFilterQuery: '(http_method:GET)',
@@ -62,7 +62,7 @@ describe('useUrlConfigData', () => {
   });
 
   it('ignore non-selected values', async () => {
-    const { result, waitFor } = renderHook(() => useUrlConfigData({
+    const { result, waitFor } = renderHook(() => useLocalStorageConfigData({
       mappedData: {
         searchWithinMs: 300000,
         searchFilterQuery: '(http_method:GET)',

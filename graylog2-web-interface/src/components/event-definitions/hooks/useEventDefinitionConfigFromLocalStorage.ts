@@ -16,13 +16,12 @@
  */
 
 import { useMemo } from 'react';
-import isEmpty from 'lodash/isEmpty';
 
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import { getWithRemovalFromLocal } from 'util/BrowserStorages';
 
-export type EventDefinitionURLConfig = {
+export type EventDefinitionLocalStorageConfig = {
   type,
   query?: string,
   streams?: Array<string>,
@@ -47,16 +46,16 @@ type EventDefinitionConfigFromUrl = {
   },
 }
 
-const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromUrl: EventDefinitionConfigFromUrl } => {
+const useEventDefinitionConfigFromLocalStorage = (): { hasLocalStorageConfig: boolean; configFromLocalStorage: EventDefinitionConfigFromUrl } => {
   const {
     'session-id': sessionId,
   } = useQuery();
 
   return useMemo(() => {
     const config = getWithRemovalFromLocal(sessionId as string);
-    if (!config) return ({ hasUrlConfig: false, configFromUrl: undefined });
+    if (!config) return ({ hasLocalStorageConfig: false, configFromLocalStorage: undefined });
 
-    const parsedUrlConfig: EventDefinitionURLConfig = JSON.parse(config);
+    const parsedLocalStorageConfig: EventDefinitionLocalStorageConfig = JSON.parse(config);
     const {
       type,
       query,
@@ -67,7 +66,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
       agg_field,
       agg_value,
       loc_query_parameters,
-    } = parsedUrlConfig;
+    } = parsedLocalStorageConfig;
 
     const aggData = (agg_function && agg_value) ? {
       conditions: {
@@ -82,8 +81,8 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
     } : {};
 
     return ({
-      hasUrlConfig: true,
-      configFromUrl: {
+      hasLocalStorageConfig: true,
+      configFromLocalStorage: {
         type,
         query: query ?? '',
         streams: streams ?? [],
@@ -96,4 +95,4 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
   }, [sessionId]);
 };
 
-export default useEventDefinitionConfigFromUrl;
+export default useEventDefinitionConfigFromLocalStorage;
