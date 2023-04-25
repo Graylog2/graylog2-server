@@ -41,7 +41,7 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
         this.packagesToExclude = new String[]{"org.graylog.shaded", "org.graylog.storage", "org.graylog2.migrations"};
     }
 
-    DbEntitiesScanner(final String[] packagesToScan, String[] packagesToExclude) {
+    DbEntitiesScanner(final String[] packagesToScan, final String[] packagesToExclude) {
         this.chainingClassLoader = null;
         this.packagesToScan = packagesToScan;
         this.packagesToExclude = packagesToExclude;
@@ -51,7 +51,7 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
     public DbEntitiesCatalog get() {
         long startTimeMs = System.currentTimeMillis();
         final DbEntitiesCatalog catalog = dbEntitiesScanningMethod.scan(packagesToScan, packagesToExclude, chainingClassLoader);
-        LOG.info(catalog.size() + " entities have been scanned and added to DB Entity Catalog, it took " + (System.currentTimeMillis() - startTimeMs) + " ms");
+        LOG.info("{} entities have been scanned and added to DB Entity Catalog, it took {} ms", catalog.size(), System.currentTimeMillis() - startTimeMs);
         return catalog;
     }
 }
