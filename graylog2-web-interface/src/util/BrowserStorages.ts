@@ -16,15 +16,12 @@
  */
 
 // eslint-disable-next-line import/prefer-default-export
-export const moveFromLocalToSession = (key: string): string | undefined => {
+export const getWithRemovalFromLocal = (key: string): string | undefined => {
   const localStorageData = localStorage.getItem(key);
-  const sessionStorageData = sessionStorage.getItem(key);
-  if (!localStorageData && !sessionStorageData) return undefined;
 
-  if (!sessionStorageData) {
-    sessionStorage.setItem(key, localStorageData);
-    localStorage.removeItem(key);
-  }
+  if (!localStorageData) return undefined;
 
-  return sessionStorage.getItem(key);
+  localStorage.removeItem(key);
+
+  return localStorageData;
 };

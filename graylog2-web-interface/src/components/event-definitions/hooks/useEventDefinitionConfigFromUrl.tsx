@@ -19,7 +19,7 @@ import { useMemo } from 'react';
 
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
-import { moveFromLocalToSession } from 'util/BrowserStorages';
+import { getWithRemovalFromLocal } from 'util/BrowserStorages';
 
 export type EventDefinitionURLConfig = {
   type,
@@ -52,7 +52,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
   } = useQuery();
 
   return useMemo(() => {
-    const config = moveFromLocalToSession(sessionId as string);
+    const config = getWithRemovalFromLocal(sessionId as string);
     if (!config) return ({ hasUrlConfig: false, configFromUrl: undefined });
 
     const parsedUrlConfig: EventDefinitionURLConfig = JSON.parse(config);
