@@ -16,10 +16,12 @@
  */
 // eslint-disable-next-line no-unused-vars, no-unused-vars
 
+import AppConfig from 'util/AppConfig';
+
 import AwsPluginConfiguration from './components/AWSPluginConfiguration';
 import { PLUGIN_CONFIG_CLASS_NAME } from './Constants';
 
-const bindings = {
+const bindings = AppConfig.isCloud() ? {} : {
   systemConfigurations: [
     {
       component: AwsPluginConfiguration,
