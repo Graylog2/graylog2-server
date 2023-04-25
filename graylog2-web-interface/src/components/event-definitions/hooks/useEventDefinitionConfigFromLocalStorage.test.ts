@@ -24,23 +24,21 @@ import {
   urlConfigWithFunctionAggString,
   urlConfigWithoutAggString,
 } from 'fixtures/createEventDefinitionFromValue';
-import { getWithRemovalFromLocal } from 'util/BrowserStorages';
 
 jest.mock('routing/useQuery');
-
-jest.mock('util/BrowserStorages', () => ({
-  ...jest.requireActual('util/BrowserStorages'),
-  getWithRemovalFromLocal: jest.fn(),
-  __esModule: true,
-}));
 
 describe('useEventDefinitionConfigFromLocalStorage', () => {
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({ 'session-id': 'session-id' });
   });
 
+  afterEach(() => {
+    localStorage.removeItem('session-id');
+  });
+
   it('return data with conditions part when function, field and value exist', async () => {
-    asMock(getWithRemovalFromLocal).mockImplementation(() => urlConfigWithAggString);
+    localStorage.setItem('session-id', urlConfigWithAggString);
+
     const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() => expect(result.current).toEqual(
@@ -97,7 +95,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   });
 
   it('return data with conditions part when only function and value exist', async () => {
-    asMock(getWithRemovalFromLocal).mockImplementation(() => urlConfigWithFunctionAggString);
+    localStorage.setItem('session-id', urlConfigWithFunctionAggString);
 
     const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
@@ -154,7 +152,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   });
 
   it('return data without conditions part when function not exist', async () => {
-    asMock(getWithRemovalFromLocal).mockImplementation(() => urlConfigWithoutAggString);
+    localStorage.setItem('session-id', urlConfigWithoutAggString);
     const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() => expect(result.current).toEqual(
@@ -188,7 +186,6 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   });
 
   it('return hasUrlConfig when no url config data', async () => {
-    asMock(getWithRemovalFromLocal).mockImplementation(() => undefined);
     const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() => expect(result.current).toEqual(

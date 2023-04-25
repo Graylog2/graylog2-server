@@ -17,9 +17,9 @@
 
 import { useMemo } from 'react';
 
+import Store from 'logic/local-storage/Store';
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
-import { getWithRemovalFromLocal } from 'util/BrowserStorages';
 
 export type EventDefinitionLocalStorageConfig = {
   type,
@@ -52,10 +52,10 @@ const useEventDefinitionConfigFromLocalStorage = (): { hasLocalStorageConfig: bo
   } = useQuery();
 
   return useMemo(() => {
-    const config = getWithRemovalFromLocal(sessionId as string);
-    if (!config) return ({ hasLocalStorageConfig: false, configFromLocalStorage: undefined });
+    const parsedLocalStorageConfig = Store.get(sessionId);
+    if (!parsedLocalStorageConfig) return ({ hasLocalStorageConfig: false, configFromLocalStorage: undefined });
+    Store.delete(sessionId);
 
-    const parsedLocalStorageConfig: EventDefinitionLocalStorageConfig = JSON.parse(config);
     const {
       type,
       query,
