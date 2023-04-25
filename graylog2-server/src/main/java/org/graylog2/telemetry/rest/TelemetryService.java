@@ -25,15 +25,15 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
-import org.graylog2.telemetry.db.DBTelemetryUserSettingsService;
-import org.graylog2.telemetry.db.TelemetryUserSettingsDto;
+import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
+import org.graylog2.telemetry.user.db.TelemetryUserSettingsDto;
 import org.graylog2.users.events.UserDeletedEvent;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -66,6 +66,7 @@ public class TelemetryService {
     private final TelemetryResponseFactory telemetryResponseFactory;
     private final DBTelemetryUserSettingsService dbTelemetryUserSettingsService;
     private final boolean isTelemetryEnabled;
+    private final DBTelemetryClusterInfo dbTelemetryClusterInfo;
 
 
     @Inject
@@ -80,6 +81,7 @@ public class TelemetryService {
             @DetectedSearchVersion SearchVersion elasticsearchVersion,
             TelemetryResponseFactory telemetryResponseFactory,
             DBTelemetryUserSettingsService dbTelemetryUserSettingsService,
+            DBTelemetryClusterInfo dbTelemetryClusterInfo,
             EventBus eventBus) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
@@ -91,10 +93,11 @@ public class TelemetryService {
         this.elasticsearchVersion = elasticsearchVersion;
         this.telemetryResponseFactory = telemetryResponseFactory;
         this.dbTelemetryUserSettingsService = dbTelemetryUserSettingsService;
+        this.dbTelemetryClusterInfo = dbTelemetryClusterInfo;
         eventBus.register(this);
     }
 
-    public Map<String, Object> getTelemetryResponse(User currentUser, Map<String, SystemOverviewResponse> systemOverviewResponses) {
+    public Map<String, Object> getTelemetryResponse(User currentUser) {
         TelemetryUserSettings telemetryUserSettings = getTelemetryUserSettings(currentUser);
         if (isTelemetryEnabled && telemetryUserSettings.telemetryEnabled()) {
             Optional<ClusterConfig> clusterConfig = getClusterConfig();
@@ -102,7 +105,7 @@ public class TelemetryService {
             String clusterId = clusterConfig.map(c -> clusterConfigService.extractPayload(c.payload(), ClusterId.class).clusterId()).orElse(null);
 
             return telemetryResponseFactory.createTelemetryResponse(
-                    getClusterInfo(clusterId, clusterCreationDate, systemOverviewResponses),
+                    getClusterInfo(clusterId, clusterCreationDate),
                     getUserInfo(currentUser, clusterId),
                     getPluginInfo(),
                     getSearchClusterInfo(),
@@ -166,11 +169,11 @@ public class TelemetryService {
         }
     }
 
-    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate, Map<String, SystemOverviewResponse> systemOverviewResponses) {
+    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate) {
         return telemetryResponseFactory.createClusterInfo(
                 clusterId,
                 clusterCreationDate,
-                systemOverviewResponses,
+                dbTelemetryClusterInfo.findAll(),
                 getAverageLastMonthTraffic(),
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count());
     }
