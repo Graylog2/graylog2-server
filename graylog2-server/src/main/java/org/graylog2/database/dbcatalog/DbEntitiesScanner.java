@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.dbcatalog;
 
+import com.google.common.base.Stopwatch;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.graylog2.database.dbcatalog.impl.ClassGraphDbEntitiesScanningMethod;
@@ -49,9 +50,10 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
 
     @Override
     public DbEntitiesCatalog get() {
-        long startTimeMs = System.currentTimeMillis();
+        final Stopwatch stopwatch = Stopwatch.createStarted();
         final DbEntitiesCatalog catalog = dbEntitiesScanningMethod.scan(packagesToScan, packagesToExclude, chainingClassLoader);
-        LOG.info("{} entities have been scanned and added to DB Entity Catalog, it took {} ms", catalog.size(), System.currentTimeMillis() - startTimeMs);
+        stopwatch.stop();
+        LOG.info("{} entities have been scanned and added to DB Entity Catalog, it took {}", catalog.size(), stopwatch);
         return catalog;
     }
 }
