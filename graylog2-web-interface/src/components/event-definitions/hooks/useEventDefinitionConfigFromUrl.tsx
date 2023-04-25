@@ -16,6 +16,7 @@
  */
 
 import { useMemo } from 'react';
+import isEmpty from 'lodash/isEmpty';
 
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
@@ -68,7 +69,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
       loc_query_parameters,
     } = parsedUrlConfig;
 
-    const aggData = (agg_function && agg_field && agg_value) ? {
+    const aggData = (agg_function && agg_value) ? {
       conditions: {
         expression: {
           expr: undefined,
