@@ -41,7 +41,7 @@ public interface AuthServiceBackendConfig {
     }
 
     @JsonIgnore
-    Optional<List<String>> hostAllowList();
+    Optional<List<String>> externalHTTPHosts();
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
@@ -55,7 +55,7 @@ public interface AuthServiceBackendConfig {
         }
 
         @Override
-        public Optional<List<String>> hostAllowList() {
+        public Optional<List<String>> externalHTTPHosts() {
             throw new UnsupportedOperationException();
         }
     }

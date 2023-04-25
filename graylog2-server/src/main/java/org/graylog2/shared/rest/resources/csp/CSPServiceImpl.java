@@ -29,7 +29,7 @@ public class CSPServiceImpl implements CSPService {
     private static final Logger LOG = LoggerFactory.getLogger(CSPServiceImpl.class);
     private final String telemetryApiHost;
     private final DBAuthServiceBackendService dbService;
-    private String connectSrcValue;
+    private volatile String connectSrcValue;
 
     @Inject
     protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, DBAuthServiceBackendService dbService) {
@@ -41,7 +41,7 @@ public class CSPServiceImpl implements CSPService {
     @Override
     public synchronized void buildConnectSrc() {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
-                .map(dto -> dto.config().hostAllowList())
+                .map(dto -> dto.config().externalHTTPHosts())
                 .filter(optList -> optList.isPresent())
                 .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));

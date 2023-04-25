@@ -105,7 +105,7 @@ public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendCo
     }
 
     @Override
-    public Optional<List<String>> hostAllowList() {
+    public Optional<List<String>> externalHTTPHosts() {
         return Optional.of(servers().stream().map(HostAndPort::toString).toList());
     }
 

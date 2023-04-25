@@ -116,7 +116,7 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
     }
 
     @Override
-    public Optional<List<String>> hostAllowList() {
+    public Optional<List<String>> externalHTTPHosts() {
         return Optional.empty();
     }
 
