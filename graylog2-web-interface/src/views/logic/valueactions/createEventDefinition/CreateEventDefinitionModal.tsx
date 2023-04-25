@@ -19,8 +19,9 @@ import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
+import styled from 'styled-components';
 
-import { Checkbox, Modal, Button } from 'components/bootstrap';
+import { Modal, Button } from 'components/bootstrap';
 import type {
   ItemKey,
   Checked,
@@ -33,11 +34,14 @@ import {
   labels,
 } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
-import { Icon, LinkButton } from 'components/common';
+import { ExpandableList, ExpandableListItem, Icon, LinkButton } from 'components/common';
 import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
 
+const Container = styled.div`
+  margin-top: 10px;
+`;
 const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | number}) => (
   <span>
     <i>{`${labels[itemKey]}: `}</i>
@@ -108,27 +112,32 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
         </Button>
         {
           showDetails && (
-          <div>
-            {!isEmpty(aggregationChecks) && (
-            <CheckBoxGroup onChange={onCheckboxChange}
-                           groupLabel="Aggregation"
-                           checked={aggregationChecks}
-                           labels={aggregationLabels} />
-            )}
-            {!isEmpty(searchChecks) && (
-            <CheckBoxGroup onChange={onCheckboxChange}
-                           groupLabel="Search query"
-                           checked={searchChecks}
-                           labels={searchLabels} />
-            )}
-            {
+          <Container>
+            <ExpandableList>
+              {!isEmpty(aggregationChecks) && (
+                <CheckBoxGroup onChange={onCheckboxChange}
+                               groupLabel="Aggregation"
+                               checked={aggregationChecks}
+                               labels={aggregationLabels} />
+              )}
+              {!isEmpty(searchChecks) && (
+                <CheckBoxGroup onChange={onCheckboxChange}
+                               groupLabel="Search query"
+                               checked={searchChecks}
+                               labels={searchLabels} />
+              )}
+              {
               Object.entries(restChecks).map(([key, isChecked]) => (
-                <Checkbox key={key} checked={isChecked} onChange={() => onCheckboxChange({ [key]: !isChecked })}>
-                  {restLabels[key]}
-                </Checkbox>
+                <ExpandableListItem key={key}
+                                    checked={isChecked}
+                                    onChange={() => onCheckboxChange({ [key]: !isChecked })}
+                                    header={restLabels[key]}
+                                    padded={false}
+                                    expandable={false} />
               ))
             }
-          </div>
+            </ExpandableList>
+          </Container>
           )
         }
       </Modal.Body>

@@ -16,6 +16,7 @@
  */
 
 import { useMemo } from 'react';
+import isEmpty from 'lodash/isEmpty';
 
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
@@ -51,7 +52,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
   } = useQuery();
 
   return useMemo(() => {
-    if (!urlConfig) return ({ hasUrlConfig: false, configFromUrl: undefined });
+    if (!urlConfig || isEmpty(urlConfig)) return ({ hasUrlConfig: false, configFromUrl: undefined });
     const parsedUrlConfig: EventDefinitionURLConfig = JSON.parse(urlConfig as string);
     const {
       type,
@@ -65,7 +66,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
       loc_query_parameters,
     } = parsedUrlConfig;
 
-    const aggData = (agg_function && agg_field && agg_value) ? {
+    const aggData = (agg_function && agg_value) ? {
       conditions: {
         expression: {
           expr: undefined,

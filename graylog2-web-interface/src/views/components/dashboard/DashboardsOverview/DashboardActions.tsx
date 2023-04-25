@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { ShareButton } from 'components/common';
+import { IfPermitted, ShareButton } from 'components/common';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -81,9 +81,11 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
             <MenuItem divider />
           </>
         ) : null}
-        <MenuItem onClick={onDashboardDelete}>
-          <DeleteItem role="button">Delete</DeleteItem>
-        </MenuItem>
+        <IfPermitted permissions={[`view:edit:${dashboard.id}`, 'view:edit']} anyPermissions>
+          <MenuItem onClick={onDashboardDelete}>
+            <DeleteItem role="button">Delete</DeleteItem>
+          </MenuItem>
+        </IfPermitted>
       </OverlayDropdownButton>
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
