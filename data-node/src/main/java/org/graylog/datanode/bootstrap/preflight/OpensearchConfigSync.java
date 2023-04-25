@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import org.apache.logging.log4j.core.appender.rolling.action.DeletingVisitor;
+import org.apache.logging.log4j.core.appender.rolling.action.PathCondition;
 import org.graylog.datanode.Configuration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
@@ -90,22 +92,6 @@ public class OpensearchConfigSync implements PreflightCheck {
 
     private static void copyRecursively(Path source, Path target) throws IOException {
         LOG.info("Synchronizing Opensearch configuration");
-        Files.walkFileTree(source, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                Path currentTarget = target.resolve(source.relativize(dir).toString());
-                Files.createDirectories(currentTarget);
-                LOG.info("Synchronizing directory {}", currentTarget);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                final Path currentTarget = target.resolve(source.relativize(file).toString());
-                Files.copy(file, currentTarget, StandardCopyOption.REPLACE_EXISTING);
-                LOG.info("Synchronizing file {}", currentTarget);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+        FullDirSync.run(source, target);
     }
 }
