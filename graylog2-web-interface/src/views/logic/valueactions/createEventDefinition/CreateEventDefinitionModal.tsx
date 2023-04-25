@@ -37,6 +37,7 @@ import { Icon, LinkButton } from 'components/common';
 import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
+import generateId from 'logic/generateId';
 
 const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | number}) => (
   <span>
@@ -48,7 +49,7 @@ const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | n
 const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { mappedData: MappedData, modalData: ModalData, show: boolean, onClose: () => void }) => {
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
   const urlConfig = useUrlConfigData({ mappedData, checked });
-
+  const sessionId = useMemo(() => `cedfv-${generateId()}`, []);
   const onCheckboxChange = useCallback((updates) => {
     dispatchWithData({ type: 'UPDATE_CHECKED_ITEMS', payload: updates });
   }, [dispatchWithData]);
@@ -82,8 +83,8 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   }, [modalData]);
 
   const eventDefinitionCreationUrl = useMemo(() => {
-    return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&config=${JSON.stringify(urlConfig)}`;
-  }, [urlConfig]);
+    return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&session-id=${sessionId}`;
+  }, [sessionId]);
 
   const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => {
     return ({
@@ -94,6 +95,10 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
       EXACT: true,
     });
   }, [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
+
+  const onContinueConfigurationClick = useCallback(() => {
+    localStorage.setItem(sessionId, JSON.stringify(urlConfig));
+  }, [sessionId, urlConfig]);
 
   return (
     <Modal onHide={onClose} show={show}>
@@ -133,7 +138,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
         }
       </Modal.Body>
       <Modal.Footer>
-        <LinkButton bsStyle="primary" onClick={onClose} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</LinkButton>
+        <LinkButton bsStyle="primary" onClick={onContinueConfigurationClick} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</LinkButton>
       </Modal.Footer>
     </Modal>
   );

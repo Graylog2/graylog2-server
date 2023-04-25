@@ -19,6 +19,7 @@ import { useMemo } from 'react';
 
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
+import { moveFromLocalToSession } from 'util/BrowserStorages';
 
 export type EventDefinitionURLConfig = {
   type,
@@ -47,12 +48,14 @@ type EventDefinitionConfigFromUrl = {
 
 const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromUrl: EventDefinitionConfigFromUrl } => {
   const {
-    config: urlConfig,
+    'session-id': sessionId,
   } = useQuery();
 
   return useMemo(() => {
-    if (!urlConfig) return ({ hasUrlConfig: false, configFromUrl: undefined });
-    const parsedUrlConfig: EventDefinitionURLConfig = JSON.parse(urlConfig as string);
+    const config = moveFromLocalToSession(sessionId as string);
+    if (!config) return ({ hasUrlConfig: false, configFromUrl: undefined });
+
+    const parsedUrlConfig: EventDefinitionURLConfig = JSON.parse(config);
     const {
       type,
       query,
@@ -89,7 +92,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
         ...aggData,
       },
     });
-  }, [urlConfig]);
+  }, [sessionId]);
 };
 
 export default useEventDefinitionConfigFromUrl;
