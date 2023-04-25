@@ -20,10 +20,11 @@ import useEventDefinitionConfigFromLocalStorage from 'components/event-definitio
 import asMock from 'helpers/mocking/AsMock';
 import useQuery from 'routing/useQuery';
 import {
-  urlConfigWithAggString,
-  urlConfigWithFunctionAggString,
-  urlConfigWithoutAggString,
+  urlConfigWithAgg,
+  urlConfigWithFunctionAgg,
+  urlConfigWithoutAgg,
 } from 'fixtures/createEventDefinitionFromValue';
+import Store from 'logic/local-storage/Store';
 
 jest.mock('routing/useQuery');
 
@@ -33,11 +34,11 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   });
 
   afterEach(() => {
-    localStorage.removeItem('session-id');
+    Store.delete('session-id');
   });
 
   it('return data with conditions part when function, field and value exist', async () => {
-    localStorage.setItem('session-id', urlConfigWithAggString);
+    Store.set('session-id', urlConfigWithAgg);
 
     const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
@@ -95,7 +96,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   });
 
   it('return data with conditions part when only function and value exist', async () => {
-    localStorage.setItem('session-id', urlConfigWithFunctionAggString);
+    Store.set('session-id', urlConfigWithFunctionAgg);
 
     const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
@@ -152,7 +153,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
   });
 
   it('return data without conditions part when function not exist', async () => {
-    localStorage.setItem('session-id', urlConfigWithoutAggString);
+    Store.set('session-id', urlConfigWithoutAgg);
     const { result, waitFor } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
 
     await waitFor(() => expect(result.current).toEqual(
