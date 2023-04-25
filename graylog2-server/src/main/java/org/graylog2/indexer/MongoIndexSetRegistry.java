@@ -110,9 +110,9 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     public Optional<IndexSet> get(final String indexSetId) {
         return this.indexSetsCache.get()
                 .stream()
-            .filter(indexSet -> Objects.equals(indexSet.id(), indexSetId))
-            .map(indexSetConfig -> (IndexSet)mongoIndexSetFactory.create(indexSetConfig))
-            .findFirst();
+                .filter(indexSet -> Objects.equals(indexSet.id(), indexSetId))
+                .map(indexSetConfig -> (IndexSet) mongoIndexSetFactory.create(indexSetConfig))
+                .findFirst();
     }
 
     @Override
