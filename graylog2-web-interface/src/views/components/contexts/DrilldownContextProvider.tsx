@@ -24,6 +24,8 @@ import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 
 import DrilldownContext from './DrilldownContext';
 import type { Drilldown } from './DrilldownContext';
@@ -33,11 +35,14 @@ const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride
 
   if (viewType === View.Type.Dashboard) {
     const { streams, timerange, query } = widget;
+    const dashboardAndWidgetQueryString = globalOverride?.query?.query_string
+      ? concatQueryStrings([query?.query_string, globalOverride.query.query_string])
+      : query?.query_string;
 
     return ({
       streams,
-      timerange: (globalOverride && globalOverride.timerange ? globalOverride.timerange : timerange) || { type: 'relative', from: 300 },
-      query: (globalOverride && globalOverride.query ? globalOverride.query : query) || createElasticsearchQueryString(''),
+      timerange: (globalOverride?.timerange ? globalOverride.timerange : timerange) || DEFAULT_TIMERANGE,
+      query: createElasticsearchQueryString(dashboardAndWidgetQueryString || ''),
     });
   }
 

@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.filter;
 
+import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,6 +57,8 @@ public class WebAppNotFoundResponseFilterTest {
     private ContainerResponseContext responseContext;
     @Mock
     private IndexHtmlGenerator indexHtmlGenerator;
+    @Mock
+    private CSPDynamicFeature cspDynamicFeature;
 
     private WebAppNotFoundResponseFilter filter;
     private MultivaluedHashMap<String, Object> responseHeaders;
@@ -65,7 +68,7 @@ public class WebAppNotFoundResponseFilterTest {
         responseHeaders = new MultivaluedHashMap<>();
         when(indexHtmlGenerator.get(any())).thenReturn("index.html");
         when(responseContext.getHeaders()).thenReturn(responseHeaders);
-        filter = new WebAppNotFoundResponseFilter(indexHtmlGenerator);
+        filter = new WebAppNotFoundResponseFilter(indexHtmlGenerator, cspDynamicFeature);
     }
 
     @Test

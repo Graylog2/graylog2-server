@@ -22,6 +22,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { EventDefinition } from 'logic/alerts/types';
+import type FetchError from 'logic/errors/FetchError';
 
 export type ValueExpr = '>' | '<' | '>=' | '<=' | '==';
 
@@ -92,7 +93,7 @@ const fetchDefinition = (definitionId: string) => {
   return fetch('GET', definitionsUrl(definitionId)).then(eventDefinitionDataMapper);
 };
 
-const useEventDefinition = (definitionId: string): {
+const useEventDefinition = (definitionId: string, { onErrorHandler }: { onErrorHandler?: (e: FetchError)=>void} = {}): {
   data: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
   refetch: () => void,
   isLoading: boolean,
@@ -102,12 +103,18 @@ const useEventDefinition = (definitionId: string): {
     ['event-definition-by-id', definitionId],
     () => fetchDefinition(definitionId),
     {
-      onError: (errorThrown) => {
+      onError: (errorThrown: FetchError) => {
+        if (onErrorHandler) onErrorHandler(errorThrown);
+
         UserNotification.error(`Loading event definition failed with status: ${errorThrown}`,
           'Could not load event definition');
       },
       keepPreviousData: true,
       enabled: !!definitionId,
+      initialData: {
+        eventDefinition: null,
+        aggregations: [],
+      },
     },
   );
 

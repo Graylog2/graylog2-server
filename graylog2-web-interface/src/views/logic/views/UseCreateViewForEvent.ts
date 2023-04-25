@@ -218,7 +218,7 @@ export const UseCreateViewForEvent = (
 
   const queryParameters = eventDefinition?.config?.query_parameters || [];
 
-  const groupBy = eventDefinition.config.group_by;
+  const groupBy = eventDefinition?.config?.group_by ?? [];
 
   return useMemo(
     () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters }),

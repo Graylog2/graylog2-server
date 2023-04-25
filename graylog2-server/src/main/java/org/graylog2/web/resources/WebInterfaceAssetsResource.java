@@ -24,7 +24,7 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Resources;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.plugin.Plugin;
-import org.graylog2.shared.rest.resources.annotations.CSP;
+import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
 

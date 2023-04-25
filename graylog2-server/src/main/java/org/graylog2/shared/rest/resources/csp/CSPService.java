@@ -14,24 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.shared.rest.resources.csp;
 
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
+public interface CSPService {
+    void buildConnectSrc();
 
-export type Drilldown = {
-  query: QueryString,
-  streams: Array<string>,
-  timerange: TimeRange,
-};
-
-const defaultValue: Drilldown = {
-  query: createElasticsearchQueryString(''),
-  streams: [],
-  timerange: DEFAULT_TIMERANGE,
-};
-
-const DrilldownContext = React.createContext<Drilldown>(defaultValue);
-
-export default DrilldownContext;
+    String connectSrcValue();
+}
