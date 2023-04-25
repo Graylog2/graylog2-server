@@ -44,7 +44,7 @@ public class RemoteInterfaceProvider {
                                    ) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
-        this.defaultProxyTimeout = Duration.ofMillis(defaultProxyTimeout.toMicroseconds());
+        this.defaultProxyTimeout = Duration.ofMillis(defaultProxyTimeout.toMilliseconds());
     }
 
     public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass, Duration timeout) {
