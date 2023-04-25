@@ -35,6 +35,7 @@ import javax.inject.Named;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.graylog2.configuration.TelemetryConfiguration.TELEMETRY_CLUSTER_INFO_TTL;
 import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_NODE_ID;
@@ -43,7 +44,7 @@ public class TelemetryClusterInfoPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryClusterInfoPeriodical.class);
     private final ServerStatus serverStatus;
-    private final ClusterId clusterId;
+    private final String clusterId;
     private final LeaderElectionService leaderElectionService;
     private final DBTelemetryClusterInfo dbTelemetryClusterInfo;
     private final Duration telemetryClusterInfoTtl;
@@ -56,7 +57,9 @@ public class TelemetryClusterInfoPeriodical extends Periodical {
                                           DBTelemetryClusterInfo dbTelemetryClusterInfo) {
         this.telemetryClusterInfoTtl = telemetryClusterInfoTtl;
         this.serverStatus = serverStatus;
-        this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, null);
+        this.clusterId = Optional.ofNullable(clusterConfigService.get(ClusterId.class))
+                .map(ClusterId::clusterId)
+                .orElse(null);
         this.leaderElectionService = leaderElectionService;
         this.dbTelemetryClusterInfo = dbTelemetryClusterInfo;
     }
@@ -67,7 +70,7 @@ public class TelemetryClusterInfoPeriodical extends Periodical {
                 .put("facility", "graylog-server")
                 .put("codename", ServerVersion.CODENAME)
                 .put(FIELD_NODE_ID, serverStatus.getNodeId().toString())
-                .put("cluster_id", clusterId.clusterId())
+                .put("cluster_id", clusterId)
                 .put("version", ServerVersion.VERSION.toString())
                 .put("started_at", Tools.getISO8601String(serverStatus.getStartedAt()))
                 .put("hostname", Tools.getLocalCanonicalHostname())
