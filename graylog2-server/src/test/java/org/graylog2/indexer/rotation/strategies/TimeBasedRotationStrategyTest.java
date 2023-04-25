@@ -86,6 +86,7 @@ public class TimeBasedRotationStrategyTest {
         when(indexSetConfig.title()).thenReturn("index-set-title");
         when(indices.getIndices(eq(indexSet))).thenReturn(Collections.singleton(IGNORED));
         when(indices.numberOfMessages(eq(IGNORED))).thenReturn(20L);
+        when(indices.isOpen(anyString())).thenReturn(true);
         rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
     }
 

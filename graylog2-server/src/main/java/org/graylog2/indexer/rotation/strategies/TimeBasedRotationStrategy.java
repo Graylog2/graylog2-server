@@ -43,7 +43,6 @@ import javax.inject.Singleton;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -238,13 +237,10 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     }
 
     private boolean isEmptyIndexSet(IndexSet indexSet) {
-        final Set<String> allIndices = indices.getIndices(indexSet);
-        for (String index : allIndices) {
-            if (indices.numberOfMessages(index) > 0) {
-                return false;
-            }
-        }
-        return true;
+        return indices.getIndices(indexSet)
+                .stream()
+                .filter(indices::isOpen)
+                .noneMatch(indexName -> indices.numberOfMessages(indexName) > 0);
     }
 
     private Pair<Period, Boolean> getNormalizedRotationPeriod(TimeBasedRotationStrategyConfig config) {
