@@ -19,11 +19,16 @@ import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { simpleView } from 'views/test/ViewFixtures';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
+
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -44,6 +49,7 @@ describe('DashboardActions', () => {
   beforeEach(() => {
     oldWindowConfirm = window.confirm;
     window.confirm = jest.fn();
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   afterEach(() => {
@@ -53,7 +59,7 @@ describe('DashboardActions', () => {
   it('does not delete dashboard when user clicks cancel', async () => {
     asMock(window.confirm).mockReturnValue(false);
 
-    render(<DashboardActions dashboard={simpleView()} refetchDashboards={() => Promise.resolve()} />);
+    render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
     await clickDashboardAction('Delete');
 
@@ -65,13 +71,24 @@ describe('DashboardActions', () => {
   it('deletes dashboard when user confirms deletion', async () => {
     asMock(window.confirm).mockReturnValue(true);
 
-    render(<DashboardActions dashboard={simpleView()} refetchDashboards={() => Promise.resolve()} />);
+    render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
     await clickDashboardAction('Delete');
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
     expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+  });
+
+  it('does not offer deletion when user has only read permissions', async () => {
+    const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${simpleDashboard.id}`])).build();
+    asMock(useCurrentUser).mockReturnValue(currentUser);
+
+    render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
+
+    userEvent.click(await screen.findByText('More'));
+
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
   });
 
   describe('supports dashboard deletion hook', () => {
