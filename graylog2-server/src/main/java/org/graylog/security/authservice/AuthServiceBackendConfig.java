@@ -41,6 +41,13 @@ public interface AuthServiceBackendConfig {
     }
 
     @JsonIgnore
+    /**
+     * Returns a list of hosts/ports related to the authentication backend in the format <host>:<port>.
+     * This is useful e.g. to populate the connect-src in Content Security Policy header.
+     * Backends that are not accessed via HTTP will return Optional.empty().
+     *
+     * @return list of host/port Strings
+     */
     Optional<List<String>> externalHTTPHosts();
 
     interface Builder<SELF> {
