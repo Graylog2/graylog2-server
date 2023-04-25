@@ -161,12 +161,8 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
 
     @Override
     public <T> int remove(Class<T> type) {
-        return remove(type.getCanonicalName());
-    }
-
-    @Override
-    public <T> int remove(String key) {
-        final WriteResult<ClusterConfig, String> result = dbCollection.remove(DBQuery.is("type", key));
+        final String canonicalName = type.getCanonicalName();
+        final WriteResult<ClusterConfig, String> result = dbCollection.remove(DBQuery.is("type", canonicalName));
         return result.getN();
     }
 
