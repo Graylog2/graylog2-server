@@ -43,18 +43,18 @@ import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class OpenSearchInstance extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
+public class DatanodeInstance extends TestableSearchServerInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
 
     public static final String DEFAULT_HEAP_SIZE = "2g";
-    public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
+    public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
 
     private final OpenSearchClient openSearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
+    protected DatanodeInstance(String image, SearchVersion version, Network network, String heapSize) {
         super(image, version, network, heapSize);
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
@@ -62,13 +62,13 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
     }
-    protected OpenSearchInstance(String image, SearchVersion version, Network network) {
+    protected DatanodeInstance(String image, SearchVersion version, Network network) {
         this(image, version, network, DEFAULT_HEAP_SIZE);
     }
 
     @Override
     public SearchServer searchServer() {
-        return OPENSEARCH_VERSION;
+        return DATANODE_VERSION;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -91,29 +91,21 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .get();
     }
 
-    public static OpenSearchInstance create() {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
-    }
-
-    public static OpenSearchInstance create(String heapSize) {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize);
-    }
-
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static OpenSearchInstance create(SearchVersion searchVersion, Network network) {
+    public static DatanodeInstance create(SearchVersion searchVersion, Network network) {
         return create(searchVersion, network, DEFAULT_HEAP_SIZE);
     }
 
-    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
+    private static DatanodeInstance create(SearchVersion searchVersion, Network network, String heapSize) {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
 
-        return new OpenSearchInstance(image, searchVersion, network, heapSize);
+        return new DatanodeInstance(image, searchVersion, network, heapSize);
     }
 
     protected static String imageNameFrom(Version version) {
-        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.toString());
+        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev"); // TODO:use the requested version
     }
 
     @Override
