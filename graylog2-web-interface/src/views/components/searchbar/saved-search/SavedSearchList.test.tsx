@@ -16,11 +16,14 @@
  */
 import React from 'react';
 import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
+import Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
+import { adminUser } from 'fixtures/users';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import SavedSearchList from './SavedSearchList';
 
@@ -60,7 +63,13 @@ jest.mock('views/stores/SavedSearchesStore', () => ({
   },
 }));
 
+jest.mock('hooks/useCurrentUser');
+
 describe('SavedSearchList', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+  });
+
   describe('render the SavedSearchList', () => {
     it('should render empty', async () => {
       const views = createPaginatedSearches(0);
@@ -141,5 +150,20 @@ describe('SavedSearchList', () => {
 
       expect(onLoad).toBeCalledTimes(1);
     });
+  });
+
+  it('should not display delete action for saved search when user is missing required permissions', async () => {
+    const views = createPaginatedSearches(1);
+    asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
+    const currentUser = adminUser.toBuilder().permissions(Immutable.List(['view:read:search-id-0}'])).build();
+    asMock(useCurrentUser).mockReturnValue(currentUser);
+
+    render(<SavedSearchList toggleModal={() => {}}
+                            deleteSavedSearch={jest.fn()}
+                            activeSavedSearchId="search-id-0" />);
+
+    await screen.findByText('search-title-0');
+
+    expect(screen.queryByTitle('Delete search search-title-0')).not.toBeInTheDocument();
   });
 });
