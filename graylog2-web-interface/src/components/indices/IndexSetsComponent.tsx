@@ -122,8 +122,7 @@ const IndexSetsComponent = () => {
 
   const Toolbar = styled(Row)(({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[90]};
-    padding-bottom: 10px;
-    padding-top: 10px;
+    padding-bottom: 15px;
   `);
 
   const GlobalStatsCol = styled(Col)`
@@ -206,6 +205,16 @@ const IndexSetsComponent = () => {
 
   return (
     <>
+      <Row>
+        <Col md={12}>
+          <SearchForm onSearch={onSearch}
+                      queryWidth={300}
+                      wrapperClass="has-bm"
+                      onReset={onSearchReset}
+                      query={searchTerm}
+                      placeholder="Find index sets" />
+        </Col>
+      </Row>
       <Toolbar>
         <GlobalStatsCol md={3}>
           <GlobalStats><strong>Stats for all indices:</strong> {statsEnabled
@@ -214,16 +223,6 @@ const IndexSetsComponent = () => {
           </GlobalStats>
           <Button onClick={onToggleStats}>{statsEnabled ? 'Disable stats' : 'Enable stats'}</Button>
         </GlobalStatsCol>
-        <Col md={3}>
-          <SearchForm onSearch={onSearch}
-                      label="Search"
-                      queryWidth={300}
-                      wrapperClass="has-bm"
-                      onReset={onSearchReset}
-                      query={searchTerm}
-                      placeholder="Enter query to search index sets" />
-
-        </Col>
       </Toolbar>
 
       <Row>
