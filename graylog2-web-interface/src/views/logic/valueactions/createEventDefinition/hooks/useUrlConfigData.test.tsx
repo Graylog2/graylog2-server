@@ -124,7 +124,7 @@ describe('useUrlConfigData', () => {
         'action',
         'http_method',
       ],
-      query: '((http_method:GET))',
+      query: '(http_method:GET)',
       search_within_ms: 300000,
       streams: [
         'streamId-1',

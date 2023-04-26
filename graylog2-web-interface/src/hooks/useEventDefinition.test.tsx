@@ -66,8 +66,7 @@ describe('useEventDefinition', () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockEventDefinitionTwoAggregations));
     const { result, waitFor } = renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), { wrapper });
 
-    await waitFor(() => result.current.isLoading);
-    await waitFor(() => !result.current.isLoading);
+    await waitFor(() => result.current.isFetched);
 
     expect(fetch).toHaveBeenCalledWith('GET', definitionUrl);
 

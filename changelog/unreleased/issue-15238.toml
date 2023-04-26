@@ -1,0 +1,5 @@
+type = "c"
+message = "Include URLs for authentication service(s) in the CSP header connect-src."
+
+issues = ["15238"]
+pulls = ["15283", "Graylog2/graylog-plugin-enterprise#5053"]

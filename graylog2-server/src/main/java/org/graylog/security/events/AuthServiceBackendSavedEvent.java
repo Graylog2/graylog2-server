@@ -14,31 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.security.events;
 
-export type EventReplayInfo = {
-  timerange_start: string,
-  timerange_end: string,
-  query: string,
-  streams: string[],
-};
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-export type Event = {
-  id: string,
-  event_definition_id: string,
-  event_definition_type: string,
-  priority: string,
-  timestamp: string,
-  timerange_start: string,
-  timerange_end: string,
-  key: string,
-  fields: Object[],
-  group_by_fields: {[key: string]: string},
-  source_streams: string[],
-  replay_info: EventReplayInfo | undefined,
-  alert: boolean | undefined,
-};
+@AutoValue
+public abstract class AuthServiceBackendSavedEvent {
+    private static final String FIELD_AUTH_SERVICE_ID = "auth_service_id";
 
-export type EventDefinitionContext = {
-  id: string,
-  title: string,
-};
+    @JsonProperty(FIELD_AUTH_SERVICE_ID)
+    public abstract String authServiceId();
+
+    @JsonCreator
+    public static AuthServiceBackendSavedEvent create(@JsonProperty(FIELD_AUTH_SERVICE_ID) String authServiceId) {
+        return new AutoValue_AuthServiceBackendSavedEvent(authServiceId);
+    }
+}

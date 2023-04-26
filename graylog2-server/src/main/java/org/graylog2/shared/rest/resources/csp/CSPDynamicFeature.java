@@ -14,19 +14,37 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.rest.resources.annotations;
+package org.graylog2.shared.rest.resources.csp;
 
-import org.graylog2.shared.rest.CSPResponseFilter;
+import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
 public class CSPDynamicFeature implements DynamicFeature {
     private static final Logger LOG = LoggerFactory.getLogger(CSPDynamicFeature.class);
+    private final CSPService cspService;
+
+    @Inject
+    public CSPDynamicFeature(@Context CSPService cspService) {
+        this.cspService = cspService;
+    }
+
+    public String dynamicCspString() {
+        return dynamicCspString(CSP.CSP_DEFAULT);
+    }
+
+    public String dynamicCspString(String staticCspString) {
+        if (!staticCspString.contains("connect-src")) {
+            return staticCspString + "connect-src " + cspService.connectSrcValue();
+        }
+        return staticCspString;
+    }
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
@@ -34,10 +52,10 @@ public class CSPDynamicFeature implements DynamicFeature {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         String cspValue = null;
         if (resourceClass != null && resourceClass.isAnnotationPresent(CSP.class)) {
-            cspValue = resourceClass.getAnnotation(CSP.class).value();
+            cspValue = dynamicCspString(resourceClass.getAnnotation(CSP.class).value());
             LOG.debug("CSP class annotation for {}: {}", resourceClass.getSimpleName(), cspValue);
         } else if (resourceMethod != null && resourceMethod.isAnnotationPresent(CSP.class)) {
-            cspValue = resourceMethod.getAnnotation(CSP.class).value();
+            cspValue = dynamicCspString(resourceMethod.getAnnotation(CSP.class).value());
             LOG.debug("CSP method annotation for {}: {}", resourceMethod.getName(), cspValue);
         }
         if (cspValue != null) {
