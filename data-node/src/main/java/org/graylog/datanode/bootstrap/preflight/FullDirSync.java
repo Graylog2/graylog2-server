@@ -41,8 +41,21 @@ public class FullDirSync {
 
         for (Path path : existingPaths) {
             LOG.info("Deleting obsolete file " + path);
+            if(Files.isDirectory(path)) {
+                deleteDirRecursively(path);
+            }
             Files.deleteIfExists(path);
         }
+    }
+
+    private static Path deleteDirRecursively(Path path) throws IOException {
+        return Files.walkFileTree(path, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.deleteIfExists(file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     private static List<Path> copyFiles(Path source, Path target) throws IOException {

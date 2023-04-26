@@ -56,6 +56,8 @@ class FullDirSyncTest {
         -empty-dir
         -subdir
           -y.txt
+        -unused-dir
+          -z.txt
          */
 
         Files.createFile(source.resolve("a.txt"));
@@ -68,6 +70,8 @@ class FullDirSyncTest {
         Files.createDirectories(target.resolve("subdir"));
         Files.createDirectories(target.resolve("empty-dir"));
         Files.createFile(target.resolve("subdir").resolve("y.txt"));
+        Files.createDirectories(target.resolve("unused-dir"));
+        Files.createFile(target.resolve("unused-dir").resolve("z.txt"));
     }
 
     @Test
