@@ -17,6 +17,7 @@
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
@@ -25,6 +26,8 @@ import useSavedSearches from 'views/hooks/useSavedSearches';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
+import { adminUser } from 'fixtures/users';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import SavedSearchesModal from './SavedSearchesModal';
 
@@ -70,6 +73,7 @@ const createPaginatedSearches = (count = 1) => {
 jest.mock('views/hooks/useSavedSearches');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences');
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('routing/Routes', () => ({
   getPluginRoute: (x) => () => x,
@@ -87,6 +91,7 @@ describe('SavedSearchesModal', () => {
 
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   describe('render the SavedSearchesModal', () => {
@@ -172,6 +177,19 @@ describe('SavedSearchesModal', () => {
       userEvent.click(listItem);
 
       expect(onLoad).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not display delete action for saved search when user is missing required permissions', async () => {
+      const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${defaultPaginatedSearches.list[0].id}`])).build();
+      asMock(useCurrentUser).mockReturnValue(currentUser);
+
+      render(<SavedSearchesModal toggleModal={() => {}}
+                                 deleteSavedSearch={jest.fn()}
+                                 activeSavedSearchId="search-id-0" />);
+
+      await screen.findByText('search-title-0');
+
+      expect(screen.queryByTitle('Delete search search-title-0')).not.toBeInTheDocument();
     });
 
     it('should update layout setting when changing page size', async () => {
