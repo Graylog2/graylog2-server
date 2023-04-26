@@ -58,7 +58,6 @@ class ContentPackEntitiesList extends React.Component {
 
     this.state = {
       showApplyConfigModal: false,
-      showConfigModal: false,
       showConfigModalId: undefined,
       filteredEntities: props.contentPack.entities || [],
       filter: undefined,
@@ -140,15 +139,15 @@ class ContentPackEntitiesList extends React.Component {
     );
 
     const closeShowModal = () => {
-      this.setState({ showConfigModal: false, showConfigModalId: undefined });
+      this.setState({ showConfigModalId: undefined });
     };
 
     const openShowModal = (entityId) => {
-      this.setState({ showConfigModal: true, showConfigModalId: entityId });
+      this.setState({ showConfigModalId: entityId });
     };
 
-    const showModal = entity.id === this.state.showConfigModalId ? (
-      <BootstrapModalWrapper showModal={this.state.showConfigModal}
+    const showModal = (
+      <BootstrapModalWrapper showModal={entity.id === this.state.showConfigModalId}
                              onHide={closeShowModal}
                              bsSize="large"
                              data-app-section="content_pack_entity_list"
@@ -163,7 +162,7 @@ class ContentPackEntitiesList extends React.Component {
           <Button onClick={closeShowModal}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
-    ) : null;
+    );
 
     const disableBtn = contentPack.parameters.length <= 0;
     const appliedParameterCount = (appliedParameter[entity.id] || []).length;
