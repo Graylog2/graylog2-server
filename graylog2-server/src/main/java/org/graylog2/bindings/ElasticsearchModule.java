@@ -17,18 +17,12 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog2.configuration.IndexerDiscoveryProvider;
-import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.indexer.FailureIndexMappingFactory;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
-
-import java.net.URI;
-import java.util.List;
 
 public class ElasticsearchModule extends AbstractModule {
     @Override

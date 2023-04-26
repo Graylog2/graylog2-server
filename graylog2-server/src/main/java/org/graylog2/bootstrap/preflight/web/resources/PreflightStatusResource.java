@@ -37,11 +37,11 @@ import javax.ws.rs.core.MediaType;
 public class PreflightStatusResource {
 
     private final Version version = Version.CURRENT_CLASSPATH;
-    private final PreflightConfigService preflightConfigService;
+    private final PreflightConfigService preflightConfigServiceIf;
 
     @Inject
-    public PreflightStatusResource(PreflightConfigService preflightConfigService) {
-        this.preflightConfigService = preflightConfigService;
+    public PreflightStatusResource(PreflightConfigService preflightConfigServiceIf) {
+        this.preflightConfigServiceIf = preflightConfigServiceIf;
     }
 
     @GET
@@ -53,6 +53,6 @@ public class PreflightStatusResource {
     @POST
     @Path("/finish-config")
     public PreflightConfig finishConfig() throws ValidationException {
-        return preflightConfigService.saveConfiguration();
+        return preflightConfigServiceIf.saveConfiguration();
     }
 }

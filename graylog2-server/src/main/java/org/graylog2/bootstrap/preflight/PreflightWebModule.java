@@ -44,7 +44,7 @@ public class PreflightWebModule extends Graylog2Module {
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
 
-        bind(PreflightConfigService.class);
+        bind(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
 
         addPreflightRestResource(PreflightResource.class);

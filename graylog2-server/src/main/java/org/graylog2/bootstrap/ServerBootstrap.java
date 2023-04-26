@@ -183,9 +183,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private void doRunWithPreflightInjector(Injector preflightInjector) {
         final PreflightBoot preflightBoot = preflightInjector.getInstance(PreflightBoot.class);
 
-        final Supplier<Boolean> shouldRun = preflightBoot::shouldRunPreflightWeb;
-
-        if (!shouldRun.get()) {
+        if (!preflightBoot.shouldRunPreflightWeb()) {
             return;
         }
 
@@ -195,7 +193,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
-            while (shouldRun.get()) {
+            while (preflightBoot.shouldRunPreflightWeb()) {
                 try {
                     LOG.debug("Preflight config still in progress, waiting for the marker document");
                     Thread.sleep(1000);

@@ -30,15 +30,15 @@ public class PreflightBoot {
 
     private final boolean isFreshInstallation;
     private final List<URI> hosts;
-    private final PreflightConfigService preflightConfigService;
-    private Configuration configuration;
+    private final PreflightConfigService preflightConfigServiceIf;
+    private final Configuration configuration;
 
     @Inject
     public PreflightBoot(@Named("isFreshInstallation") boolean isFreshInstallation, @Named("elasticsearch_hosts") List<URI> hosts,
-                         PreflightConfigService preflightConfigService, Configuration configuration) {
+                         PreflightConfigService preflightConfigServiceIf, Configuration configuration) {
         this.isFreshInstallation = isFreshInstallation;
         this.hosts = hosts;
-        this.preflightConfigService = preflightConfigService;
+        this.preflightConfigServiceIf = preflightConfigServiceIf;
         this.configuration = configuration;
     }
 
@@ -56,7 +56,7 @@ public class PreflightBoot {
             return false;
         }
 
-        if (preflightConfigService.getPersistedConfig().isPresent()) {
+        if (preflightConfigServiceIf.getPersistedConfig().isPresent()) {
             return false;
         }
 
