@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.graylog2.database.DbEntity.NOBODY_ALOWED;
+import static org.graylog2.database.DbEntity.NOBODY_ALLOWED;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,7 +72,7 @@ class DbEntitiesScannerTest {
 
         assertSame(entryByCollectionName, entryByModelClass);
 
-        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", NodeImpl.class, NOBODY_ALOWED), entryByCollectionName);
+        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", NodeImpl.class, NOBODY_ALLOWED), entryByCollectionName);
     }
 
     @Test
