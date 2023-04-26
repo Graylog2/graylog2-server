@@ -153,6 +153,7 @@ const EventNotificationsContainer = () => {
                                               onPageSizeChange={onPageSizeChange}
                                               pageSize={layoutConfig.pageSize}
                                               rowActions={renderEventDefinitionActions}
+                                              actionsCellWidth={160}
                                               columnRenderers={columnRenderers}
                                               columnDefinitions={columnDefinitions} />
         )}
