@@ -84,6 +84,11 @@ public class RunningGraylogBackend implements GraylogBackend {
     }
 
     @Override
+    public String getSearchLogs() {
+        return "noop -> because the server is running, check the logs in the console ;-)";
+    }
+
+    @Override
     public Optional<MailServerInstance> getEmailServerInstance() {
 
         if (isPortOpen("localhost", MailServerContainer.API_PORT)) {
