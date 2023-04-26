@@ -59,6 +59,7 @@ class ContentPackEntitiesList extends React.Component {
     this.state = {
       showApplyConfigModal: false,
       showConfigModal: false,
+      showConfigModalId: undefined,
       filteredEntities: props.contentPack.entities || [],
       filter: undefined,
     };
@@ -139,14 +140,14 @@ class ContentPackEntitiesList extends React.Component {
     );
 
     const closeShowModal = () => {
-      this.setState({ showConfigModal: false });
+      this.setState({ showConfigModal: false, showConfigModalId: undefined });
     };
 
-    const openShowModal = () => {
-      this.setState({ showConfigModal: true });
+    const openShowModal = (entityId) => {
+      this.setState({ showConfigModal: true, showConfigModalId: entityId });
     };
 
-    const showModal = (
+    const showModal = entity.id === this.state.showConfigModalId ? (
       <BootstrapModalWrapper showModal={this.state.showConfigModal}
                              onHide={closeShowModal}
                              bsSize="large"
@@ -162,7 +163,7 @@ class ContentPackEntitiesList extends React.Component {
           <Button onClick={closeShowModal}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
-    );
+    ) : null;
 
     const disableBtn = contentPack.parameters.length <= 0;
     const appliedParameterCount = (appliedParameter[entity.id] || []).length;
@@ -188,7 +189,7 @@ class ContentPackEntitiesList extends React.Component {
             </Button>
             )}
             <Button bsSize="xs"
-                    onClick={() => { openShowModal(); }}>
+                    onClick={() => { openShowModal(entity.id); }}>
               Show
             </Button>
           </ButtonToolbar>
