@@ -101,7 +101,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                                 final String collection) {
         return catalog.getByCollectionName(collection)
                 .map(DbEntityCatalogEntry::readPermission)
-                .map(rp -> rp.equals(DbEntity.ALL_ALOWED) || subject.isPermitted(rp + ":*"))
+                .map(rp -> rp.equals(DbEntity.ALL_ALLOWED) || subject.isPermitted(rp + ":*"))
                 .orElse(false);
     }
 
