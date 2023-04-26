@@ -41,7 +41,7 @@ import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
-import org.graylog2.configuration.IndexDiscoveryModule;
+import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
@@ -82,7 +82,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -238,7 +237,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
-                new IndexDiscoveryModule(),
+                new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
                 binder -> preflightCheckModules.forEach(binder::install));
     }
@@ -394,7 +393,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
-        result.add(new IndexDiscoveryModule());
+        result.add(new IndexerDiscoveryModule());
 
         return result;
     }
