@@ -146,7 +146,7 @@ class ContentPackEntitiesList extends React.Component {
       this.setState({ showConfigModalId: entityId });
     };
 
-    const showModal = (
+    const showModal = this.state.showConfigModalId && (
       <BootstrapModalWrapper showModal={entity.id === this.state.showConfigModalId}
                              onHide={closeShowModal}
                              bsSize="large"
