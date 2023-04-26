@@ -167,6 +167,7 @@ const SavedSearchesList = ({
                                activeSort={layoutConfig.sort}
                                pageSize={searchParams.pageSize}
                                onPageSizeChange={onPageSizeChange}
+                               actionsCellWidth={60}
                                rowActions={renderSavedSearchActions}
                                columnRenderers={customColumnRenderers}
                                columnDefinitions={attributes} />
