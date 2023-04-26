@@ -28,7 +28,6 @@ import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
-    private static final String CONNECT_SRC = "connect-src 'self' https://telemetry.graylog.cloud";
     private final GraylogApis api;
 
     public FiltersIT(GraylogApis api) {
@@ -37,7 +36,7 @@ public class FiltersIT {
 
     @ContainerMatrixTest
     void cspDocumentationBrowser() {
-        String expected = CSP.CSP_SWAGGER + CONNECT_SRC;
+        String expected = CSP.CSP_SWAGGER;
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -50,7 +49,7 @@ public class FiltersIT {
 
     @ContainerMatrixTest
     void cspWebInterfaceAssets() {
-        String expected = CSP.CSP_DEFAULT + CONNECT_SRC;
+        String expected = CSP.CSP_DEFAULT;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -64,7 +63,7 @@ public class FiltersIT {
 
     @ContainerMatrixTest
     void cspWebAppNotFound() {
-        String expected = CSP.CSP_DEFAULT + CONNECT_SRC;
+        String expected = CSP.CSP_DEFAULT;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
