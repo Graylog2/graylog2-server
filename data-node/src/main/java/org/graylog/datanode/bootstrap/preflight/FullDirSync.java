@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,21 +42,12 @@ public class FullDirSync {
 
         for (Path path : existingPaths) {
             LOG.info("Deleting obsolete file " + path);
-            if(Files.isDirectory(path)) {
-                deleteDirRecursively(path);
+            if (Files.isDirectory(path)) {
+                FileUtils.deleteDirectory(path.toFile());
+            } else {
+                Files.deleteIfExists(path);
             }
-            Files.deleteIfExists(path);
         }
-    }
-
-    private static Path deleteDirRecursively(Path path) throws IOException {
-        return Files.walkFileTree(path, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.deleteIfExists(file);
-                return FileVisitResult.CONTINUE;
-            }
-        });
     }
 
     private static List<Path> copyFiles(Path source, Path target) throws IOException {
