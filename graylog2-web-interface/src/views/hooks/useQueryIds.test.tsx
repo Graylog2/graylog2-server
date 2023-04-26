@@ -24,11 +24,13 @@ import View from 'views/logic/views/View';
 import useQueryIds from 'views/hooks/useQueryIds';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import ViewState from 'views/logic/views/ViewState';
 
 const createView = (queryIds: Array<string>) => View.builder()
   .search(Search.builder()
     .queries(Immutable.OrderedSet(queryIds.map((queryId) => Query.builder().id(queryId).build())))
     .build())
+  .state(Immutable.Map(queryIds.map((queryId) => [queryId, ViewState.create()])))
   .build();
 
 const Wrapper = ({ children, queryIds }: React.PropsWithChildren<{ queryIds: Array<string> }>) => (
