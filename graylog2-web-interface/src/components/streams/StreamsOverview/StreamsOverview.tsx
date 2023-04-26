@@ -140,7 +140,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    expandedSectionsRenderer={expandedSections}
                                    activeSort={layoutConfig.sort}
                                    rowActions={entityActions}
-                                   actionsCellWidth={165}
+                                   actionsCellWidth={160}
                                    columnRenderers={columnRenderers}
                                    columnDefinitions={columnDefinitions}
                                    entityAttributesAreCamelCase={false} />

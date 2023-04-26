@@ -125,7 +125,7 @@ const DashboardsOverview = () => {
                                onSortChange={onSortChange}
                                pageSize={layoutConfig.pageSize}
                                rowActions={renderDashboardActions}
-                               actionsCellWidth={165}
+                               actionsCellWidth={160}
                                visibleColumns={layoutConfig.displayedAttributes} />
       )}
     </PaginatedList>
