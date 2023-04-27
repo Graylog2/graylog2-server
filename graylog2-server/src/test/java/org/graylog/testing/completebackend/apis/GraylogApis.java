@@ -26,6 +26,8 @@ import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,8 @@ import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.not;
 
 public class GraylogApis {
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
+
     ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
     private final GraylogBackend backend;
     private final Users users;
@@ -198,16 +202,16 @@ public class GraylogApis {
                 .statusCode(expectedResult);
     }
 
-    public RestAssuredConfig withGraylogBackendFailureConfig() {
-        return this.withGraylogBackendFailureConfig(500);
-    }
-
     private boolean errorRunningIndexer(final String logs) {
         return logs.contains("Elasticsearch cluster not available")
                 || logs.contains("Elasticsearch cluster is unreachable or unhealthy");
     }
 
-    public RestAssuredConfig withGraylogBackendFailureConfig(int minError) {
+    public RestAssuredConfig withGraylogBackendFailureConfig() {
+        return this.withGraylogBackendFailureConfig(500);
+    }
+
+    public RestAssuredConfig withGraylogBackendFailureConfig(final int minError) {
         return RestAssured.config()
                 .objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
                         (type, s) -> OBJECT_MAPPER_PROVIDER.get()
@@ -215,14 +219,14 @@ public class GraylogApis {
                 .failureConfig(FailureConfig.failureConfig().with().failureListeners(
                         (reqSpec, respSpec, resp) -> {
                             if (resp.statusCode() >= minError) {
-                                final var backendLogs =this.backend.getLogs();
-                                System.out.println("------------------------ Output from graylog docker container start ------------------------");
-                                System.out.println(backendLogs);
-                                System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
+                                final var backendLogs = this.backend.getLogs();
+                                LOG.error("------------------------ Output from graylog docker container start ------------------------\n"
+                                        + backendLogs
+                                        + "\n------------------------ Output from graylog docker container ends  ------------------------");
                                 if(errorRunningIndexer(backendLogs)) {
-                                    System.out.println("------------------------ Output from indexer docker container start ------------------------");
-                                    System.out.println(this.backend.getSearchLogs());
-                                    System.out.println("------------------------ Output from indexer docker container ends  ------------------------");
+                                    LOG.error("------------------------ Output from indexer docker container start ------------------------\n"
+                                            + this.backend.getSearchLogs()
+                                            + "\n------------------------ Output from indexer docker container ends  ------------------------");
                                 }
                             }
                         })
