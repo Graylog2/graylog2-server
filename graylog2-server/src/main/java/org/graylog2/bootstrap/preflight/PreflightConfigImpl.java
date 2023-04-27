@@ -26,9 +26,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.graylog2.database.DbEntity.ALL_ALOWED;
+import static org.graylog2.database.DbEntity.ALL_ALLOWED;
 
-@DbEntity(collection = "preflight", titleField = "result", readPermission = ALL_ALOWED)
+@DbEntity(collection = "preflight", titleField = "result", readPermission = ALL_ALLOWED)
 public class PreflightConfigImpl extends PersistedImpl implements PreflightConfig {
 
     protected PreflightConfigImpl(@Nullable Map<String, Object> fields) {
