@@ -58,7 +58,7 @@ class ContentPackEntitiesList extends React.Component {
 
     this.state = {
       showApplyConfigModal: false,
-      showConfigModal: false,
+      showConfigModalId: undefined,
       filteredEntities: props.contentPack.entities || [],
       filter: undefined,
     };
@@ -139,15 +139,15 @@ class ContentPackEntitiesList extends React.Component {
     );
 
     const closeShowModal = () => {
-      this.setState({ showConfigModal: false });
+      this.setState({ showConfigModalId: undefined });
     };
 
-    const openShowModal = () => {
-      this.setState({ showConfigModal: true });
+    const openShowModal = (entityId) => {
+      this.setState({ showConfigModalId: entityId });
     };
 
-    const showModal = (
-      <BootstrapModalWrapper showModal={this.state.showConfigModal}
+    const showModal = this.state.showConfigModalId && (
+      <BootstrapModalWrapper showModal={entity.id === this.state.showConfigModalId}
                              onHide={closeShowModal}
                              bsSize="large"
                              data-app-section="content_pack_entity_list"
@@ -188,7 +188,7 @@ class ContentPackEntitiesList extends React.Component {
             </Button>
             )}
             <Button bsSize="xs"
-                    onClick={() => { openShowModal(); }}>
+                    onClick={() => { openShowModal(entity.id); }}>
               Show
             </Button>
           </ButtonToolbar>

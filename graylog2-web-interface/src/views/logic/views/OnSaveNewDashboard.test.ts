@@ -20,6 +20,7 @@ import UserNotification from 'util/UserNotification';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import type { HistoryFunction } from 'routing/useHistory';
+import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
@@ -65,6 +66,24 @@ describe('OnSaveNewDashboard', () => {
     await dispatch(OnSaveNewDashboard(view));
 
     expect(loadDashboard).toHaveBeenCalled();
+  });
+
+  it('sets dirty flag to false', async () => {
+    const view = View.create();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
+
+    await dispatch(OnSaveNewDashboard(view));
+
+    expect(dispatch).toHaveBeenCalledWith(setIsDirty(false));
+  });
+
+  it('sets new flag to false', async () => {
+    const view = View.create();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
+
+    await dispatch(OnSaveNewDashboard(view));
+
+    expect(dispatch).toHaveBeenCalledWith(setIsNew(false));
   });
 
   it('redirects to saved view', async () => {

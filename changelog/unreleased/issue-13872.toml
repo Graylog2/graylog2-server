@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix time-based rotation check when closed indices are present."
+
+issues = ["13872"]
+pulls = ["15326"]

@@ -1,0 +1,6 @@
+type = "added"
+message = "Updating login background and claim."
+
+issues = ["15215"]
+pulls = ["15295"]
+

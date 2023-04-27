@@ -209,3 +209,95 @@ export const modalDataResult = {
   searchWithinMs: 300000,
   streams: 'streamId-1-title, streamId-2-title',
 };
+
+export const urlConfigWithAgg = {
+  agg_field: 'action',
+  agg_function: 'count',
+  agg_value: 400,
+  group_by: [
+    'action',
+    'action',
+    'http_method',
+  ],
+  loc_query_parameters: [
+    {
+      binding: undefined,
+      data_type: 'any',
+      default_value: 'GET',
+      description: '',
+      key: 'lt',
+      lookup_table: 'http_method',
+      name: 'newParameter',
+      optional: false,
+      title: 'lt',
+      type: 'lut-parameter-v1',
+    },
+  ],
+  query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
+  search_within_ms: 300000,
+  streams: [
+    'streamId-1',
+    'streamId-2',
+  ],
+  type: 'aggregation-v1',
+};
+
+export const urlConfigWithFunctionAgg = {
+  agg_function: 'count',
+  agg_value: 400,
+  group_by: [
+    'action',
+    'action',
+    'http_method',
+  ],
+  loc_query_parameters: [
+    {
+      binding: undefined,
+      data_type: 'any',
+      default_value: 'GET',
+      description: '',
+      key: 'lt',
+      lookup_table: 'http_method',
+      name: 'newParameter',
+      optional: false,
+      title: 'lt',
+      type: 'lut-parameter-v1',
+    },
+  ],
+  query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
+  search_within_ms: 300000,
+  streams: [
+    'streamId-1',
+    'streamId-2',
+  ],
+  type: 'aggregation-v1',
+};
+
+export const urlConfigWithoutAgg = {
+  group_by: [],
+  loc_query_parameters: [
+    {
+      binding: undefined,
+      data_type: 'any',
+      default_value: 'GET',
+      description: '',
+      key: 'lt',
+      lookup_table: 'http_method',
+      name: 'newParameter',
+      optional: false,
+      title: 'lt',
+      type: 'lut-parameter-v1',
+    },
+  ],
+  query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
+  search_within_ms: 300000,
+  streams: [
+    'streamId-1',
+    'streamId-2',
+  ],
+  type: 'aggregation-v1',
+};
+
+export const urlConfigWithAggString = JSON.stringify(urlConfigWithAgg);
+export const urlConfigWithFunctionAggString = JSON.stringify(urlConfigWithFunctionAgg);
+export const urlConfigWithoutAggString = JSON.stringify(urlConfigWithoutAgg);

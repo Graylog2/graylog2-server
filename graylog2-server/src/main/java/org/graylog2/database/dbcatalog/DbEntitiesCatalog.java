@@ -55,4 +55,8 @@ public class DbEntitiesCatalog {
     public Optional<DbEntityCatalogEntry> getByCollectionName(final String collection) {
         return Optional.ofNullable(entitiesByCollectionName.get(collection));
     }
+
+    public int size() {
+        return entitiesByCollectionName.size();
+    }
 }
