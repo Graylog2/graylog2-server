@@ -102,7 +102,8 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
 
   const onContinueConfigurationClick = useCallback(() => {
     localStorage.setItem(sessionId, JSON.stringify(localStorageConfig));
-  }, [sessionId, localStorageConfig]);
+    onClose();
+  }, [sessionId, localStorageConfig, onClose]);
 
   return (
     <Modal onHide={onClose} show={show}>
