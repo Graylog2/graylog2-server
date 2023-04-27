@@ -202,6 +202,11 @@ public class GraylogApis {
         return this.withGraylogBackendFailureConfig(500);
     }
 
+    private boolean errorRunningIndexer(final String logs) {
+        return logs.contains("Elasticsearch cluster not available")
+                || logs.contains("Elasticsearch cluster is unreachable or unhealthy");
+    }
+
     public RestAssuredConfig withGraylogBackendFailureConfig(int minError) {
         return RestAssured.config()
                 .objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
@@ -213,9 +218,12 @@ public class GraylogApis {
                                 System.out.println("------------------------ Output from graylog docker container start ------------------------");
                                 System.out.println(this.backend.getLogs());
                                 System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
-                                System.out.println("------------------------ Output from indexer docker container start ------------------------");
-                                System.out.println(this.backend.getSearchLogs());
-                                System.out.println("------------------------ Output from indexer docker container ends  ------------------------");
+                                final var indexerLogs = this.backend.getSearchLogs();
+                                if(errorRunningIndexer(indexerLogs)) {
+                                    System.out.println("------------------------ Output from indexer docker container start ------------------------");
+                                    System.out.println(indexerLogs);
+                                    System.out.println("------------------------ Output from indexer docker container ends  ------------------------");
+                                }
                             }
                         })
                 );
