@@ -1,6 +1,6 @@
 type = "c"
 message = "Update Content Security Policy on the fly, when an authentication backend is created."
 
-issues = [""]
+issues = ["15371"]
 pulls = ["15305"]
 
