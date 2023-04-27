@@ -33,7 +33,6 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.security.encryption.EncryptedValue;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -102,11 +101,6 @@ public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendCo
         if (isBlank(userFullNameAttribute())) {
             result.addError(FIELD_USER_FULL_NAME_ATTRIBUTE, "User full name cannot be empty.");
         }
-    }
-
-    @Override
-    public Optional<List<String>> externalHTTPHosts() {
-        return Optional.empty();
     }
 
     @Override

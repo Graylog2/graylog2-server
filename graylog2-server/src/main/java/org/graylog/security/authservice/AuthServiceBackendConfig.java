@@ -48,7 +48,9 @@ public interface AuthServiceBackendConfig {
      *
      * @return list of host/port Strings
      */
-    Optional<List<String>> externalHTTPHosts();
+    default Optional<List<String>> externalHTTPHosts() {
+        return Optional.empty();
+    }
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
