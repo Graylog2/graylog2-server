@@ -162,6 +162,7 @@ const StreamActions = ({
                    bsSize="xsmall" />
       <OverlayDropdownButton title="More"
                              bsSize="xsmall"
+                             buttonTitle="More actions"
                              disabled={isNotEditable}
                              dropdownZIndex={1000}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
