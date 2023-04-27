@@ -47,6 +47,11 @@ const HeaderComponentsWrapper = styled.div(({ theme }) => css`
   .btn-link {
     color: ${theme.colors.variant.darker.default};
   }
+
+  .btn-toolbar {
+    display: flex;
+    max-height: 29px;
+  }
 `);
 
 const CollectorEntry = styled.div`

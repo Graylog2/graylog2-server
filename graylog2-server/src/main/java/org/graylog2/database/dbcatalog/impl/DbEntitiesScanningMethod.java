@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-declare module '*.css' {
-  interface CSSClasses { [key: string]: any }
-  const classes: CSSClasses;
-  export default classes;
-}
+package org.graylog2.database.dbcatalog.impl;
 
-declare module '*.jpg' {
-  export default string;
-}
-declare module '*.jpeg' {
-  export default string;
-}
-declare module '*.svg' {
-  export default string;
-}
+import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 
-declare module '*.png' {
-  export default string;
+public interface DbEntitiesScanningMethod {
+
+    DbEntitiesCatalog scan(final String[] packagesToScan,
+                           final String[] packagesToExclude,
+                           final ChainingClassLoader chainingClassLoader);
 }

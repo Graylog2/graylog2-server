@@ -35,7 +35,7 @@ import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 
 public class PreflightWebModule extends Graylog2Module {
 
-    public static final String FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED = "preflight_config";
+    public static final String FEATURE_FLAG_PREFLIGHT_WEB_ENABLED = "preflight_web";
 
     @Override
     protected void configure() {

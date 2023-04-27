@@ -87,7 +87,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
-import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED;
+import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_WEB_ENABLED;
 
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
@@ -156,7 +156,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
-        if(featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED)) {
+        if(featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
         }
 
