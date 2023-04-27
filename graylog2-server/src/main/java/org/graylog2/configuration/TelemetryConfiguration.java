@@ -72,7 +72,7 @@ public class TelemetryConfiguration {
         @Override
         public void validate(final String name, final Duration value) throws ValidationException {
             if (value != null && value.compareTo(Duration.ofMinutes(10)) < 0) {
-                throw new ValidationException("Parameter " + name + " should be at least 10 minute (found " + value + ")");
+                throw new ValidationException("Parameter " + name + " should be at least 10 minutes (found " + value + ")");
             }
         }
     }
