@@ -213,9 +213,9 @@ public class GraylogApis {
                                 System.out.println("------------------------ Output from graylog docker container start ------------------------");
                                 System.out.println(this.backend.getLogs());
                                 System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
-                                System.out.println("------------------------ Output from searchServer docker container start ------------------------");
+                                System.out.println("------------------------ Output from indexer docker container start ------------------------");
                                 System.out.println(this.backend.getSearchLogs());
-                                System.out.println("------------------------ Output from searchServer docker container ends  ------------------------");
+                                System.out.println("------------------------ Output from indexer docker container ends  ------------------------");
                             }
                         })
                 );
