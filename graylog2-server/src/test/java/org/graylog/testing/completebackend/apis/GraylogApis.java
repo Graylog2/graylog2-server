@@ -215,13 +215,13 @@ public class GraylogApis {
                 .failureConfig(FailureConfig.failureConfig().with().failureListeners(
                         (reqSpec, respSpec, resp) -> {
                             if (resp.statusCode() >= minError) {
+                                final var backendLogs =this.backend.getLogs();
                                 System.out.println("------------------------ Output from graylog docker container start ------------------------");
-                                System.out.println(this.backend.getLogs());
+                                System.out.println(backendLogs);
                                 System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
-                                final var indexerLogs = this.backend.getSearchLogs();
-                                if(errorRunningIndexer(indexerLogs)) {
+                                if(errorRunningIndexer(backendLogs)) {
                                     System.out.println("------------------------ Output from indexer docker container start ------------------------");
-                                    System.out.println(indexerLogs);
+                                    System.out.println(this.backend.getSearchLogs());
                                     System.out.println("------------------------ Output from indexer docker container ends  ------------------------");
                                 }
                             }
