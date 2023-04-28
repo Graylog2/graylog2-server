@@ -111,6 +111,11 @@ class NodesActions extends React.Component {
               <MenuItem>Get process-buffer dump</MenuItem>
             </LinkContainer>
           </IfPermitted>
+          <IfPermitted permissions="loggersmessages:read">
+            <LinkContainer to={Routes.SYSTEM.SYSTEMLOGS(node.node_id)}>
+              <MenuItem>Get recent system log messages</MenuItem>
+            </LinkContainer>
+          </IfPermitted>
         </DropdownButton>
       </ButtonToolbar>
     );

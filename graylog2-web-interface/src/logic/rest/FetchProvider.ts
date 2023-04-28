@@ -76,6 +76,21 @@ const defaultResponseHandler = (resp: Response) => {
   throw resp;
 };
 
+const streamingPlainTextResponseHandler = async (resp: {ok: boolean, body: ReadableStream<string>}) => {
+  if (resp.ok) {
+    reportServerSuccess();
+
+    const chunks: Array<any> = [];
+    // @ts-ignore
+    for await (const chunk of resp.body) {
+      chunks.push(chunk)
+    }
+    const buffer = Buffer.concat(chunks);
+    return buffer.toString("utf-8")
+  }
+  throw resp;
+};
+
 export class Builder {
   private options = {};
 
@@ -165,6 +180,16 @@ export class Builder {
     return this;
   }
 
+  streamingplaintext(body) {
+    this.body = { body, mimeType: 'text/plain' };
+    this.accept = 'text/plain';
+
+    this.responseHandler = streamingPlainTextResponseHandler;
+    this.errorHandler = (error: Response) => onServerError(error);
+
+    return this;
+  }
+
   ignoreUnauthorized() {
     this.errorHandler = (error: Response) => onServerError(error, () => {});
 
@@ -229,6 +254,14 @@ export default function fetch<T = any>(method: Method, url: string, body?: any, 
 export function fetchPlainText(method, url, body) {
   const promise = () => new Builder(method, url)
     .plaintext(body)
+    .build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchStreamingPlainText(method, url, body) {
+  const promise = () => new Builder(method, url)
+    .streamingplaintext(body)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
