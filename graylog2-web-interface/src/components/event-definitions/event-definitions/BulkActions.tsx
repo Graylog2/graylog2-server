@@ -127,6 +127,7 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
 
   const handleConfirm = () => {
     onAction();
+    setShowDialog(false);
   };
 
   return (
