@@ -55,6 +55,7 @@ public class V20180323150000_AddSidecarUser extends Migration {
                 ImmutableSet.of(
                         SidecarRestPermissions.COLLECTORS_READ,
                         SidecarRestPermissions.CONFIGURATIONS_READ,
+                        SidecarRestPermissions.SIDECARS_READ,
                         SidecarRestPermissions.SIDECARS_UPDATE));
 
         helpers.ensureUser(
