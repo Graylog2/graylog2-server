@@ -41,10 +41,11 @@ public class GelfOutputTest {
         final GelfMessage gelfMessage = new GelfMessage("Test");
         final GelfOutput gelfOutput = Mockito.spy(new GelfOutput(transport));
         doReturn(gelfMessage).when(gelfOutput).toGELFMessage(message);
+        when(transport.trySend(gelfMessage)).thenReturn(true);
 
         gelfOutput.write(message);
 
-        verify(transport).send(eq(gelfMessage));
+        verify(transport).trySend(eq(gelfMessage));
     }
 
     @Test

@@ -47,6 +47,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -181,7 +182,13 @@ public class GelfOutput implements MessageOutput {
 
     @Override
     public void write(final Message message) throws Exception {
-        transport.send(toGELFMessage(message));
+        // Use #trySend instead of #send on the transport, so we don't block and can handle the shutdown of the output.
+        while (isRunning() && !transport.trySend(toGELFMessage(message))) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Couldn't send message to GELF transport. Waiting 100 ms before trying again.");
+            }
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
     }
 
     @Override
