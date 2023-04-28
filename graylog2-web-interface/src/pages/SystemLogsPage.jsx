@@ -30,6 +30,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
 }
+
 const DEFAULT_LIMIT = 5000;
 
 const SystemLogsPage = createReactClass({
