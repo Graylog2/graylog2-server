@@ -20,7 +20,11 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 export const UnlicensedText = () => (
   <>
-    Only paid licenses allow you to use graylog enterprise support. You may still use this file in other ways.
+    <strong>Please examine the bundle content before sharing it.
+      It might contain sensitive data like IP addresses, hostnames or even passwords!
+    </strong><br />
+    Only paid license users are entitled to use Graylog enterprise support.
+    You may however use this file for other means of debugging.
   </>
 );
 
@@ -32,11 +36,7 @@ const ClusterSupportBundleInfo = () => {
     <p className="description">
       Create a zip file which contains useful debugging information from your Graylog cluster.<br />
       Graylog Enterprise customers can attach bundles to their support ticket, which will help the Graylog technical
-      support team
-      with analyzing and diagnosing issues.<br />
-      <strong>Please examine the bundle before sending it to Graylog.
-        It might contain sensitive data like IP addresses, hostnames or even passwords!
-      </strong>
+      support team with analyzing and diagnosing issues.<br />
       <br />
       {InfoComponent && (<InfoComponent />)}
     </p>
