@@ -20,12 +20,14 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
+import { Row, Col, Button } from 'components/bootstrap';
+import { DocumentTitle, Icon, PageHeader, Spinner, Timestamp } from 'components/common';
 import withParams from 'routing/withParams';
+import withHistory from 'routing/withHistory';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import Routes from 'routing/Routes';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
@@ -40,12 +42,24 @@ const SystemLogsPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     params: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
 
   componentDidMount() {
+    this.fetchLogs();
+  },
+
+  fetchLogs() {
+    this.setState({ isReloadingResults: true });
     ClusterOverviewStore.systemLogs(this.props.params.nodeId, DEFAULT_LIMIT).then((sysLogs) => this.setState({ sysLogs: sysLogs, taken: new Date() }));
+    this.setState({ isReloadingResults: false });
+  },
+
+  cancel() {
+    const { history } = this.props;
+    history.push(Routes.SYSTEM.NODES.LIST);
   },
 
   _isLoading() {
@@ -65,6 +79,23 @@ const SystemLogsPage = createReactClass({
       </span>
     );
 
+    const control = (
+      <Col md={1}>
+        <small>Reload&nbsp;</small>
+        <Button onClick={this.fetchLogs} disabled={this.state.isReloadingResults}>
+          <Icon name="sync" spin={this.state.isReloadingResults} />
+        </Button>
+      </Col>
+    );
+
+    const backButton = (
+      <Col md={1}>
+        <Button onClick={this.cancel}>
+          Back
+        </Button>
+      </Col>
+    );
+
     const sysLogs = this.state.sysLogs ? <pre className="threaddump">{this.state.sysLogs}</pre> : <Spinner />;
 
     return (
@@ -72,9 +103,15 @@ const SystemLogsPage = createReactClass({
         <div>
           <PageHeader title={title} />
           <Row className="content">
+            {control} {backButton}
+          </Row>
+          <Row className="content">
             <Col md={12}>
               {sysLogs}
             </Col>
+          </Row>
+          <Row className="content">
+            {control}
           </Row>
         </div>
       </DocumentTitle>
@@ -82,4 +119,4 @@ const SystemLogsPage = createReactClass({
   },
 });
 
-export default withParams(SystemLogsPage);
+export default withHistory(withParams(SystemLogsPage));
