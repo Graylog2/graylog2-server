@@ -21,6 +21,7 @@ import { Spinner, ConfirmDialog, NoSearchResult } from 'components/common';
 import { Col, Row, Table, Button } from 'components/bootstrap';
 import type { BundleFile } from 'hooks/useClusterSupportBundle';
 import useClusterSupportBundle from 'hooks/useClusterSupportBundle';
+import ClusterSupportBundleInfo from 'components/loggers/ClusterSupportBundleInfo';
 
 const Header = styled.div`
   display: flex;
@@ -51,7 +52,7 @@ const LoadingSpinner = styled(Spinner)(({ theme }) => `
 
 const ClusterSupportBundleOverview = () => {
   const { list, isCreating, onCreate, onDelete, onDownload } = useClusterSupportBundle();
-  const [bundleNameToDelete, setBundleNameToDelete] = useState<string|null>(null);
+  const [bundleNameToDelete, setBundleNameToDelete] = useState<string | null>(null);
 
   const renderRow = (bundle: BundleFile) => (
     <tr key={bundle.file_name}>
@@ -62,8 +63,14 @@ const ClusterSupportBundleOverview = () => {
         {bundle.size}
       </AlignRightCell>
       <AlignRightCell>
-        <DownloadButton bsSize="xsmall" bsStyle="info" onClick={() => onDownload(bundle.file_name)}>Download</DownloadButton>
-        <Button bsSize="xsmall" bsStyle="default" onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete</Button>
+        <DownloadButton bsSize="xsmall"
+                        bsStyle="info"
+                        onClick={() => onDownload(bundle.file_name)}>Download
+        </DownloadButton>
+        <Button bsSize="xsmall"
+                bsStyle="default"
+                onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete
+        </Button>
       </AlignRightCell>
     </tr>
   );
@@ -79,14 +86,7 @@ const ClusterSupportBundleOverview = () => {
               {isCreating && <LoadingSpinner text="" delay={0} />}
             </Button>
           </Header>
-          <p className="description">
-            Create a zip file which contains useful debugging information from your Graylog cluster.<br />
-            Graylog Enterprise customers can attach bundles to their support ticket, which will help the Graylog technical support team
-            with analyzing and diagnosing issues.<br />
-            <strong>Please examine the bundle before sending it to Graylog.
-              It might contain sensitive data like IP addresses, hostnames or even passwords!
-            </strong>
-          </p>
+          <ClusterSupportBundleInfo />
           {(list.length > 0) ? (
             <Table className="table-striped table-condensed table-hover">
               <colgroup>
