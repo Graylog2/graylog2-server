@@ -52,21 +52,26 @@ exports[`<Pagination /> should display Pagination 1`] = `
   data-testid="graylog-pagination"
 >
   <li
-    aria-label="First"
+    aria-label="Open first page"
     class="disabled"
+    title="Open first page"
   >
     <span />
   </li>
   <li
-    aria-label="Prev"
+    aria-label="Open previous page"
     class="disabled"
+    title="Open previous page"
   >
     <span />
   </li>
   <li
     class="active"
   >
-    <span>
+    <span
+      aria-label="Active page"
+      title="Active page"
+    >
       1
       <span
         class="sr-only"
@@ -79,8 +84,10 @@ exports[`<Pagination /> should display Pagination 1`] = `
     class=""
   >
     <a
+      aria-label="Open page 2"
       href="#"
       role="button"
+      title="Open page 2"
     >
       2
     </a>
@@ -89,8 +96,10 @@ exports[`<Pagination /> should display Pagination 1`] = `
     class=""
   >
     <a
+      aria-label="Open page 3"
       href="#"
       role="button"
+      title="Open page 3"
     >
       3
     </a>
@@ -99,8 +108,10 @@ exports[`<Pagination /> should display Pagination 1`] = `
     class=""
   >
     <a
+      aria-label="Open page 4"
       href="#"
       role="button"
+      title="Open page 4"
     >
       4
     </a>
@@ -109,15 +120,18 @@ exports[`<Pagination /> should display Pagination 1`] = `
     class=""
   >
     <a
+      aria-label="Open page 5"
       href="#"
       role="button"
+      title="Open page 5"
     >
       5
     </a>
   </li>
   <li
-    aria-label="Next"
+    aria-label="Open next page"
     class=""
+    title="Open next page"
   >
     <a
       href="#"
@@ -125,8 +139,9 @@ exports[`<Pagination /> should display Pagination 1`] = `
     />
   </li>
   <li
-    aria-label="Last"
+    aria-label="Open last page"
     class=""
+    title="Open last page"
   >
     <a
       href="#"

@@ -47,7 +47,7 @@ describe('<Pagination />', () => {
                                                   totalPages={totalPages}
                                                   onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('Next'));
+    fireEvent.click(getByLabelText('Open next page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage + 1);
   });
@@ -60,7 +60,7 @@ describe('<Pagination />', () => {
                                                   totalPages={totalPages}
                                                   onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('Prev'));
+    fireEvent.click(getByLabelText('Open previous page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage - 1);
   });
@@ -73,7 +73,7 @@ describe('<Pagination />', () => {
                                                   totalPages={totalPages}
                                                   onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('Last'));
+    fireEvent.click(getByLabelText('Open last page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(totalPages);
   });
@@ -86,7 +86,7 @@ describe('<Pagination />', () => {
                                                   totalPages={totalPages}
                                                   onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('First'));
+    fireEvent.click(getByLabelText('Open first page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(1);
   });
