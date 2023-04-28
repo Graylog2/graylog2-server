@@ -187,7 +187,7 @@ public class GelfOutput implements MessageOutput {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Couldn't send message to GELF transport. Waiting 100 ms before trying again.");
             }
-            TimeUnit.MILLISECONDS.sleep(100);
+            TimeUnit.MICROSECONDS.sleep(100);
         }
     }
 
