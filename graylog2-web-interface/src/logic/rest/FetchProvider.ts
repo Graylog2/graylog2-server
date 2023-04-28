@@ -81,13 +81,18 @@ const streamingPlainTextResponseHandler = async (resp: {ok: boolean, body: Reada
     reportServerSuccess();
 
     const chunks: Array<any> = [];
+
     // @ts-ignore
+    // eslint-disable-next-line no-restricted-syntax
     for await (const chunk of resp.body) {
-      chunks.push(chunk)
+      chunks.push(chunk);
     }
+
     const buffer = Buffer.concat(chunks);
-    return buffer.toString("utf-8")
+
+    return buffer.toString('utf-8');
   }
+
   throw resp;
 };
 
