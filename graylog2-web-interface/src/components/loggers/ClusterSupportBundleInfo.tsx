@@ -19,9 +19,9 @@ import * as React from 'react';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 export const UnlicensedText = () => (
-  <p>
+  <>
     Only paid licenses allow you to use graylog enterprise support. You may still use this file in other ways.
-  </p>
+  </>
 );
 
 const ClusterSupportBundleInfo = () => {
@@ -37,6 +37,7 @@ const ClusterSupportBundleInfo = () => {
       <strong>Please examine the bundle before sending it to Graylog.
         It might contain sensitive data like IP addresses, hostnames or even passwords!
       </strong>
+      <br />
       {InfoComponent && (<InfoComponent />)}
     </p>
   );
