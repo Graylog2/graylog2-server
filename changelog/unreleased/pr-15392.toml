@@ -1,6 +1,0 @@
-type = "fixed"
-message = "Fix potential incorrect CIDR lookups in CSV data adapters by matching longest CIDR prefix."
-
-issues = ["Graylog2/graylog-plugin-enterprise#5035"]
-pulls = ["15392"]
-
