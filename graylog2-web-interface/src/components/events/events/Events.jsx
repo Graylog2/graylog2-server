@@ -254,24 +254,24 @@ class Events extends React.Component {
                            onAlertFilterChange={onAlertFilterChange}
                            onTimeRangeChange={onTimeRangeChange}
                            onSearchReload={onSearchReload} />
-          <EventListContainer>
-            <PaginatedList totalItems={totalEvents}
-                           onChange={onPageChange}
-                           pageSizes={PAGE_SIZES}>
-              {eventList.length === 0 ? (
-                emptyListComponent
-              ) : (
-                <EventsTable id="events-table">
-                  <thead>
-                    <tr>
-                      {HEADERS.map((header) => <th key={header}>{header}</th>)}
-                    </tr>
-                  </thead>
-                  {eventList.map(this.renderEvent)}
-                </EventsTable>
-              )}
-            </PaginatedList>
-          </EventListContainer>
+          {eventList.length === 0 ? (
+            emptyListComponent
+          ) : (
+            <EventListContainer>
+              <PaginatedList totalItems={totalEvents}
+                             onChange={onPageChange}
+                             pageSizes={PAGE_SIZES}>
+                  <EventsTable id="events-table">
+                    <thead>
+                      <tr>
+                        {HEADERS.map((header) => <th key={header}>{header}</th>)}
+                      </tr>
+                    </thead>
+                    {eventList.map(this.renderEvent)}
+                  </EventsTable>
+              </PaginatedList>
+            </EventListContainer>
+          )}
         </Col>
       </Row>
     );
