@@ -106,7 +106,7 @@ public class SystemJobManagerTest {
         final boolean terminatedSuccessfully = executorService.awaitTermination(5, TimeUnit.SECONDS);
         Assertions.assertThat(terminatedSuccessfully).isTrue();
 
-        // now futures are either a job ID or null if the execution failed due to
+        // now futures are either an optional with job ID or empty optional if the execution failed due to a  SystemJobConcurrencyException
         Assertions.assertThat(futures)
                 .extracting(Future::get)
                 .filteredOn(Optional::isEmpty)
