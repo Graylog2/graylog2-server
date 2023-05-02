@@ -1,0 +1,11 @@
+---
+##
+ # Copyright OpenSearch Contributors
+ # SPDX-License-Identifier: Apache-2.0
+##
+
+# configuration file for the reports scheduler plugin
+opensearch.reports:
+  general:
+    operationTimeoutMs: 60000 # 60 seconds, Minimum 100ms
+    defaultItemsQueryCount: 100 # default number of items to query

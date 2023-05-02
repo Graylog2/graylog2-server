@@ -1,0 +1,85 @@
+_meta:
+  type: "audit"
+  config_version: 2
+
+config:
+  # enable/disable audit logging
+  enabled: true
+
+  audit:
+    # Enable/disable REST API auditing
+    enable_rest: true
+
+    # Categories to exclude from REST API auditing
+    disabled_rest_categories:
+      - AUTHENTICATED
+      - GRANTED_PRIVILEGES
+
+    # Enable/disable Transport API auditing
+    enable_transport: true
+
+    # Categories to exclude from Transport API auditing
+    disabled_transport_categories:
+      - AUTHENTICATED
+      - GRANTED_PRIVILEGES
+
+    # Users to be excluded from auditing. Wildcard patterns are supported. Eg:
+    # ignore_users: ["test-user", "employee-*"]
+    ignore_users:
+      - kibanaserver
+
+    # Requests to be excluded from auditing. Wildcard patterns are supported. Eg:
+    # ignore_requests: ["indices:data/read/*", "SearchRequest"]
+    ignore_requests: []
+
+    # Log individual operations in a bulk request
+    resolve_bulk_requests: false
+
+    # Include the body of the request (if available) for both REST and the transport layer
+    log_request_body: true
+
+    # Logs all indices affected by a request. Resolves aliases and wildcards/date patterns
+    resolve_indices: true
+
+    # Exclude sensitive headers from being included in the logs. Eg: Authorization
+    exclude_sensitive_headers: true
+
+  compliance:
+    # enable/disable compliance
+    enabled: true
+
+    # Log updates to internal security changes
+    internal_config: true
+
+    # Log external config files for the node
+    external_config: false
+
+    # Log only metadata of the document for read events
+    read_metadata_only: true
+
+    # Map of indexes and fields to monitor for read events. Wildcard patterns are supported for both index names and fields. Eg:
+    # read_watched_fields: {
+    #   "twitter": ["message"]
+    #   "logs-*": ["id", "attr*"]
+    # }
+    read_watched_fields: {}
+
+    # List of users to ignore for read events. Wildcard patterns are supported. Eg:
+    # read_ignore_users: ["test-user", "employee-*"]
+    read_ignore_users:
+      - kibanaserver
+
+    # Log only metadata of the document for write events
+    write_metadata_only: true
+
+    # Log only diffs for document updates
+    write_log_diffs: false
+
+    # List of indices to watch for write events. Wildcard patterns are supported
+    # write_watched_indices: ["twitter", "logs-*"]
+    write_watched_indices: []
+
+    # List of users to ignore for write events. Wildcard patterns are supported. Eg:
+    # write_ignore_users: ["test-user", "employee-*"]
+    write_ignore_users:
+      - kibanaserver
