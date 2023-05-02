@@ -18,8 +18,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Title = styled.h3(({ theme }) => css`
-  height: 30px;
-
   a {
     color: ${theme.colors.global.textDefault};
   }

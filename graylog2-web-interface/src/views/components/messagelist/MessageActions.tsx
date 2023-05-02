@@ -66,7 +66,7 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
 
 const MessageActions = ({ index, id, fields, decorationStats, disabled, disableSurroundingSearch, disableTestAgainstStream, showOriginal, toggleShowOriginal, streams, searchConfig }: Props) => {
   if (disabled) {
-    return <ButtonGroup className="pull-right" bsSize="small" />;
+    return <ButtonGroup bsSize="small" />;
   }
 
   const messageUrl = index ? Routes.message_show(index, id) : '#';
@@ -83,7 +83,7 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
   const showChanges = decorationStats && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
 
   return (
-    <ButtonGroup className="pull-right" bsSize="small">
+    <ButtonGroup bsSize="small">
       {showChanges}
       <Button href={messageUrl}>Permalink</Button>
 
