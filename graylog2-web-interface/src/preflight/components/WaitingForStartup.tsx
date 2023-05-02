@@ -19,31 +19,14 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useEffect } from 'react';
 import { Space } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 
 import Spinner from 'components/common/Spinner';
 import { Section } from 'preflight/components/common';
-import { Builder } from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import useServerAvailability from 'preflight/hooks/useServerAvailability';
 
 const P = styled.p`
   max-width: 700px;
 `;
-
-const fetchServerAvailability = () => {
-  return new Builder('GET', qualifyUrl('/api'))
-    .json()
-    .setHeader('X-Graylog-No-Session-Extension', 'true')
-    .build();
-};
-
-const useServerAvailability = () => {
-  const { data } = useQuery(['server-availability'], fetchServerAvailability, {
-    refetchInterval: 2000,
-  });
-
-  return { data: !!data };
-};
 
 const WaitingForStartup = () => {
   const { data: serverIsAvailable } = useServerAvailability();
