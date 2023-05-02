@@ -49,7 +49,6 @@ const SystemOverviewPage = () => {
         <IfPermitted permissions="indices:failures">
           <IndexerSystemOverviewComponent />
         </IfPermitted>
-        
         <TimesList />
 
         <IfPermitted permissions="systemmessages:read">
