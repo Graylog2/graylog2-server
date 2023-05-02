@@ -17,13 +17,18 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
+import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.Map;
 
 public class TelemetryConfiguration {
 
     public static final String TELEMETRY_ENABLED = "telemetry_enabled";
+    public static final String TELEMETRY_CLUSTER_INFO_TTL = "telemetry_cluster_info_ttl";
 
     @Parameter(value = "telemetry_api_key", required = true)
     private String telemetryApiKey = "phc_fmJsCXBb0sqPpUCAJ51C0sT933i8LHUT6Zqm4oCGuK7";
@@ -33,6 +38,9 @@ public class TelemetryConfiguration {
 
     @Parameter(value = TELEMETRY_ENABLED)
     private boolean telemetryEnabled = true;
+
+    @Parameter(value = "telemetry_cluster_info_ttl", converter = JavaDurationConverter.class, validators = Minimum10MinuteValidator.class)
+    private Duration telemetryClusterInfoTtl = Duration.ofMinutes(10);
 
 
     @Nullable
@@ -48,11 +56,24 @@ public class TelemetryConfiguration {
         return telemetryEnabled;
     }
 
-    public Map<String, ?> toMap() {
+    public Duration getTelemetryClusterInfoTtl() {
+        return telemetryClusterInfoTtl;
+    }
+
+    public Map<String, ?> telemetryFrontendSettings() {
         return Map.of(
                 "api_key", getTelemetryApiKey() != null ? getTelemetryApiKey() : "",
                 "host", getTelemetryApiHost(),
                 "enabled", isTelemetryEnabled()
         );
+    }
+
+    public static class Minimum10MinuteValidator implements Validator<Duration> {
+        @Override
+        public void validate(final String name, final Duration value) throws ValidationException {
+            if (value != null && value.compareTo(Duration.ofMinutes(10)) < 0) {
+                throw new ValidationException("Parameter " + name + " should be at least 10 minutes (found " + value + ")");
+            }
+        }
     }
 }
