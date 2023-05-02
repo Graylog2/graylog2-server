@@ -29,7 +29,7 @@ export const UnlicensedText = () => (
 );
 
 const ClusterSupportBundleInfo = () => {
-  const pluginLogger = usePluginEntities('logger');
+  const pluginLogger = usePluginEntities('supportBundle');
   const InfoComponent = pluginLogger[0]?.EnterpriseSupportBundleInfo || UnlicensedText;
 
   return (

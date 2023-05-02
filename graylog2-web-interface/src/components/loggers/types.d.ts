@@ -20,6 +20,6 @@ interface LoggerPlugin {
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
-    logger?: LoggerPlugin;
+    supportBundle?: LoggerPlugin;
   }
 }
