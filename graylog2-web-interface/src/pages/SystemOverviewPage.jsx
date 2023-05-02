@@ -44,12 +44,12 @@ const SystemOverviewPage = () => {
 
         <HideOnCloud>
           <IndexerClusterHealth />
-
-          <IfPermitted permissions="indices:failures">
-            <IndexerSystemOverviewComponent />
-          </IfPermitted>
         </HideOnCloud>
 
+        <IfPermitted permissions="indices:failures">
+          <IndexerSystemOverviewComponent />
+        </IfPermitted>
+        
         <TimesList />
 
         <IfPermitted permissions="systemmessages:read">
