@@ -84,10 +84,14 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
     if (isEmpty) return null;
     const { BadgeComponent } = pluginRoute;
 
+    const renderBadge = pluginRoute.children.some((child) => {
+      return isPermitted(currentUserPermissions, child.permissions) && child?.BadgeComponent;
+    });
+
     return (
       <NavDropdown key={title}
                    title={title}
-                   badge={BadgeComponent}
+                   badge={renderBadge ? BadgeComponent : null}
                    id="enterprise-dropdown"
                    inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
