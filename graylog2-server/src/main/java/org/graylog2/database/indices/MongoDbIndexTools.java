@@ -18,12 +18,21 @@ package org.graylog2.database.indices;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.mongojack.JacksonDBCollection;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class MongoDbIndexTools {
 
@@ -36,6 +45,25 @@ public class MongoDbIndexTools {
 
     public MongoDbIndexTools(final JacksonDBCollection<?, ObjectId> db) {
         this.db = db;
+    }
+
+    // MongoDB Indexes cannot be altered once created.
+    public static void ensureTTLIndex(MongoCollection<Document> collection, Duration ttl, String fieldUpdatedAt) {
+        final IndexOptions indexOptions = new IndexOptions().expireAfter(ttl.getSeconds(), TimeUnit.SECONDS);
+        final Bson updatedAtKey = Indexes.ascending(fieldUpdatedAt);
+        for (Document document : collection.listIndexes()) {
+            final Set<String> keySet = document.get("key", Document.class).keySet();
+            if (keySet.contains(fieldUpdatedAt)) {
+                // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
+                final long expireAfterSeconds = document.get("expireAfterSeconds", Number.class).longValue();
+                if (Objects.equals(expireAfterSeconds, indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
+                    return;
+                }
+                collection.dropIndex(updatedAtKey);
+            }
+        }
+        // not found or dropped, creating new index
+        collection.createIndex(updatedAtKey, indexOptions);
     }
 
     /**

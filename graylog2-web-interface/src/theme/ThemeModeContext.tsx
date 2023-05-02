@@ -14,22 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-declare module '*.css' {
-  interface CSSClasses { [key: string]: any }
-  const classes: CSSClasses;
-  export default classes;
-}
+import * as React from 'react';
 
-declare module '*.jpg' {
-  export default string;
-}
-declare module '*.jpeg' {
-  export default string;
-}
-declare module '*.svg' {
-  export default string;
-}
+import { singleton } from 'logic/singleton';
 
-declare module '*.png' {
-  export default string;
-}
+const ThemeModeContext = React.createContext<{} | undefined>(undefined);
+
+export default singleton('contexts.ThemeModeContext', () => ThemeModeContext);
