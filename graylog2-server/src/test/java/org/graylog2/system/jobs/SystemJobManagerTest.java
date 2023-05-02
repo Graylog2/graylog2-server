@@ -17,6 +17,7 @@
 package org.graylog2.system.jobs;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.assertj.core.api.Assertions;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
@@ -86,7 +87,7 @@ public class SystemJobManagerTest {
     public void testSubmitThrowsExceptionIfMaxConcurrencyLevelReached() throws Exception {
         SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
-        final ExecutorService executorService = Executors.newFixedThreadPool(3);
+        final ExecutorService executorService = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("job-trigger-%d").build());
 
         LongRunningJob job1 = new LongRunningJob(3);
         LongRunningJob job2 = new LongRunningJob(3);
