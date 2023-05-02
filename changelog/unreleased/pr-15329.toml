@@ -1,0 +1,6 @@
+type = "f"
+message = "Let cookie auth take precedence over basic auth. "
+
+issues = ["6831"]
+pulls = ["15329"]
+
