@@ -18,24 +18,35 @@ package org.graylog2.system.jobs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.Uninterruptibles;
+import org.assertj.core.api.Assertions;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class SystemJobManagerTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
     private SystemMessageActivityWriter systemMessageActivityWriter;
+
+    @BeforeEach
+    void setUp() {
+        systemMessageActivityWriter = Mockito.mock(SystemMessageActivityWriter.class);
+    }
 
     @Test
     public void testGetRunningJobs() throws Exception {
@@ -71,9 +82,11 @@ public class SystemJobManagerTest {
         assertEquals(2, manager.concurrentJobs(job1.getClass()));
     }
 
-    @Test
+    @RepeatedTest(100)
     public void testSubmitThrowsExceptionIfMaxConcurrencyLevelReached() throws Exception {
         SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
+
+        final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
         LongRunningJob job1 = new LongRunningJob(3);
         LongRunningJob job2 = new LongRunningJob(3);
@@ -83,21 +96,37 @@ public class SystemJobManagerTest {
         job1.setMaxConcurrency(1);
         job2.setMaxConcurrency(1);
 
-        manager.submit(job1);
+        final List<Callable<Optional<String>>> tasks = Arrays.asList(
+                wrapJobCatchException(manager, job1),
+                wrapJobCatchException(manager, job2)
+        );
 
-        boolean exceptionThrown = false;
-        try {
-            manager.submit(job2);
-        } catch (SystemJobConcurrencyException e) {
-            exceptionThrown = true;
-        }
+        final List<Future<Optional<String>>> futures = executorService.invokeAll(tasks);
+        executorService.shutdown();
+        final boolean terminatedSuccessfully = executorService.awaitTermination(5, TimeUnit.SECONDS);
+        Assertions.assertThat(terminatedSuccessfully).isTrue();
 
-        assertTrue(exceptionThrown);
+        // now futures are either a job ID or null if the execution failed due to
+        Assertions.assertThat(futures)
+                .extracting(Future::get)
+                .filteredOn(Optional::isEmpty)
+                .hasSize(1);
 
         manager.submit(job3);
 
         assertEquals(2, manager.getRunningJobs().size());
         assertEquals(1, manager.concurrentJobs(job1.getClass()));
+    }
+
+    @NotNull
+    private static Callable<Optional<String>> wrapJobCatchException(SystemJobManager manager, LongRunningJob job1) {
+        return () -> {
+            try {
+                return Optional.of(manager.submit(job1));
+            } catch (SystemJobConcurrencyException e) {
+                return Optional.empty();
+            }
+        };
     }
 
     private static class LongRunningJob extends SystemJob {
