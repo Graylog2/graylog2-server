@@ -23,9 +23,9 @@ import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import { adminUser } from 'fixtures/users';
-import useCurrentUser from 'hooks/useCurrentUser';
 
 import SavedSearchList from './SavedSearchList';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 const createPaginatedSearches = (count = 1) => {
   const views: Array<View> = [];
@@ -63,13 +63,7 @@ jest.mock('views/stores/SavedSearchesStore', () => ({
   },
 }));
 
-jest.mock('hooks/useCurrentUser');
-
 describe('SavedSearchList', () => {
-  beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
-  });
-
   describe('render the SavedSearchList', () => {
     it('should render empty', async () => {
       const views = createPaginatedSearches(0);
@@ -117,9 +111,13 @@ describe('SavedSearchList', () => {
       asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
       const onDelete = jest.fn(() => Promise.resolve(views[0]));
 
-      render(<SavedSearchList toggleModal={() => {}}
-                              deleteSavedSearch={onDelete}
-                              activeSavedSearchId="search-id-0" />);
+      render(
+        <CurrentUserContext.Provider value={adminUser}>
+          <SavedSearchList toggleModal={() => {}}
+                           deleteSavedSearch={onDelete}
+                           activeSavedSearchId="search-id-0" />
+        </CurrentUserContext.Provider>
+      );
 
       await screen.findByText('search-title-0');
       const deleteBtn = screen.getByTitle('Delete search search-title-0');
@@ -156,11 +154,13 @@ describe('SavedSearchList', () => {
     const views = createPaginatedSearches(1);
     asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
     const currentUser = adminUser.toBuilder().permissions(Immutable.List(['view:read:search-id-0}'])).build();
-    asMock(useCurrentUser).mockReturnValue(currentUser);
 
-    render(<SavedSearchList toggleModal={() => {}}
-                            deleteSavedSearch={jest.fn()}
-                            activeSavedSearchId="search-id-0" />);
+    render(
+      <CurrentUserContext.Provider value={currentUser}>
+        <SavedSearchList toggleModal={() => {}}
+                         deleteSavedSearch={jest.fn()}
+                         activeSavedSearchId="search-id-0" />
+      </CurrentUserContext.Provider>);
 
     await screen.findByText('search-title-0');
 
