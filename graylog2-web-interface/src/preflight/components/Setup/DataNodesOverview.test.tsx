@@ -18,7 +18,6 @@ import * as React from 'react';
 import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import fetch from 'logic/rest/FetchProvider';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
