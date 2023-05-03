@@ -169,6 +169,7 @@
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.7</zookeeper.version>
+        <zstd.version>1.5.4-1</zstd.version>
         <cron-utils.version>9.1.6</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <commons-net.version>3.6</commons-net.version>
