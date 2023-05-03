@@ -19,6 +19,7 @@ package org.graylog.datanode.management;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
+import org.graylog.datanode.ProcessProvidingExecutor;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessInfo;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -155,7 +157,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         final Path executable = configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
         final List<String> arguments = configuration.asMap().entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
-        commandLineProcess = new CommandLineProcess(executable, arguments, this);
+        commandLineProcess = new CommandLineProcess(executable, arguments, this, configuration.getEnv());
         commandLineProcess.start();
     }
 

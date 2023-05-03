@@ -78,12 +78,6 @@ public class DatanodeContainerizedBackend {
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
 
-                //datanode_transport_certificate=datanode-transport-certificates.p12
-                //datanode_transport_certificate_password=password
-
-                //datanode_http_certificate=datanode-http-certificates.p12
-                //datanode_http_certificate_password=password
-
                 .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
                 .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", "this_is_not_used_but_required")

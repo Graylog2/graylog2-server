@@ -26,9 +26,10 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.traffic.TrafficCounterService;
-import org.graylog2.telemetry.db.DBTelemetryUserSettingsService;
-import org.graylog2.telemetry.db.TelemetryUserSettingsDto;
+import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
+import org.graylog2.telemetry.user.db.TelemetryUserSettingsDto;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,8 @@ public class TelemetryServiceTest {
     @Mock
     DBTelemetryUserSettingsService dbTelemetryUserSettingsService;
     @Mock
+    DBTelemetryClusterInfo dbTelemetryClusterInfo;
+    @Mock
     EventBus eventBus;
     @Mock
     User user;
@@ -85,7 +88,7 @@ public class TelemetryServiceTest {
         TelemetryService telemetryService = createTelemetryService(false);
         mockUserTelemetryEnabled(true);
 
-        Map<String, Object> response = telemetryService.getTelemetryResponse(user, Map.of());
+        Map<String, Object> response = telemetryService.getTelemetryResponse(user);
 
         assertThat(response).containsOnlyKeys(USER_TELEMETRY_SETTINGS);
     }
@@ -95,7 +98,7 @@ public class TelemetryServiceTest {
         TelemetryService telemetryService = createTelemetryService(true);
         mockUserTelemetryEnabled(false);
 
-        Map<String, Object> response = telemetryService.getTelemetryResponse(user, Map.of());
+        Map<String, Object> response = telemetryService.getTelemetryResponse(user);
 
         assertThat(response).containsOnlyKeys(USER_TELEMETRY_SETTINGS);
     }
@@ -105,7 +108,7 @@ public class TelemetryServiceTest {
         TelemetryService telemetryService = createTelemetryService(true);
         when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
 
-        Map<String, Object> response = telemetryService.getTelemetryResponse(user, Map.of());
+        Map<String, Object> response = telemetryService.getTelemetryResponse(user);
 
         assertThatAllTelemetryDataIsPresent(response);
     }
@@ -116,7 +119,7 @@ public class TelemetryServiceTest {
         mockUserTelemetryEnabled(true);
         when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
 
-        Map<String, Object> response = telemetryService.getTelemetryResponse(user, Map.of());
+        Map<String, Object> response = telemetryService.getTelemetryResponse(user);
 
         assertThatAllTelemetryDataIsPresent(response);
     }
@@ -128,7 +131,7 @@ public class TelemetryServiceTest {
         when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
         when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
 
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> telemetryService.getTelemetryResponse(user, Map.of()));
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> telemetryService.getTelemetryResponse(user));
     }
 
     private void assertThatAllTelemetryDataIsPresent(Map<String, Object> response) {
@@ -151,6 +154,7 @@ public class TelemetryServiceTest {
                 elasticsearchVersion,
                 new TelemetryResponseFactory(objectMapper),
                 dbTelemetryUserSettingsService,
+                dbTelemetryClusterInfo,
                 eventBus
         );
     }

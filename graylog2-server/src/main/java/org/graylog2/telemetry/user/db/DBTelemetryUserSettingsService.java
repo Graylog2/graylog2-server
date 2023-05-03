@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.telemetry.db;
+package org.graylog2.telemetry.user.db;
 
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -25,7 +25,7 @@ import org.mongojack.JacksonDBCollection;
 import javax.inject.Inject;
 import java.util.Optional;
 
-import static org.graylog2.telemetry.db.TelemetryUserSettingsDto.FIELD_USER_ID;
+import static org.graylog2.telemetry.user.db.TelemetryUserSettingsDto.FIELD_USER_ID;
 
 public class DBTelemetryUserSettingsService {
 
