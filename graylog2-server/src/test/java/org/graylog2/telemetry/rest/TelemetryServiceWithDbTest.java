@@ -27,8 +27,9 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.traffic.TrafficCounterService;
-import org.graylog2.telemetry.db.DBTelemetryUserSettingsService;
+import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +38,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.Duration;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,6 +87,7 @@ public class TelemetryServiceWithDbTest {
                 elasticsearchVersion,
                 new TelemetryResponseFactory(objectMapper),
                 new DBTelemetryUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
+                new DBTelemetryClusterInfo(Duration.ZERO, mongodb.mongoConnection()),
                 eventBus
         );
     }
