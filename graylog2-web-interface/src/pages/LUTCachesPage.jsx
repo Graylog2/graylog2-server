@@ -34,9 +34,7 @@ const _saved = (history) => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 };
 
-const _isCreating = ({ action }) => {
-  return action === 'create';
-};
+const _isCreating = ({ action }) => action === 'create';
 
 const _validateCache = (adapter) => {
   LookupTableCachesActions.validate(adapter);

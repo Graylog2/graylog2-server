@@ -30,10 +30,8 @@ const Title = styled.h3(({ theme }) => css`
   }
 `);
 
-const MessageDetailsTitle = (props) => {
-  return (
-    <Title {...props} />
-  );
-};
+const MessageDetailsTitle = (props) => (
+  <Title {...props} />
+);
 
 export default MessageDetailsTitle;

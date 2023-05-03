@@ -53,14 +53,10 @@ const CollectorConfigurationModalContainer = ({
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
-  const getSelectedLogCollector = () => {
-    return (uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
-  };
+  const getSelectedLogCollector = () => (uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
 
-  const sortConfigurationNames = (configs: Configuration[]) => {
-    return configs.sort((config1, config2) => naturalSortIgnoreCase(config1.name, config2.name))
-      .map((config) => config.name);
-  };
+  const sortConfigurationNames = (configs: Configuration[]) => configs.sort((config1, config2) => naturalSortIgnoreCase(config1.name, config2.name))
+    .map((config) => config.name);
 
   const getAssignedConfigurations = (_selectedSidecarCollectorPairs: SidecarCollectorPairType[], selectedCollector: Collector) => {
     const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
@@ -119,9 +115,7 @@ const CollectorConfigurationModalContainer = ({
     onCancel();
   };
 
-  const getConfiguration = (configName: string) => {
-    return configurations.find((config) => config.name === configName);
-  };
+  const getConfiguration = (configName: string) => configurations.find((config) => config.name === configName);
 
   const getCollector = (configName: string) => {
     const configuration = getConfiguration(configName);
@@ -136,11 +130,9 @@ const CollectorConfigurationModalContainer = ({
   };
 
   const getAssignedFromTags = (configId: string, collectorId: string, sidecars: SidecarSummary[]) => {
-    const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => {
-      return accumulator.concat(
-        sidecar.assignments.find((assignment) => (assignment.collector_id === collectorId) && (assignment.configuration_id === configId)).assigned_from_tags,
-      );
-    }, []);
+    const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => accumulator.concat(
+      sidecar.assignments.find((assignment) => (assignment.collector_id === collectorId) && (assignment.configuration_id === configId)).assigned_from_tags,
+    ), []);
 
     return uniq(assigned_from_tags);
   };

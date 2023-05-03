@@ -137,11 +137,9 @@ describe('FetchProvider', () => {
     ['POST with text', 'POST' as const, 'test3', 'uuid-beef-feed'],
     ['POST without content', 'POST' as const, 'test4', null],
     ['DELETE without content and status 204', 'DELETE' as const, 'test5', null],
-  ])('should receive a %s', async (_text, method, url, expectedResponse) => {
-    return fetch(method, `${baseUrl}/${url}`).then((response) => {
-      expect(response).toStrictEqual(expectedResponse);
-    });
-  });
+  ])('should receive a %s', async (_text, method, url, expectedResponse) => fetch(method, `${baseUrl}/${url}`).then((response) => {
+    expect(response).toStrictEqual(expectedResponse);
+  }));
 
   it('sets correct accept header', async () => {
     const result = await fetchFile('POST', `${baseUrl}/failIfWrongAcceptHeader`, {}, 'text/csv');

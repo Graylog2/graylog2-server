@@ -17,18 +17,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const MessageCountRotationStrategySummary = ({ config }) => {
-  return (
-    <div>
-      <dl>
-        <dt>Index rotation strategy:</dt>
-        <dd>Message Count</dd>
-        <dt>Max docs per index:</dt>
-        <dd>{config.max_docs_per_index}</dd>
-      </dl>
-    </div>
-  );
-};
+const MessageCountRotationStrategySummary = ({ config }) => (
+  <div>
+    <dl>
+      <dt>Index rotation strategy:</dt>
+      <dd>Message Count</dd>
+      <dt>Max docs per index:</dt>
+      <dd>{config.max_docs_per_index}</dd>
+    </dl>
+  </div>
+);
 
 MessageCountRotationStrategySummary.propTypes = {
   config: PropTypes.object.isRequired,

@@ -19,9 +19,7 @@ import React from 'react';
 import { Table } from 'components/bootstrap';
 
 const TemplatesHelper = () => {
-  const _buildVariableName = (name) => {
-    return `\${sidecar.${name}}`;
-  };
+  const _buildVariableName = (name) => `\${sidecar.${name}}`;
 
   return (
     <div>

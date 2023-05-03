@@ -31,9 +31,7 @@ class LowercaseConverterConfiguration extends React.Component {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
 
-  _getConverterObject = () => {
-    return { type: this.props.type, config: this.props.configuration };
-  };
+  _getConverterObject = () => ({ type: this.props.type, config: this.props.configuration });
 
   _toggleConverter = (event) => {
     let converter;

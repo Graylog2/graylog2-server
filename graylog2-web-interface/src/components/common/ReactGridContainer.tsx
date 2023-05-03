@@ -146,19 +146,17 @@ type Props = {
   width?: number,
 }
 
-const computeLayout = (positions: WidgetPositions = {}) => {
-  return Object.keys(positions).map((id) => {
-    const { col, row, height, width } = positions[id];
+const computeLayout = (positions: WidgetPositions = {}) => Object.keys(positions).map((id) => {
+  const { col, row, height, width } = positions[id];
 
-    return {
-      i: id,
-      x: col ? Math.max(col - 1, 0) : 0,
-      y: (row === undefined || row <= 0 ? Infinity : row - 1),
-      h: height || 1,
-      w: width || 1,
-    };
-  });
-};
+  return {
+    i: id,
+    x: col ? Math.max(col - 1, 0) : 0,
+    y: (row === undefined || row <= 0 ? Infinity : row - 1),
+    h: height || 1,
+    w: width || 1,
+  };
+});
 
 type Layout = { i: string, x: number, y: number, h: number, w: number }[];
 

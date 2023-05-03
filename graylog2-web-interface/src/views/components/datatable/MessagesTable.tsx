@@ -159,19 +159,17 @@ type Props = {
   condensed?: boolean,
 };
 
-const MessagesTable = ({ children, condensed, striped, bordered, stickyHeader, borderedHeader }: Props) => {
-  return (
-    <MessagesContainer>
-      <StyledTable condensed={condensed}
-                   striped={striped}
-                   bordered={bordered}
-                   $stickyHeader={stickyHeader}
-                   $borderedHeader={borderedHeader}>
-        {children}
-      </StyledTable>
-    </MessagesContainer>
-  );
-};
+const MessagesTable = ({ children, condensed, striped, bordered, stickyHeader, borderedHeader }: Props) => (
+  <MessagesContainer>
+    <StyledTable condensed={condensed}
+                 striped={striped}
+                 bordered={bordered}
+                 $stickyHeader={stickyHeader}
+                 $borderedHeader={borderedHeader}>
+      {children}
+    </StyledTable>
+  </MessagesContainer>
+);
 
 MessagesTable.propTypes = {
   children: PropTypes.node.isRequired,

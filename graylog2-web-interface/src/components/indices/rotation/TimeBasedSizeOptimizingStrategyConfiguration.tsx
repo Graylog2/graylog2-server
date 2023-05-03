@@ -33,13 +33,9 @@ type Props = {
   updateConfig: (config: Omit<TimeBasedSizeOptimizingStrategyConfig, 'type'>) => void,
 }
 
-export const durationToRoundedDays = (duration: string) => {
-  return Math.round(moment.duration(duration).asDays());
-};
+export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-const getInitialRangeInDays = (indexLifeTimeMin, IndexLifeTimeMax) => {
-  return [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
-};
+const getInitialRangeInDays = (indexLifeTimeMin, IndexLifeTimeMax) => [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
 
 const YEAR_IN_DAYS = 365;
 
@@ -56,9 +52,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
   const maxRotationPeriod = useMaxIndexRotationLimit();
   const [maxRange, setMaxRange] = useState(getInitialMaxRange(durationToRoundedDays(maxRotationPeriod), indexLifetimeRange[1]));
 
-  const isValidRange = useCallback((range: Array<number>) => {
-    return range[0] < range[1] && range[1] <= maxRange;
-  }, [maxRange]);
+  const isValidRange = useCallback((range: Array<number>) => range[0] < range[1] && range[1] <= maxRange, [maxRange]);
 
   const validationState = (range: Array<number>): null | 'error' => {
     if (isValidRange(range)) {

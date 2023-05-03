@@ -88,9 +88,7 @@ const UserSyncStep = ({
     });
   };
 
-  const getInitalFormValues = (values: WizardFormValues) => {
-    return { ...values, ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }) };
-  };
+  const getInitalFormValues = (values: WizardFormValues) => ({ ...values, ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }) });
 
   return (
     <Formik initialValues={getInitalFormValues(stepsState.formValues)}

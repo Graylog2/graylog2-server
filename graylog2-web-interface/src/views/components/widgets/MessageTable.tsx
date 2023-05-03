@@ -151,25 +151,23 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
         <Table className="table table-condensed">
           <TableHead>
             <tr>
-              {selectedFields.toSeq().map((selectedFieldName) => {
-                return (
-                  <th key={selectedFieldName}>
-                    <Field type={_fieldTypeFor(selectedFieldName, fields)}
-                           name={selectedFieldName}
-                           queryId={activeQueryId}>
-                      {selectedFieldName}
-                    </Field>
-                    <InteractiveContext.Consumer>
-                      {(interactive) => (interactive && (
+              {selectedFields.toSeq().map((selectedFieldName) => (
+                <th key={selectedFieldName}>
+                  <Field type={_fieldTypeFor(selectedFieldName, fields)}
+                         name={selectedFieldName}
+                         queryId={activeQueryId}>
+                    {selectedFieldName}
+                  </Field>
+                  <InteractiveContext.Consumer>
+                    {(interactive) => (interactive && (
                       <FieldSortIcon fieldName={selectedFieldName}
                                      onSortChange={onSortChange}
                                      setLoadingState={setLoadingState}
                                      config={config} />
-                      ))}
-                    </InteractiveContext.Consumer>
-                  </th>
-                );
-              }).toArray()}
+                    ))}
+                  </InteractiveContext.Consumer>
+                </th>
+              )).toArray()}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {

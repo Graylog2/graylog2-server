@@ -113,25 +113,23 @@ const priorityFormatter = (eventId, priority) => {
   );
 };
 
-const renderEmptyContent = () => {
-  return (
-    <Row>
-      <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
-        <EmptyEntity title="Looks like you didn't define any Events yet">
-          <p>
-            Create Event Definitions that are able to search, aggregate or correlate Messages and other
-            Events, allowing you to record significant Events in Graylog and alert on them.
-          </p>
-          <IfPermitted permissions="eventdefinitions:create">
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success">Get Started!</Button>
-            </LinkContainer>
-          </IfPermitted>
-        </EmptyEntity>
-      </Col>
-    </Row>
-  );
-};
+const renderEmptyContent = () => (
+  <Row>
+    <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
+      <EmptyEntity title="Looks like you didn't define any Events yet">
+        <p>
+          Create Event Definitions that are able to search, aggregate or correlate Messages and other
+          Events, allowing you to record significant Events in Graylog and alert on them.
+        </p>
+        <IfPermitted permissions="eventdefinitions:create">
+          <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+            <Button bsStyle="success">Get Started!</Button>
+          </LinkContainer>
+        </IfPermitted>
+      </EmptyEntity>
+    </Col>
+  </Row>
+);
 
 class Events extends React.Component {
   static propTypes = {
@@ -165,13 +163,11 @@ class Events extends React.Component {
     onPageChange(1, nextPageSize);
   };
 
-  expandRow = (eventId) => {
-    return () => {
-      const { expanded } = this.state;
-      const nextExpanded = expanded.includes(eventId) ? without(expanded, eventId) : expanded.concat([eventId]);
+  expandRow = (eventId) => () => {
+    const { expanded } = this.state;
+    const nextExpanded = expanded.includes(eventId) ? without(expanded, eventId) : expanded.concat([eventId]);
 
-      this.setState({ expanded: nextExpanded });
-    };
+    this.setState({ expanded: nextExpanded });
   };
 
   renderLinkToEventDefinition = (event, eventDefinitionContext) => {

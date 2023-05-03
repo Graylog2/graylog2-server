@@ -67,17 +67,11 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-const _visualizationForType = (type: string) => {
-  return widgetDefinition(type).visualizationComponent;
-};
+const _visualizationForType = (type: string) => widgetDefinition(type).visualizationComponent;
 
-const _editComponentForType = (type: string) => {
-  return widgetDefinition(type).editComponent;
-};
+const _editComponentForType = (type: string) => widgetDefinition(type).editComponent;
 
-const _hasOwnEditSubmitButton = (type: string) => {
-  return widgetDefinition(type).hasEditSubmitButton;
-};
+const _hasOwnEditSubmitButton = (type: string) => widgetDefinition(type).hasEditSubmitButton;
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);

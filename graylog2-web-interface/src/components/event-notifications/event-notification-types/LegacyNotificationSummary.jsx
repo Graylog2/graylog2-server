@@ -42,14 +42,12 @@ class LegacyNotificationSummary extends React.Component {
       const typeConfiguration = typeData.configuration;
 
       content = Object.entries(typeConfiguration)
-        .map(([key, value]) => {
-          return (
-            <tr key={key}>
-              <td>{value.human_name}</td>
-              <td>{configurationValues[key]}</td>
-            </tr>
-          );
-        });
+        .map(([key, value]) => (
+          <tr key={key}>
+            <td>{value.human_name}</td>
+            <td>{configurationValues[key]}</td>
+          </tr>
+        ));
     } else {
       content = (
         <tr className="danger">

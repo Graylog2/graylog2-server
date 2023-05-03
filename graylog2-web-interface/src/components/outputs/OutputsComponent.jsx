@@ -101,16 +101,10 @@ const OutputsComponent = createReactClass({
 
   _fetchAssignableOutputs(outputs) {
     OutputsStore.load((resp) => {
-      const streamOutputIds = outputs.map((output) => {
-        return output.id;
-      });
+      const streamOutputIds = outputs.map((output) => output.id);
       const assignableOutputs = resp.outputs
-        .filter((output) => {
-          return streamOutputIds.indexOf(output.id) === -1;
-        })
-        .sort((output1, output2) => {
-          return output1.title.localeCompare(output2.title);
-        });
+        .filter((output) => streamOutputIds.indexOf(output.id) === -1)
+        .sort((output1, output2) => output1.title.localeCompare(output2.title));
 
       this.setState({ assignableOutputs: assignableOutputs });
     });
