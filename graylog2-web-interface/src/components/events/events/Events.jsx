@@ -261,14 +261,14 @@ class Events extends React.Component {
               <PaginatedList totalItems={totalEvents}
                              onChange={onPageChange}
                              pageSizes={PAGE_SIZES}>
-                  <EventsTable id="events-table">
-                    <thead>
-                      <tr>
-                        {HEADERS.map((header) => <th key={header}>{header}</th>)}
-                      </tr>
-                    </thead>
-                    {eventList.map(this.renderEvent)}
-                  </EventsTable>
+                <EventsTable id="events-table">
+                  <thead>
+                    <tr>
+                      {HEADERS.map((header) => <th key={header}>{header}</th>)}
+                    </tr>
+                  </thead>
+                  {eventList.map(this.renderEvent)}
+                </EventsTable>
               </PaginatedList>
             </EventListContainer>
           )}
