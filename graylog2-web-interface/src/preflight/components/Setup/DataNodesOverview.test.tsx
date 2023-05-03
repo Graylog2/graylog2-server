@@ -90,7 +90,8 @@ describe('DataNodesOverview', () => {
   });
 
   it('should resume startup', async () => {
-    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
+    const onResumeStartup = jest.fn();
+    renderPreflight(<DataNodesOverview onResumeStartup={onResumeStartup} />);
 
     await screen.findByText('node-id-3');
 
@@ -100,27 +101,7 @@ describe('DataNodesOverview', () => {
 
     userEvent.click(resumeStartupButton);
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
-  });
-
-  it('should display confirm dialog on resume startup when there is no Graylog data node', async () => {
-    asMock(useDataNodes).mockReturnValue({
-      data: [],
-      isFetching: false,
-      isInitialLoading: false,
-      error: undefined,
-    });
-
-    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
-
-    const resumeStartupButton = screen.getByRole('button', {
-      name: /resume startup/i,
-    });
-
-    userEvent.click(resumeStartupButton);
-
-    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node?'));
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(onResumeStartup).toHaveBeenCalledTimes(1));
   });
 
   it('should display error message when there was an error fetching data nodes', async () => {
