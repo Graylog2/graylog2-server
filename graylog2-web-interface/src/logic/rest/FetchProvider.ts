@@ -76,21 +76,11 @@ const defaultResponseHandler = (resp: Response) => {
   throw resp;
 };
 
-const streamingPlainTextResponseHandler = async (resp: {ok: boolean, body: ReadableStream<string>}) => {
+const streamingPlainTextResponseHandler = async (resp: Response) => {
   if (resp.ok) {
     reportServerSuccess();
 
-    const chunks: Array<any> = [];
-
-    // @ts-ignore
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of resp.body) {
-      chunks.push(chunk);
-    }
-
-    const buffer = Buffer.concat(chunks);
-
-    return buffer.toString('utf-8');
+    return resp.text();
   }
 
   throw resp;
@@ -196,7 +186,8 @@ export class Builder {
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error: Response) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => {
+    });
 
     return this;
   }
