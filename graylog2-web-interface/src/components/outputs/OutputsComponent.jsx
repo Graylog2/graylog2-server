@@ -45,8 +45,7 @@ const OutputsComponent = createReactClass({
   mixins: [PermissionsMixin],
 
   getInitialState() {
-    return {
-    };
+    return {};
   },
 
   componentDidMount() {
@@ -80,7 +79,7 @@ const OutputsComponent = createReactClass({
   },
 
   _handleCreateOutput(data) {
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'outputs',
       eventElement: 'create-output',
     });
@@ -102,17 +101,23 @@ const OutputsComponent = createReactClass({
 
   _fetchAssignableOutputs(outputs) {
     OutputsStore.load((resp) => {
-      const streamOutputIds = outputs.map((output) => { return output.id; });
+      const streamOutputIds = outputs.map((output) => {
+        return output.id;
+      });
       const assignableOutputs = resp.outputs
-        .filter((output) => { return streamOutputIds.indexOf(output.id) === -1; })
-        .sort((output1, output2) => { return output1.title.localeCompare(output2.title); });
+        .filter((output) => {
+          return streamOutputIds.indexOf(output.id) === -1;
+        })
+        .sort((output1, output2) => {
+          return output1.title.localeCompare(output2.title);
+        });
 
       this.setState({ assignableOutputs: assignableOutputs });
     });
   },
 
   _handleAssignOutput(outputId) {
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'outputs',
       eventElement: 'assign-output',
     });
@@ -125,7 +130,7 @@ const OutputsComponent = createReactClass({
   },
 
   _removeOutputGlobally(outputId) {
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'outputs',
       eventElement: 'remove-output-globally',
     });
@@ -142,7 +147,7 @@ const OutputsComponent = createReactClass({
   },
 
   _removeOutputFromStream(outputId, streamId) {
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'outputs',
       eventElement: 'remove-output-from-stream',
     });
@@ -159,7 +164,7 @@ const OutputsComponent = createReactClass({
   },
 
   _handleOutputUpdate(output, deltas) {
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'outputs',
       eventElement: 'update-output',
     });

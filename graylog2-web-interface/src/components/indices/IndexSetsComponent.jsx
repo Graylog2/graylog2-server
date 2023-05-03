@@ -86,7 +86,7 @@ const IndexSetsComponent = createReactClass({
   _deleteIndexSet(indexSet, deleteIndices) {
     this.props.paginationQueryParameter.resetPage();
 
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'index_sets',
       eventElement: 'delete-index-set',
     });
@@ -118,7 +118,11 @@ const IndexSetsComponent = createReactClass({
       <Col md={12}>
         <IndexSetDetails indexSet={indexSet} />
 
-        <IndexSetDeletionForm ref={(elem) => { this.forms[`index-set-deletion-form-${indexSet.id}`] = elem; }} indexSet={indexSet} onDelete={this._deleteIndexSet} />
+        <IndexSetDeletionForm ref={(elem) => {
+          this.forms[`index-set-deletion-form-${indexSet.id}`] = elem;
+        }}
+                              indexSet={indexSet}
+                              onDelete={this._deleteIndexSet} />
       </Col>
     );
 
@@ -128,8 +132,10 @@ const IndexSetsComponent = createReactClass({
       </Link>
     );
 
-    const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
-    const isReadOnly = !indexSet.writable ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
+    const isDefault = indexSet.default
+      ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
+    const isReadOnly = !indexSet.writable
+      ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
     let { description } = indexSet;
 
     if (indexSet.default) {

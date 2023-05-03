@@ -30,15 +30,15 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const HTTPHeaderAuthConfigSection = () => {
   const [submitError, setSubmitError] = useState<string | undefined>();
-  const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined>();
+  const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined | void>();
   const sectionTitle = 'Trusted Header Authentication';
   const history = useHistory();
 
   const sendTelemetry = useSendTelemetry();
 
   const _onSubmit = (data: HTTPHeaderAuthConfigJSON) => {
-    sendTelemetry('submit_form', {
-      appSection: 'trusted_header_authentication',
+    sendTelemetry('form_submit', {
+      appSection: 'authentication-authenticator-config',
       eventElement: 'update-config',
     });
 
@@ -87,7 +87,8 @@ const HTTPHeaderAuthConfigSection = () => {
             <Row>
               <Col mdOffset={3} md={9}>
                 <Alert bsStyle="info">
-                  <Icon name="info-circle" /> Please configure the <code>trusted_proxies</code> setting in the Graylog server configuration file.
+                  <Icon name="info-circle" /> Please configure the <code>trusted_proxies</code> setting in the Graylog
+                  server configuration file.
                 </Alert>
               </Col>
             </Row>

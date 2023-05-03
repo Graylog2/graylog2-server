@@ -95,7 +95,7 @@ const NodeLoggers = createReactClass({
                         onClick={() => {
                           this.setState({ showDetails: !showDetails });
 
-                          sendTelemetry('toggle_input_button', {
+                          sendTelemetry('input_button_toggle', {
                             appSection: 'logging',
                             eventElement: 'show-log-level-metrics',
                             eventInfo: { showing: !showDetails },
@@ -107,7 +107,10 @@ const NodeLoggers = createReactClass({
               </div>
               <h2>
                 <LinkToNode nodeId={nodeId} />
-                <small> Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong></small>
+                <small> Has written a total of <strong>{this._formatThroughput()} internal log
+                  messages.
+                </strong>
+                </small>
               </h2>
             </div>
             <div className="subsystems">

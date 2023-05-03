@@ -76,7 +76,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   };
 
   const handleSubmit = (values: GeoIpConfigType) => {
-    sendTelemetry('submit_form', {
+    sendTelemetry('form_submit', {
       appSection: 'configurations_geolocation_processor',
       eventElement: 'update_configuration_button',
     });

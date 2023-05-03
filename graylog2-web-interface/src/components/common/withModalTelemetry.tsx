@@ -33,12 +33,12 @@ const withModalTelemetry = (Component) => {
       };
 
       if (show && eventElement) {
-        sendTelemetry('open_modal', telemetryEvent);
+        sendTelemetry('modal_open', telemetryEvent);
       }
 
       return () => {
         if (show && eventElement) {
-          sendTelemetry('close_modal', telemetryEvent);
+          sendTelemetry('modal_close', telemetryEvent);
         }
       };
     }, [show, eventElement, appSection, sendTelemetry]);

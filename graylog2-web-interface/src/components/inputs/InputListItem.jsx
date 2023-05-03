@@ -27,7 +27,14 @@ import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/com
 import { ConfigurationWell } from 'components/configurationforms';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
+import {
+  InputForm,
+  InputStateBadge,
+  InputStateControl,
+  InputStaticFields,
+  InputThroughput,
+  StaticFieldForm,
+} from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
@@ -69,7 +76,7 @@ const InputListItem = createReactClass({
   _updateInput(data) {
     InputsActions.update(this.props.input.id, data);
 
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'inputs',
       eventElement: 'edit-input',
     });
@@ -172,7 +179,9 @@ const InputListItem = createReactClass({
         {showMetricsMenuItem}
 
         <IfPermitted permissions={`inputs:edit:${this.props.input.id}`}>
-          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static field</MenuItem>
+          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static
+            field
+          </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions="inputs:terminate">
@@ -196,7 +205,9 @@ const InputListItem = createReactClass({
 
     const inputForm = definition
       ? (
-        <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+        <InputForm ref={(configurationForm) => {
+          this.configurationForm = configurationForm;
+        }}
                    key={`edit-form-input-${input.id}`}
                    globalValue={input.global}
                    nodeValue={input.node}
@@ -217,7 +228,10 @@ const InputListItem = createReactClass({
                              id={input.id}
                              configuration={input.attributes}
                              typeDefinition={definition || {}} />
-          <StaticFieldForm ref={(staticFieldForm) => { this.staticFieldForm = staticFieldForm; }} input={this.props.input} />
+          <StaticFieldForm ref={(staticFieldForm) => {
+            this.staticFieldForm = staticFieldForm;
+          }}
+                           input={this.props.input} />
           <InputStaticFields input={this.props.input} />
         </Col>
         <Col md={4}>

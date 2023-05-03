@@ -58,7 +58,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   }, []);
 
   const _saveConfiguration = (indexSetItem: IndexSet) => {
-    sendTelemetry('submit_form', {
+    sendTelemetry('form_submit', {
       appSection: 'index_sets',
       eventElement: 'create-index-set',
     });

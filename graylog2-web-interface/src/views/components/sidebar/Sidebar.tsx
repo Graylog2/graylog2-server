@@ -85,7 +85,11 @@ const Sidebar = ({ searchPageLayout, results, children, sections }: Props) => {
   const activeSection = sections.find((section) => section.key === activeSectionKey);
 
   const toggleSidebar = () => {
-    sendTelemetry('toggle_input_button', { appSection: 'search_sidebar', eventInfo: { initialSectionKey, activeSectionKey } });
+    sendTelemetry('input_button_toggle', {
+      appSection: 'search_sidebar',
+      eventInfo: { initialSectionKey, activeSectionKey },
+    });
+
     _toggleSidebar(initialSectionKey, activeSectionKey, setActiveSectionKey);
   };
 

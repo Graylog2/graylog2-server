@@ -197,7 +197,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const sendTelemetry = useSendTelemetry();
 
   const onToggleEdit = useCallback(() => {
-    sendTelemetry('toggle_input_button', {
+    sendTelemetry('input_button_toggle', {
       appSection: 'search-widget',
       eventElement: 'widget-edit-button',
     });

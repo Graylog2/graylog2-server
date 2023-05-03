@@ -61,7 +61,7 @@ const StreamActions = ({
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
   const onToggleStreamStatus = useCallback(async () => {
-    sendTelemetry('toggle_input_button', {
+    sendTelemetry('input_button_toggle', {
       appSection: 'stream',
       eventElement: 'stream-item-toggle-status',
     });

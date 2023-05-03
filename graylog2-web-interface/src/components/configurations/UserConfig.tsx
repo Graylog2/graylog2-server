@@ -66,7 +66,7 @@ const UserConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values) => {
-    sendTelemetry('submit_form', {
+    sendTelemetry('form_submit', {
       appSection: 'configurations_user',
       eventElement: 'update_configuration_button',
     });

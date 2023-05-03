@@ -78,7 +78,7 @@ const CreateInputControl = createReactClass({
 
     this.setState({ selectedInput: selectedInput });
 
-    this.props.sendTelemetry('change_input_value', {
+    this.props.sendTelemetry('input_value_change', {
       appSection: 'inputs',
       eventElement: 'select-input',
       eventInfo: { value: selectedInput },
@@ -107,7 +107,7 @@ const CreateInputControl = createReactClass({
   },
 
   _createInput(data) {
-    this.props.sendTelemetry('submit_form', {
+    this.props.sendTelemetry('form_submit', {
       appSection: 'inputs',
       eventElement: 'create-input',
     });
@@ -125,7 +125,9 @@ const CreateInputControl = createReactClass({
       const inputTypeName = inputTypes[selectedInput];
 
       inputModal = (
-        <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+        <InputForm ref={(configurationForm) => {
+          this.configurationForm = configurationForm;
+        }}
                    key="configuration-form-input"
                    configFields={selectedInputDefinition.requested_configuration}
                    title={<span>Launch new <em>{inputTypeName}</em> input</span>}

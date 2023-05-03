@@ -48,7 +48,7 @@ const LogLevelDropdown = createReactClass({
       event.preventDefault();
       this._changeLoglevel(loglevel);
 
-      this.props.sendTelemetry('change_input_value', {
+      this.props.sendTelemetry('input_value_change', {
         appSection: 'logging',
         eventElement: 'change-log-level',
         eventInfo: { value: loglevel },

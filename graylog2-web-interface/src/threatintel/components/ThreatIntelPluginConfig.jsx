@@ -101,7 +101,7 @@ const ThreatIntelPluginConfig = createReactClass({
   _saveConfig() {
     const { updateConfig, sendTelemetry } = this.props;
 
-    sendTelemetry('submit_form', {
+    sendTelemetry('form_submit', {
       appSection: 'configurations_threat_intel',
       eventElement: 'update_configuration_button',
     });
@@ -140,8 +140,10 @@ const ThreatIntelPluginConfig = createReactClass({
           <fieldset>
             <Input type="checkbox"
                    id="tor-checkbox"
-                   // eslint-disable-next-line react/no-unused-class-component-methods
-                   ref={(elem) => { this.torEnabled = elem; }}
+              // eslint-disable-next-line react/no-unused-class-component-methods
+                   ref={(elem) => {
+                     this.torEnabled = elem;
+                   }}
                    label="Allow Tor exit node lookups?"
                    help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
                    name="tor_enabled"
@@ -150,8 +152,10 @@ const ThreatIntelPluginConfig = createReactClass({
 
             <Input type="checkbox"
                    id="spamhaus-checkbox"
-                   // eslint-disable-next-line react/no-unused-class-component-methods
-                   ref={(elem) => { this.spamhausEnabled = elem; }}
+              // eslint-disable-next-line react/no-unused-class-component-methods
+                   ref={(elem) => {
+                     this.spamhausEnabled = elem;
+                   }}
                    label="Allow Spamhaus DROP/EDROP lookups?"
                    help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
                    name="tor_enabled"

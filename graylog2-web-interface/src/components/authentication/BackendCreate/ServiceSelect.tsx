@@ -59,7 +59,7 @@ const BackendCreateSelect = () => {
   const sendTelemetry = useSendTelemetry();
 
   const onSubmit = useCallback((formState: FormState) => {
-    sendTelemetry('submit_form', {
+    sendTelemetry('form_submit', {
       appSection: 'authentication_services',
       eventElement: 'start-new-authentication-services',
     });
@@ -79,7 +79,7 @@ const BackendCreateSelect = () => {
                     <Select clearable={false}
                             inputProps={{ 'aria-label': 'Select a service' }}
                             onChange={(authService) => {
-                              sendTelemetry('change_input_value', {
+                              sendTelemetry('input_value_change', {
                                 appSection: 'authentication_services',
                                 eventElement: 'select-authentication-service',
                                 eventInfo: { value: String(authService) },

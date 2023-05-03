@@ -28,7 +28,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
   const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
   const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
-
+  
   useEffect(() => {
     const setGroup = () => {
       if (isTelemetryDataLoaded

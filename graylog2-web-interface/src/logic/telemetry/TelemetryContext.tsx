@@ -26,8 +26,20 @@ export type TelemetryEvent = {
   }
 };
 
-export type TelemetryEventType = '$pageview' | 'view' | 'click' | 'submit_form' | 'open_popover'
-  | 'close_popover' | 'toggle_input_button' | 'change_input_value' | 'close_modal' | 'open_modal';
+export type TelemetryEventType =
+  '$pageview'
+  | 'view'
+  | 'click'
+  | 'form_submit'
+  | 'popover_open'
+  | 'popover_close'
+  | 'input_button_toggle'
+  | 'input_value_change'
+  | 'modal_close'
+  | 'modal_open'
+  | 'select'
+  | 'visit'
+  | 'navigate';
 
 type ContextType = {
   sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
