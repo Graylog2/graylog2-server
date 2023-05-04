@@ -26,7 +26,6 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 
@@ -41,8 +40,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -51,6 +48,7 @@ import static com.mongodb.client.model.Updates.setOnInsert;
 import static org.graylog2.cluster.lock.Lock.FIELD_LOCKED_BY;
 import static org.graylog2.cluster.lock.Lock.FIELD_RESOURCE;
 import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
+import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
 
 /**
  * Lock service implementation using MongoDB to maintain locks.
@@ -74,29 +72,9 @@ public class MongoLockService implements LockService {
         this.nodeId = nodeId;
 
         collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
-
         collection.createIndex(Indexes.ascending(FIELD_RESOURCE), new IndexOptions().unique(true));
 
-        final Bson updatedAtKey = Indexes.ascending(FIELD_UPDATED_AT);
-        final IndexOptions indexOptions = new IndexOptions().expireAfter(lockTTL.getSeconds(), TimeUnit.SECONDS);
-        ensureTTLIndex(collection, updatedAtKey, indexOptions);
-    }
-
-    // MongoDB Indexes cannot be altered once created. If the leaderElectionLockTTL has changed, replace the index
-    private void ensureTTLIndex(MongoCollection<Document> collection, Bson updatedAtKey, IndexOptions indexOptions) {
-        for (Document document : collection.listIndexes()) {
-            final Set<String> keySet = document.get("key", Document.class).keySet();
-            if (keySet.contains(FIELD_UPDATED_AT)) {
-                // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
-                final long expireAfterSeconds = document.get("expireAfterSeconds", Number.class).longValue();
-                if (Objects.equals(expireAfterSeconds, indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
-                    return;
-                }
-                collection.dropIndex(updatedAtKey);
-            }
-        }
-        // not found or dropped, creating new index
-        collection.createIndex(updatedAtKey, indexOptions);
+        ensureTTLIndex(collection, lockTTL, FIELD_UPDATED_AT);
     }
 
     @Override
