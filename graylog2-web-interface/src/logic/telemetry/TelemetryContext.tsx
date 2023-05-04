@@ -19,9 +19,10 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 export type TelemetryEvent = {
-  appSection?: string,
-  eventElement?: string
-  eventInfo?: {
+  app_pathname?: string,
+  app_section?: string,
+  app_action_value?: string
+  event_details?: {
     [key: string]: string | boolean | number,
   }
 };

@@ -105,8 +105,8 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
     }
 
     sendTelemetry('form_submit', {
-      appSection: 'configurations_url_whitelist',
-      eventElement: 'update_configuration_button',
+      app_section: 'urlwhitelist',
+      app_action_value: 'configuration-update',
     });
 
     if (isValid) {

@@ -77,8 +77,9 @@ class IndexSetConfigurationPage extends React.Component {
       _saveConfiguration(history, newIndexSet);
 
       sendTelemetry('form_submit', {
-        appSection: 'index_sets',
-        eventElement: 'update-index-set',
+        app_pathname: 'indexsets',
+        app_section: 'indexset',
+        app_action_value: 'configuration-form',
       });
     };
 

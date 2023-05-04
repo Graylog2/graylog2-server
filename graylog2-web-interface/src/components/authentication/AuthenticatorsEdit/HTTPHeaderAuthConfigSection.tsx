@@ -38,8 +38,9 @@ const HTTPHeaderAuthConfigSection = () => {
 
   const _onSubmit = (data: HTTPHeaderAuthConfigJSON) => {
     sendTelemetry('form_submit', {
-      appSection: 'authentication-authenticator-config',
-      eventElement: 'update-config',
+      app_pathname: 'authentication',
+      app_section: 'authenticator-trustedheader',
+      app_action_value: 'config-update',
     });
 
     setSubmitError(undefined);
