@@ -1,0 +1,5 @@
+type = "fixed"
+message = "We improved the index set overview page performance and added a title-based search feature."
+
+issues = ["12498"]
+pulls = ["15155"]
