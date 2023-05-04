@@ -23,10 +23,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CSPResourcesTest {
     @Test
     void loadPropertiesTest() {
-        String expected = "connect-src *;img-src *";
+        String expected = "connect-src *;default-src 'self';img-src *;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'";
         CSPResources cspResources = new CSPResources();
 
         assertThat(cspResources).isNotNull();
-        assertThat(cspResources.cspString()).isEqualTo(expected);
+        assertThat(cspResources.cspString("default")).isEqualTo(expected);
     }
 }

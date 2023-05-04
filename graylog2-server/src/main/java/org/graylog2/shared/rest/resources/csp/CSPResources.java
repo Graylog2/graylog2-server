@@ -16,21 +16,20 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CSPResources {
     private static final Logger LOG = LoggerFactory.getLogger(CSPResources.class);
     private static final String DEFAULT_FILE = "/org/graylog2/security/csp.config";
-    private Map<String, String> cspResources;
+    private Table<String, String, String> cspResources;
 
     public CSPResources() {
         this(DEFAULT_FILE);
@@ -39,25 +38,47 @@ public class CSPResources {
     public CSPResources(String fileName) {
         try {
             cspResources = loadProperties(fileName);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.warn("Could not load config file {}: {}", fileName, e.getMessage());
-            cspResources = new HashMap<>();
+            cspResources = HashBasedTable.create();
         }
     }
 
-    public String cspString() {
-        return cspResources.keySet().stream()
+    /**
+     * Return a CSP string based on all the properties with the specified group name
+     *
+     * @param group
+     * @return CSP string
+     */
+    public String cspString(String group) {
+        return cspResources.row(group).keySet().stream()
                 .sorted()
-                .map(key -> key + " " + cspResources.get(key))
+                .map(key -> key + " " + cspResources.get(group, key))
                 .collect(Collectors.joining(";"));
     }
 
-    Map<String, String> loadProperties(String fileName) throws IOException {
-        InputStream inputStream = CSPResources.class.getResourceAsStream(fileName);
+    /**
+     * Parse a property file where all property names are like 'group.key'.
+     *
+     * @param path path of resource file
+     * @return table of property values
+     * @throws IOException
+     */
+    Table<String, String, String> loadProperties(String path) throws IOException {
+        InputStream inputStream = CSPResources.class.getResourceAsStream(path);
         Properties properties = new Properties();
         properties.load(inputStream);
-        return properties.stringPropertyNames().stream()
-                .collect(Collectors.toMap(Function.identity(), properties::getProperty));
+
+        Table<String, String, String> resources = HashBasedTable.create();
+        for (String propertyName : properties.stringPropertyNames()) {
+            String[] substrings = propertyName.split("[.]");
+            if (substrings.length != 2) {
+                LOG.warn("Skipping malformed property {}: expecting format <group>.<key>", propertyName);
+            } else {
+                resources.put(substrings[0], substrings[1], properties.getProperty(propertyName));
+            }
+        }
+        return resources;
     }
 
 }
