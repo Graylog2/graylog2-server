@@ -50,8 +50,9 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     });
 
     sendTelemetry('click', {
-      appSection: 'search-widget',
-      eventElement: 'widget-stretch-button',
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-stretch-button',
     });
   }, [onStretch, position, sendTelemetry, widgetId, widgetType]);
 

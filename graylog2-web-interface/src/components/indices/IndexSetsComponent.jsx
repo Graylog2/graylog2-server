@@ -67,8 +67,9 @@ const IndexSetsComponent = createReactClass({
   _onSetDefault(indexSet) {
     return () => {
       this.props.sendTelemetry('click', {
-        appSection: 'index_sets',
-        eventElement: 'set-default-index-set',
+        app_pathname: 'index-sets',
+        app_section: 'index-set',
+        app_action_value: 'set-default',
       });
 
       IndexSetsActions.setDefault(indexSet).then(() => {
@@ -87,8 +88,9 @@ const IndexSetsComponent = createReactClass({
     this.props.paginationQueryParameter.resetPage();
 
     this.props.sendTelemetry('form_submit', {
-      appSection: 'index_sets',
-      eventElement: 'delete-index-set',
+      app_pathname: 'index-sets',
+      app_section: 'index-set',
+      app_action_value: 'delete',
     });
 
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {

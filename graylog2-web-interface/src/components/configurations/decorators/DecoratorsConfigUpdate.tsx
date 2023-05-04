@@ -77,8 +77,9 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     onSave(modifiedDecorators);
 
     sendTelemetry('form_submit', {
-      appSection: 'configurations_decorators',
-      eventElement: 'update_configuration_button',
+      app_pathname: 'configuration',
+      app_section: 'decorators',
+      app_action_value: 'configuration-save',
     });
   }, [onSave, modifiedDecorators, sendTelemetry]);
 

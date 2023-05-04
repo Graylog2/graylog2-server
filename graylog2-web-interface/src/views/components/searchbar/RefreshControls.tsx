@@ -56,9 +56,10 @@ const RefreshControls = () => {
 
   const _onChange = (interval: number) => {
     sendTelemetry('input_value_change', {
-      appSection: 'search_bar',
-      eventElement: 'refresh-search-control-dropdown',
-      eventInfo: { interval: interval },
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'refresh-search-control-dropdown',
+      event_details: { interval: interval },
     });
 
     RefreshActions.setInterval(interval);
@@ -68,9 +69,10 @@ const RefreshControls = () => {
 
   const _toggleEnable = useCallback(() => {
     sendTelemetry('input_button_toggle', {
-      appSection: 'search_bar',
-      eventElement: 'refresh-search-control-enable',
-      eventInfo: { enabled: !refreshConfig.enabled },
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'refresh-search-control-enable',
+      event_details: { enabled: !refreshConfig.enabled },
     });
 
     if (refreshConfig.enabled) {

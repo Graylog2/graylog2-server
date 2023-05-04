@@ -154,8 +154,9 @@ const SearchesConfig = () => {
     const update = { ...formConfig };
 
     sendTelemetry('form_submit', {
-      appSection: 'configurations_search',
-      eventElement: 'update_configuration_button',
+      app_pathname: 'configuration',
+      app_section: 'search',
+      app_action_value: 'configuration-save',
     });
 
     if (relativeTimeRangeOptionsUpdate) {
@@ -307,14 +308,14 @@ const SearchesConfig = () => {
                                   title="Relative Timerange Options"
                                   help={
                                     <span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>
-} />
+              } />
             <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
                                   update={onSurroundingTimeRangeOptionsUpdate}
                                   validator={surroundingTimeRangeValidator}
                                   title="Surrounding Timerange Options"
                                   help={
                                     <span>Configure the available options for the <strong>surrounding</strong> time range selector as <strong>ISO8601 duration</strong></span>
-} />
+              } />
 
             <Input id="filter-fields-input"
                    type="text"

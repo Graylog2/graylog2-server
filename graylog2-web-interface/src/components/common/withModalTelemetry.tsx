@@ -18,6 +18,7 @@
 import type { ModalProps } from 'react-bootstrap';
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import kebabCase from 'lodash/kebabCase';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -29,9 +30,9 @@ const withModalTelemetry = (Component) => {
 
     useEffect(() => {
       const telemetryEvent = {
-        app_pathname: pathname,
-        app_section: appSection,
-        app_action_value: eventElement,
+        app_pathname: kebabCase(pathname),
+        app_section: kebabCase(appSection),
+        app_action_value: kebabCase(eventElement),
       };
 
       if (show && eventElement) {

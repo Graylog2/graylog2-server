@@ -109,8 +109,9 @@ const IndexSetsDefaultsConfig = () => {
     delete defaultIndexValues?.retention_strategy;
 
     sendTelemetry('form_submit', {
-      appSection: 'configurations_index_defaults',
-      eventElement: 'update_configuration_button',
+      app_pathname: 'configuration',
+      app_section: 'index-default',
+      app_action_value: 'configuration-save',
     });
 
     handleSaveConfig(defaultIndexValues)

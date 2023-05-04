@@ -38,8 +38,8 @@ const CreateStreamButton = ({ bsSize, bsStyle, buttonText, className, indexSets,
 
   const toggleCreateModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'create-stream-button',
+      app_pathname: 'streams',
+      app_action_value: 'stream-create-button',
     });
 
     return setShowCreateModal((cur) => !cur);

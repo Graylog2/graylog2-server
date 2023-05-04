@@ -142,8 +142,9 @@ const MessageTableEntry = ({
 
     if (!isSelectingText) {
       sendTelemetry('input_button_toggle', {
-        appSection: 'search-widget',
-        eventElement: 'widget-message-table-toggle-details',
+        app_pathname: 'search',
+        app_section: 'widget',
+        app_action_value: 'widget-message-table-toggle-details',
       });
 
       toggleDetail(`${message.index}-${message.id}`);

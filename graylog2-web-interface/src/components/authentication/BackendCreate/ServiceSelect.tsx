@@ -62,7 +62,7 @@ const BackendCreateSelect = () => {
     sendTelemetry('form_submit', {
       app_pathname: 'authentication',
       app_section: 'services',
-      app_action_value: 'createservice',
+      app_action_value: 'create-service-form',
     });
 
     _onSubmit(history, formState);

@@ -79,9 +79,9 @@ const CreateInputControl = createReactClass({
     this.setState({ selectedInput: selectedInput });
 
     this.props.sendTelemetry('input_value_change', {
-      appSection: 'inputs',
-      eventElement: 'select-input',
-      eventInfo: { value: selectedInput },
+      app_pathname: 'inputs',
+      app_action_value: 'input-select',
+      event_details: { value: selectedInput },
     });
 
     InputTypesActions.get.triggerPromise(selectedInput).then((inputDefinition) => this.setState({ selectedInputDefinition: inputDefinition }));
@@ -108,8 +108,8 @@ const CreateInputControl = createReactClass({
 
   _createInput(data) {
     this.props.sendTelemetry('form_submit', {
-      appSection: 'inputs',
-      eventElement: 'create-input',
+      app_pathname: 'inputs',
+      app_action_value: 'input-create',
     });
 
     InputsActions.create(data).then(() => {
@@ -155,8 +155,8 @@ const CreateInputControl = createReactClass({
                                 bsStyle="info"
                                 onClick={() => {
                                   this.props.sendTelemetry('click', {
-                                    appSection: 'inputs',
-                                    eventElement: 'find-more-inputs',
+                                    app_pathname: 'inputs',
+                                    app_action_value: 'inputs-find-more',
                                   });
                                 }}
                                 style={{ marginLeft: 10 }}>

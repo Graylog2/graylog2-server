@@ -110,9 +110,9 @@ const GraylogClusterTrafficGraph = () => {
     setGraphDays(newDays);
 
     sendTelemetry('input_value_change', {
-      app_pathname: 'systemoverview',
-      app_section: 'clusteroverview-outgoingtraffic',
-      app_action_value: 'trafficgraph-days',
+      app_pathname: 'system-overview',
+      app_section: 'outgoing-traffic',
+      app_action_value: 'trafficgraph-days-button',
       event_details: { value: newDays },
     });
   };

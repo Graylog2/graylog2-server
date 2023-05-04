@@ -96,9 +96,10 @@ const NodeLoggers = createReactClass({
                           this.setState({ showDetails: !showDetails });
 
                           sendTelemetry('input_button_toggle', {
-                            appSection: 'logging',
-                            eventElement: 'show-log-level-metrics',
-                            eventInfo: { showing: !showDetails },
+                            app_pathname: 'logging',
+                            app_section: 'log-level',
+                            app_action_value: 'show-metrics',
+                            event_details: { showing: !showDetails },
                           });
                         }}>
                   <Icon name="tachometer-alt" />{' '}

@@ -75,8 +75,9 @@ const UrlWhiteListConfig = () => {
 
   const saveConfig = () => {
     sendTelemetry('form_submit', {
-      appSection: 'configurations_url_whitelist',
-      eventElement: 'update_configuration_button',
+      app_pathname: 'configuration',
+      app_section: 'urlwhitelist',
+      app_action_value: 'configuration-save',
     });
 
     ConfigurationsActions.updateWhitelist(ConfigurationType.URL_WHITELIST_CONFIG, formConfig).then(() => {

@@ -80,8 +80,8 @@ const OutputsComponent = createReactClass({
 
   _handleCreateOutput(data) {
     this.props.sendTelemetry('form_submit', {
-      appSection: 'outputs',
-      eventElement: 'create-output',
+      app_pathname: 'outputs',
+      app_action_value: 'create-output',
     });
 
     OutputsStore.save(data, (result) => {
@@ -118,8 +118,8 @@ const OutputsComponent = createReactClass({
 
   _handleAssignOutput(outputId) {
     this.props.sendTelemetry('form_submit', {
-      appSection: 'outputs',
-      eventElement: 'assign-output',
+      app_pathname: 'outputs',
+      app_action_value: 'assign-output',
     });
 
     StreamsStore.addOutput(this.props.streamId, outputId, (response) => {
@@ -131,8 +131,8 @@ const OutputsComponent = createReactClass({
 
   _removeOutputGlobally(outputId) {
     this.props.sendTelemetry('form_submit', {
-      appSection: 'outputs',
-      eventElement: 'remove-output-globally',
+      app_pathname: 'outputs',
+      app_action_value: 'globally-remove-output',
     });
 
     // eslint-disable-next-line no-alert
@@ -148,8 +148,8 @@ const OutputsComponent = createReactClass({
 
   _removeOutputFromStream(outputId, streamId) {
     this.props.sendTelemetry('form_submit', {
-      appSection: 'outputs',
-      eventElement: 'remove-output-from-stream',
+      app_pathname: 'outputs',
+      app_action_value: 'remove-output-from-stream',
     });
 
     // eslint-disable-next-line no-alert
@@ -165,8 +165,8 @@ const OutputsComponent = createReactClass({
 
   _handleOutputUpdate(output, deltas) {
     this.props.sendTelemetry('form_submit', {
-      appSection: 'outputs',
-      eventElement: 'update-output',
+      app_pathname: 'outputs',
+      app_action_value: 'output-update',
     });
 
     OutputsStore.update(output, deltas, () => {

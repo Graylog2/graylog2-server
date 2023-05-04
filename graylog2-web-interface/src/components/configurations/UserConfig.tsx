@@ -67,8 +67,9 @@ const UserConfig = () => {
 
   const saveConfig = (values) => {
     sendTelemetry('form_submit', {
-      appSection: 'configurations_user',
-      eventElement: 'update_configuration_button',
+      app_pathname: 'configuration',
+      app_section: 'user',
+      app_action_value: 'configuration-save',
     });
 
     ConfigurationsActions.update(ConfigurationType.USER_CONFIG, values).then(() => {

@@ -73,9 +73,10 @@ const TimeRangeInput = ({
     setShow(!show);
 
     sendTelemetry('input_button_toggle', {
-      appSection: 'search_bar',
-      eventElement: 'time-range-dropdown',
-      eventInfo: {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'time-range-dropdown',
+      event_details: {
         showing: !show,
       },
     });

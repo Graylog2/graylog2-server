@@ -55,8 +55,8 @@ const InputListItem = createReactClass({
 
   _deleteInput() {
     this.props.sendTelemetry('click', {
-      appSection: 'inputs',
-      eventElement: 'delete-input',
+      app_pathname: 'inputs',
+      app_action_value: 'input-delete',
     });
 
     // eslint-disable-next-line no-alert
@@ -77,8 +77,8 @@ const InputListItem = createReactClass({
     InputsActions.update(this.props.input.id, data);
 
     this.props.sendTelemetry('form_submit', {
-      appSection: 'inputs',
-      eventElement: 'edit-input',
+      app_pathname: 'inputs',
+      app_action_value: 'input-edit',
     });
   },
 
@@ -108,8 +108,8 @@ const InputListItem = createReactClass({
                        to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
           <Button onClick={() => {
             sendTelemetry('click', {
-              appSection: 'inputs',
-              eventElement: 'show-received-messages',
+              app_pathname: 'inputs',
+              app_action_value: 'show-received-messages',
             });
           }}>
             Show received messages
@@ -132,8 +132,8 @@ const InputListItem = createReactClass({
           <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
             <Button onClick={() => {
               sendTelemetry('click', {
-                appSection: 'inputs',
-                eventElement: 'manage-extractors',
+                app_pathname: 'inputs',
+                app_action_value: 'manage-extractors',
               });
             }}>
               Manage extractors
@@ -153,8 +153,8 @@ const InputListItem = createReactClass({
           <MenuItem key={`show-metrics-${this.props.input.id}`}
                     onClick={() => {
                       sendTelemetry('click', {
-                        appSection: 'inputs',
-                        eventElement: 'show-metrics',
+                        app_pathname: 'inputs',
+                        app_action_value: 'show-metrics',
                       });
                     }}>
             Show metrics

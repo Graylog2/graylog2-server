@@ -84,9 +84,10 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
   const _onChange = (range) => {
     if (range !== null && range !== undefined) {
       sendTelemetry('input_value_change', {
-        appSection: 'search_bar',
-        eventElement: 'relative-timerange-selector',
-        eventInfo: { range },
+        app_pathname: 'search',
+        app_section: 'search-bar',
+        app_action_value: 'relative-timerange-selector',
+        event_details: { range },
       });
 
       onChange(parseInt(range, 10));

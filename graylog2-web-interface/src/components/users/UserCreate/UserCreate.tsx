@@ -196,8 +196,8 @@ const UserCreate = () => {
     _onSubmit(history, data, user.roles, setSubmitError);
 
     sendTelemetry('form_submit', {
-      appSection: 'users_overview',
-      eventElement: 'create-user',
+      app_pathname: 'users',
+      app_action_value: 'user-create-form',
     });
   };
 
@@ -225,9 +225,9 @@ const UserCreate = () => {
                                             the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session
                                               timeout
                                             </Link>
-                                                </IfPermitted> is enabled.
+                                            </IfPermitted> is enabled.
                                           </NoSearchResult>
-)} />
+                                        )} />
                 ) : (
                   <TimeoutFormGroup />
                 )}
@@ -257,9 +257,9 @@ const UserCreate = () => {
                                      key={role.id} />
                     ))}
                     {!hasValidRole && (
-                    <Alert bsStyle="danger">You need to select at least one of
-                      the <em>Reader</em> or <em>Admin</em> roles.
-                    </Alert>
+                      <Alert bsStyle="danger">You need to select at least one of
+                        the <em>Reader</em> or <em>Admin</em> roles.
+                      </Alert>
                     )}
                   </>
                 </Input>

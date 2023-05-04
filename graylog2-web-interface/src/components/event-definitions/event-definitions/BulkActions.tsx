@@ -73,8 +73,9 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
 
   const handleAction = (action) => {
     sendTelemetry('click', {
-      appSection: 'event-definition',
-      eventElement: `event-definition-bulk-${action}`,
+      app_pathname: 'event-definition',
+      app_section: 'event-definition-bulk',
+      app_action_value: `event-definition-bulk-${action}`,
     });
 
     switch (action) {
