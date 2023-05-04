@@ -52,7 +52,6 @@ const postConfigUpdate = (update) => {
 const AWSPluginConfiguration = ({ config }: Props) => {
   const [updateConfig, setUpdateConfig] = useState(_initialState(config));
   const [showAwsConfigModal, setShowAwsConfigModal] = useState(false);
-  console.log(config);
 
   const updateConfigField = (field, value) => {
     setUpdateConfig({ ...updateConfig, [field]: value });
