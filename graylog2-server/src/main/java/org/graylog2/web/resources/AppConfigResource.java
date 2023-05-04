@@ -92,7 +92,7 @@ public class AppConfigResource {
                 .put("isCloud", configuration.isCloud())
                 .put("pluginUISettings", buildPluginUISettings())
                 .put("featureFlags", toPrettyJsonString(featureFlags.getAll()))
-                .put("telemetry", toPrettyJsonString(telemetryConfiguration.toMap()))
+                .put("telemetry", toPrettyJsonString(telemetryConfiguration.telemetryFrontendSettings()))
                 .build();
         return templateEngine.transform(template, model);
     }

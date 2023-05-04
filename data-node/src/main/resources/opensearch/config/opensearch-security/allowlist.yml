@@ -1,0 +1,69 @@
+---
+_meta:
+  type: "allowlist"
+  config_version: 2
+
+# Description:
+# enabled - feature flag.
+# if enabled is false, the allowlisting feature is removed.
+# This is like removing the check that checks if an API is allowlisted.
+# This is equivalent to continuing with the usual access control checks, and removing all the code that implements allowlisting.
+# if enabled is true, then all users except SuperAdmin can access only the APIs in requests
+# SuperAdmin can access all APIs.
+# SuperAdmin is defined by the SuperAdmin certificate, which is configured in the opensearch.yml setting: plugins.security.authcz.admin_dn:
+# Refer to the example setting in opensearch.yml.example, and the opendistro documentation to know more about configuring SuperAdmin.
+#
+# requests - map of allowlisted endpoints, and the allowlisted HTTP requests for those endpoints
+
+# Examples showing how to configure this yml file (make sure the _meta data from above is also there):
+# Example 1:
+# To enable allowlisting and allowlist GET /_cluster/settings
+#
+#config:
+#  enabled: true
+#  requests:
+#    /_cluster/settings:
+#      - GET
+#
+# Example 2:
+# If you want to allowlist multiple request methods for /_cluster/settings (GET,PUT):
+#
+#config:
+#  enabled: true
+#  requests:
+#    /_cluster/settings:
+#      - GET
+#      - PUT
+#
+# Example 3:
+# If you want to allowlist other APIs as well, for example GET /_cat/nodes, and GET /_cat/shards:
+#
+#config:
+#  enabled: true
+#  requests:
+#    /_cluster/settings:
+#      - GET
+#      - PUT
+#    /_cat/nodes:
+#      - GET
+#    /_cat/shards:
+#      - GET
+#
+# Example 4:
+# If you want to disable the allowlisting feature, set enabled to false.
+#  enabled: false
+#  requests:
+#    /_cluster/settings:
+#      - GET
+#
+#At this point, all APIs become allowlisted because the feature to allowlist is off, so requests is irrelevant.
+
+
+#this name must be config
+config:
+  enabled: false
+  requests:
+    /_cluster/settings:
+      - GET
+    /_cat/nodes:
+      - GET
