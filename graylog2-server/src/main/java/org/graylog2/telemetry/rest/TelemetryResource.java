@@ -25,14 +25,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
+import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Named;
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -41,13 +37,8 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 
 import static org.graylog2.audit.AuditEventTypes.TELEMETRY_USER_SETTINGS_UPDATE;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -57,18 +48,14 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/telemetry")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TelemetryResource extends ProxiedResource {
+public class TelemetryResource extends RestResource {
 
     private final TelemetryService telemetryService;
     private final AuditEventSender auditEventSender;
 
-    protected TelemetryResource(NodeService nodeService,
-                                RemoteInterfaceProvider remoteInterfaceProvider,
-                                @Context HttpHeaders httpHeaders,
-                                @Named("proxiedRequestsExecutorService") ExecutorService executorService,
-                                TelemetryService telemetryService,
+    @Inject
+    protected TelemetryResource(TelemetryService telemetryService,
                                 AuditEventSender auditEventSender) {
-        super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
         this.telemetryService = telemetryService;
         this.auditEventSender = auditEventSender;
     }
@@ -76,7 +63,7 @@ public class TelemetryResource extends ProxiedResource {
     @GET
     @ApiOperation(value = "Get telemetry information.")
     public Map<String, Object> get() {
-        return telemetryService.getTelemetryResponse(getCurrentUserOrThrow(), getSystemOverviewResponses());
+        return telemetryService.getTelemetryResponse(getCurrentUserOrThrow());
     }
 
     @GET
@@ -116,17 +103,4 @@ public class TelemetryResource extends ProxiedResource {
         }
         return currentUser;
     }
-
-
-    private Map<String, SystemOverviewResponse> getSystemOverviewResponses() {
-        Map<String, SystemOverviewResponse> results = new HashMap<>();
-        requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::system)
-                .forEach((s, r) -> results.put(s, toSystemOverviewResponse(r)));
-        return results;
-    }
-
-    private SystemOverviewResponse toSystemOverviewResponse(CallResult<SystemOverviewResponse> callResult) {
-        return Optional.ofNullable(callResult.response()).flatMap(NodeResponse::entity).orElse(null);
-    }
-
 }

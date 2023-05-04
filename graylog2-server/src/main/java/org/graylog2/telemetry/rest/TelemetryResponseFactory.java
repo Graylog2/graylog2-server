@@ -19,7 +19,6 @@ package org.graylog2.telemetry.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.flattener.JsonFlattener;
-import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
@@ -82,7 +81,7 @@ class TelemetryResponseFactory {
 
     Map<String, Object> createClusterInfo(String clusterId,
                                           DateTime clusterCreationDate,
-                                          Map<String, SystemOverviewResponse> nodes,
+                                          Map<String, Object> nodes,
                                           long averageLastMonthTraffic,
                                           long usersCount) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
