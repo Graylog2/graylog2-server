@@ -28,6 +28,7 @@ import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.graylog2.telemetry.user.db.TelemetryUserSettingsDto;
 import org.joda.time.DateTime;
@@ -37,12 +38,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.system.traffic.TrafficCounterService.TrafficHistogram;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -132,6 +138,60 @@ public class TelemetryServiceTest {
         when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> telemetryService.getTelemetryResponse(user));
+    }
+
+    @Test
+    void test_licenses() {
+        TelemetryService telemetryService = createTelemetryService(true);
+        mockUserTelemetryEnabled(true);
+        when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
+        TelemetryLicenseStatus enterpriseLicense = createLicense("/license/enterprise");
+        TelemetryLicenseStatus expiredEnterpriseLicense = enterpriseLicense.toBuilder().expired(true).build();
+        TelemetryLicenseStatus invalidEnterpriseLicense = enterpriseLicense.toBuilder().valid(false).build();
+        TelemetryLicenseStatus olderEnterpriseLicense = enterpriseLicense.toBuilder()
+                .expirationDate(enterpriseLicense.expirationDate().minusDays(1)).build();
+        TelemetryLicenseStatus securityLicense = createLicense("/license/security");
+        when(enterpriseDataProvider.licenseStatus()).thenReturn(List.of(
+                olderEnterpriseLicense,
+                invalidEnterpriseLicense,
+                enterpriseLicense,
+                expiredEnterpriseLicense,
+                securityLicense));
+
+        Map<String, Object> response = telemetryService.getTelemetryResponse(user);
+
+        assertThat(response.get(LICENSE)).isEqualTo(merge(
+                toMap(enterpriseLicense, "enterprise"),
+                toMap(securityLicense, "security")));
+    }
+
+    @SafeVarargs
+    public final Map<String, Object> merge(Map<String, Object>... values) {
+        return Stream.of(values)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> v1));
+    }
+
+    private Map<String, Object> toMap(TelemetryLicenseStatus license, String licenseName) {
+        return Map.of(
+                f("license.%s.violated", licenseName), license.violated(),
+                f("license.%s.expired", licenseName), license.expired(),
+                f("license.%s.valid", licenseName), license.valid(),
+                f("license.%s.expiration_date", licenseName), license.expirationDate()
+        );
+    }
+
+    private TelemetryLicenseStatus createLicense(String subject) {
+        return TelemetryLicenseStatus.builder()
+                .valid(true)
+                .violated(false)
+                .expired(false)
+                .subject(subject)
+                .expirationDate(ZonedDateTime.now())
+                .build();
     }
 
     private void assertThatAllTelemetryDataIsPresent(Map<String, Object> response) {

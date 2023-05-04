@@ -24,9 +24,12 @@ import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -114,7 +117,35 @@ class TelemetryResponseFactory {
     }
 
     private Map<String, Object> createLicenseInfo(List<TelemetryLicenseStatus> telemetryLicenseStatuses) {
-        return flatten(Map.of(LICENSE, Map.of(LICENSE, telemetryLicenseStatuses)));
+        Map<String, List<TelemetryLicenseStatus>> groupedBySubject = telemetryLicenseStatuses.stream()
+                .collect(Collectors.groupingBy(TelemetryLicenseStatus::subject));
+
+        List<TelemetryLicenseStatus> uniqueLicenses = groupedBySubject.values().stream()
+                .map(this::filter).flatMap(Collection::stream).toList();
+        Map<String, Object> licenses = new LinkedHashMap<>();
+        for (TelemetryLicenseStatus l : uniqueLicenses) {
+            String licenseString = formatLicenseString(l);
+            licenses.put(f("%s.expired", licenseString), l.expired());
+            licenses.put(f("%s.valid", licenseString), l.valid());
+            licenses.put(f("%s.violated", licenseString), l.violated());
+            licenses.put(f("%s.expiration_date", licenseString), l.expirationDate());
+        }
+        return licenses;
+    }
+
+    private List<TelemetryLicenseStatus> filter(List<TelemetryLicenseStatus> telemetryLicenseStatuses1) {
+        Comparator<TelemetryLicenseStatus> compareIsValid = Comparator.comparing(TelemetryLicenseStatus::valid).reversed();
+        Comparator<TelemetryLicenseStatus> compareIsExpired = Comparator.comparing(TelemetryLicenseStatus::expired);
+        Comparator<TelemetryLicenseStatus> compareByDate = Comparator.comparing(TelemetryLicenseStatus::expirationDate).reversed();
+
+        return telemetryLicenseStatuses1.stream()
+                .min(compareIsValid.thenComparing(compareIsExpired).thenComparing(compareByDate))
+                .map(List::of)
+                .orElse(List.of());
+    }
+
+    private String formatLicenseString(TelemetryLicenseStatus telemetryLicenseStatus) {
+        return telemetryLicenseStatus.subject().replace("/", ".").substring(1);
     }
 
     private Map<String, Object> flatten(Object o) {
@@ -124,5 +155,4 @@ class TelemetryResponseFactory {
             throw new RuntimeException(f("Couldn't serialize %s!", o), e);
         }
     }
-
 }
