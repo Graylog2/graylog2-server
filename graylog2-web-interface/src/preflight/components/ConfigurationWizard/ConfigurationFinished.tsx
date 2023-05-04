@@ -14,26 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
+import * as React from 'react';
+import { Title, Space } from '@mantine/core';
 
-export type DataNode = {
-  hostname: string,
-  id: string,
-  is_leader: boolean,
-  is_master: boolean,
-  last_seen: string,
-  node_id: string,
-  short_node_id: string,
-  transport_address: string,
-  type: string,
-}
+import { Button } from 'preflight/components/common';
 
-export type DataNodes = Array<DataNode>;
+const ConfigurationFinished = () => (
+  <div>
+    <Title order={3}>All data nodes are secured and reachable.</Title>
+    <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
+    <Space h="md" />
+    <Button>Resume startup</Button>
+  </div>
+);
 
-export type DataNodesCAStatus = {
-  isConfigured: boolean
-}
-
-export type DataNodeStatus = typeof DATA_NODES_STATUS[keyof typeof DATA_NODES_STATUS]['key']
-
-export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']
+export default ConfigurationFinished;

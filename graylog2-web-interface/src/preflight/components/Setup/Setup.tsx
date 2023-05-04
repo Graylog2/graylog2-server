@@ -22,6 +22,7 @@ import DocsHelper from 'util/DocsHelper';
 import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
+import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
 
 const P = styled.p`
   max-width: 700px;
@@ -51,6 +52,8 @@ const Setup = ({ onResumeStartup }: Props) => (
       If you want to configure an Elasticsearch or OpenSearch node manually, you need to adjust the Graylog configuration and restart the Graylog server.
       After the restart this page will not show up again.
     </P>
+
+    <ConfigurationWizard />
   </Section>
 );
 

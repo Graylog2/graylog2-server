@@ -14,26 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
+import * as React from 'react';
 
-export type DataNode = {
-  hostname: string,
-  id: string,
-  is_leader: boolean,
-  is_master: boolean,
-  last_seen: string,
-  node_id: string,
-  short_node_id: string,
-  transport_address: string,
-  type: string,
-}
+const CAForm = () => <div>The form</div>;
 
-export type DataNodes = Array<DataNode>;
-
-export type DataNodesCAStatus = {
-  isConfigured: boolean
-}
-
-export type DataNodeStatus = typeof DATA_NODES_STATUS[keyof typeof DATA_NODES_STATUS]['key']
-
-export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']
+export default CAForm;
