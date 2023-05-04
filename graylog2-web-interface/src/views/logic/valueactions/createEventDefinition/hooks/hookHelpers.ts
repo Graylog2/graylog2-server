@@ -28,7 +28,7 @@ import type ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { FiltersType } from 'views/types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
+import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 
 export const getStreams = (filter: FilterType): Array<string> => {
   if (!filter) return [];
@@ -47,7 +47,7 @@ export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: str
   }).map((path) => {
     const [field, value] = Object.entries(path)[0];
 
-    return `${field}:${value}`;
+    return `${field}:${escape(value)}`;
   }), { withBrackets: false });
 };
 
@@ -99,20 +99,20 @@ export const aggregationValueHandler: AggregationHandler = ({ widget, value, fie
   const rowValuePath = transformValuePathToQuery(rowPaths);
 
   return ({
-    searchFromValue: `${field}:${value}`,
+    searchFromValue: `${field}:${escape(value)}`,
     rowValuePath,
   });
 };
 
 export const messagesValueHandler: AggregationHandler = ({ value, field }) => {
   return ({
-    searchFromValue: `${field}:${value}`,
+    searchFromValue: `${field}:${escape(value)}`,
   });
 };
 
 export const logsValueHandler: AggregationHandler = ({ value, field }) => {
   return ({
-    searchFromValue: `${field}:${value}`,
+    searchFromValue: `${field}:${escape(value)}`,
   });
 };
 

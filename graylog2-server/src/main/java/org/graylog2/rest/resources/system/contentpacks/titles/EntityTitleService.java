@@ -131,7 +131,7 @@ public class EntityTitleService {
     private boolean checkCanReadTitle(final Subject subject,
                                       final String readPermission,
                                       final String idAsString) {
-        return DbEntity.ALL_ALOWED.equals(readPermission) ||
+        return DbEntity.ALL_ALLOWED.equals(readPermission) ||
                 subject.isPermitted(readPermission + ":" + idAsString);
     }
 }

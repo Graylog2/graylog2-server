@@ -69,7 +69,7 @@ class MongoEntitySuggestionServiceTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsTrueWhenCatalogHasAllAllowedPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, DbEntity.ALL_ALOWED))
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, DbEntity.ALL_ALLOWED))
         ).when(catalog)
                 .getByCollectionName("streams");
 

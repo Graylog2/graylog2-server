@@ -83,7 +83,7 @@ const MessageActions = ({
   const menuActions = useMemo(() => pluggableMenuActions.map((PluggableMenuAction) => <PluggableMenuAction id={id} index={index} />), [id, index, pluggableMenuActions]);
 
   if (disabled) {
-    return <ButtonGroup className="pull-right" bsSize="small" />;
+    return <ButtonGroup bsSize="small" />;
   }
 
   const messageUrl = index ? Routes.message_show(index, id) : '#';
@@ -100,7 +100,7 @@ const MessageActions = ({
   const showChanges = decorationStats && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
 
   return (
-    <ButtonGroup className="pull-right" bsSize="small">
+    <ButtonGroup bsSize="small">
       {showChanges}
       <Button href={messageUrl}>Permalink</Button>
       {menuActions}

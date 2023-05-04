@@ -18,12 +18,16 @@ import UserNotification from 'util/UserNotification';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { loadDashboard } from 'views/logic/views/Actions';
 import type { HistoryFunction } from 'routing/useHistory';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
 
 import type View from './View';
 
-export default (view: View, history: HistoryFunction) => async () => {
+export default (view: View, history: HistoryFunction) => async (dispatch: AppDispatch) => {
   try {
     const savedView = await ViewManagementActions.create(view);
+    dispatch(setIsDirty(false));
+    dispatch(setIsNew(false));
     loadDashboard(history, savedView.id);
     UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
   } catch (error) {

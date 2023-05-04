@@ -18,7 +18,6 @@ values. Please see the sample [graylog.conf](https://github.com/Graylog2/graylog
 - `elasticsearch_replicas`
 - `disable_index_optimization`
 - `index_optimization_max_num_segments`
-- `index_field_type_periodical_full_refresh_interval`
 - `rotation_strategy`
 - `elasticsearch_max_docs_per_index`
 - `elasticsearch_max_size_per_index`
@@ -108,6 +107,8 @@ The following Java Code API changes have been made.
 | `IndexSetValidator#validateRetentionPeriod`  | The method argument have changed from `IndexSetConfig` to `RotationStrategyConfig, RetentionStrategyConfig` |
 | `ElasticsearchConfiguration#getIndexPrefix`  | The method name has changed to `getDefaultIndexPrefix`                                                      |
 | `ElasticsearchConfiguration#getTemplateName` | The method name has changed to `getDefaultIndexTemplateName`                                                |
+| `AuthServiceBackendConfig#externalHTTPHosts` | This method was added to the interface                                                                      |
+
 
 All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
 have been un-deprecated, as Graylog intends to maintain them going forward. 
