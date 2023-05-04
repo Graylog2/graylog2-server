@@ -19,20 +19,20 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,11 +40,11 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesTabularResponseCreator.class);
 
-    private final FieldTypesLookup fieldTypesLookup;
+    private final MappedFieldTypesService mappedFieldTypesService;
 
     @Inject
-    public MessagesTabularResponseCreator(final FieldTypesLookup fieldTypesLookup) {
-        this.fieldTypesLookup = fieldTypesLookup;
+    public MessagesTabularResponseCreator(final MappedFieldTypesService mappedFieldTypesService) {
+        this.mappedFieldTypesService = mappedFieldTypesService;
     }
 
     public TabularResponse mapToResponse(final MessagesRequestSpec messagesRequestSpec,
@@ -68,14 +68,22 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
     private TabularResponse mapToResponse(final MessagesRequestSpec searchRequestSpec,
                                           final MessageList.Result messageListResult,
                                           final SearchUser searchUser) {
-        final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
-        final Map<String, String> fieldTypes = fieldTypesLookup.getTypes(streams, new HashSet<>(searchRequestSpec.fields()));
-
         return new TabularResponse(
-                searchRequestSpec.getSchema(fieldTypes),
+                getSchema(searchRequestSpec, searchUser),
                 getDatarows(searchRequestSpec, messageListResult),
                 new Metadata(messageListResult.effectiveTimerange())
         );
+    }
+
+    private List<ResponseSchemaEntry> getSchema(MessagesRequestSpec searchRequestSpec, SearchUser searchUser) {
+        final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
+        final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
+        final MessageFieldTypeMapper fieldsMapper = new MessageFieldTypeMapper(knownFields);
+
+        return searchRequestSpec.fields()
+                .stream()
+                .map(fieldsMapper)
+                .collect(Collectors.toList());
     }
 
     private static List<List<Object>> getDatarows(final MessagesRequestSpec messagesRequestSpec,
