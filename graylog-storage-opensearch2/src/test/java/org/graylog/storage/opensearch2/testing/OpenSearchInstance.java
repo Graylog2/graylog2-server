@@ -46,7 +46,7 @@ import static java.util.Objects.isNull;
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
-    public static final String DEFAULT_HEAP_SIZE = "4g";
+    public static final String DEFAULT_HEAP_SIZE = "2g";
     public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
     private final OpenSearchClient openSearchClient;
@@ -136,7 +136,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("plugins.security.ssl.http.enabled", "false")
