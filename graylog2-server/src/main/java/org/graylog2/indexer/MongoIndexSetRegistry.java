@@ -101,7 +101,6 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
         }
         return mongoIndexSets.build();
     }
-
     @Override
     public Set<IndexSet> getAll() {
         return ImmutableSet.copyOf(findAllMongoIndexSets());
@@ -110,10 +109,10 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public Optional<IndexSet> get(final String indexSetId) {
         return this.indexSetsCache.get()
-            .stream()
-            .filter(indexSet -> Objects.equals(indexSet.id(), indexSetId))
-            .map(indexSetConfig -> (IndexSet)mongoIndexSetFactory.create(indexSetConfig))
-            .findFirst();
+                .stream()
+                .filter(indexSet -> Objects.equals(indexSet.id(), indexSetId))
+                .map(indexSetConfig -> (IndexSet) mongoIndexSetFactory.create(indexSetConfig))
+                .findFirst();
     }
 
     @Override
@@ -138,6 +137,16 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
         }
 
         return resultBuilder.build();
+    }
+
+    @Override
+    public Set<IndexSet> getFromIndexConfig(Collection<IndexSetConfig> indexSetConfigs) {
+        final ImmutableSet.Builder<MongoIndexSet> mongoIndexSets = ImmutableSet.builder();
+        for (IndexSetConfig config : indexSetConfigs) {
+            final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(config);
+            mongoIndexSets.add(mongoIndexSet);
+        }
+        return ImmutableSet.copyOf(mongoIndexSets.build());
     }
 
     @Override
