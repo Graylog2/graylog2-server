@@ -64,7 +64,7 @@ public class SystemJobManager {
         return submitWithDelay(job, 0, TimeUnit.SECONDS);
     }
 
-    public String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
+    public synchronized String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
         // for immediate jobs, check allowed concurrency right now
         if (delay == 0) {
             checkAllowedConcurrency(job);
