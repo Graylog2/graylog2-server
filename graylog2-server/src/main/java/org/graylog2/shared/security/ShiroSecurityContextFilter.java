@@ -137,12 +137,12 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         if ("token".equalsIgnoreCase(credential)) {
             return new AccessTokenAuthToken(userName, host);
         }
-        if (!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(credential)) {
-            return new UsernamePasswordToken(userName, credential, host);
-        }
         if (cookies.containsKey(SESSION_COOKIE_NAME)) {
             final Cookie authenticationCookie = cookies.get(SESSION_COOKIE_NAME);
             return new SessionIdToken(authenticationCookie.getValue(), host, remoteAddr);
+        }
+        if (!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(credential)) {
+            return new UsernamePasswordToken(userName, credential, host);
         }
 
         return new PossibleTrustedHeaderToken(host, remoteAddr);

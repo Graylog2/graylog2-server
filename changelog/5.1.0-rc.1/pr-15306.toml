@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix query parser's tokenizer state after regex has ended."
+
+issues = ["Graylog2/graylog-plugin-enterprise#5014"]
+pulls = ["15306"]
+

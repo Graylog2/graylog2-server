@@ -17,10 +17,11 @@
 
 import { useMemo } from 'react';
 
+import Store from 'logic/local-storage/Store';
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 
-export type EventDefinitionURLConfig = {
+export type EventDefinitionLocalStorageConfig = {
   type,
   query?: string,
   streams?: Array<string>,
@@ -45,14 +46,16 @@ type EventDefinitionConfigFromUrl = {
   },
 }
 
-const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromUrl: EventDefinitionConfigFromUrl } => {
+const useEventDefinitionConfigFromLocalStorage = (): { hasLocalStorageConfig: boolean; configFromLocalStorage: EventDefinitionConfigFromUrl } => {
   const {
-    config: urlConfig,
+    'session-id': sessionId,
   } = useQuery();
 
   return useMemo(() => {
-    if (!urlConfig) return ({ hasUrlConfig: false, configFromUrl: undefined });
-    const parsedUrlConfig: EventDefinitionURLConfig = JSON.parse(urlConfig as string);
+    const parsedLocalStorageConfig = Store.get(sessionId);
+    if (!parsedLocalStorageConfig) return ({ hasLocalStorageConfig: false, configFromLocalStorage: undefined });
+    Store.delete(sessionId);
+
     const {
       type,
       query,
@@ -63,9 +66,9 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
       agg_field,
       agg_value,
       loc_query_parameters,
-    } = parsedUrlConfig;
+    } = parsedLocalStorageConfig;
 
-    const aggData = (agg_function && agg_field && agg_value) ? {
+    const aggData = (agg_function && agg_value) ? {
       conditions: {
         expression: {
           expr: undefined,
@@ -78,8 +81,8 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
     } : {};
 
     return ({
-      hasUrlConfig: true,
-      configFromUrl: {
+      hasLocalStorageConfig: true,
+      configFromLocalStorage: {
         type,
         query: query ?? '',
         streams: streams ?? [],
@@ -89,7 +92,7 @@ const useEventDefinitionConfigFromUrl = (): { hasUrlConfig: boolean; configFromU
         ...aggData,
       },
     });
-  }, [urlConfig]);
+  }, [sessionId]);
 };
 
-export default useEventDefinitionConfigFromUrl;
+export default useEventDefinitionConfigFromLocalStorage;

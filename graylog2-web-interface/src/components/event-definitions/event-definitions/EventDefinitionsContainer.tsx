@@ -150,6 +150,7 @@ const EventDefinitionsContainer = () => {
                                             pageSize={layoutConfig.pageSize}
                                             bulkActions={renderBulkActions}
                                             activeSort={layoutConfig.sort}
+                                            actionsCellWidth={160}
                                             rowActions={renderEventDefinitionActions}
                                             columnRenderers={columnRenderers}
                                             columnDefinitions={columnDefinitions}

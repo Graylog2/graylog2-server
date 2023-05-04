@@ -31,7 +31,7 @@ import { EventNotificationsActions, EventNotificationsStore } from 'stores/event
 import 'components/event-notifications/event-notification-types';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
-import useEventDefinitionConfigFromUrl from 'components/event-definitions/hooks/useEventDefinitionConfigFromUrl';
+import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 
 import EventDefinitionForm from './EventDefinitionForm';
 
@@ -58,7 +58,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
-  const { configFromUrl, hasUrlConfig } = useEventDefinitionConfigFromUrl();
+  const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
 
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
@@ -82,8 +82,8 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
     fetchClusterConfig();
     fetchNotifications();
 
-    if (hasUrlConfig) {
-      const conditionPlugin = getConditionPlugin(configFromUrl.type);
+    if (hasLocalStorageConfig) {
+      const conditionPlugin = getConditionPlugin(configFromLocalStorage.type);
       const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
 
       setEventDefinition((cur) => {
@@ -94,12 +94,12 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
           config: {
             ...defaultConfig,
             ...cloned.config,
-            ...configFromUrl,
+            ...configFromLocalStorage,
           },
         });
       });
     }
-  }, [configFromUrl, fetchClusterConfig, hasUrlConfig]);
+  }, [configFromLocalStorage, fetchClusterConfig, hasLocalStorageConfig]);
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
