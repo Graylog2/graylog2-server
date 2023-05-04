@@ -124,9 +124,9 @@ const Time = ({ index }: Props) => (
             <OverlayDropdownButton title={TimeUnits[value.unit] || ''}>
               {Object.keys(TimeUnits).map((unit) => (
                 <MenuItem key={unit}
-                              onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>
-                      {TimeUnits[unit]}
-                    </MenuItem>
+                          onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>
+                  {TimeUnits[unit]}
+                </MenuItem>
               ))}
             </OverlayDropdownButton>
           </InputGroup.Button>

@@ -64,11 +64,11 @@ const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) 
               <li>
                 {_cap(dependency.type)}: <i>{dependency.title}</i><br />
                 Owners: {dependency.owners.map((owner, key) => (
-                      <span key={owner.id}>
-                        {_cap(owner.type)} <i>{owner.title}</i>
-                        {key !== dependency.owners.size - 1 && ', '}
-                      </span>
-                    ))}
+                  <span key={owner.id}>
+                    {_cap(owner.type)} <i>{owner.title}</i>
+                    {key !== dependency.owners.size - 1 && ', '}
+                  </span>
+                ))}
               </li>
             </List>
           ))}
