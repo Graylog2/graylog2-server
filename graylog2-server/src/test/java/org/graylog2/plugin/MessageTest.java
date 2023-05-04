@@ -24,11 +24,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -75,6 +79,7 @@ public class MessageTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
+    private final ElasticsearchConfiguration elasticsearchConfiguration = mock(ElasticsearchConfiguration.class);
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private Message message;
     private DateTime originalTimestamp;
@@ -85,15 +90,28 @@ public class MessageTest {
     public void setUp() {
         DateTimeUtils.setCurrentMillisFixed(1524139200000L);
 
+        Module configModule = new AbstractModule() {
+            // Inject custom ElasticsearchConfiguration
+            @Override
+            protected void configure() {
+                bind(ElasticsearchConfiguration.class).toInstance(elasticsearchConfiguration);
+            }
+        };
+        GuiceInjectorHolder.clearInjector();
+        GuiceInjectorHolder.createInjector(Collections.singletonList(configModule));
+
         metricRegistry = new MetricRegistry();
         originalTimestamp = Tools.nowUTC();
         message = new Message("foo", "bar", originalTimestamp);
         invalidTimestampMeter = metricRegistry.meter("test");
 
+        when(elasticsearchConfiguration.getReplaceDotsInFieldNames())
+                .thenReturn(true); // Set to default value
     }
 
     @After
     public void tearDown() {
+        GuiceInjectorHolder.clearInjector();
         DateTimeUtils.setCurrentMillisSystem();
     }
 
@@ -420,6 +438,25 @@ public class MessageTest {
         // Elasticsearch >=2.0 does not allow "." in keys. Make sure we replace them before writing the message.
         assertEquals("#toElasticsearchObject() should replace \".\" in keys with a \"_\"",
                 "dot", object.get("field_3"));
+
+        assertEquals("foo", object.get("message"));
+        assertEquals("bar", object.get("source"));
+        assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
+
+        @SuppressWarnings("unchecked")
+        final Collection<String> streams = (Collection<String>) object.get("streams");
+        assertThat(streams).isEmpty();
+    }
+
+    @Test
+    public void testToElasticSearchObjectWithDotReplacementDisabled() throws Exception {
+        when(elasticsearchConfiguration.getReplaceDotsInFieldNames()).thenReturn(false);
+        message.addField("field.3", "dot");
+
+        final Map<String, Object> object = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
+
+        assertEquals("#toElasticsearchObject() should keep \".\" in keys when replace_dots_in_field_names = false",
+                "dot", object.get("field.3"));
 
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));

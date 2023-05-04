@@ -100,6 +100,12 @@ const JSONExtractorConfiguration = createReactClass({
     return this.state.trying || !this.props.exampleMessage;
   },
 
+  _keySeparatorError(separator) {
+    return separator.includes(".")
+      ? "Warning: Elasticsearch does not allow '.' in field names from version 2.0 up to 5.0 (excluded)"
+      : null
+  },
+
   render() {
     return (
       <div>
@@ -129,6 +135,7 @@ const JSONExtractorConfiguration = createReactClass({
                defaultValue={this.state.configuration.key_separator}
                required
                onChange={this._onChange('key_separator')}
+               error={this._keySeparatorError(this.state.configuration.key_separator)}
                help={<span>What string to use to concatenate different keys of a nested JSON object (only used if <em>not</em> flattened).</span>} />
 
         <Input type="text"

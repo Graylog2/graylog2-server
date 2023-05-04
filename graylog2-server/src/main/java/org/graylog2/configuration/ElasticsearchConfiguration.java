@@ -274,6 +274,9 @@ public class ElasticsearchConfiguration {
         return timeSizeOptimizingRotationFixedLeeway;
     }
 
+    @Parameter(value = "replace_dots_in_field_names")
+    private Boolean replaceDotsInFieldNames = true;
+
     public boolean isDisableVersionCheck() {
         return disableVersionCheck;
     }
@@ -332,5 +335,9 @@ public class ElasticsearchConfiguration {
                     MAX_INDEX_RETENTION_PERIOD, getMaxIndexRetentionPeriod())
             );
         }
+    }
+
+    public Boolean getReplaceDotsInFieldNames() {
+        return replaceDotsInFieldNames;
     }
 }
