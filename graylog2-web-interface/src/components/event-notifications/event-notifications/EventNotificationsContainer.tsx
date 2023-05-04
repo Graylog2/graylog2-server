@@ -29,6 +29,7 @@ import '../event-notification-types';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from 'components/event-notifications/event-notifications/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
 import NotificationTitle from './NotificationTitle';
@@ -74,6 +75,7 @@ const EventNotificationsContainer = () => {
     sort: layoutConfig.sort,
   });
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
+  const sendTelemetry = useSendTelemetry();
   const columnRenderers = useMemo(() => customColumnRenderers(testResults), [testResults]);
   const columnDefinitions = useMemo(
     () => ([...(paginatedEventNotifications?.attributes ?? [])]),
@@ -104,6 +106,12 @@ const EventNotificationsContainer = () => {
   }, [paginationQueryParameter, updateTableLayout]);
 
   const handleTest = useCallback((notification: EventNotification) => {
+    sendTelemetry('input_value_change', {
+      app_pathname: 'events',
+      app_section: 'event-notification',
+      app_action_value: 'notification-test',
+    });
+
     getNotificationTest(notification);
     refetchEventNotifications();
   }, [getNotificationTest, refetchEventNotifications]);

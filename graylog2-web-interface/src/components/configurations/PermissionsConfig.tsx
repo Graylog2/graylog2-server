@@ -63,7 +63,7 @@ const PermissionsConfig = () => {
 
   const saveConfig = (values: PermissionsConfigType) => {
     sendTelemetry('form_submit', {
-      app_pathname: 'configuration',
+      app_pathname: 'configurations',
       app_section: 'permissions',
       app_action_value: 'configuration-save',
     });

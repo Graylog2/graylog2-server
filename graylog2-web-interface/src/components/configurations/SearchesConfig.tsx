@@ -154,7 +154,7 @@ const SearchesConfig = () => {
     const update = { ...formConfig };
 
     sendTelemetry('form_submit', {
-      app_pathname: 'configuration',
+      app_pathname: 'configurations',
       app_section: 'search',
       app_action_value: 'configuration-save',
     });

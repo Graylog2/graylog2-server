@@ -102,7 +102,7 @@ const ThreatIntelPluginConfig = createReactClass({
     const { updateConfig, sendTelemetry } = this.props;
 
     sendTelemetry('form_submit', {
-      app_pathname: 'configuration',
+      app_pathname: 'configurations',
       app_section: 'threat-intel',
       app_action_value: 'configuration-save',
     });
