@@ -60,6 +60,7 @@ describe('NewDashboardPage', () => {
     asMock(useLocation).mockReturnValue(mockLocation);
     asMock(useQuery).mockReturnValue({});
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: View.create(), executionState: SearchExecutionState.empty() });
+    asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
   afterEach(() => {

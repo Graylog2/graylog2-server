@@ -29,6 +29,8 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useCreateSearch from 'views/hooks/useCreateSearch';
+import type View from 'views/logic/views/View';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -63,6 +65,7 @@ describe('NewSearchPage', () => {
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
+    asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
   it('should render minimal', async () => {
