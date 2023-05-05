@@ -73,6 +73,7 @@ export const adminUser = User.builder()
   .sessionTimeoutMs(10000000000)
   .clientAddress('192.168.0.1')
   .accountStatus('enabled')
+  .startpage(null)
   .build();
 
 export const userList = Immutable.List<User>([adminUser, bob, alice]);

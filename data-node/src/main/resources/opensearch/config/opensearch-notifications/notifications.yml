@@ -1,0 +1,12 @@
+---
+##
+ # Copyright OpenSearch Contributors
+ # SPDX-License-Identifier: Apache-2.0
+##
+
+# configuration file for the notifications plugin
+opensearch.notifications:
+  general:
+    operation_timeout_ms: 60000 # 60 seconds, Minimum 100ms
+    default_items_query_count: 100 # default number of items to query
+    filter_send_by_backend_roles: false # Does sendNotification needs to validate user's backend roles

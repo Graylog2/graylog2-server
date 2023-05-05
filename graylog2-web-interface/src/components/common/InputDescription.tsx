@@ -44,7 +44,7 @@ const InputDescription = ({ className, error, help }: Props) => {
   }
 
   return (
-    <HelpBlock className={`${className} no-bm`}>
+    <HelpBlock className={`${className ?? ''} input-description`}>
       {error && (
         <ErrorMessage>
           {error}

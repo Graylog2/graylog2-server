@@ -24,10 +24,12 @@ import type { UserTelemetrySettings } from 'stores/telemetry/TelemetrySettingsSt
 import {
   TelemetrySettingsActions,
 } from 'stores/telemetry/TelemetrySettingsStore';
+import AppConfig from 'util/AppConfig';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 
 const TelemetrySettingsConfig = () => {
   const [settings, setSettings] = useState<UserTelemetrySettings | undefined>(undefined);
+  const { enabled: isTelemetryEnabled } = AppConfig.telemetry() || {};
 
   useEffect(() => {
     TelemetrySettingsActions.get().then((result) => {
@@ -59,6 +61,7 @@ const TelemetrySettingsConfig = () => {
                    label="Enable telemetry">
               <FormikFormGroup label="enabled"
                                name="telemetry_enabled"
+                               disabled={!isTelemetryEnabled}
                                formGroupClassName="form-group no-bm"
                                type="checkbox" />
             </Input>
@@ -67,7 +70,7 @@ const TelemetrySettingsConfig = () => {
               <Col xs={12}>
                 <div className="pull-right">
                   <Button bsStyle="success"
-                          disabled={isSubmitting || !isValid}
+                          disabled={isSubmitting || !isValid || !isTelemetryEnabled}
                           title="Update Preferences"
                           type="submit">
                     Update telemetry

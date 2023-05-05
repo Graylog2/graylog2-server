@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix show Index Failure section on System Overview for Cloud."
+
+issues = ["4774"]
+pulls = ["15398"]
+

@@ -35,7 +35,11 @@ type Props = {
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const pluggableEventActions = usePluginEntities('views.components.eventActions');
-  const eventActions = useMemo(() => pluggableEventActions.map((PluggableEventAction) => <PluggableEventAction event={event} />), [pluggableEventActions, event]);
+  const eventActions = useMemo(() => pluggableEventActions.map(
+    ({ component: PluggableEventAction, key }) => (
+      <PluggableEventAction key={key} event={event} />
+    ),
+  ), [pluggableEventActions, event]);
 
   const plugin = useMemo(() => {
     if (event.event_definition_type === undefined) {

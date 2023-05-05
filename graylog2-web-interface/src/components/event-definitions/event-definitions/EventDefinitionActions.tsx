@@ -179,7 +179,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                      entityType="event_definition"
                      onClick={() => setShowEntityShareModal(true)}
                      bsSize="xsmall" />
-        <OverlayDropdownButton title="More Actions"
+        <OverlayDropdownButton title="More"
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
           {showActions() && (

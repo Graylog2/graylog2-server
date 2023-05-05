@@ -27,7 +27,7 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
-import org.graylog2.shared.rest.resources.annotations.CSP;
+import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
 
 import javax.inject.Inject;
@@ -92,7 +92,7 @@ public class AppConfigResource {
                 .put("isCloud", configuration.isCloud())
                 .put("pluginUISettings", buildPluginUISettings())
                 .put("featureFlags", toPrettyJsonString(featureFlags.getAll()))
-                .put("telemetry", toPrettyJsonString(telemetryConfiguration.toMap()))
+                .put("telemetry", toPrettyJsonString(telemetryConfiguration.telemetryFrontendSettings()))
                 .build();
         return templateEngine.transform(template, model);
     }

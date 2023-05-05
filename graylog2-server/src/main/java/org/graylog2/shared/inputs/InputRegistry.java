@@ -18,25 +18,28 @@ package org.graylog2.shared.inputs;
 
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Singleton
-public class InputRegistry extends HashSet<IOState<MessageInput>> {
+public class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
 
+    private final Set<IOState<MessageInput>> inputStates = Sets.newConcurrentHashSet();
+
     public Set<IOState<MessageInput>> getInputStates() {
-        return ImmutableSet.copyOf(this);
+        return ImmutableSet.copyOf(inputStates);
     }
 
     public IOState<MessageInput> getInputState(String inputId) {
-        for (IOState<MessageInput> inputState : this) {
+        for (IOState<MessageInput> inputState : inputStates) {
             if (inputState.getStoppable().getPersistId().equals(inputId)) {
                 return inputState;
             }
@@ -47,7 +50,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
 
     public Set<IOState<MessageInput>> getRunningInputs() {
         ImmutableSet.Builder<IOState<MessageInput>> runningInputs = ImmutableSet.builder();
-        for (IOState<MessageInput> inputState : this) {
+        for (IOState<MessageInput> inputState : inputStates) {
             if (inputState.getState() == IOState.Type.RUNNING) {
                 runningInputs.add(inputState);
             }
@@ -56,7 +59,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
     }
 
     public boolean hasTypeRunning(Class klazz) {
-        for (IOState<MessageInput> inputState : this) {
+        for (IOState<MessageInput> inputState : inputStates) {
             if (inputState.getStoppable().getClass().equals(klazz)) {
                 return true;
             }
@@ -70,7 +73,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
     }
 
     public MessageInput getRunningInput(String inputId) {
-        for (IOState<MessageInput> inputState : this) {
+        for (IOState<MessageInput> inputState : inputStates) {
             if (inputState.getStoppable().getId().equals(inputId)) {
                 return inputState.getStoppable();
             }
@@ -80,7 +83,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
     }
 
     public IOState<MessageInput> getRunningInputState(String inputStateId) {
-        for (IOState<MessageInput> inputState : this) {
+        for (IOState<MessageInput> inputState : inputStates) {
             if (inputState.getStoppable().getId().equals(inputStateId)) {
                 return inputState;
             }
@@ -96,7 +99,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
             inputState.setState(IOState.Type.TERMINATED);
         }
 
-        return super.remove(inputState);
+        return inputStates.remove(inputState);
     }
 
     public boolean remove(IOState<MessageInput> inputState) {
@@ -120,4 +123,11 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
         return inputState;
     }
 
+    public boolean add(IOState<MessageInput> messageInputIOState) {
+        return inputStates.add(messageInputIOState);
+    }
+
+    public Stream<IOState<MessageInput>> stream() {
+        return inputStates.stream();
+    }
 }

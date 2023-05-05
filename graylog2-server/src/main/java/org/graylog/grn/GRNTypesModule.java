@@ -38,5 +38,7 @@ public class GRNTypesModule extends PluginModule {
         addGRNType(GRNTypes.SEARCH, ViewGRNDescriptorProvider.class);
         addGRNType(GRNTypes.STREAM, StreamGRNDescriptorProvider.class);
         addGRNType(GRNTypes.USER, UserGRNDescriptorProvider.class);
+        addGRNType(GRNTypes.LAST_OPENED, FallbackGRNDescriptorProvider.class);
+        addGRNType(GRNTypes.FAVORITE, FallbackGRNDescriptorProvider.class);
     }
 }

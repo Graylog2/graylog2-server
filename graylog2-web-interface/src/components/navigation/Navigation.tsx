@@ -29,6 +29,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
+import { Icon } from 'components/common';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -83,10 +84,14 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
     if (isEmpty) return null;
     const { BadgeComponent } = pluginRoute;
 
+    const renderBadge = pluginRoute.children.some((child) => {
+      return isPermitted(currentUserPermissions, child.permissions) && child?.BadgeComponent;
+    });
+
     return (
       <NavDropdown key={title}
                    title={title}
-                   badge={BadgeComponent}
+                   badge={renderBadge ? BadgeComponent : null}
                    id="enterprise-dropdown"
                    inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
@@ -183,10 +188,15 @@ const Navigation = React.memo(({ pathname }: Props) => {
             <DevelopmentHeaderBadge />
             {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
-
           <ScratchpadToggle />
 
           <HelpMenu active={_isActive(pathname, Routes.WELCOME)} />
+
+          <LinkContainer relativeActive to={Routes.WELCOME}>
+            <NavItem id="welcome-nav-link" aria-label="Welcome">
+              <Icon size="lg" fixedWidth title="Welcome" name="home" />
+            </NavItem>
+          </LinkContainer>
 
           <UserMenu fullName={fullName} readOnly={readOnly} userId={userId} />
         </Nav>

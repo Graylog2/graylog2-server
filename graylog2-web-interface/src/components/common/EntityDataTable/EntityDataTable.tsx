@@ -55,6 +55,7 @@ const StyledTable = styled(Table)(({ theme }) => css`
     > tbody:nth-of-type(even) > tr {
       background-color: ${theme.colors.table.background};
     }
+
     > tbody:nth-of-type(odd) > tr {
       background-color: ${theme.colors.table.backgroundAlt};
     }
@@ -103,17 +104,19 @@ const useElementsWidths = <Entity extends EntityBase>({
   columns,
   columnRenderersByAttribute,
   displayBulkSelectCol,
+  fixedActionsCellWidth,
 }: {
   columns: Array<Column>,
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
   displayBulkSelectCol: boolean
-  entityAttributesAreCamelCase: boolean
+  fixedActionsCellWidth: number | undefined
 }) => {
   const tableRef = useRef<HTMLTableElement>();
   const actionsRef = useRef<HTMLDivElement>();
   const { width: tableWidth } = useElementDimensions(tableRef);
   const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
-  const actionsColWidth = actionsRef.current?.offsetWidth ? (actionsRef.current.offsetWidth ?? 0) + CELL_PADDING * 2 : 0;
+  const actionsColInnerWidth = fixedActionsCellWidth ?? (actionsRef.current?.offsetWidth ?? 0);
+  const actionsColWidth = actionsColInnerWidth ? actionsColInnerWidth + CELL_PADDING * 2 : 0;
 
   const columnsWidths = useColumnsWidths<Entity>({
     actionsColWidth,
@@ -141,6 +144,12 @@ const mergeColumnsRenderers = <Entity extends EntityBase>(columns: Array<Column>
 };
 
 type Props<Entity extends EntityBase> = {
+  /**
+   * Needs to be defined when not all action cells in every row have the same width.
+   * When they have the same width, the column width will be calculated automatically.
+   * Should not include the actions col padding. Should be teh max width an action cell can have.
+   */
+  actionsCellWidth?: number
   /** Currently active sort */
   activeSort?: Sort,
   /**
@@ -181,6 +190,7 @@ type Props<Entity extends EntityBase> = {
  * Flexible data table component which allows defining custom column renderers.
  */
 const EntityDataTable = <Entity extends EntityBase>({
+  actionsCellWidth: fixedActionsCellWidth,
   activeSort,
   entityAttributesAreCamelCase,
   bulkActions,
@@ -218,7 +228,7 @@ const EntityDataTable = <Entity extends EntityBase>({
     columns,
     columnRenderersByAttribute,
     displayBulkSelectCol,
-    entityAttributesAreCamelCase,
+    fixedActionsCellWidth,
   });
 
   const onToggleEntitySelect = useCallback((itemId: string) => {
@@ -292,6 +302,7 @@ const EntityDataTable = <Entity extends EntityBase>({
 };
 
 EntityDataTable.defaultProps = {
+  actionsCellWidth: undefined,
   activeSort: undefined,
   bulkActions: undefined,
   columnRenderers: undefined,
