@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap;
+package org.graylog.datanode.bootstrap.preflight;
 
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
@@ -41,7 +41,7 @@ public class OpensearchBinPreflightCheck implements PreflightCheck {
         this(opensearchDistribution.directory());
     }
 
-    protected OpensearchBinPreflightCheck(Path opensearchBaseDirectory) {
+    public OpensearchBinPreflightCheck(Path opensearchBaseDirectory) {
         this.opensearchDir = opensearchBaseDirectory;
     }
 

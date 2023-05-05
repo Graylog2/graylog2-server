@@ -172,6 +172,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     @Override
+    public String getSearchLogs() {
+        return searchServer.getLogs();
+    }
+
+    @Override
     public void close() {
         node.close();
         mongodb.close();

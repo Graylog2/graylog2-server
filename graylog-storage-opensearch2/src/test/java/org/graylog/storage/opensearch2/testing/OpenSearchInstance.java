@@ -151,4 +151,9 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     public Adapters adapters() {
         return this.adapters;
     }
+
+    @Override
+    public String getLogs() {
+        return this.container.getLogs();
+    }
 }
