@@ -173,6 +173,11 @@ public class Message implements Messages, Indexable {
      */
     public static final String FIELD_GL2_SOURCE_INPUT = "gl2_source_input";
 
+    /*
+     * Will be set to the id of the forwarder input that was used to receive this message from the forwarder
+     */
+    public static final String FIELD_GL2_FORWARDER_INPUT = "gl2_forwarder_input";
+
     /**
      * Will be set to the ID of the node that received the message.
      */
