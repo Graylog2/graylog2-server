@@ -37,8 +37,9 @@ public abstract class TelemetryLicenseStatus {
 
     public abstract ZonedDateTime expirationDate();
 
-    public abstract Builder toBuilder();
+    public abstract long trafficLimit();
 
+    public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -51,6 +52,8 @@ public abstract class TelemetryLicenseStatus {
         public abstract Builder subject(String subject);
 
         public abstract Builder expirationDate(ZonedDateTime expirationDate);
+
+        public abstract Builder trafficLimit(long trafficLimit);
 
         public abstract TelemetryLicenseStatus build();
     }

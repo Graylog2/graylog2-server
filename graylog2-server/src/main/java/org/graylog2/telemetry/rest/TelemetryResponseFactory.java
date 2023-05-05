@@ -149,6 +149,7 @@ class TelemetryResponseFactory {
             licenses.put(f("%s.valid", licenseString), l.valid());
             licenses.put(f("%s.violated", licenseString), l.violated());
             licenses.put(f("%s.expiration_date", licenseString), l.expirationDate());
+            licenses.put(f("%s.traffic_limit", licenseString), l.trafficLimit());
         }
         return licenses;
     }
