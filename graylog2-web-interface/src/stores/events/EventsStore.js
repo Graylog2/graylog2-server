@@ -91,7 +91,7 @@ export const EventsStore = singletonStore(
         filter: filter,
         timerange: timerange,
       });
-      
+
       promise.then((response) => {
         this.events = response.events;
 
@@ -110,6 +110,7 @@ export const EventsStore = singletonStore(
         return response;
       }).catch((error) => {
         this.events = [];
+
         this.parameters = {
           query,
           page,
@@ -117,12 +118,16 @@ export const EventsStore = singletonStore(
           filter,
           timerange,
         };
+
         this.totalEvents = 0;
-        this.context = { event_definitions: {}, streams: {} };
-        
+
+        this.context = {
+          event_definitions: {}, streams: {},
+        };
+
         this.propagateChanges();
 
-        return error
+        return error;
       });
 
       EventsActions.search.promise(promise);

@@ -227,7 +227,7 @@ class Events extends React.Component {
       onAlertFilterChange,
       onTimeRangeChange,
       onSearchReload,
-      paginationQueryParameter
+      paginationQueryParameter,
     } = this.props;
 
     const eventList = events.map((e) => e.event);
