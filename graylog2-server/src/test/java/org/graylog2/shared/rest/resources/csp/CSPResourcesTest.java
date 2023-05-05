@@ -16,17 +16,30 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CSPResourcesTest {
+    final static String DEFAULT_DIR = "connect-src *;default-src 'self';img-src *;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'";
+    static CSPResources cspResources;
+
+    @BeforeAll
+    static void setup() {
+        cspResources = new CSPResources();
+    }
+
     @Test
     void loadPropertiesTest() {
-        String expected = "connect-src *;default-src 'self';img-src *;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'";
-        CSPResources cspResources = new CSPResources();
+        assertThat(cspResources.cspString("default")).isEqualTo(DEFAULT_DIR);
+    }
 
-        assertThat(cspResources).isNotNull();
-        assertThat(cspResources.cspString("default")).isEqualTo(expected);
+    @Test
+    void mergeTest() {
+        String csp1 = "default-src v1 v2;img-src v3 v4";
+        String expected = "default-src v1 v2 'self';img-src v3 v4 *;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline';connect-src *;";
+        ;
+        assertThat(cspResources.merge(csp1, "default")).isEqualTo(expected);
     }
 }

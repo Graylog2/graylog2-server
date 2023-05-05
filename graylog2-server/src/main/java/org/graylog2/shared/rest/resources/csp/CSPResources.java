@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.slf4j.Logger;
@@ -26,6 +27,21 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * A Content Security Policy header consists of a list of policy directives, each of
+ * which consists of a directive and one or more values:
+ * <pre>
+ * {@code
+ * <CSP> ::= Content-Security-Policy: <csp-list>
+ * <csp-list> :: = <policy-directive>{;<policy-directive>}
+ * <policy-directive> ::= <directive> <value>{ <value>}
+ * <directive> ::= default-src | script-src | ...
+ * <value> ::= Strings that do not contain any white space
+ * }
+ * </pre>
+ *
+ * See https://content-security-policy.com/
+ **/
 public class CSPResources {
     private static final Logger LOG = LoggerFactory.getLogger(CSPResources.class);
     private static final String DEFAULT_FILE = "/org/graylog2/security/csp.config";
@@ -45,7 +61,7 @@ public class CSPResources {
     }
 
     /**
-     * Return a CSP string based on all the properties with the specified group name
+     * Return csp-list as a single string, based on all the properties with the specified group name
      *
      * @param group
      * @return CSP string
@@ -55,6 +71,36 @@ public class CSPResources {
                 .sorted()
                 .map(key -> key + " " + cspResources.get(group, key))
                 .collect(Collectors.joining(";"));
+    }
+
+    /**
+     * Merge all directives for the specified group into an existing csp-list.
+     * We do not attempt to remove any duplicate values
+     *
+     * @param csp   Existing csp-list
+     * @param group Group name of resource values to be merged
+     * @return merged csp-list
+     */
+    public String merge(String csp, String group) {
+        String result = "";
+        String[] policyDirectives = csp.split(";");
+        for (String policyDirective : policyDirectives) {
+            int firstWhiteSpace = policyDirective.indexOf(" ");
+            String directive = policyDirective.substring(0, firstWhiteSpace);
+            String resource = cspResources.get(group, directive);
+            result += policyDirective;
+            if (!Strings.isNullOrEmpty(resource)) {
+                result += " " + resource + ";";
+            }
+        }
+
+        for (String policyDirective : cspResources.row(group).keySet()) {
+            if (!result.contains(policyDirective)) {
+                result += policyDirective + " " + cspResources.get(group, policyDirective) + ";";
+            }
+        }
+
+        return result;
     }
 
     /**
