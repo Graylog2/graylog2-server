@@ -1,0 +1,5 @@
+type = "Added"
+message = "Added flattening functionality to the JSON Path Codec."
+
+pulls = ["14851"]
+
