@@ -21,6 +21,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.graylog.security.certutil.csr.storage.CsrFileStorage;
 import org.junit.jupiter.api.Test;
 
 import javax.security.auth.x500.X500Principal;
