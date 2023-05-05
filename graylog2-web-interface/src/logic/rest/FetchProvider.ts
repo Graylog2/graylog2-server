@@ -76,7 +76,7 @@ const defaultResponseHandler = (resp: Response) => {
   throw resp;
 };
 
-const streamingPlainTextResponseHandler = async (resp: Response) => {
+const textResponseHandler = (resp: Response) => {
   if (resp.ok) {
     reportServerSuccess();
 
@@ -179,7 +179,7 @@ export class Builder {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'text/plain';
 
-    this.responseHandler = streamingPlainTextResponseHandler;
+    this.responseHandler = textResponseHandler;
     this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
