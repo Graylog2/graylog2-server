@@ -24,11 +24,38 @@ import TelemetryInfoModal from 'logic/telemetry/TelemetryInfoModal';
 import type { TelemetryDataType } from 'logic/telemetry/useTelemetryData';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
 
+const getGlobalProps = (telemetryData: TelemetryDataType) => {
+  const {
+    cluster: {
+      cluster_id,
+      cluster_creation_date,
+      nodes_count,
+      average_last_month_traffic,
+      users_count,
+      license_count,
+      'node_leader.app_version': node_leader_app_version,
+    },
+    license,
+  } = telemetryData;
+
+  return {
+    cluster_id,
+    cluster_creation_date,
+    nodes_count,
+    average_last_month_traffic,
+    users_count,
+    license_count,
+    node_leader_app_version,
+    ...license,
+  };
+};
+
 const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
   const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
   const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
-  
+  const [globalProps, setGlobalProps] = useState({});
+
   useEffect(() => {
     const setGroup = () => {
       if (isTelemetryDataLoaded
@@ -42,6 +69,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
           search_cluster: searchCluster,
           user_telemetry_settings: { telemetry_permission_asked: isPermissionAsked },
         } = telemetryData as TelemetryDataType;
+        setGlobalProps(getGlobalProps(telemetryData));
 
         posthog.group('cluster', clusterId, {
           ...clusterDetails,
@@ -64,7 +92,10 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
     const sendTelemetry = (eventType: TelemetryEventType, event: TelemetryEvent) => {
       if (posthog) {
         try {
-          posthog.capture(eventType, event);
+          posthog.capture(eventType, {
+            ...event,
+            ...globalProps,
+          });
         } catch {
           // eslint-disable-next-line no-console
           console.warn('Could not capture telemetry event.');
@@ -75,7 +106,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
     return ({
       sendTelemetry,
     });
-  }, [posthog]);
+  }, [globalProps, posthog]);
 
   const handleConfirmTelemetryDialog = () => {
     TelemetrySettingsActions.update({ telemetry_permission_asked: true, telemetry_enabled: true }).then(() => {
