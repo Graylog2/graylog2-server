@@ -23,6 +23,7 @@ import styled, { css } from 'styled-components';
 import { Link, LinkContainer } from 'components/common/router';
 import { OverlayTrigger, EmptyEntity, NoSearchResult, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import { Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
+import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -87,6 +88,7 @@ const EventListContainer = styled.div`
 `;
 
 export const PAGE_SIZES = [10, 25, 50, 100];
+export const EVENTS_MAX_OFFSET_LIMIT = 10000;
 
 const priorityFormatter = (eventId, priority) => {
   const priorityName = capitalize(EventDefinitionPriorityEnum.properties[priority].name);
@@ -149,6 +151,7 @@ class Events extends React.Component {
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
     onSearchReload: PropTypes.func.isRequired,
+    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -224,6 +227,7 @@ class Events extends React.Component {
       onAlertFilterChange,
       onTimeRangeChange,
       onSearchReload,
+      paginationQueryParameter
     } = this.props;
 
     const eventList = events.map((e) => e.event);
@@ -235,6 +239,7 @@ class Events extends React.Component {
     const { query, filter: { alerts: filter } } = parameters;
     const excludedFile = filter === 'exclude' ? 'Events' : 'Alerts & Events';
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
+    const offsetLimitError = paginationQueryParameter.page * paginationQueryParameter.pageSize > EVENTS_MAX_OFFSET_LIMIT;
 
     const emptyListComponent = query ? (
       <NoSearchResult>
@@ -246,6 +251,19 @@ class Events extends React.Component {
       </NoEntitiesExist>
     );
 
+    const offsetLimitErrorComponent = (
+      <tbody>
+        <tr>
+          <td colSpan={5}>
+            <NoSearchResult>
+              Unfortunately we can only fetch Events with an Offset (page number * rows per page) less than or equal to: [10000].
+              Please use more advanced methods (Search Field and Date Filter) in order to get distant chunks of results.
+            </NoSearchResult>
+          </td>
+        </tr>
+      </tbody>
+    );
+
     return (
       <Row>
         <Col md={12}>
@@ -254,7 +272,7 @@ class Events extends React.Component {
                            onAlertFilterChange={onAlertFilterChange}
                            onTimeRangeChange={onTimeRangeChange}
                            onSearchReload={onSearchReload} />
-          {eventList.length === 0 ? (
+          {(eventList.length === 0 && !offsetLimitError) ? (
             emptyListComponent
           ) : (
             <EventListContainer>
@@ -267,7 +285,11 @@ class Events extends React.Component {
                       {HEADERS.map((header) => <th key={header}>{header}</th>)}
                     </tr>
                   </thead>
-                  {eventList.map(this.renderEvent)}
+                  {offsetLimitError ? (
+                    offsetLimitErrorComponent
+                  ) : (
+                    eventList.map(this.renderEvent)
+                  )}
                 </EventsTable>
               </PaginatedList>
             </EventListContainer>
@@ -278,4 +300,4 @@ class Events extends React.Component {
   }
 }
 
-export default Events;
+export default withPaginationQueryParameter(Events);
