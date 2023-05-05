@@ -95,7 +95,7 @@ class IndexSetConfigurationPage extends React.Component {
                         <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
                           <Button bsStyle="info">Index sets overview</Button>
                         </LinkContainer>
-                      )}>
+            )}>
             <span>
               Modify the current configuration for this index set, allowing you to customize the retention, sharding,
               and replication of messages coming from one or more streams.

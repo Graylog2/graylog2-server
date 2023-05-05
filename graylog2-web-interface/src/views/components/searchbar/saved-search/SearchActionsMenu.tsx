@@ -102,7 +102,11 @@ const SearchActionsMenu = () => {
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
 
   const pluggableSearchActions = usePluginEntities('views.components.searchActions');
-  const searchActions = useMemo(() => pluggableSearchActions.map((PluggableSearchAction) => <PluggableSearchAction loaded={loaded} view={view} />), [pluggableSearchActions, loaded, view]);
+  const searchActions = useMemo(() => pluggableSearchActions.map(
+    ({ component: PluggableSearchAction, key }) => (
+      <PluggableSearchAction key={key} loaded={loaded} view={view} />
+    ),
+  ), [pluggableSearchActions, loaded, view]);
 
   const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {

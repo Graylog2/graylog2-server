@@ -25,6 +25,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
@@ -44,7 +45,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceBackendDTO> {
     private final Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories;
     private final EventBus eventBus;
-
+    private final ClusterEventBus clusterEventBus;
     private static final Set<String> ALLOWED_FIELDS = ImmutableSet.of(AuthServiceBackendDTO.FIELD_TITLE, AuthServiceBackendDTO.FIELD_DESCRIPTION);
     private final SearchQueryParser searchQueryParser;
 
@@ -52,17 +53,19 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
     protected DBAuthServiceBackendService(MongoConnection mongoConnection,
                                           MongoJackObjectMapperProvider mapper,
                                           Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories,
-                                          EventBus eventBus) {
+                                          EventBus eventBus,
+                                          ClusterEventBus clusterEventBus) {
         super(mongoConnection, mapper, AuthServiceBackendDTO.class, "auth_service_backends");
         this.backendFactories = backendFactories;
         this.eventBus = eventBus;
+        this.clusterEventBus = clusterEventBus;
         this.searchQueryParser = new SearchQueryParser(AuthServiceBackendDTO.FIELD_TITLE, ALLOWED_FIELDS);
     }
 
     @Override
     public AuthServiceBackendDTO save(AuthServiceBackendDTO newBackend) {
         AuthServiceBackendDTO authServiceBackendDTO = super.save(prepareUpdate(newBackend));
-        eventBus.post(AuthServiceBackendSavedEvent.create(authServiceBackendDTO.id()));
+        clusterEventBus.post(AuthServiceBackendSavedEvent.create(authServiceBackendDTO.id()));
         return authServiceBackendDTO;
     }
 
