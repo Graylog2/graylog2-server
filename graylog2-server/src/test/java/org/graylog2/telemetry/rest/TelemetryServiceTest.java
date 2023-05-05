@@ -180,7 +180,8 @@ public class TelemetryServiceTest {
                 f("license.%s.violated", licenseName), license.violated(),
                 f("license.%s.expired", licenseName), license.expired(),
                 f("license.%s.valid", licenseName), license.valid(),
-                f("license.%s.expiration_date", licenseName), license.expirationDate()
+                f("license.%s.expiration_date", licenseName), license.expirationDate(),
+                f("license.%s.traffic_limit", licenseName), license.trafficLimit()
         );
     }
 
@@ -191,6 +192,7 @@ public class TelemetryServiceTest {
                 .expired(false)
                 .subject(subject)
                 .expirationDate(ZonedDateTime.now())
+                .trafficLimit(0L)
                 .build();
     }
 
