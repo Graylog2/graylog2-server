@@ -38,7 +38,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.graylog2.configuration.TelemetryConfiguration.TELEMETRY_CLUSTER_INFO_TTL;
+import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_IS_LEADER;
 import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_NODE_ID;
+import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_VERSION;
 
 public class TelemetryClusterInfoPeriodical extends Periodical {
 
@@ -71,14 +73,14 @@ public class TelemetryClusterInfoPeriodical extends Periodical {
                 .put("codename", ServerVersion.CODENAME)
                 .put(FIELD_NODE_ID, serverStatus.getNodeId().toString())
                 .put("cluster_id", clusterId)
-                .put("version", ServerVersion.VERSION.toString())
+                .put(FIELD_VERSION, ServerVersion.VERSION.toString())
                 .put("started_at", Tools.getISO8601String(serverStatus.getStartedAt()))
                 .put("hostname", Tools.getLocalCanonicalHostname())
                 .put("lifecycle", serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH))
                 .put("lb_status", serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH))
                 .put("timezone", serverStatus.getTimezone().getID())
                 .put("operating_system", System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"))
-                .put("is_leader", leaderElectionService.isLeader())
+                .put(FIELD_IS_LEADER, leaderElectionService.isLeader())
                 .put("is_processing", serverStatus.isProcessing())
                 .build();
 

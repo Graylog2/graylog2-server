@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_IS_LEADER;
+import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_VERSION;
 
 class TelemetryResponseFactory {
     private static final String CURRENT_USER = "current_user";
@@ -45,6 +47,13 @@ class TelemetryResponseFactory {
     @Inject
     public TelemetryResponseFactory(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    private static boolean isLeader(Map<String, Object> n) {
+        if (n.get(FIELD_IS_LEADER) instanceof Boolean isLeader) {
+            return isLeader;
+        }
+        return false;
     }
 
     Map<String, Object> createTelemetryResponse(Map<String, Object> clusterInfo,
@@ -84,7 +93,7 @@ class TelemetryResponseFactory {
 
     Map<String, Object> createClusterInfo(String clusterId,
                                           DateTime clusterCreationDate,
-                                          Map<String, Object> nodes,
+                                          Map<String, Map<String, Object>> nodes,
                                           long averageLastMonthTraffic,
                                           long usersCount) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
@@ -94,8 +103,17 @@ class TelemetryResponseFactory {
         clusterInfo.put("average_last_month_traffic", averageLastMonthTraffic);
         clusterInfo.put("users_count", usersCount);
         clusterInfo.put("nodes", nodes);
+        clusterInfo.put("node_leader.app_version", leaderNodeVersion(nodes));
         return clusterInfo;
 
+    }
+
+    private Object leaderNodeVersion(Map<String, Map<String, Object>> nodes) {
+        return nodes.values().stream()
+                .filter(TelemetryResponseFactory::isLeader)
+                .map(stringObjectMap -> stringObjectMap.get(FIELD_VERSION))
+                .findFirst()
+                .orElse("unknown");
     }
 
     Map<String, Object> createPluginInfo(boolean isEnterprisePluginInstalled,
