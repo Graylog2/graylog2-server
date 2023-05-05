@@ -40,7 +40,7 @@ jest.mock('routing/useQuery');
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 
 describe('NewSearchPage', () => {
   const query = {
