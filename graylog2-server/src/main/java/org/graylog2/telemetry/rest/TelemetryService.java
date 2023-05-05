@@ -32,6 +32,7 @@ import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.graylog2.telemetry.user.db.TelemetryUserSettingsDto;
 import org.graylog2.users.events.UserDeletedEvent;
@@ -104,12 +105,13 @@ public class TelemetryService {
             DateTime clusterCreationDate = clusterConfig.map(ClusterConfig::lastUpdated).orElse(null);
             String clusterId = clusterConfig.map(c -> clusterConfigService.extractPayload(c.payload(), ClusterId.class).clusterId()).orElse(null);
 
+            List<TelemetryLicenseStatus> licenseStatuses = enterpriseDataProvider.licenseStatus();
             return telemetryResponseFactory.createTelemetryResponse(
-                    getClusterInfo(clusterId, clusterCreationDate),
+                    getClusterInfo(clusterId, clusterCreationDate, licenseStatuses),
                     getUserInfo(currentUser, clusterId),
                     getPluginInfo(),
                     getSearchClusterInfo(),
-                    enterpriseDataProvider.licenseStatus(),
+                    licenseStatuses,
                     telemetryUserSettings);
         } else {
             return telemetryResponseFactory.createTelemetryDisabledResponse(telemetryUserSettings);
@@ -169,13 +171,14 @@ public class TelemetryService {
         }
     }
 
-    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate) {
+    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate, List<TelemetryLicenseStatus> licenseStatuses) {
         return telemetryResponseFactory.createClusterInfo(
                 clusterId,
                 clusterCreationDate,
                 dbTelemetryClusterInfo.findAll(),
                 getAverageLastMonthTraffic(),
-                userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count());
+                userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count(),
+                licenseStatuses.size());
     }
 
     private Map<String, Object> getPluginInfo() {
