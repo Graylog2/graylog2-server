@@ -44,6 +44,9 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        // reset possible block from other tests
+        client().resetClusterBlock();
+
         toTest = createMoreSearchAdapter();
         importFixture("org/graylog/events/search/more_search_adapter.json");
     }
