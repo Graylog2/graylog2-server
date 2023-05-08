@@ -18,12 +18,14 @@ package org.graylog.storage.opensearch2.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.ActiveShardCount;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;
@@ -133,7 +135,26 @@ public class FixtureImporterOS2 implements FixtureImporter {
         }
     }
 
+    private void putPersistentSetting(String setting, String value) {
+        final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
+
+        if(value == null) {
+            request.persistentSettings(Settings.builder().putNull(setting));
+        } else {
+            request.persistentSettings(Settings.builder().put(setting, value));
+        }
+
+        client.execute((c, requestOptions) -> c.cluster().putSettings(request, requestOptions),
+                "Unable to update OS cluster setting: " + setting + "=" + value);
+    }
+
+    private void resetClusterBlock() {
+        // reset create_index block for OpenSearch 2.x see https://github.com/opensearch-project/OpenSearch/pull/5852
+        putPersistentSetting("cluster.blocks.create_index", null);
+    }
+
     private void createIndex(String indexName) {
+        resetClusterBlock();
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
                 .waitForActiveShards(ActiveShardCount.ONE);
         client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
