@@ -156,6 +156,9 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        // reset possible block from other tests
+        client().resetClusterBlock();
+
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
