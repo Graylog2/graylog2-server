@@ -61,9 +61,9 @@ const StreamActions = ({
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
   const onToggleStreamStatus = useCallback(async () => {
-    sendTelemetry('toggle_input_button', {
-      appSection: 'stream',
-      eventElement: 'stream-item-toggle-status',
+    sendTelemetry('input_button_toggle', {
+      app_pathname: 'streams',
+      app_action_value: ' stream-item-status',
     });
 
     setChangingStatus(true);
@@ -82,8 +82,8 @@ const StreamActions = ({
 
   const toggleEntityShareModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-share-action',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-share',
     });
 
     setShowEntityShareModal((cur) => !cur);
@@ -91,8 +91,8 @@ const StreamActions = ({
 
   const toggleUpdateModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-update-update',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-update',
     });
 
     setShowUpdateModal((cur) => !cur);
@@ -100,8 +100,8 @@ const StreamActions = ({
 
   const toggleCloneModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-clone-action',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-clone',
     });
 
     setShowCloneModal((cur) => !cur);
@@ -109,8 +109,8 @@ const StreamActions = ({
 
   const toggleStreamRuleModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-rule-action',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-rule',
     });
 
     setShowStreamRuleModal((cur) => !cur);
@@ -118,8 +118,8 @@ const StreamActions = ({
 
   const onDelete = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-delete',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-delete',
     });
 
     // eslint-disable-next-line no-alert

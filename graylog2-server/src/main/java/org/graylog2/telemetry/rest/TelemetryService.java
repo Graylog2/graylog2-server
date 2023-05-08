@@ -19,19 +19,17 @@ package org.graylog2.telemetry.rest;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
-import org.graylog2.cluster.ClusterConfig;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService;
-import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
+import org.graylog2.telemetry.cluster.TelemetryClusterService;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.graylog2.telemetry.user.db.TelemetryUserSettingsDto;
 import org.graylog2.users.events.UserDeletedEvent;
@@ -57,7 +55,6 @@ public class TelemetryService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryService.class);
     private final TrafficCounterService trafficCounterService;
-    private final ClusterConfigService clusterConfigService;
     private final TelemetryEnterpriseDataProvider enterpriseDataProvider;
     private final UserService userService;
     private final Set<PluginMetaData> pluginMetaDataSet;
@@ -66,14 +63,13 @@ public class TelemetryService {
     private final TelemetryResponseFactory telemetryResponseFactory;
     private final DBTelemetryUserSettingsService dbTelemetryUserSettingsService;
     private final boolean isTelemetryEnabled;
-    private final DBTelemetryClusterInfo dbTelemetryClusterInfo;
+    private final TelemetryClusterService telemetryClusterService;
 
 
     @Inject
     public TelemetryService(
             @Named(TELEMETRY_ENABLED) boolean isTelemetryEnabled,
             TrafficCounterService trafficCounterService,
-            ClusterConfigService clusterConfigService,
             TelemetryEnterpriseDataProvider enterpriseDataProvider,
             UserService userService,
             Set<PluginMetaData> pluginMetaDataSet,
@@ -81,11 +77,10 @@ public class TelemetryService {
             @DetectedSearchVersion SearchVersion elasticsearchVersion,
             TelemetryResponseFactory telemetryResponseFactory,
             DBTelemetryUserSettingsService dbTelemetryUserSettingsService,
-            DBTelemetryClusterInfo dbTelemetryClusterInfo,
-            EventBus eventBus) {
+            EventBus eventBus,
+            TelemetryClusterService telemetryClusterService) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
-        this.clusterConfigService = clusterConfigService;
         this.enterpriseDataProvider = enterpriseDataProvider;
         this.userService = userService;
         this.pluginMetaDataSet = pluginMetaDataSet;
@@ -93,23 +88,23 @@ public class TelemetryService {
         this.elasticsearchVersion = elasticsearchVersion;
         this.telemetryResponseFactory = telemetryResponseFactory;
         this.dbTelemetryUserSettingsService = dbTelemetryUserSettingsService;
-        this.dbTelemetryClusterInfo = dbTelemetryClusterInfo;
+        this.telemetryClusterService = telemetryClusterService;
         eventBus.register(this);
     }
 
     public Map<String, Object> getTelemetryResponse(User currentUser) {
         TelemetryUserSettings telemetryUserSettings = getTelemetryUserSettings(currentUser);
         if (isTelemetryEnabled && telemetryUserSettings.telemetryEnabled()) {
-            Optional<ClusterConfig> clusterConfig = getClusterConfig();
-            DateTime clusterCreationDate = clusterConfig.map(ClusterConfig::lastUpdated).orElse(null);
-            String clusterId = clusterConfig.map(c -> clusterConfigService.extractPayload(c.payload(), ClusterId.class).clusterId()).orElse(null);
+            DateTime clusterCreationDate = telemetryClusterService.getClusterCreationDate().orElse(null);
+            String clusterId = telemetryClusterService.getClusterId();
 
+            List<TelemetryLicenseStatus> licenseStatuses = enterpriseDataProvider.licenseStatus();
             return telemetryResponseFactory.createTelemetryResponse(
-                    getClusterInfo(clusterId, clusterCreationDate),
+                    getClusterInfo(clusterId, clusterCreationDate, licenseStatuses),
                     getUserInfo(currentUser, clusterId),
                     getPluginInfo(),
                     getSearchClusterInfo(),
-                    enterpriseDataProvider.licenseStatus(),
+                    licenseStatuses,
                     telemetryUserSettings);
         } else {
             return telemetryResponseFactory.createTelemetryDisabledResponse(telemetryUserSettings);
@@ -137,6 +132,10 @@ public class TelemetryService {
 
         dbTelemetryUserSettingsService.findByUserId(currentUser.getId()).ifPresent(dto -> builder.id(dto.id()));
         dbTelemetryUserSettingsService.save(builder.build());
+    }
+
+    public void updateTelemetryClusterData() {
+        telemetryClusterService.updateTelemetryClusterData();
     }
 
     public void deleteUserSettingsByUser(User currentUser) {
@@ -169,23 +168,20 @@ public class TelemetryService {
         }
     }
 
-    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate) {
+    private Map<String, Object> getClusterInfo(String clusterId, DateTime clusterCreationDate, List<TelemetryLicenseStatus> licenseStatuses) {
         return telemetryResponseFactory.createClusterInfo(
                 clusterId,
                 clusterCreationDate,
-                dbTelemetryClusterInfo.findAll(),
+                telemetryClusterService.nodesTelemetryInfo(),
                 getAverageLastMonthTraffic(),
-                userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count());
+                userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count(),
+                licenseStatuses.size());
     }
 
     private Map<String, Object> getPluginInfo() {
         boolean isEnterprisePluginInstalled = pluginMetaDataSet.stream().anyMatch(p -> "Graylog Enterprise".equals(p.getName()));
         List<String> plugins = pluginMetaDataSet.stream().map(p -> f("%s:%s", p.getName(), p.getVersion())).toList();
         return telemetryResponseFactory.createPluginInfo(isEnterprisePluginInstalled, plugins);
-    }
-
-    private Optional<ClusterConfig> getClusterConfig() {
-        return Optional.ofNullable(clusterConfigService.getRaw(ClusterId.class));
     }
 
     private long getAverageLastMonthTraffic() {

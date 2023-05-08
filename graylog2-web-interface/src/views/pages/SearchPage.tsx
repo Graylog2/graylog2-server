@@ -25,7 +25,6 @@ import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStr
 import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
 import { DocumentTitle, Spinner } from 'components/common';
 import type View from 'views/logic/views/View';
-import useLoadView from 'views/hooks/useLoadView';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
@@ -58,7 +57,6 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState, SearchComponentSlots }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
-  useLoadView(viewPromise, isNew);
   const history = useHistory();
   const loadNewView = useCallback(() => _loadNewView(history), [_loadNewView, history]);
   const loadView = useCallback((viewId: string) => _loadView(history, viewId), [_loadView, history]);

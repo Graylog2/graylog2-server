@@ -41,7 +41,12 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
   const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
 
   const handleChange = (selected: string) => {
-    sendTelemetry('change_input_value', { appSection: 'search_bar', eventElement: 'stream-filter', eventInfo: {} });
+    sendTelemetry('input_value_change', {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-filter',
+    });
+
     onChange(selected === '' ? [] : selected.split(','));
   };
 
