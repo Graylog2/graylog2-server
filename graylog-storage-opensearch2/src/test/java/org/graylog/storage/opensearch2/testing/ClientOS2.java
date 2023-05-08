@@ -252,7 +252,11 @@ public class ClientOS2 implements Client {
     public void putSetting(String setting, String value) {
         final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
 
-        request.persistentSettings(Settings.builder().put(setting, value));
+        if(value == null) {
+            request.persistentSettings(Settings.builder().putNull(setting));
+        } else {
+            request.persistentSettings(Settings.builder().put(setting, value));
+        }
 
         client.execute((c, requestOptions) -> c.cluster().putSettings(request, requestOptions),
                 "Unable to update OS cluster setting: " + setting + "=" + value);
