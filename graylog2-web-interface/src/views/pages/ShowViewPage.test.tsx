@@ -37,7 +37,7 @@ jest.mock('actions/errors/ErrorsActions', () => ({
 
 jest.mock('views/components/Search', () => 'extended-search-page');
 jest.mock('views/hooks/useFetchView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
 
 jest.mock('routing/useParams');
