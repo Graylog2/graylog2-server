@@ -126,6 +126,8 @@ public class CertutilHttp implements CliCommand {
                         .withSubjectAlternativeName(cnName)
                         .withSubjectAlternativeName(Tools.getLocalHostname())
                         .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
+                        .withSubjectAlternativeName("127.0.0.1")
+                        .withSubjectAlternativeName("ip6-localhost")
                         .validity(Duration.ofDays(validityDays));
 
                 final String alternativeNames = console.readLine("Enter alternative names (addresses) of this node [comma separated]: ");
