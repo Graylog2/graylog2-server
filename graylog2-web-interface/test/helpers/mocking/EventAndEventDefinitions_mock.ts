@@ -198,6 +198,14 @@ export const mockedMappedAggregation: Array<EventDefinitionAggregation> = [
   },
 ];
 
+export const mockedMappedAggregationNoField: Array<EventDefinitionAggregation> = [
+  {
+    expr: '>',
+    value: 500,
+    function: 'count',
+    fnSeries: 'count()',
+  },
+];
 const eventData = mockEventData.event;
 const query = QueryGenerator(eventData.replay_info.streams, 'query-id', {
   type: 'absolute',
@@ -220,6 +228,21 @@ const field1Widget = AggregationWidget.builder()
       .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
       .series([Series.forFunction('count(field1)')])
       .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field1)', Direction.Descending)])
+      .visualization('table')
+      .rollup(true)
+      .build(),
+  )
+  .build();
+
+const noFieldWidget = AggregationWidget.builder()
+  .id('field1-widget-id')
+  .type('pivot')
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots([])
+      .series([Series.forFunction('count()')])
+      .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count()', Direction.Descending)])
       .visualization('table')
       .rollup(true)
       .build(),
@@ -257,6 +280,12 @@ const summaryWidget = AggregationWidget.builder()
   .build();
 const widgetsWithOneAggregation = [
   field1Widget,
+  histogram,
+  messageTable,
+];
+
+const widgetsWithOneAggregationNoField = [
+  noFieldWidget,
   histogram,
   messageTable,
 ];
@@ -342,6 +371,34 @@ export const mockedViewWithOneAggregation = View.create()
   .search(searchOneAggregation)
   .build();
 
+export const mockedViewWithOneAggregationNoField = View.create()
+  .toBuilder()
+  .id('view-id')
+  .type(View.Type.Search)
+  .state({
+    'query-id': ViewState.create()
+      .toBuilder()
+      .titles({
+        widget: {
+          'field1-widget-id': 'count() > 500',
+          'mc-widget-id': 'Message Count',
+          'allm-widget-id': 'All Messages',
+        },
+      })
+      .widgets(widgetsWithOneAggregationNoField)
+      .widgetMapping(Immutable.Map(
+        ['field1-widget-id', 'mc-widget-id', 'allm-widget-id'].map((item) => [item, Immutable.Set([undefined])]),
+      ))
+      .widgetPositions({
+        'field1-widget-id': new WidgetPosition(1, 1, 3, 6),
+        'mc-widget-id': new WidgetPosition(1, 4, 2, Infinity),
+        'allm-widget-id': new WidgetPosition(1, 6, 6, Infinity),
+      })
+      .build(),
+  })
+  .search(searchOneAggregation)
+  .build();
+
 const queryED = QueryGenerator(eventData.replay_info.streams, 'query-id', {
   type: 'relative',
   range: 60,
@@ -374,3 +431,28 @@ export const mockedViewWithOneAggregationED = mockedViewWithOneAggregation
     ).build()]).build(),
   )
   .build();
+
+export const mockEventDefinitionOneAggregationNoFields = {
+  ...mockEventDefinitionTwoAggregations,
+  id: 'event-definition-id-1',
+  config: {
+    ...mockEventDefinitionTwoAggregations.config,
+    group_by: [],
+    series: [],
+    conditions: {
+      expression: {
+        expr: '||',
+        left: {
+          expr: '>',
+          left: {
+            expr: 'number-ref',
+          },
+          right: {
+            expr: 'number',
+            value: 500.0,
+          },
+        },
+      },
+    },
+  },
+};

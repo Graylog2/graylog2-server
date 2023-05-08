@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import okhttp3.ResponseBody;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.Node;
@@ -31,23 +32,30 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
 import org.graylog2.rest.resources.system.logs.RemoteLoggersResource;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 
 @RequiresAuthentication
 @Api(value = "Cluster/System/Loggers", description = "Cluster-wide access to internal Graylog loggers")
@@ -107,5 +115,44 @@ public class ClusterLoggersResource extends ProxiedResource {
             @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
             @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
         return requestOnAllNodes(RemoteLoggersResource.class, client -> client.setSingleLoggerLevel(loggerName, level));
+    }
+
+    @GET
+    @Path("messages/recent/{nodeId}")
+    @ApiOperation(value = "Get recent internal log messages from a specific node")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Memory appender is disabled."),
+            @ApiResponse(code = 500, message = "Memory appender is broken.")
+    })
+    @Produces(MediaType.TEXT_PLAIN)
+    @HideOnCloud
+    public Response messages(@ApiParam(name = "nodeId", value = "The nodeId to get logs from") @PathParam("nodeId") @NotEmpty String nodeId,
+            @ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
+            "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
+                                       defaultValue = "1000", allowableValues = "range[0, infinity]")
+                             @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) throws IOException {
+
+        var nodeResponse = doNodeApiCall(nodeId, RemoteLoggersResource.class, c -> c.messages(limit), Function.identity(), null);
+
+        if (nodeResponse.isSuccess()) {
+            // we cannot use try-with because the ResponseBody needs to stream the output
+            ResponseBody responseBody = nodeResponse.entity().orElseThrow();
+
+            try {
+                StreamingOutput streamingOutput = output -> {
+                    try {
+                        responseBody.byteStream().transferTo(output);
+                    } catch (Exception e) {
+                        responseBody.close(); // avoid leaking connections on errors
+                    }
+                };
+                var mediaType = MediaType.valueOf(MediaType.TEXT_PLAIN);
+                Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
+                return response.build();
+            } catch (Exception e) {
+                responseBody.close();
+            }
+        }
+        return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
     }
 }

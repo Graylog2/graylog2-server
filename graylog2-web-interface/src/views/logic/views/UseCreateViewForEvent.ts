@@ -76,7 +76,8 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
 };
 
 const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
-  const rowPivots = [pivotForField(uniq([field, ...groupBy].filter((v) => !!v)), new FieldType('value', [], []))];
+  const uniqPivotFields = uniq([field, ...groupBy].filter((v) => !!v));
+  const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
   const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];

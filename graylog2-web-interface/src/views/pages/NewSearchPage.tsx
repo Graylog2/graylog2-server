@@ -18,12 +18,14 @@ import * as React from 'react';
 
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
+import useCreateSearch from 'views/hooks/useCreateSearch';
 
 import SearchPage from './SearchPage';
 
 const NewSearchPage = () => {
   const { timeRange, queryString, streams } = useSearchURLQueryParams();
-  const view = useCreateSavedSearch(streams, timeRange, queryString);
+  const viewPromise = useCreateSavedSearch(streams, timeRange, queryString);
+  const view = useCreateSearch(viewPromise);
 
   return <SearchPage view={view} isNew />;
 };

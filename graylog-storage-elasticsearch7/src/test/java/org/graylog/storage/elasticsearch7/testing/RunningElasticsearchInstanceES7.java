@@ -155,4 +155,9 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     public RestHighLevelClient restHighLevelClient() {
         return this.restHighLevelClient;
     }
+
+    @Override
+    public String getLogs() {
+        return "noop -> working against running ES Instance.";
+    }
 }

@@ -31,7 +31,7 @@ export type EventDefinitionAggregation = {
   value: number,
   function: string,
   fnSeries: string,
-  field: string
+  field?: string
 }
 export const definitionsUrl = (definitionId: string) => qualifyUrl(`/events/definitions/${definitionId}`);
 
