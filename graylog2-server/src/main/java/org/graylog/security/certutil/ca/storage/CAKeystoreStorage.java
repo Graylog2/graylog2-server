@@ -14,31 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.security.certutil.ca.storage;
 
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.testcontainers.containers.Network;
+import org.graylog.security.certutil.ca.exceptions.CAStorageException;
 
-import java.util.Optional;
+import java.nio.file.Path;
+import java.security.KeyStore;
 
-public interface GraylogBackend {
-    String uri();
+public interface CAKeystoreStorage {
 
-    int apiPort();
+    void writeCAKeyStore(final Path keystorePath,
+                         final KeyStore caKeyStore,
+                         final char[] password)
+            throws CAStorageException;
 
-    SearchServerInstance searchServerInstance();
+    //TODO: we may need a read method as well, for CSR processing
 
-    int mappedPortFor(int originalPort);
-
-    void importMongoDBFixture(String resourcePath, Class<?> testClass);
-
-    void importElasticsearchFixture(String resourcePath, Class<?> testClass);
-
-    Network network();
-
-    String getLogs();
-
-    Optional<MailServerInstance> getEmailServerInstance();
-
-    String getSearchLogs();
 }
