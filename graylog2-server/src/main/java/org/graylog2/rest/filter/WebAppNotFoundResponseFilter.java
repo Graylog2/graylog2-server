@@ -65,7 +65,7 @@ public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
             responseContext.getHeaders().putSingle("X-UA-Compatible", "IE=edge");
         }
         if (!responseContext.getHeaders().containsKey(CSP_HEADER)) {
-            responseContext.getHeaders().add(CSP_HEADER, cspDynamicFeature.dynamicCspString());
+            responseContext.getHeaders().add(CSP_HEADER, cspDynamicFeature.cspDefault());
         }
     }
 }

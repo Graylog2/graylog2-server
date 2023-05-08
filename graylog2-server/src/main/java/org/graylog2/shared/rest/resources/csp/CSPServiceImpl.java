@@ -29,24 +29,37 @@ public class CSPServiceImpl implements CSPService {
     private static final Logger LOG = LoggerFactory.getLogger(CSPServiceImpl.class);
     private final String telemetryApiHost;
     private final DBAuthServiceBackendService dbService;
+    private final CSPResources cspResources;
     private volatile String connectSrcValue;
 
     @Inject
     protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, DBAuthServiceBackendService dbService) {
         this.telemetryApiHost = telemetryConfiguration.getTelemetryApiHost();
         this.dbService = dbService;
-        buildConnectSrc();
+        this.cspResources = new CSPResources();
+        updateConnectSrc();
     }
 
     @Override
-    public synchronized void buildConnectSrc() {
+    public synchronized void updateConnectSrc() {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
                 .map(dto -> dto.config().externalHTTPHosts())
                 .filter(optList -> optList.isPresent())
                 .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));
-        connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
+        connectSrcValue = "connect-src 'self' " + telemetryApiHost + " " + hostList;
         LOG.debug("Updated CSP: {}", connectSrcValue);
+    }
+
+    @Override
+    public String cspString(String group) {
+        return cspResources.cspString(group);
+    }
+
+    @Override
+    public String merge(String csp, String group) {
+        String cspWithResources = cspResources.mergeWithResources(csp, group);
+        return merge(cspWithResources, connectSrcValue);
     }
 
     @Override

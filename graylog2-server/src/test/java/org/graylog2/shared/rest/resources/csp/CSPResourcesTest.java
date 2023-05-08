@@ -22,24 +22,26 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CSPResourcesTest {
-    final static String DEFAULT_DIR = "connect-src *;default-src 'self';img-src *;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'";
     static CSPResources cspResources;
 
     @BeforeAll
     static void setup() {
-        cspResources = new CSPResources();
+        cspResources = new CSPResources("/org/graylog2/security/cspTest.config");
     }
 
     @Test
     void loadPropertiesTest() {
-        assertThat(cspResources.cspString("default")).isEqualTo(DEFAULT_DIR);
+        String defaultDirective = "connect-src url1.com:9999 url2.com;default-src 'self';img-src https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'";
+        String swaggerDirective = "connect-src url4.com;img-src https://url5.com:9999;script-src 'self' 'unsafe-eval' 'unsafe-inline';style-src 'self' 'unsafe-inline'";
+        assertThat(cspResources.cspString("default")).isEqualTo(defaultDirective);
+        assertThat(cspResources.cspString("swagger")).isEqualTo(swaggerDirective);
     }
 
     @Test
     void mergeTest() {
         String csp1 = "default-src v1 v2;img-src v3 v4";
-        String expected = "default-src v1 v2 'self';img-src v3 v4 *;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline';connect-src *;";
-        ;
-        assertThat(cspResources.merge(csp1, "default")).isEqualTo(expected);
+        String expected = "default-src v1 v2 'self';img-src v3 v4 https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline';connect-src url1.com:9999 url2.com;";
+
+        assertThat(cspResources.mergeWithResources(csp1, "default")).isEqualTo(expected);
     }
 }

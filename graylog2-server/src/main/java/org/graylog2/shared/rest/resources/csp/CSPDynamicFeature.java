@@ -29,21 +29,16 @@ import java.lang.reflect.Method;
 public class CSPDynamicFeature implements DynamicFeature {
     private static final Logger LOG = LoggerFactory.getLogger(CSPDynamicFeature.class);
     private final CSPService cspService;
+    private final String cspDefaultValue;
 
     @Inject
     public CSPDynamicFeature(@Context CSPService cspService) {
         this.cspService = cspService;
+        this.cspDefaultValue = cspService.cspString(CSP.DEFAULT);
     }
 
-    public String dynamicCspString() {
-        return dynamicCspString(CSP.CSP_DEFAULT);
-    }
-
-    public String dynamicCspString(String staticCspString) {
-        if (!staticCspString.contains("connect-src")) {
-            return staticCspString + "connect-src " + cspService.connectSrcValue();
-        }
-        return staticCspString;
+    public String cspDefault() {
+        return cspDefaultValue;
     }
 
     @Override
@@ -52,11 +47,11 @@ public class CSPDynamicFeature implements DynamicFeature {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         String cspValue = null;
         if (resourceClass != null && resourceClass.isAnnotationPresent(CSP.class)) {
-            cspValue = dynamicCspString(resourceClass.getAnnotation(CSP.class).value());
-            LOG.debug("CSP class annotation for {}: {}", resourceClass.getSimpleName(), cspValue);
+            cspValue = cspService.cspString(resourceClass.getAnnotation(CSP.class).group());
+            LOG.info("CSP class annotation for {}: {}", resourceClass.getSimpleName(), cspValue);
         } else if (resourceMethod != null && resourceMethod.isAnnotationPresent(CSP.class)) {
-            cspValue = dynamicCspString(resourceMethod.getAnnotation(CSP.class).value());
-            LOG.debug("CSP method annotation for {}: {}", resourceMethod.getName(), cspValue);
+            cspValue = cspService.cspString(resourceMethod.getAnnotation(CSP.class).group());
+            LOG.info("CSP method annotation for {}: {}", resourceMethod.getName(), cspValue);
         }
         if (cspValue != null) {
             CSPResponseFilter filter = new CSPResponseFilter(cspValue);

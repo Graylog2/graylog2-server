@@ -24,7 +24,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -45,18 +50,18 @@ import java.util.stream.Collectors;
 public class CSPResources {
     private static final Logger LOG = LoggerFactory.getLogger(CSPResources.class);
     private static final String DEFAULT_FILE = "/org/graylog2/security/csp.config";
-    private Table<String, String, String> cspResources;
+    private Table<String, String, Set<String>> cspTable;
 
     public CSPResources() {
         this(DEFAULT_FILE);
     }
 
-    public CSPResources(String fileName) {
+    public CSPResources(String resourceName) {
         try {
-            cspResources = loadProperties(fileName);
+            cspTable = loadProperties(resourceName);
         } catch (Exception e) {
-            LOG.warn("Could not load config file {}: {}", fileName, e.getMessage());
-            cspResources = HashBasedTable.create();
+            LOG.warn("Could not load config resource {}: {}", resourceName, e.getMessage());
+            cspTable = HashBasedTable.create();
         }
     }
 
@@ -67,10 +72,29 @@ public class CSPResources {
      * @return CSP string
      */
     public String cspString(String group) {
-        return cspResources.row(group).keySet().stream()
+        return cspTable.row(group).keySet().stream()
                 .sorted()
-                .map(key -> key + " " + cspResources.get(group, key))
+                .map(key -> key + " " + String.join(" ", cspTable.get(group, key)))
                 .collect(Collectors.joining(";"));
+    }
+
+    /**
+     * Update all existing groups (rows) in the table with the specified value.
+     *
+     * @param directive
+     * @param value     a directive value, consisting of one or more entries separated by blanks
+     */
+    public void updateGroups(String directive, String value) {
+        Set<String> valueSet = new HashSet<>(Arrays.asList(value.split(" ")));
+
+        cspTable.rowKeySet().forEach(group -> {
+                    if (cspTable.get(group, directive) == null) {
+                        cspTable.put(group, directive, valueSet);
+                    } else {
+                        cspTable.get(group, directive).addAll(valueSet);
+                    }
+                }
+        );
     }
 
     /**
@@ -81,26 +105,59 @@ public class CSPResources {
      * @param group Group name of resource values to be merged
      * @return merged csp-list
      */
-    public String merge(String csp, String group) {
+    public String mergeWithResources(String csp, String group) {
         String result = "";
         String[] policyDirectives = csp.split(";");
-        for (String policyDirective : policyDirectives) {
+        for (String s : policyDirectives) {
+            String policyDirective = s.stripLeading();
             int firstWhiteSpace = policyDirective.indexOf(" ");
             String directive = policyDirective.substring(0, firstWhiteSpace);
-            String resource = cspResources.get(group, directive);
-            result += policyDirective;
+            String resource = cspTable.get(group, directive);
             if (!Strings.isNullOrEmpty(resource)) {
-                result += " " + resource + ";";
+                result += policyDirective + " " + resource + ";";
+            } else {
+                result += policyDirective + ";";
             }
         }
 
-        for (String policyDirective : cspResources.row(group).keySet()) {
+        for (String policyDirective : cspTable.row(group).keySet()) {
             if (!result.contains(policyDirective)) {
-                result += policyDirective + " " + cspResources.get(group, policyDirective) + ";";
+                result += policyDirective + " " + cspTable.get(group, policyDirective) + ";";
             }
         }
 
         return result;
+    }
+
+    /**
+     * Merge 2 CSP policy directives: if a directive is present in both CSPs we concatenate the
+     * values.
+     *
+     * @param csp1
+     * @param csp2
+     * @return Merged CSP
+     */
+    public String mergeCSPs(String csp1, String csp2) {
+        Map<String, String> cspMap1 = cspToMap(csp1);
+        Map<String, String> cspMap2 = cspToMap(csp2);
+        for (Map.Entry<String, String> entry : cspMap2.entrySet()) {
+            cspMap1.merge(entry.getKey(), entry.getValue(), (v1, v2) -> v1 + " " + v2);
+        }
+        return cspMap1.entrySet().stream()
+                .map(entry -> entry.getKey() + " " + entry.getValue())
+                .collect(Collectors.joining(";"));
+    }
+
+    private Map<String, String> cspToMap(String csp) {
+        Map<String, String> cspMap = new HashMap<>();
+        Arrays.stream(csp.split(";"))
+                .forEach(s -> {
+                    String policyDirective = s.stripLeading();
+                    int firstWhiteSpace = policyDirective.indexOf(" ");
+                    String directive = policyDirective.substring(0, firstWhiteSpace);
+                    cspMap.put(directive, policyDirective.substring(firstWhiteSpace + 1));
+                });
+        return cspMap;
     }
 
     /**
@@ -110,21 +167,34 @@ public class CSPResources {
      * @return table of property values
      * @throws IOException
      */
-    Table<String, String, String> loadProperties(String path) throws IOException {
+    private Table<String, String, Set<String>> loadProperties(String path) throws IOException {
         InputStream inputStream = CSPResources.class.getResourceAsStream(path);
         Properties properties = new Properties();
         properties.load(inputStream);
 
-        Table<String, String, String> resources = HashBasedTable.create();
+        Table<String, String, Set<String>> resources = HashBasedTable.create();
         for (String propertyName : properties.stringPropertyNames()) {
             String[] substrings = propertyName.split("[.]");
             if (substrings.length != 2) {
                 LOG.warn("Skipping malformed property {}: expecting format <group>.<key>", propertyName);
             } else {
-                resources.put(substrings[0], substrings[1], properties.getProperty(propertyName));
+                String[] valueArray = properties.getProperty(propertyName).split(" ");
+                resources.put(substrings[0], substrings[1], new HashSet<>(Arrays.asList(valueArray)));
             }
         }
         return resources;
+    }
+
+    private void append(String directive, String value) {
+        cspTable.rowKeySet().forEach(r -> {
+            String existingValue = cspTable.get(r, directive);
+            if (existingValue != null) {
+                if (existingValue.contains(value))
+                    cspTable.put(r, directive, existingValue + " " + value);
+            } else {
+                cspTable.put(r, directive, value);
+            }
+        });
     }
 
 }
