@@ -14,28 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
+import createSearch from 'views/logic/slices/createSearch';
 import type View from 'views/logic/views/View';
-import Search from 'views/logic/search/Search';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 
-const createSearchUrl = qualifyUrl('/views/search');
+const useCreateSearch = (viewPromise: Promise<View>) => {
+  return useMemo(() => viewPromise.then(async (_view) => {
+    await createSearch(_view.search);
 
-const createSearch = (search: Search) => fetch('POST', createSearchUrl, JSON.stringify(search))
-  .then((response) => Search.fromJSON(response));
-
-const useLoadView = (viewPromise: Promise<View>, isNew: boolean) => {
-  useEffect(() => {
-    viewPromise.then((view) => {
-      if (isNew) {
-        return createSearch(view.search);
-      }
-
-      return Promise.resolve(view.search);
-    });
-  }, [isNew, viewPromise]);
+    return _view;
+  }), [viewPromise]);
 };
 
-export default useLoadView;
+export default useCreateSearch;
