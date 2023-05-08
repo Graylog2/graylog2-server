@@ -107,7 +107,9 @@ const StreamRuleModal = ({
   return (
     <Modal title={title}
            onHide={onClose}
-           show>
+           show
+           data-app-section="manage_stream_rules"
+           data-event-element={title}>
       <Formik<FormValues> initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
         {({ values, setFieldValue, isSubmitting, isValidating }) => (
           <Form>
@@ -193,7 +195,7 @@ const StreamRuleModal = ({
                     <p>
                       <strong>Result:</strong>
                       {' '}
-                      <HumanReadableStreamRule streamRule={values} streamRuleTypes={streamRuleTypes} inputs={inputs} />
+                      <HumanReadableStreamRule streamRule={values} inputs={inputs} />
                     </p>
                   </Col>
                   <Col md={4}>

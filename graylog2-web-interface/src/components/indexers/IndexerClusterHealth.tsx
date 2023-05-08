@@ -16,11 +16,12 @@
  */
 import React from 'react';
 import { useQueries } from '@tanstack/react-query';
+import styled from 'styled-components';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
-import { DocumentationLink, SmallSupportLink } from 'components/support';
+import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import type FetchError from 'logic/errors/FetchError';
@@ -31,9 +32,10 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
-type Props = {
-  minimal?: boolean,
-};
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
 
 const GET_INDEXER_CLUSTER_HEALTH = 'indexerCluster.health';
 const GET_INDEXER_CLUSTER_NAME = 'indexerCluster.name';
@@ -71,6 +73,10 @@ const useLoadHealthAndName = (enabled: boolean) => {
   });
 };
 
+type Props = {
+  minimal?: boolean,
+};
+
 const IndexerClusterHealth = ({ minimal }: Props) => {
   const currentUser = useCurrentUser();
   const userHasRequiredPermissions = isPermitted(currentUser.permissions, 'indexercluster:read');
@@ -84,14 +90,10 @@ const IndexerClusterHealth = ({ minimal }: Props) => {
     <Row className="content">
       <Col md={12}>
         {!minimal && (
-          <>
+          <Header>
             <h2>Elasticsearch cluster</h2>
-
-            <SmallSupportLink>
-              The possible Elasticsearch cluster states and more related information is available in the{' '}
-              <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation" />.
-            </SmallSupportLink>
-          </>
+            <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Elasticsearch setup documentation" displayIcon />
+          </Header>
         )}
 
         {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}

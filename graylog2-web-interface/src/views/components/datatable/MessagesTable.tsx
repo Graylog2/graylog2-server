@@ -123,7 +123,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     margin-right: 0;
   }
 
-  tr.message-detail-row div[class*="col-"] {
+  tr.message-detail-row div[class*='col-'] {
     padding-right: 0;
   }
 
@@ -145,7 +145,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   
   @media print {
     tr.fields-row > td {
-      min-width: 0px;
+      min-width: 0;
     }
   }
 `);

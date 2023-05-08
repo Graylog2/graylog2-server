@@ -40,6 +40,7 @@ module.exports = {
     'property-no-vendor-prefix': [true, {
       ignoreProperties: ['grid-rows', 'grid-columns', 'grid-row', 'grid-column'],
     }],
+    'string-quotes': 'single',
     'value-no-vendor-prefix': [true, {
       ignoreValues: ['grid', 'inline-grid'],
     }],

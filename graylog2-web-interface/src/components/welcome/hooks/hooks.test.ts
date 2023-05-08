@@ -27,6 +27,7 @@ import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
+import { createGRN } from 'logic/permissions/GRN';
 
 const urlPrefix = '/startpage';
 
@@ -34,8 +35,7 @@ const getUrl = (url: string, prefix: string = urlPrefix) => qualifyUrl(`${prefix
 
 const mockLastOpened = {
   lastOpened: [{
-    type: 'search',
-    id: '1',
+    grn: createGRN('search', '1'),
     title: 'Title 1',
   }],
   page: 1,
@@ -43,8 +43,7 @@ const mockLastOpened = {
 
 const mockFavoriteItems = {
   favorites: [{
-    type: 'search',
-    id: '1',
+    grn: createGRN('search', '1'),
     title: 'Title 1',
   }],
   page: 1,
@@ -54,10 +53,9 @@ const mockedRecentActivityResponse = {
   recentActivity: [{
     id: '5',
     activity_type: 'share',
-    item_type: 'dashboard',
-    item_id: '5',
     item_title: 'Title 5',
     timestamp: '2022-01-01',
+    item_grn: createGRN('dashboard', '5'),
   }],
   page: 1,
   total: 1,
@@ -67,10 +65,9 @@ const mockedRecentActivity = {
   recentActivity: [{
     id: '5',
     activityType: 'share',
-    itemType: 'dashboard',
-    itemId: '5',
     itemTitle: 'Title 5',
     timestamp: '2022-01-01',
+    itemGrn: createGRN('dashboard', '5'),
   }],
   page: 1,
   total: 1,

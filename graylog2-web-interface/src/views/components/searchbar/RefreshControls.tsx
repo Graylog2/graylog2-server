@@ -23,6 +23,8 @@ import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootst
 import { Icon, Pluralize } from 'components/common';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -42,36 +44,33 @@ const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: { refreshConfigE
   return <>{buttonText}</>;
 };
 
-const _onChange = (interval: number) => {
-  RefreshActions.setInterval(interval);
-};
-
-const INTERVAL_OPTIONS = [
-  ['1 Second', 1000],
-  ['2 Seconds', 2000],
-  ['5 Seconds', 5000],
-  ['10 Seconds', 10000],
-  ['30 Seconds', 30000],
-  ['1 Minute', 60000],
-  ['5 Minutes', 300000],
-] as const;
+const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
 const RefreshControls = () => {
   const refreshConfig = useRefreshConfig();
+  const sendTelemetry = useSendTelemetry();
+  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
+
+  const _onChange = (interval: number) => {
+    sendTelemetry('change_input_value', { appSection: 'search_bar', eventElement: 'refresh-search-control-dropdown', eventInfo: { interval: interval } });
+    RefreshActions.setInterval(interval);
+  };
 
   useEffect(() => () => RefreshActions.disable(), []);
 
   const _toggleEnable = useCallback(() => {
+    sendTelemetry('toggle_input_button', { appSection: 'search_bar', eventElement: 'refresh-search-control-enable', eventInfo: { enabled: !refreshConfig.enabled } });
+
     if (refreshConfig.enabled) {
       RefreshActions.disable();
     } else {
       RefreshActions.enable();
     }
-  }, [refreshConfig?.enabled]);
+  }, [refreshConfig?.enabled, sendTelemetry]);
 
-  const intervalOptions = INTERVAL_OPTIONS.map(([label, interval]) => {
-    return <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(interval)}>{label}</MenuItem>;
-  });
+  const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
+    <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>
+  ));
   const intervalDuration = moment.duration(refreshConfig.interval);
   const naturalInterval = intervalDuration.asSeconds() < 60
     ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>

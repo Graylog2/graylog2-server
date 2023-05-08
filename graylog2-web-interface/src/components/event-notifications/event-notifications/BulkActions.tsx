@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -24,8 +24,10 @@ import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { Button } from 'components/bootstrap';
+import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   selectedNotificationsIds: Array<string>,
@@ -35,9 +37,16 @@ type Props = {
 
 const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, refetchEventNotifications }: Props) => {
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
   const selectedItemsAmount = selectedNotificationsIds?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
+
   const onDelete = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'event-notification',
+      eventElement: 'event-notification-bulk-delete',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
       const deleteCalls = selectedNotificationsIds.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
@@ -45,31 +54,33 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
         const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletednotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
+        const notDeletedNotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
 
-        if (notDeletednotificationIds.length) {
+        if (notDeletedNotificationIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
-          if (notDeletednotificationIds.length !== selectedNotificationsIds.length) {
+          if (notDeletedNotificationIds.length !== selectedNotificationsIds.length) {
             queryClient.invalidateQueries(['eventNotifications', 'overview']);
           }
 
-          UserNotification.error(`${notDeletednotificationIds.length} out of ${selectedNotificationsIds} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
+          UserNotification.error(`${notDeletedNotificationIds.length} out of ${selectedNotificationsIds} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
 
           return;
         }
 
         queryClient.invalidateQueries(['eventNotifications', 'overview']);
-        setSelectedNotificationsIds(notDeletednotificationIds);
+        setSelectedNotificationsIds(notDeletedNotificationIds);
         refetchEventNotifications();
         UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
     }
-  }, [descriptor, queryClient, refetchEventNotifications, selectedNotificationsIds, selectedItemsAmount, setSelectedNotificationsIds]);
+  }, [sendTelemetry, selectedItemsAmount, descriptor, selectedNotificationsIds, queryClient, setSelectedNotificationsIds, refetchEventNotifications]);
 
   return (
-    <Button bsSize="xsmall" bsStyle="danger" onClick={() => onDelete()}>Delete</Button>
+    <BulkActionsDropdown selectedEntities={selectedNotificationsIds} setSelectedEntities={setSelectedNotificationsIds}>
+      <MenuItem onSelect={() => onDelete()}>Delete</MenuItem>
+    </BulkActionsDropdown>
   );
 };
 

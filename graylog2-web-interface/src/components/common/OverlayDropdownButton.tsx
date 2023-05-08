@@ -26,6 +26,7 @@ type Props = {
   children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
   closeOnSelect?: boolean,
   disabled?: boolean
+  dropdownMinWidth?: number
   dropdownZIndex?: number,
   onToggle?: () => void,
   title: React.ReactNode,
@@ -35,14 +36,15 @@ type Props = {
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
 const OverlayDropdownButton = ({
-  children,
-  title,
   bsSize,
-  disabled,
-  dropdownZIndex,
-  closeOnSelect,
   buttonTitle,
+  children,
+  closeOnSelect,
+  disabled,
+  dropdownMinWidth,
+  dropdownZIndex,
   onToggle: onToggleProp,
+  title,
 }: Props) => {
   const [show, setShowDropdown] = useState(false);
 
@@ -58,11 +60,13 @@ const OverlayDropdownButton = ({
     <OverlayDropdown show={show}
                      closeOnSelect={closeOnSelect}
                      dropdownZIndex={dropdownZIndex}
+                     dropdownMinWidth={dropdownMinWidth}
                      renderToggle={({ onToggle, toggleTarget }) => (
                        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
                          <Button bsSize={bsSize}
                                  className="dropdown-toggle"
                                  ref={toggleTarget}
+                                 aria-label={buttonTitle}
                                  title={buttonTitle}
                                  disabled={disabled}
                                  onClick={onToggle}>
@@ -80,8 +84,9 @@ const OverlayDropdownButton = ({
 OverlayDropdownButton.defaultProps = {
   bsSize: undefined,
   buttonTitle: undefined,
-  closeOnSelect: false,
+  closeOnSelect: true,
   disabled: false,
+  dropdownMinWidth: undefined,
   dropdownZIndex: undefined,
   onToggle: undefined,
 };

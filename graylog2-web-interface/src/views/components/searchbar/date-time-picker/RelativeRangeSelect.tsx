@@ -63,7 +63,7 @@ const Ago = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
 
   ::after {
-    content: "ago";
+    content: 'ago';
   }
 `);
 

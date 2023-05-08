@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import camelCase from 'lodash/camelCase';
 
 import type { Column, ColumnRenderer, EntityBase } from './types';
 
@@ -27,12 +28,16 @@ const TableCell = <Entity extends EntityBase>({
   column,
   columnRenderer,
   entity,
+  entityAttributesAreCamelCase,
 }: {
   column: Column
   columnRenderer: ColumnRenderer<Entity> | undefined,
   entity: Entity,
+  entityAttributesAreCamelCase: boolean,
 }) => {
-  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id];
+  const attributeKey = entityAttributesAreCamelCase ? camelCase(column.id) : column.id;
+  const attributeValue = entity[attributeKey];
+  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(attributeValue, entity, column) : attributeValue;
 
   return (<Td>{content}</Td>);
 };

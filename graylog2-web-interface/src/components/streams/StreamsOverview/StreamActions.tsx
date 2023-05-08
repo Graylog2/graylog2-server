@@ -32,10 +32,15 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import StreamModal from '../StreamModal';
 
-const DefaultStreamHelp = () => <HoverForHelp displayLeftMargin>Action not available for the default stream</HoverForHelp>;
+const DefaultStreamHelp = () => (
+  <HoverForHelp displayLeftMargin>Action not available for the default
+    stream
+  </HoverForHelp>
+);
 
 const StreamActions = ({
   stream,
@@ -50,11 +55,17 @@ const StreamActions = ({
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showCloneModal, setShowCloneModal] = useState(false);
   const [changingStatus, setChangingStatus] = useState(false);
+  const sendTelemetry = useSendTelemetry();
   const setStartpage = useCallback(() => StartpageStore.set(currentUser.id, 'stream', stream.id), [stream.id, currentUser.id]);
 
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
   const onToggleStreamStatus = useCallback(async () => {
+    sendTelemetry('toggle_input_button', {
+      appSection: 'stream',
+      eventElement: 'stream-item-toggle-status',
+    });
+
     setChangingStatus(true);
 
     if (stream.disabled) {
@@ -67,25 +78,50 @@ const StreamActions = ({
     }
 
     setChangingStatus(false);
-  }, [stream.disabled, stream.id, stream.title]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
 
   const toggleEntityShareModal = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'stream',
+      eventElement: 'stream-item-share-action',
+    });
+
     setShowEntityShareModal((cur) => !cur);
-  }, []);
+  }, [sendTelemetry]);
 
   const toggleUpdateModal = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'stream',
+      eventElement: 'stream-item-update-update',
+    });
+
     setShowUpdateModal((cur) => !cur);
-  }, []);
+  }, [sendTelemetry]);
 
   const toggleCloneModal = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'stream',
+      eventElement: 'stream-item-clone-action',
+    });
+
     setShowCloneModal((cur) => !cur);
-  }, []);
+  }, [sendTelemetry]);
 
   const toggleStreamRuleModal = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'stream',
+      eventElement: 'stream-item-rule-action',
+    });
+
     setShowStreamRuleModal((cur) => !cur);
-  }, []);
+  }, [sendTelemetry]);
 
   const onDelete = useCallback(() => {
+    sendTelemetry('click', {
+      appSection: 'stream',
+      eventElement: 'stream-item-delete',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
@@ -96,7 +132,7 @@ const StreamActions = ({
         UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
     }
-  }, [stream.id, stream.title]);
+  }, [sendTelemetry, stream.id, stream.title]);
 
   const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => {
     return StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
@@ -124,8 +160,9 @@ const StreamActions = ({
                    entityType="stream"
                    onClick={toggleEntityShareModal}
                    bsSize="xsmall" />
-      <OverlayDropdownButton title="More Actions"
+      <OverlayDropdownButton title="More"
                              bsSize="xsmall"
+                             buttonTitle="More actions"
                              disabled={isNotEditable}
                              dropdownZIndex={1000}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
@@ -137,34 +174,26 @@ const StreamActions = ({
               : <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>}
             {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
-          <MenuItem divider />
-        </IfPermitted>
-        <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-          <LinkContainer to={Routes.stream_edit(stream.id)}>
-            <MenuItem disabled={isDefaultStream || isNotEditable}>
-              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
-            </MenuItem>
-          </LinkContainer>
-        </IfPermitted>
-        <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem onSelect={toggleUpdateModal} disabled={isDefaultStream}>
-            Edit stream {isDefaultStream && <DefaultStreamHelp />}
-          </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleStreamRuleModal} disabled={isDefaultStream}>
             Quick add rule {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-        <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
-          <MenuItem onSelect={toggleCloneModal} disabled={isDefaultStream}>
-            Clone this stream {isDefaultStream && <DefaultStreamHelp />}
+        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+          <MenuItem onSelect={toggleUpdateModal} disabled={isDefaultStream}>
+            Edit stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-        <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <LinkContainer to={Routes.stream_alerts(stream.id)}>
-            <MenuItem>
-              Manage Alerts
+
+        <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+          <MenuItem divider />
+        </IfPermitted>
+
+        <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+          <LinkContainer to={Routes.stream_edit(stream.id)}>
+            <MenuItem disabled={isDefaultStream || isNotEditable}>
+              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
             </MenuItem>
           </LinkContainer>
         </IfPermitted>
@@ -177,13 +206,28 @@ const StreamActions = ({
             </LinkContainer>
           </IfPermitted>
         </HideOnCloud>
-        <MenuItem onSelect={setStartpage} disabled={currentUser.readOnly}>
-          Set as startpage
-        </MenuItem>
+        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+          <LinkContainer to={Routes.stream_alerts(stream.id)}>
+            <MenuItem>
+              Manage Alerts
+            </MenuItem>
+          </LinkContainer>
+        </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem divider />
         </IfPermitted>
+
+        <MenuItem onSelect={setStartpage} disabled={currentUser.readOnly}>
+          Set as startpage
+        </MenuItem>
+
+        <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
+          <MenuItem onSelect={toggleCloneModal} disabled={isDefaultStream}>
+            Clone this stream {isDefaultStream && <DefaultStreamHelp />}
+          </MenuItem>
+        </IfPermitted>
+
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={onDelete} disabled={isDefaultStream}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}

@@ -84,7 +84,7 @@ const StatusMessage = styled.span(({ theme, $visible }: { theme: DefaultTheme, $
   flex: 1;
   color: ${theme.colors.variant.success};
   font-style: italic;
-  opacity: ${$visible ? "1" : "0"};
+  opacity: ${$visible ? '1' : '0'};
   transition: opacity 150ms ease-in-out;
 `);
 

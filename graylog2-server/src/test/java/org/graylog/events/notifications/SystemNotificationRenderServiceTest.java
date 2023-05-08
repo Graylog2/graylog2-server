@@ -61,10 +61,10 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("dummy", "dummy")
                 .addDetail("exception", new Exception("My Test Exception"))
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
-        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
+        when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService.render(notification.getType(), SystemNotificationRenderService.Format.HTML, null);
+                renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
         assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Email Transport Configuration is missing or invalid!");
         assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
         assertThat(renderResponse.description).containsSequence("<span>");
@@ -134,7 +134,7 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("description", "my description")
                 .addDetail("blockDetails", blockDetails)
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
-        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
+        when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);

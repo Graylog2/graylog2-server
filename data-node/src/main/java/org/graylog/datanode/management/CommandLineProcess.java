@@ -33,18 +33,25 @@ import java.util.concurrent.TimeoutException;
 
 
 class CommandLineProcess {
+    private static final String JAVA_HOME_ENV = "JAVA_HOME";
 
     private final Path executable;
     private final List<String> arguments;
     private final ProcessListener listener;
+    private final Environment environment;
     private final ExecuteWatchdog watchDog;
 
     private Process process;
 
-    public CommandLineProcess(Path executable, List<String> arguments, ProcessListener listener) {
+
+    CommandLineProcess(Path executable,
+                       List<String> arguments,
+                       ProcessListener listener,
+                       Environment environment) {
         this.executable = executable;
         this.arguments = arguments;
         this.listener = listener;
+        this.environment = environment;
         this.watchDog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
     }
 
@@ -60,10 +67,10 @@ class CommandLineProcess {
 
         ProcessProvidingExecutor executor = new ProcessProvidingExecutor();
 
-        //executor.setStreamHandler(logs);
         executor.setStreamHandler(new PumpStreamHandler(new LoggingOutputStream(listener::onStdOut), new LoggingOutputStream(listener::onStdErr)));
         executor.setWatchdog(watchDog);
-        executor.execute(cmdLine, listener);
+
+        executor.execute(cmdLine, environment.getEnv(), listener);
         try {
             this.process = executor.getProcess().get(30, TimeUnit.SECONDS);
             listener.onStart();
@@ -77,6 +84,7 @@ class CommandLineProcess {
     public void stop() {
         this.watchDog.destroyProcess();
     }
+
     /**
      * "Do not rely on the undelying process if not necessary"
      */

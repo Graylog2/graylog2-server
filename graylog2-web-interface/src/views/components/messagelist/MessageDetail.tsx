@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useState, useMemo } from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { Link } from 'components/common/router';
@@ -52,6 +53,13 @@ const _formatMessageTitle = (index, id) => {
 
   return <span>{id} <Label bsStyle="warning">Not stored</Label></span>;
 };
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px
+`;
 
 type Props = {
   allStreams?: Immutable.List<Stream>,
@@ -129,22 +137,23 @@ const MessageDetail = ({
         <>
           <Row className="row-sm">
             <Col md={12}>
-              <MessageActions index={index}
-                              id={id}
-                              fields={fields}
-                              decorationStats={decorationStats}
-                              disabled={disableMessageActions}
-                              disableSurroundingSearch={disableSurroundingSearch}
-                              disableTestAgainstStream={disableTestAgainstStream}
-                              showOriginal={showOriginal}
-                              toggleShowOriginal={_toggleShowOriginal}
-                              searchConfig={searchesClusterConfig}
-                              streams={allStreams} />
-              <MessageDetailsTitle>
-                <Icon name="envelope" />
-                &nbsp;
-                {messageTitle}
-              </MessageDetailsTitle>
+              <Header>
+                <MessageDetailsTitle>
+                  <Icon name="envelope" />&nbsp;{messageTitle}
+                </MessageDetailsTitle>
+                <MessageActions index={index}
+                                id={id}
+                                fields={fields}
+                                decorationStats={decorationStats}
+                                disabled={disableMessageActions}
+                                disableSurroundingSearch={disableSurroundingSearch}
+                                disableTestAgainstStream={disableTestAgainstStream}
+                                showOriginal={showOriginal}
+                                toggleShowOriginal={_toggleShowOriginal}
+                                searchConfig={searchesClusterConfig}
+                                streams={allStreams} />
+
+              </Header>
             </Col>
           </Row>
           <Row id={`sticky-augmentations-boundary-${message.id}`}>

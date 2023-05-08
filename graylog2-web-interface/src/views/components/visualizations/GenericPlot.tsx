@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
 import { Popover } from 'components/bootstrap';
@@ -259,7 +259,8 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
                                    target={legendConfig.target}>
                             <Popover id="legend-config"
                                      title={`Configuration for ${legendConfig.name}`}
-                                     className={styles.locals.customPopover}>
+                                     className={styles.locals.customPopover}
+                                     data-event-element="Generic Plot">
                               <ColorPicker color={legendConfig.color}
                                            colors={defaultColors}
                                            onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />

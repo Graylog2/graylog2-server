@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import type { List } from 'immutable';
 import { OrderedSet } from 'immutable';
 import PropTypes from 'prop-types';
@@ -30,7 +30,6 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 import type { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
 
 import ExportSettings from './ExportSettings';
@@ -82,8 +81,6 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
   const initialSelectedWidget = initialWidget(exportableWidgets, directExportWidgetId);
   const initialSelectedFields = _getInitialFields(initialSelectedWidget);
 
-  const { all: fields } = useContext(FieldTypesContext);
-
   const singleWidgetDownload = !!directExportWidgetId;
 
   const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings, format }: FormState) => {
@@ -113,7 +110,10 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
         const setSelectedFields = (newFields) => setFieldValue('selectedFields', newFields);
 
         return (
-          <BootstrapModalWrapper showModal onHide={closeModal}>
+          <BootstrapModalWrapper showModal
+                                 onHide={closeModal}
+                                 data-app-section="dashboard_export"
+                                 data-event-element={title}>
             <Form>
               <Modal.Header>
                 <Modal.Title>{title}</Modal.Title>
@@ -138,8 +138,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
                     </Field>
                   )}
                   {!showWidgetSelection && (
-                    <ExportSettings fields={fields}
-                                    selectedWidget={initialSelectedWidget}
+                    <ExportSettings selectedWidget={initialSelectedWidget}
                                     view={view} />
                   )}
                 </Content>

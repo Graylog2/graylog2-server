@@ -20,15 +20,14 @@ import styled from 'styled-components';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';
 import ActiveFilter from 'components/common/EntityFilters/ActiveFilter';
-
-const Container = styled.div`
-  display: flex;
-  margin-left: 10px;
-  align-items: center;
-`;
+import { ROW_MIN_HEIGHT } from 'components/common/EntityFilters/Constants';
 
 const FilterGroup = styled.div`
-  display: flex;
+  display: inline-flex;
+  align-items: center;
+  min-height: ${ROW_MIN_HEIGHT}px;
+  gap: 3px;
+  flex-wrap: wrap;
 `;
 
 const FilterGroupTitle = styled.div`
@@ -39,13 +38,13 @@ type Props = {
   attributes: Attributes,
   filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
   filters: Filters,
-  onChangeFilter: (attributeId: string, newFilter: Filter) => void,
-  onDeleteFilter: (attributeId: string, filterId: string) => void,
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
+  onDeleteFilter: (attributeId: string, filterValue: string) => void,
 }
 
 const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
-  <Container>
-    {Object.entries(filters).map(([attributeId, filterValues]) => {
+  <>
+    {filters.entrySeq().map(([attributeId, filterValues]) => {
       const attribute = attributes.find(({ id }) => id === attributeId);
 
       return (
@@ -55,7 +54,8 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
           </FilterGroupTitle>
           {filterValues.map((filter) => (
             <ActiveFilter filter={filter}
-                          key={filter.id}
+                          allActiveFilters={filters}
+                          key={`${attribute.id}-${filter.value}`}
                           attribute={attribute}
                           filterValueRenderer={filterValueRenderers?.[attributeId]}
                           onChangeFilter={onChangeFilter}
@@ -64,8 +64,7 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
         </FilterGroup>
       );
     })}
-
-  </Container>
+  </>
 );
 
 export default ActiveFilters;

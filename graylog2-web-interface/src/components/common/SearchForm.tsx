@@ -16,10 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import Promise from 'bluebird';
 import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import Spinner from 'components/common/Spinner';
 
@@ -145,7 +144,7 @@ const SearchForm = ({
    * @private
    */
   const setLoadingState = () => {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       if (useLoadingState) {
         setIsLoading(true);
         resolve();

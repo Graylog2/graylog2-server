@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import styled from 'styled-components';
+import type { SyntheticEvent } from 'react';
 
 import Button from 'components/bootstrap/Button';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
@@ -59,8 +60,8 @@ type Props = {
   isAsyncSubmit?: boolean,
   isSubmitting?: boolean,
   leftCol?: React.ReactNode,
-  onSubmit?: () => void,
-  submitButtonText: string,
+  onSubmit?: (event?: SyntheticEvent) => void,
+  submitButtonText: string|React.ReactNode,
   submitButtonType?: 'submit' | 'button',
   submitIcon?: IconName,
 } & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);

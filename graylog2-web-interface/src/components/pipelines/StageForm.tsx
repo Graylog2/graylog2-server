@@ -107,6 +107,7 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
       </Button>
       <BootstrapModalForm show={showModal}
                           title={`${create ? 'Add new' : 'Edit'} stage ${nextStage.stage}`}
+                          data-telemetry-title={`${create ? 'Add new' : 'Edit'} stage`}
                           onSubmitForm={_handleSave}
                           onCancel={_closeModal}
                           submitButtonText={create ? 'Add stage' : 'Update stage'}>

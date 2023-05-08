@@ -16,10 +16,7 @@
  */
 package org.graylog.elasticsearch.e2e;
 
-import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
@@ -32,31 +29,29 @@ import static org.graylog.testing.graylognode.NodeContainerConfig.GELF_HTTP_PORT
 
 @ContainerMatrixTestsConfiguration
 public class ElasticsearchE2E {
-    private final GraylogBackend sut;
-    private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public ElasticsearchE2E(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
-        this.requestSpec = requestSpec;
+    public ElasticsearchE2E(GraylogApis api) {
+        this.api = api;
     }
 
     @ContainerMatrixTest
     void inputMessageCanBeSearched() {
-        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
+        int mappedPort = this.api.backend().mappedPortFor(GELF_HTTP_PORT);
 
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
+        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, api.requestSpecificationSupplier());
 
         GelfInputUtils.postMessage(mappedPort,
                 "{\"short_message\":\"kram\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
+                api.requestSpecificationSupplier());
 
-        List<String> messages = SearchUtils.searchForAllMessages(requestSpec);
+        List<String> messages = SearchUtils.searchForAllMessages(this.api.requestSpecificationSupplier());
         assertThat(messages).doesNotContain("Hello there");
 
         GelfInputUtils.postMessage(mappedPort,
                 "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
+                api.requestSpecificationSupplier());
 
-        assertThat(SearchUtils.waitForMessage(requestSpec, "Hello there")).isTrue();
+        assertThat(SearchUtils.waitForMessage(this.api.requestSpecificationSupplier(), "Hello there")).isTrue();
     }
 }

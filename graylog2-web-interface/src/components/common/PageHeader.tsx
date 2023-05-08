@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 import styled, { css } from 'styled-components';
 
 import { Col, Label, Tooltip } from 'components/bootstrap';
@@ -51,7 +51,7 @@ const LifecycleIndicatorContainer = styled.span(({ theme }) => css`
 const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => css`
   display: flex;
   gap: 10px;
-  align-items: ${$hasMultipleChildren ? "center" : "flex-start"};
+  align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
 `);
 
 const Actions = styled.div`
@@ -85,7 +85,7 @@ const LifecycleIndicator = ({
     return null;
   }
 
-  const label = lodash.upperFirst(lifecycle);
+  const label = upperFirst(lifecycle);
   const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
   const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 

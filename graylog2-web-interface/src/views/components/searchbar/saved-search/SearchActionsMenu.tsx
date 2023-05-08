@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useCallback, useState, useContext, useRef } from 'react';
+import { useCallback, useState, useContext, useRef, useMemo } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -45,6 +45,8 @@ import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
+import useHistory from 'routing/useHistory';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -91,12 +93,20 @@ const SearchActionsMenu = () => {
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
   const pluggableSaveViewControls = useSaveViewFormControls();
+  const history = useHistory();
 
   const toggleFormModal = useCallback(() => setShowForm((cur) => !cur), []);
   const toggleListModal = useCallback(() => setShowList((cur) => !cur), []);
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
+
+  const pluggableSearchActions = usePluginEntities('views.components.searchActions');
+  const searchActions = useMemo(() => pluggableSearchActions.map(
+    ({ component: PluggableSearchAction, key }) => (
+      <PluggableSearchAction key={key} loaded={loaded} view={view} />
+    ),
+  ), [pluggableSearchActions, loaded, view]);
 
   const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {
@@ -144,17 +154,17 @@ const SearchActionsMenu = () => {
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
       .then(() => {
         if (deletedView.id === view.id) {
-          loadNewSearch();
+          loadNewSearch(history);
         }
 
         return Promise.resolve();
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  }, [view.id]);
+  }, [history, view.id]);
 
   const _loadAsDashboard = useCallback(() => {
-    loadAsDashboard(view);
-  }, [view]);
+    loadAsDashboard(history, view);
+  }, [history, view]);
 
   return (
     <Container aria-label="Search Meta Buttons">
@@ -198,7 +208,12 @@ const SearchActionsMenu = () => {
         <MenuItem disabled={disableReset} onSelect={loadNewView} icon="eraser">
           Reset search
         </MenuItem>
-        <MenuItem divider />
+        {searchActions.length > 0 ? (
+          <>
+            <MenuItem divider />
+            {searchActions}
+          </>
+        ) : null}
       </DropdownButton>
       {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}
       {showMetadataEdit && (

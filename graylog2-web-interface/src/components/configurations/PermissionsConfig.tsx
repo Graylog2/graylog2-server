@@ -15,21 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
-import type { PermissionsConfigType } from 'src/stores/configurations/ConfigurationsStore';
 
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import type { PermissionsConfigType } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
+import { getConfig } from 'components/configurations/helpers';
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
-
-type Props = {
-  config: PermissionsConfigType,
-  updateConfig: (config: PermissionsConfigType) => Promise<void>,
-};
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const StyledDefList = styled.dl.attrs({
   className: 'deflist',
@@ -47,22 +48,39 @@ const LabelSpan = styled.span(({ theme }: { theme: DefaultTheme }) => css`
   font-weight: bold;
 `);
 
-const PermissionsConfig = ({ config, updateConfig }: Props) => {
+const PermissionsConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [config, setConfig] = useState<PermissionsConfigType | undefined>(undefined);
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
-  const _saveConfig = (values) => {
-    updateConfig(values).then(() => {
+  const sendTelemetry = useSendTelemetry();
+
+  useEffect(() => {
+    ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG).then(() => {
+      setConfig(getConfig(ConfigurationType.PERMISSIONS_CONFIG, configuration));
+    });
+  }, [configuration]);
+
+  const saveConfig = (values: PermissionsConfigType) => {
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_permissions',
+      eventElement: 'update_configuration_button',
+    });
+
+    ConfigurationsActions.update(ConfigurationType.PERMISSIONS_CONFIG, values).then(() => {
       setShowModal(false);
     });
   };
 
-  const _resetConfig = () => {
+  const resetConfig = () => {
     setShowModal(false);
   };
 
+  const modalTitle = 'Configure Permissions';
+
   return (
     <div>
-      <h2>Permissions Config</h2>
+      <h2>Permissions Configuration</h2>
       <p>These settings can be used to control which entity sharing options are available.</p>
 
       {!config ? <Spinner /> : (
@@ -87,14 +105,19 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
-            <Formik onSubmit={_saveConfig} initialValues={config}>
+          <Modal show={showModal}
+                 onHide={resetConfig}
+                 aria-modal="true"
+                 aria-labelledby="dialog_label"
+                 data-app-section="configurations_permissions"
+                 data-event-element={modalTitle}>
+            <Formik onSubmit={saveConfig} initialValues={config}>
 
               {({ isSubmitting }) => {
                 return (
                   <Form>
                     <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">Configure Permissions</Modal.Title>
+                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body>
@@ -124,7 +147,7 @@ const PermissionsConfig = ({ config, updateConfig }: Props) => {
                     </Modal.Body>
 
                     <Modal.Footer>
-                      <ModalSubmit onCancel={_resetConfig}
+                      <ModalSubmit onCancel={resetConfig}
                                    isSubmitting={isSubmitting}
                                    isAsyncSubmit
                                    submitLoadingText="Update configuration"

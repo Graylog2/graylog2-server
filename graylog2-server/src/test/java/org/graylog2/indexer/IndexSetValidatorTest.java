@@ -25,6 +25,8 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.Before;
@@ -69,11 +71,14 @@ public class IndexSetValidatorTest {
         final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
+        final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);
 
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
+        when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
+        when(retentionStrategyConfig.validate(elasticsearchConfiguration)).thenReturn(new ValidationResult());
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
@@ -208,6 +213,27 @@ public class IndexSetValidatorTest {
         assertThat(validator.periodOtherThanDays(Period.days(5))).isFalse();
         assertThat(validator.periodOtherThanDays(Period.weeks(5))).isTrue();
         assertThat(validator.periodOtherThanDays(Period.days(5).withHours(3))).isTrue();
+    }
+
+    @Test
+    public void validateIndexAction() {
+        final String prefix = "graylog_index";
+        final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
+        final IndexSetConfig newConfig = mock(IndexSetConfig.class);
+        final IndexSet indexSet = mock(IndexSet.class);
+        final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);
+
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(newConfig.indexPrefix()).thenReturn(prefix);
+        when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
+        when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
+        ValidationResult validationResult = new ValidationResult().addError("fieldName", "error");
+        when(retentionStrategyConfig.validate(elasticsearchConfiguration)).thenReturn(validationResult);
+
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
+
+        assertThat(violation).isPresent();
     }
 
     private IndexSetConfig testIndexSetConfig() {

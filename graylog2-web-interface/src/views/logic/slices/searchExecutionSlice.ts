@@ -26,7 +26,7 @@ import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import executeSearch from 'views/logic/slices/executeSearch';
 import type View from 'views/logic/views/View';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectView, selectParameters } from 'views/logic/slices/viewSelectors';
+import { selectView, selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
   selectWidgetsToSearch,
@@ -103,11 +103,12 @@ export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 
 export const executeWithExecutionState = (
   view: View, widgetsToSearch: Array<string>, executionState: SearchExecutionState, resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
-) => (dispatch: AppDispatch) => dispatch(parseSearch(view.search))
+) => (dispatch: AppDispatch, getState: GetState) => dispatch(parseSearch(view.search))
   .then(() => {
     dispatch(loading());
+    const activeQuery = selectActiveQuery(getState());
 
-    return executeSearch(view, widgetsToSearch, executionState)
+    return executeSearch(view, widgetsToSearch, executionState, [activeQuery])
       .then(resultMapper)
       .then((result) => dispatch(finishedLoading(result)));
   });
@@ -123,7 +124,7 @@ export const execute = () => (dispatch: AppDispatch, getState: () => RootState) 
 
 export const setGlobalOverrideQuery = (queryString: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
-  const newGlobalOverride = globalOverride.toBuilder().query({ type: 'elasticsearch', query_string: queryString }).build();
+  const newGlobalOverride = globalOverride.toBuilder().query(createElasticsearchQueryString(queryString)).build();
 
   return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
 };

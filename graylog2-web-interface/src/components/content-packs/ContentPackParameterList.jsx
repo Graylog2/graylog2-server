@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 
 import { Badge, Button, Modal, ButtonToolbar } from 'components/bootstrap';
 import { DataTable, SearchForm, Icon, ModalSubmit } from 'components/common';
@@ -152,7 +152,9 @@ class ContentPackParameterList extends React.Component {
     const modal = (
       <BootstrapModalWrapper showModal={showModal}
                              onHide={closeModal}
-                             bsSize="large">
+                             bsSize="large"
+                             data-app-section="content_pack_parameter_list"
+                             data-event-element="Parameter">
         <Modal.Header closeButton>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>

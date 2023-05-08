@@ -33,6 +33,7 @@ import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -73,6 +74,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   const showActions = (): boolean => {
     return scopePermissions?.is_mutable;
@@ -80,6 +82,10 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
 
   const isSystemEventDefinition = (): boolean => {
     return eventDefinition?.config?.type === 'system-notifications-v1';
+  };
+
+  const isAggregationEventDefinition = (): boolean => {
+    return eventDefinition?.config?.type === 'aggregation-v1';
   };
 
   const updateState = ({ show, type, definition }) => {
@@ -90,6 +96,11 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   };
 
   const handleAction = (action, definition) => {
+    sendTelemetry('click', {
+      appSection: 'event-definition',
+      eventElement: `event-definition-action-${action}`,
+    });
+
     switch (action) {
       case DIALOG_TYPES.COPY:
         updateState({ show: true, type: DIALOG_TYPES.COPY, definition });
@@ -132,7 +143,9 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
               `Event Definition "${eventDefinition.title}" was deleted successfully.`);
           },
           (error) => {
-            UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+            const errorStatus = error?.additional?.body?.errors?.dependency.join(' ') || error;
+
+            UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${errorStatus}`,
               'Could not delete Event Definition');
           },
         ).finally(() => {
@@ -166,51 +179,66 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                      entityType="event_definition"
                      onClick={() => setShowEntityShareModal(true)}
                      bsSize="xsmall" />
-        <OverlayDropdownButton title="More Actions"
+        <OverlayDropdownButton title="More"
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
           {showActions() && (
-          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-              <MenuItem data-testid="edit-button">
-                Edit
-              </MenuItem>
-            </LinkContainer>
-          </IfPermitted>
+            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
+                <MenuItem data-testid="edit-button">
+                  Edit
+                </MenuItem>
+              </LinkContainer>
+            </IfPermitted>
           )}
           {!isSystemEventDefinition() && (
-          <>
-            <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
-            <MenuItem divider />
-            <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-              {isScheduled ? 'Disable' : 'enable'}
-            </MenuItem>
-
-            {showActions() && (
-            <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+            <>
+              <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
               <MenuItem divider />
-              <MenuItem onClick={() => handleAction(DIALOG_TYPES.DELETE, eventDefinition)} data-testid="delete-button">Delete</MenuItem>
-            </IfPermitted>
-            )}
-          </>
+              <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+                {isScheduled ? 'Disable' : 'Enable'}
+              </MenuItem>
+
+              {showActions() && (
+                <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+                  <MenuItem divider />
+                  <MenuItem onClick={() => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
+                            data-testid="delete-button">Delete
+                  </MenuItem>
+                </IfPermitted>
+              )}
+            </>
           )}
+          {
+            isAggregationEventDefinition() && (
+              <>
+                <MenuItem divider />
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
+                  <MenuItem>
+                    Replay search
+                  </MenuItem>
+                </LinkContainer>
+
+              </>
+            )
+          }
         </OverlayDropdownButton>
       </ButtonToolbar>
       {showDialog && (
-      <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
-                     show
-                     onConfirm={handleConfirm}
-                     onCancel={handleClearState}>
-        {DIALOG_TEXT[dialogType].dialogBody(currentDefinition.title)}
-      </ConfirmDialog>
+        <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
+                       show
+                       onConfirm={handleConfirm}
+                       onCancel={handleClearState}>
+          {DIALOG_TEXT[dialogType].dialogBody(currentDefinition.title)}
+        </ConfirmDialog>
       )}
       {showEntityShareModal && (
-      <EntityShareModal entityId={eventDefinition.id}
-                        entityType="event_definition"
-                        entityTypeTitle="event definition"
-                        entityTitle={eventDefinition.title}
-                        description="Search for a User or Team to add as collaborator on this event definition."
-                        onClose={() => setShowEntityShareModal(false)} />
+        <EntityShareModal entityId={eventDefinition.id}
+                          entityType="event_definition"
+                          entityTypeTitle="event definition"
+                          entityTitle={eventDefinition.title}
+                          description="Search for a User or Team to add as collaborator on this event definition."
+                          onClose={() => setShowEntityShareModal(false)} />
       )}
     </>
   );

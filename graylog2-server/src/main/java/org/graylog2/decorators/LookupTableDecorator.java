@@ -18,6 +18,9 @@ package org.graylog2.decorators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -37,6 +40,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_CACHE_NAME;
+import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_CACHE_TYPE;
+import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_DATA_ADAPTER_NAME;
+import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_DATA_ADAPTER_TYPE;
+import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_TABLE_NAME;
 
 public class LookupTableDecorator implements SearchResponseDecorator {
     private static final String CK_SOURCE_FIELD = "source_field";
@@ -131,8 +139,20 @@ public class LookupTableDecorator implements SearchResponseDecorator {
         this.lookupTable = lookupTableService.newBuilder().lookupTable(lookupTableName).build();
     }
 
+    @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
+
+        final LookupTable table = lookupTable.getTable();
+
+        if (table != null) {
+            Span.current().setAttribute(LOOKUP_TABLE_NAME, table.name())
+                    .setAttribute(LOOKUP_CACHE_NAME, table.cache().name())
+                    .setAttribute(LOOKUP_CACHE_TYPE, table.cache().getConfig().type())
+                    .setAttribute(LOOKUP_DATA_ADAPTER_NAME, table.dataAdapter().name())
+                    .setAttribute(LOOKUP_DATA_ADAPTER_TYPE, table.dataAdapter().getConfig().type());
+        }
+
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
                     // Do not touch the message if the field does not exist.

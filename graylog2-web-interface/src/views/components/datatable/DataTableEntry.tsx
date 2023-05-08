@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
-import { flatten, get } from 'lodash';
+import flatten from 'lodash/flatten';
+import get from 'lodash/get';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
@@ -105,8 +106,12 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   ));
   const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
     const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
-    const [k, v]: Array<string> = translatedPath;
-    const parentValuePath = [...valuePath, { [k]: v }];
+    const parentValuePath = [...valuePath];
+
+    for (let i = 0; i < translatedPath.length; i += 2) {
+      const [k, v]: Array<string> = translatedPath.slice(i, i + 2);
+      parentValuePath.push({ [k]: v });
+    }
 
     return series.map(({ effectiveName, function: fn }) => {
       const fullPath = [].concat(translatedPath, [effectiveName]);
@@ -119,17 +124,22 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   const columns = flatten([fieldColumns, columnPivotFields]);
 
   return (
-    <tr className={`fields-row ${classes}`}>
-      {columns.map(({ field, value, path, source }, idx) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Column key={`${activeQuery}-${field}=${value}-${idx}`}
-                field={field}
-                value={value}
-                type={fieldTypeFor(columnNameToField(field, series), types)}
-                valuePath={path.slice()}
-                source={source} />
-      ))}
-    </tr>
+    (
+      <tr className={`fields-row ${classes}`}>
+        {columns.map(({ field, value, path, source }, idx) => {
+          const key = `${activeQuery}-${field}=${value}-${idx}`;
+
+          return (
+            <Column key={key}
+                    field={field}
+                    value={value}
+                    type={fieldTypeFor(columnNameToField(field, series), types)}
+                    valuePath={path.slice()}
+                    source={source} />
+          );
+        })}
+      </tr>
+    )
   );
 };
 

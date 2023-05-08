@@ -16,14 +16,28 @@
  */
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
+import MessageShow from 'components/search/MessageShow';
 import Routes from 'routing/Routes';
-import history from 'util/History';
+import useHistory from 'routing/useHistory';
 
 import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
+
+const RuleSimulationFormGroup = styled(FormGroup)`
+  margin-bottom: 40px;
+`;
+
+const ResetButton = styled(Button)`
+  margin-left: 8px;
+`;
+
+const MessageShowContainer = styled.div`
+  padding: 16px;
+`;
 
 type Props = {
   create: boolean,
@@ -38,10 +52,18 @@ const RuleForm = ({ create }: Props) => {
     onAceLoaded,
     onChangeSource,
     ruleSource,
+    simulateRule,
+    rawMessageToSimulate,
+    setRawMessageToSimulate,
+    ruleSimulationResult,
+    setRuleSimulationResult,
+    startRuleSimulation,
+    setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
 
   const [isDirty, setIsDirty] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const history = useHistory();
 
   const handleError = (error) => {
     if (error.responseMessage.includes('duplicate key error')) {
@@ -77,6 +99,24 @@ const RuleForm = ({ create }: Props) => {
     setErrorMessage('');
     setIsDirty(true);
     onChangeSource(newSource);
+  };
+
+  const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRawMessageToSimulate(event.target.value);
+  };
+
+  const handleRunRuleSimulation = () => {
+    simulateRule(rawMessageToSimulate, setRuleSimulationResult);
+  };
+
+  const handleResetRuleSimulation = () => {
+    setRawMessageToSimulate('');
+    setRuleSimulationResult(null);
+    setStartRuleSimulation(false);
+  };
+
+  const handleStartRuleSimulation = () => {
+    setStartRuleSimulation(true);
   };
 
   const handleCancel = () => {
@@ -115,6 +155,45 @@ const RuleForm = ({ create }: Props) => {
                             value={ruleSource}
                             innerRef={ruleSourceRef} />
         </Input>
+
+        <RuleSimulationFormGroup>
+          <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
+          <div>
+            {!startRuleSimulation && (
+            <Button bsStyle="info"
+                    bsSize="xsmall"
+                    onClick={handleStartRuleSimulation}>
+              Start rule simulation
+            </Button>
+            )}
+            {startRuleSimulation && (
+            <>
+              <Input id="message"
+                     type="textarea"
+                     placeholder="Message string"
+                     value={rawMessageToSimulate}
+                     onChange={handleRawMessageChange}
+                     rows={3} />
+              <Button bsStyle="info"
+                      bsSize="xsmall"
+                      disabled={!rawMessageToSimulate || !ruleSource}
+                      onClick={handleRunRuleSimulation}>
+                Run rule simulation
+              </Button>
+              <ResetButton bsStyle="default"
+                           bsSize="xsmall"
+                           onClick={handleResetRuleSimulation}>
+                Reset
+              </ResetButton>
+              {ruleSimulationResult && (
+              <MessageShowContainer>
+                <MessageShow message={ruleSimulationResult} />
+              </MessageShowContainer>
+              )}
+            </>
+            )}
+          </div>
+        </RuleSimulationFormGroup>
       </fieldset>
 
       <Row>

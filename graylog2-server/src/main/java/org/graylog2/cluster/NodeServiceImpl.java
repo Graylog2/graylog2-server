@@ -16,24 +16,45 @@
  */
 package org.graylog2.cluster;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.mongodb.AggregationOptions;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class NodeServiceImpl extends PersistedServiceImpl implements NodeService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NodeServiceImpl.class);
+
+    public static final String LAST_SEEN_FIELD = "$last_seen";
     private final long pingTimeout;
+    private final static Map<String, Object> lastSeenFieldDefinition = Map.of("last_seen", Map.of("$type", "timestamp"));
+    private final static DBObject addLastSeenFieldAsDate = new BasicDBObject("$addFields", Map.of("last_seen_date", Map.of("$cond",
+            Map.of(
+                    "if", Map.of("$isNumber", LAST_SEEN_FIELD),
+                    "then", Map.of("$toDate", Map.of("$toLong", LAST_SEEN_FIELD)),
+                    "else", Map.of("$toDate", Map.of("$dateToString", Map.of("date", LAST_SEEN_FIELD)))
+            )
+    )));
 
     @Inject
     public NodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
@@ -42,7 +63,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     public NodeServiceImpl(final MongoConnection mongoConnection, final int staleLeaderTimeout) {
         super(mongoConnection);
-        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(staleLeaderTimeout);
+        this.pingTimeout = staleLeaderTimeout;
     }
 
     public Node.Type type() {
@@ -50,29 +71,25 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public String registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("last_seen", Tools.getUTCTimestamp());
-        fields.put("node_id", nodeId);
-        fields.put("type", type().toString());
-        fields.put("is_leader", isLeader);
-        fields.put("transport_address", httpPublishUri.toString());
-        fields.put("hostname", hostname);
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
+        final Map<String, Object> fields = Map.of(
+                "$set", Map.of(
+                        "node_id", nodeId,
+                        "type", type().toString(),
+                        "is_leader", isLeader,
+                        "transport_address", httpPublishUri.toString(),
+                        "hostname", hostname
+                ),
+                "$currentDate", lastSeenFieldDefinition
+        );
 
-        try {
-            Node node;
-            try {
-                // Update existing node object.
-                final String objectId = byNodeId(nodeId).getId();
-                node = new NodeImpl(new ObjectId(objectId), fields);
-            } catch (NodeNotFoundException e) {
-                // Create new node object.
-                node = new NodeImpl(fields);
-            }
-            return save(node);
-        } catch (ValidationException e) {
-            throw new RuntimeException("Validation failed.", e);
-        }
+        final WriteResult result = this.collection(NodeImpl.class).update(
+                new BasicDBObject("node_id", nodeId),
+                new BasicDBObject(fields),
+                true,
+                false
+        );
+        return result.getN() == 1;
     }
 
     @Override
@@ -92,24 +109,17 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         return byNodeId(nodeId.getNodeId());
     }
 
-    @Override
-    public Map<String, Node> allActive(Node.Type type) {
-        Map<String, Node> nodes = Maps.newHashMap();
-
-        BasicDBObject query = new BasicDBObject();
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("type", type.toString());
-
-        for (DBObject obj : query(NodeImpl.class, query)) {
-            Node node = new NodeImpl((ObjectId) obj.get("_id"), obj.toMap());
-            String nodeId = (String) obj.get("node_id");
-
-            nodes.put(nodeId, node);
-        }
-
-        return nodes;
+    private Stream<DBObject> aggregate(List<? extends DBObject> pipeline) {
+        return cursorToStream(this.collection(NodeImpl.class).aggregate(pipeline, AggregationOptions.builder().build()));
     }
 
+    @Override
+    public Map<String, Node> allActive(Node.Type type) {
+        return aggregate(recentHeartbeat(List.of(Map.of("type", type.toString()))))
+                .collect(Collectors.toMap(obj -> (String) obj.get("node_id"), obj -> new NodeImpl((ObjectId) obj.get("_id"), obj.toMap())));
+    }
+
+    @Deprecated
     @Override
     public Map<String, Node> allActive() {
         Map<String, Node> nodes = Maps.newHashMap();
@@ -121,52 +131,88 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         return nodes;
     }
 
+    private List<? extends DBObject> recentHeartbeat(List<? extends Map<String, Object>> additionalMatches) {
+        var match = ImmutableList.builder()
+                .add(Map.of("$expr", Map.of("$gte", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout))))))
+                .addAll(additionalMatches)
+                .build();
+        return List.of(
+                addLastSeenFieldAsDate,
+                new BasicDBObject("$match", Map.of("$and", match)),
+                new BasicDBObject("$unset", "last_seen_date")
+        );
+    }
+
     @Override
     public void dropOutdated() {
-        BasicDBObject query = new BasicDBObject();
-        query.put("last_seen", new BasicDBObject("$lt", Tools.getUTCTimestamp() - pingTimeout));
+        var outdatedIds = aggregate(List.of(
+                addLastSeenFieldAsDate,
+                new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout)))))),
+                new BasicDBObject("$project", Map.of("_id", "$_id"))
+        ))
+                .map(obj -> obj.get("_id"))
+                .toList();
 
-        destroyAll(NodeImpl.class, query);
+        if (!outdatedIds.isEmpty()) {
+            final BasicDBObject query = new BasicDBObject("_id", Map.of("$in", outdatedIds));
+            destroyAll(NodeImpl.class, query);
+        }
+    }
+
+    private Stream<DBObject> cursorToStream(Iterator<DBObject> cursor) {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(cursor, Spliterator.ORDERED), false);
     }
 
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    @Override
-    public void markAsAlive(Node node, boolean isLeader, String restTransportAddress) {
-        node.getFields().put("last_seen", Tools.getUTCTimestamp());
-        node.getFields().put("is_leader", isLeader);
-        node.getFields().put("transport_address", restTransportAddress);
-        try {
-            save(node);
-        } catch (ValidationException e) {
-            throw new RuntimeException("Validation failed.", e);
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
+        BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
+
+        final BasicDBObject update = new BasicDBObject(Map.of(
+                "$set", Map.of(
+                        "is_leader", isLeader,
+                        "transport_address", restTransportAddress.toString()
+                ),
+                "$currentDate", lastSeenFieldDefinition
+        ));
+
+        final WriteResult result = super.collection(NodeImpl.class).update(query, update);
+
+        final int updatedDocumentsCount = result.getN();
+        if (updatedDocumentsCount != 1) {
+            throw new NodeNotFoundException("Unable to find node " + node.getNodeId());
         }
     }
 
     @Override
-    public void markAsAlive(Node node, boolean isLeader, URI restTransportAddress) {
-        markAsAlive(node, isLeader, restTransportAddress.toString());
-    }
-
-    @Override
     public boolean isOnlyLeader(NodeId nodeId) {
-        BasicDBObject query = new BasicDBObject();
-        query.put("type", Node.Type.SERVER.toString());
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("node_id", new BasicDBObject("$ne", nodeId.getNodeId()));
-        query.put("is_leader", true);
 
-        return query(NodeImpl.class, query).size() == 0;
+        if(type() != Node.Type.SERVER) {
+            LOG.warn("Caution, isOnlyLeader called in the {} context, but returning only results of type {}", type(), Node.Type.SERVER);
+        }
+
+        return aggregate(recentHeartbeat(List.of(
+                Map.of(
+                        "type", Node.Type.SERVER.toString(),
+                        "node_id", new BasicDBObject("$ne", nodeId.getNodeId()),
+                        "is_leader", true
+                )
+        ))).findAny().isEmpty();
     }
 
     @Override
     public boolean isAnyLeaderPresent() {
-        BasicDBObject query = new BasicDBObject();
-        query.put("type", Node.Type.SERVER.toString());
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("is_leader", true);
 
-        return query(NodeImpl.class, query).size() > 0;
+        if(type() != Node.Type.SERVER) {
+            LOG.warn("Caution, isOnlyLeader called in the {} context, but returning only results of type {}", type(), Node.Type.SERVER);
+        }
+
+        return aggregate(recentHeartbeat(List.of(
+                Map.of(
+                        "type", Node.Type.SERVER.toString(),
+                        "is_leader", true
+                )
+        ))).findAny().isPresent();
     }
 }

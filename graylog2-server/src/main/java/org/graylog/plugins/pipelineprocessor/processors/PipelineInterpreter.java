@@ -284,7 +284,7 @@ public class PipelineInterpreter implements MessageProcessor {
         return result;
     }
 
-    private void evaluateStage(Stage stage,
+    public void evaluateStage(Stage stage,
                                Message message,
                                String msgId,
                                List<Message> result,
@@ -395,6 +395,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                       InterpreterListener interpreterListener,
                                       Pipeline pipeline,
                                       EvaluationContext context, Rule rule, Statement statement) {
+        context.setRule(rule);
         statement.evaluate(context);
         if (context.hasEvaluationErrors()) {
             // if the last statement resulted in an error, do not continue to execute this rules

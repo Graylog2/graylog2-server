@@ -75,7 +75,7 @@ const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) 
               ))}
             </li>
           ));
-        })}
+        }).toArray()}
       </List>
     </Container>
   );

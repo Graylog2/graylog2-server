@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { renderWithDataRouter } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import RuleForm from './RuleForm';
@@ -39,7 +39,7 @@ describe('RuleForm', () => {
 
     const handleDescription = jest.fn();
 
-    const { getByLabelText, getByRole } = render(
+    const { getByLabelText, getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         description: '',
         handleDescription: handleDescription,
@@ -51,8 +51,8 @@ describe('RuleForm', () => {
         onChangeSource: () => {},
       }}>
         <RuleForm create={false} />
-      </PipelineRulesContext.Provider>,
-    );
+      </PipelineRulesContext.Provider>
+    ));
 
     const descriptionInput = getByLabelText('Description');
 
@@ -63,5 +63,42 @@ describe('RuleForm', () => {
     userEvent.click(createRuleButton);
 
     expect(handleDescription).toHaveBeenCalledWith(ruleToUpdate.description);
+  });
+
+  it('should run rule simulation using the rule input', async () => {
+    const ruleToUpdate = {
+      source: `rule "concat new_"
+      when
+      has_field("message")
+      then
+        set_field("message", concat("new_",to_string($message.message)));
+      end`,
+    };
+
+    const setRawMessageToSimulate = jest.fn();
+    const ruleInput = 'new_test';
+
+    const { getByRole, getByPlaceholderText } = renderWithDataRouter(
+      <PipelineRulesContext.Provider value={{
+        ruleSource: ruleToUpdate.source,
+        ruleSourceRef: {},
+        usedInPipelines: [],
+        rawMessageToSimulate: '',
+        startRuleSimulation: true,
+        setRawMessageToSimulate,
+      }}>
+        <RuleForm create={false} />
+      </PipelineRulesContext.Provider>,
+    );
+
+    const rawMessageInput = getByPlaceholderText('Message string');
+
+    expect(rawMessageInput).toHaveValue('');
+
+    userEvent.paste(rawMessageInput, ruleInput);
+    const runSimulationButton = getByRole('button', { name: 'Run rule simulation' });
+    userEvent.click(runSimulationButton);
+
+    expect(setRawMessageToSimulate).toHaveBeenCalledWith(ruleInput);
   });
 });

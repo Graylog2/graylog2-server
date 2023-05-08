@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import { debounce, cloneDeep } from 'lodash';
+import debounce from 'lodash/debounce';
+import cloneDeep from 'lodash/cloneDeep';
 import React from 'react';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -169,6 +170,7 @@ class EditConfigurationVariableModal extends React.Component {
         </Button>
         <BootstrapModalForm show={showModal}
                             title={<>{create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;</>}
+                            data-telemetry-title={`${create ? 'Create' : 'Edit'} Variable user`}
                             onSubmitForm={this._save}
                             onCancel={this.closeModal}
                             submitButtonDisabled={this._hasErrors()}

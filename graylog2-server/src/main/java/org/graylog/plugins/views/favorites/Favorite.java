@@ -16,5 +16,7 @@
  */
 package org.graylog.plugins.views.favorites;
 
-public record Favorite(String id, String type, String title) {
+import org.graylog.grn.GRN;
+
+public record Favorite(GRN grn, String title) {
 }

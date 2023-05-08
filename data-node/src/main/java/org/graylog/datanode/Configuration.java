@@ -72,19 +72,16 @@ public class Configuration extends BaseConfiguration {
     private boolean disableNativeSystemStatsCollector = false;
 
     @Parameter(value = "opensearch_location")
-    private String opensearchLocation = "./data-node/bin/opensearch-2.4.1";
-
-    @Parameter(value = "opensearch_version")
-    private String opensearchVersion = "2.4.1";
+    private String opensearchDistributionRoot = "dist";
 
     @Parameter(value = "opensearch_data_location")
-    private String opensearchDataLocation = "./data-node/bin/data";
+    private String opensearchDataLocation = "data";
 
     @Parameter(value = "opensearch_logs_location")
-    private String opensearchLogsLocation = "./data-node/bin/logs";
+    private String opensearchLogsLocation = "logs";
 
     @Parameter(value = "opensearch_config_location")
-    private String opensearchConfigLocation = "./data-node/bin/config";
+    private String opensearchConfigLocation = "config";
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
@@ -151,16 +148,12 @@ public class Configuration extends BaseConfiguration {
         return isLeader;
     }
 
+    public String getOpensearchDistributionRoot() {
+        return opensearchDistributionRoot;
+    }
+
     public String getOpensearchConfigLocation() {
         return opensearchConfigLocation;
-    }
-
-    public String getOpensearchLocation() {
-        return opensearchLocation;
-    }
-
-    public String getOpensearchVersion() {
-        return opensearchVersion;
     }
 
     public String getOpensearchDataLocation() {
@@ -193,7 +186,7 @@ public class Configuration extends BaseConfiguration {
     private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
-    private String nodeIdFile = "/etc/graylog/datanode/node-id";
+    private String nodeIdFile = "data/node-id";
 
     @Parameter(value = "root_username")
     private String rootUsername = "admin";
@@ -204,6 +197,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "root_email")
     private String rootEmail = "";
 
+    @Parameter(value = "single_node_only")
+    private boolean singleNodeOnly = false;
 
     public String getNodeIdFile() {
         return nodeIdFile;
@@ -265,6 +260,10 @@ public class Configuration extends BaseConfiguration {
 
     public Optional<String> getOpensearchNetworkHostHost() {
         return Optional.ofNullable(opensearchNetworkHostHost);
+    }
+
+    public boolean isSingleNodeOnly() {
+        return singleNodeOnly;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

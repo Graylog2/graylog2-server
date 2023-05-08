@@ -24,6 +24,12 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 
+const INITIAL_DATA = {
+  pagination: { total: 0 },
+  list: [],
+  attributes: [],
+};
+
 type PaginatedSearchesResponse = PaginatedListJSON & {
   elements: Array<ViewJson>,
   attributes: Array<Attribute>
@@ -56,11 +62,11 @@ const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { e
     list: Readonly<Array<View>>,
     pagination: { total: number },
     attributes: Array<Attribute>,
-  } | undefined,
+  },
   refetch: () => void,
-  isLoading: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isLoading } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['saved-searches', 'overview', searchParams],
     () => fetchSavedSearches(searchParams),
     {
@@ -74,9 +80,9 @@ const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { e
   );
 
   return ({
-    data,
+    data: data ?? INITIAL_DATA,
     refetch,
-    isLoading,
+    isInitialLoading,
   });
 };
 

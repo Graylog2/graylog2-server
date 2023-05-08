@@ -21,6 +21,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.rest.RestTools;
 import org.graylog2.utilities.IpSubnet;
@@ -65,6 +66,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        ThreadContext.unbindSubject();
         final boolean secure = requestContext.getSecurityContext().isSecure();
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
         final Map<String, Cookie> cookies = requestContext.getCookies();
@@ -135,12 +137,12 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         if ("token".equalsIgnoreCase(credential)) {
             return new AccessTokenAuthToken(userName, host);
         }
-        if (!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(credential)) {
-            return new UsernamePasswordToken(userName, credential, host);
-        }
         if (cookies.containsKey(SESSION_COOKIE_NAME)) {
             final Cookie authenticationCookie = cookies.get(SESSION_COOKIE_NAME);
             return new SessionIdToken(authenticationCookie.getValue(), host, remoteAddr);
+        }
+        if (!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(credential)) {
+            return new UsernamePasswordToken(userName, credential, host);
         }
 
         return new PossibleTrustedHeaderToken(host, remoteAddr);

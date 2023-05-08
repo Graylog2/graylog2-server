@@ -32,16 +32,16 @@ public class Sharing implements GraylogRestApi {
 
     public static final String PERMISSION_OWN = "own";
     public static final String PERMISSION_VIEW = "view";
-    private final RequestSpecification requestSpecification;
+    private final GraylogApis api;
 
-    public Sharing(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    public Sharing(GraylogApis api) {
+        this.api = api;
     }
 
 
     public JsonPath setSharing(SharingRequest req) {
         return given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .body(serialize(req))
                 .post("/authz/shares/entities/" + req.entity().serialize())

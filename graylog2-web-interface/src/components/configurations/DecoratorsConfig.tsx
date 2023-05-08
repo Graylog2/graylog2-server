@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import { groupBy } from 'lodash';
+import groupBy from 'lodash/groupBy';
 
 import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
@@ -66,13 +66,11 @@ const DecoratorsConfig = () => {
     .sort((d1, d2) => d1.order - d2.order);
   const readOnlyDecoratorItems = sortedDecorators.map((decorator) => formatDecorator(decorator, currentDecorators, types));
 
-  const streamOptions = streams.filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id));
-
   return (
     <div>
       <h2>Decorators Configuration</h2>
       <p>Select the stream for which you want to see the set of default decorators.</p>
-      <StreamSelect streams={streamOptions} onChange={setCurrentStream} value={currentStream} />
+      <StreamSelect streams={streams} onChange={setCurrentStream} value={currentStream} />
       <DecoratorList decorators={readOnlyDecoratorItems} disableDragging />
       <IfPermitted permissions="decorators:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>

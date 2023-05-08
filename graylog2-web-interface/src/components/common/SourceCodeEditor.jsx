@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import lodash from 'lodash';
+import isFinite from 'lodash/isFinite';
 import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
@@ -36,7 +36,7 @@ import './ace/theme-graylog';
 const SourceCodeContainer = styled.div(({ resizable, theme }) => css`
   .react-resizable-handle {
     z-index: 100; /* Ensure resize handle is over text editor */
-    display: ${resizable ? "block" : "none"};
+    display: ${resizable ? 'block' : 'none'};
   }
 
   ${theme.components.aceEditor}
@@ -162,6 +162,8 @@ class SourceCodeEditor extends React.Component {
       const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
 
       fetch('GET', url).then((response) => {
+        if (!Array.isArray(response)) return '';
+
         const functions = response.map((res) => res.name).join('|');
         const pipelineRulesMode = new PipelineRulesMode(functions);
 
@@ -245,7 +247,7 @@ class SourceCodeEditor extends React.Component {
       readOnly,
       value,
     } = this.props;
-    const validCssWidth = lodash.isFinite(width) ? width : '100%';
+    const validCssWidth = isFinite(width) ? width : '100%';
     const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
 
     return (

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { trim } from 'lodash';
+import trim from 'lodash/trim';
 
 const isPhrase = (searchTerm: string | undefined | null) => {
   return String(searchTerm).indexOf(' ') !== -1;
@@ -51,4 +51,11 @@ const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND')
   return `${oldQuery} ${operator} ${newTerm}`;
 };
 
-export { isPhrase, escape, addToQuery };
+const concatQueryStrings = (queryStrings: Array<string>, { operator = 'AND', withBrackets = true } = {}): string => {
+  const withRemovedEmpty = queryStrings.filter((s: string) => !!(s?.trim()));
+  const showBracketsForChild = withBrackets && withRemovedEmpty.length > 1;
+
+  return withRemovedEmpty.map((s) => (showBracketsForChild ? `(${s})` : s)).join(` ${operator} `);
+};
+
+export { isPhrase, escape, addToQuery, concatQueryStrings };

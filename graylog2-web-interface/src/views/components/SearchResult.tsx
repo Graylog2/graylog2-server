@@ -27,8 +27,8 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useIsLoading from 'views/hooks/useIsLoading';
 
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
-  height: ${$hasFocusedWidget ? "100%" : "auto"};
-  overflow: ${$hasFocusedWidget ? "auto" : "visible"};
+  height: ${$hasFocusedWidget ? '100%' : 'auto'};
+  overflow: ${$hasFocusedWidget ? 'auto' : 'visible'};
   position: relative;
 `);
 

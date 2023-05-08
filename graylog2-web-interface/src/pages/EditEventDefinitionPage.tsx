@@ -25,10 +25,10 @@ import EventDefinitionFormContainer from 'components/event-definitions/event-def
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
-import history from 'util/History';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import type { EventDefinition } from 'logic/alerts/types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import useHistory from 'routing/useHistory';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
@@ -36,6 +36,7 @@ const EditEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
+  const history = useHistory();
 
   React.useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
@@ -57,7 +58,7 @@ const EditEventDefinitionPage = () => {
           },
         );
     }
-  }, [params, currentUser]);
+  }, [params, currentUser, history]);
 
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
 

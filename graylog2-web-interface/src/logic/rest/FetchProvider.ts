@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { memoize } from 'lodash';
+import memoize from 'lodash/memoize';
 
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
-import Routes from 'routing/Routes';
-import history from 'util/History';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
 
@@ -73,6 +71,16 @@ const defaultResponseHandler = (resp: Response) => {
     reportServerSuccess();
 
     return noContent ? null : resp.json();
+  }
+
+  throw resp;
+};
+
+const textResponseHandler = (resp: Response) => {
+  if (resp.ok) {
+    reportServerSuccess();
+
+    return resp.text();
   }
 
   throw resp;
@@ -157,20 +165,29 @@ export class Builder {
   }
 
   plaintext(body) {
-    const onUnauthorized = () => history.replace(Routes.STARTPAGE);
-
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
 
     this.responseHandler = defaultResponseHandler;
 
-    this.errorHandler = (error: Response) => onServerError(error, onUnauthorized);
+    this.errorHandler = (error: Response) => onServerError(error);
+
+    return this;
+  }
+
+  streamingplaintext(body) {
+    this.body = { body, mimeType: 'text/plain' };
+    this.accept = 'text/plain';
+
+    this.responseHandler = textResponseHandler;
+    this.errorHandler = (error: Response) => onServerError(error);
 
     return this;
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error: Response) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => {
+    });
 
     return this;
   }
@@ -218,17 +235,29 @@ function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<
 
 type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 
-export default function fetch<T = any>(method: Method, url: string, body?: any): Promise<T> {
+export default function fetch<T = any>(method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
   const promise = () => new Builder(method, url)
     .json(body)
     .build();
 
-  return queuePromiseIfNotLoggedin(promise)();
+  if (requireSession) {
+    return queuePromiseIfNotLoggedin(promise)();
+  }
+
+  return promise();
 }
 
 export function fetchPlainText(method, url, body) {
   const promise = () => new Builder(method, url)
     .plaintext(body)
+    .build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchStreamingPlainText(method, url, body) {
+  const promise = () => new Builder(method, url)
+    .streamingplaintext(body)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();

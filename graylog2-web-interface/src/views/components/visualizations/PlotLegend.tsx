@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
-import { chunk } from 'lodash';
+import chunk from 'lodash/chunk';
 
 import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
@@ -43,7 +43,7 @@ const ColorHint = styled.div(({ color }) => `
 const Container = styled.div`
   display: grid;
   grid-template: 4fr auto / 1fr;
-  grid-template-areas: "." ".";
+  grid-template-areas: '.' '.';
   height: 100%;
 `;
 
@@ -162,10 +162,12 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   });
 
   const result = chunk(tableCells, 5).map((cells, index) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <LegendRow key={index}>
-      {cells}
-    </LegendRow>
+    (
+      // eslint-disable-next-line react/no-array-index-key
+      <LegendRow key={index}>
+        {cells}
+      </LegendRow>
+    )
   ));
 
   return (
@@ -181,7 +183,8 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
                    placement="top"
                    target={colorPickerConfig.target}>
             <Popover id="legend-config"
-                     title={`Configuration for ${colorPickerConfig.name}`}>
+                     title={`Configuration for ${colorPickerConfig.name}`}
+                     data-event-element="Plot Legend">
               <ColorPicker color={colors.get(colorPickerConfig.name)}
                            colors={defaultColors}
                            onChange={(newColor) => _onColorSelect(colorPickerConfig.name, newColor)} />

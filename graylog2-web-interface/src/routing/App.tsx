@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
+import { Outlet } from 'react-router-dom';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { QueryParamProvider } from 'use-query-params';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
 import { Icon, Spinner } from 'components/common';
@@ -26,8 +28,8 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
-
 import 'stylesheets/typeahead.less';
+import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 
 const AppLayout = styled.div`
   display: flex;
@@ -46,6 +48,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   left: 50%;
   margin-left: -125px;
   top: 50px;
+  /* stylelint-disable function-no-unknown */
   color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
   font-size: 80px;
   padding: 25px;
@@ -58,40 +61,36 @@ const ScrollToHint = styled.div(({ theme }) => css`
   background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
 `);
 
-const App = ({ children }) => (
-  <CurrentUserContext.Consumer>
-    {(currentUser) => {
-      if (!currentUser) {
-        return <Spinner />;
-      }
+const App = () => (
+  <QueryParamProvider adapter={ReactRouter6Adapter}>
+    <CurrentUserContext.Consumer>
+      {(currentUser) => {
+        if (!currentUser) {
+          return <Spinner />;
+        }
 
-      return (
-        <ScratchpadProvider loginName={currentUser.username}>
-          <AppLayout>
-            <Navigation />
-            <ScrollToHint id="scroll-to-hint">
-              <Icon name="arrow-up" />
-            </ScrollToHint>
-            <Scratchpad />
-            <ReportedErrorBoundary>
-              <RuntimeErrorBoundary>
-                <PageContent>
-                  {children}
-                </PageContent>
-              </RuntimeErrorBoundary>
-            </ReportedErrorBoundary>
-          </AppLayout>
-        </ScratchpadProvider>
-      );
-    }}
-  </CurrentUserContext.Consumer>
+        return (
+          <ScratchpadProvider loginName={currentUser.username}>
+            <NavigationTelemetry />
+            <AppLayout>
+              <Navigation />
+              <ScrollToHint id="scroll-to-hint">
+                <Icon name="arrow-up" />
+              </ScrollToHint>
+              <Scratchpad />
+              <ReportedErrorBoundary>
+                <RuntimeErrorBoundary>
+                  <PageContent>
+                    <Outlet />
+                  </PageContent>
+                </RuntimeErrorBoundary>
+              </ReportedErrorBoundary>
+            </AppLayout>
+          </ScratchpadProvider>
+        );
+      }}
+    </CurrentUserContext.Consumer>
+  </QueryParamProvider>
 );
-
-App.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
-};
 
 export default App;

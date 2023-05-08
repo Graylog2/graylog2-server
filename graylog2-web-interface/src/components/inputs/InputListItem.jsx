@@ -20,6 +20,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
+import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
 import { DropdownButton, MenuItem, Col, Button } from 'components/bootstrap';
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
@@ -29,6 +30,7 @@ import Routes from 'routing/Routes';
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const InputListItem = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -39,11 +41,17 @@ const InputListItem = createReactClass({
     input: PropTypes.object.isRequired,
     currentNode: PropTypes.object.isRequired,
     permissions: PropTypes.array.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
 
   _deleteInput() {
+    this.props.sendTelemetry('click', {
+      appSection: 'inputs',
+      eventElement: 'delete-input',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete(this.props.input);
@@ -60,6 +68,11 @@ const InputListItem = createReactClass({
 
   _updateInput(data) {
     InputsActions.update(this.props.input.id, data);
+
+    this.props.sendTelemetry('submit_form', {
+      appSection: 'inputs',
+      eventElement: 'edit-input',
+    });
   },
 
   render() {
@@ -67,7 +80,7 @@ const InputListItem = createReactClass({
       return <Spinner />;
     }
 
-    const { input } = this.props;
+    const { input, sendTelemetry } = this.props;
     const definition = this.state.inputDescriptions[input.type];
 
     const titleSuffix = (
@@ -81,30 +94,47 @@ const InputListItem = createReactClass({
     );
 
     const actions = [];
+    const queryField = (input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
 
     if (this.isPermitted(this.props.permissions, ['searches:relative'])) {
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
-                       to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
-          <Button>Show received messages</Button>
+                       to={Routes.search(`${queryField}:${this.props.input.id}`, { relative: 0 })}>
+          <Button onClick={() => {
+            sendTelemetry('click', {
+              appSection: 'inputs',
+              eventElement: 'show-received-messages',
+            });
+          }}>
+            Show received messages
+          </Button>
         </LinkContainer>,
       );
     }
 
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
-      let extractorRoute;
+      if (!AppConfig.isCloud()) {
+        let extractorRoute;
 
-      if (this.props.input.global) {
-        extractorRoute = Routes.global_input_extractors(this.props.input.id);
-      } else {
-        extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+        if (this.props.input.global) {
+          extractorRoute = Routes.global_input_extractors(this.props.input.id);
+        } else {
+          extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+        }
+
+        actions.push(
+          <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
+            <Button onClick={() => {
+              sendTelemetry('click', {
+                appSection: 'inputs',
+                eventElement: 'manage-extractors',
+              });
+            }}>
+              Manage extractors
+            </Button>
+          </LinkContainer>,
+        );
       }
-
-      actions.push(
-        <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
-          <Button>Manage extractors</Button>
-        </LinkContainer>,
-      );
 
       actions.push(<InputStateControl key={`input-state-control-${this.props.input.id}`} input={this.props.input} />);
     }
@@ -114,7 +144,15 @@ const InputListItem = createReactClass({
     if (!this.props.input.global) {
       showMetricsMenuItem = (
         <LinkContainer to={Routes.filtered_metrics(this.props.input.node, this.props.input.id)}>
-          <MenuItem key={`show-metrics-${this.props.input.id}`}>Show metrics</MenuItem>
+          <MenuItem key={`show-metrics-${this.props.input.id}`}
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        appSection: 'inputs',
+                        eventElement: 'show-metrics',
+                      });
+                    }}>
+            Show metrics
+          </MenuItem>
         </LinkContainer>
       );
     }
@@ -202,4 +240,4 @@ const InputListItem = createReactClass({
   },
 });
 
-export default InputListItem;
+export default withTelemetry(InputListItem);

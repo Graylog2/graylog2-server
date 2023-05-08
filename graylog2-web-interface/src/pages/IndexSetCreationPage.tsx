@@ -22,7 +22,6 @@ import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
-import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
@@ -40,6 +39,8 @@ import type {
 } from 'components/indices/Types';
 import { adjustFormat } from 'util/DateTime';
 import useIndexDefaults from 'pages/useIndexDefaults';
+import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   retentionStrategies?: Array<RetentionStrategy> | null | undefined,
@@ -48,12 +49,20 @@ type Props = {
 }
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
+  const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
   }, []);
 
   const _saveConfiguration = (indexSetItem: IndexSet) => {
+    sendTelemetry('submit_form', {
+      appSection: 'index_sets',
+      eventElement: 'create-index-set',
+    });
+
     const copy = indexSetItem;
 
     copy.creation_date = adjustFormat(new Date(), 'internal');

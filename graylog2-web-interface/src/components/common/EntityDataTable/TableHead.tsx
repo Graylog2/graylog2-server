@@ -22,10 +22,10 @@ import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 import type { Sort } from 'stores/PaginationTypes';
 
 import BulkSelectHead from './BulkSelectHead';
-import type { Column, ColumnRenderer, ColumnRenderers, EntityBase } from './types';
+import type { Column, ColumnRenderer, EntityBase, ColumnRenderersByAttribute } from './types';
 
 const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
-  width: ${$width ? `${$width}px` : "auto"};
+  width: ${$width ? `${$width}px` : 'auto'};
 `);
 
 const TableHeader = <Entity extends EntityBase>({
@@ -61,7 +61,7 @@ const TableHeader = <Entity extends EntityBase>({
 
 const ActionsHead = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   text-align: right;
-  width: ${$width ? `${$width}px` : "auto"};
+  width: ${$width ? `${$width}px` : 'auto'};
 `);
 
 const TableHead = <Entity extends EntityBase>({
@@ -69,7 +69,7 @@ const TableHead = <Entity extends EntityBase>({
   activeSort,
   columns,
   columnsOrder,
-  columnRenderers,
+  columnRenderersByAttribute,
   columnsWidths,
   data,
   displayActionsCol,
@@ -83,7 +83,7 @@ const TableHead = <Entity extends EntityBase>({
   columns: Array<Column>,
   columnsWidths: { [columnId: string]: number },
   columnsOrder: Array<string>,
-  columnRenderers: ColumnRenderers<Entity>,
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
   data: Readonly<Array<Entity>>,
   displayActionsCol: boolean,
   displayBulkSelectCol: boolean,
@@ -105,7 +105,7 @@ const TableHead = <Entity extends EntityBase>({
                           setSelectedEntities={setSelectedEntities} />
         )}
         {sortedColumns.map((column) => {
-          const columnRenderer = columnRenderers[column.id];
+          const columnRenderer = columnRenderersByAttribute[column.id];
 
           return (
             <TableHeader<Entity> columnRenderer={columnRenderer}

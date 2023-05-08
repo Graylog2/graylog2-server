@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import find from 'lodash/find';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
@@ -62,7 +62,7 @@ const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
           border-color: ${theme.colors.variant.lighter.default};
           border-style: solid;
           border-width: 0 1px 1px 0;
-          content: "";
+          content: '';
           display: block;
           height: 15px;
           position: absolute;
@@ -234,7 +234,7 @@ class Wizard extends React.Component<Props, State> {
       return false;
     }
 
-    return lodash.find(steps, { key: activeStep });
+    return find(steps, { key: activeStep });
   };
 
   _getSelectedStep = () => {

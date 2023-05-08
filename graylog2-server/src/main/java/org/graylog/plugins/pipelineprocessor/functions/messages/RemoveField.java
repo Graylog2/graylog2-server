@@ -24,28 +24,34 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
 
+import java.util.stream.Collectors;
+
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class RemoveField extends AbstractFunction<Void> {
-
     public static final String NAME = "remove_field";
     public static final String FIELD = "field";
     private final ParameterDescriptor<String, String> fieldParam;
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public RemoveField() {
-        fieldParam = ParameterDescriptor.string(FIELD).description("The field to remove").build();
+        fieldParam = ParameterDescriptor.string(FIELD).description("The field(s) to remove (name or regex)").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final String field = fieldParam.required(args, context);
+        final String fieldOrPattern = fieldParam.required(args, context);
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
 
-        message.removeField(field);
+        message.getFieldNames().stream()
+                .filter(f -> f.matches(fieldOrPattern))
+                .collect(Collectors.toList()) // required to avoid ConcurrentModificationException
+                .forEach(message::removeField);
+
         return null;
     }
+
 
     @Override
     public FunctionDescriptor<Void> descriptor() {

@@ -16,21 +16,26 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Button } from 'components/bootstrap';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 function inputStateFilter(state) {
   return state.inputStates ? state.inputStates[this.props.input.id] : undefined;
 }
 
 const InputStateControl = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'InputStateControl',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     input: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connectFilter(InputStatesStore, 'inputState', inputStateFilter)],
@@ -55,22 +60,36 @@ const InputStateControl = createReactClass({
     return nodeIDs.some((nodeID) => {
       const nodeState = this.state.inputState[nodeID];
 
-      return nodeState.state === 'RUNNING';
+      return nodeState.state === 'RUNNING' || nodeState.state === 'STARTING' || nodeState.state === 'FAILING';
     });
   },
 
   _startInput() {
     this.setState({ loading: true });
 
+    this.props.sendTelemetry('click', {
+      appSection: 'inputs',
+      eventElement: 'start-input',
+    });
+
     InputStatesStore.start(this.props.input)
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => {
+        this.setState({ loading: false });
+      });
   },
 
   _stopInput() {
     this.setState({ loading: true });
 
+    this.props.sendTelemetry('click', {
+      appSection: 'inputs',
+      eventElement: 'stop-input',
+    });
+
     InputStatesStore.stop(this.props.input)
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => {
+        this.setState({ loading: false });
+      });
   },
 
   render() {
@@ -90,4 +109,4 @@ const InputStateControl = createReactClass({
   },
 });
 
-export default InputStateControl;
+export default withTelemetry(InputStateControl);

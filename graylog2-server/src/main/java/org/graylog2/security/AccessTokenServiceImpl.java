@@ -16,6 +16,10 @@
  */
 package org.graylog2.security;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -27,16 +31,20 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -45,17 +53,23 @@ import java.util.stream.Collectors;
  * The token value will automatically be encrypted/decrypted when storing/loading the token object from the database.
  * That means the token value is encrypted at rest but the loaded {@link AccessToken} always contains the plain text value.
  */
+@Singleton
 public class AccessTokenServiceImpl extends PersistedServiceImpl implements AccessTokenService {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private static final SecureRandom RANDOM = new SecureRandom();
     private final AccessTokenCipher cipher;
+    private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
     public AccessTokenServiceImpl(MongoConnection mongoConnection, AccessTokenCipher accessTokenCipher) {
         super(mongoConnection);
         this.cipher = accessTokenCipher;
+        setLastAccessCache(30, TimeUnit.SECONDS);
+
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
+        // make sure we cannot overwrite an existing access token
+        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
     }
 
     @Override
@@ -129,15 +143,17 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     }
 
     @Override
-    public void touch(AccessToken accessToken) throws ValidationException {
-        accessToken.getFields().put(AccessTokenImpl.LAST_ACCESS, Tools.nowUTC());
-        save(accessToken);
+    public DateTime touch(AccessToken accessToken) throws ValidationException {
+        try {
+            return lastAccessCache.get(accessToken.getId());
+        } catch (ExecutionException e) {
+            LOG.debug("Ignoring error: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public String save(AccessToken accessToken) throws ValidationException {
-        // make sure we cannot overwrite an existing access token
-        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
         return super.save(encrypt(accessToken));
     }
 
@@ -176,5 +192,25 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         } else {
             return new AccessTokenImpl(new ObjectId(token.getId()), fields);
         }
+    }
+
+    @VisibleForTesting
+    @Override
+    public void setLastAccessCache(long duration, TimeUnit unit) {
+        lastAccessCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(duration, unit)
+                .build(new CacheLoader<>() {
+                    @Override
+                    public DateTime load(String id) throws Exception {
+                        AccessToken accessToken = loadById(id);
+                        DateTime now = Tools.nowUTC();
+                        if (accessToken != null) {
+                            accessToken.getFields().put(AccessTokenImpl.LAST_ACCESS, Tools.nowUTC());
+                            LOG.debug("Accesstoken: saving access time");
+                            save(accessToken);
+                        }
+                        return now;
+                    }
+                });
     }
 }

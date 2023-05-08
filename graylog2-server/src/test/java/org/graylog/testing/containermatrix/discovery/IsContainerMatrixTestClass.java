@@ -17,6 +17,7 @@
 package org.graylog.testing.containermatrix.discovery;
 
 import com.google.common.collect.Sets;
+import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -31,11 +32,15 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.getSearchVersionOverride;
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.isCompatible;
 
 public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     private static final IsContainerMatrixTest isTestMethod = new IsContainerMatrixTest();
@@ -66,7 +71,7 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
                 return config.serverLifecycle().equals(container.getLifecycle())
                         && config.mavenProjectDirProvider().equals(container.getMavenProjectDirProvider())
                         && config.pluginJarsProvider().equals(container.getPluginJarsProvider())
-                        && getSearchServers(config).contains(container.getEsVersion())
+                        && isMatchingSearchServer(config)
                         && getMongodbServers(config).contains(container.getMongoVersion());
             }
         } else {
@@ -77,6 +82,20 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
 
     private Set<MongodbServer> getMongodbServers(ContainerMatrixTestsConfiguration config) {
         return Sets.newHashSet(config.mongoVersions());
+    }
+
+    private boolean isMatchingSearchServer(ContainerMatrixTestsConfiguration config) {
+        final var optional = getSearchVersionOverride();
+        if(optional.isPresent()) {
+            if(config.searchVersions().length == 0) {
+                return true;
+            } else {
+                final var override = optional.get();
+                return Arrays.stream(config.searchVersions()).anyMatch(version -> isCompatible(override, version));
+            }
+        } else {
+            return getSearchServers(config).contains(container.getEsVersion());
+        }
     }
 
     private Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {

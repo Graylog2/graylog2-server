@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.utils.JsonUtils;
 import org.graylog.testing.utils.RangeUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -32,9 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -52,21 +52,21 @@ public class SearchDriver {
     private static final Logger LOG = LoggerFactory.getLogger(SearchDriver.class);
 
     /**
-     * @param requestSpec @see io.restassured.specification.RequestSpecification
+     * @param Supplier to get the RequestSpecification from
      * @return all messages' "message" field as List<String>
      */
-    public static List<String> searchAllMessages(RequestSpecification requestSpec) {
-        return searchAllMessagesInTimeRange(requestSpec, RangeUtils.allMessagesTimeRange());
+    public static List<String> searchAllMessages(Supplier<RequestSpecification> spec) {
+        return searchAllMessagesInTimeRange(spec, RangeUtils.allMessagesTimeRange());
     }
 
-    public static List<String> searchAllMessagesInTimeRange(RequestSpecification requestSpec, TimeRange timeRange) {
+    public static List<String> searchAllMessagesInTimeRange(Supplier<RequestSpecification> spec, TimeRange timeRange) {
         String queryId = "query-id";
         String messageListId = "message-list-id";
 
         String body = allMessagesJson(queryId, messageListId, timeRange);
 
         final JsonPath response = given()
-                .spec(requestSpec)
+                .spec(spec.get())
                 .when()
                 .body(body)
                 .post("/views/search/sync")
@@ -104,9 +104,9 @@ public class SearchDriver {
         return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
     }
 
-    public static List<MappedFieldTypeDTO> getFieldTypes(RequestSpecification requestSpecification) {
+    public static List<MappedFieldTypeDTO> getFieldTypes(Supplier<RequestSpecification> spec) {
         final MappedFieldTypeDTO[] as = given()
-                .spec(requestSpecification)
+                .spec(spec.get())
                 .get("/views/fields")
                 .as(MappedFieldTypeDTO[].class);
         return Arrays.asList(as);

@@ -42,13 +42,13 @@ const Actions = styled.div<{ $scrolledToBottom: boolean, $alignAtBottom: boolean
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: ${$alignAtBottom ? "flex-end" : "space-between"};
+  justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
   padding-top: 5px;
 
   ::before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
-    content: " ";
-    display: ${$scrolledToBottom ? "block" : "none"};
+    content: ' ';
+    display: ${$scrolledToBottom ? 'block' : 'none'};
     height: 3px;
     position: absolute;
     left: 0;

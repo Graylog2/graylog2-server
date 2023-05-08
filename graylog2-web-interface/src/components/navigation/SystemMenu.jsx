@@ -24,6 +24,7 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
+import AppConfig from 'util/AppConfig';
 
 import NavigationLink from './NavigationLink';
 
@@ -71,6 +72,12 @@ const _systemTitle = (pathname) => {
 
 const SystemMenu = () => {
   const location = useLocation();
+  let showInputs = true;
+
+  if (AppConfig.isCloud()) {
+    showInputs = AppConfig.isFeatureEnabled('cloud_inputs');
+  }
+
   const pluginSystemNavigations = PluginStore.exports('systemnavigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
@@ -93,10 +100,10 @@ const SystemMenu = () => {
       <HideOnCloud>
         <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
       </HideOnCloud>
+      <IfPermitted permissions={['inputs:read']}>
+        {showInputs ? <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" /> : null}
+      </IfPermitted>
       <HideOnCloud>
-        <IfPermitted permissions={['inputs:read']}>
-          <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" />
-        </IfPermitted>
         <IfPermitted permissions={['outputs:read']}>
           <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
         </IfPermitted>

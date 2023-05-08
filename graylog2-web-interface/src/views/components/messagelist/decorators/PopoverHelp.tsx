@@ -25,7 +25,10 @@ import DecoratorStyles from './decoratorStyles.css';
 
 const PopoverHelp = () => {
   const popoverHelp = (
-    <Popover id="decorators-help" className={DecoratorStyles.helpPopover}>
+    <Popover id="decorators-help"
+             className={DecoratorStyles.helpPopover}
+             data-app-section="add_decorator_button"
+             data-event-element="Decorators">
       <p className="description">
         Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
         shown in the search results. Decorator config is stored <strong>per stream</strong>.

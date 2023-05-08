@@ -21,9 +21,10 @@ import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.datanode.bootstrap.commands.CliCommandHelp;
 import org.graylog.datanode.bootstrap.commands.ShowVersion;
-import org.graylog.datanode.bootstrap.commands.certutil.CertutilCa;
-import org.graylog.datanode.bootstrap.commands.certutil.CertutilCert;
-import org.graylog.datanode.bootstrap.commands.certutil.CertutilHttp;
+import org.graylog.security.certutil.CertutilCa;
+import org.graylog.security.certutil.CertutilCert;
+import org.graylog.security.certutil.CertutilCsr;
+import org.graylog.security.certutil.CertutilHttp;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.bootstrap.CliCommandsProvider;
 
@@ -38,6 +39,7 @@ public class Main {
                         CertutilCa.class,
                         CertutilCert.class,
                         CertutilHttp.class,
+                        CertutilCsr.class,
                         ShowVersion.class,
                         CliCommandHelp.class));
 

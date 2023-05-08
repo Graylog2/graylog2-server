@@ -19,6 +19,7 @@ package org.graylog2.lookup;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.graylog.grn.GRN;
 import org.graylog2.contentpacks.ContentPackService;
 
 import javax.inject.Inject;
@@ -61,29 +62,29 @@ public class Catalog {
                 });
     }
 
-    public String getTitle(final String id) {
+    public String getTitle(final GRN grn) {
         try {
-            var item = cache.get(id);
+            var item = cache.get(grn.entity());
             if(item.title() != null) {
                 return item.title();
             } else {
-                return "Unknown entity: " + id;
+                return "Unknown entity: " + grn;
             }
         } catch (ExecutionException cex) {
-            return "Unknown entity: " + id;
+            return "Unknown entity: " + grn;
         }
     }
 
-    public String getType(final String id) {
+    public String getType(final GRN grn) {
         try {
-            var item = cache.get(id);
+            var item = cache.get(grn.entity());
             if(item.type() != null) {
                 return item.type().toLowerCase(Locale.ROOT);
             } else {
-                return "Unknown entity: " + id;
+                return "Unknown entity: " + grn;
             }
         } catch (ExecutionException cex) {
-            return "Unknown entity: " + id;
+            return "Unknown entity: " + grn;
         }
     }
 }

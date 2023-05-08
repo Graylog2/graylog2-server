@@ -30,6 +30,7 @@ import type { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { InputsStore } from 'stores/inputs/InputsStore';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import CustomHighlighting from './CustomHighlighting';
 import MessageDetail from './MessageDetail';
@@ -40,7 +41,11 @@ import type { Message } from './Types';
 import TypeSpecificValue from '../TypeSpecificValue';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
+export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({
+  expanded,
+  highlighted,
+  theme,
+}) => `
   && {
     border-top: 0;
 
@@ -78,7 +83,7 @@ const MessageDetailRow = styled.tr`
     margin-right: 0;
   }
 
-  div[class*="col-"] {
+  div[class*='col-'] {
     padding-right: 0;
   }
 `;
@@ -124,6 +129,7 @@ const MessageTableEntry = ({
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
+  const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = Immutable.List<Stream>(streamsList);
   const streams = Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream]));
@@ -133,6 +139,11 @@ const MessageTableEntry = ({
     const isSelectingText = !!window.getSelection()?.toString();
 
     if (!isSelectingText) {
+      sendTelemetry('toggle_input_button', {
+        appSection: 'search-widget',
+        eventElement: 'widget-message-table-toggle-details',
+      });
+
       toggleDetail(`${message.index}-${message.id}`);
     }
   };

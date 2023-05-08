@@ -16,19 +16,31 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.FailureConfig;
+import io.restassured.config.ObjectMapperConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.not;
 
 public class GraylogApis {
-    private final RequestSpecification requestSpecification;
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
+
+    ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
     private final GraylogBackend backend;
     private final Users users;
     private final Streams streams;
@@ -39,21 +51,31 @@ public class GraylogApis {
     private final FieldTypes fieldTypes;
     private final Views views;
 
-    public GraylogApis(RequestSpecification requestSpecification, GraylogBackend backend) {
-        this.requestSpecification = requestSpecification;
+    public GraylogApis(GraylogBackend backend) {
         this.backend = backend;
-        this.users = new Users(this.requestSpecification);
-        this.streams = new Streams(this.requestSpecification);
-        this.sharing = new Sharing(this.requestSpecification);
-        this.gelf = new GelfInputApi(this.requestSpecification, backend);
-        this.search = new Search(this.requestSpecification);
-        this.indices = new Indices(this.requestSpecification);
-        this.fieldTypes = new FieldTypes(this.requestSpecification);
-        this.views = new Views(this.requestSpecification);
+        this.users = new Users(this);
+        this.streams = new Streams(this);
+        this.sharing = new Sharing(this);
+        this.gelf = new GelfInputApi(this);
+        this.search = new Search(this);
+        this.indices = new Indices(this);
+        this.fieldTypes = new FieldTypes(this);
+        this.views = new Views(this);
     }
 
     public RequestSpecification requestSpecification() {
-        return requestSpecification;
+        return new RequestSpecBuilder().build()
+                .baseUri(backend.uri())
+                .port(backend.apiPort())
+                .basePath("/api")
+                .accept(JSON)
+                .contentType(JSON)
+                .header("X-Requested-By", "peterchen")
+                .auth().basic("admin", "admin");
+    }
+
+    public Supplier<RequestSpecification> requestSpecificationSupplier() {
+        return () -> this.requestSpecification();
     }
 
     public GraylogBackend backend() {
@@ -94,8 +116,8 @@ public class GraylogApis {
 
     protected RequestSpecification prefix(final Users.User user) {
         return given()
-                .config(backend.withGraylogBackendFailureConfig())
-                .spec(requestSpecification)
+                .config(withGraylogBackendFailureConfig())
+                .spec(this.requestSpecification())
                 .auth().basic(user.username(), user.password())
                 .when();
     }
@@ -178,5 +200,36 @@ public class GraylogApis {
                 .then()
                 .log().ifStatusCodeMatches(not(expectedResult))
                 .statusCode(expectedResult);
+    }
+
+    private boolean errorRunningIndexer(final String logs) {
+        return logs.contains("Elasticsearch cluster not available")
+                || logs.contains("Elasticsearch cluster is unreachable or unhealthy");
+    }
+
+    public RestAssuredConfig withGraylogBackendFailureConfig() {
+        return this.withGraylogBackendFailureConfig(500);
+    }
+
+    public RestAssuredConfig withGraylogBackendFailureConfig(final int minError) {
+        return RestAssured.config()
+                .objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
+                        (type, s) -> OBJECT_MAPPER_PROVIDER.get()
+                ))
+                .failureConfig(FailureConfig.failureConfig().with().failureListeners(
+                        (reqSpec, respSpec, resp) -> {
+                            if (resp.statusCode() >= minError) {
+                                final var backendLogs = this.backend.getLogs();
+                                LOG.error("------------------------ Output from graylog docker container start ------------------------\n"
+                                        + backendLogs
+                                        + "\n------------------------ Output from graylog docker container ends  ------------------------");
+                                if(errorRunningIndexer(backendLogs)) {
+                                    LOG.error("------------------------ Output from indexer docker container start ------------------------\n"
+                                            + this.backend.getSearchLogs()
+                                            + "\n------------------------ Output from indexer docker container ends  ------------------------");
+                                }
+                            }
+                        })
+                );
     }
 }

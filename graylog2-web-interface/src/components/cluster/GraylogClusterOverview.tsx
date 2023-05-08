@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { reduce } from 'lodash';
+import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -33,6 +33,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { formatTrafficData } from 'util/TrafficUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import TrafficGraph from './TrafficGraph';
 
@@ -100,12 +101,19 @@ const GraylogClusterTrafficGraph = () => {
   const containerRef = useRef(null);
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
+  const sendTelemetry = useSendTelemetry();
 
   const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
     event.preventDefault();
     const newDays = Number(event.target.value);
 
     setGraphDays(newDays);
+
+    sendTelemetry('change_input_value', {
+      appSection: 'graylog_cluster',
+      eventElement: 'graph-days',
+      eventInfo: { value: String(newDays) },
+    });
   };
 
   useEffect(() => {

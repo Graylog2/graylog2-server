@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Filters } from 'components/common/EntityFilters/types';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 // Transform filters, so they can be used as URL query params, for example for the PaginationURL helper.
-const FiltersForQueryParams = (filters: Filters) => {
+const FiltersForQueryParams = (filters: UrlQueryFilters) => {
   if (!filters) {
     return undefined;
   }
 
-  return Object.entries(filters).map(([attributeId, filterValues]) => (
-    filterValues.map(({ value }) => `${attributeId}:${value}`)
-  ));
+  return filters.entrySeq().flatMap(([attributeId, filterValues]) => (
+    filterValues.map((value) => `${attributeId}:${value}`)
+  )).toArray();
 };
 
 export default FiltersForQueryParams;

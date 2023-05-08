@@ -18,6 +18,8 @@
 import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
+import withModalTelemetry from 'components/common/withModalTelemetry';
+
 const Dialog = css`
   margin-top: 55px;
   
@@ -50,7 +52,7 @@ const Body = css`
   }
 `;
 
-const Modal = styled(BootstrapModal)`
+const Modal = styled(withModalTelemetry(BootstrapModal))`
   .modal-backdrop {
     height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
     z-index: 1030;

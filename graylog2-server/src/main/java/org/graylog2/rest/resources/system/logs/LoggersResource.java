@@ -28,29 +28,22 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.impl.ThrowableProxy;
-import org.apache.logging.log4j.util.ReadOnlyStringMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.log4j.MemoryAppender;
-import org.graylog2.rest.models.system.loggers.responses.InternalLogMessage;
-import org.graylog2.rest.models.system.loggers.responses.LogMessagesSummary;
 import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SingleLoggerSummary;
 import org.graylog2.rest.models.system.loggers.responses.SingleSubsystemSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Min;
@@ -65,12 +58,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "System/Loggers", description = "Internal Graylog loggers")
@@ -218,52 +211,26 @@ public class LoggersResource extends RestResource {
             @ApiResponse(code = 500, message = "Memory appender is broken.")
     })
     @Path("/messages/recent")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
-    public LogMessagesSummary messages(@ApiParam(name = "limit", value = "How many log messages should be returned", defaultValue = "500", allowableValues = "range[0, infinity]")
-                                       @QueryParam("limit") @DefaultValue("500") @Min(0L) int limit,
-                                       @ApiParam(name = "level", value = "Which log level (or higher) should the messages have", defaultValue = "ALL", allowableValues = "[OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL]")
-                                       @QueryParam("level") @DefaultValue("ALL") @NotEmpty String level) {
+    @HideOnCloud
+    public Response messages(@ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
+                                       "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
+                                       defaultValue = "1000", allowableValues = "range[0, infinity]")
+                                       @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {
             throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
         }
 
-        if (!(appender instanceof MemoryAppender)) {
+        if (!(appender instanceof MemoryAppender memoryAppender)) {
             throw new InternalServerErrorException("Memory appender is not an instance of MemoryAppender. Please refer to the example log4j.xml file.");
         }
+        var mediaType = MediaType.valueOf(MediaType.TEXT_PLAIN);
+        StreamingOutput streamingOutput = outputStream -> memoryAppender.streamFormattedLogMessages(outputStream, limit);
+        Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
 
-        final Level logLevel = Level.toLevel(level, Level.ALL);
-        final MemoryAppender memoryAppender = (MemoryAppender) appender;
-        final List<InternalLogMessage> messages = new ArrayList<>(limit);
-        for (LogEvent event : memoryAppender.getLogMessages(limit)) {
-            final Level eventLevel = event.getLevel();
-            if (!eventLevel.isMoreSpecificThan(logLevel)) {
-                continue;
-            }
-
-            final ThrowableProxy thrownProxy = event.getThrownProxy();
-            final String throwable;
-            if (thrownProxy == null) {
-                throwable = null;
-            } else {
-                throwable = thrownProxy.getExtendedStackTraceAsString("");
-            }
-
-            final Marker marker = event.getMarker();
-            messages.add(InternalLogMessage.create(
-                    event.getMessage().getFormattedMessage(),
-                    event.getLoggerName(),
-                    eventLevel.toString(),
-                    marker == null ? null : marker.toString(),
-                    new DateTime(event.getTimeMillis(), DateTimeZone.UTC),
-                    throwable,
-                    event.getThreadName(),
-                    Optional.ofNullable(event.getContextData()).map(ReadOnlyStringMap::toMap).orElse(Map.of())
-            ));
-        }
-
-        return LogMessagesSummary.create(messages);
+        return response.build();
     }
 
     private Appender getAppender(final String appenderName) {

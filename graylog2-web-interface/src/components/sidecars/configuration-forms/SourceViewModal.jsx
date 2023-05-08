@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import lodash from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
@@ -45,7 +45,7 @@ class SourceViewModal extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (!lodash.isEqual(this.state, SourceViewModal.initialState) && !lodash.isEqual(prevProps, this.props)) {
+    if (!isEqual(this.state, SourceViewModal.initialState) && !isEqual(prevProps, this.props)) {
       this.resetState();
     }
 
@@ -90,7 +90,9 @@ class SourceViewModal extends React.Component {
   render() {
     return (
       <BootstrapModalWrapper showModal={this.props.showModal}
-                             onHide={this.props.onHide}>
+                             onHide={this.props.onHide}
+                             data-app-section="collector_configuration_form"
+                             data-event-element="Preview Configuration">
         <Modal.Header closeButton>
           <Modal.Title><span>Configuration <em>{this.state.name}</em></span></Modal.Title>
         </Modal.Header>

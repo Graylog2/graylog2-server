@@ -80,8 +80,7 @@ const variantStyles = css(({ bsStyle, theme }) => {
 const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   border: 0;
-
-  padding: 10px 10px 5px;
+  padding: 5px 10px;
 
   .list-group-item-heading {
     font-size: ${theme.fonts.size.h5};

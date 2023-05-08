@@ -31,9 +31,15 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-describe('DashboardsOverview BulkActions', () => {
+describe('DashboardsOverview BulkActionsRow', () => {
+  const openActionsDropdown = async () => {
+    await screen.findByRole('button', {
+      name: /bulk actions/i,
+    });
+  };
+
   const deleteDashboards = async () => {
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
   };
 
   beforeEach(() => {
@@ -47,6 +53,7 @@ describe('DashboardsOverview BulkActions', () => {
     render(<BulkActions selectedDashboardIds={['dashboard-id-1', 'dashboard-id-2']}
                         setSelectedDashboardIds={setSelectedDashboardIds} />);
 
+    await openActionsDropdown();
     await deleteDashboards();
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');
@@ -73,6 +80,7 @@ describe('DashboardsOverview BulkActions', () => {
     render(<BulkActions selectedDashboardIds={['dashboard-id-1', 'dashboard-id-2']}
                         setSelectedDashboardIds={setSelectedDashboardIds} />);
 
+    await openActionsDropdown();
     await deleteDashboards();
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');

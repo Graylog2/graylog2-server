@@ -51,6 +51,7 @@ import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import { RefreshActions } from 'views/stores/RefreshStore';
+import useParameters from 'views/hooks/useParameters';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -93,12 +94,15 @@ const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'res
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const view = useView();
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
+  const { parameters, parameterBindings } = useParameters();
   const currentUser = useCurrentUser();
   const contextValue = useMemo(() => ({
     view,
     analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
     currentUser,
-  }), [currentUser, searchesClusterConfig?.analysis_disabled_fields, view]);
+    parameters,
+    parameterBindings,
+  }), [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view]);
 
   return (
     <AdditionalContext.Provider value={contextValue}>
@@ -115,7 +119,11 @@ const useAutoRefresh = (refresh: () => Promise<unknown>) => {
   }), [refresh]);
 };
 
-const Search = () => {
+type Props = {
+  InfoBarSlot?: React.ComponentType,
+}
+
+const Search = ({ InfoBarSlot }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
@@ -166,6 +174,7 @@ const Search = () => {
                             <SearchArea>
                               <IfInteractive>
                                 <HeaderElements />
+                                {InfoBarSlot && <InfoBarSlot />}
                                 <IfDashboard>
                                   {!editingWidget && <DashboardSearchBar />}
                                 </IfDashboard>
@@ -196,6 +205,10 @@ const Search = () => {
       </WidgetFocusProvider>
     </>
   );
+};
+
+Search.defaultProps = {
+  InfoBarSlot: undefined,
 };
 
 export default Search;

@@ -16,7 +16,7 @@
  */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import isEqual from 'lodash/isEqual';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -114,7 +114,7 @@ const StyledSearchForm = styled(SearchForm)`
 
 const InfoContainer = styled(Alert)`
   border: unset;
-  margin-bottom: 0px;
+  margin-bottom: 0;
   margin-top: 4px;
 `;
 
@@ -164,7 +164,7 @@ const CollectorConfigurationModal = ({
     setSearchQuery('');
   };
 
-  const isNotDirty = lodash.isEqual(selectedConfigurations, initialAssignedConfigs) && lodash.isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
+  const isNotDirty = isEqual(selectedConfigurations, initialAssignedConfigs) && isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
 
   const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(getFilterQuery(searchQuery)));
 
@@ -215,7 +215,10 @@ const CollectorConfigurationModal = ({
   });
 
   return (
-    <BootstrapModalWrapper showModal={show} onHide={onCancel}>
+    <BootstrapModalWrapper showModal={show}
+                           onHide={onCancel}
+                           data-app-section="collectors_administration_assign_configurations"
+                           data-event-element={`Edit ${selectedCollectorName} Configurations`}>
       <Modal.Header>
         <ModalTitle>
           Edit <b>{selectedCollectorName}</b> Configurations

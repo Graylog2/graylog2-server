@@ -41,7 +41,7 @@ const ShortContent = styled.p`
 
 const LongContent = styled.div(({ $visible }: {$visible: boolean}) => css`
   white-space: pre-wrap;
-  display: ${$visible ? "block" : "none"};
+  display: ${$visible ? 'block' : 'none'};
   padding-top: 12px;
 `);
 

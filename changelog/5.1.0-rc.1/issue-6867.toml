@@ -1,0 +1,5 @@
+type = "f" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Only executed widgets of current page ond dashboards."
+
+issues = ["6867"]
+pulls = ["14890"]

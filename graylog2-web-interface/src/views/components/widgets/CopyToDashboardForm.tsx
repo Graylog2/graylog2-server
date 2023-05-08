@@ -17,7 +17,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 
 import { Modal, ListGroup, ListGroupItem } from 'components/bootstrap';
-import { PaginatedList, SearchForm, ModalSubmit } from 'components/common';
+import { PaginatedList, SearchForm, ModalSubmit, Spinner } from 'components/common';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import type { SearchParams } from 'stores/PaginationTypes';
 
@@ -49,7 +49,7 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
       direction: 'asc',
     },
   });
-  const { data: paginatedDashboards } = useDashboards(searchParams);
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards } = useDashboards(searchParams);
 
   useEffect(() => {
     setSelectedDashboard(null);
@@ -76,36 +76,42 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
   };
 
   return (
-    <Modal show>
+    <Modal show
+           data-app-section="dashboards"
+           data-event-element="CopyToDashboardForm">
       <Modal.Body>
-        <PaginatedList onChange={handlePageChange}
-                       activePage={searchParams.page}
-                       totalItems={paginatedDashboards?.pagination?.total ?? 0}
-                       pageSize={searchParams.pageSize}
-                       pageSizes={[5, 10, 15]}
-                       useQueryParameter={false}>
-          <div style={{ marginBottom: '5px' }}>
-            <SearchForm onSearch={handleSearch}
-                        onReset={handleSearchReset} />
-          </div>
-          {paginatedDashboards?.list && paginatedDashboards.list.length > 0 ? (
-            <ListGroup>
-              {paginatedDashboards.list.map((dashboard) => {
-                const isActiveDashboard = activeDashboardId === dashboard.id;
+        {isLoadingDashboards && <Spinner />}
+        {!isLoadingDashboards && (
+          <PaginatedList onChange={handlePageChange}
+                         activePage={searchParams.page}
+                         totalItems={paginatedDashboards.pagination.total}
+                         pageSize={searchParams.pageSize}
+                         pageSizes={[5, 10, 15]}
+                         useQueryParameter={false}>
+            <div style={{ marginBottom: '5px' }}>
+              <SearchForm onSearch={handleSearch}
+                          onReset={handleSearchReset} />
+            </div>
+            {paginatedDashboards.list.length ? (
+              <ListGroup>
+                {paginatedDashboards.list.map((dashboard) => {
+                  const isActiveDashboard = activeDashboardId === dashboard.id;
 
-                return (
-                  <ListGroupItem active={selectedDashboard === dashboard.id}
-                                 onClick={isActiveDashboard ? undefined : () => setSelectedDashboard(dashboard.id)}
-                                 header={dashboard.title}
-                                 disabled={isActiveDashboard}
-                                 key={dashboard.id}>
-                    {dashboard.summary}
-                  </ListGroupItem>
-                );
-              })}
-            </ListGroup>
-          ) : <span>No dashboards found</span>}
-        </PaginatedList>
+                  return (
+                    <ListGroupItem active={selectedDashboard === dashboard.id}
+                                   onClick={isActiveDashboard ? undefined : () => setSelectedDashboard(dashboard.id)}
+                                   header={dashboard.title}
+                                   disabled={isActiveDashboard}
+                                   key={dashboard.id}>
+                      {dashboard.summary}
+                    </ListGroupItem>
+                  );
+                })}
+              </ListGroup>
+            ) : <span>No dashboards found</span>}
+          </PaginatedList>
+        )}
+
       </Modal.Body>
       <Modal.Footer>
         <ModalSubmit submitButtonText={submitButtonText}

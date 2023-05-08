@@ -64,8 +64,9 @@ const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
   await userEvent.click(await screen.findByRole('menuitem', { name: key }));
 };
 
-const selectField = async (fieldName) => {
-  const fieldSelection = await screen.findByLabelText('Fields');
+const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
+  const grouoingContainer = await screen.findByTestId(`grouping-${groupingIndex}`);
+  const fieldSelection = within(grouoingContainer).getByLabelText(fieldSelectLabel);
 
   await act(async () => {
     await selectEvent.openMenu(fieldSelection);
@@ -182,14 +183,7 @@ describe('AggregationWizard', () => {
     await addElement('Grouping');
     await selectField('timestamp');
     await addElement('Grouping');
-
-    const fieldSelections = await screen.findAllByLabelText('Fields');
-
-    await act(async () => {
-      await selectEvent.openMenu(fieldSelections[1]);
-      await selectEvent.select(fieldSelections[1], 'took_ms', selectEventConfig);
-    });
-
+    await selectField('took_ms', 1);
     await submitWidgetConfigForm();
 
     const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
@@ -243,7 +237,7 @@ describe('AggregationWizard', () => {
     renderSUT({ onChange, config });
 
     await screen.findByText('took_ms');
-    await selectField('http_method');
+    await selectField('http_method', 0, 'Add another field');
     await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
@@ -268,7 +262,7 @@ describe('AggregationWizard', () => {
     renderSUT({ onChange, config });
 
     await screen.findByText('took_ms');
-    await selectField('timestamp');
+    await selectField('timestamp', 0, 'Add another field');
     await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig

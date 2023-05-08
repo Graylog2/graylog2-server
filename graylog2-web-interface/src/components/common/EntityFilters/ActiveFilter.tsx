@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
 import { Icon } from 'components/common';
-import type { Filter } from 'components/common/EntityFilters/types';
+import type { Filter, Filters } from 'components/common/EntityFilters/types';
+import OverlayDropdown from 'components/common/OverlayDropdown';
+import FilterConfiguration from 'components/common/EntityFilters/FilterConfiguration';
 
 const Container = styled.div`
   display: flex;
-
-  :not(:last-child) {
-    margin-right: 3px;
-  }
 `;
 
 const CenteredButton = styled(Button)`
@@ -35,34 +33,87 @@ const CenteredButton = styled(Button)`
   align-items: center;
 `;
 
+type FilterValueDropdownProps = {
+  attribute: Attribute,
+  allActiveFilters: Filters | undefined,
+  filter: Filter,
+  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
+}
+
+const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filterValueRenderer, filter }: FilterValueDropdownProps) => {
+  const [show, setShowDropdown] = useState(false);
+  const { value, title } = filter;
+
+  const _onToggle = () => {
+    setShowDropdown((cur) => !cur);
+  };
+
+  const onSubmit = (newFilter: { title: string, value: string }) => {
+    onChangeFilter(attribute.id, value, { value: newFilter.value, title: newFilter.title });
+    _onToggle();
+  };
+
+  return (
+    <OverlayDropdown show={show}
+                     closeOnSelect={false}
+                     renderToggle={({ onToggle, toggleTarget }) => (
+                       <CenteredButton bsSize="xsmall" onClick={onToggle} title="Change filter value" ref={toggleTarget}>
+                         {filterValueRenderer ? filterValueRenderer(value, title) : title}
+                       </CenteredButton>
+                     )}
+                     placement="bottom"
+                     onToggle={_onToggle}>
+      <FilterConfiguration attribute={attribute}
+                           filterValueRenderer={filterValueRenderer}
+                           onSubmit={onSubmit}
+                           filter={filter}
+                           allActiveFilters={allActiveFilters} />
+    </OverlayDropdown>
+  );
+};
+
 type Props = {
   attribute: Attribute,
   filter: Filter,
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onChangeFilter: (attributeId: string, newFilter: Filter) => void,
+  allActiveFilters: Filters | undefined
+  filterValueRenderer: (value: string, title: string) => React.ReactNode | undefined,
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
   onDeleteFilter: (attributeId: string, filterId: string) => void,
 }
 
 const ActiveFilter = ({
   attribute,
-  filter: { value, title, id },
+  allActiveFilters,
+  filter,
   filterValueRenderer,
   onDeleteFilter,
   onChangeFilter,
 }: Props) => {
-  const onFilterClick = () => {
+  const { value, title } = filter;
+
+  const onChangeBooleanValue = () => {
     if (attribute.type === 'BOOLEAN') {
       const oppositeFilterOption = attribute.filter_options.find(({ value: optionVal }) => optionVal !== value);
-      onChangeFilter(attribute.id, { id, value: oppositeFilterOption.value, title: oppositeFilterOption.title });
+      onChangeFilter(attribute.id, value, { value: oppositeFilterOption.value, title: oppositeFilterOption.title });
     }
   };
 
   return (
-    <Container className="btn-group" data-testid={`filter-${id}`}>
-      <CenteredButton bsSize="xsmall" onClick={onFilterClick} title="Change filter value">
-        {filterValueRenderer ? filterValueRenderer(value, title) : title}
-      </CenteredButton>
-      <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, id)} title="Delete filter">
+    <Container className="btn-group" data-testid={`${attribute.id}-filter-${value}`}>
+      {attribute.type === 'BOOLEAN' && (
+        <CenteredButton bsSize="xsmall" onClick={onChangeBooleanValue} title="Change filter value">
+          {filterValueRenderer ? filterValueRenderer(value, title) : title}
+        </CenteredButton>
+      )}
+      {attribute.type !== 'BOOLEAN' && (
+        <FilterValueDropdown onChangeFilter={onChangeFilter}
+                             attribute={attribute}
+                             filter={filter}
+                             allActiveFilters={allActiveFilters}
+                             filterValueRenderer={filterValueRenderer} />
+      )}
+      <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, value)} title="Delete filter">
         <Icon name="times" />
       </CenteredButton>
     </Container>

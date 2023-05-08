@@ -19,6 +19,7 @@ package org.graylog.datanode.management;
 import org.graylog.datanode.process.ProcessInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 
+import java.net.URI;
 import java.util.List;
 
 public interface OpensearchProcess extends ManagableProcess {
@@ -29,10 +30,13 @@ public interface OpensearchProcess extends ManagableProcess {
 
     Object nodeName();
 
+    boolean isLeaderNode();
     void setLeaderNode(boolean isManagerNode);
 
     String opensearchVersion();
 
     List<String> stdOutLogs();
     List<String> stdErrLogs();
+
+    URI getOpensearchBaseUrl();
 }

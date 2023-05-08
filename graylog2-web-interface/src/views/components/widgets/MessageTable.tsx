@@ -52,14 +52,17 @@ const Table = styled.table(({ theme }) => css`
     th {
       font-weight: bold !important;
       font-size: inherit !important;
+      white-space: break-spaces !important;
+      word-break: break-all !important;
     }
 
     th,
     td {
       border: 1px ${theme.colors.gray[80]} solid !important;
       left: 0;
-      padding: 5px;
+      padding: 5px !important;
       position: static;
+      min-width: 0 !important;
     }
   }
 `);
@@ -166,7 +169,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
                     </InteractiveContext.Consumer>
                   </th>
                 );
-              })}
+              }).toArray()}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {

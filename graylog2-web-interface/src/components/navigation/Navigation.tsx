@@ -29,6 +29,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
+import { Icon } from 'components/common';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -58,16 +59,16 @@ function pluginMenuItemExists(description: string): boolean {
   return !!pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 }
 
-const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatureFlag }: PluginNavigationDropdownItem, currentUserPermissions: Immutable.List<string>, topLevel = false) => {
-  if (permissions && !isPermitted(currentUserPermissions, permissions)) {
-    return null;
-  }
+const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatureFlag, BadgeComponent }: PluginNavigationDropdownItem, currentUserPermissions: Immutable.List<string>, topLevel = false) => {
+  if (permissions && !isPermitted(currentUserPermissions, permissions)) return null;
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) return null;
 
-  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
-    return null;
-  }
-
-  return <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
+  return (
+    <NavigationLink key={description}
+                    description={BadgeComponent ? <BadgeComponent text={description} /> : description}
+                    path={appPrefixed(path)}
+                    topLevel={topLevel} />
+  );
 };
 
 const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions: Immutable.List<string>, pathname: string) => {
@@ -80,12 +81,19 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(currentUserPermissions, child.permissions) && (child.requiredFeatureFlag ? AppConfig.isFeatureEnabled(child.requiredFeatureFlag) : true));
 
-    if (isEmpty) {
-      return null;
-    }
+    if (isEmpty) return null;
+    const { BadgeComponent } = pluginRoute;
+
+    const renderBadge = pluginRoute.children.some((child) => {
+      return isPermitted(currentUserPermissions, child.permissions) && child?.BadgeComponent;
+    });
 
     return (
-      <NavDropdown key={title} title={title} id="enterprise-dropdown" inactiveTitle={pluginRoute.description}>
+      <NavDropdown key={title}
+                   title={title}
+                   badge={renderBadge ? BadgeComponent : null}
+                   id="enterprise-dropdown"
+                   inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
     );
@@ -180,10 +188,15 @@ const Navigation = React.memo(({ pathname }: Props) => {
             <DevelopmentHeaderBadge />
             {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
-
           <ScratchpadToggle />
 
           <HelpMenu active={_isActive(pathname, Routes.WELCOME)} />
+
+          <LinkContainer relativeActive to={Routes.WELCOME}>
+            <NavItem id="welcome-nav-link" aria-label="Welcome">
+              <Icon size="lg" fixedWidth title="Welcome" name="home" />
+            </NavItem>
+          </LinkContainer>
 
           <UserMenu fullName={fullName} readOnly={readOnly} userId={userId} />
         </Nav>

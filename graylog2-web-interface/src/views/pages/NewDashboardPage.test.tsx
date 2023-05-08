@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
+import type { Location } from 'react-router-dom';
 
 import useLocation from 'routing/useLocation';
 import asMock from 'helpers/mocking/AsMock';
@@ -24,9 +25,9 @@ import View from 'views/logic/views/View';
 import useQuery from 'routing/useQuery';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import StreamsContext from 'contexts/StreamsContext';
-import useLoadView from 'views/hooks/useLoadView';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useCreateSearch from 'views/hooks/useCreateSearch';
 
 import NewDashboardPage from './NewDashboardPage';
 
@@ -35,7 +36,7 @@ jest.mock('views/components/Search', () => () => <span>Extended search page</spa
 jest.mock('routing/useQuery');
 jest.mock('routing/useLocation');
 jest.mock('views/logic/views/UseProcessHooksForView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 
 const SimpleNewDashboardPage = () => (
   <StreamsContext.Provider value={[{}]}>
@@ -49,7 +50,7 @@ describe('NewDashboardPage', () => {
     search: '',
     state: {},
     hash: '',
-  };
+  } as Location;
 
   beforeAll(loadViewsPlugin);
 
@@ -59,6 +60,7 @@ describe('NewDashboardPage', () => {
     asMock(useLocation).mockReturnValue(mockLocation);
     asMock(useQuery).mockReturnValue({});
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: View.create(), executionState: SearchExecutionState.empty() });
+    asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
   afterEach(() => {
@@ -76,9 +78,9 @@ describe('NewDashboardPage', () => {
   it('should create new view with type dashboard on mount', async () => {
     render(<SimpleNewDashboardPage />);
 
-    await waitFor(() => expect(useLoadView).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(useCreateSearch).toHaveBeenCalled());
 
-    await expect(asMock(useLoadView).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ type: View.Type.Dashboard }));
+    await expect(asMock(useCreateSearch).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ type: View.Type.Dashboard }));
   });
 
   it('should render transform search view to dashboard view, if view is defined in location state', async () => {
@@ -95,9 +97,9 @@ describe('NewDashboardPage', () => {
 
     await findByText('Extended search page');
 
-    await waitFor(() => expect(useLoadView).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(useCreateSearch).toHaveBeenCalled());
 
-    await expect(asMock(useLoadView).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ title: 'My Search', type: View.Type.Dashboard }));
+    await expect(asMock(useCreateSearch).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ title: 'My Search', type: View.Type.Dashboard }));
   });
 
   it('should process hooks with provided location query when transforming search view to dashboard view', async () => {

@@ -23,6 +23,7 @@ import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
 import { IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
+import type { StartPage } from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
@@ -31,6 +32,13 @@ import ServiceAccountFormGroup from '../UserCreate/ServiceAccountFormGroup';
 import StartpageFormGroup from '../StartpageFormGroup';
 import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
 import { Link } from '../../common/router';
+
+export type SettingsFormValues = {
+  timezone: string,
+  session_timeout_ms: number,
+  startpage: StartPage | null | undefined,
+  service_account: boolean,
+}
 
 const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
   margin-bottom: 20px;
@@ -60,8 +68,8 @@ const SettingsSection = ({
 
   return (
     <SectionComponent title="Settings">
-      <Formik onSubmit={onSubmit}
-              initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
+      <Formik<SettingsFormValues> onSubmit={onSubmit}
+                                  initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <IfPermitted permissions="*">

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 
 import { LinkContainer } from 'components/common/router';
@@ -23,22 +24,7 @@ import { ClipboardButton } from 'components/common';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-
-type Props = {
-  index: string,
-  id: string,
-  fields: {
-    [key: string]: unknown,
-  },
-  decorationStats: any,
-  disabled: boolean,
-  disableSurroundingSearch: boolean,
-  disableTestAgainstStream: boolean,
-  showOriginal: boolean,
-  toggleShowOriginal: () => void,
-  streams: Immutable.List<any>,
-  searchConfig: SearchesConfig,
-};
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const streamList = streams.map((stream) => {
@@ -64,9 +50,42 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
   );
 };
 
-const MessageActions = ({ index, id, fields, decorationStats, disabled, disableSurroundingSearch, disableTestAgainstStream, showOriginal, toggleShowOriginal, streams, searchConfig }: Props) => {
+type Props = {
+  index: string,
+  id: string,
+  fields: {
+    [key: string]: unknown,
+  },
+  decorationStats: any,
+  disabled: boolean,
+  disableSurroundingSearch: boolean,
+  disableTestAgainstStream: boolean,
+  showOriginal: boolean,
+  toggleShowOriginal: () => void,
+  streams: Immutable.List<any>,
+  searchConfig: SearchesConfig,
+};
+
+const MessageActions = ({
+  index,
+  id,
+  fields,
+  decorationStats,
+  disabled,
+  disableSurroundingSearch,
+  disableTestAgainstStream,
+  showOriginal,
+  toggleShowOriginal,
+  streams,
+  searchConfig,
+}: Props) => {
+  const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
+  const menuActions = useMemo(() => pluggableMenuActions.map(
+    ({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />,
+  ), [id, index, pluggableMenuActions]);
+
   if (disabled) {
-    return <ButtonGroup className="pull-right" bsSize="small" />;
+    return <ButtonGroup bsSize="small" />;
   }
 
   const messageUrl = index ? Routes.message_show(index, id) : '#';
@@ -83,9 +102,10 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
   const showChanges = decorationStats && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
 
   return (
-    <ButtonGroup className="pull-right" bsSize="small">
+    <ButtonGroup bsSize="small">
       {showChanges}
       <Button href={messageUrl}>Permalink</Button>
+      {menuActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />

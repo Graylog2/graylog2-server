@@ -15,22 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { List } from 'immutable';
 import { Field } from 'formik';
 
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type Widget from 'views/logic/widgets/Widget';
 import type View from 'views/logic/views/View';
 import { Input, HelpBlock, Row } from 'components/bootstrap';
-import FieldSelect from 'views/components/widgets/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import ExportFormatSelection from 'views/components/export/ExportFormatSelection';
+import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 
 import CustomExportSettings from './CustomExportSettings';
 
 type ExportSettingsType = {
-  fields: List<FieldTypeMapping>,
   selectedWidget: Widget | undefined | null,
   view: View,
 };
@@ -53,7 +50,6 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget, 
 };
 
 const ExportSettings = ({
-  fields,
   selectedWidget,
   view,
 }: ExportSettingsType) => {
@@ -66,7 +62,7 @@ const ExportSettings = ({
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
         <p>
-          Define the fields for your file. You can change the field order with drag and drop.<br />
+          Define the fields for your file.<br />
         </p>
         {selectedWidget && (
           <p>
@@ -82,15 +78,14 @@ const ExportSettings = ({
           {({ field: { name, value, onChange } }) => (
             <>
               <label htmlFor={name}>Fields to export</label>
-              <FieldSelect fields={fields}
-                           onChange={(newFields) => {
-                             const newFieldsValue = newFields.map((field) => ({ field }));
-
-                             return onChange({ target: { name, value: newFieldsValue } });
-                           }}
-                           value={value}
-                           allowOptionCreation={!!selectedWidget}
-                           inputId={name} />
+              <FieldsConfiguration onChange={
+                                      (newFields) => onChange({
+                                        target: { name, value: newFields.map((field) => ({ field })) },
+                                      })
+                                   }
+                                   selectSize="normal"
+                                   displaySortableListOverlayInPortal
+                                   selectedFields={value.map(({ field }) => field)} />
             </>
           )}
         </Field>

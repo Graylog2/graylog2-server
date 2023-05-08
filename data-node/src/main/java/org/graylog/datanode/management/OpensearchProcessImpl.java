@@ -19,6 +19,7 @@ package org.graylog.datanode.management;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
+import org.graylog.datanode.ProcessProvidingExecutor;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessInfo;
@@ -36,8 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -64,14 +67,13 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.stderr = new CircularFifoQueue<>(logsCacheSize);
     }
 
-    private static RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
+    private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
-        final boolean sslEnabled = Boolean.parseBoolean(configuration.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        final HttpHost host = new HttpHost("localhost", configuration.httpPort(), sslEnabled ? "https" : "http");
+        final HttpHost host = getRestBaseUrl(configuration);
 
         RestClientBuilder builder = RestClient.builder(host);
-        if (sslEnabled) {
+        if ("https".equals(host.getSchemeName())) {
             if (configuration.authUsername() != null && configuration.authPassword() != null) {
                 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(configuration.authUsername(), configuration.authPassword()));
             }
@@ -103,7 +105,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public ProcessInfo processInfo() {
-
         return process().map(process -> new ProcessInfo(
                 process.pid(),
                 configuration.nodeName(), processState.getState(),
@@ -114,6 +115,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 getRestBaseUrl(configuration).toString()
 
         )).orElseGet(() -> new ProcessInfo(-1, configuration.nodeName(), processState.getState(), false, null, null, null, null));
+    }
+
+    @Override
+    public URI getOpensearchBaseUrl() {
+        return URI.create(getRestBaseUrl(configuration).toURI());
     }
 
     private HttpHost getRestBaseUrl(OpensearchConfiguration config) {
@@ -133,6 +139,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.isLeaderNode = isLeaderNode;
     }
 
+    @Override
     public boolean isLeaderNode() {
         return isLeaderNode;
     }
@@ -150,7 +157,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         final Path executable = configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
         final List<String> arguments = configuration.asMap().entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
-        commandLineProcess = new CommandLineProcess(executable, arguments, this);
+        commandLineProcess = new CommandLineProcess(executable, arguments, this, configuration.getEnv());
         commandLineProcess.start();
     }
 
@@ -178,11 +185,13 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public void onProcessComplete(int exitValue) {
+        LOG.info("Opensearch process completed with exit code {}", exitValue);
         onEvent(ProcessEvent.PROCESS_TERMINATED);
     }
 
     @Override
     public void onProcessFailed(ExecuteException e) {
+        LOG.warn("Opensearch process failed", e);
         onEvent(ProcessEvent.PROCESS_TERMINATED);
     }
 }

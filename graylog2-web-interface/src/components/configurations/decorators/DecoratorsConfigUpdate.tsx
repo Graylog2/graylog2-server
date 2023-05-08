@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Modal } from 'components/bootstrap';
@@ -24,6 +24,7 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
 import formatDecorator from './FormatDecorator';
@@ -38,7 +39,7 @@ type Props = {
   onSave: (newDecorators: Array<Decorator>) => unknown,
 };
 
-const _updateOrder = (orderedDecorators, decorators, onChange) => {
+const _updateOrder = (orderedDecorators: Array<{ id: string }>, decorators: Array<Decorator>, onChange: (decorators: Array<Decorator>) => void) => {
   const newDecorators = cloneDeep(decorators);
 
   orderedDecorators.forEach((item, idx) => {
@@ -55,15 +56,24 @@ const _updateOrder = (orderedDecorators, decorators, onChange) => {
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
+  const sendTelemetry = useSendTelemetry();
+
   const onCreate = useCallback(
-    ({ stream, ...rest }) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
+    ({ stream, ...rest }: Decorator) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onReorder = useCallback(
-    (orderedDecorators) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
+    (orderedDecorators: Array<{ id: string }>) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
     [modifiedDecorators, setModifiedDecorators],
   );
-  const onSubmit = useCallback(() => onSave(modifiedDecorators), [onSave, modifiedDecorators]);
+  const onSubmit = useCallback(() => {
+    onSave(modifiedDecorators);
+
+    sendTelemetry('submit_form', {
+      appSection: 'configurations_decorators',
+      eventElement: 'update_configuration_button',
+    });
+  }, [onSave, modifiedDecorators, sendTelemetry]);
 
   const currentDecorators = modifiedDecorators.filter((decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
   const decoratorItems = currentDecorators
@@ -77,11 +87,15 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     onCancel();
   }, [decorators, onCancel]);
 
+  const modalTitle = 'Update Default Decorators Configuration';
+
   return (
     <BootstrapModalWrapper showModal={show}
-                           onHide={_onCancel}>
+                           onHide={_onCancel}
+                           data-app-section="configurations_decorators"
+                           data-event-element={modalTitle}>
       <Modal.Header closeButton>
-        <Modal.Title>Update Default Decorators Configuration</Modal.Title>
+        <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>Select the stream for which you want to change the set of default decorators.</p>

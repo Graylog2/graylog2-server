@@ -20,9 +20,9 @@ import styled from 'styled-components';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import MenuItem from 'components/bootstrap/MenuItem';
 import { HoverForHelp, Icon } from 'components/common';
-import type { Attribute, Attributes } from 'stores/PaginationTypes';
-import generateId from 'logic/generateId';
+import type { Attributes } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
+import FilterConfiguration from 'components/common/EntityFilters/FilterConfiguration';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -34,13 +34,13 @@ const AttributeSelect = ({
   activeFilters,
 }: {
   attributes: Attributes,
-  activeFilters: Filters,
+  activeFilters: Filters | undefined,
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string>>
 }) => (
   <>
     <MenuItem header>Create Filter</MenuItem>
     {attributes.map(({ id, title, type }) => {
-      const hasActiveFilter = !!activeFilters[id]?.length;
+      const hasActiveFilter = !!activeFilters?.[id]?.length;
       const disabled = type === 'BOOLEAN' ? hasActiveFilter : false;
 
       return (
@@ -60,32 +60,9 @@ const AttributeSelect = ({
   </>
 );
 
-const FilterConfiguration = ({
-  attribute,
-  onSubmit,
-  filterValueRenderer,
-}: {
-  attribute: Attribute,
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter) => void,
-}) => (
-  <>
-    <MenuItem header>Create {attribute.title} Filter</MenuItem>
-    {attribute.type === 'BOOLEAN' && (
-      <>
-        {attribute.filter_options.map(({ title, value }) => (
-          <MenuItem onSelect={() => onSubmit({ value, title, id: generateId() })} key={`filter-value-${title}`}>
-            {filterValueRenderer ? filterValueRenderer(value, title) : title}
-          </MenuItem>
-        ))}
-      </>
-    )}
-  </>
-);
-
 type Props = {
   filterableAttributes: Attributes,
-  activeFilters: Filters,
+  activeFilters: Filters | undefined,
   onCreateFilter: (attributeId: string, filter: Filter) => void,
   filterValueRenderers: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode } | undefined;
 }
@@ -102,11 +79,15 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
                              buttonTitle="Create Filter"
                              onToggle={onToggleDropdown}
                              closeOnSelect={false}
+                             dropdownMinWidth={120}
                              dropdownZIndex={1000}>
         {({ toggleDropdown }) => {
-          const _onCreateFilter = (filter: Filter) => {
-            toggleDropdown();
-            onCreateFilter(selectedAttributeId, filter);
+          const _onCreateFilter = (filter: { title: string, value: string }, closeDropdown = true) => {
+            if (closeDropdown) {
+              toggleDropdown();
+            }
+
+            onCreateFilter(selectedAttributeId, { value: filter.value, title: filter.title });
           };
 
           if (!selectedAttributeId) {
@@ -119,6 +100,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
 
           return (
             <FilterConfiguration onSubmit={_onCreateFilter}
+                                 allActiveFilters={activeFilters}
                                  attribute={selectedAttribute}
                                  filterValueRenderer={filterValueRenderers?.[selectedAttributeId]} />
           );

@@ -19,17 +19,17 @@ import React from 'react';
 import AppRouter from 'routing/AppRouter';
 import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 import StreamsProvider from 'contexts/StreamsProvider';
-import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
+import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
 
 const LoggedInPage = () => (
   <DefaultQueryClientProvider>
     <ThemeAndUserProvider>
-      <GlobalContextProviders>
+      <TelemetryProvider>
         <StreamsProvider>
           <AppRouter />
         </StreamsProvider>
-      </GlobalContextProviders>
+      </TelemetryProvider>
     </ThemeAndUserProvider>
   </DefaultQueryClientProvider>
 );

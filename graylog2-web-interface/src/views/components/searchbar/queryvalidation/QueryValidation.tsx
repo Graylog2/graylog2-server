@@ -19,7 +19,7 @@ import { useContext, useState, useRef, useCallback, useEffect, useMemo } from 'r
 import type { DefaultTheme } from 'styled-components';
 import styled, { css, keyframes } from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
-import { delay } from 'lodash';
+import delay from 'lodash/delay';
 import { useFormikContext } from 'formik';
 
 import { Popover } from 'components/bootstrap';
@@ -47,11 +47,11 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   border: 0;
   display: flex;
   align-items: center;
-  cursor: ${$clickable ? "pointer" : "default"};
+  cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
 const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => css`
-  color: ${$status === "ERROR" ? theme.colors.variant.danger : theme.colors.variant.warning};
+  color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);
 
@@ -97,7 +97,7 @@ const shakeAnimation = keyframes`
 `;
 
 const StyledPopover = styled(Popover)(({ $shaking }) => css`
-  animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : "none"};
+  animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
 `);
 
 const ExplanationTitle = ({ title }: { title: string }) => (
@@ -213,33 +213,32 @@ const QueryValidation = () => {
                              text={<Icon name="lightbulb" />} />
         )}
       </Container>
-
       {hasExplanations && showExplanation && (
-        <Overlay show
-                 containerPadding={10}
-                 placement="bottom"
-                 target={explanationTriggerRef.current}
-                 shouldUpdatePosition
-                 transition={Transition}>
-          <StyledPopover id="query-validation-error-explanation"
-                         title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
-                         $shaking={shakingPopover}>
-            <div role="alert">
-              {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
-                <Explanation key={id}>
-                  <span><b>{errorTitle}</b>: {errorMessage}</span>
-                  <DocumentationLink page={getErrorDocumentationLink(errorType)}
-                                     title={`${errorTitle} documentation`}
-                                     text={<DocumentationIcon name="lightbulb" />} />
-                </Explanation>
-              ))}
-              {plugableValidationExplanation?.map((PlugableExplanation, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <PlugableExplanation validationState={validationState} key={index} />),
-              )}
-            </div>
-          </StyledPopover>
-        </Overlay>
+      <Overlay show
+               containerPadding={10}
+               placement="bottom"
+               target={explanationTriggerRef.current}
+               shouldUpdatePosition
+               transition={Transition}>
+        <StyledPopover id="query-validation-error-explanation"
+                       title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
+                       $shaking={shakingPopover}>
+          <div role="alert">
+            {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
+              <Explanation key={id}>
+                <span><b>{errorTitle}</b>: {errorMessage}</span>
+                <DocumentationLink page={getErrorDocumentationLink(errorType)}
+                                   title={`${errorTitle} documentation`}
+                                   text={<DocumentationIcon name="lightbulb" />} />
+              </Explanation>
+            ))}
+            {plugableValidationExplanation?.map((PlugableExplanation, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              (<PlugableExplanation validationState={validationState} key={index} />)),
+            )}
+          </div>
+        </StyledPopover>
+      </Overlay>
       )}
     </>
   );

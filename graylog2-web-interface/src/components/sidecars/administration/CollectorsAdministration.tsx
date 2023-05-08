@@ -16,7 +16,10 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import union from 'lodash/union';
+import uniq from 'lodash/uniq';
+import without from 'lodash/without';
 import styled, { css } from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
@@ -43,6 +46,11 @@ const HeaderComponentsWrapper = styled.div(({ theme }) => css`
 
   .btn-link {
     color: ${theme.colors.variant.darker.default};
+  }
+
+  .btn-toolbar {
+    display: flex;
+    max-height: 29px;
   }
 `);
 
@@ -136,7 +144,7 @@ const CollectorsAdministration = ({
   const selectAllInput = useRef(null);
 
   // Filter out sidecars with no compatible collectors
-  const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !lodash.isEmpty(collector));
+  const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !isEmpty(collector));
 
   const sidecarCollectorId = (sidecar: SidecarSummary, collector: Collector) => {
     return `${sidecar.node_id}-${collector.name}`;
@@ -222,8 +230,8 @@ const CollectorsAdministration = ({
   const handleSidecarCollectorSelect = (collectorId: string) => {
     return (event) => {
       const newSelection = (event.target.checked
-        ? lodash.union(selected, [collectorId])
-        : lodash.without(selected, collectorId));
+        ? union(selected, [collectorId])
+        : without(selected, collectorId));
 
       setSelected(newSelection);
     };
@@ -352,6 +360,11 @@ const CollectorsAdministration = ({
     onFilter();
   };
 
+  const handlePageChange = (page: number, pageSize: number) => {
+    setSelected([]);
+    onPageChange(page, pageSize);
+  };
+
   const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => {
     return sidecarCollectorPairs.find(({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId);
   });
@@ -365,13 +378,13 @@ const CollectorsAdministration = ({
       </ControlledTableList.Item>
     );
   } else {
-    const sidecars = lodash.uniq<SidecarSummary>(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
+    const sidecars = uniq<SidecarSummary>(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
 
     formattedCollectors = sidecars.map((sidecarToMap) => {
       const sidecarCollectors = sidecarCollectorPairs
         .filter(({ sidecar }) => sidecar.node_id === sidecarToMap.node_id)
         .map(({ collector }) => collector)
-        .filter((collector) => !lodash.isEmpty(collector));
+        .filter((collector) => !isEmpty(collector));
 
       return formatSidecar(sidecarToMap, sidecarCollectors, configurations);
     });
@@ -381,7 +394,7 @@ const CollectorsAdministration = ({
     <PaginatedListContainer>
       <PaginatedList pageSizes={PAGE_SIZES}
                      totalItems={pagination.total}
-                     onChange={onPageChange}>
+                     onChange={handlePageChange}>
         <SidecarSearchForm query={query} onSearch={handleSearch} onReset={handleReset} />
         <FiltersSummary collectors={collectors}
                         configurations={configurations}

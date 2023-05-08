@@ -29,21 +29,21 @@ type Props = {
 };
 
 export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
-  position: ${sidebarIsPinned ? "relative" : "fixed"};
+  position: ${sidebarIsPinned ? 'relative' : 'fixed'};
   width: 270px;
-  height: ${sidebarIsPinned ? "100%" : "calc(100% - 50px)"}; /* subtract the nav height */
-  top: ${sidebarIsPinned ? 0 : "50px"};
-  left: ${sidebarIsPinned ? 0 : "50px"};
+  height: ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
+  top: ${sidebarIsPinned ? 0 : '50px'};
+  left: ${sidebarIsPinned ? 0 : '50px'};
 
   background: ${theme.colors.global.contentBackground};
-  border-right: ${sidebarIsPinned ? "none" : `1px solid ${theme.colors.variant.light.default}`};
-  box-shadow: ${sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : "none"};
+  border-right: ${sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
+  box-shadow: ${sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
 
   z-index: ${sidebarIsPinned ? 1030 : 6};
 
   ${sidebarIsPinned && css`
     ::before {
-      content: "";
+      content: '';
       position: absolute;
       top: 0;
       right: -6px;

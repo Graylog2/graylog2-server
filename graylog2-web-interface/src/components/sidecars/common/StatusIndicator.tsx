@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
@@ -36,7 +36,7 @@ type Props = {
 const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) => {
   const { toUserTimezone } = useUserDateTime();
   let message = messageProp;
-  const text = lodash.upperFirst(SidecarStatusEnum.toString(status));
+  const text = upperFirst(SidecarStatusEnum.toString(status));
   const lastSeenDateTime = toUserTimezone(lastSeen);
 
   let icon;
@@ -63,7 +63,9 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
 
   if (message && id) {
     const popover = (
-      <Popover id={`${id}-status-tooltip`}>
+      <Popover id={`${id}-status-tooltip`}
+               data-app-section="sidecars"
+               data-event-element="Status Indicator">
         {message}
       </Popover>
     );

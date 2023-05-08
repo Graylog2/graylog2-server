@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.plugin.database.ValidationException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -31,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -161,12 +164,13 @@ public class AccessTokenServiceImplTest {
     @Test
     @MongoDBFixtures("accessTokensSingleToken.json")
     public void testTouch() throws Exception {
+        accessTokenService.setLastAccessCache(1, TimeUnit.NANOSECONDS);
         final AccessToken token = accessTokenService.load("foobar");
-        final DateTime initialLastAccess = token.getLastAccess();
+        final DateTime firstAccess = accessTokenService.touch(token);
 
-        accessTokenService.touch(token);
-
-        assertThat(token.getLastAccess()).isGreaterThan(initialLastAccess);
+        Thread.sleep(1,0);
+        final DateTime secondAccess = accessTokenService.touch(token);
+        assertThat(secondAccess).isGreaterThan(firstAccess);
     }
 
     @Test
@@ -192,9 +196,12 @@ public class AccessTokenServiceImplTest {
         assertEquals(token.getToken(), newToken.getToken());
     }
 
-    @Test(expected = IllegalStateException.class)
-    @MongoDBFixtures("accessTokensMultipleIdenticalTokens.json")
-    public void testExceptionForMultipleTokens() throws Exception {
-        accessTokenService.load("foobar");
+    @Test(expected = DuplicateKeyException.class)
+    @MongoDBFixtures("accessTokensSingleToken.json")
+    public void testExceptionForMultipleTokens() throws ValidationException {
+        final AccessToken existingToken = accessTokenService.load("foobar");
+        final AccessToken newToken = accessTokenService.create("user", "foobar");
+        newToken.setToken(existingToken.getToken());
+        accessTokenService.save(newToken);
     }
 }

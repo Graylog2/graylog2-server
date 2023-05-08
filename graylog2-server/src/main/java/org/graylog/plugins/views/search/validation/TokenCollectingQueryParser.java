@@ -24,6 +24,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermRangeQuery;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -105,7 +106,12 @@ public class TokenCollectingQueryParser extends QueryParser {
 
     @Override
     protected Query newRangeQuery(String field, String part1, String part2, boolean startInclusive, boolean endInclusive) {
-        return saveQueryLookupTokens(super.newRangeQuery(field, part1, part2, startInclusive, endInclusive));
+        // first we let lucene parser to build the term range query
+        final TermRangeQuery query = (TermRangeQuery)super.newRangeQuery(field, part1, part2, startInclusive, endInclusive);
+        // then we wrap it by our own instance, that overrides the visit method and
+        // disables the Automation in the visitor calls.
+        final Query adaptedQuery = new BypassAutomationRangeQuery(query.getField(), query.getLowerTerm(), query.getUpperTerm(), query.includesLower(), query.includesUpper(), query.getRewriteMethod());
+        return saveQueryLookupTokens(adaptedQuery);
     }
 
     @Override

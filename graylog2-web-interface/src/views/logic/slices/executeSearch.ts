@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Bluebird from 'bluebird';
-
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchJobType } from 'views/stores/SearchJobs';
@@ -24,15 +22,19 @@ import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 
-const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => {
-  return new Bluebird((resolve) => {
-    if (job?.execution?.done) {
-      return resolve(job);
-    }
+const delay = (ms: number) => new Promise((resolve) => {
+  setTimeout(resolve, ms);
+});
 
-    return resolve(Bluebird.delay(250)
-      .then(() => searchJobStatus(job.id))
-      .then((jobStatus) => trackJobStatus(jobStatus)));
+const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => {
+  return new Promise((resolve) => {
+    if (job?.execution?.done) {
+      resolve(job);
+    } else {
+      resolve(delay(250)
+        .then(() => searchJobStatus(job.id))
+        .then((jobStatus) => trackJobStatus(jobStatus)));
+    }
   });
 };
 
@@ -40,13 +42,17 @@ const executeSearch = (
   view: View,
   widgetsToSearch: string[],
   executionStateParam: SearchExecutionState,
+  keepQueries: string[] = [],
 ): Promise<SearchExecutionResult> => {
   const { widgetMapping, search } = view;
 
-  let executionStateBuilder = executionStateParam.toBuilder();
+  const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty()).toBuilder()
+    .keepQueries(keepQueries)
+    .build();
+
+  let executionStateBuilder = executionStateParam.toBuilder().globalOverride(globalOverride);
 
   if (widgetsToSearch) {
-    const { globalOverride = GlobalOverride.empty() } = executionStateParam;
     const keepSearchTypes = widgetsToSearch.map((widgetId) => widgetMapping.get(widgetId))
       .reduce((acc, searchTypeSet) => [...acc, ...searchTypeSet.toArray()], globalOverride.keepSearchTypes || []);
     const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();

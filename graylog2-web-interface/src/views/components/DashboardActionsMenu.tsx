@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
@@ -37,8 +37,10 @@ import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
 import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredParameters';
 import useAppDispatch from 'stores/useAppDispatch';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { updateView } from 'views/logic/slices/viewSlice';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
+import useHistory from 'routing/useHistory';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -80,6 +82,17 @@ const DashboardActionsMenu = () => {
     </>
   );
   const dispatch = useAppDispatch();
+  const history = useHistory();
+  const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
+  const modalRefs = useRef({});
+  const dashboardActions = useMemo(() => pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
+    <PluggableDashboardAction key={`dashboard-action-${key}`} dashboard={view} modalRef={() => modalRefs.current[key]} />
+  )), [pluggableDashboardActions, view]);
+  const dashboardActionModals = useMemo(() => pluggableDashboardActions
+    .filter(({ modal }) => !!modal)
+    .map(({ modal: ActionModal, key }) => (
+      <ActionModal key={`dashboard-action-modal-${key}`} dashboard={view} ref={(r) => { modalRefs.current[key] = r; }} />
+    )), [pluggableDashboardActions, view]);
 
   const _onSaveNewDashboard = useCallback(async (newDashboard: View) => {
     const isViewDuplication = !!view.id;
@@ -87,11 +100,11 @@ const DashboardActionsMenu = () => {
     if (isViewDuplication) {
       const dashboardWithPluginData = await executePluggableDuplicationHandler(newDashboard, currentUser.permissions, pluggableSaveViewControls);
 
-      return dispatch(onSaveNewDashboard(dashboardWithPluginData));
+      return dispatch(onSaveNewDashboard(dashboardWithPluginData, history));
     }
 
-    return dispatch(onSaveNewDashboard(newDashboard));
-  }, [currentUser.permissions, dispatch, pluggableSaveViewControls, view.id]);
+    return dispatch(onSaveNewDashboard(newDashboard, history));
+  }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, view.id]);
   const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
   const _onUpdateView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
 
@@ -120,6 +133,12 @@ const DashboardActionsMenu = () => {
       )}
       {showDropDownButton && (
         <DropdownButton title={<Icon name="ellipsis-h" title="More Actions" />} id="query-tab-actions-dropdown" pullRight noCaret>
+          {dashboardActions.length > 0 && (
+            <>
+              {dashboardActions}
+              <MenuItem divider />
+            </>
+          )}
           <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit} icon="edit">
             Edit metadata
           </MenuItem>
@@ -155,6 +174,7 @@ const DashboardActionsMenu = () => {
                         onClose={() => setShareViewOpen(false)} />
       )}
       {exportOpen && <ExportModal view={view} closeModal={() => setExportOpen(false)} />}
+      {dashboardActionModals}
     </ButtonGroup>
   );
 };

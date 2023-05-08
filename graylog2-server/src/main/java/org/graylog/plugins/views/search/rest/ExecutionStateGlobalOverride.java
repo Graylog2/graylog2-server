@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -49,6 +50,9 @@ public abstract class ExecutionStateGlobalOverride {
     @JsonProperty
     public abstract ImmutableSet<String> keepSearchTypes();
 
+    @JsonProperty
+    public abstract ImmutableSet<String> keepQueries();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -61,7 +65,8 @@ public abstract class ExecutionStateGlobalOverride {
                 limit().isPresent() ||
                 offset().isPresent() ||
                 !searchTypes().isEmpty() ||
-                !keepSearchTypes().isEmpty();
+                !keepSearchTypes().isEmpty() ||
+                !keepQueries().isEmpty();
     }
 
     public static ExecutionStateGlobalOverride empty() {
@@ -92,11 +97,16 @@ public abstract class ExecutionStateGlobalOverride {
         public abstract Builder keepSearchTypes(ImmutableSet<String> keepSearchTypes);
 
         @JsonProperty
+        public abstract Builder keepQueries(ImmutableSet<String> keepQueries);
+
+        @JsonProperty
         public abstract Builder searchTypes(ImmutableMap<String, SearchTypeExecutionState> searchTypes);
 
         public abstract ImmutableMap.Builder<String, SearchTypeExecutionState> searchTypesBuilder();
 
         public abstract ImmutableSet.Builder<String> keepSearchTypesBuilder();
+
+        public abstract ImmutableSet.Builder<String> keepQueriesBuilder();
 
         public abstract ExecutionStateGlobalOverride build();
     }

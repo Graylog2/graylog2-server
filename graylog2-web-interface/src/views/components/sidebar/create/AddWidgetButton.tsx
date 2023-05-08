@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';

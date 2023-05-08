@@ -19,6 +19,7 @@ package org.graylog.testing.completebackend.apis.inputs;
 import com.google.common.collect.ImmutableMap;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.GraylogRestApi;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -33,27 +34,24 @@ public final class GelfInputApi implements GraylogRestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(GelfInputApi.class);
     private static final int DEFAULT_GELF_HTTP_PORT = 12201;
-    private final RequestSpecification requestSpecification;
-    private final GraylogBackend backend;
+    private final GraylogApis api;
 
-    public GelfInputApi(RequestSpecification requestSpecification, GraylogBackend backend) {
-        this.requestSpecification = requestSpecification;
-        this.backend = backend;
+    public GelfInputApi(GraylogApis api) {
+        this.api = api;
     }
-
 
     public PortBoundGelfInputApi createGelfHttpInput() {
         return createGelfHttpInput(DEFAULT_GELF_HTTP_PORT);
     }
 
     public PortBoundGelfInputApi createGelfHttpInput(int gelfHttpPort) {
-        return createGelfHttpInput(backend.mappedPortFor(gelfHttpPort), gelfHttpPort);
+        return createGelfHttpInput(api.backend().mappedPortFor(gelfHttpPort), gelfHttpPort);
     }
 
     public PortBoundGelfInputApi createGelfHttpInput(int mappedPort, int gelfHttpPort) {
 
         final ArrayList<Integer> inputs = given()
-                .spec(requestSpecification)
+                .spec(api.requestSpecification())
                 .expect()
                 .response()
                 .statusCode(200)
@@ -70,7 +68,7 @@ public final class GelfInputApi implements GraylogRestApi {
                     null);
 
             given()
-                    .spec(requestSpecification)
+                    .spec(api.requestSpecification())
                     .body(request)
                     .expect().response().statusCode(201)
                     .when()
@@ -103,7 +101,7 @@ public final class GelfInputApi implements GraylogRestApi {
 
     private RequestSpecification gelfEndpoint(int mappedPort) {
         return given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .basePath("/gelf")
                 .port(mappedPort);
     }

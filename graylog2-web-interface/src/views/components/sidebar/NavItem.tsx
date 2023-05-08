@@ -59,7 +59,7 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSele
   ${(isSelected && !sidebarIsPinned) && css`
     ::before,
     ::after {
-      content: "";
+      content: '';
       position: absolute;
       right: -5px;
       height: 15px;

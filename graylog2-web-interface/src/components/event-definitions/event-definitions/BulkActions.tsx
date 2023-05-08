@@ -23,11 +23,13 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { Button } from 'components/bootstrap';
+import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
-  selectedDefintionsIds: Array<string>,
+  selectedDefinitionsIds: Array<string>,
   setSelectedEventDefinitionsIds: (definitionIds: Array<string>) => void
 };
 const ACTION_TYPES = {
@@ -40,27 +42,28 @@ const getDescriptor = (count: number) => StringUtils.pluralize(count, 'event def
 const ACTION_TEXT = {
   [ACTION_TYPES.DELETE]: {
     dialogTitle: 'Delete Event Definitions',
-    dialogBody: (count: number) => `Are you sure you want to delete ${getDescriptor(count)}"?`,
+    dialogBody: (count: number) => `Are you sure you want to delete ${count} ${getDescriptor(count)}?`,
     bulkActionUrl: ApiRoutes.EventDefinitionsApiController.bulkDelete().url,
 
   },
   [ACTION_TYPES.DISABLE]: {
     dialogTitle: 'Disable Event Definitions',
-    dialogBody: (count: number) => `Are you sure you want to disable ${getDescriptor(count)}"?`,
+    dialogBody: (count: number) => `Are you sure you want to disable ${count} ${getDescriptor(count)}?`,
     bulkActionUrl: ApiRoutes.EventDefinitionsApiController.bulkUnschedule().url,
   },
   [ACTION_TYPES.ENABLE]: {
     dialogTitle: 'Enable Event Definitions',
-    dialogBody: (count: number) => `Are you sure you want to enable ${getDescriptor(count)}"?`,
+    dialogBody: (count: number) => `Are you sure you want to enable ${count} ${getDescriptor(count)}?`,
     bulkActionUrl: ApiRoutes.EventDefinitionsApiController.bulkSchedule().url,
   },
 };
 
-const BulkActions = ({ selectedDefintionsIds, setSelectedEventDefinitionsIds }: Props) => {
+const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }: Props) => {
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
   const [actionType, setActionType] = useState(null);
-  const selectedItemsAmount = selectedDefintionsIds?.length;
+  const selectedItemsAmount = selectedDefinitionsIds?.length;
+  const sendTelemetry = useSendTelemetry();
   const refetchEventDefinitions = useCallback(() => queryClient.invalidateQueries(['eventDefinition', 'overview']), [queryClient]);
 
   const updateState = ({ show, type }) => {
@@ -69,6 +72,11 @@ const BulkActions = ({ selectedDefintionsIds, setSelectedEventDefinitionsIds }: 
   };
 
   const handleAction = (action) => {
+    sendTelemetry('click', {
+      appSection: 'event-definition',
+      eventElement: `event-definition-bulk-${action}`,
+    });
+
     switch (action) {
       case ACTION_TYPES.DELETE:
         updateState({ show: true, type: ACTION_TYPES.DELETE });
@@ -92,15 +100,19 @@ const BulkActions = ({ selectedDefintionsIds, setSelectedEventDefinitionsIds }: 
     refetchEventDefinitions();
   };
 
+  const getErrorExplanation = (failures: Array<{ entity_id: string, failure_explanation: string }>) => {
+    return failures?.reduce((acc, failure) => `${acc} ${failure?.failure_explanation}`, '');
+  };
+
   const onAction = useCallback(() => {
     fetch('POST',
       qualifyUrl(ACTION_TEXT[actionType].bulkActionUrl),
-      { entity_ids: selectedDefintionsIds },
+      { entity_ids: selectedDefinitionsIds },
     ).then(({ failures }) => {
       if (failures?.length) {
         const notUpdatedDefinitionIds = failures.map(({ entity_id }) => entity_id);
         setSelectedEventDefinitionsIds(notUpdatedDefinitionIds);
-        UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${getDescriptor(selectedItemsAmount)} could not be ${actionType}d.`);
+        UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${getDescriptor(selectedItemsAmount)} could not be ${actionType}d. ${getErrorExplanation(failures)}`);
       } else {
         setSelectedEventDefinitionsIds([]);
         UserNotification.success(`${selectedItemsAmount} ${getDescriptor(selectedItemsAmount)} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionType}d successfully.`, 'Success');
@@ -111,26 +123,27 @@ const BulkActions = ({ selectedDefintionsIds, setSelectedEventDefinitionsIds }: 
       }).finally(() => {
         refetchEventDefinitions();
       });
-  }, [actionType, refetchEventDefinitions, selectedDefintionsIds, selectedItemsAmount, setSelectedEventDefinitionsIds]);
+  }, [actionType, refetchEventDefinitions, selectedDefinitionsIds, selectedItemsAmount, setSelectedEventDefinitionsIds]);
 
   const handleConfirm = () => {
     onAction();
+    setShowDialog(false);
   };
 
   return (
-    <>
-      <Button bsSize="xsmall" bsStyle="primary" onClick={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</Button>
-      <Button bsSize="xsmall" bsStyle="primary" onClick={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</Button>
-      <Button bsSize="xsmall" bsStyle="danger" onClick={() => handleAction(ACTION_TYPES.DELETE)}>Delete</Button>
+    <BulkActionsDropdown selectedEntities={selectedDefinitionsIds} setSelectedEntities={setSelectedEventDefinitionsIds}>
+      <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</MenuItem>
+      <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</MenuItem>
+      <MenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)}>Delete</MenuItem>
       {showDialog && (
-      <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}
-                     show
-                     onConfirm={handleConfirm}
-                     onCancel={handleClearState}>
-        {ACTION_TEXT[actionType]?.dialogBody(selectedItemsAmount)}
-      </ConfirmDialog>
+        <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}
+                       show
+                       onConfirm={handleConfirm}
+                       onCancel={handleClearState}>
+          {ACTION_TEXT[actionType]?.dialogBody(selectedItemsAmount)}
+        </ConfirmDialog>
       )}
-    </>
+    </BulkActionsDropdown>
   );
 };
 

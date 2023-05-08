@@ -21,6 +21,9 @@ import com.codahale.metrics.MetricRegistry;
 import com.eaio.uuid.UUID;
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import org.graylog.tracing.GraylogSemanticAttributes;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -64,7 +67,7 @@ public class SystemJobManager {
         return submitWithDelay(job, 0, TimeUnit.SECONDS);
     }
 
-    public String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
+    public synchronized String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
         // for immediate jobs, check allowed concurrency right now
         if (delay == 0) {
             checkAllowedConcurrency(job);
@@ -86,7 +89,7 @@ public class SystemJobManager {
 
                     final Stopwatch x = Stopwatch.createStarted();
 
-                    job.execute();  // ... blocks until it finishes.
+                    executeJob(job);  // ... blocks until it finishes.
                     x.stop();
 
                     final String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(
@@ -106,12 +109,18 @@ public class SystemJobManager {
         return job.getId();
     }
 
+    @WithSpan
+    private void executeJob(SystemJob job) {
+        Span.current().setAttribute(GraylogSemanticAttributes.SYSTEM_JOB_TYPE, job.getClassName());
+        job.execute();
+    }
+
     protected void checkAllowedConcurrency(SystemJob job) throws SystemJobConcurrencyException {
         final int concurrent = concurrentJobs(job.getClass());
 
         if (concurrent >= job.maxConcurrency()) {
             throw new SystemJobConcurrencyException("The maximum of parallel [" + job.getClass().getCanonicalName() + "] is locked " +
-                                                            "to <" + job.maxConcurrency() + "> but <" + concurrent + "> are running.");
+                    "to <" + job.maxConcurrency() + "> but <" + concurrent + "> are running.");
         }
     }
 

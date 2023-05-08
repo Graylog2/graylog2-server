@@ -18,9 +18,11 @@ package org.graylog2.security;
 
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -37,9 +39,11 @@ public interface AccessTokenService extends PersistedService {
 
     AccessToken create(String username, String name);
 
-    void touch(AccessToken accessToken) throws ValidationException;
+    DateTime touch(AccessToken accessToken) throws ValidationException;
 
     String save(AccessToken accessToken) throws ValidationException;
 
     int deleteAllForUser(String username);
+
+    public void setLastAccessCache(long duration, TimeUnit unit);
 }

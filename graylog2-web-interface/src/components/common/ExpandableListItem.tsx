@@ -23,7 +23,7 @@ import { Checkbox } from 'components/bootstrap';
 import Icon from './Icon';
 
 const ItemWrap = styled.li(({ padded }: { padded: boolean }) => css`
-  padding: ${padded ? "10px 5px" : ""};
+  padding: ${padded ? '10px 5px' : ''};
 `);
 
 const Container = styled.div(({ theme }) => css`
@@ -57,16 +57,16 @@ const IconStack = styled.div(({ theme }) => css`
     height: 1em;
     vertical-align: text-top;
 
-    &:hover [class*="fa-"] {
+    &:hover [class*='fa-'] {
       color: ${theme.colors.variant.primary};
       opacity: 1;
     }
   }
 
-  [class*="fa-"]:first-child {
+  [class*='fa-']:first-child {
     opacity: 0;
 
-    ~ [class*="fa-"]:hover {
+    ~ [class*='fa-']:hover {
       color: ${theme.colors.global.contentBackground};
     }
   }

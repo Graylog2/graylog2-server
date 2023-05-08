@@ -18,7 +18,6 @@ values. Please see the sample [graylog.conf](https://github.com/Graylog2/graylog
 - `elasticsearch_replicas`
 - `disable_index_optimization`
 - `index_optimization_max_num_segments`
-- `index_field_type_periodical_full_refresh_interval`
 - `rotation_strategy`
 - `elasticsearch_max_docs_per_index`
 - `elasticsearch_max_size_per_index`
@@ -90,7 +89,30 @@ Unless user-specified defaults are specified, the following new defaults will be
 - Shards: 1 (previously 4 in many cases)
 - Rotation Strategy: Time Size Optimizing - 30-40 days (previously Index Time [1D] in many cases)
 
-# API Changes
+#### Import Custom Sigma Rule Repositories
+Previously, the official Sigma HQ rule repository was the only repository that could be used to import Sigma rules. Now
+any public Git repository containing Sigma rule source files can be imported to Graylog and rules can be imported from
+them. Since Graylog no longer reads directly from the Sigma HQ repository, it must be imported before new rules can be
+added from it. To expedite this process, on the `Security > Sigma Rules > Sigma Repos` page there is an `Add SigmaHQ`
+button that will import the repository. The repository is about 10MB and all Sigma rule source files will be copied into
+MongoDB so the clone may take a minute to complete. Once the repository has been added rules can be imported as they were
+in 5.0.
+
+The rules within imported repositories must conform to the
+[Sigma specification](https://github.com/SigmaHQ/sigma-specification/blob/main/Sigma_specification.md) in order to be
+successfully added. Since the repositories are stored locally they will not have the latest changes automatically applied
+but can easily be refreshed in the `Sigma Repos` tab using the `Refresh` menu item for each repository.
+
+## Removal of deprecated Inputs
+
+The following inputs are no longer available:
+- AWS Logs (deprecated)
+- AWS Flow Logs (deprecated)
+
+The inputs were marked as deprecated since Graylog version `3.2.0`.
+If you still run any of those inputs, please configure the alternative "Kinesis/CloudWatch" input instead ahead of upgrading.
+
+## Java API Changes
 The following Java Code API changes have been made.
 
 | File/method                                  | Description                                                                                                 |
@@ -99,6 +121,8 @@ The following Java Code API changes have been made.
 | `IndexSetValidator#validateRetentionPeriod`  | The method argument have changed from `IndexSetConfig` to `RotationStrategyConfig, RetentionStrategyConfig` |
 | `ElasticsearchConfiguration#getIndexPrefix`  | The method name has changed to `getDefaultIndexPrefix`                                                      |
 | `ElasticsearchConfiguration#getTemplateName` | The method name has changed to `getDefaultIndexTemplateName`                                                |
+| `AuthServiceBackendConfig#externalHTTPHosts` | This method was added to the interface                                                                      |
+
 
 All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
 have been un-deprecated, as Graylog intends to maintain them going forward. 
@@ -146,15 +170,27 @@ will be returned like this if the `secret` attribute contains a sensitive value:
 }
 ```
 
+### Added Optional Default Timezone configuration for Syslog inputs
+When creating or editing a new syslog input, it is now possible to configure a default timezone in case logs ingested are not
+sending dates in UTC. When left as "Not configured", system behaves as before. 
+
+The following REST API endpoints were changed:
+
+| Endpoint                                                                                                   | Description                                   |
+|------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute. |
+
 ## Behaviour Changes
 
 - The `JSON path value from HTTP API` input will now only run on the leader node, if the `Global` option has been selected in the input configuration. Previously, the input was started on all nodes in the cluster.
 - The default connection and read timeouts for email sending have been reduced from 60 seconds to 10 seconds.
+- We are now parsing the time zone information send by Fortigate syslog messages. Any workarounds to transform the date into the right timezone because the forwared timezone information was not honored, should be removed.
 
 ## Configuration File Changes
 
-| Option                                      | Action  | Description                                                                                |
-|---------------------------------------------|---------|--------------------------------------------------------------------------------------------|
-| `gc_warning_threshold`                      | removed | GC warnings have been removed.                                                             |
-| `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds. |
-| `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.               |"
+| Option                                      | Action  | Description                                                                                     |
+|---------------------------------------------|---------|-------------------------------------------------------------------------------------------------|
+| `gc_warning_threshold`                      | removed | GC warnings have been removed.                                                                  |
+| `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds.      |
+| `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.                    |
+| `disabled_retention_strategies`             | added   | Allow disabling of `none` `close` `delete` retention strategies. At least one must stay enabled |

@@ -25,7 +25,7 @@ const FormControl = styled(BootstrapFormControl)(({ theme }) => css`
     border-radius: ${INPUT_BORDER_RADIUS};
   }
 
-  &.form-control:not([type="range"]) {
+  &.form-control:not([type='range']) {
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
     border-color: ${theme.colors.input.border};

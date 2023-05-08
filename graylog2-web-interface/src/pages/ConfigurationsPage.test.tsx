@@ -15,41 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
-import MockStore from 'helpers/mocking/StoreMock';
-import { configuration as mockConfiguration } from 'fixtures/configurations';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
-import usePluginEntities from 'hooks/usePluginEntities';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 
-jest.mock('hooks/usePluginEntities');
-jest.mock('components/configurations/SearchesConfig', () => () => <span>Search Configuration</span>);
-jest.mock('components/configurations/MessageProcessorsConfig', () => () => <span>Message Processors Configuration</span>);
+jest.mock('components/configurations/SearchesConfig', () => () => <span>Search Configuration Component</span>);
+jest.mock('components/configurations/MessageProcessorsConfig', () => () => <span>Message Processors Configuration Component</span>);
 jest.mock('components/configurations/SidecarConfig');
-
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsStore: MockStore(),
-}));
-
-jest.mock('stores/configurations/ConfigurationsStore', () => ({
-  ConfigurationsStore: MockStore(['getInitialState', () => ({
-    configuration: mockConfiguration,
-  })]),
-  ConfigurationsActions: {
-    listWhiteListConfig: jest.fn(() => Promise.resolve()),
-    list: jest.fn(() => Promise.resolve()),
-    listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
-    listPermissionsConfig: jest.fn(() => Promise.resolve()),
-    listUserConfig: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('stores/streams/StreamsStore', () => ({
-  StreamsActions: { listStreams: () => Promise.resolve() },
-}));
 
 const ComponentThrowingError = () => {
   throw new Error('Boom!');
@@ -64,31 +39,35 @@ describe('ConfigurationsPage', () => {
     jest.resetAllMocks();
   });
 
-  it('wraps core configuration elements with error boundary', async () => {
-    asMock(usePluginEntities).mockReturnValue([]);
+  it('wraps core configuration elements with error boundary and displays error', async () => {
     asMock(SidecarConfig).mockImplementation(ComponentThrowingError);
 
+    render(<ConfigurationsPage />);
+
+    const sidecarNavItem = await screen.findByRole('button', {
+      name: /sidecar/i,
+    });
+
     await suppressConsole(async () => {
-      render(<ConfigurationsPage />);
+      fireEvent.click(sidecarNavItem);
 
       return screen.findByText('Boom!');
     });
-
-    await screen.findByText('Message Processors Configuration');
   });
 
-  it('wraps plugin configuration elements with error boundary', async () => {
-    asMock(usePluginEntities).mockReturnValue([
-      { configType: 'foo', component: ComponentThrowingError },
-      { configType: 'bar', component: ComponentWorkingFine },
-    ]);
+  it('wraps core configuration elements with error boundary and renders component', async () => {
+    asMock(SidecarConfig).mockImplementation(ComponentWorkingFine);
 
-    await suppressConsole(() => {
-      render(<ConfigurationsPage />);
+    render(<ConfigurationsPage />);
 
-      return screen.findByText('Boom!');
+    const sidecarNavItem = await screen.findByRole('button', {
+      name: /sidecar/i,
     });
 
-    await screen.findByText('It is all good!');
+    await suppressConsole(async () => {
+      fireEvent.click(sidecarNavItem);
+
+      return screen.findByText('It is all good!');
+    });
   });
 });

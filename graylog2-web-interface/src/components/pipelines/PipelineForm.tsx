@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -100,6 +100,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
         </Button>
         <BootstrapModalForm show={showModal}
                             title={`${create ? 'Add new' : 'Edit'} pipeline ${nextPipeline.title}`}
+                            data-telemetry-title={`${create ? 'Add new' : 'Edit'} pipeline`}
                             onSubmitForm={_handleSubmit}
                             onCancel={_closeModal}
                             submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}>

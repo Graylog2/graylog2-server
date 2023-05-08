@@ -182,6 +182,7 @@ const ApiRoutes = {
     get: (indexSetId: string) => { return { url: `/system/indices/index_sets/${indexSetId}` }; },
     create: () => { return { url: '/system/indices/index_sets' }; },
     delete: (indexSetId: string, deleteIndices) => { return { url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }; },
+    searchPaginated: (searchTerm, skip, limit, stats) => { return { url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}` }; },
     setDefault: (indexSetId: string) => { return { url: `/system/indices/index_sets/${indexSetId}/default` }; },
     stats: () => { return { url: '/system/indices/index_sets/stats' }; },
   },
@@ -213,6 +214,12 @@ const ApiRoutes = {
     subsystems: () => { return { url: '/cluster/system/loggers/subsystems' }; },
     setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => { return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }; },
   },
+  ClusterSupportBundleController: {
+    delete: (filename: string) => { return { url: `/cluster/debug/support/bundle/${filename}` }; },
+    download: (filename: string) => { return { url: `/cluster/debug/support/bundle/download/${filename}` }; },
+    list: () => { return { url: '/cluster/debug/support/bundle/list' }; },
+    create: () => { return { url: '/cluster/debug/support/bundle/build' }; },
+  },
   MessageFieldsApiController: {
     list: () => { return { url: '/system/fields' }; },
     types: () => ({ url: 'views/fields' }),
@@ -228,8 +235,10 @@ const ApiRoutes = {
   },
   NotificationsApiController: {
     delete: (type: string) => { return { url: `/system/notifications/${type}` }; },
+    deleteWithKey: (type: string, key: string) => { return { url: `/system/notifications/${type}/${key}` }; },
     list: () => { return { url: '/system/notifications' }; },
     getHtmlMessage: (type: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }; },
+    getHtmlMessageWithKey: (type: string, key: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}` }; },
   },
   OutputsApiController: {
     index: () => { return { url: '/system/outputs' }; },
@@ -259,6 +268,8 @@ const ApiRoutes = {
     paginated: () => { return { url: '/streams/paginated' }; },
     get: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     bulk_delete: () => ({ url: '/streams/bulk_delete' }),
+    bulk_resume: () => ({ url: '/streams/bulk_resume' }),
+    bulk_pause: () => ({ url: '/streams/bulk_pause' }),
     create: () => { return { url: '/streams' }; },
     update: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     cloneStream: (streamId: string) => { return { url: `/streams/${streamId}/clone` }; },
@@ -310,6 +321,14 @@ const ApiRoutes = {
     lookupTableTest: () => { return { url: '/tools/lookup_table_tester' }; },
     urlWhitelistCheck: () => { return { url: '/system/urlwhitelist/check' }; },
     urlWhitelistGenerateRegex: () => { return { url: '/system/urlwhitelist/generate_regex' }; },
+  },
+  TelemetryApiController: {
+    info: () => {
+      return { url: '/telemetry' };
+    },
+    setting: () => {
+      return { url: '/telemetry/user/settings' };
+    },
   },
   UniversalSearchApiController: {
     _streamFilter(streamId: string) {
@@ -429,6 +448,7 @@ const ApiRoutes = {
     multiple: () => { return { url: '/system/pipelines/rule/multiple' }; },
     functions: () => { return { url: '/system/pipelines/rule/functions' }; },
     parse: () => { return { url: '/system/pipelines/rule/parse' }; },
+    simulate: () => { return { url: '/system/pipelines/rule/simulate' }; },
     metricsConfig: () => { return { url: '/system/pipelines/rule/config/metrics' }; },
   },
   ConnectionsController: {

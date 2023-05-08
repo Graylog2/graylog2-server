@@ -29,6 +29,7 @@ export type AppConfigs = {
   isCloud: boolean,
   pluginUISettings: { [key: string]: {} },
   featureFlags: { [key: string]: string },
+  telemetry: { api_key: string, host: string, enabled: boolean },
 };
 
 declare global {
@@ -86,6 +87,10 @@ const AppConfig = {
 
   customThemeColors() {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
+  },
+
+  telemetry() {
+    return appConfig()?.telemetry;
   },
 
   publicNotifications() {
