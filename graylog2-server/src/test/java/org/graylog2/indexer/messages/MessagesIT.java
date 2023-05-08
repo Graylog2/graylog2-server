@@ -181,6 +181,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
+        client().resetClusterBlock();
 
         final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
