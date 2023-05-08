@@ -108,9 +108,8 @@ const NodeLoggers = createReactClass({
               </div>
               <h2>
                 <LinkToNode nodeId={nodeId} />
-                <small> Has written a total of <strong>{this._formatThroughput()} internal log
-                  messages.
-                </strong>
+                <small>
+                  Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong>
                 </small>
               </h2>
             </div>

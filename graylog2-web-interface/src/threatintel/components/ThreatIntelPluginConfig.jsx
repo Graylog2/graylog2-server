@@ -141,8 +141,8 @@ const ThreatIntelPluginConfig = createReactClass({
           <fieldset>
             <Input type="checkbox"
                    id="tor-checkbox"
-              // eslint-disable-next-line react/no-unused-class-component-methods
                    ref={(elem) => {
+                     // eslint-disable-next-line react/no-unused-class-component-methods
                      this.torEnabled = elem;
                    }}
                    label="Allow Tor exit node lookups?"
@@ -153,8 +153,8 @@ const ThreatIntelPluginConfig = createReactClass({
 
             <Input type="checkbox"
                    id="spamhaus-checkbox"
-              // eslint-disable-next-line react/no-unused-class-component-methods
                    ref={(elem) => {
+                     // eslint-disable-next-line react/no-unused-class-component-methods
                      this.spamhausEnabled = elem;
                    }}
                    label="Allow Spamhaus DROP/EDROP lookups?"

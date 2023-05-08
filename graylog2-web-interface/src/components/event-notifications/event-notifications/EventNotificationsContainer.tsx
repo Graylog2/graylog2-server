@@ -17,15 +17,11 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
 import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
-
-// Import built-in Event Notification Types
-import '../event-notification-types';
-
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from 'components/event-notifications/event-notifications/Constants';
@@ -38,6 +34,9 @@ import BulkActions from './BulkActions';
 
 import useEventNotifications from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
+
+// Import built-in Event Notification Types
+import '../event-notification-types';
 
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
   attributes: {
@@ -114,7 +113,7 @@ const EventNotificationsContainer = () => {
 
     getNotificationTest(notification);
     refetchEventNotifications();
-  }, [getNotificationTest, refetchEventNotifications]);
+  }, [getNotificationTest, refetchEventNotifications, sendTelemetry]);
 
   const renderEventDefinitionActions = useCallback((listItem: EventNotification) => (
     <EventNotificationActions notification={listItem}

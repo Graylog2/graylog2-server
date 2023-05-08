@@ -222,9 +222,11 @@ const UserCreate = () => {
                   <GlobalTimeoutMessage label="Sessions Timeout"
                                         value={(
                                           <NoSearchResult>User session timeout is not editable because
-                                            the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session
-                                              timeout
-                                            </Link>
+                                            the
+                                            <IfPermitted permissions={['clusterconfigentry:read']}>
+                                              <Link to={Routes.SYSTEM.CONFIGURATIONS}>
+                                                global session timeout
+                                              </Link>
                                             </IfPermitted> is enabled.
                                           </NoSearchResult>
                                         )} />
