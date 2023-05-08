@@ -32,6 +32,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import 'moment-duration-format';
 
+import QuickAccessTimeRangeForm from 'components/configurations/QuickAccessTimeRangeForm';
+
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
@@ -299,6 +301,7 @@ const SearchesConfig = () => {
                                 validator={relativeTimeRangeValidator}
                                 title="Relative Timerange Options"
                                 help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
+          <QuickAccessTimeRangeForm />
           <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
                                 update={onSurroundingTimeRangeOptionsUpdate}
                                 validator={surroundingTimeRangeValidator}

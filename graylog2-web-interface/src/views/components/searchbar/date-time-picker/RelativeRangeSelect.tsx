@@ -143,6 +143,23 @@ const RelativeRangeSelectInner = ({
   name: string,
   onChange: (changeEvent: { target: { name: string, value: RangeClassified } }) => void,
 }) => {
+  console.log({
+    classifiedRange,
+    classifyRange,
+    defaultRange,
+    disableUnsetRange,
+    disabled,
+    error,
+    fieldName,
+    limitDuration,
+    name,
+    onChange,
+    onUnsetRange,
+    title,
+    unsetRangeLabel,
+    unsetRangeValue,
+  });
+
   const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
   const { isAllTime, value, unit } = classifiedRange;
