@@ -96,6 +96,10 @@ public class OutputRegistryTest {
     public void testLaunchNewOutput() throws Exception {
         final String outputId = "foobar";
         final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("stream-for-output-" + outputId);
+        when(stream.getOutputs()).thenReturn(Set.of(output));
+        when(output.getId()).thenReturn(outputId);
+        when(streamService.load("stream-for-output-" + outputId)).thenReturn(stream);
         when(messageOutputFactory.fromStreamOutput(eq(output), eq(stream), any(Configuration.class))).thenReturn(messageOutput);
         when(outputService.load(eq(outputId))).thenReturn(output);
 
@@ -176,6 +180,9 @@ public class OutputRegistryTest {
     private void loadIntoRegistry(Output... outputs) throws Exception {
         for (final Output output : outputs) {
             Stream stream = mock(Stream.class);
+            when(stream.getId()).thenReturn("stream-for-output-" + output.hashCode());
+            when(stream.getOutputs()).thenReturn(Set.of(output));
+            when(streamService.load("stream-for-output-" + output.hashCode())).thenReturn(stream);
             when(outputService.load(eq(output.getId()))).thenReturn(output);
             when(messageOutputFactory.fromStreamOutput(eq(output), eq(stream), any(Configuration.class)))
                     .thenReturn(messageOutput);
