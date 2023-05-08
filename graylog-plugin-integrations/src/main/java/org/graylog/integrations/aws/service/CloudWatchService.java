@@ -52,16 +52,19 @@ public class CloudWatchService {
     private static final int SUBSCRIPTION_RETRY_MAX_ATTEMPTS = 120;
     private static final TimeUnit SUBSCRIPTION_RETRY_DELAY_UNIT = TimeUnit.MILLISECONDS;
 
-    private CloudWatchLogsClientBuilder logsClientBuilder;
+    private final CloudWatchLogsClientBuilder logsClientBuilder;
+    private final AWSClientBuilderUtil awsClientBuilderUtil;
 
     @Inject
-    public CloudWatchService(CloudWatchLogsClientBuilder logsClientBuilder) {
+    public CloudWatchService(CloudWatchLogsClientBuilder logsClientBuilder,
+                             AWSClientBuilderUtil awsClientBuilderUtil) {
         this.logsClientBuilder = logsClientBuilder;
+        this.awsClientBuilderUtil = awsClientBuilderUtil;
     }
 
     public LogGroupsResponse getLogGroupNames(AWSRequest request) {
 
-        final CloudWatchLogsClient cloudWatchLogsClient = AWSClientBuilderUtil.buildClient(logsClientBuilder, request);
+        final CloudWatchLogsClient cloudWatchLogsClient = awsClientBuilderUtil.buildClient(logsClientBuilder, request);
         final DescribeLogGroupsRequest describeLogGroupsRequest = DescribeLogGroupsRequest.builder().build();
         final DescribeLogGroupsIterable responses = cloudWatchLogsClient.describeLogGroupsPaginator(describeLogGroupsRequest);
 
@@ -81,32 +84,33 @@ public class CloudWatchService {
     }
 
     public CreateLogSubscriptionResponse addSubscriptionFilter(CreateLogSubscriptionRequest request) {
-        CloudWatchLogsClient cloudWatch = AWSClientBuilderUtil.buildClient(logsClientBuilder, request);
+        CloudWatchLogsClient cloudWatch = awsClientBuilderUtil.buildClient(logsClientBuilder, request);
         final PutSubscriptionFilterRequest putSubscriptionFilterRequest =
                 PutSubscriptionFilterRequest.builder()
-                                            .logGroupName(request.logGroupName())
-                                            .filterName(request.filterName())
-                                            .filterPattern(request.filterPattern())
-                                            .destinationArn(request.destinationStreamArn())
-                                            .roleArn(request.roleArn())
-                                            .distribution(Distribution.BY_LOG_STREAM)
-                                            .build();
+                        .logGroupName(request.logGroupName())
+                        .filterName(request.filterName())
+                        .filterPattern(request.filterPattern())
+                        .destinationArn(request.destinationStreamArn())
+                        .roleArn(request.roleArn())
+                        .distribution(Distribution.BY_LOG_STREAM)
+                        .build();
         try {
             final Retryer<Void> retryer = RetryerBuilder.<Void>newBuilder()
                     .retryIfExceptionOfType(InvalidParameterException.class)
                     .withWaitStrategy(WaitStrategies.fixedWait(SUBSCRIPTION_RETRY_DELAY, SUBSCRIPTION_RETRY_DELAY_UNIT))
                     .withStopStrategy(StopStrategies.stopAfterAttempt(SUBSCRIPTION_RETRY_MAX_ATTEMPTS))
                     .withRetryListener(new RetryListener() {
+                        @Override
                         public <V> void onRetry(Attempt<V> attempt) {
                             if (attempt.hasException()) {
                                 LOG.info("Failed to create log group subscription on retry attempt [{}]. " +
-                                         "This is probably normal and indicates that the specified IAM role is not ready yet due to IAM eventual consistency." +
-                                         "Retrying now. Exception [{}]", attempt.getAttemptNumber(), attempt.getExceptionCause().getMessage());
+                                        "This is probably normal and indicates that the specified IAM role is not ready yet due to IAM eventual consistency." +
+                                        "Retrying now. Exception [{}]", attempt.getAttemptNumber(), attempt.getExceptionCause().getMessage());
                             } else if (attempt.hasException() && attempt.getAttemptNumber() == SUBSCRIPTION_RETRY_MAX_ATTEMPTS) {
                                 LOG.error("Failed to put subscription after [{}] attempts. Giving up. Exception [{}]", attempt.getAttemptNumber(), attempt.getExceptionCause());
                             } else if (attempt.getAttemptNumber() > 1) {
                                 LOG.info("Retry of CloudWatch log group [{}] subscription was finally successful on attempt [{}].",
-                                         request.logGroupName(), attempt.getAttemptNumber());
+                                        request.logGroupName(), attempt.getAttemptNumber());
                             }
                         }
                     })
@@ -118,18 +122,18 @@ public class CloudWatchService {
                 });
 
                 String explanation = String.format("Success. The subscription filter [%s] was added for the CloudWatch log group [%s].",
-                                                   request.filterName(), request.logGroupName());
+                        request.filterName(), request.logGroupName());
                 return CreateLogSubscriptionResponse.create(explanation);
             } catch (RetryException e) {
                 throw new RuntimeException(String.format("Failed to create the CloudWatch subscription after [%d] attempts. Exception [%s]",
-                                                         e.getNumberOfFailedAttempts(), e.getCause()), e.getCause()); // e.getCause() returns the actual AWS exception to the UI.
+                        e.getNumberOfFailedAttempts(), e.getCause()), e.getCause()); // e.getCause() returns the actual AWS exception to the UI.
             }
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
             final String responseMessage = String.format("Attempt to add subscription [%s] to Cloudwatch log group " +
-                                                         "[%s] failed due to the following exception: [%s]",
-                                                         request.filterName(),
-                                                         request.logGroupName(), specificError);
+                            "[%s] failed due to the following exception: [%s]",
+                    request.filterName(),
+                    request.logGroupName(), specificError);
             LOG.error(responseMessage);
             throw new BadRequestException(responseMessage, e);
         }

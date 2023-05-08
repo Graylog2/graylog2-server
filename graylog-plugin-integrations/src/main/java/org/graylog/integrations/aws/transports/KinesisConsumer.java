@@ -20,10 +20,10 @@ package org.graylog.integrations.aws.transports;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.integrations.aws.AWSAuthFactory;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,14 @@ import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClientBuilder;
 import software.amazon.kinesis.common.ConfigsBuilder;
 import software.amazon.kinesis.common.KinesisClientUtil;
+import software.amazon.kinesis.coordinator.NoOpWorkerStateChangeListener;
 import software.amazon.kinesis.coordinator.Scheduler;
+import software.amazon.kinesis.coordinator.WorkerStateChangeListener;
+import software.amazon.kinesis.lifecycle.NoOpTaskExecutionListener;
+import software.amazon.kinesis.lifecycle.TaskExecutionListener;
+import software.amazon.kinesis.lifecycle.TaskOutcome;
+import software.amazon.kinesis.lifecycle.TaskType;
+import software.amazon.kinesis.lifecycle.events.TaskExecutionListenerInput;
 import software.amazon.kinesis.retrieval.polling.PollingConfig;
 
 import java.util.Locale;
@@ -67,6 +74,8 @@ public class KinesisConsumer implements Runnable {
     private final AWSMessageType awsMessageType;
     private final Consumer<byte[]> handleMessageCallback;
     private final AWSRequest request;
+    private final AWSClientBuilderUtil awsClientBuilderUtil;
+    private final InputFailureRecorder inputFailureRecorder;
     private Scheduler kinesisScheduler;
 
     KinesisConsumer(NodeId nodeId,
@@ -75,7 +84,9 @@ public class KinesisConsumer implements Runnable {
                     Consumer<byte[]> handleMessageCallback,
                     String kinesisStreamName,
                     AWSMessageType awsMessageType,
-                    int recordBatchSize, AWSRequest request) {
+                    int recordBatchSize, AWSRequest request,
+                    AWSClientBuilderUtil awsClientBuilderUtil,
+                    InputFailureRecorder inputFailureRecorder) {
         Preconditions.checkArgument(StringUtils.isNotBlank(kinesisStreamName), "A Kinesis stream name is required.");
         Preconditions.checkNotNull(awsMessageType, "A AWSMessageType is required.");
 
@@ -87,26 +98,28 @@ public class KinesisConsumer implements Runnable {
         this.awsMessageType = awsMessageType;
         this.recordBatchSize = recordBatchSize;
         this.request = request;
+        this.awsClientBuilderUtil = awsClientBuilderUtil;
+        this.inputFailureRecorder = inputFailureRecorder;
     }
 
+    @Override
     public void run() {
 
         LOG.debug("Starting the Kinesis Consumer.");
-        AwsCredentialsProvider credentialsProvider = AWSAuthFactory.create(request.region(), request.awsAccessKeyId(),
-                                                                           request.awsSecretAccessKey(), request.assumeRoleArn());
+        AwsCredentialsProvider credentialsProvider = awsClientBuilderUtil.createCredentialsProvider(request);
 
         final Region region = Region.of(request.region());
 
         final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
-        AWSClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
+        awsClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
         final DynamoDbAsyncClient dynamoClient = dynamoDbClientBuilder.build();
 
         final CloudWatchAsyncClientBuilder cloudwatchClientBuilder = CloudWatchAsyncClient.builder();
-        AWSClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
+        awsClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
         final CloudWatchAsyncClient cloudWatchClient = cloudwatchClientBuilder.build();
 
         final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder();
-        AWSClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
+        awsClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
         final KinesisAsyncClient kinesisAsyncClient = KinesisClientUtil.createKinesisAsyncClient(kinesisAsyncClientBuilder);
 
         final String workerId = String.format(Locale.ENGLISH, "graylog-node-%s", nodeId.anonymize());
@@ -120,9 +133,9 @@ public class KinesisConsumer implements Runnable {
         final KinesisShardProcessorFactory kinesisShardProcessorFactory = new KinesisShardProcessorFactory(objectMapper, transport, handleMessageCallback, kinesisStreamName, awsMessageType);
 
         ConfigsBuilder configsBuilder = new ConfigsBuilder(kinesisStreamName, applicationName,
-                                                           kinesisAsyncClient, dynamoClient, cloudWatchClient,
-                                                           workerId,
-                                                           kinesisShardProcessorFactory);
+                kinesisAsyncClient, dynamoClient, cloudWatchClient,
+                workerId,
+                kinesisShardProcessorFactory);
 
         final PollingConfig pollingConfig = new PollingConfig(kinesisStreamName, kinesisAsyncClient);
 
@@ -131,11 +144,32 @@ public class KinesisConsumer implements Runnable {
             LOG.debug("Using explicit batch size [{}]", recordBatchSize);
             pollingConfig.maxRecords(recordBatchSize);
         }
+        WorkerStateChangeListener workerStateChangeListener = new NoOpWorkerStateChangeListener() {
+            @Override
+            public void onAllInitializationAttemptsFailed(Throwable e) {
+                inputFailureRecorder.setFailing(
+                        KinesisConsumer.class,
+                        "Initialization for Kinesis stream <%s> failed.".formatted(kinesisStreamName), e);
+            }
+        };
+
+        TaskExecutionListener taskExecutionListener = new NoOpTaskExecutionListener() {
+            @Override
+            public void afterTaskExecution(TaskExecutionListenerInput input) {
+                if (TaskOutcome.FAILURE.equals(input.taskOutcome())) {
+                    inputFailureRecorder.setFailing(KinesisConsumer.class,
+                            "Errors for Kinesis stream <%s>!".formatted(kinesisStreamName));
+                } else if (TaskOutcome.SUCCESSFUL.equals(input.taskOutcome()) && TaskType.PROCESS.equals(input.taskType())) {
+                    inputFailureRecorder.setRunning();
+                }
+            }
+        };
+
         this.kinesisScheduler = new Scheduler(
                 configsBuilder.checkpointConfig(),
-                configsBuilder.coordinatorConfig(),
+                configsBuilder.coordinatorConfig().workerStateChangeListener(workerStateChangeListener),
                 configsBuilder.leaseManagementConfig(),
-                configsBuilder.lifecycleConfig(),
+                configsBuilder.lifecycleConfig().taskExecutionListener(taskExecutionListener),
                 configsBuilder.metricsConfig(),
                 configsBuilder.processorConfig(),
                 configsBuilder.retrievalConfig().retrievalSpecificConfig(pollingConfig));
@@ -161,6 +195,7 @@ public class KinesisConsumer implements Runnable {
                 LOG.error("Exception while executing graceful shutdown.", e);
             } catch (TimeoutException e) {
                 LOG.error("Timeout while waiting for shutdown.  Scheduler may not have exited.");
+                kinesisScheduler.shutdown();
             }
         }
     }

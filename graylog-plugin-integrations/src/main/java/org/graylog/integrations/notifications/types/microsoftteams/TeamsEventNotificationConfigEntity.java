@@ -25,6 +25,7 @@ import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 
@@ -47,6 +48,9 @@ public abstract class TeamsEventNotificationConfigEntity implements EventNotific
     @JsonProperty(TeamsEventNotificationConfig.TEAMS_ICON_URL)
     public abstract ValueReference iconUrl();
 
+    @JsonProperty(TeamsEventNotificationConfig.TEAMS_TIME_ZONE)
+    public abstract ValueReference timeZone();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -59,7 +63,8 @@ public abstract class TeamsEventNotificationConfigEntity implements EventNotific
         @JsonCreator
         public static Builder create() {
             return new AutoValue_TeamsEventNotificationConfigEntity.Builder()
-                    .type(TYPE_NAME);
+                    .type(TYPE_NAME)
+                    .timeZone(ValueReference.of("UTC"));
         }
 
         @JsonProperty(TeamsEventNotificationConfig.TEAMS_COLOR)
@@ -74,6 +79,9 @@ public abstract class TeamsEventNotificationConfigEntity implements EventNotific
         @JsonProperty(TeamsEventNotificationConfig.TEAMS_ICON_URL)
         public abstract Builder iconUrl(ValueReference iconUrl);
 
+        @JsonProperty(TeamsEventNotificationConfig.TEAMS_TIME_ZONE)
+        public abstract Builder timeZone(ValueReference timeZone);
+
         public abstract TeamsEventNotificationConfigEntity build();
     }
 
@@ -85,6 +93,7 @@ public abstract class TeamsEventNotificationConfigEntity implements EventNotific
                 .customMessage(customMessage().asString(parameters))
                 .customMessage(customMessage().asString(parameters))
                 .iconUrl(iconUrl().asString(parameters))
+                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
                 .build();
     }
 }

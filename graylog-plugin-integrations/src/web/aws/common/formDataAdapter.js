@@ -56,7 +56,6 @@ export const toGenericInputCreateRequest = ({
   awsCloudWatchAwsRegion,
   awsCloudWatchBatchSize,
   awsEndpointCloudWatch = { value: undefined },
-  awsCloudWatchGlobalInput = { value: undefined },
   awsCloudWatchKinesisInputType = { value: DEFAULT_KINESIS_LOG_TYPE },
   awsCloudWatchKinesisStream,
   awsCloudWatchName,
@@ -70,7 +69,6 @@ export const toGenericInputCreateRequest = ({
 }) => ({
   type: 'org.graylog.integrations.aws.inputs.AWSInput',
   title: awsCloudWatchName.value,
-  global: !!awsCloudWatchGlobalInput.value,
   configuration: {
     ...awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret ? {
       aws_access_key: awsCloudWatchAwsKey?.value,

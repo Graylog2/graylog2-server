@@ -22,12 +22,14 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.service.AWSService;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -41,9 +43,11 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
+import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
@@ -55,7 +59,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-public class KinesisTransport extends ThrottleableTransport {
+public class KinesisTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(KinesisTransport.class);
     public static final String NAME = "aws-kinesis-transport";
 
@@ -71,26 +75,29 @@ public class KinesisTransport extends ThrottleableTransport {
     private final NodeId nodeId;
     private final LocalMetricRegistry localRegistry;
     private final ObjectMapper objectMapper;
+    private final AWSClientBuilderUtil awsClientBuilderUtil;
+    private final ExecutorService executor;
 
     private KinesisConsumer kinesisConsumer;
-    private final ExecutorService executor;
 
     @Inject
     public KinesisTransport(@Assisted final Configuration configuration,
                             EventBus serverEventBus,
                             final NodeId nodeId,
                             LocalMetricRegistry localRegistry,
-                            ObjectMapper objectMapper) {
+                            ObjectMapper objectMapper,
+                            AWSClientBuilderUtil awsClientBuilderUtil) {
         super(serverEventBus, configuration);
         this.configuration = configuration;
         this.nodeId = nodeId;
         this.localRegistry = localRegistry;
         this.objectMapper = objectMapper;
+        this.awsClientBuilderUtil = awsClientBuilderUtil;
         this.executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
-                                                                  .setDaemon(true)
-                                                                  .setNameFormat("aws-kinesis-reader-%d")
-                                                                  .setUncaughtExceptionHandler((t, e) -> LOG.error("Uncaught exception in AWS Kinesis reader.", e))
-                                                                  .build());
+                .setDaemon(true)
+                .setNameFormat("aws-kinesis-reader-%d")
+                .setUncaughtExceptionHandler((t, e) -> LOG.error("Uncaught exception in AWS Kinesis reader.", e))
+                .build());
     }
 
     @Override
@@ -105,11 +112,11 @@ public class KinesisTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void doLaunch(MessageInput input) throws MisfireException {
+    public void doLaunch(MessageInput input, InputFailureRecorder inputFailureRecorder) throws MisfireException {
 
         final Region region = Region.of(Objects.requireNonNull(configuration.getString(CK_AWS_REGION)));
         final String key = configuration.getString(CK_ACCESS_KEY);
-        final String secret = configuration.getString(CK_SECRET_KEY);
+        final EncryptedValue secret = configuration.getEncryptedValue(CK_SECRET_KEY);
         final String assumeRoleArn = configuration.getString(AWSInput.CK_ASSUME_ROLE_ARN);
 
         final String dynamodbEndpoint = configuration.getString(AWSInput.CK_DYNAMODB_ENDPOINT);
@@ -138,7 +145,7 @@ public class KinesisTransport extends ThrottleableTransport {
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
 
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, kinesisCallback(input),
-                                                   streamName, awsMessageType, batchSize, awsRequest);
+                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder);
 
         LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
         executor.submit(this.kinesisConsumer);

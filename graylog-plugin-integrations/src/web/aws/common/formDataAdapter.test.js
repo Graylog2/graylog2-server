@@ -51,7 +51,6 @@ describe('formDataAdapter', () => {
 
     expect(request.type).toBe('org.graylog.integrations.aws.inputs.AWSInput');
     expect(request.title).toEqual(formData.awsCloudWatchName.value);
-    expect(request.global).toEqual(formData.awsCloudWatchGlobalInput.value);
 
     const { configuration } = request;
 

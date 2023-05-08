@@ -21,7 +21,7 @@ import camelCase from 'lodash/camelCase';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
-import { ColorPickerPopover } from 'components/common';
+import { ColorPickerPopover, TimezoneSelect } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 
 import type { ConfigType, ValidationType } from '../types';
@@ -72,7 +72,7 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
     /* eslint-enable no-template-curly-in-string */
     icon_url: '',
     backlog_size: 0,
-
+    time_zone: 'UTC',
   };
 
   constructor(props: TeamsNotificationFormType | Readonly<TeamsNotificationFormType>) {
@@ -111,6 +111,10 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
   handleColorChange: (color: string, _: any, hidePopover: any) => void = (color, _, hidePopover) => {
     hidePopover();
     this.propagateChange('color', color);
+  };
+
+  handleTimeZoneChange = (nextValue) => {
+    this.propagateChange('time_zone', nextValue);
   };
 
   handleChange = (event: { target: { name: any; }; }) => {
@@ -160,6 +164,15 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
                onChange={this.handleChange} />
 
         <FormGroup>
+          <Input id="notification-time-zone"
+                 help="Time zone used for timestamps in the notification body."
+                 label="Time zone for date/time values">
+            <TimezoneSelect className="timezone-select"
+                            name="time_zone"
+                            value={config.time_zone}
+                            onChange={this.handleTimeZoneChange}
+                            clearable={false} />
+          </Input>
           <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
           <InputGroup>
             <InputGroup.Addon>

@@ -24,7 +24,6 @@ import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -32,7 +31,6 @@ import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import software.amazon.awssdk.regions.Region;
@@ -47,7 +45,6 @@ public class AWSInput extends MessageInput {
     public static final String NAME = "AWS Kinesis/CloudWatch";
     public static final String TYPE = "org.graylog.integrations.aws.inputs.AWSInput";
 
-    public static final String CK_GLOBAL = "global";
     public static final String CK_AWS_REGION = "aws_region";
     public static final String CK_ACCESS_KEY = "aws_access_key";
     public static final String CK_SECRET_KEY = "aws_secret_key";
@@ -76,16 +73,6 @@ public class AWSInput extends MessageInput {
               serverStatus);
     }
 
-    @Override
-    public void launch(InputBuffer buffer) throws MisfireException {
-        super.launch(buffer);
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-    }
-
     @FactoryClass
     public interface Factory extends MessageInput.Factory<AWSInput> {
         @Override
@@ -102,16 +89,25 @@ public class AWSInput extends MessageInput {
         public Descriptor() {
             super(NAME, false, "");
         }
+
+        @Override
+        public boolean isCloudCompatible() {
+            return true;
+        }
     }
 
     @ConfigClass
     public static class Config extends MessageInput.Config {
 
         private static final String AWS_SDK_ENDPOINT_DESCRIPTION = "Only specify this if you want to override the endpoint, which the AWS SDK communicates with.";
+        private final boolean isCloud;
 
         @Inject
-        public Config(AWSTransport.Factory transport, AWSCodec.Factory codec) {
+        public Config(AWSTransport.Factory transport,
+                      AWSCodec.Factory codec,
+                      org.graylog2.Configuration configuration) {
             super(transport.getConfig(), codec.getConfig());
+            this.isCloud = configuration.isCloud();
         }
 
         @Override
@@ -133,14 +129,15 @@ public class AWSInput extends MessageInput {
                     "AWS access key",
                     "",
                     "Access key of an AWS user with sufficient permissions. (See documentation)",
-                    ConfigurationField.Optional.OPTIONAL));
+                    isCloud ? ConfigurationField.Optional.NOT_OPTIONAL : ConfigurationField.Optional.OPTIONAL));
 
             request.addField(new TextField(
                     CK_SECRET_KEY,
                     "AWS secret key",
                     "",
                     "Secret key of an AWS user with sufficient permissions. (See documentation)",
-                    ConfigurationField.Optional.OPTIONAL,
+                    isCloud ? ConfigurationField.Optional.NOT_OPTIONAL : ConfigurationField.Optional.OPTIONAL,
+                    true,
                     TextField.Attribute.IS_PASSWORD));
 
             request.addField(new TextField(

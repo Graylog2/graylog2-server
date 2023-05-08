@@ -17,6 +17,7 @@
 package org.graylog.integrations.aws.resources.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.security.encryption.EncryptedValue;
 
 import javax.annotation.Nullable;
 
@@ -47,7 +48,7 @@ public interface AWSRequest {
 
     @Nullable
     @JsonProperty(AWS_SECRET_ACCESS_KEY)
-    String awsSecretAccessKey();
+    EncryptedValue awsSecretAccessKey();
 
     @Nullable
     @JsonProperty(ASSUME_ROLE_ARN)
@@ -77,7 +78,7 @@ public interface AWSRequest {
         SELF awsAccessKeyId(String awsAccessKeyId);
 
         @JsonProperty(AWS_SECRET_ACCESS_KEY)
-        SELF awsSecretAccessKey(String awsSecretAccessKey);
+        SELF awsSecretAccessKey(EncryptedValue awsSecretAccessKey);
 
         @JsonProperty(ASSUME_ROLE_ARN)
         SELF assumeRoleArn(String assumeRoleArn);

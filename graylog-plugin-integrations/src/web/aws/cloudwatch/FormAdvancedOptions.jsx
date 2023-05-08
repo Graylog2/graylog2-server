@@ -28,7 +28,6 @@ const FormAdvancedOptions = ({ onChange }) => {
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
   const {
-    awsCloudWatchGlobalInput,
     awsCloudWatchBatchSize,
     awsCloudWatchThrottleEnabled,
     awsCloudWatchAddFlowLogPrefix,
@@ -40,14 +39,6 @@ const FormAdvancedOptions = ({ onChange }) => {
 
   return (
     <StyledAdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
-      <Input id="awsCloudWatchGlobalInput"
-             type="checkbox"
-             value="global-input"
-             defaultChecked={awsCloudWatchGlobalInput ? awsCloudWatchGlobalInput.value : ''}
-             onChange={onChange}
-             label="Global Input"
-             help="Should this input start on all nodes" />
-
       <Input id="awsCloudWatchThrottleEnabled"
              type="checkbox"
              value="enable-throttling"

@@ -16,7 +16,6 @@
  */
 package org.graylog.integrations.notifications.types.microsoftteams;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
 import org.graylog.events.notifications.EventNotification;
@@ -33,6 +32,8 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,18 +53,18 @@ public class TeamsEventNotification implements EventNotification {
     private final EventNotificationService notificationCallbackService;
     private final Engine templateEngine;
     private final NotificationService notificationService;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapperProvider objectMapperProvider;
     private final NodeId nodeId;
     private final RequestClient requestClient;
 
     @Inject
     public TeamsEventNotification(EventNotificationService notificationCallbackService,
-                                  ObjectMapper objectMapper,
+                                  ObjectMapperProvider objectMapperProvider,
                                   Engine templateEngine,
                                   NotificationService notificationService,
                                   NodeId nodeId, RequestClient requestClient) {
         this.notificationCallbackService = notificationCallbackService;
-        this.objectMapper = requireNonNull(objectMapper);
+        this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.templateEngine = requireNonNull(templateEngine);
         this.notificationService = requireNonNull(notificationService);
         this.nodeId = requireNonNull(nodeId);
@@ -81,7 +82,7 @@ public class TeamsEventNotification implements EventNotification {
 
         try {
             TeamsMessage teamsMessage = createTeamsMessage(ctx, config);
-            requestClient.send(objectMapper.writeValueAsString(teamsMessage), config.webhookUrl());
+            requestClient.send(objectMapperProvider.getForTimeZone(config.timeZone()).writeValueAsString(teamsMessage), config.webhookUrl());
         } catch (TemporaryEventNotificationException exp) {
             //scheduler needs to retry a TemporaryEventNotificationException
             throw exp;
@@ -145,7 +146,7 @@ public class TeamsEventNotification implements EventNotification {
 
     String buildCustomMessage(EventNotificationContext ctx, TeamsEventNotificationConfig config, String template) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
-        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog);
+        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog, config.timeZone());
         try {
             return templateEngine.transform(template, model);
         } catch (Exception e) {
@@ -166,11 +167,11 @@ public class TeamsEventNotification implements EventNotification {
 
 
     @VisibleForTesting
-    Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog) {
+    Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog, DateTimeZone timeZone) {
         EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
 
         LOG.debug("the custom message model data is {}", modelData);
-        Map<String, Object> objectMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+        Map<String, Object> objectMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         objectMap.put("type", type);
 
         return objectMap;

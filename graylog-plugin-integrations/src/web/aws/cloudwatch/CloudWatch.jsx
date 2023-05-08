@@ -16,17 +16,18 @@
  */
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
 import { getValueFromInput } from 'util/FormsUtils.js';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import StepAuthorize from 'aws/StepAuthorize';
 import { StepsContext } from 'aws/context/Steps';
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import { SidebarContext } from 'aws/context/Sidebar';
+// import useHistory from 'routing/useHistory';
 
 import StepKinesis from './StepKinesis';
 import StepHealthCheck from './StepHealthCheck';
@@ -47,6 +48,8 @@ const CloudWatch = ({ externalInputSubmit, onSubmit }) => {
   const { sidebar, clearSidebar } = useContext(SidebarContext);
   const [dirty, setDirty] = useState(false);
   const [lastStep, setLastStep] = useState(false);
+  // const history = useHistory();
+  const navigate = useNavigate();
 
   const handleStepChange = (nextStep) => {
     setCurrentStep(nextStep);
@@ -88,7 +91,8 @@ const CloudWatch = ({ externalInputSubmit, onSubmit }) => {
         if (externalInputSubmit) {
           onSubmit(maybeFormData);
         } else {
-          history.push(Routes.SYSTEM.INPUTS);
+          // history.push(Routes.SYSTEM.INPUTS);
+          navigate(Routes.SYSTEM.INPUTS);
         }
       }
     };
@@ -125,7 +129,7 @@ const CloudWatch = ({ externalInputSubmit, onSubmit }) => {
         disabled: isDisabledStep('review'),
       },
     ];
-  }, [availableSteps, availableStreams.length, clearSidebar, currentStep, dirty, isDisabledStep, setCurrentStep, setEnabledStep, setFormData, externalInputSubmit, onSubmit]);
+  }, [isDisabledStep, availableStreams.length, externalInputSubmit, setCurrentStep, dirty, setFormData, clearSidebar, availableSteps, currentStep, setEnabledStep, onSubmit, navigate]);
 
   useEffect(() => {
     if (availableSteps.length === 0) {

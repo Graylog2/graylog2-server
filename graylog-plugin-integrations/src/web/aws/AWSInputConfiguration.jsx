@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
-import history from 'util/History';
 import Routes from 'aws/common/Routes.js';
 
 const AWSInputConfiguration = ({ url }) => {
-  history.push(url);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate(url);
+  }, [url, navigate]);
 
   return null;
 };

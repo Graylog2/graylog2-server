@@ -16,26 +16,43 @@
  */
 package org.graylog.integrations.aws;
 
-import org.junit.Assert;
+
 import org.junit.Test;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+
 public class AWSAuthFactoryTest {
 
     @Test
     public void testAutomaticAuth() {
-
-        Assert.assertTrue(AWSAuthFactory.create(null, null, null, null) instanceof DefaultCredentialsProvider);
+        assertThat(AWSAuthFactory.create(false, null, null, null, null))
+                .isExactlyInstanceOf(DefaultCredentialsProvider.class);
     }
 
     @Test
-    public void testKeySecret() {
+    public void testAutomaticAuthIsFailingInCloudWithInvalidAccessKey() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                        AWSAuthFactory.create(true, null, null, "secret", null))
+                .withMessageContaining("Access key");
+    }
 
-        final AwsCredentialsProvider awsCredentialsProvider = AWSAuthFactory.create(null, "key", "secret", null);
-        Assert.assertTrue(awsCredentialsProvider instanceof StaticCredentialsProvider);
-        Assert.assertEquals("key", awsCredentialsProvider.resolveCredentials().accessKeyId());
-        Assert.assertEquals("secret", awsCredentialsProvider.resolveCredentials().secretAccessKey());
+    @Test
+    public void testAutomaticAuthIsFailingInCloudWithInvalidSecretKey() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                        AWSAuthFactory.create(true, null, "key", null, null))
+                .withMessageContaining("Secret key");
+    }
+
+
+    @Test
+    public void testKeySecret() {
+        final AwsCredentialsProvider awsCredentialsProvider = AWSAuthFactory.create(false, null, "key", "secret", null);
+        assertThat(awsCredentialsProvider).isExactlyInstanceOf(StaticCredentialsProvider.class);
+        assertThat("key").isEqualTo(awsCredentialsProvider.resolveCredentials().accessKeyId());
+        assertThat("secret").isEqualTo(awsCredentialsProvider.resolveCredentials().secretAccessKey());
     }
 }

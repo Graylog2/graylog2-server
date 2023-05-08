@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
-import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
 
-function SlackNotificationSummary({ notification, ...restProps }) {
+import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
+import type { SlackNotificationSummaryType } from 'event-notifications/types';
+
+function SlackNotificationSummary({ notification, ...restProps }: SlackNotificationSummaryType) {
   return (
     <CommonNotificationSummary {...restProps} notification={notification}>
       <tr>
@@ -34,8 +35,16 @@ function SlackNotificationSummary({ notification, ...restProps }) {
         <td>{notification.config.channel}</td>
       </tr>
       <tr>
+        <td>Include Title</td>
+        <td>{notification.config.include_title}</td>
+      </tr>
+      <tr>
         <td>Custom Message</td>
         <td>{notification.config.custom_message}</td>
+      </tr>
+      <tr>
+        <td>Time Zone</td>
+        <td>{notification.config.time_zone}</td>
       </tr>
       <tr>
         <td>Message Backlog Limit</td>
@@ -61,35 +70,9 @@ function SlackNotificationSummary({ notification, ...restProps }) {
         <td>Icon Emoji</td>
         <td>{notification.config.icon_emoji}</td>
       </tr>
-      <tr>
-        <td>Graylog URL</td>
-        <td>{notification.config.graylog_url}</td>
-      </tr>
     </CommonNotificationSummary>
   );
 }
-
-SlackNotificationSummary.propTypes = {
-  type: PropTypes.string.isRequired,
-  notification: PropTypes.shape({
-    config: PropTypes.shape({
-      graylog_url: PropTypes.string,
-      icon_emoji: PropTypes.string,
-      icon_url: PropTypes.string,
-      link_names: PropTypes.string,
-      notify_channel: PropTypes.string,
-      backlog_size: PropTypes.number,
-      user_name: PropTypes.string,
-      custom_message: PropTypes.string,
-      channel: PropTypes.string,
-      webhook_url: PropTypes.string,
-      color: PropTypes.string,
-
-    }).isRequired,
-
-  }),
-  definitionNotification: PropTypes.object.isRequired,
-};
 
 SlackNotificationSummary.defaultProps = {
   notification: {},

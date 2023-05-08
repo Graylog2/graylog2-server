@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations.aws.resources;
 
+import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.resources.requests.CreateLogSubscriptionRequest;
 import org.graylog.integrations.aws.resources.requests.CreateRolePermissionRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
@@ -25,14 +26,13 @@ import org.graylog.integrations.aws.resources.responses.KinesisNewStreamResponse
 import org.graylog.integrations.aws.service.CloudWatchService;
 import org.graylog.integrations.aws.service.KinesisService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClientBuilder;
@@ -57,7 +57,9 @@ import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -67,7 +69,6 @@ public class KinesisSetupResourceTest {
 
     private static final String REGION = "us-east-1";
     private static final String KEY = "key";
-    private static final String SECRET = "secret";
     private static final String STREAM_NAME = "stream-name";
     private static final String STREAM_ARN = "stream-arn";
     private static final String ROLE_ARN = "role-arn";
@@ -76,30 +77,16 @@ public class KinesisSetupResourceTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private KinesisSetupResource setupResource;
-
-    private CloudWatchService cloudWatchService;
-    private KinesisService kinesisService;
-
     @Mock
-    private IamClientBuilder iamClientBuilder = Mockito.mock(IamClientBuilder.class);
-
+    private IamClient iamClient;
     @Mock
-    private IamClient iamClient = Mockito.mock(IamClient.class);
-
+    private CloudWatchLogsClient logsClient;
     @Mock
-    private CloudWatchLogsClientBuilder logsClientBuilder = Mockito.mock(CloudWatchLogsClientBuilder.class);
-
-    @Mock
-    private CloudWatchLogsClient logsClient = Mockito.mock(CloudWatchLogsClient.class);
-
-    @Mock
-    private KinesisClientBuilder kinesisClientBuilder = Mockito.mock(KinesisClientBuilder.class);
-
-    @Mock
-    private KinesisClient kinesisClient = Mockito.mock(KinesisClient.class);
-
+    private KinesisClient kinesisClient;
     @Mock
     private User currentUser;
+    @Mock
+    private EncryptedValue encryptedValue;
 
     /**
      * Provide override getCurrentUser for test context since Principal is not established by default.
@@ -121,34 +108,24 @@ public class KinesisSetupResourceTest {
     public void setUp() {
 
         // Set up services.
-        cloudWatchService = new CloudWatchService(logsClientBuilder);
-        kinesisService = new KinesisService(iamClientBuilder, kinesisClientBuilder, null, null);
-        setupResource = new KinesisSetupTestResource(cloudWatchService, kinesisService);
+        AWSClientBuilderUtil awsClientBuilderUtil = mock(AWSClientBuilderUtil.class);
+        setupResource = new KinesisSetupTestResource(
+                new CloudWatchService(mock(CloudWatchLogsClientBuilder.class), awsClientBuilderUtil),
+                new KinesisService(mock(IamClientBuilder.class), mock(KinesisClientBuilder.class), null, null, awsClientBuilderUtil));
 
-        // Set up IAM client.
-        when(iamClientBuilder.region(isA(Region.class))).thenReturn(iamClientBuilder);
-        when(iamClientBuilder.credentialsProvider(isA(AwsCredentialsProvider.class))).thenReturn(iamClientBuilder);
-        when(iamClientBuilder.build()).thenReturn(iamClient);
-
-        // Set up CloudWatch client.
-        when(logsClientBuilder.region(isA(Region.class))).thenReturn(logsClientBuilder);
-        when(logsClientBuilder.credentialsProvider(isA(AwsCredentialsProvider.class))).thenReturn(logsClientBuilder);
-        when(logsClientBuilder.build()).thenReturn(logsClient);
-
-        // Set up Kinesis client.
-        when(kinesisClientBuilder.region(isA(Region.class))).thenReturn(kinesisClientBuilder);
-        when(kinesisClientBuilder.credentialsProvider(isA(AwsCredentialsProvider.class))).thenReturn(kinesisClientBuilder);
-        when(kinesisClientBuilder.build()).thenReturn(kinesisClient);
+        when(awsClientBuilderUtil.buildClient(any(IamClientBuilder.class), any())).thenReturn(iamClient);
+        when(awsClientBuilderUtil.buildClient(any(CloudWatchLogsClientBuilder.class), any())).thenReturn(logsClient);
+        when(awsClientBuilderUtil.buildClient(any(KinesisClientBuilder.class), any())).thenReturn(kinesisClient);
 
         // Stream AWS request mocks
         when(kinesisClient.createStream(isA(CreateStreamRequest.class)))
                 .thenReturn(CreateStreamResponse.builder().build());
         when(kinesisClient.describeStream(isA(DescribeStreamRequest.class)))
                 .thenReturn(DescribeStreamResponse.builder().streamDescription(StreamDescription.builder()
-                                                                                                .streamName(STREAM_NAME)
-                                                                                                .streamStatus(StreamStatus.ACTIVE)
-                                                                                                .streamARN(STREAM_ARN)
-                                                                                                .build()).build());
+                        .streamName(STREAM_NAME)
+                        .streamStatus(StreamStatus.ACTIVE)
+                        .streamARN(STREAM_ARN)
+                        .build()).build());
 
         // Policy AWS request mocks
         when(iamClient.createRole(isA(Consumer.class)))
@@ -169,10 +146,10 @@ public class KinesisSetupResourceTest {
         // Stream
         final KinesisNewStreamRequest request =
                 KinesisNewStreamRequest.builder()
-                                       .region(Region.EU_WEST_1.id())
-                                       .awsAccessKeyId(KEY)
-                                       .awsSecretAccessKey(SECRET)
-                                       .streamName(STREAM_NAME).build();
+                        .region(Region.EU_WEST_1.id())
+                        .awsAccessKeyId(KEY)
+                        .awsSecretAccessKey(encryptedValue)
+                        .streamName(STREAM_NAME).build();
         final KinesisNewStreamResponse streamResponse = setupResource.createNewKinesisStream(request);
         assertEquals(STREAM_NAME, streamResponse.streamName());
         assertEquals(STREAM_ARN, streamResponse.streamArn());
@@ -180,28 +157,28 @@ public class KinesisSetupResourceTest {
         // Policy
         final CreateRolePermissionRequest policyRequest =
                 CreateRolePermissionRequest.builder()
-                                           .region(REGION)
-                                           .awsAccessKeyId(KEY)
-                                           .awsSecretAccessKey(SECRET)
-                                           .streamName(streamResponse.streamName())
-                                           .streamArn(streamResponse.streamArn()).build();
+                        .region(REGION)
+                        .awsAccessKeyId(KEY)
+                        .awsSecretAccessKey(encryptedValue)
+                        .streamName(streamResponse.streamName())
+                        .streamArn(streamResponse.streamArn()).build();
         final CreateRolePermissionResponse policyResponse = setupResource.autoKinesisPermissions(policyRequest);
         assertEquals(ROLE_ARN, policyResponse.roleArn());
 
         // Subscription
         final CreateLogSubscriptionRequest subscriptionRequest =
                 CreateLogSubscriptionRequest.builder()
-                                            .region(REGION)
-                                            .awsAccessKeyId(KEY)
-                                            .awsSecretAccessKey(SECRET)
-                                            .logGroupName("log-group-name")
-                                            .filterName("filter-name")
-                                            .filterPattern("filter-pattern")
-                                            .destinationStreamArn(streamResponse.streamArn())
-                                            .roleArn(policyResponse.roleArn()).build();
+                        .region(REGION)
+                        .awsAccessKeyId(KEY)
+                        .awsSecretAccessKey(encryptedValue)
+                        .logGroupName("log-group-name")
+                        .filterName("filter-name")
+                        .filterPattern("filter-pattern")
+                        .destinationStreamArn(streamResponse.streamArn())
+                        .roleArn(policyResponse.roleArn()).build();
         final CreateLogSubscriptionResponse subscriptionResponse = setupResource.createSubscription(subscriptionRequest);
         subscriptionResponse.result();
         assertEquals("Success. The subscription filter [filter-name] was added for the CloudWatch log group [log-group-name].",
-                     subscriptionResponse.result());
+                subscriptionResponse.result());
     }
 }

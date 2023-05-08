@@ -19,8 +19,6 @@ import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { exampleFormDataWithKeySecretAuth } from 'aws/FormData.fixtures';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
-import history from 'util/History';
 import { FormDataProvider } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import { StepsContext } from 'aws/context/Steps';
@@ -29,9 +27,17 @@ import Routes from 'routing/Routes';
 
 import CloudWatch from './CloudWatch';
 
-const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
+const mockNavigate = jest.fn();
 
-jest.mock('util/History');
+jest.mock('react-router-dom', () => {
+  const original = jest.requireActual('react-router-dom');
+
+  return {
+    __esModule: true,
+    ...original,
+    useNavigate: jest.fn(() => mockNavigate),
+  };
+});
 
 // eslint-disable-next-line react/prop-types
 const TestCommonProviders = ({ children }) => (
@@ -69,9 +75,9 @@ describe('<CloudWatch>', () => {
 
     userEvent.click(submitButton);
 
-    await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1));
 
-    expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.INPUTS);
+    expect(mockNavigate).toHaveBeenCalledWith(Routes.SYSTEM.INPUTS);
   });
 
   it('calls onSubmit when input is submitted externally', async () => {

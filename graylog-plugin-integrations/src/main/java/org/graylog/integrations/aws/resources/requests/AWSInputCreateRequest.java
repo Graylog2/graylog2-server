@@ -35,7 +35,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     private static final String AWS_MESSAGE_TYPE = "aws_input_type";
     private static final String STREAM_NAME = "stream_name";
     private static final String BATCH_SIZE = "batch_size";
-    private static final String GLOBAL = "global";
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String ADD_FLOW_LOG_PREFIX = "add_flow_log_prefix";
 
@@ -50,9 +49,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
     @JsonProperty(BATCH_SIZE)
     public abstract int batchSize();
-
-    @JsonProperty(GLOBAL)
-    public abstract boolean global();
 
     @JsonProperty(THROTTLING_ALLOWED)
     public abstract boolean throttlingAllowed();
@@ -82,9 +78,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
         @JsonProperty(BATCH_SIZE)
         public abstract Builder batchSize(int batchSize);
-
-        @JsonProperty(GLOBAL)
-        public abstract Builder global(boolean global);
 
         @JsonProperty(THROTTLING_ALLOWED)
         public abstract Builder throttlingAllowed(boolean throttlingAllowed);

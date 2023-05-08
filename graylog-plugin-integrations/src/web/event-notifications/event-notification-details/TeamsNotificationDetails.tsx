@@ -41,6 +41,7 @@ const TeamsNotificationDetails: React.FC<TeamsNotificationSummaryType> = ({ noti
                        )} />
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
     <ReadOnlyFormGroup label="Icon URL" value={notification.config.icon_url} />
+    <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
   </>
 );
 
