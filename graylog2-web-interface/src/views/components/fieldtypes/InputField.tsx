@@ -1,21 +1,14 @@
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useContext } from 'react';
 
-import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
-import type { ExtractStoreState } from 'stores/connect';
-import { useStore } from 'stores/connect';
+import InputsContext from 'contexts/InputsContext';
 
 type Props = {
   value: string,
 }
 
-const mapInputs = (inputStore: ExtractStoreState<typeof InputsStore>) => {
-  return Object.fromEntries(inputStore?.inputs?.map((input) => [input.id, input]) ?? []);
-};
-
 const InputField = ({ value }: Props) => {
-  useEffect(() => { InputsActions.list(); }, []);
-  const inputsMap = useStore(InputsStore, mapInputs);
+  const inputsMap = useContext(InputsContext);
 
   const inputTitle = inputsMap[value]?.title ?? value;
 
