@@ -275,6 +275,11 @@ public class ClientES7 implements Client {
     }
 
     @Override
+    public void resetClusterBlock() {
+        // noop for ES7, needed for OS 2.x
+    }
+
+    @Override
     public void setIndexBlock(String index) {
         final UpdateSettingsRequest request = new UpdateSettingsRequest(index)
                 .settings(Collections.singletonMap(

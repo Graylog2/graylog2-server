@@ -66,6 +66,8 @@ public interface Client {
 
     void resetIndexBlock(String index);
 
+    void resetClusterBlock();
+
     void setIndexBlock(String index);
 
     void updateMapping(String index, Map<String, Object> mapping);

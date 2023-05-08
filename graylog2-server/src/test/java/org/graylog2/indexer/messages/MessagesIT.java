@@ -78,6 +78,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @After
     public void tearDown() {
+        client().resetClusterBlock();
         client().cleanUp();
     }
 
