@@ -14,31 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.security.certutil.ca.exceptions;
 
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.testcontainers.containers.Network;
+public class CACreationException extends Exception {
 
-import java.util.Optional;
-
-public interface GraylogBackend {
-    String uri();
-
-    int apiPort();
-
-    SearchServerInstance searchServerInstance();
-
-    int mappedPortFor(int originalPort);
-
-    void importMongoDBFixture(String resourcePath, Class<?> testClass);
-
-    void importElasticsearchFixture(String resourcePath, Class<?> testClass);
-
-    Network network();
-
-    String getLogs();
-
-    Optional<MailServerInstance> getEmailServerInstance();
-
-    String getSearchLogs();
+    public CACreationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

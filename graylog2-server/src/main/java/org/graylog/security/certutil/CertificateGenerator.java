@@ -35,7 +35,7 @@ import java.time.Instant;
 import java.util.Date;
 
 public class CertificateGenerator {
-    protected static KeyPair generate(CertRequest request) throws Exception {
+    public static KeyPair generate(CertRequest request) throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         X500Name name = new X500Name("CN=" + request.cnName());

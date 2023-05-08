@@ -182,6 +182,7 @@ const ApiRoutes = {
     get: (indexSetId: string) => { return { url: `/system/indices/index_sets/${indexSetId}` }; },
     create: () => { return { url: '/system/indices/index_sets' }; },
     delete: (indexSetId: string, deleteIndices) => { return { url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }; },
+    searchPaginated: (searchTerm, skip, limit, stats) => { return { url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}` }; },
     setDefault: (indexSetId: string) => { return { url: `/system/indices/index_sets/${indexSetId}/default` }; },
     stats: () => { return { url: '/system/indices/index_sets/stats' }; },
   },
