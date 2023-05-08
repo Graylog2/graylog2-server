@@ -276,6 +276,9 @@ public class ClientOS2 implements Client {
 
         client.execute((c, requestOptions) -> c.indices().putSettings(request, requestOptions),
                 "Unable to reset index block for " + index);
+
+        // reset create_index block for OpenSearch 2.x see https://github.com/opensearch-project/OpenSearch/pull/5852
+        putSetting("cluster.blocks.create_index", null);
     }
 
     @Override

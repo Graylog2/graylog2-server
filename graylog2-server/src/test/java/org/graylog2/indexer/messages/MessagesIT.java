@@ -69,9 +69,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        // reset create_index block for OpenSearch 2.x see https://github.com/opensearch-project/OpenSearch/pull/5852
-        client().putSetting("cluster.blocks.create_index", null);
-
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
