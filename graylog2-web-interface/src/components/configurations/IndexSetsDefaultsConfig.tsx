@@ -108,9 +108,10 @@ const IndexSetsDefaultsConfig = () => {
     delete defaultIndexValues?.rotation_strategy;
     delete defaultIndexValues?.retention_strategy;
 
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_index_defaults',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'index-default',
+      app_action_value: 'configuration-save',
     });
 
     handleSaveConfig(defaultIndexValues)

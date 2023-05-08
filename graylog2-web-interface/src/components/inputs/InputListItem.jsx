@@ -27,7 +27,14 @@ import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/com
 import { ConfigurationWell } from 'components/configurationforms';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
+import {
+  InputForm,
+  InputStateBadge,
+  InputStateControl,
+  InputStaticFields,
+  InputThroughput,
+  StaticFieldForm,
+} from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
@@ -48,8 +55,8 @@ const InputListItem = createReactClass({
 
   _deleteInput() {
     this.props.sendTelemetry('click', {
-      appSection: 'inputs',
-      eventElement: 'delete-input',
+      app_pathname: 'inputs',
+      app_action_value: 'input-delete',
     });
 
     // eslint-disable-next-line no-alert
@@ -69,9 +76,9 @@ const InputListItem = createReactClass({
   _updateInput(data) {
     InputsActions.update(this.props.input.id, data);
 
-    this.props.sendTelemetry('submit_form', {
-      appSection: 'inputs',
-      eventElement: 'edit-input',
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'inputs',
+      app_action_value: 'input-edit',
     });
   },
 
@@ -101,8 +108,8 @@ const InputListItem = createReactClass({
                        to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
           <Button onClick={() => {
             sendTelemetry('click', {
-              appSection: 'inputs',
-              eventElement: 'show-received-messages',
+              app_pathname: 'inputs',
+              app_action_value: 'show-received-messages',
             });
           }}>
             Show received messages
@@ -125,8 +132,8 @@ const InputListItem = createReactClass({
           <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
             <Button onClick={() => {
               sendTelemetry('click', {
-                appSection: 'inputs',
-                eventElement: 'manage-extractors',
+                app_pathname: 'inputs',
+                app_action_value: 'manage-extractors',
               });
             }}>
               Manage extractors
@@ -146,8 +153,8 @@ const InputListItem = createReactClass({
           <MenuItem key={`show-metrics-${this.props.input.id}`}
                     onClick={() => {
                       sendTelemetry('click', {
-                        appSection: 'inputs',
-                        eventElement: 'show-metrics',
+                        app_pathname: 'inputs',
+                        app_action_value: 'show-metrics',
                       });
                     }}>
             Show metrics
@@ -172,7 +179,9 @@ const InputListItem = createReactClass({
         {showMetricsMenuItem}
 
         <IfPermitted permissions={`inputs:edit:${this.props.input.id}`}>
-          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static field</MenuItem>
+          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static
+            field
+          </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions="inputs:terminate">
@@ -196,7 +205,9 @@ const InputListItem = createReactClass({
 
     const inputForm = definition
       ? (
-        <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+        <InputForm ref={(configurationForm) => {
+          this.configurationForm = configurationForm;
+        }}
                    key={`edit-form-input-${input.id}`}
                    globalValue={input.global}
                    nodeValue={input.node}
@@ -217,7 +228,10 @@ const InputListItem = createReactClass({
                              id={input.id}
                              configuration={input.attributes}
                              typeDefinition={definition || {}} />
-          <StaticFieldForm ref={(staticFieldForm) => { this.staticFieldForm = staticFieldForm; }} input={this.props.input} />
+          <StaticFieldForm ref={(staticFieldForm) => {
+            this.staticFieldForm = staticFieldForm;
+          }}
+                           input={this.props.input} />
           <InputStaticFields input={this.props.input} />
         </Col>
         <Col md={4}>
