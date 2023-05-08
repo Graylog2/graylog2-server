@@ -105,6 +105,7 @@ const Routes = {
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
     PROCESSBUFFERDUMP: (nodeId: string) => `/system/processbufferdump/${nodeId}`,
+    SYSTEMLOGS: (nodeId: string) => `/system/logs/recent/${nodeId}`,
     AUTHENTICATION: {
       BACKENDS: {
         OVERVIEW: '/system/authentication/services',
