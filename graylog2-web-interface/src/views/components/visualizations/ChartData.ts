@@ -22,6 +22,7 @@ import set from 'lodash/set';
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import transformKeys from './TransformKeys';
 
@@ -121,7 +122,7 @@ export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => (result
   return [name, newKeys, newValues, z];
 });
 
-const doNotSuffixTraceForSingleSeries = (keys) => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
+const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
 
 export type ChartDataConfig = {
   widgetConfig: AggregationWidgetConfig,
@@ -130,6 +131,7 @@ export type ChartDataConfig = {
   seriesFormatter?: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries,
   leafValueMatcher?: (value: Value) => boolean,
   formatTime: (time: DateTime, format?: DateTimeFormats) => string,
+  mapKeys: (key: Key, pivot: Pivot) => Key,
 };
 
 export const chartData = (
@@ -141,12 +143,13 @@ export const chartData = (
     seriesFormatter: customSeriesFormatter = formatSeries,
     leafValueMatcher,
     formatTime,
+    mapKeys,
   }: ChartDataConfig,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
 
   return flow([
-    transformKeys(rowPivots, columnPivots, formatTime),
+    transformKeys(rowPivots, columnPivots, formatTime, mapKeys),
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
     customSeriesFormatter,
     removeNulls(),
