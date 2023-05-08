@@ -54,6 +54,9 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        // reset possible block from other tests
+        client().resetClusterBlock();
+
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);

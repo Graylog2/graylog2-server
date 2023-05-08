@@ -61,6 +61,9 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        // reset possible block from other tests
+        client().resetClusterBlock();
+
         client().createIndex(INDEX_NAME, 1, 0);
         client().addAliasMapping(INDEX_NAME, ALIAS_NAME);
         client().waitForGreenStatus(INDEX_NAME, ALIAS_NAME);
