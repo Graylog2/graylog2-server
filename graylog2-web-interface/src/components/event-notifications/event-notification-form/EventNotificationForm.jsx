@@ -74,15 +74,13 @@ class EventNotificationForm extends React.Component {
   };
 
   handleSubmit = (event) => {
-    const { sendTelemetry } = this.props;
+    const { notification, onSubmit, sendTelemetry } = this.props;
 
     sendTelemetry('form_submit', {
       app_pathname: 'events',
       app_section: 'event-notification',
       app_action_value: 'save',
     });
-
-    const { notification, onSubmit } = this.props;
 
     event.preventDefault();
 
@@ -119,15 +117,13 @@ class EventNotificationForm extends React.Component {
   };
 
   handleTestTrigger = () => {
-    const { sendTelemetry } = this.props;
+    const { notification, onTest, sendTelemetry } = this.props;
 
     sendTelemetry('input_value_change', {
       app_pathname: 'events',
       app_section: 'event-notification',
       app_action_value: 'notification-test',
     });
-
-    const { notification, onTest } = this.props;
 
     onTest(notification);
   };
