@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+
 import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
 import { CONFIGURATION_STEPS } from 'preflight/Constants';
 import useConfigurationStep from 'preflight/hooks/useConfigurationStep';
-
 import { asMock } from 'helpers/mocking';
 
 jest.mock('preflight/hooks/useConfigurationStep');
@@ -27,21 +27,21 @@ jest.mock('preflight/hooks/useConfigurationStep');
 describe('ConfigurationWizard', () => {
   it('should show CA configuration step', async () => {
     asMock(useConfigurationStep).mockReturnValue({ step: CONFIGURATION_STEPS.CA_CONFIGURATION.key, isLoading: false });
-    render(<ConfigurationWizard />);
+    render(<ConfigurationWizard onResumeStartup={() => {}} />);
 
     await screen.findByText(/In this first step you can either upload or create a new certificate authority./);
   });
 
   it('should show CA provisioning step', async () => {
     asMock(useConfigurationStep).mockReturnValue({ step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key, isLoading: false });
-    render(<ConfigurationWizard />);
+    render(<ConfigurationWizard onResumeStartup={() => {}} />);
 
     await screen.findByText(/Certificate authority has been configured successfully./);
   });
 
   it('should show success step', async () => {
     asMock(useConfigurationStep).mockReturnValue({ step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key, isLoading: false });
-    render(<ConfigurationWizard />);
+    render(<ConfigurationWizard onResumeStartup={() => {}} />);
 
     await screen.findByText(/All data nodes are secured and reachable./);
   });

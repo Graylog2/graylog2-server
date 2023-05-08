@@ -19,12 +19,18 @@ import { Title, Space } from '@mantine/core';
 
 import { Button } from 'preflight/components/common';
 
-const ConfigurationFinished = () => (
+type Props = {
+  onResumeStartup: () => void,
+}
+
+const ConfigurationFinished = ({ onResumeStartup }: Props) => (
   <div>
     <Title order={3}>All data nodes are secured and reachable.</Title>
     <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
     <Space h="md" />
-    <Button>Resume startup</Button>
+    <Button onClick={onResumeStartup} size="xs">
+      Resume startup
+    </Button>
   </div>
 );
 

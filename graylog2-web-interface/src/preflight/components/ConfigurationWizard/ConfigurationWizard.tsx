@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { Grid } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
+
 import useConfigurationStep from 'preflight/hooks/useConfigurationStep';
 import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Constants';
-
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
@@ -59,7 +59,11 @@ const stepIcon = (stepKey, activeStepKey, theme): { name: IconName, color: strin
   };
 };
 
-const ConfigurationWizard = () => {
+type Props = {
+  onResumeStartup: () => void,
+}
+
+const ConfigurationWizard = ({ onResumeStartup }: Props) => {
   const { step: activeStepKey, isLoading: isLoadingConfigurationStep } = useConfigurationStep();
   const theme = useTheme();
 
@@ -72,7 +76,7 @@ const ConfigurationWizard = () => {
       <Grid.Col span={6}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning />}
-        {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && <ConfigurationFinished />}
+        {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && <ConfigurationFinished onResumeStartup={onResumeStartup} />}
       </Grid.Col>
       <Grid.Col span={6}>
         <List spacing="md"

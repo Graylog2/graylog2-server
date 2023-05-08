@@ -16,7 +16,6 @@
  */
 
 import { CONFIGURATION_STEPS } from 'preflight/Constants';
-
 import type { DataNodes, ConfigurationStep, DataNodesCAStatus } from 'preflight/types';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 

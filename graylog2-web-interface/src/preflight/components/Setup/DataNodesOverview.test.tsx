@@ -82,7 +82,7 @@ describe('DataNodesOverview', () => {
   });
 
   it('should list available data nodes', async () => {
-    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
+    renderPreflight(<DataNodesOverview />);
 
     await screen.findByText('node-id-3');
     await screen.findByText('http://localhost:9200');
@@ -90,7 +90,7 @@ describe('DataNodesOverview', () => {
 
   it('should resume startup', async () => {
     const onResumeStartup = jest.fn();
-    renderPreflight(<DataNodesOverview onResumeStartup={onResumeStartup} />);
+    renderPreflight(<DataNodesOverview />);
 
     await screen.findByText('node-id-3');
 
@@ -111,7 +111,7 @@ describe('DataNodesOverview', () => {
       error: new FetchError('The request error message', 500, { status: 500, body: { message: 'The request error message' } }),
     });
 
-    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
+    renderPreflight(<DataNodesOverview />);
     await screen.findByText(/There was an error fetching the data nodes:/);
     await screen.findByText(/There was an error fetching a resource: The request error message. Additional information: Not available/);
   });
