@@ -181,7 +181,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
-        client().resetClusterBlock();
 
         final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
@@ -277,6 +276,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().putSetting("cluster.routing.allocation.disk.watermark.low", "85%");
 
         client().resetIndexBlock(index);
+        client().resetClusterBlock();
     }
 
     private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {

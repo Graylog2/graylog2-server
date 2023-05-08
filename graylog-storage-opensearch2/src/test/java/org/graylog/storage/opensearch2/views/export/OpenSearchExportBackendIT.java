@@ -61,9 +61,6 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() {
-        // reset possible block from other tests
-        client().resetClusterBlock();
-
         indexLookup = mock(IndexLookup.class);
 
         sut = new OpenSearchExportBackend(indexLookup, requestStrategy(), false);
