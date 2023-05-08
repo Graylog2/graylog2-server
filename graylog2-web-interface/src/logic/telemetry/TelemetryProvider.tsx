@@ -36,6 +36,7 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
       'node_leader.app_version': node_leader_app_version,
     },
     license,
+    current_user,
   } = telemetryData;
 
   return {
@@ -47,6 +48,7 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
     license_count,
     node_leader_app_version,
     ...license,
+    ...current_user,
   };
 };
 
