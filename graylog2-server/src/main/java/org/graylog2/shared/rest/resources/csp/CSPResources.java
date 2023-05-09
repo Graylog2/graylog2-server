@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.slf4j.Logger;
@@ -25,9 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,17 +71,19 @@ public class CSPResources {
     public String cspString(String group) {
         return cspTable.row(group).keySet().stream()
                 .sorted()
-                .map(key -> key + " " + String.join(" ", cspTable.get(group, key)))
+                .map(key -> key + " "
+                        + cspTable.get(group, key).stream().sorted().collect(Collectors.joining(" ")))
                 .collect(Collectors.joining(";"));
     }
 
     /**
-     * Update all existing groups (rows) in the table with the specified value.
+     * Update all existing groups (rows) in the table with the specified value. Duplicated values
+     * are ignored.
      *
      * @param directive
      * @param value     a directive value, consisting of one or more entries separated by blanks
      */
-    public void updateGroups(String directive, String value) {
+    public void updateAll(String directive, String value) {
         Set<String> valueSet = new HashSet<>(Arrays.asList(value.split(" ")));
 
         cspTable.rowKeySet().forEach(group -> {
@@ -95,69 +94,6 @@ public class CSPResources {
                     }
                 }
         );
-    }
-
-    /**
-     * Merge all directives for the specified group into an existing csp-list.
-     * We do not attempt to remove any duplicate values
-     *
-     * @param csp   Existing csp-list
-     * @param group Group name of resource values to be merged
-     * @return merged csp-list
-     */
-    public String mergeWithResources(String csp, String group) {
-        String result = "";
-        String[] policyDirectives = csp.split(";");
-        for (String s : policyDirectives) {
-            String policyDirective = s.stripLeading();
-            int firstWhiteSpace = policyDirective.indexOf(" ");
-            String directive = policyDirective.substring(0, firstWhiteSpace);
-            String resource = cspTable.get(group, directive);
-            if (!Strings.isNullOrEmpty(resource)) {
-                result += policyDirective + " " + resource + ";";
-            } else {
-                result += policyDirective + ";";
-            }
-        }
-
-        for (String policyDirective : cspTable.row(group).keySet()) {
-            if (!result.contains(policyDirective)) {
-                result += policyDirective + " " + cspTable.get(group, policyDirective) + ";";
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Merge 2 CSP policy directives: if a directive is present in both CSPs we concatenate the
-     * values.
-     *
-     * @param csp1
-     * @param csp2
-     * @return Merged CSP
-     */
-    public String mergeCSPs(String csp1, String csp2) {
-        Map<String, String> cspMap1 = cspToMap(csp1);
-        Map<String, String> cspMap2 = cspToMap(csp2);
-        for (Map.Entry<String, String> entry : cspMap2.entrySet()) {
-            cspMap1.merge(entry.getKey(), entry.getValue(), (v1, v2) -> v1 + " " + v2);
-        }
-        return cspMap1.entrySet().stream()
-                .map(entry -> entry.getKey() + " " + entry.getValue())
-                .collect(Collectors.joining(";"));
-    }
-
-    private Map<String, String> cspToMap(String csp) {
-        Map<String, String> cspMap = new HashMap<>();
-        Arrays.stream(csp.split(";"))
-                .forEach(s -> {
-                    String policyDirective = s.stripLeading();
-                    int firstWhiteSpace = policyDirective.indexOf(" ");
-                    String directive = policyDirective.substring(0, firstWhiteSpace);
-                    cspMap.put(directive, policyDirective.substring(firstWhiteSpace + 1));
-                });
-        return cspMap;
     }
 
     /**
@@ -184,17 +120,4 @@ public class CSPResources {
         }
         return resources;
     }
-
-    private void append(String directive, String value) {
-        cspTable.rowKeySet().forEach(r -> {
-            String existingValue = cspTable.get(r, directive);
-            if (existingValue != null) {
-                if (existingValue.contains(value))
-                    cspTable.put(r, directive, existingValue + " " + value);
-            } else {
-                cspTable.put(r, directive, value);
-            }
-        });
-    }
-
 }

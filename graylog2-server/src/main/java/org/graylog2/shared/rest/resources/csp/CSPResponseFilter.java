@@ -23,10 +23,12 @@ import javax.ws.rs.core.MultivaluedMap;
 
 public class CSPResponseFilter implements ContainerResponseFilter {
     public final static String CSP_HEADER = "Content-Security-Policy";
-    private String value;
+    private String group;
+    private final CSPService cspService;
 
-    public CSPResponseFilter(String value) {
-        this.value = value;
+    public CSPResponseFilter(String group, CSPService cspService) {
+        this.group = group;
+        this.cspService = cspService;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class CSPResponseFilter implements ContainerResponseFilter {
                        ContainerResponseContext responseContext) {
         final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
         if (!headers.containsKey(CSP_HEADER)) {
-            headers.add(CSP_HEADER, value);
+            headers.add(CSP_HEADER, cspService.cspString(group));
         }
     }
 }

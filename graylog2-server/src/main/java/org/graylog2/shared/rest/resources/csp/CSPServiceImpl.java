@@ -30,7 +30,6 @@ public class CSPServiceImpl implements CSPService {
     private final String telemetryApiHost;
     private final DBAuthServiceBackendService dbService;
     private final CSPResources cspResources;
-    private volatile String connectSrcValue;
 
     @Inject
     protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, DBAuthServiceBackendService dbService) {
@@ -47,23 +46,13 @@ public class CSPServiceImpl implements CSPService {
                 .filter(optList -> optList.isPresent())
                 .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));
-        connectSrcValue = "connect-src 'self' " + telemetryApiHost + " " + hostList;
+        String connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
+        cspResources.updateAll("connect-src", connectSrcValue);
         LOG.debug("Updated CSP: {}", connectSrcValue);
     }
 
     @Override
     public String cspString(String group) {
         return cspResources.cspString(group);
-    }
-
-    @Override
-    public String merge(String csp, String group) {
-        String cspWithResources = cspResources.mergeWithResources(csp, group);
-        return merge(cspWithResources, connectSrcValue);
-    }
-
-    @Override
-    public String connectSrcValue() {
-        return connectSrcValue;
     }
 }

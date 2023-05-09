@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,24 +24,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CSPResourcesTest {
     static CSPResources cspResources;
 
-    @BeforeAll
-    static void setup() {
+    @BeforeEach
+    void setup() {
         cspResources = new CSPResources("/org/graylog2/security/cspTest.config");
     }
 
     @Test
     void loadPropertiesTest() {
-        String defaultDirective = "connect-src url1.com:9999 url2.com;default-src 'self';img-src https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'";
-        String swaggerDirective = "connect-src url4.com;img-src https://url5.com:9999;script-src 'self' 'unsafe-eval' 'unsafe-inline';style-src 'self' 'unsafe-inline'";
-        assertThat(cspResources.cspString("default")).isEqualTo(defaultDirective);
-        assertThat(cspResources.cspString("swagger")).isEqualTo(swaggerDirective);
+        assertThat(cspResources.cspString("default")).isEqualTo(
+                "connect-src url1.com:9999 url2.com;default-src 'self';img-src https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'");
+        assertThat(cspResources.cspString("swagger")).isEqualTo(
+                "connect-src url4.com;img-src https://url5.com:9999;script-src 'self' 'unsafe-eval' 'unsafe-inline';style-src 'self' 'unsafe-inline'");
     }
 
     @Test
-    void mergeTest() {
-        String csp1 = "default-src v1 v2;img-src v3 v4";
-        String expected = "default-src v1 v2 'self';img-src v3 v4 https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline';connect-src url1.com:9999 url2.com;";
-
-        assertThat(cspResources.mergeWithResources(csp1, "default")).isEqualTo(expected);
+    void updateTest() {
+        cspResources.updateAll("default-src", "xxx xxx yyy yyy");
+        assertThat(cspResources.cspString("default")).isEqualTo(
+                "connect-src url1.com:9999 url2.com;default-src 'self' xxx yyy;img-src https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'");
+        assertThat(cspResources.cspString("swagger")).isEqualTo(
+                "connect-src url4.com;default-src xxx yyy;img-src https://url5.com:9999;script-src 'self' 'unsafe-eval' 'unsafe-inline';style-src 'self' 'unsafe-inline'");
     }
 }

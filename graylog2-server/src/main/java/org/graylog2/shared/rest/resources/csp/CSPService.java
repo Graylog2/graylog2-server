@@ -20,8 +20,4 @@ public interface CSPService {
     void updateConnectSrc();
 
     String cspString(String group);
-
-    String merge(String csp, String group);
-
-    String connectSrcValue();
 }

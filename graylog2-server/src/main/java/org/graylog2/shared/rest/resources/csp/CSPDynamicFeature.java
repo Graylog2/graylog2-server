@@ -29,16 +29,14 @@ import java.lang.reflect.Method;
 public class CSPDynamicFeature implements DynamicFeature {
     private static final Logger LOG = LoggerFactory.getLogger(CSPDynamicFeature.class);
     private final CSPService cspService;
-    private final String cspDefaultValue;
 
     @Inject
     public CSPDynamicFeature(@Context CSPService cspService) {
         this.cspService = cspService;
-        this.cspDefaultValue = cspService.cspString(CSP.DEFAULT);
     }
 
     public String cspDefault() {
-        return cspDefaultValue;
+        return cspService.cspString(CSP.DEFAULT);
     }
 
     @Override
@@ -48,13 +46,11 @@ public class CSPDynamicFeature implements DynamicFeature {
         String cspValue = null;
         if (resourceClass != null && resourceClass.isAnnotationPresent(CSP.class)) {
             cspValue = cspService.cspString(resourceClass.getAnnotation(CSP.class).group());
-            LOG.info("CSP class annotation for {}: {}", resourceClass.getSimpleName(), cspValue);
         } else if (resourceMethod != null && resourceMethod.isAnnotationPresent(CSP.class)) {
             cspValue = cspService.cspString(resourceMethod.getAnnotation(CSP.class).group());
-            LOG.info("CSP method annotation for {}: {}", resourceMethod.getName(), cspValue);
         }
         if (cspValue != null) {
-            CSPResponseFilter filter = new CSPResponseFilter(cspValue);
+            CSPResponseFilter filter = new CSPResponseFilter(cspValue, cspService);
             context.register(filter);
         }
     }
