@@ -154,7 +154,7 @@ public class FixtureImporterOS2 implements FixtureImporter {
     }
 
     private void createIndex(String indexName) {
-        resetClusterBlock();
+//        resetClusterBlock();
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
                 .waitForActiveShards(ActiveShardCount.ONE);
         client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
