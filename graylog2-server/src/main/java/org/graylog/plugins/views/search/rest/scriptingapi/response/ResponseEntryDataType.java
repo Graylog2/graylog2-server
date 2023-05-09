@@ -32,6 +32,9 @@ public enum ResponseEntryDataType {
     BINARY(FieldTypeMapper.BINARY_TYPE),
     IP(FieldTypeMapper.IP_TYPE),
     GEO(FieldTypeMapper.GEO_POINT_TYPE),
+    STREAM(FieldTypeMapper.STREAMS_TYPE),
+    INPUT(FieldTypeMapper.INPUT_TYPE),
+    NODE(FieldTypeMapper.STREAMS_TYPE),
     UNKNOWN();
 
     private final Set<FieldTypes.Type> correspondingFieldTypes;
