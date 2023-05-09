@@ -31,7 +31,7 @@ const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'
     formatTime,
     mapKeys,
     ...config,
-  }), [config, formatTime, rows]);
+  }), [config, formatTime, mapKeys, rows]);
 };
 
 export default useChartData;

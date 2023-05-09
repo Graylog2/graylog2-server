@@ -44,7 +44,7 @@ const findIndices = <T> (ary: Array<T>, predicate: (value: T) => boolean): Array
   .filter(({ value }) => predicate(value))
   .map(({ idx }) => idx);
 
-export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, formatTime: TimeFormatter, keyMapper: KeyMapper = (key) => key): (rows: Rows) => Rows => (result = []) => {
+export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, formatTime: TimeFormatter): (rows: Rows) => Rows => (result = []) => {
   const rowIndices = findIndices(rowPivots, (pivot) => (pivot.type === 'time'));
   const columnIndices = findIndices(columnPivots, (pivot) => (pivot.type === 'time'));
 

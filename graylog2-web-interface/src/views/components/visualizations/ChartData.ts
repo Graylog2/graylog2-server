@@ -22,9 +22,11 @@ import set from 'lodash/set';
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
-import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 
+import type { KeyMapper } from './TransformKeys';
 import transformKeys from './TransformKeys';
+
+const keySeparator = '\u2E31';
 
 export type ChartDefinition = {
   type: string,
@@ -57,7 +59,7 @@ export type KeyJoiner = (keys: Array<any>) => string;
 
 export type Generator = (type: string, name: string, labels: Array<string>, values: Array<any>, data: Array<Array<any>>, idx: number, total: number, config: AggregationWidgetConfig) => ChartDefinition;
 
-const _defaultKeyJoiner = (keys) => keys.join('-');
+const _defaultKeyJoiner = (keys) => keys.join(keySeparator);
 
 const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({
   type,
@@ -102,14 +104,17 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   return { valuesBySeries, xLabels };
 };
 
-export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config: AggregationWidgetConfig = undefined): ((ExtractedSeries) => Array<ChartDefinition>) => (results: ExtractedSeries) => {
-  const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
-    chartType,
-    value,
-    x.map((key) => key.join('-')),
-    values,
-    z,
-  ]);
+export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config: AggregationWidgetConfig = undefined, mapKeys: KeyMapper = (key) => key): ((ExtractedSeries) => Array<ChartDefinition>) => {
+  const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
+
+  return (results: ExtractedSeries) => {
+    const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
+      chartType,
+      value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join('-'),
+      x.map((key) => key.join(keySeparator)),
+      values,
+      z,
+    ]);
 
   return allCharts.map((args, idx) => generator(...args, idx, allCharts.length, config));
 };
@@ -122,7 +127,7 @@ export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => (result
   return [name, newKeys, newValues, z];
 });
 
-const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
+const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) => (keys.length > 1 ? keys.slice(0, -1).join(keySeparator) : keys[0]);
 
 export type ChartDataConfig = {
   widgetConfig: AggregationWidgetConfig,
@@ -131,7 +136,7 @@ export type ChartDataConfig = {
   seriesFormatter?: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries,
   leafValueMatcher?: (value: Value) => boolean,
   formatTime: (time: DateTime, format?: DateTimeFormats) => string,
-  mapKeys: (key: Key, pivot: Pivot) => Key,
+  mapKeys: (key: Key, field: string) => Key,
 };
 
 export const chartData = (
@@ -149,10 +154,10 @@ export const chartData = (
   const { rowPivots, columnPivots, series } = config;
 
   return flow([
-    transformKeys(rowPivots, columnPivots, formatTime, mapKeys),
+    transformKeys(rowPivots, columnPivots, formatTime),
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
     customSeriesFormatter,
     removeNulls(),
-    generateChart(chartType, generator, config),
+    generateChart(chartType, generator, config, mapKeys),
   ])(data);
 };
