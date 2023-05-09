@@ -29,9 +29,7 @@ type Props = {
 
 const CachePicker = ({ caches }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
-  const sortedCaches = caches.map((cache) => {
-    return { value: cache.id, label: `${cache.title} (${cache.name})` };
-  }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+  const sortedCaches = caches.map((cache) => ({ value: cache.id, label: `${cache.title} (${cache.name})` })).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
   const errorMessage = touched ? error : '';
 

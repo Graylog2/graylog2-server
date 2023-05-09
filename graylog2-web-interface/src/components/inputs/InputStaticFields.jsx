@@ -26,21 +26,17 @@ class InputStaticFields extends React.Component {
     input: PropTypes.object.isRequired,
   };
 
-  _deleteStaticField = (fieldName) => {
-    return () => {
-      if (window.confirm(`Are you sure you want to remove static field '${fieldName}' from '${this.props.input.title}'?`)) {
-        InputStaticFieldsStore.destroy(this.props.input, fieldName);
-      }
-    };
+  _deleteStaticField = (fieldName) => () => {
+    if (window.confirm(`Are you sure you want to remove static field '${fieldName}' from '${this.props.input.title}'?`)) {
+      InputStaticFieldsStore.destroy(this.props.input, fieldName);
+    }
   };
 
-  _deleteButton = (fieldName) => {
-    return (
-      <Button bsStyle="link" bsSize="xsmall" style={{ verticalAlign: 'baseline' }} onClick={this._deleteStaticField(fieldName)}>
-        <Icon name="remove" />
-      </Button>
-    );
-  };
+  _deleteButton = (fieldName) => (
+    <Button bsStyle="link" bsSize="xsmall" style={{ verticalAlign: 'baseline' }} onClick={this._deleteStaticField(fieldName)}>
+      <Icon name="remove" />
+    </Button>
+  );
 
   _formatStaticFields = (staticFields) => {
     const formattedFields = [];

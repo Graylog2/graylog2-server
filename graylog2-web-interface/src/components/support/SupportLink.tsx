@@ -39,27 +39,25 @@ const IconStack = styled.div<{ small: boolean }>(({ small, theme }) => css`
   }
 `);
 
-const SupportLink = ({ small, children }: Props) => {
-  return (
-    <table className="description-tooltips" style={{ marginBottom: '10px', display: 'inline' }}>
-      <tbody>
-        <tr>
-          <td style={{ width: '40px' }}>
-            <IconStack className={`fa-stack ${small ? '' : 'fa-lg'}`} small={small}>
-              <Icon name="circle" className="fa-stack-2x" />
-              <Icon name="lightbulb" className="fa-stack-1x" inverse />
-            </IconStack>
-          </td>
-          <td>
-            <strong>
-              {children}
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  );
-};
+const SupportLink = ({ small, children }: Props) => (
+  <table className="description-tooltips" style={{ marginBottom: '10px', display: 'inline' }}>
+    <tbody>
+      <tr>
+        <td style={{ width: '40px' }}>
+          <IconStack className={`fa-stack ${small ? '' : 'fa-lg'}`} small={small}>
+            <Icon name="circle" className="fa-stack-2x" />
+            <Icon name="lightbulb" className="fa-stack-1x" inverse />
+          </IconStack>
+        </td>
+        <td>
+          <strong>
+            {children}
+          </strong>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+);
 
 SupportLink.propTypes = {
   small: PropTypes.bool,

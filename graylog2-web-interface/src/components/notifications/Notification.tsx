@@ -54,9 +54,7 @@ const NotificationTimestamp = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
-const _sanitizeDescription = (description) => {
-  return DOMPurify.sanitize(description);
-};
+const _sanitizeDescription = (description) => DOMPurify.sanitize(description);
 
 const Notification = ({ notification }: Props) => {
   const message = useNotificationMessage(notification);

@@ -19,35 +19,29 @@ import { mount } from 'wrappedEnzyme';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 
-const getComparisonExpression = (operator, value = 0) => {
-  return {
-    expr: operator,
-    left: {
-      expr: 'number-ref',
-      ref: '1234',
-    },
-    right: {
-      expr: 'number',
-      value: value,
-    },
-  };
-};
+const getComparisonExpression = (operator, value = 0) => ({
+  expr: operator,
+  left: {
+    expr: 'number-ref',
+    ref: '1234',
+  },
+  right: {
+    expr: 'number',
+    value: value,
+  },
+});
 
-const getBooleanExpression = (operator, left = getComparisonExpression(), right = getComparisonExpression()) => {
-  return {
-    expr: operator,
-    left: left,
-    right: right,
-  };
-};
+const getBooleanExpression = (operator, left = getComparisonExpression(), right = getComparisonExpression()) => ({
+  expr: operator,
+  left: left,
+  right: right,
+});
 
-const getGroupExpression = (operator, child = getComparisonExpression()) => {
-  return {
-    expr: 'group',
-    operator: operator,
-    child: child,
-  };
-};
+const getGroupExpression = (operator, child = getComparisonExpression()) => ({
+  expr: 'group',
+  operator: operator,
+  child: child,
+});
 
 describe('AggregationConditionExpression', () => {
   const defaultEventDefinition = {

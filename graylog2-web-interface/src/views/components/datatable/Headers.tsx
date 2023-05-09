@@ -57,8 +57,7 @@ const CenteredTh = styled(StyledTh)`
   text-align: center;
 `;
 
-const PinIcon = styled.button(({ theme }) => {
-  return css`
+const PinIcon = styled.button(({ theme }) => css`
     border: 0;
     background: transparent;
     padding: 5px;
@@ -69,8 +68,7 @@ const PinIcon = styled.button(({ theme }) => {
     &.active {
       color: ${theme.colors.gray[20]};
     }
-`;
-});
+`);
 
 type HeaderFilterProps = {
   activeQuery: string;
@@ -220,25 +218,23 @@ const Headers = ({ columnPivots, fields, rowPivots, series, rollup, actualColumn
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
   const interactive = useContext(InteractiveContext);
 
-  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => {
-    return (
-      <HeaderField activeQuery={activeQuery}
-                   key={`${prefix}${field}`}
-                   fields={fields}
-                   field={field}
-                   prefix={prefix}
-                   span={span}
-                   title={title}
-                   onSortChange={onSortChange}
-                   sortConfigMap={sortConfigMap}
-                   sortable={sortable}
-                   sortType={sortType}
-                   onSetColumnsWidth={onSetColumnsWidth}
-                   isPinned={pinnedColumns.has(`${prefix}${field}`)}
-                   showPinIcon={showPinIcon}
-                   togglePin={togglePin} />
-    );
-  };
+  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => (
+    <HeaderField activeQuery={activeQuery}
+                 key={`${prefix}${field}`}
+                 fields={fields}
+                 field={field}
+                 prefix={prefix}
+                 span={span}
+                 title={title}
+                 onSortChange={onSortChange}
+                 sortConfigMap={sortConfigMap}
+                 sortable={sortable}
+                 sortType={sortType}
+                 onSetColumnsWidth={onSetColumnsWidth}
+                 isPinned={pinnedColumns.has(`${prefix}${field}`)}
+                 showPinIcon={showPinIcon}
+                 togglePin={togglePin} />
+  );
 
   const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }));
   const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: interactive, sortType: SortConfig.SERIES_TYPE, showPinIcon: false }));

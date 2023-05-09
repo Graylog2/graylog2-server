@@ -59,9 +59,7 @@ export const ClusterOverviewStore = singletonStore(
     threadDump(nodeId) {
       const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/threaddump`))
         .then(
-          (response) => {
-            return response.threaddump;
-          },
+          (response) => response.threaddump,
           (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
         );
 
@@ -71,9 +69,7 @@ export const ClusterOverviewStore = singletonStore(
     processbufferDump(nodeId) {
       const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/processbufferdump`))
         .then(
-          (response) => {
-            return response.processbuffer_dump;
-          },
+          (response) => response.processbuffer_dump,
           (error) => UserNotification.error(`Getting process buffer dump for node '${nodeId}' failed: ${error}`, 'Could not get process buffer dump'),
         );
 

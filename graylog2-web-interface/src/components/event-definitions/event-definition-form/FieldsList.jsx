@@ -49,20 +49,16 @@ class FieldsList extends React.Component {
     onAddFieldClick();
   };
 
-  handleEditClick = (fieldName) => {
-    return () => {
-      const { onEditFieldClick } = this.props;
+  handleEditClick = (fieldName) => () => {
+    const { onEditFieldClick } = this.props;
 
-      onEditFieldClick(fieldName);
-    };
+    onEditFieldClick(fieldName);
   };
 
-  handleRemoveClick = (fieldName) => {
-    return () => {
-      const { onRemoveFieldClick } = this.props;
+  handleRemoveClick = (fieldName) => () => {
+    const { onRemoveFieldClick } = this.props;
 
-      onRemoveFieldClick(fieldName);
-    };
+    onRemoveFieldClick(fieldName);
   };
 
   providerFormatter = (config) => {
@@ -70,11 +66,9 @@ class FieldsList extends React.Component {
 
     return (
       <p>
-        {configKeys.map((key) => {
-          return (
-            <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
-          );
-        })}
+        {configKeys.map((key) => (
+          <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
+        ))}
       </p>
     );
   };

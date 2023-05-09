@@ -38,13 +38,11 @@ type Props = {
   style?: React.CSSProperties
 }
 
-const TimerangeSelector = ({ className, children, ...restProps }: Props) => {
-  return (
-    <TimerangeWrap className={className} {...restProps}>
-      {children}
-    </TimerangeWrap>
-  );
-};
+const TimerangeSelector = ({ className, children, ...restProps }: Props) => (
+  <TimerangeWrap className={className} {...restProps}>
+    {children}
+  </TimerangeWrap>
+);
 
 TimerangeSelector.propTypes = {
   className: PropTypes.string,

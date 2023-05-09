@@ -53,30 +53,28 @@ const Autocomplete = ({
   required,
   helpText,
   options,
-}: autocompleteProps) => {
-  return (
-    <Field name={fieldName} help={helpText}>
-      {({ field: { name, value, onChange } }) => (
-        <>
-          <StyledLabel>{label}</StyledLabel>
-          <Select id={fieldName}
-                  name={name}
-                  clearable={clearable}
-                  required={required}
-                  allowCreate
-                  onChange={(index) => onChange({ target: { value: index, name } })}
-                  options={options}
-                  value={value} />
-          {helpText && (
-            <span className="help-block">
-              <HelpText>{helpText}</HelpText>
-            </span>
-          )}
-        </>
-      )}
-    </Field>
-  );
-};
+}: autocompleteProps) => (
+  <Field name={fieldName} help={helpText}>
+    {({ field: { name, value, onChange } }) => (
+      <>
+        <StyledLabel>{label}</StyledLabel>
+        <Select id={fieldName}
+                name={name}
+                clearable={clearable}
+                required={required}
+                allowCreate
+                onChange={(index) => onChange({ target: { value: index, name } })}
+                options={options}
+                value={value} />
+        {helpText && (
+        <span className="help-block">
+          <HelpText>{helpText}</HelpText>
+        </span>
+        )}
+      </>
+    )}
+  </Field>
+);
 
 Autocomplete.defaultProps = {
   clearable: false,

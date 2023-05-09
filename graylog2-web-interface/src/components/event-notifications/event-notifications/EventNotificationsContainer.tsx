@@ -41,9 +41,7 @@ import '../event-notification-types';
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
   attributes: {
     title: {
-      renderCell: (_title: string, notification) => {
-        return <NotificationTitle notification={notification} testResults={testResults} />;
-      },
+      renderCell: (_title: string, notification) => <NotificationTitle notification={notification} testResults={testResults} />,
     },
     type: {
       renderCell: (_type: string, notification) => (

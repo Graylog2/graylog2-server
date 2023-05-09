@@ -108,30 +108,28 @@ const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => 
 `;
 });
 
-const ProgressBar = ({ bars, className }: ProgressBarProps) => {
-  return (
-    <ProgressWrap className={className}>
-      {bars.map((bar, index) => {
-        const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
+const ProgressBar = ({ bars, className }: ProgressBarProps) => (
+  <ProgressWrap className={className}>
+    {bars.map((bar, index) => {
+      const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
 
-        return (
-          <Bar role="progressbar"
-               aria-valuenow={value}
-               aria-valuemin={0}
-               aria-valuemax={100}
-               aria-valuetext={label}
-               key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
-               animated={animated}
-               bsStyle={bsStyle}
-               striped={striped}
-               value={value}>
-            {label}
-          </Bar>
-        );
-      })}
-    </ProgressWrap>
-  );
-};
+      return (
+        <Bar role="progressbar"
+             aria-valuenow={value}
+             aria-valuemin={0}
+             aria-valuemax={100}
+             aria-valuetext={label}
+             key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
+             animated={animated}
+             bsStyle={bsStyle}
+             striped={striped}
+             value={value}>
+          {label}
+        </Bar>
+      );
+    })}
+  </ProgressWrap>
+);
 
 ProgressBar.propTypes = {
   bars: PropTypes.arrayOf(PropTypes.shape({

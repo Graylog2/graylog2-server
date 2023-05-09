@@ -83,9 +83,7 @@ const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc, { labels }) => {
-  return union(acc, labels);
-}, []);
+const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc, { labels }) => union(acc, labels), []);
 
 const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, isFunction: boolean) => {
   if (rowPivots.length === 1 && series.length === 1 && rowPivots[0].fields?.length === 1 && !isFunction) {

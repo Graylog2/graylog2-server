@@ -48,9 +48,7 @@ export const parseVersion = (version: string = defaultVersion): Version | void =
   };
 };
 
-export const getFullVersion = (): string => {
-  return defaultVersion;
-};
+export const getFullVersion = (): string => defaultVersion;
 
 export const getMajorAndMinorVersion = (): string => {
   const result = parseVersion();

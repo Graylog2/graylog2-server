@@ -30,9 +30,7 @@ export type ValidationQuery = {
   validation_mode?: 'QUERY' | 'SEARCH_FILTER'
 }
 
-const queryExists = (query: string | ElasticsearchQueryString) => {
-  return typeof query === 'object' ? !!query.query_string : !!query;
-};
+const queryExists = (query: string | ElasticsearchQueryString) => (typeof query === 'object' ? !!query.query_string : !!query);
 
 export const validateQuery = (
   {

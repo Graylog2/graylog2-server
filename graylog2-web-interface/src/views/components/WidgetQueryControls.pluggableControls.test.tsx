@@ -94,13 +94,11 @@ describe('WidgetQueryControls pluggable controls', () => {
     .config({})
     .build();
 
-  const PluggableSearchBarControl = () => {
-    return (
-      <FormikInput label="Pluggable Control"
-                   name="pluggableControl"
-                   id="pluggable-control" />
-    );
-  };
+  const PluggableSearchBarControl = () => (
+    <FormikInput label="Pluggable Control"
+                 name="pluggableControl"
+                 id="pluggable-control" />
+  );
 
   const mockOnSubmit = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
@@ -115,11 +113,9 @@ describe('WidgetQueryControls pluggable controls', () => {
         () => ({
           id: 'pluggable-search-bar-control',
           component: PluggableSearchBarControl,
-          useInitialDashboardWidgetValues: () => {
-            return ({
-              pluggableControl: 'Initial Value',
-            });
-          },
+          useInitialDashboardWidgetValues: () => ({
+            pluggableControl: 'Initial Value',
+          }),
           onSearchSubmit: mockOnSubmit,
           onDashboardWidgetSubmit: mockOnSubmit,
           validationPayload: (values) => {

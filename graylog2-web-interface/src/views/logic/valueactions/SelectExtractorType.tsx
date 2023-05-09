@@ -31,11 +31,7 @@ type State = {
 
 const _renderOption = ({ label }: { label: string }) => <strong>{label}</strong>;
 
-const _getExtractorTypes = () => {
-  return ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => {
-    return { label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType };
-  });
-};
+const _getExtractorTypes = () => ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => ({ label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType }));
 
 class SelectExtractorType extends React.Component<ActionComponentProps, State> {
   static propTypes = {

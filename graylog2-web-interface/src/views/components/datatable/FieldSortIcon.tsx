@@ -36,9 +36,7 @@ type DirectionStrategy = {
   tooltip: (fieldName: string) => string,
 };
 
-const _tooltip = (fieldName: string, newDirection: Direction | null) => {
-  return newDirection ? `Sort ${fieldName} ${newDirection.direction}` : `Remove ${fieldName} sort`;
-};
+const _tooltip = (fieldName: string, newDirection: Direction | null) => (newDirection ? `Sort ${fieldName} ${newDirection.direction}` : `Remove ${fieldName} sort`);
 
 const _changeSort = (nextDirection: Direction, sortConfigMap: OrderedMap<string, SortConfig>, fieldName: string, onSortChange: (newSortConfig: SortConfig[]) => Promise<unknown>, setLoadingState: (loading: boolean) => void, type, activeSort) => {
   let newSortConfigSet;

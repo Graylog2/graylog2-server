@@ -42,9 +42,7 @@ const LocaleSelect = createReactClass({
   _formatLocales(locales) {
     const sortedLocales = Object.values(locales)
       .filter((locale) => locale.language_tag !== 'und')
-      .map((locale) => {
-        return { value: locale.language_tag, label: locale.display_name };
-      })
+      .map((locale) => ({ value: locale.language_tag, label: locale.display_name }))
       .sort((a, b) => {
         const nameA = a.label.toUpperCase();
         const nameB = b.label.toUpperCase();

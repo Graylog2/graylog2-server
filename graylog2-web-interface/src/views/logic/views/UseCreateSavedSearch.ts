@@ -24,12 +24,10 @@ const useCreateSavedSearch = (
   streamId?: string | string[],
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
-) => {
-  return useMemo(
-    () => ViewGenerator(View.Type.Search, streamId, timeRange, queryString),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-};
+) => useMemo(
+  () => ViewGenerator(View.Type.Search, streamId, timeRange, queryString),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [],
+);
 
 export default useCreateSavedSearch;
