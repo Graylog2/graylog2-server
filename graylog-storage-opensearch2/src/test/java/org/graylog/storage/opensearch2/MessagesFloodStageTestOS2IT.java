@@ -23,7 +23,7 @@ import org.junit.Rule;
 
 public class MessagesFloodStageTestOS2IT extends MessagesFloodStageTestIT {
     @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.createNew();
 
     @Override
     protected SearchServerInstance searchServer() {

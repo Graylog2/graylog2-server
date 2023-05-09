@@ -61,6 +61,12 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         this.container = createContainer(image, version, network);
     }
 
+    protected TestableSearchServerInstance(String image, SearchVersion version, Network network, String heapSize, boolean createNew) {
+        this.version = version;
+        this.heapSize = heapSize;
+        this.container = createNew ? createNewContainer(image, version, network) : createContainer(image, version, network);
+    }
+
     @Override
     public GenericContainer<?> createContainer(String image, SearchVersion version, Network network) {
         if (!containersByVersion.containsKey(version)) {
@@ -72,6 +78,15 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
             containersByVersion.put(version, container);
         }
         return containersByVersion.get(version);
+    }
+
+    public GenericContainer<?> createNewContainer(String image, SearchVersion version, Network network) {
+        GenericContainer<?> container = buildContainer(image, network);
+        container.start();
+        if (LOG.isDebugEnabled()) {
+            container.followOutput(new Slf4jLogConsumer(LOG));
+        }
+        return container;
     }
 
     @Override

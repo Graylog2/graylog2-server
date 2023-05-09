@@ -54,8 +54,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
-        super(image, version, network, heapSize);
+    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize, boolean createNew) {
+        super(image, version, network, heapSize, createNew);
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient);
@@ -63,7 +63,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         adapters = new AdaptersOS2(openSearchClient);
     }
     protected OpenSearchInstance(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+        this(image, version, network, DEFAULT_HEAP_SIZE, false);
     }
 
     @Override
@@ -92,24 +92,28 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     public static OpenSearchInstance create() {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE, false);
+    }
+
+    public static OpenSearchInstance createNew() {
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE, true);
     }
 
     public static OpenSearchInstance create(String heapSize) {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize);
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize, false);
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
     public static OpenSearchInstance create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
+        return create(searchVersion, network, DEFAULT_HEAP_SIZE, false);
     }
 
-    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
+    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize, boolean createNew) {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
 
-        return new OpenSearchInstance(image, searchVersion, network, heapSize);
+        return new OpenSearchInstance(image, searchVersion, network, heapSize, createNew);
     }
 
     protected static String imageNameFrom(Version version) {
