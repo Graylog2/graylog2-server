@@ -62,9 +62,10 @@ const PermissionsConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values: PermissionsConfigType) => {
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_permissions',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'permissions',
+      app_action_value: 'configuration-save',
     });
 
     ConfigurationsActions.update(ConfigurationType.PERMISSIONS_CONFIG, values).then(() => {

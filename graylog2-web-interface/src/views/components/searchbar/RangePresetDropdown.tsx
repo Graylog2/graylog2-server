@@ -61,7 +61,8 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
       }
 
       const optionLabel = availableOptions[key].replace(/Search\sin(\sthe\slast)?\s/, '');
-      const option = (<MenuItem eventKey={seconds} key={`relative-option-${key}`} disabled={disabled}>{optionLabel}</MenuItem>);
+      const option = (
+        <MenuItem eventKey={seconds} key={`relative-option-${key}`} disabled={disabled}>{optionLabel}</MenuItem>);
 
       // The "search in all messages" option should be the last one.
       if (key === 'PT0S') {
@@ -82,7 +83,13 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
 
   const _onChange = (range) => {
     if (range !== null && range !== undefined) {
-      sendTelemetry('change_input_value', { appSection: 'search_bar', eventElement: 'relative-timerange-selector', eventInfo: { range } });
+      sendTelemetry('input_value_change', {
+        app_pathname: 'search',
+        app_section: 'search-bar',
+        app_action_value: 'relative-timerange-selector',
+        event_details: { range },
+      });
+
       onChange(parseInt(range, 10));
     }
   };
@@ -101,7 +108,8 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
       {options}
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
-        <AdminMenuItem href="/system/configurations" target="_blank">Configure Ranges <ExternalIcon name="external-link-alt" /></AdminMenuItem>
+        <AdminMenuItem href="/system/configurations" target="_blank">Configure Ranges <ExternalIcon name="external-link-alt" />
+        </AdminMenuItem>
       </IfPermitted>
     </DropdownButton>
   );

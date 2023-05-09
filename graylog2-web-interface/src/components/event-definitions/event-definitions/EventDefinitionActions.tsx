@@ -97,8 +97,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
 
   const handleAction = (action, definition) => {
     sendTelemetry('click', {
-      appSection: 'event-definition',
-      eventElement: `event-definition-action-${action}`,
+      app_pathname: 'event-definition',
+      app_action_value: `event-definition-action-${action}`,
     });
 
     switch (action) {

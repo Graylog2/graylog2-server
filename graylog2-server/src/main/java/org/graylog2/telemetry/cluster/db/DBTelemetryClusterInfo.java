@@ -41,6 +41,8 @@ import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
 public class DBTelemetryClusterInfo {
 
     public static final String FIELD_NODE_ID = "node_id";
+    public static final String FIELD_IS_LEADER = "is_leader";
+    public static final String FIELD_VERSION = "version";
     private static final String FIELD_ID = "_id";
     private static final String FIELD_UPDATED_AT = "updated_at";
     private static final String COLLECTION_NAME = "telemetry_cluster_infos";
@@ -67,8 +69,8 @@ public class DBTelemetryClusterInfo {
         );
     }
 
-    public Map<String, Object> findAll() {
-        Map<String, Object> nodes = new LinkedHashMap<>();
+    public Map<String, Map<String, Object>> findAll() {
+        Map<String, Map<String, Object>> nodes = new LinkedHashMap<>();
         for (Document document : collection.find()) {
             nodes.put(document.getString(FIELD_NODE_ID), document.entrySet().stream()
                     .filter(entry -> !FIELD_UPDATED_AT.equals(entry.getKey()))
