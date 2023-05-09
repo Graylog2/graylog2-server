@@ -78,7 +78,8 @@ public class CSPResources {
 
     /**
      * Update all existing groups (rows) in the table with the specified value. Duplicated values
-     * are ignored.
+     * are ignored; but substrings are tolerated e.g. test.com test.com:9999
+     * Thread-safety needs to be enforced by the caller (i.e. CSPService).
      *
      * @param directive
      * @param value     a directive value, consisting of one or more entries separated by blanks

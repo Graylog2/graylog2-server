@@ -43,7 +43,7 @@ public class CSPServiceImpl implements CSPService {
     public synchronized void updateConnectSrc() {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
                 .map(dto -> dto.config().externalHTTPHosts())
-                .filter(optList -> optList.isPresent())
+                .filter(java.util.Optional::isPresent)
                 .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));
         String connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
