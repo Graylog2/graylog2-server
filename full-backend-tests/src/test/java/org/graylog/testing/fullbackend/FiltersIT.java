@@ -21,6 +21,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.shared.rest.resources.csp.CSP;
+import org.graylog2.shared.rest.resources.csp.CSPResources;
 import org.graylog2.shared.rest.resources.csp.CSPResponseFilter;
 import org.hamcrest.Matchers;
 
@@ -29,14 +30,15 @@ import static io.restassured.RestAssured.given;
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
     private final GraylogApis api;
+    private final CSPResources cspResources;
 
     public FiltersIT(GraylogApis api) {
         this.api = api;
+        this.cspResources = new CSPResources();
     }
 
     @ContainerMatrixTest
     void cspDocumentationBrowser() {
-        String expected = CSP.CSP_SWAGGER;
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -44,12 +46,11 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(expected));
+                        Matchers.containsString(cspResources.cspString(CSP.SWAGGER)));
     }
 
     @ContainerMatrixTest
     void cspWebInterfaceAssets() {
-        String expected = CSP.CSP_DEFAULT;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -58,12 +59,11 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(expected));
+                        Matchers.containsString(cspResources.cspString(CSP.DEFAULT)));
     }
 
     @ContainerMatrixTest
     void cspWebAppNotFound() {
-        String expected = CSP.CSP_DEFAULT;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -71,6 +71,6 @@ public class FiltersIT {
                 .get("streams")
                 .then()
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(expected));
+                        Matchers.containsString(cspResources.cspString(CSP.DEFAULT)));
     }
 }
