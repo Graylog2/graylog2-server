@@ -33,6 +33,7 @@ public abstract class RuleDao {
     public static final String FIELD_SOURCE = "source";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_MODFIED_AT = "modfied_at";
+    public static final String FIELD_RULEBUILDER = "rulebuilder";
 
     @JsonProperty(FIELD_ID)
     @Nullable
@@ -58,6 +59,10 @@ public abstract class RuleDao {
     @Nullable
     public abstract DateTime modifiedAt();
 
+    @JsonProperty
+    @Nullable
+    public abstract RuleBuilder ruleBuilder();
+
     public static Builder builder() {
         return new AutoValue_RuleDao.Builder();
     }
@@ -66,11 +71,12 @@ public abstract class RuleDao {
 
     @JsonCreator
     public static RuleDao create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                    @JsonProperty(FIELD_TITLE)  String title,
-                                    @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
-                                    @JsonProperty(FIELD_SOURCE) String source,
-                                    @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
-                                    @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt) {
+                                 @JsonProperty(FIELD_TITLE) String title,
+                                 @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                 @JsonProperty(FIELD_SOURCE) String source,
+                                 @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
+                                 @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt,
+                                 @JsonProperty(FIELD_RULEBUILDER) @Nullable RuleBuilder ruleBuilder) {
         return builder()
                 .id(id)
                 .source(source)
@@ -78,6 +84,7 @@ public abstract class RuleDao {
                 .description(description)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
+                .ruleBuilder(ruleBuilder)
                 .build();
     }
 
@@ -96,5 +103,7 @@ public abstract class RuleDao {
         public abstract Builder createdAt(DateTime createdAt);
 
         public abstract Builder modifiedAt(DateTime modifiedAt);
+
+        public abstract Builder ruleBuilder(RuleBuilder ruleBuilder);
     }
 }

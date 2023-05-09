@@ -26,35 +26,34 @@ import org.graylog2.plugin.Message;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
-public class HasField extends AbstractFunction<Boolean> {
+public class GetField extends AbstractFunction<Object> {
 
-    public static final String NAME = "has_field";
+    public static final String NAME = "get_field";
     public static final String FIELD = "field";
     private final ParameterDescriptor<String, String> fieldParam;
     private final ParameterDescriptor<Message, Message> messageParam;
 
-    public HasField() {
-        fieldParam = ParameterDescriptor.string(FIELD).description("The field to check").build();
+    public GetField() {
+        fieldParam = ParameterDescriptor.string(FIELD).description("The field to get").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").primary().build();
     }
 
     @Override
-    public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
+    public Object evaluate(FunctionArgs args, EvaluationContext context) {
         final String field = fieldParam.required(args, context);
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
 
-        return message.hasField(field);
+        return message.getField(field);
     }
 
     @Override
-    public FunctionDescriptor<Boolean> descriptor() {
-        return FunctionDescriptor.<Boolean>builder()
+    public FunctionDescriptor<Object> descriptor() {
+        return FunctionDescriptor.<Object>builder()
                 .name(NAME)
-                .returnType(Boolean.class)
+                .returnType(Object.class)
                 .params(ImmutableList.of(fieldParam, messageParam))
-                .description("Checks whether a message contains a value for a field")
+                .description("Retrieves the value for a field")
                 .ruleBuilderEnabled()
-                .ruleBuilderTitle("Message has field \"$field\"")
                 .build();
     }
 }

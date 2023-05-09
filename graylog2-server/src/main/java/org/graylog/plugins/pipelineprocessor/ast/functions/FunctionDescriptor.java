@@ -57,6 +57,10 @@ public abstract class FunctionDescriptor<T> {
     @JsonProperty
     public abstract boolean ruleBuilderEnabled();
 
+    @JsonProperty
+    @Nullable
+    public abstract String ruleBuilderTitle();
+
     public static <T> Builder<T> builder() {
         //noinspection unchecked
         return new AutoValue_FunctionDescriptor.Builder().pure(false).ruleBuilderEnabled(false);
@@ -82,6 +86,8 @@ public abstract class FunctionDescriptor<T> {
         public Builder<T> ruleBuilderEnabled() {
             return ruleBuilderEnabled(true);
         }
+
+        public abstract Builder<T> ruleBuilderTitle(String ruleBuilderTitle);
 
         public Builder<T> params(ParameterDescriptor... params) {
             return params(ImmutableList.<ParameterDescriptor>builder().add(params).build());

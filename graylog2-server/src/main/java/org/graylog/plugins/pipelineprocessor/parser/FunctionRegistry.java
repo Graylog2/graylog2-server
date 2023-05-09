@@ -48,4 +48,21 @@ public class FunctionRegistry {
     public Collection<Function<?>> all() {
         return functions.values().stream().collect(Collectors.toList());
     }
+
+    public Map<String, Function<?>> ruleBuilderConditions() {
+        return functions.entrySet()
+                .stream()
+                .filter(f -> f.getValue().descriptor().ruleBuilderEnabled()
+                        && f.getValue().descriptor().returnType().equals(Boolean.class))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public Map<String, Function<?>> ruleBuilderActions() {
+        return functions.entrySet()
+                .stream()
+                .filter(f -> f.getValue().descriptor().ruleBuilderEnabled())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
 }
+

@@ -96,7 +96,8 @@ public class SetField extends AbstractFunction<Void> {
                         suffixParam,
                         messageParam,
                         defaultParam))
-                        .description("Sets a new field in a message")
+                .description("Sets a new field in a message")
+                .ruleBuilderEnabled()
                         .build();
     }
 }
