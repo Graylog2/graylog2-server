@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect } from 'react';
+import kebabCase from 'lodash/kebabCase';
 
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -25,7 +26,9 @@ const NavigationTelemetry = () => {
 
   useEffect(() => {
     if (location.pathname) {
-      sendTelemetry('$pageview', {});
+      sendTelemetry('$pageview', {
+        app_pathname: kebabCase(location.pathname),
+      });
     }
   }, [location.pathname, sendTelemetry]);
 

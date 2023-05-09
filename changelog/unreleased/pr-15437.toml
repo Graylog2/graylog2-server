@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Make sure that search creation has finished before executing it for new saved searches/dashboards."
+
+issues = ["15435"]
+pulls = ["15437"]
+

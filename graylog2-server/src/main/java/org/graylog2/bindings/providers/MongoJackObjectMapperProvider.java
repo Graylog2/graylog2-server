@@ -21,27 +21,16 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.SimpleType;
-import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
-import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
-import org.graylog2.jackson.MongoJodaDateTimeSerializer;
-import org.graylog2.jackson.MongoZonedDateTimeDeserializer;
-import org.graylog2.jackson.MongoZonedDateTimeSerializer;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-import org.graylog2.security.encryption.EncryptedValueMapperConfig;
-import org.joda.time.DateTime;
 import org.mongojack.internal.MongoJackModule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.time.ZonedDateTime;
 
 @Singleton
 public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
@@ -49,24 +38,11 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
 
     @Inject
     public MongoJackObjectMapperProvider(ObjectMapper objectMapper) {
-        // add the mongojack specific stuff on a copy of the original ObjectMapper to avoid changing the singleton instance
-        this.objectMapper = objectMapper.copy()
+        this.objectMapper = CommonMongoJackObjectMapperProvider.configure(objectMapper)
                 .addHandler(new ReplaceUnknownSubtypesWithFallbackHandler())
-                .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy())
-                .setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
-                    @Override
-                    public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                        return super.hasIgnoreMarker(member) || member.hasAnnotation(MongoIgnore.class);
-                    }
-                })
-                .registerModule(new SimpleModule("JSR-310-MongoJack")
-                        .addSerializer(ZonedDateTime.class, new MongoZonedDateTimeSerializer())
-                        .addDeserializer(ZonedDateTime.class, new MongoZonedDateTimeDeserializer())
-                        .addSerializer(DateTime.class, new MongoJodaDateTimeSerializer())
-                        .addDeserializer(DateTime.class, new MongoJodaDateTimeDeserializer()));
+                .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy());
 
         MongoJackModule.configure(this.objectMapper);
-        EncryptedValueMapperConfig.enableDatabase(this.objectMapper);
     }
 
     @Override
