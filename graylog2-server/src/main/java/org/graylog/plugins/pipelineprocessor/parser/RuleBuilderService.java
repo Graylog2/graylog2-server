@@ -79,23 +79,6 @@ public class RuleBuilderService {
         return syntax + System.lineSeparator() + "  )";
     }
 
-    private String addFunctionParameter(ParameterDescriptor descriptor, RuleBuilderStep step) {
-        final String name = descriptor.name();
-        final Object value = step.parameters().get(name);
-        String syntax = "    " + name + " : ";
-        if (value == null) {
-            return null;
-        } else if (value instanceof String valueString) {
-            if (valueString.startsWith("$")) {
-                syntax += ((String) value).substring(1);
-            } else {
-                syntax += "\"" + value + "\"";
-            }
-        } else {
-            syntax += value;
-        }
-        return syntax;
-    }
 
     private String generateActions(List<RuleBuilderStep> actions, boolean generateSimulatorFields) {
         return actions.stream().map(s -> generateAction(s, generateSimulatorFields)).collect(Collectors.joining(System.lineSeparator()));
@@ -120,4 +103,26 @@ public class RuleBuilderService {
         return syntax;
     }
 
+
+    String addFunctionParameter(ParameterDescriptor descriptor, RuleBuilderStep step) {
+        final String parameterName = descriptor.name();
+        final Map<String, Object> parameters = step.parameters();
+        if (Objects.isNull(parameters)) {
+            return null;
+        }
+        final Object value = parameters.get(parameterName);
+        String syntax = "    " + parameterName + " : ";
+        if (value == null) {
+            return null;
+        } else if (value instanceof String valueString) {
+            if (valueString.startsWith("$")) { // value set as variable
+                syntax += ((String) value).substring(1);
+            } else {
+                syntax += "\"" + value + "\""; // value set as string
+            }
+        } else {
+            syntax += value;
+        }
+        return syntax;
+    }
 }

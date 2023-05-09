@@ -145,7 +145,7 @@ public class RuleResourceTest {
                 "when true\n" +
                 "then\n" +
                 "   debug(\"OK\");\n" +
-                "end", title), null, null);
+                "end", title), null, null, null);
     }
 
     private PipelineDao pipelineDao(String id, String title) {
