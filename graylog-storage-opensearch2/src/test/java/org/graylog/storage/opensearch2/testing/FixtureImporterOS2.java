@@ -135,26 +135,7 @@ public class FixtureImporterOS2 implements FixtureImporter {
         }
     }
 
-    private void putPersistentSetting(String setting, String value) {
-        final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
-
-        if(value == null) {
-            request.persistentSettings(Settings.builder().putNull(setting));
-        } else {
-            request.persistentSettings(Settings.builder().put(setting, value));
-        }
-
-        client.execute((c, requestOptions) -> c.cluster().putSettings(request, requestOptions),
-                "Unable to update OS cluster setting: " + setting + "=" + value);
-    }
-
-    private void resetClusterBlock() {
-        // reset create_index block for OpenSearch 2.x see https://github.com/opensearch-project/OpenSearch/pull/5852
-        putPersistentSetting("cluster.blocks.create_index", null);
-    }
-
     private void createIndex(String indexName) {
-//        resetClusterBlock();
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
                 .waitForActiveShards(ActiveShardCount.ONE);
         client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
