@@ -57,7 +57,16 @@ const StyledInputList = styled(InputList)`
   margin: auto 15px;
 `;
 
-const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
+const UserSyncStep = ({
+  help = {},
+  excludedFields = {},
+  formRef,
+  onSubmit,
+  onSubmitAll,
+  submitAllError,
+  validateOnMount,
+  roles,
+}: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendValidationErrors } = stepsState;
@@ -67,8 +76,9 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
 
   const _onSubmitAll = (validateForm) => {
     sendTelemetry('click', {
-      appSection: 'authentication_services_user_sync_step',
-      eventElement: 'finish-and-save-service',
+      app_pathname: 'authentication',
+      app_section: 'directory-service',
+      app_action_value: 'usersync-save',
     });
 
     validateForm().then((errors) => {
@@ -114,24 +124,24 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                            validate={validateField(FORM_VALIDATION.userNameAttribute)} />
 
           {!excludedFields.emailAttributes && (
-          <Field name="emailAttributes" validate={validateField(FORM_VALIDATION.emailAttributes)}>
-            {({ field: { name, value, onChange }, meta: { error } }) => (
-              <Input bsStyle={error ? 'error' : undefined}
-                     help={help.emailAttributes}
-                     error={error ?? backendValidationErrors?.emailAttributes}
-                     id="email-attributes-input"
-                     label="Email Attributes"
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <StyledInputList id="userEmailAttributes"
-                                 placeholder="Email Attributes"
-                                 name={name}
-                                 values={value}
-                                 isClearable
-                                 onChange={onChange} />
-              </Input>
-            )}
-          </Field>
+            <Field name="emailAttributes" validate={validateField(FORM_VALIDATION.emailAttributes)}>
+              {({ field: { name, value, onChange }, meta: { error } }) => (
+                <Input bsStyle={error ? 'error' : undefined}
+                       help={help.emailAttributes}
+                       error={error ?? backendValidationErrors?.emailAttributes}
+                       id="email-attributes-input"
+                       label="Email Attributes"
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9">
+                  <StyledInputList id="userEmailAttributes"
+                                   placeholder="Email Attributes"
+                                   name={name}
+                                   values={value}
+                                   isClearable
+                                   onChange={onChange} />
+                </Input>
+              )}
+            </Field>
           )}
           <FormikFormGroup help={help.userFullNameAttribute}
                            label="Full Name Attribute"
@@ -152,7 +162,8 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the static role assignment will only affect new users created via {stepsState.authBackendMeta.serviceTitle}!
+                Changing the static role assignment will only affect new users created
+                via {stepsState.authBackendMeta.serviceTitle}!
                 Existing user accounts will be updated on their next login, or if you edit their roles manually.
               </Panel>
             </Col>
@@ -199,8 +210,9 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                     disabled={isSubmitting}
                     onClick={() => {
                       sendTelemetry('click', {
-                        appSection: 'authentication_services_user_sync_step',
-                        eventElement: 'next-group-synchronization',
+                        app_pathname: 'authentication',
+                        app_section: 'directory-service',
+                        app_action_value: 'groupsync-button',
                       });
                     }}
                     type="submit">

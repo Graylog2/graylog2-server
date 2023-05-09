@@ -51,7 +51,7 @@ import { Link } from '../../common/router';
 
 const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
   margin-bottom: 20px;
-  
+
   .read-only-value-col {
     padding-top: 0;
   }
@@ -195,9 +195,9 @@ const UserCreate = () => {
   const onSubmit = (data) => {
     _onSubmit(history, data, user.roles, setSubmitError);
 
-    sendTelemetry('submit_form', {
-      appSection: 'users_overview',
-      eventElement: 'create-user',
+    sendTelemetry('form_submit', {
+      app_pathname: 'users',
+      app_action_value: 'user-create-form',
     });
   };
 
@@ -220,7 +220,16 @@ const UserCreate = () => {
                 <Headline>Settings</Headline>
                 {isGlobalTimeoutEnabled ? (
                   <GlobalTimeoutMessage label="Sessions Timeout"
-                                        value={<NoSearchResult>User session timeout is not editable because the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link></IfPermitted> is enabled.</NoSearchResult>} />
+                                        value={(
+                                          <NoSearchResult>User session timeout is not editable because
+                                            the
+                                            <IfPermitted permissions={['clusterconfigentry:read']}>
+                                              <Link to={Routes.SYSTEM.CONFIGURATIONS}>
+                                                global session timeout
+                                              </Link>
+                                            </IfPermitted> is enabled.
+                                          </NoSearchResult>
+                                        )} />
                 ) : (
                   <TimeoutFormGroup />
                 )}
@@ -233,7 +242,10 @@ const UserCreate = () => {
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Assign Roles">
-                  <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} submitOnSelect />
+                  <RolesSelector onSubmit={_onAssignRole}
+                                 assignedRolesIds={user.roles}
+                                 identifier={(role) => role.name}
+                                 submitOnSelect />
                 </Input>
 
                 <Input id="selected-roles-overview"
@@ -246,7 +258,11 @@ const UserCreate = () => {
                                      onDeleteItem={(data) => _onUnassignRole(data)}
                                      key={role.id} />
                     ))}
-                    {!hasValidRole && <Alert bsStyle="danger">You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.</Alert>}
+                    {!hasValidRole && (
+                      <Alert bsStyle="danger">You need to select at least one of
+                        the <em>Reader</em> or <em>Admin</em> roles.
+                      </Alert>
+                    )}
                   </>
                 </Input>
               </div>
