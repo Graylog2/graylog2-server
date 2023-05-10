@@ -2107,9 +2107,9 @@
     prop-types "^15.8.1"
 
 "@graylog/sawmill@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-1.0.4.tgz#099abbea86f32621fb6f9d7003a4d91ec6123049"
-  integrity sha512-MSZXhUdkNHKZVH4DVePSE7wa6Va1sQ6sGcjzTyaKhshL/9NPDEAweMTCe7WHEUrpNnAgJlDeFXx4GF4IVwyycA==
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-1.0.5.tgz#180026fa7cf109c395092cf83386dc9568e536a5"
+  integrity sha512-G68cdxnxmyIyEKJvqjJHrWUADPp9F3iIX6/YLiamTqvrewXJvmHPFslm+n5nD9qjnhMcOxOZGu17kwPbNx2tVw==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
@@ -4071,6 +4071,11 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-2.0.3.tgz#c00c48d19340224242842e38b8f7b76c308bbd3f"
   integrity sha512-Bwxd73pHuYc0cyl7vulPp2I6kAYtmJPkfUivbts7by6wDAVyFdKzGX3AksbvCRyNVFUJu7o2ZTcWXdT90T3qbg==
+
+"@webpack-cli/serve@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-2.0.4.tgz#3982ee6f8b42845437fc4d391e93ac5d9da52f0f"
+  integrity sha512-0xRgjgDLdz6G7+vvDLlaRpFatJaJ69uTalZLRSMX5B3VUrDmXcrVA3+6fXXQgmYz7bY9AAgs348XQdmtLsK41A==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -8237,7 +8242,7 @@ grapheme-splitter@^1.0.4:
     styled-components "5.3.10"
     typescript "5.0.4"
     webpack "5.82.0"
-    webpack-cli "5.1.0"
+    webpack-cli "5.1.1"
     webpack-merge "4.2.2"
 
 grid-index@^1.1.0:
@@ -11812,9 +11817,9 @@ postcss@^8.4.19:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.53.2"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.53.2.tgz#ea185f23d36e5fa0543b6e43a2df12cca4b9131e"
-  integrity sha512-/vSGeDEWNX8ZVvXu4DA+tdZXcc8gHjZl8Tb5cU97KXngQCOumsSimJTBeG/PI8X8R/mRWBbOmnllo72YWTrl1g==
+  version "1.56.0"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.56.0.tgz#fea94fead4eb312292f6f7b1407248398cf0cb98"
+  integrity sha512-Ng44eEPYlrvLohxLSGMRoy6xQWrNMI74gEl0vKqgvYIX31bXFsKgZaDsVluPrK+IyG+U2HokIVkrURkDXn7rOQ==
   dependencies:
     fflate "^0.4.1"
     rrweb-snapshot "^1.1.14"
@@ -15109,6 +15114,25 @@ webpack-cli@5.1.0:
     "@webpack-cli/configtest" "^2.1.0"
     "@webpack-cli/info" "^2.0.1"
     "@webpack-cli/serve" "^2.0.3"
+    colorette "^2.0.14"
+    commander "^10.0.1"
+    cross-spawn "^7.0.3"
+    envinfo "^7.7.3"
+    fastest-levenshtein "^1.0.12"
+    import-local "^3.0.2"
+    interpret "^3.1.1"
+    rechoir "^0.8.0"
+    webpack-merge "^5.7.3"
+
+webpack-cli@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-5.1.1.tgz#c211ac6d911e77c512978f7132f0d735d4a97ace"
+  integrity sha512-OLJwVMoXnXYH2ncNGU8gxVpUtm3ybvdioiTvHgUyBuyMLKiVvWy+QObzBsMtp5pH7qQoEuWgeEUQ/sU3ZJFzAw==
+  dependencies:
+    "@discoveryjs/json-ext" "^0.5.0"
+    "@webpack-cli/configtest" "^2.1.0"
+    "@webpack-cli/info" "^2.0.1"
+    "@webpack-cli/serve" "^2.0.4"
     colorette "^2.0.14"
     commander "^10.0.1"
     cross-spawn "^7.0.3"

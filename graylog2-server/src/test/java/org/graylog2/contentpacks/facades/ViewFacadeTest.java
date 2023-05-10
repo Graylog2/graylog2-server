@@ -50,6 +50,7 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -68,6 +69,7 @@ import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
@@ -110,18 +112,19 @@ public class ViewFacadeTest {
     public static class TestViewService extends ViewService {
         protected TestViewService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                  ObjectMapper mapper,
-                                  ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class));
+                                  ClusterConfigService clusterConfigService,
+                                  MongoCollections mongoCollections) {
+            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService,
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class), mongoCollections);
         }
     }
 
     public static class TestViewSummaryService extends ViewSummaryService {
         protected TestViewSummaryService(MongoConnection mongoConnection,
                                          MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                         ObjectMapper mapper) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper);
+                                         MongoCollections mongoCollections) {
+            super(mongoConnection, mongoJackObjectMapperProvider, mongoCollections);
+
         }
     }
 
@@ -153,9 +156,11 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(EventList.class);
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
+        final MongoCollections mongoCollections = new MongoCollections(
+                new CommonMongoJackObjectMapperProvider(() -> objectMapper), mongoConnection);
         searchDbService = new TestSearchDBService(mongoConnection, mapper);
-        viewService = new TestViewService(mongoConnection, mapper, objectMapper, null);
-        viewSummaryService = new TestViewSummaryService(mongoConnection, mapper, objectMapper);
+        viewService = new TestViewService(mongoConnection, mapper, null, mongoCollections);
+        viewSummaryService = new TestViewSummaryService(mongoConnection, mapper, mongoCollections);
         userService = mock(UserService.class);
 
         facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService);
