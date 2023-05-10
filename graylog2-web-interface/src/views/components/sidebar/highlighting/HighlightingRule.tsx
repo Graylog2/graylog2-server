@@ -67,9 +67,7 @@ type Props = {
   rule: Rule,
 };
 
-const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => async (dispatch: AppDispatch) => {
-  return dispatch(updateHighlightingRule(rule, { color: newColor })).then(hidePopover);
-};
+const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => async (dispatch: AppDispatch) => dispatch(updateHighlightingRule(rule, { color: newColor })).then(hidePopover);
 
 const onDelete = (rule: Rule) => async (dispatch: AppDispatch) => {
   // eslint-disable-next-line no-alert

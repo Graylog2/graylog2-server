@@ -52,9 +52,7 @@ const StyledSpinner = styled(Spinner)`
   margin-left: 10px;
 `;
 
-const getListClassName = (matchData) => {
-  return (matchData.matches ? 'success' : 'danger');
-};
+const getListClassName = (matchData) => (matchData.matches ? 'success' : 'danger');
 
 type Props = {
   streamId: string,
@@ -91,9 +89,7 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
     }
   };
 
-  const _onStreamRuleFormSubmit = (_streamRuleId: string, data) => {
-    return StreamRulesStore.create(streamId, data, () => {});
-  };
+  const _onStreamRuleFormSubmit = (_streamRuleId: string, data) => StreamRulesStore.create(streamId, data, () => {});
 
   const _onAddStreamRule = (event) => {
     event.preventDefault();

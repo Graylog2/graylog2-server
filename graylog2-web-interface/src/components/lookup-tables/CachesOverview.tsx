@@ -86,32 +86,28 @@ const buildHelpPopover = () => (
   </Popover>
 );
 
-const NoResults = ({ query }: { query: string }) => {
-  return (
-    <tbody>
-      <tr>
-        <td colSpan={7}>
-          {query
-            ? <NoSearchResult>No caches found with title &quot;{query}&quot;</NoSearchResult>
-            : <NoEntitiesExist>There are no caches to list</NoEntitiesExist>}
-        </td>
-      </tr>
-    </tbody>
-  );
-};
+const NoResults = ({ query }: { query: string }) => (
+  <tbody>
+    <tr>
+      <td colSpan={7}>
+        {query
+          ? <NoSearchResult>No caches found with title &quot;{query}&quot;</NoSearchResult>
+          : <NoEntitiesExist>There are no caches to list</NoEntitiesExist>}
+      </td>
+    </tr>
+  </tbody>
+);
 
-const DataRow = ({ caches, query }: { caches: LookupTableCache[], query: string }) => {
-  return caches.length > 0
-    ? (
-      <>
-        {caches.map((cache: LookupTableCache) => (
-          <CacheTableEntry key={`cache-item-${cache.id}`} cache={cache} />
-        ))}
-      </>
-    ) : (
-      <NoResults query={query} />
-    );
-};
+const DataRow = ({ caches, query }: { caches: LookupTableCache[], query: string }) => (caches.length > 0
+  ? (
+    <>
+      {caches.map((cache: LookupTableCache) => (
+        <CacheTableEntry key={`cache-item-${cache.id}`} cache={cache} />
+      ))}
+    </>
+  ) : (
+    <NoResults query={query} />
+  ));
 
 type Props = {
   caches: LookupTableCache[],

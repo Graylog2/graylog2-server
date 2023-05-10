@@ -74,9 +74,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
   const { loadingIndexDefaultsConfig, indexDefaultsConfig: config } = useIndexDefaults();
 
-  const _isLoading = () => {
-    return !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
-  };
+  const _isLoading = () => !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
 
   if (_isLoading()) {
     return <Spinner />;

@@ -17,37 +17,32 @@
 // eslint-disable-next-line no-restricted-imports
 import type { ModalProps } from 'react-bootstrap';
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import kebabCase from 'lodash/kebabCase';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const withModalTelemetry = (Component) => {
-  return (props: ModalProps) => {
-    const { show, 'data-event-element': eventElement, 'data-app-section': appSection }: any = props;
-    const sendTelemetry = useSendTelemetry();
-    const { pathname } = useLocation();
+const withModalTelemetry = (Component) => (props: ModalProps) => {
+  const { show, 'data-event-element': eventElement, 'data-app-section': appSection }: any = props;
+  const sendTelemetry = useSendTelemetry();
 
-    useEffect(() => {
-      const telemetryEvent = {
-        app_pathname: kebabCase(pathname),
-        app_section: kebabCase(appSection),
-        app_action_value: kebabCase(eventElement),
-      };
+  useEffect(() => {
+    const telemetryEvent = {
+      app_section: kebabCase(appSection),
+      app_action_value: kebabCase(eventElement),
+    };
 
+    if (show && eventElement) {
+      sendTelemetry('modal_open', telemetryEvent);
+    }
+
+    return () => {
       if (show && eventElement) {
-        sendTelemetry('modal_open', telemetryEvent);
+        sendTelemetry('modal_close', telemetryEvent);
       }
+    };
+  }, [show, eventElement, appSection, sendTelemetry]);
 
-      return () => {
-        if (show && eventElement) {
-          sendTelemetry('modal_close', telemetryEvent);
-        }
-      };
-    }, [show, eventElement, appSection, sendTelemetry, pathname]);
-
-    return <Component {...props} />;
-  };
+  return <Component {...props} />;
 };
 
 export default withModalTelemetry;

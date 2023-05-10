@@ -31,9 +31,7 @@ const mockAggregateActionHandler = jest.fn();
 const mockAddMessageCountActionHandler = jest.fn();
 const mockAddMessageTableActionHandler = jest.fn();
 
-const MockCreateParameterDialog = () => {
-  return <span>42</span>;
-};
+const MockCreateParameterDialog = () => <span>42</span>;
 
 const bindings: PluginExports = {
   creators: [

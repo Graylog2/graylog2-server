@@ -29,6 +29,7 @@ class EnvironmentTest {
     void testFiltering() {
         final Environment env = new Environment(Map.of("USER", "test", "JAVA_HOME", "/path/to/jre"));
         Assertions.assertThat(env.getEnv())
-                 .doesNotContainKey("JAVA_HOME");
+                 .doesNotContainKey("JAVA_HOME")
+                .containsKey("USER");
     }
 }

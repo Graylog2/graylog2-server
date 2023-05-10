@@ -29,13 +29,11 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
-const getNoOptionMessgage = () => {
-  return (
-    <StyledDiv key="noOptions" className="menu-notice menu-notice--no-options">
-      No Options
-    </StyledDiv>
-  );
-};
+const getNoOptionMessgage = () => (
+  <StyledDiv key="noOptions" className="menu-notice menu-notice--no-options">
+    No Options
+  </StyledDiv>
+);
 
 const AsyncCustomMenuList = ({ children, selectProps: { loadOptions, total } }: Props.MenuList) => {
   const items = children?.length ? children : [getNoOptionMessgage()];

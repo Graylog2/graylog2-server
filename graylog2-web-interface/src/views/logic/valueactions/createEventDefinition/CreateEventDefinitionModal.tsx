@@ -69,36 +69,24 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   const searchChecks = useMemo<Partial<Checked>>(() => pick(checked, searchGroup), [checked]);
   const restChecks = useMemo<Partial<Checked>>(() => omit(checked, [...searchGroup, ...aggregationGroup]), [checked]);
 
-  const aggregationLabels = useMemo<{ [name: string]: JSX.Element }>(() => {
-    return mapValues(pick(modalData, aggregationGroup), (value, key: ItemKey) => {
-      return <CheckboxLabel itemKey={key} value={value} />;
-    });
-  }, [modalData]);
-  const searchLabels = useMemo<{ [name: string]: JSX.Element }>(() => {
-    return mapValues(pick(modalData, searchGroup), (value, key: ItemKey) => (
-      <CheckboxLabel itemKey={key} value={value} />
-    ));
-  }, [modalData]);
+  const aggregationLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(pick(modalData, aggregationGroup), (value, key: ItemKey) => <CheckboxLabel itemKey={key} value={value} />), [modalData]);
+  const searchLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(pick(modalData, searchGroup), (value, key: ItemKey) => (
+    <CheckboxLabel itemKey={key} value={value} />
+  )), [modalData]);
 
-  const restLabels = useMemo<{ [name: string]: JSX.Element }>(() => {
-    return mapValues(omit(modalData, [...aggregationGroup, ...searchGroup]), (value, key: ItemKey) => (
-      <CheckboxLabel itemKey={key} value={value} />
-    ));
-  }, [modalData]);
+  const restLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(omit(modalData, [...aggregationGroup, ...searchGroup]), (value, key: ItemKey) => (
+    <CheckboxLabel itemKey={key} value={value} />
+  )), [modalData]);
 
-  const eventDefinitionCreationUrl = useMemo(() => {
-    return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&session-id=${sessionId}`;
-  }, [sessionId]);
+  const eventDefinitionCreationUrl = useMemo(() => `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&session-id=${sessionId}`, [sessionId]);
 
-  const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => {
-    return ({
-      ALL: true,
-      ROW: !!mappedData?.rowValuePath?.length,
-      COL: !!mappedData?.columnValuePath?.length,
-      CUSTOM: true,
-      EXACT: true,
-    });
-  }, [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
+  const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => ({
+    ALL: true,
+    ROW: !!mappedData?.rowValuePath?.length,
+    COL: !!mappedData?.columnValuePath?.length,
+    CUSTOM: true,
+    EXACT: true,
+  }), [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
 
   const onContinueConfigurationClick = useCallback(() => {
     localStorage.setItem(sessionId, JSON.stringify(localStorageConfig));

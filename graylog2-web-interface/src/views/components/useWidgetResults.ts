@@ -71,8 +71,6 @@ const selectWidgetResults = (widgetId: string) => createSelector(
   },
 );
 
-const useWidgetResults = (widgetId: string) => {
-  return useAppSelector(selectWidgetResults(widgetId));
-};
+const useWidgetResults = (widgetId: string) => useAppSelector(selectWidgetResults(widgetId));
 
 export default useWidgetResults;

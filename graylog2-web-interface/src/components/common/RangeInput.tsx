@@ -83,22 +83,20 @@ const RangeInput = ({
   labelClassName,
   wrapperClassName,
   ...otherProps
-}: Props) => {
-  return (
-    <Input labelClassName={labelClassName}
-           id={id}
-           wrapperClassName={wrapperClassName}
-           help={help}
-           bsStyle={bsStyle}
-           error={error}
-           label={label}>
-      <StyledSlider renderTrack={Track}
-                    renderThumb={Thumb}
-                    className={error}
-                    {...otherProps} />
-    </Input>
-  );
-};
+}: Props) => (
+  <Input labelClassName={labelClassName}
+         id={id}
+         wrapperClassName={wrapperClassName}
+         help={help}
+         bsStyle={bsStyle}
+         error={error}
+         label={label}>
+    <StyledSlider renderTrack={Track}
+                  renderThumb={Thumb}
+                  className={error}
+                  {...otherProps} />
+  </Input>
+);
 
 RangeInput.defaultProps = {
   label: undefined,

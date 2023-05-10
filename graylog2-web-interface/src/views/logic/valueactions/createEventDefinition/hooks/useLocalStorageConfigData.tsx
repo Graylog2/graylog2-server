@@ -21,9 +21,7 @@ import type { Checked, MappedData } from 'views/logic/valueactions/createEventDe
 import type { EventDefinitionLocalStorageConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 
-const concatQuery = (queryParts: Array<string>) => {
-  return concatQueryStrings(queryParts.filter((queryPart) => !!queryPart));
-};
+const concatQuery = (queryParts: Array<string>) => concatQueryStrings(queryParts.filter((queryPart) => !!queryPart));
 
 const useLocalStorageConfigData = ({ mappedData, checked }: { mappedData: MappedData, checked: Checked }) => useMemo<EventDefinitionLocalStorageConfig>(() => {
   const {

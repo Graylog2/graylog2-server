@@ -59,9 +59,7 @@ const CreateInputControl = createReactClass({
     if (inputTypes) {
       const inputTypesIds = Object.keys(inputTypes);
 
-      options = inputTypesIds.map((id) => {
-        return { value: id, label: inputTypes[id] };
-      });
+      options = inputTypesIds.map((id) => ({ value: id, label: inputTypes[id] }));
 
       options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
     } else {

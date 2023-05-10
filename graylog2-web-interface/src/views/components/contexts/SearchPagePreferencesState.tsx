@@ -84,9 +84,7 @@ const SearchPagePreferencesState = ({ children }: Props) => {
 
   const _onSidebarPinningChange = useCallback((newIsPinned: boolean) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned), [currentUser, userPreferences, viewType]);
 
-  const getPreference = useCallback((stateKey: string, defaultValue: boolean) => {
-    return state[stateKey] ?? defaultValue;
-  }, [state]);
+  const getPreference = useCallback((stateKey: string, defaultValue: boolean) => state[stateKey] ?? defaultValue, [state]);
 
   const setPreference = useCallback((stateKey: string, value: boolean) => {
     if (stateKey === 'sidebarIsPinned') {

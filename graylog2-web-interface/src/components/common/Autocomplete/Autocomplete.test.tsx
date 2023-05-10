@@ -26,16 +26,14 @@ const OPTIONS = [
   { value: 'Amarillo', label: 'Yellow' },
 ];
 
-const renderAutocomplete = () => {
-  return render(
-    <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
-      <Autocomplete fieldName="spaColor"
-                    label="Color translator"
-                    helpText="Choose a color"
-                    options={OPTIONS} />
-    </Formik>,
-  );
-};
+const renderAutocomplete = () => render(
+  <Formik initialValues={{ value: 'Verde', label: 'Green' }} onSubmit={() => null}>
+    <Autocomplete fieldName="spaColor"
+                  label="Color translator"
+                  helpText="Choose a color"
+                  options={OPTIONS} />
+  </Formik>,
+);
 
 describe('Autocomplete component', () => {
   it('should render the field with a label', async () => {

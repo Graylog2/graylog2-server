@@ -54,9 +54,7 @@ const SidecarEditConfigurationPage = ({ params }) => {
     _reloadConfiguration();
   }, [history, params]);
 
-  const _isLoading = () => {
-    return !configuration || !configurationSidecars;
-  };
+  const _isLoading = () => !configuration || !configurationSidecars;
 
   if (_isLoading()) {
     return <Spinner />;

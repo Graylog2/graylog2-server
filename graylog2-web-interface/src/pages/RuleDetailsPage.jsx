@@ -33,9 +33,7 @@ function filterRules(rule, ruleId) {
 }
 
 function filterPipelines(pipelines = [], title = '') {
-  return pipelines.filter((pipeline) => {
-    return pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1);
-  });
+  return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));
 }
 
 const RuleDetailsPage = ({ params, rule, pipelines }) => {

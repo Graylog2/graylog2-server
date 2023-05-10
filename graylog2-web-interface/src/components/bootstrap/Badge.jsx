@@ -33,11 +33,9 @@ const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
 `;
 });
 
-const Badge = forwardRef(({ ...props }, ref) => {
-  return (
-    <StyledBadge ref={ref} {...props} />
-  );
-});
+const Badge = forwardRef(({ ...props }, ref) => (
+  <StyledBadge ref={ref} {...props} />
+));
 
 export default Badge;
 export { StyledBadge };
