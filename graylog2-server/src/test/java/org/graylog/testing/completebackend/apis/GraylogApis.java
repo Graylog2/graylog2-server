@@ -221,7 +221,7 @@ public class GraylogApis {
                             if (resp.statusCode() >= minError) {
                                 final var backendLogs = this.backend.getLogs();
                                 System.out.println("------------------------ Output from graylog docker container start ------------------------");
-                                System.out.println(backendLogs);
+                                LOG.error(backendLogs);
                                 System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
                                 if(errorRunningIndexer(backendLogs)) {
                                     System.out.println("------------------------ Output from indexer docker container start ------------------------");

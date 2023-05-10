@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.StringContains.containsString;
 
 @ContainerMatrixTestsConfiguration
@@ -66,6 +68,16 @@ public class StartPageIT {
         var id = validatableResponse.extract().jsonPath().get("views[0].id").toString();
 
         api.get("/views/" + id, user, Map.of(), 200);
+        api.get("/views/" + id, user, Map.of(), 200);
+
+        given().config(api.withGraylogBackendFailureConfig(200))
+                .spec(api.requestSpecification())
+                .auth().basic(user.username(), user.password())
+                .when().get("/views/" + id)
+                .then()
+                .log().ifStatusCodeMatches(not(201))
+                .statusCode(201);
+
         validatableResponse = api.get("/startpage/lastOpened", user, Map.of(), 200);
         validatableResponse.assertThat().body("lastOpened[0].grn", containsString(id));
     }
