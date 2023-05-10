@@ -27,6 +27,7 @@ import type { KeyMapper } from './TransformKeys';
 import transformKeys from './TransformKeys';
 
 const keySeparator = '\u2E31';
+const humanSeparator = '-';
 
 export type ChartDefinition = {
   type: string,
@@ -104,22 +105,28 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   return { valuesBySeries, xLabels };
 };
 
-export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config: AggregationWidgetConfig = undefined, mapKeys: KeyMapper = (key) => key): ((ExtractedSeries) => Array<ChartDefinition>) => {
+export const generateChart = (
+  chartType: string,
+  generator: Generator = _defaultChartGenerator,
+  config: AggregationWidgetConfig = undefined,
+  mapKeys: KeyMapper = (key) => key,
+): ((results: ExtractedSeries) => Array<ChartDefinition>) => {
   const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
 
   return (results: ExtractedSeries) => {
     const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
       chartType,
-      value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join('-'),
-      x.map((key) => key.join(keySeparator)),
+      value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
+      x.map((key) => key.join(humanSeparator)),
       values,
       z,
     ]);
 
-  return allCharts.map((args, idx) => generator(...args, idx, allCharts.length, config));
+    return allCharts.map((args, idx) => generator(...args, idx, allCharts.length, config));
+  };
 };
 
-export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => (results: ExtractedSeries) => results.map(([name, keys, values, z]) => {
+export const removeNulls = (): ((series: ExtractedSeries) => ExtractedSeries) => (results: ExtractedSeries) => results.map(([name, keys, values, z]) => {
   const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
   const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
   const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
@@ -136,7 +143,7 @@ export type ChartDataConfig = {
   seriesFormatter?: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries,
   leafValueMatcher?: (value: Value) => boolean,
   formatTime: (time: DateTime, format?: DateTimeFormats) => string,
-  mapKeys: (key: Key, field: string) => Key,
+  mapKeys?: (key: Key, field: string) => Key,
 };
 
 export const chartData = (
