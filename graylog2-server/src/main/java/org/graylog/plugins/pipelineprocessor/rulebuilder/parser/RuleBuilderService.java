@@ -45,6 +45,7 @@ public class RuleBuilderService {
     }
 
     public String generateRuleSource(String title, RuleBuilder ruleBuilder, boolean generateSimulatorFields) {
+        //TODO: possible injection here, sanitize input!
         final String rule = String.format(RULE_TEMPLATE, title,
                 conditionParser.generate(ruleBuilder.conditions()),
                 actionParser.generate(ruleBuilder.actions(), generateSimulatorFields));

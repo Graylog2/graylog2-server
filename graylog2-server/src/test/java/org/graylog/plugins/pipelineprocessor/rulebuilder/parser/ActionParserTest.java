@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,7 +66,9 @@ public class ActionParserTest {
                         integer("optional").optional().build()
                 ), Void.class
         ));
-        ruleBuilderRegistry = new RuleBuilderRegistry(new FunctionRegistry(functions));
+        ruleBuilderRegistry = new RuleBuilderRegistry(
+                new FunctionRegistry(functions),
+                new RuleFragmentService(null));
     }
 
     @Before

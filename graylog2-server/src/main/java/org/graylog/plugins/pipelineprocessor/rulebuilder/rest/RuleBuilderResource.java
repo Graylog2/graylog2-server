@@ -22,13 +22,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -89,7 +89,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     public Collection<Object> actions() {
         return ruleBuilderRegistry.actions()
                 .values().stream()
-                .map(Function::descriptor)
+                .map(RuleFragment::descriptor)
                 .collect(Collectors.toList());
     }
 
@@ -99,7 +99,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     public Collection<Object> conditions() {
         return ruleBuilderRegistry.conditions()
                 .values().stream()
-                .map(Function::descriptor)
+                .map(RuleFragment::descriptor)
                 .collect(Collectors.toList());
     }
 

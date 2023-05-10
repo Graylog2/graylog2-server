@@ -17,10 +17,10 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class ConditionParser {
 
     public static final String NL = System.lineSeparator();
-    protected final Map<String, Function<?>> conditions;
+    protected final Map<String, RuleFragment> conditions;
 
     @Inject
     public ConditionParser(RuleBuilderRegistry ruleBuilderRegistry) {

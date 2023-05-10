@@ -16,34 +16,50 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import com.google.common.collect.Streams;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RuleBuilderRegistry {
 
     private final FunctionRegistry functionRegistry;
+    private final RuleFragmentService ruleFragmentService;
 
     @Inject
-    public RuleBuilderRegistry(FunctionRegistry functionRegistry) {
+    public RuleBuilderRegistry(FunctionRegistry functionRegistry,
+                               RuleFragmentService ruleFragmentService) {
         this.functionRegistry = functionRegistry;
+        this.ruleFragmentService = ruleFragmentService;
     }
 
-    public Map<String, Function<?>> conditions() {
-        return functionRegistry.all()
+    public Map<String, RuleFragment> conditions() {
+        final Stream<RuleFragment> conditions = functionRegistry.all()
                 .stream()
                 .filter(f -> f.descriptor().ruleBuilderEnabled()
                         && f.descriptor().returnType().equals(Boolean.class))
+                .map(f -> RuleFragment.builder()
+                        .descriptor(f.descriptor())
+                        .build()
+                );
+        return Streams.concat(conditions, ruleFragmentService.all().stream())
                 .collect(Collectors.toMap(f -> f.descriptor().name(), function -> function));
     }
 
-    public Map<String, Function<?>> actions() {
-        return functionRegistry.all()
+    public Map<String, RuleFragment> actions() {
+        final Stream<RuleFragment> functions = functionRegistry.all()
                 .stream()
                 .filter(f -> f.descriptor().ruleBuilderEnabled())
+                .map(f -> RuleFragment.builder()
+                        .descriptor(f.descriptor())
+                        .build()
+                );
+        return Streams.concat(functions, ruleFragmentService.all().stream())
                 .collect(Collectors.toMap(f -> f.descriptor().name(), function -> function));
     }
 
