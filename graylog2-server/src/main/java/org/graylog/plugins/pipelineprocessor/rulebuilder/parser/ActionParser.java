@@ -19,7 +19,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
-import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 
 import javax.inject.Inject;
@@ -34,8 +34,8 @@ public class ActionParser {
     protected final Map<String, Function<?>> actions;
 
     @Inject
-    public ActionParser(FunctionRegistry functionRegistry) {
-        this.actions = functionRegistry.ruleBuilderActions();
+    public ActionParser(RuleBuilderRegistry ruleBuilderRegistry) {
+        this.actions = ruleBuilderRegistry.actions();
     }
 
     public String generate(List<RuleBuilderStep> actions, boolean generateSimulatorFields) {

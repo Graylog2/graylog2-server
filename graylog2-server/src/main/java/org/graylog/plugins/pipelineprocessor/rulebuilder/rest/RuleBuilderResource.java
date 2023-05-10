@@ -24,11 +24,11 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
-import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -55,15 +55,15 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @RequiresAuthentication
 public class RuleBuilderResource extends RestResource implements PluginRestResource {
     private static final RateLimitedLog log = getRateLimitedLog(RuleBuilderResource.class);
-    private final FunctionRegistry functionRegistry;
+    private final RuleBuilderRegistry ruleBuilderRegistry;
     private final RuleResource ruleResource;
     private final RuleBuilderService ruleBuilderParser;
 
     @Inject
-    public RuleBuilderResource(FunctionRegistry functionRegistry,
+    public RuleBuilderResource(RuleBuilderRegistry ruleBuilderRegistry,
                                RuleResource ruleResource,
                                RuleBuilderService ruleBuilderParser) {
-        this.functionRegistry = functionRegistry;
+        this.ruleBuilderRegistry = ruleBuilderRegistry;
         this.ruleResource = ruleResource;
         this.ruleBuilderParser = ruleBuilderParser;
     }
@@ -83,12 +83,12 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleResource.createFromParser(ruleSource);
     }
 
-    @ApiOperation("Get function descriptors for rule builder")
-    @Path("/functions")
+    @ApiOperation("Get action descriptors for rule builder")
+    @Path("/actions")
     @GET
-    public Collection<Object> functions() {
-        return functionRegistry.all().stream()
-                .filter(f -> f.descriptor().ruleBuilderEnabled())
+    public Collection<Object> actions() {
+        return ruleBuilderRegistry.actions()
+                .values().stream()
                 .map(Function::descriptor)
                 .collect(Collectors.toList());
     }
@@ -97,8 +97,8 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @Path("/conditions")
     @GET
     public Collection<Object> conditions() {
-        return functionRegistry.all().stream()
-                .filter(f -> f.descriptor().ruleBuilderEnabled() && f.descriptor().returnType().equals(Boolean.class))
+        return ruleBuilderRegistry.conditions()
+                .values().stream()
                 .map(Function::descriptor)
                 .collect(Collectors.toList());
     }

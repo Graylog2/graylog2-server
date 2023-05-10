@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,7 +39,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 public class ConditionParserTest {
 
     public static final String NL = System.lineSeparator();
-    private static FunctionRegistry functionRegistry;
+    private static RuleBuilderRegistry ruleBuilderRegistry;
     private ConditionParser conditionParser;
 
     private static final String FUNCTION1_NAME = "function1";
@@ -58,12 +59,12 @@ public class ConditionParserTest {
                         integer("optional").optional().build()
                 ), Boolean.class
         ));
-        functionRegistry = new FunctionRegistry(functions);
+        ruleBuilderRegistry = new RuleBuilderRegistry(new FunctionRegistry(functions));
     }
 
     @Before
     public void initialize() {
-        conditionParser = new ConditionParser(functionRegistry);
+        conditionParser = new ConditionParser(ruleBuilderRegistry);
     }
 
 
