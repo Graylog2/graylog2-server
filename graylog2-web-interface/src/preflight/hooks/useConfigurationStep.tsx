@@ -22,6 +22,8 @@ import useDataNodes from 'preflight/hooks/useDataNodes';
 import useDataNodesCA from './useDataNodesCA';
 
 const configurationStep = (dataNodes: DataNodes, dataNodesCA: DataNodesCA) => {
+  return CONFIGURATION_STEPS.CA_CONFIGURATION.key;
+
   if (!dataNodesCA) {
     return CONFIGURATION_STEPS.CA_CONFIGURATION.key;
   }
