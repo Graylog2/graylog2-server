@@ -217,7 +217,7 @@ describe('Chart helper functions', () => {
         transformKeys(config.rowPivots, config.columnPivots, formatTime),
         extractSeries(),
         formatSeries,
-        generateChart('scatter', generatorFunction),
+        generateChart('scatter', generatorFunction, config),
       ]);
       const result = pipeline(input);
       const expectedResult = [
