@@ -39,9 +39,7 @@ type Props = {
   }
 }
 
-const _initialState = (config) => {
-  return omit(config, ['secret_key', 'secret_key_salt']);
-};
+const _initialState = (config) => omit(config, ['secret_key', 'secret_key_salt']);
 
 const postConfigUpdate = (update) => {
   const url = URLUtils.qualifyUrl(PLUGIN_API_ENDPOINT);
@@ -61,14 +59,12 @@ const AWSPluginConfiguration = ({ config }: Props) => {
     setUpdateConfig({ ...updateConfig, secret_key: '' });
   };
 
-  const onUpdate = (field) => {
-    return (value) => {
-      if (typeof value === 'object') {
-        updateConfigField(field, getValueFromInput(value.target));
-      } else {
-        updateConfigField(field, value);
-      }
-    };
+  const onUpdate = (field) => (value) => {
+    if (typeof value === 'object') {
+      updateConfigField(field, getValueFromInput(value.target));
+    } else {
+      updateConfigField(field, value);
+    }
   };
 
   const openModal = () => {
