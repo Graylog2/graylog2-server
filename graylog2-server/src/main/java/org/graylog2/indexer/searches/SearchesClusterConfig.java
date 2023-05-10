@@ -138,6 +138,7 @@ public abstract class SearchesClusterConfig {
                 .analysisDisabledFields(DEFAULT_ANALYSIS_DISABLED_FIELDS)
                 .autoRefreshTimerangeOptions(DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS)
                 .defaultAutoRefreshOption(DEFAULT_AUTO_REFRESH_DEFAULT_OPTION)
+                .quickAccessTimerangePresets(List.of())
                 .build();
     }
 
