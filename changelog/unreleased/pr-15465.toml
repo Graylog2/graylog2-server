@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fixing session expiration on the nodes page."
+
+issues = ["Graylog2/graylog-plugin-enterprise#5158"]
+pulls = ["15465"]
+
