@@ -17,9 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Tooltip = ({ children }) => {
-  return <>{children}</>;
-};
+const Tooltip = ({ children }) => <>{children}</>;
 
 Tooltip.propTypes = {
   children: PropTypes.any.isRequired,

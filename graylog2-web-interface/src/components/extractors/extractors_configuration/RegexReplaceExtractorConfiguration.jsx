@@ -37,14 +37,12 @@ class RegexReplaceExtractorConfiguration extends React.Component {
     trying: false,
   };
 
-  _onChange = (key) => {
-    return (event) => {
-      this.props.onExtractorPreviewLoad(undefined);
-      const newConfig = this.props.configuration;
+  _onChange = (key) => (event) => {
+    this.props.onExtractorPreviewLoad(undefined);
+    const newConfig = this.props.configuration;
 
-      newConfig[key] = FormUtils.getValueFromInput(event.target);
-      this.props.onChange(newConfig);
-    };
+    newConfig[key] = FormUtils.getValueFromInput(event.target);
+    this.props.onChange(newConfig);
   };
 
   _onTryClick = () => {
@@ -74,9 +72,7 @@ class RegexReplaceExtractorConfiguration extends React.Component {
     promise.finally(() => this.setState({ trying: false }));
   };
 
-  _isTryButtonDisabled = () => {
-    return this.state.trying || !this.props.configuration.regex || !this.props.configuration.replacement || !this.props.exampleMessage;
-  };
+  _isTryButtonDisabled = () => this.state.trying || !this.props.configuration.regex || !this.props.configuration.replacement || !this.props.exampleMessage;
 
   render() {
     const regexHelpMessage = (

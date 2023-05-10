@@ -84,13 +84,11 @@ class EventDefinitionDescription extends React.Component {
     return notificationsInformation;
   };
 
-  static clearNotifications = (definition) => {
-    return () => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Are you sure you want to clear queued notifications for "${definition.title}"?`)) {
-        EventDefinitionsActions.clearNotificationQueue(definition);
-      }
-    };
+  static clearNotifications = (definition) => () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Are you sure you want to clear queued notifications for "${definition.title}"?`)) {
+      EventDefinitionsActions.clearNotificationQueue(definition);
+    }
   };
 
   constructor() {

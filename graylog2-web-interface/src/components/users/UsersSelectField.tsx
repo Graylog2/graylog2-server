@@ -28,9 +28,7 @@ import PaginatedSelect from '../common/Select/PaginatedSelect';
 
 const DEFAULT_PAGINATION = { page: 1, perPage: 50, query: '', total: 0 };
 
-const formatUsers = (users) => {
-  return users.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username }));
-};
+const formatUsers = (users) => users.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username }));
 
 type Props = {
     value: string,

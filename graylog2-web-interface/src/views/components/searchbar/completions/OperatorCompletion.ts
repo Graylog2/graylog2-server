@@ -43,13 +43,9 @@ const operators: Array<CompletionResult> = [
   },
 ];
 
-const _matchesFieldName = (prefix) => {
-  return (field) => (field.name.indexOf(prefix) >= 0);
-};
+const _matchesFieldName = (prefix) => (field) => (field.name.indexOf(prefix) >= 0);
 
-const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Token | undefined | null => {
-  return tokens.slice(0, currentTokenIdx).reverse().find((token) => (token.type !== 'text' || trim(token.value) !== ''));
-};
+const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Token | undefined | null => tokens.slice(0, currentTokenIdx).reverse().find((token) => (token.type !== 'text' || trim(token.value) !== ''));
 
 class OperatorCompletion implements Completer {
   // eslint-disable-next-line class-methods-use-this

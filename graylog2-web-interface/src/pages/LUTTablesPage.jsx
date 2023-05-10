@@ -35,9 +35,7 @@ const _saved = (history) => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
 };
 
-const _isCreating = ({ action }) => {
-  return action === 'create';
-};
+const _isCreating = ({ action }) => action === 'create';
 
 const _validateTable = (table) => {
   LookupTablesActions.validate(table);

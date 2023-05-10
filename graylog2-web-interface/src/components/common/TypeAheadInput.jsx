@@ -104,9 +104,7 @@ class TypeAheadInput extends React.Component {
     this._destroyTypeahead();
   }
 
-  getValue = () => {
-    return $(this.fieldInput).typeahead('val');
-  };
+  getValue = () => $(this.fieldInput).typeahead('val');
 
   clear = () => {
     $(this.fieldInput).typeahead('val', '');

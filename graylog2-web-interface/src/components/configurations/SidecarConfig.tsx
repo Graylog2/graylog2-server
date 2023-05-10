@@ -77,25 +77,17 @@ const SidecarConfig = () => {
     });
   };
 
-  const onUpdate = (field) => {
-    return (value) => {
-      const newValue = typeof value === 'object' ? getValueFromInput(value.target) : value;
+  const onUpdate = (field) => (value) => {
+    const newValue = typeof value === 'object' ? getValueFromInput(value.target) : value;
 
-      setFormConfig({ ...formConfig, [field]: newValue });
-    };
+    setFormConfig({ ...formConfig, [field]: newValue });
   };
 
-  const inactiveThresholdValidator = (milliseconds) => {
-    return milliseconds >= 1000;
-  };
+  const inactiveThresholdValidator = (milliseconds) => milliseconds >= 1000;
 
-  const expirationThresholdValidator = (milliseconds) => {
-    return milliseconds >= 60 * 1000;
-  };
+  const expirationThresholdValidator = (milliseconds) => milliseconds >= 60 * 1000;
 
-  const durationMilliseconds = (duration) => {
-    return ISODurationUtils.isValidDuration(duration, (milliseconds) => { return milliseconds; });
-  };
+  const durationMilliseconds = (duration) => ISODurationUtils.isValidDuration(duration, (milliseconds) => milliseconds);
 
   const updateIntervalValidator = (milliseconds) => {
     const inactiveMilliseconds = durationMilliseconds(formConfig.sidecar_inactive_threshold);

@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>5.1.0-SNAPSHOT</version>
+    <version>5.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -96,7 +96,7 @@
         <apache-httpcore.version>4.4.14</apache-httpcore.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-java-sdk-2.version>2.17.77</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.20.61</aws-java-sdk-2.version>
         <bouncycastle.version>1.69</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
@@ -140,6 +140,7 @@
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.8.1</mongodb-driver.version>
         <mongojack.version>2.10.1.2</mongojack.version>
+        <mongojack4.version>4.8.0-0</mongojack4.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.91.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.59.Final</netty-tcnative-boringssl-static.version>
@@ -169,6 +170,7 @@
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.7</zookeeper.version>
+        <zstd.version>1.5.4-1</zstd.version>
         <cron-utils.version>9.1.6</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <commons-net.version>3.6</commons-net.version>
@@ -257,6 +259,13 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
                 <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-java-sdk-2.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

@@ -85,13 +85,11 @@ const SearchBar = () => {
 };
 
 describe('SearchBar pluggable controls', () => {
-  const PluggableSearchBarControl = () => {
-    return (
-      <FormikInput label="Pluggable Control"
-                   name="pluggableControl"
-                   id="pluggable-control" />
-    );
-  };
+  const PluggableSearchBarControl = () => (
+    <FormikInput label="Pluggable Control"
+                 name="pluggableControl"
+                 id="pluggable-control" />
+  );
 
   const mockOnSubmitFromPlugin = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
@@ -102,16 +100,12 @@ describe('SearchBar pluggable controls', () => {
         () => ({
           id: 'pluggable-search-bar-control',
           component: PluggableSearchBarControl,
-          useInitialSearchValues: () => {
-            return ({
-              pluggableControl: 'Initial Value',
-            });
-          },
-          useInitialDashboardWidgetValues: () => {
-            return ({
-              pluggableControl: 'Initial Value',
-            });
-          },
+          useInitialSearchValues: () => ({
+            pluggableControl: 'Initial Value',
+          }),
+          useInitialDashboardWidgetValues: () => ({
+            pluggableControl: 'Initial Value',
+          }),
           onSearchSubmit: mockOnSubmitFromPlugin,
           onDashboardWidgetSubmit: mockOnSubmitFromPlugin,
           validationPayload: (values) => {

@@ -21,9 +21,7 @@ import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
 
-const _getInitialState = () => {
-  return { time: moment() };
-};
+const _getInitialState = () => ({ time: moment() });
 
 const StyledDl = styled.dl`
   margin-top: 5px;

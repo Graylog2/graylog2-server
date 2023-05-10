@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-interface",
-  "version": "5.1.0-SNAPSHOT",
+  "version": "5.2.0-SNAPSHOT",
   "description": "Graylog Web Interface",
   "author": "torch",
   "license": "SSPL-1.0",
@@ -100,7 +100,7 @@
     "react-redux": "^8.0.5",
     "react-resizable": "^3.0.4",
     "react-rnd": "^10.1.1",
-    "react-select": "4.3.0",
+    "react-select": "5.7.3",
     "react-slider": "^2.0.4",
     "react-sortable-hoc": "^1.7.1",
     "react-sticky-el": "^2.0.9",
@@ -174,7 +174,7 @@
     "ts-node": "^10.2.1",
     "utility-types": "^3.10.0",
     "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "5.0.1",
+    "webpack-cli": "5.1.0",
     "webpack-dev-server": "^4.13.1",
     "webpack-merge": "^4.2.2"
   },

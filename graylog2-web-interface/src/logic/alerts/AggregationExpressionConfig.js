@@ -14,35 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export const emptyComparisonExpressionConfig = () => {
-  return {
-    expr: undefined,
-    left: {
-      expr: 'number-ref',
-      ref: undefined,
-    },
-    right: {
-      expr: 'number',
-      value: 0,
-    },
-  };
-};
+export const emptyComparisonExpressionConfig = () => ({
+  expr: undefined,
+  left: {
+    expr: 'number-ref',
+    ref: undefined,
+  },
+  right: {
+    expr: 'number',
+    value: 0,
+  },
+});
 
-export const emptyBooleanExpressionConfig = ({ operator = '&&', left = emptyComparisonExpressionConfig(), right = emptyComparisonExpressionConfig() }) => {
-  return {
-    expr: operator,
-    left: left,
-    right: right,
-  };
-};
+export const emptyBooleanExpressionConfig = ({ operator = '&&', left = emptyComparisonExpressionConfig(), right = emptyComparisonExpressionConfig() }) => ({
+  expr: operator,
+  left: left,
+  right: right,
+});
 
-export const emptyGroupExpressionConfig = ({ operator = '&&', child = emptyComparisonExpressionConfig() }) => {
-  return {
-    expr: 'group',
-    operator: operator,
-    child: child,
-  };
-};
+export const emptyGroupExpressionConfig = ({ operator = '&&', child = emptyComparisonExpressionConfig() }) => ({
+  expr: 'group',
+  operator: operator,
+  child: child,
+});
 
 /**
  * Replaces all boolean expressions inside the current tree, without affecting any internal groups.

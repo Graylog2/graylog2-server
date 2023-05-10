@@ -62,7 +62,7 @@ class ContentPackEdit extends React.Component {
     const content = this.props.contentPack;
     const { selectedEntities } = this.props;
     const selection = Object.keys(selectedEntities)
-      .reduce((acc, key) => { return acc + selectedEntities[key].length; }, 0) > 0;
+      .reduce((acc, key) => acc + selectedEntities[key].length, 0) > 0;
 
     return !(content.name && content.summary && content.vendor && selection);
   }
@@ -79,7 +79,7 @@ class ContentPackEdit extends React.Component {
       const configPaths = entityData.getPaths();
 
       Object.keys(configPaths).forEach((path) => {
-        const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path; });
+        const index = parameters.findIndex((paramMap) => paramMap.configKey === path);
 
         if (index >= 0) {
           configPaths[path].setParameter(parameters[index].paramName);

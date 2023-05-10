@@ -128,7 +128,7 @@ class ContentPackSelection extends React.Component {
     }
 
     const selectionEmpty = Object.keys(selectedEntities)
-      .reduce((acc, entityGroup) => { return acc + selectedEntities[entityGroup].length; }, 0) <= 0;
+      .reduce((acc, entityGroup) => acc + selectedEntities[entityGroup].length, 0) <= 0;
 
     if (selectionEmpty) {
       errors.selection = 'Select at least one entity.';
@@ -151,9 +151,7 @@ class ContentPackSelection extends React.Component {
     }), this._validate);
   };
 
-  _error = (name) => {
-    return this.state.touched[name] ? this.state.errors[name] : undefined;
-  };
+  _error = (name) => (this.state.touched[name] ? this.state.errors[name] : undefined);
 
   _updateSelectionEntity = (entity) => {
     const { selectedEntities, onStateChange } = this.props;
@@ -161,7 +159,7 @@ class ContentPackSelection extends React.Component {
     const newSelection = cloneDeep(selectedEntities);
 
     newSelection[typeName] = (newSelection[typeName] || []);
-    const index = newSelection[typeName].findIndex((e) => { return e.id === entity.id; });
+    const index = newSelection[typeName].findIndex((e) => e.id === entity.id);
 
     if (index < 0) {
       newSelection[typeName].push(entity);
@@ -216,7 +214,7 @@ class ContentPackSelection extends React.Component {
       return false;
     }
 
-    return selectedEntities[typeName].findIndex((e) => { return e.id === entity.id; }) >= 0;
+    return selectedEntities[typeName].findIndex((e) => e.id === entity.id) >= 0;
   };
 
   _isGroupSelected = (type) => {

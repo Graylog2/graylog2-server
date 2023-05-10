@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Show all streams in global decorators configuration, fixing display problem"
+
+issues = ["13465", "13467"]
+pulls = ["15280"]

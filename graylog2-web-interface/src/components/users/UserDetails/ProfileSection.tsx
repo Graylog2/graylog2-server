@@ -37,9 +37,7 @@ const ProfileSection = ({
     accountStatus,
   },
 }: Props) => {
-  const isOldUser = () => {
-    return fullName && (!firstName && !lastName);
-  };
+  const isOldUser = () => fullName && (!firstName && !lastName);
 
   return (
     <SectionComponent title="Profile">

@@ -37,9 +37,7 @@ const HeaderWrapper = styled.div`
 `;
 
 const ControlledTableListHeader = ({ children }: { children: React.ReactNode }) => {
-  const wrapStringChildren = (text) => {
-    return <HeaderWrapper>{text}</HeaderWrapper>;
-  };
+  const wrapStringChildren = (text) => <HeaderWrapper>{text}</HeaderWrapper>;
 
   const header = typeof children === 'string' ? wrapStringChildren(children) : children;
 

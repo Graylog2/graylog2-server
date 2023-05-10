@@ -55,28 +55,24 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
     return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type) || {};
   };
 
-  const sortedEventDefinitionTypes = (): any => {
-    return (PluginStore.exports('eventDefinitionTypes') as any).sort((eventDefinitionType1, eventDefinitionType2) => {
-      // Try to sort by given sort order and displayName if possible, otherwise do it by displayName
-      const eventDefinitionType1Order = eventDefinitionType1.sortOrder;
-      const eventDefinitionType2Order = eventDefinitionType2.sortOrder;
+  const sortedEventDefinitionTypes = (): any => (PluginStore.exports('eventDefinitionTypes') as any).sort((eventDefinitionType1, eventDefinitionType2) => {
+    // Try to sort by given sort order and displayName if possible, otherwise do it by displayName
+    const eventDefinitionType1Order = eventDefinitionType1.sortOrder;
+    const eventDefinitionType2Order = eventDefinitionType2.sortOrder;
 
-      if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
-        const sort = defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) - defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
+    if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
+      const sort = defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) - defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
 
-        if (sort !== 0) {
-          return sort;
-        }
+      if (sort !== 0) {
+        return sort;
       }
+    }
 
-      return naturalSort(eventDefinitionType1.displayName, eventDefinitionType2.displayName);
-    });
-  };
+    return naturalSort(eventDefinitionType1.displayName, eventDefinitionType2.displayName);
+  });
 
-  const formattedEventDefinitionTypes = () => {
-    return sortedEventDefinitionTypes()
-      .map((type) => ({ label: type.displayName, value: type.type }));
-  };
+  const formattedEventDefinitionTypes = () => sortedEventDefinitionTypes()
+    .map((type) => ({ label: type.displayName, value: type.type }));
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
     const conditionPlugin = getConditionPlugin(nextType);
@@ -87,21 +83,17 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
 
   const renderConditionTypeDescriptions = () => {
     const typeDescriptions = sortedEventDefinitionTypes()
-      .map((type) => {
-        return (
-          <React.Fragment key={type.type}>
-            <dt>{type.displayName}</dt>
-            <dd>{type.description || 'No description available.'}</dd>
-          </React.Fragment>
-        );
-      });
+      .map((type) => (
+        <React.Fragment key={type.type}>
+          <dt>{type.displayName}</dt>
+          <dd>{type.description || 'No description available.'}</dd>
+        </React.Fragment>
+      ));
 
     return <dl>{typeDescriptions}</dl>;
   };
 
-  const disabledSelect = () => {
-    return !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
-  };
+  const disabledSelect = () => !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;

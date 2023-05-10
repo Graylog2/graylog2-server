@@ -37,27 +37,25 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteTimestamp = ({ disabled, nextTimeRange, range }: Props) => {
-  return (
-    <Field name={`nextTimeRange[${range}]`}>
-      {({ field: { value, onChange, name }, meta: { error } }) => {
-        const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
+const AbsoluteTimestamp = ({ disabled, nextTimeRange, range }: Props) => (
+  <Field name={`nextTimeRange[${range}]`}>
+    {({ field: { value, onChange, name }, meta: { error } }) => {
+      const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+      const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
 
-        return (
-          <>
-            <AbsoluteDateInput name={name}
-                               disabled={disabled}
-                               value={dateTime}
-                               onChange={_onChange} />
+      return (
+        <>
+          <AbsoluteDateInput name={name}
+                             disabled={disabled}
+                             value={dateTime}
+                             onChange={_onChange} />
 
-            <ErrorMessage>{error}</ErrorMessage>
-          </>
-        );
-      }}
-    </Field>
-  );
-};
+          <ErrorMessage>{error}</ErrorMessage>
+        </>
+      );
+    }}
+  </Field>
+);
 
 AbsoluteTimestamp.propTypes = {
   disabled: PropTypes.bool,

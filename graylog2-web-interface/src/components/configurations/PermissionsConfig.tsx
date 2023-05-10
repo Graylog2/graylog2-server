@@ -62,9 +62,10 @@ const PermissionsConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values: PermissionsConfigType) => {
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_permissions',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'permissions',
+      app_action_value: 'configuration-save',
     });
 
     ConfigurationsActions.update(ConfigurationType.PERMISSIONS_CONFIG, values).then(() => {
@@ -113,49 +114,47 @@ const PermissionsConfig = () => {
                  data-event-element={modalTitle}>
             <Formik onSubmit={saveConfig} initialValues={config}>
 
-              {({ isSubmitting }) => {
-                return (
-                  <Form>
-                    <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
-                    </Modal.Header>
+              {({ isSubmitting }) => (
+                <Form>
+                  <Modal.Header closeButton>
+                    <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                  </Modal.Header>
 
-                    <Modal.Body>
-                      <div>
-                        <Row>
-                          <Col sm={12}>
-                            <FormikInput type="checkbox"
-                                         name="allow_sharing_with_everyone"
-                                         id="shareWithEveryone"
-                                         label={(
-                                           <LabelSpan>Share with everyone</LabelSpan>
+                  <Modal.Body>
+                    <div>
+                      <Row>
+                        <Col sm={12}>
+                          <FormikInput type="checkbox"
+                                       name="allow_sharing_with_everyone"
+                                       id="shareWithEveryone"
+                                       label={(
+                                         <LabelSpan>Share with everyone</LabelSpan>
                                          )} />
-                            <InputDescription help="Control whether it is possible to share with everyone." />
-                          </Col>
-                          <Col sm={12}>
-                            <FormikInput type="checkbox"
-                                         name="allow_sharing_with_users"
-                                         id="shareWithUsers"
-                                         label={(
-                                           <LabelSpan>Share with users</LabelSpan>
+                          <InputDescription help="Control whether it is possible to share with everyone." />
+                        </Col>
+                        <Col sm={12}>
+                          <FormikInput type="checkbox"
+                                       name="allow_sharing_with_users"
+                                       id="shareWithUsers"
+                                       label={(
+                                         <LabelSpan>Share with users</LabelSpan>
                                          )} />
-                            <InputDescription help="Control whether it is possible to share with single users." />
-                          </Col>
+                          <InputDescription help="Control whether it is possible to share with single users." />
+                        </Col>
 
-                        </Row>
-                      </div>
-                    </Modal.Body>
+                      </Row>
+                    </div>
+                  </Modal.Body>
 
-                    <Modal.Footer>
-                      <ModalSubmit onCancel={resetConfig}
-                                   isSubmitting={isSubmitting}
-                                   isAsyncSubmit
-                                   submitLoadingText="Update configuration"
-                                   submitButtonText="Update configuration" />
-                    </Modal.Footer>
-                  </Form>
-                );
-              }}
+                  <Modal.Footer>
+                    <ModalSubmit onCancel={resetConfig}
+                                 isSubmitting={isSubmitting}
+                                 isAsyncSubmit
+                                 submitLoadingText="Update configuration"
+                                 submitButtonText="Update configuration" />
+                  </Modal.Footer>
+                </Form>
+              )}
 
             </Formik>
           </Modal>

@@ -39,7 +39,7 @@ public class CSPServiceImpl implements CSPService {
     }
 
     @Override
-    public void buildConnectSrc() {
+    public synchronized void buildConnectSrc() {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
                 .map(dto -> dto.config().externalHTTPHosts())
                 .filter(optList -> optList.isPresent())

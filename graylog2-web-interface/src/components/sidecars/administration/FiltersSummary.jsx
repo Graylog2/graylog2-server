@@ -55,11 +55,7 @@ class FiltersSummary extends React.Component {
     return value;
   };
 
-  formatFilters = (filters) => {
-    return Object.keys(filters).map((filterKey) => {
-      return <li key={filterKey}>{filterKey}: {this.formatFilter(filterKey, filters[filterKey])}</li>;
-    });
-  };
+  formatFilters = (filters) => Object.keys(filters).map((filterKey) => <li key={filterKey}>{filterKey}: {this.formatFilter(filterKey, filters[filterKey])}</li>);
 
   render() {
     const { filters, onResetFilters } = this.props;
