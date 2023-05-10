@@ -15,22 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { CONFIGURATION_STEPS } from 'preflight/Constants';
+import { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
 import type { DataNodes, ConfigurationStep, DataNodesCA } from 'preflight/types';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 
 import useDataNodesCA from './useDataNodesCA';
 
-const configurationStep = (_dataNodes: DataNodes, dataNodesCA: DataNodesCA) => {
+const configurationStep = (dataNodes: DataNodes, dataNodesCA: DataNodesCA) => {
   if (!dataNodesCA) {
     return CONFIGURATION_STEPS.CA_CONFIGURATION.key;
   }
 
-  // const finishedProvisioning = !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.SIGNED.key);
-  //
-  // if (!finishedProvisioning) {
-  //   return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
-  // }
+  const finishedProvisioning = !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED.key);
+
+  if (!finishedProvisioning) {
+    return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
+  }
 
   return CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key;
 };

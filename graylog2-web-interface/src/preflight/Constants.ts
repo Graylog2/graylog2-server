@@ -41,6 +41,9 @@ export const DATA_NODES_STATUS = {
   UNCONFIGURED: {
     key: 'UNCONFIGURED',
   },
+  CONFIGURED: {
+    key: 'UNCONFIGURED',
+  },
   CSR: {
     key: 'CSR',
   },

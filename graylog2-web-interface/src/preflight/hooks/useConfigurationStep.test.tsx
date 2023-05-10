@@ -23,6 +23,7 @@ describe('useConfigurationStep', () => {
       short_node_id: 'node-id-1',
       transport_address: 'http://localhost:9200',
       type: 'DATANODE',
+      status: 'UNCONFIGURED',
     },
     {
       hostname: '192.168.0.11',
@@ -34,6 +35,7 @@ describe('useConfigurationStep', () => {
       short_node_id: 'node-id-2',
       transport_address: 'http://localhost:9201',
       type: 'DATANODE',
+      status: 'UNCONFIGURED',
     },
     {
       hostname: '192.168.0.12',
@@ -45,6 +47,7 @@ describe('useConfigurationStep', () => {
       short_node_id: 'node-id-3',
       transport_address: 'http://localhost:9202',
       type: 'DATANODE',
+      status: 'UNCONFIGURED',
     },
   ];
 
@@ -121,6 +124,7 @@ describe('useConfigurationStep', () => {
         short_node_id: 'node-id-1',
         transport_address: 'http://localhost:9200',
         type: 'DATANODE',
+        status: 'UNCONFIGURED',
       }],
     });
 
@@ -150,13 +154,14 @@ describe('useConfigurationStep', () => {
         short_node_id: 'node-id-1',
         transport_address: 'http://localhost:9200',
         type: 'DATANODE',
+        status: 'CONNECTED',
       }],
     });
 
     const { result, waitFor } = renderHook(() => useConfigurationStep());
 
     await waitFor(() => expect(result.current).toEqual({
-      step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
+      step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
       isLoading: false,
     }));
   });
