@@ -24,6 +24,8 @@ export { default as MenuItem } from './MenuItem';
 export { default as Row } from './Row';
 export { default as Section } from './Section';
 export { default as List } from './List';
+export { default as FormikInput } from './FormikInput';
+export { default as Input } from './Input';
 export { default as MenuTarget } from './mantine/MenuTarget';
 export { default as MenuDropdownWrapper } from './mantine/MenuDropdownWrapper';
 export * from './mantine/imports';

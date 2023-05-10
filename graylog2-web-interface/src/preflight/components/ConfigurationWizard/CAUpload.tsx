@@ -48,7 +48,7 @@ const CAUpload = () => {
       UserNotification.success('CA uploaded successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
     }).catch((error) => {
-      UserNotification.error(`CA uploaded failed with error: ${error}`);
+      UserNotification.error(`CA upload failed with error: ${error}`);
     }).finally(() => {
       setIsUploading(false);
     });

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Title, Tabs, Space } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
+import CACreateForm from './CACreateForm';
 import CAUpload from './CAUpload';
 
 const StyledTabs = styled(Tabs)(({ theme }) => css`
@@ -44,7 +45,7 @@ const CAConfiguration = () => (
         <CAUpload />
       </Tabs.Panel>
       <Tabs.Panel value="create" pt="xs">
-        Create new CA
+        <CACreateForm />
       </Tabs.Panel>
     </StyledTabs>
   </>

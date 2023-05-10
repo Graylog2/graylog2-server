@@ -14,8 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
+import { Field } from 'formik';
 
-const CAForm = () => <div>The form</div>;
+import Input from 'preflight/components/common/Input';
 
-export default CAForm;
+type Props = {
+  name: string,
+  label: string,
+  placeholder?: string,
+}
+
+const FormikInput = ({ name, placeholder, label }: Props) => (
+  <Field name={name}>
+    {({ field: { value, onChange, onBlur }, meta: { error: validationError } }) => (
+      <Input onBlur={onBlur}
+             id={name}
+             label={label}
+             placeholder={placeholder}
+             value={value}
+             error={validationError}
+             onChange={onChange} />
+    )}
+  </Field>
+);
+
+FormikInput.defaultProps = {
+  placeholder: undefined,
+};
+
+export default FormikInput;
