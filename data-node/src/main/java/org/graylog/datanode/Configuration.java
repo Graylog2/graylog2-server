@@ -81,7 +81,7 @@ public class Configuration extends BaseConfiguration {
     private String opensearchLogsLocation = "logs";
 
     @Parameter(value = "opensearch_config_location")
-    private String opensearchConfigLocation = "bin/opensearch-2.4.1/config";
+    private String opensearchConfigLocation = "config";
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
@@ -107,13 +107,13 @@ public class Configuration extends BaseConfiguration {
     private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
 
     @Parameter(value = "transport_certificate_password")
-    private String datanodeTransportCertificatePassword = "password";
+    private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = "datanode-http-certificates.p12";
 
     @Parameter(value = "http_certificate_password")
-    private String datanodeHttpCertificatePassword = "password";
+    private String datanodeHttpCertificatePassword;
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
@@ -169,7 +169,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     @Parameter(value = "rest_api_username")
-    private String restApiUsername = "admin";
+    private String restApiUsername;
 
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
@@ -183,7 +183,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     @Parameter(value = "rest_api_password")
-    private String restApiPassword = "changeit";
+    private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "data/node-id";

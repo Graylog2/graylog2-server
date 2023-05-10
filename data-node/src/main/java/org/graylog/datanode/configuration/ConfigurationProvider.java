@@ -66,7 +66,8 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         final String truststorePassword = UUID.randomUUID().toString();
         final var cfg = sharedConfiguration.test();
 
-        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
+        final String opensearchConfigLocation = localConfiguration.getOpensearchConfigLocation();
+        final Path opensearchConfigDir = Path.of(opensearchConfigLocation).resolve("opensearch");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
@@ -84,11 +85,11 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                 networkHost -> config.put("network.host", networkHost));
 
 
-        final Path transportKeystorePath = Path.of(localConfiguration.getOpensearchConfigLocation())
+        final Path transportKeystorePath = opensearchConfigDir
                 .resolve(localConfiguration.getDatanodeTransportCertificate());
 
 
-        final Path httpKeystorePath = Path.of(localConfiguration.getOpensearchConfigLocation())
+        final Path httpKeystorePath = opensearchConfigDir
                 .resolve(localConfiguration.getDatanodeHttpCertificate());
 
         if (Files.exists(transportKeystorePath) && Files.exists(httpKeystorePath)) {
@@ -123,7 +124,6 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                     localConfiguration.getDatanodeTransportCertificatePassword(),
                     CertutilCert.DATANODE_KEY_ALIAS));
 
-            Files.copy(transportKeystorePath, opensearchConfigDir.resolve(localConfiguration.getDatanodeTransportCertificate()));
             tlsConfigurationSupplier.addTransportTlsConfig(config,
                     CertutilCert.DATANODE_KEY_ALIAS,
                     localConfiguration.getDatanodeTransportCertificate(),
@@ -150,7 +150,6 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                     localConfiguration.getDatanodeHttpCertificatePassword(),
                     CertutilHttp.DATANODE_KEY_ALIAS));
 
-            Files.copy(httpKeystorePath, opensearchConfigDir.resolve(localConfiguration.getDatanodeHttpCertificate()));
             tlsConfigurationSupplier.addHttpTlsConfig(config,
                     CertutilHttp.DATANODE_KEY_ALIAS,
                     localConfiguration.getDatanodeHttpCertificate(),
@@ -170,7 +169,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         configuration = new OpensearchConfiguration(
                 opensearchDistribution.version(),
                 opensearchDistribution.directory(),
-                Path.of(localConfiguration.getOpensearchConfigLocation()),
+                Path.of(opensearchConfigLocation),
                 localConfiguration.getOpensearchHttpPort(),
                 localConfiguration.getOpensearchTransportPort(),
                 localConfiguration.getRestApiUsername(),
