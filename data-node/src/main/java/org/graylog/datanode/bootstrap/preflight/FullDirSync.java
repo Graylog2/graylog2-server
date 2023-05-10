@@ -41,13 +41,24 @@ public class FullDirSync {
         existingPaths.removeAll(copiedPaths);
 
         for (Path path : existingPaths) {
-            LOG.info("Deleting obsolete file " + path);
-            if (Files.isDirectory(path)) {
-                FileUtils.deleteDirectory(path.toFile());
+            if (!isCertificateFile(path)) {
+                if (Files.isDirectory(path)) {
+                    LOG.info("Deleting obsolete directory " + path);
+                    FileUtils.deleteDirectory(path.toFile());
+                } else {
+
+                    LOG.info("Deleting obsolete directory " + path);
+                    Files.deleteIfExists(path);
+                }
             } else {
-                Files.deleteIfExists(path);
+                LOG.info("Existing certificate file has been left undeleted " + path);
             }
         }
+
+    }
+
+    private static boolean isCertificateFile(Path path) {
+        return path.toString().endsWith(".p12");
     }
 
     private static List<Path> copyFiles(Path source, Path target) throws IOException {
