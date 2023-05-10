@@ -26,6 +26,8 @@ import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -51,7 +53,7 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
+const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.name) } });
 
 const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom: string, timeRangeTo: string) => {
   const barWidth = 0.03; // width in percentage, relative to chart width
