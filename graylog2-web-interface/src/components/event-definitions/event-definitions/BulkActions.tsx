@@ -101,9 +101,7 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
     refetchEventDefinitions();
   };
 
-  const getErrorExplanation = (failures: Array<{ entity_id: string, failure_explanation: string }>) => {
-    return failures?.reduce((acc, failure) => `${acc} ${failure?.failure_explanation}`, '');
-  };
+  const getErrorExplanation = (failures: Array<{ entity_id: string, failure_explanation: string }>) => failures?.reduce((acc, failure) => `${acc} ${failure?.failure_explanation}`, '');
 
   const onAction = useCallback(() => {
     fetch('POST',

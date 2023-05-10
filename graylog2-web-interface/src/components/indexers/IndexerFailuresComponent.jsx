@@ -63,19 +63,17 @@ class IndexerFailuresComponent extends React.Component {
     });
   }
 
-  _formatFailuresSummary = () => {
-    return (
-      <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
-        <Icon name={iconForFailureCount(this.state.total)} /> {formatTextForFailureCount(this.state.total)}
+  _formatFailuresSummary = () => (
+    <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
+      <Icon name={iconForFailureCount(this.state.total)} /> {formatTextForFailureCount(this.state.total)}
 
-        <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
-          <Button bsStyle="info" bsSize="xs" className="pull-right">
-            Show errors
-          </Button>
-        </LinkContainer>
-      </Alert>
-    );
-  };
+      <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
+        <Button bsStyle="info" bsSize="xs" className="pull-right">
+          Show errors
+        </Button>
+      </LinkContainer>
+    </Alert>
+  );
 
   render() {
     let content;

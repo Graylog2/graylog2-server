@@ -134,25 +134,19 @@ const StreamActions = ({
     }
   }, [sendTelemetry, stream.id, stream.title]);
 
-  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => {
-    return StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
-  }, [stream.id]);
+  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success')), [stream.id]);
 
-  const onUpdate = useCallback((newStream: Stream) => {
-    return StreamsStore.update(stream.id, newStream, (response) => {
-      UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
+  const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
+    UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
 
-      return response;
-    });
-  }, [stream.id]);
+    return response;
+  }), [stream.id]);
 
-  const onCloneSubmit = useCallback((newStream: Stream) => {
-    return StreamsStore.cloneStream(stream.id, newStream, (response) => {
-      UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
+  const onCloneSubmit = useCallback((newStream: Stream) => StreamsStore.cloneStream(stream.id, newStream, (response) => {
+    UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
 
-      return response;
-    });
-  }, [stream.id]);
+    return response;
+  }), [stream.id]);
 
   return (
     <ButtonToolbar>

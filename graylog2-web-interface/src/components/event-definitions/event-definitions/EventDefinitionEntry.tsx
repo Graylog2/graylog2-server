@@ -59,9 +59,7 @@ type Props = {
 const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
   .find((edt) => edt.type === type);
 
-const renderDescription = (definition, context) => {
-  return <EventDefinitionDescription definition={definition} context={context} />;
-};
+const renderDescription = (definition, context) => <EventDefinitionDescription definition={definition} context={context} />;
 
 const EventDefinitionEntry = ({
   context,
@@ -75,9 +73,7 @@ const EventDefinitionEntry = ({
   const isScheduled = get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(eventDefinition);
 
-  const isSystemEventDefinition = (): boolean => {
-    return eventDefinition.config.type === 'system-notifications-v1';
-  };
+  const isSystemEventDefinition = (): boolean => eventDefinition.config.type === 'system-notifications-v1';
 
   const titleSuffix = (): JSX.Element | undefined => {
     if (isSystemEventDefinition()) {
@@ -95,9 +91,7 @@ const EventDefinitionEntry = ({
     return <span>{suffix} <Label bsStyle="warning">disabled</Label></span>;
   };
 
-  const showActions = (): boolean => {
-    return scopePermissions?.is_mutable;
-  };
+  const showActions = (): boolean => scopePermissions?.is_mutable;
 
   const handleCopy = () => {
     onCopy(eventDefinition);

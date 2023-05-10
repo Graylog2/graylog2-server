@@ -43,14 +43,12 @@ const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfigurati
 
   const [trying, setTrying] = useState(false);
 
-  const _onChange = (key: string) => {
-    return (event) => {
-      onExtractorPreviewLoad(undefined);
-      const newConfig = configuration;
+  const _onChange = (key: string) => (event) => {
+    onExtractorPreviewLoad(undefined);
+    const newConfig = configuration;
 
-      newConfig[key] = FormUtils.getValueFromInput(event.target);
-      onChange(newConfig);
-    };
+    newConfig[key] = FormUtils.getValueFromInput(event.target);
+    onChange(newConfig);
   };
 
   const _onTryClick = useCallback(() => {

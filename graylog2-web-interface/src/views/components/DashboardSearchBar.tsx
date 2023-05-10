@@ -99,9 +99,7 @@ const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarCon
 const useInitialFormValues = (timerange: TimeRange, queryString: string) => {
   const initialValuesFromPlugins = usePluggableInitialValues();
 
-  return useMemo(() => {
-    return { timerange, queryString, ...initialValuesFromPlugins };
-  }, [queryString, timerange, initialValuesFromPlugins]);
+  return useMemo(() => ({ timerange, queryString, ...initialValuesFromPlugins }), [queryString, timerange, initialValuesFromPlugins]);
 };
 
 const DashboardSearchBar = () => {

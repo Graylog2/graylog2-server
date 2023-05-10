@@ -38,16 +38,12 @@ declare global {
   }
 }
 
-const appConfig = (): AppConfigs => {
-  return (window.appConfig || {}) as AppConfigs;
-};
+const appConfig = (): AppConfigs => (window.appConfig || {}) as AppConfigs;
 
-const getEnabledFeatures = () => {
-  return Immutable.Map(appConfig().featureFlags)
-    .filter((value) => value.trim().toLowerCase() === 'on')
-    .keySeq().toList()
-    .filter((s) => typeof s === 'string');
-};
+const getEnabledFeatures = () => Immutable.Map(appConfig().featureFlags)
+  .filter((value) => value.trim().toLowerCase() === 'on')
+  .keySeq().toList()
+  .filter((s) => typeof s === 'string');
 
 const AppConfig = {
   features: getEnabledFeatures(),

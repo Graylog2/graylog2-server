@@ -31,9 +31,7 @@ import NavigationLink from './NavigationLink';
 const TITLE_PREFIX = 'System';
 const PATH_PREFIX = '/system';
 
-const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(appPrefixed(prefix)) === 0;
-};
+const _isActive = (requestPath, prefix) => requestPath.indexOf(appPrefixed(prefix)) === 0;
 
 const titleMap = {
   '/overview': 'Overview',

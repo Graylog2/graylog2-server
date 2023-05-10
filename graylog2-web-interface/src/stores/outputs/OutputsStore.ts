@@ -54,9 +54,7 @@ export const OutputsStore = singletonStore(
       const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
 
       fetch('GET', url)
-        .then((resp) => {
-          return resp.types[typeName];
-        }, this._failCallback)
+        .then((resp) => resp.types[typeName], this._failCallback)
         .then(callback);
     },
     remove(outputId: string, callback: (error: any) => void) {

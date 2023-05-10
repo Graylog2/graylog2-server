@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.indexer.searches.timerangepresets;
 
-import AppConfig from 'util/AppConfig';
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-const useFeature = (name: string) => AppConfig.isFeatureEnabled(name);
-
-export default useFeature;
+public record TimerangePreset(@JsonProperty("timerange") TimeRange timeRange,
+                              @JsonProperty("description") String description) {
+}

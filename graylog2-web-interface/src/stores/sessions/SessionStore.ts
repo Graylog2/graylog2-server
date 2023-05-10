@@ -58,9 +58,7 @@ export const SessionStore = singletonStore(
       const builder = new Builder('POST', qualifyUrl(this.sourceUrl))
         .json({ username, password, host });
       const promise = builder.build()
-        .then((response) => {
-          return { username: response?.username };
-        });
+        .then((response) => ({ username: response?.username }));
 
       SessionActions.login.promise(promise);
     },

@@ -31,22 +31,16 @@ const _formatNotificationCount = (count: number) => {
   return `are ${count} notifications`;
 };
 
-const getTitle = (count) => {
-  return count === 0 ? 'No notifications' : `There ${_formatNotificationCount(count)}`;
-};
+const getTitle = (count) => (count === 0 ? 'No notifications' : `There ${_formatNotificationCount(count)}`);
 
-const getContent = (count: number, notificationsList: Array<NotificationType>) => {
-  return count === 0 ? (
-    <Alert bsStyle="success" className="notifications-none">
-      <Icon name="check-circle" />{' '}
+const getContent = (count: number, notificationsList: Array<NotificationType>) => (count === 0 ? (
+  <Alert bsStyle="success" className="notifications-none">
+    <Icon name="check-circle" />{' '}
       &nbsp;No notifications
-    </Alert>
-  ) : (
-    notificationsList?.map((notification) => {
-      return <Notification key={`${notification.type}-${notification?.key}-${notification.timestamp}`} notification={notification} />;
-    })
-  );
-};
+  </Alert>
+) : (
+  notificationsList?.map((notification) => <Notification key={`${notification.type}-${notification?.key}-${notification.timestamp}`} notification={notification} />)
+));
 
 const NotificationsList = () => {
   const { notifications, total } = useStore(NotificationsStore);

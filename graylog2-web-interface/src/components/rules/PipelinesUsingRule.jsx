@@ -31,15 +31,13 @@ const PipelinesUsingRule = ({ create }) => {
     return null;
   }
 
-  const formattedPipelines = () => usedInPipelines.map((pipeline) => {
-    return (
-      <li key={pipeline.id}>
-        <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
-          {pipeline.title}
-        </Link>
-      </li>
-    );
-  });
+  const formattedPipelines = () => usedInPipelines.map((pipeline) => (
+    <li key={pipeline.id}>
+      <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
+        {pipeline.title}
+      </Link>
+    </li>
+  ));
 
   return (
     <Input id="used-in-pipelines" label="Used in pipelines" help="Pipelines that use this rule in one or more of their stages.">

@@ -31,9 +31,7 @@ class AssignOutputDropdown extends React.Component {
     selectedOutput: this.PLACEHOLDER,
   };
 
-  _formatOutput = (output) => {
-    return <option key={output.id} value={output.id}>{output.title}</option>;
-  };
+  _formatOutput = (output) => <option key={output.id} value={output.id}>{output.title}</option>;
 
   _handleUpdate = (evt) => {
     this.setState({ selectedOutput: evt.target.value });

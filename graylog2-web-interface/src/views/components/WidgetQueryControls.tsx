@@ -85,13 +85,11 @@ type Props = {
   availableStreams: Array<{ key: string, value: string }>,
 };
 
-export const updateWidgetSearchControls = (widget, { timerange, streams, queryString }) => {
-  return widget.toBuilder()
-    .timerange(timerange)
-    .query(createElasticsearchQueryString(queryString))
-    .streams(streams)
-    .build();
-};
+export const updateWidgetSearchControls = (widget, { timerange, streams, queryString }) => widget.toBuilder()
+  .timerange(timerange)
+  .query(createElasticsearchQueryString(queryString))
+  .streams(streams)
+  .build();
 
 const onSubmit = async (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
   const { timerange, streams, queryString } = values;
@@ -137,9 +135,7 @@ const useInitialFormValues = (widget: Widget) => {
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
   const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
-  return useMemo(() => {
-    return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
-  }, [timerange, streams, queryString, initialValuesFromPlugins]);
+  return useMemo(() => ({ timerange, streams, queryString, ...initialValuesFromPlugins }), [timerange, streams, queryString, initialValuesFromPlugins]);
 };
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);

@@ -123,19 +123,17 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     callback(null, uniqResults);
   };
 
-  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
-    return this.completers.some((completer) => {
-      if (typeof completer.shouldShowCompletions === 'function') {
-        try {
-          return completer.shouldShowCompletions(currentLine, lines);
-        } catch (e) {
-          onCompleterError(e);
-        }
+  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => this.completers.some((completer) => {
+    if (typeof completer.shouldShowCompletions === 'function') {
+      try {
+        return completer.shouldShowCompletions(currentLine, lines);
+      } catch (e) {
+        onCompleterError(e);
       }
+    }
 
-      return false;
-    });
-  };
+    return false;
+  });
 
   get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
 }

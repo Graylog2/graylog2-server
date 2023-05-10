@@ -41,7 +41,7 @@ public class Environment {
 
     public Map<String, String> getEnv() {
         Map<String, String> env = new HashMap<>();
-        env.putAll(cleanEnvironment(env));
+        env.putAll(cleanEnvironment(this.env));
         env.putAll(additionalVariables);
         return Collections.unmodifiableMap(env);
     }

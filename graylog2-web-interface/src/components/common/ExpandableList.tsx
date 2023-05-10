@@ -30,13 +30,11 @@ type Props = PropsWithChildren<{
  * of categories. Inside the categories the user has the possibility of doing a selection.
  * The ExpandableList can be used nested.
  */
-const ExpandableList = ({ children, className }: Props) => {
-  return (
-    <ul className={className ? `${style.list} ${className}` : style.list}>
-      {children}
-    </ul>
-  );
-};
+const ExpandableList = ({ children, className }: Props) => (
+  <ul className={className ? `${style.list} ${className}` : style.list}>
+    {children}
+  </ul>
+);
 
 ExpandableList.defaultProps = {
   className: undefined,

@@ -32,10 +32,8 @@ const getNotificationPlugin = (type) => {
   return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
 };
 
-const formattedEventNotificationTypes = () => {
-  return PluginStore.exports('eventNotificationTypes')
-    .map((type) => ({ label: type.displayName, value: type.type }));
-};
+const formattedEventNotificationTypes = () => PluginStore.exports('eventNotificationTypes')
+  .map((type) => ({ label: type.displayName, value: type.type }));
 
 class EventNotificationForm extends React.Component {
   static propTypes = {

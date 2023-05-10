@@ -50,21 +50,19 @@ export const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
   rowPivots: Array<Pivot>,
   fnSeries: Array<Series>,
   sort?: Array<SortConfig>
-}) => {
-  return AggregationWidget.builder()
-    .id(generateId())
-    .config(
-      AggregationWidgetConfig.builder()
-        .columnPivots([])
-        .rowPivots(rowPivots)
-        .series(fnSeries)
-        .sort(sort)
-        .visualization('table')
-        .rollup(true)
-        .build(),
-    )
-    .build();
-};
+}) => AggregationWidget.builder()
+  .id(generateId())
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots(rowPivots)
+      .series(fnSeries)
+      .sort(sort)
+      .visualization('table')
+      .rollup(true)
+      .build(),
+  )
+  .build();
 
 const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
   const isEven = (index + 1) % 2 === 0;
