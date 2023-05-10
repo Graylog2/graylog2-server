@@ -16,13 +16,13 @@
  */
 
 import { CONFIGURATION_STEPS } from 'preflight/Constants';
-import type { DataNodes, ConfigurationStep, DataNodesCAStatus } from 'preflight/types';
+import type { DataNodes, ConfigurationStep, DataNodesCA } from 'preflight/types';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 
 import useDataNodesCA from './useDataNodesCA';
 
-const configurationStep = (_dataNodes: DataNodes, dataNodesCAStatus: DataNodesCAStatus) => {
-  if (!dataNodesCAStatus.isConfigured) {
+const configurationStep = (_dataNodes: DataNodes, dataNodesCA: DataNodesCA) => {
+  if (!dataNodesCA) {
     return CONFIGURATION_STEPS.CA_CONFIGURATION.key;
   }
 
@@ -37,7 +37,7 @@ const configurationStep = (_dataNodes: DataNodes, dataNodesCAStatus: DataNodesCA
 
 const useConfigurationStep = (): { step: ConfigurationStep | undefined, isLoading: boolean } => {
   const { data: dataNodes, isInitialLoading: isLoadingDataNodes } = useDataNodes();
-  const { data: dataNodesCAStatus, isInitialLoading: isLoadingCAStatus } = useDataNodesCA();
+  const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus } = useDataNodesCA();
 
   if (isLoadingDataNodes || isLoadingCAStatus) {
     return ({ isLoading: true, step: undefined });
@@ -45,7 +45,7 @@ const useConfigurationStep = (): { step: ConfigurationStep | undefined, isLoadin
 
   return ({
     isLoading: false,
-    step: configurationStep(dataNodes, dataNodesCAStatus),
+    step: configurationStep(dataNodes, dataNodesCA),
   });
 };
 

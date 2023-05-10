@@ -1,7 +1,7 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
+
 import useDataNodesCA from 'preflight/hooks/useDataNodesCA';
 import { CONFIGURATION_STEPS } from 'preflight/Constants';
-
 import asMock from 'helpers/mocking/AsMock';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 
@@ -56,7 +56,7 @@ describe('useConfigurationStep', () => {
   };
 
   const useDataNodesCAResult = {
-    data: { isConfigured: false },
+    data: undefined,
     isInitialLoading: false,
     isFetching: false,
     error: undefined,
@@ -92,7 +92,7 @@ describe('useConfigurationStep', () => {
   it('should define CA configuration step as active step, when CA is not configured', async () => {
     asMock(useDataNodesCA).mockReturnValue({
       ...useDataNodesResult,
-      data: { isConfigured: false },
+      data: undefined,
     });
 
     const { result, waitFor } = renderHook(() => useConfigurationStep());
@@ -106,7 +106,7 @@ describe('useConfigurationStep', () => {
   it('should define certificate provisioning step as active step, when CA has not been provisioned', async () => {
     asMock(useDataNodesCA).mockReturnValue({
       ...useDataNodesResult,
-      data: { isConfigured: true },
+      data: { id: 'ca-id', type: 'ca-type' },
     });
 
     asMock(useDataNodes).mockReturnValue({
@@ -135,7 +135,7 @@ describe('useConfigurationStep', () => {
   it('should define success step as active step, when CA been provisioned', async () => {
     asMock(useDataNodesCA).mockReturnValue({
       ...useDataNodesResult,
-      data: { isConfigured: true },
+      data: { id: 'ca-id', type: 'ca-type' },
     });
 
     asMock(useDataNodes).mockReturnValue({

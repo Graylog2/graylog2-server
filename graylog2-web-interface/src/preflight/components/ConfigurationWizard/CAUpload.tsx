@@ -19,9 +19,13 @@ import { Group, Text } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import styled from 'styled-components';
 import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
+import fetch from 'logic/rest/FetchProvider';
+import UserNotification from 'preflight/util/UserNotification';
 import { Icon } from 'preflight/components/common';
+import { qualifyUrl } from 'util/URLUtils';
+import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
 const CADropzone = styled(Dropzone)`
   height: 120px;
@@ -30,26 +34,24 @@ const CADropzone = styled(Dropzone)`
   justify-content: center;
 `;
 
-const uploadRejectionMessage = (files) => {
-  if (files.length > 1) {
-    return 'Only one file allowed';
-  }
-
-  return 'There was an error';
-};
-
 const CAUpload = () => {
-  const onRejectUpload = useCallback((files: Array<unknown>) => {
-    UserNotification.error('CA upload failed', uploadRejectionMessage(files));
+  const queryClient = useQueryClient();
+  const onRejectUpload = useCallback(() => {
+    UserNotification.error('CA upload failed');
   }, []);
 
-  const onProcessUpload = useCallback(() => {
-  }, []);
+  const onProcessUpload = useCallback((files: Array<File>) => {
+    fetch('POST', qualifyUrl('/api/ca/upload'), { files }, false).then(() => {
+      UserNotification.success('CA uploaded successfully');
+      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+    }).catch((error) => {
+      UserNotification.error(`CA uploaded failed with error: ${error}`);
+    });
+  }, [queryClient]);
 
   return (
     <CADropzone onDrop={onProcessUpload}
-                onReject={onRejectUpload}
-                maxFiles={1}>
+                onReject={onRejectUpload}>
       <Group position="center">
         <Dropzone.Accept>
           <Icon name="file" type="solid" size="2x" />

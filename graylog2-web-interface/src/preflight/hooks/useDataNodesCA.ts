@@ -17,16 +17,18 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import type { DataNodesCAStatus } from 'preflight/types';
+import type { DataNodesCA } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
-const fetchDataNodesCA = async (): Promise<DataNodesCAStatus> => (
-  // fetch('GET', qualifyUrl('/api/preflight/ca'))
-  Promise.resolve({ isConfigured: false })
+export const QUERY_KEY = ['data-nodes', 'ca-status'];
+const fetchDataNodesCA = (): Promise<DataNodesCA> => (
+  fetch('GET', qualifyUrl('/api/ca'), undefined, false)
 );
 
 const useDataNodesCA = (): {
-  data: DataNodesCAStatus,
+  data: DataNodesCA,
   isFetching: boolean,
   error: FetchError,
   isInitialLoading: boolean
@@ -36,10 +38,10 @@ const useDataNodesCA = (): {
     isFetching,
     error,
     isInitialLoading,
-  } = useQuery<DataNodesCAStatus, FetchError>({
-    queryKey: ['data-nodes', 'ca-status'],
+  } = useQuery<DataNodesCA, FetchError>({
+    queryKey: QUERY_KEY,
     queryFn: fetchDataNodesCA,
-    initialData: { isConfigured: false },
+    initialData: undefined,
     retry: 3000,
   });
 

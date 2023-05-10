@@ -77,6 +77,7 @@ const DataNodesOverview = () => {
           There was an error fetching the data nodes: {dataNodesFetchError.message}
         </Alert>
       )}
+      <Space h="md" />
     </>
   );
 };

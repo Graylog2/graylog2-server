@@ -30,8 +30,9 @@ export type DataNode = {
 
 export type DataNodes = Array<DataNode>;
 
-export type DataNodesCAStatus = {
-  isConfigured: boolean
+export type DataNodesCA = {
+  id: string,
+  type: string,
 }
 
 export type DataNodeStatus = typeof DATA_NODES_STATUS[keyof typeof DATA_NODES_STATUS]['key']
