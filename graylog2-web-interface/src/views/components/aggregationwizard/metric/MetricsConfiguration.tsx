@@ -37,18 +37,16 @@ const MetricsConfiguration = () => {
                   validateOnChange={false}
                   render={() => (
                     <>
-                      {metrics.map((_metric, index) => {
-                        return (
+                      {metrics.map((_metric, index) => (
 
-                          (
-                            <ElementConfigurationContainer key={`metrics-${index}`}
-                                                           onRemove={removeMetric(index)}
-                                                           elementTitle={MetricElement.title}>
-                              <MetricConfiguration index={index} />
-                            </ElementConfigurationContainer>
-                          )
-                        );
-                      })}
+                        (
+                          <ElementConfigurationContainer key={`metrics-${index}`}
+                                                         onRemove={removeMetric(index)}
+                                                         elementTitle={MetricElement.title}>
+                            <MetricConfiguration index={index} />
+                          </ElementConfigurationContainer>
+                        )
+                      ))}
                     </>
                   )} />
     )

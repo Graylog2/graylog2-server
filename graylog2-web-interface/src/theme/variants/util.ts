@@ -142,15 +142,13 @@ const generateGlobalColors = (
   brand: $PropertyType<Colors, 'brand'>,
   global: $PropertyType<Colors, 'global'>,
   variant: $PropertyType<Colors, 'variant'>,
-) => {
-  return {
-    linkHover: chroma(global.link)[mode === THEME_MODE_DARK ? 'brighten' : 'darken'](1).hex(),
-    navigationBackground: global.contentBackground,
-    navigationBoxShadow: chroma(variant.lightest.default).alpha(0.5).css(),
-    textAlt: brand.secondary,
-    textDefault: brand.tertiary,
-  };
-};
+) => ({
+  linkHover: chroma(global.link)[mode === THEME_MODE_DARK ? 'brighten' : 'darken'](1).hex(),
+  navigationBackground: global.contentBackground,
+  navigationBoxShadow: chroma(variant.lightest.default).alpha(0.5).css(),
+  textAlt: brand.secondary,
+  textDefault: brand.tertiary,
+});
 
 export {
   darken,

@@ -147,9 +147,7 @@ const InputsList = createReactClass({
       return;
     }
 
-    const filterMethod = (input) => {
-      return regExp.test(input.title);
-    };
+    const filterMethod = (input) => regExp.test(input.title);
 
     this.setState((cur) => ({
       filteredGlobalInputs: cur.globalInputs.filter(filterMethod),

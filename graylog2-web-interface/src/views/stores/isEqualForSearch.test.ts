@@ -34,15 +34,11 @@ import {
 import isEqualForSearch from './isEqualForSearch';
 
 export class AlwaysEqualForSearch {
-  equalsForSearch = () => {
-    return true;
-  };
+  equalsForSearch = () => true;
 }
 
 export class NeverEqualForSearch {
-  equalsForSearch = () => {
-    return false;
-  };
+  equalsForSearch = () => false;
 }
 
 describe('isEqualForSearch', () => {

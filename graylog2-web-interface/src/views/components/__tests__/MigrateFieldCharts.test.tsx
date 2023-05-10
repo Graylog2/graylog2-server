@@ -72,9 +72,7 @@ const getNewWidget = (actionMock) => {
   return viewState.widgets.get(widgetsTotal - 1);
 };
 
-const getNewWidgetConfig = (actionMock) => {
-  return getNewWidget(actionMock).config;
-};
+const getNewWidgetConfig = (actionMock) => getNewWidget(actionMock).config;
 
 const MigrateFieldCharts = () => {
   const search = Search.builder()

@@ -49,9 +49,7 @@ class TimezoneSelect extends React.Component {
   // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   _UNCLASSIFIED_AREA = 'Unclassified';
 
-  getValue = () => {
-    return this.timezone.getValue();
-  };
+  getValue = () => this.timezone.getValue();
 
   _formatTimezones = () => {
     const timezones = {};

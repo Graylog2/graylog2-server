@@ -51,9 +51,7 @@ class ImportsViewModal extends React.Component {
     }
   }
 
-  _isLoading = () => {
-    return !this.state.uploads;
-  };
+  _isLoading = () => !this.state.uploads;
 
   _loadUploads = (page) => {
     CollectorConfigurationsActions.listUploads({ page: page })
@@ -75,9 +73,7 @@ class ImportsViewModal extends React.Component {
   };
 
   // eslint-disable-next-line class-methods-use-this
-  _buildVariableName = (name) => {
-    return `\${sidecar.${name}}`;
-  };
+  _buildVariableName = (name) => `\${sidecar.${name}}`;
 
   _formatUpload(upload) {
     const tooltip = <Tooltip id={`${upload.id}-status-tooltip`}>{upload.collector_id}</Tooltip>;

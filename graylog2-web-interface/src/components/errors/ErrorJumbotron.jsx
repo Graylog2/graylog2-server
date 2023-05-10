@@ -35,18 +35,16 @@ const StyledErrorJumbotron = styled(Jumbotron)(({ theme }) => css`
   text-align: center;
 `);
 
-const ErrorJumbotron = ({ children, title }) => {
-  return (
-    <ContainerRow>
-      <Col mdOffset={2} md={8}>
-        <StyledErrorJumbotron>
-          <H1>{title}</H1>
-          {children}
-        </StyledErrorJumbotron>
-      </Col>
-    </ContainerRow>
-  );
-};
+const ErrorJumbotron = ({ children, title }) => (
+  <ContainerRow>
+    <Col mdOffset={2} md={8}>
+      <StyledErrorJumbotron>
+        <H1>{title}</H1>
+        {children}
+      </StyledErrorJumbotron>
+    </Col>
+  </ContainerRow>
+);
 
 ErrorJumbotron.propTypes = {
   children: PropTypes.node.isRequired,

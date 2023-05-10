@@ -17,8 +17,6 @@
 
 import AppConfig from 'util/AppConfig';
 
-const useFeature = (name: string) => {
-  return AppConfig.isFeatureEnabled(name);
-};
+const useFeature = (name: string) => AppConfig.isFeatureEnabled(name);
 
 export default useFeature;

@@ -50,46 +50,40 @@ type Props = {
   titleOrder?: TitleOrder
 };
 
-const SectionHeader = ({ title, actions, titleOrder }: Props) => {
-  return (
-    <Row>
-      <Col lg={6} md={6}>
-        <Title order={titleOrder}>{title}</Title>
-      </Col>
-      <Col lg={6} md={6}>
-        <TitleActionContainer>{actions}</TitleActionContainer>
-      </Col>
-    </Row>
-  );
-};
+const SectionHeader = ({ title, actions, titleOrder }: Props) => (
+  <Row>
+    <Col lg={6} md={6}>
+      <Title order={titleOrder}>{title}</Title>
+    </Col>
+    <Col lg={6} md={6}>
+      <TitleActionContainer>{actions}</TitleActionContainer>
+    </Col>
+  </Row>
+);
 
 SectionHeader.defaultProps = {
   actions: undefined,
   titleOrder: 2,
 };
 
-export const Subsection = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => {
-  return (
-    <SubsectionContainer component="section">
-      <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
-      {children}
-    </SubsectionContainer>
-  );
-};
+export const Subsection = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => (
+  <SubsectionContainer component="section">
+    <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
+    {children}
+  </SubsectionContainer>
+);
 
 Subsection.defaultProps = {
   actions: undefined,
   titleOrder: undefined,
 };
 
-const Section = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => {
-  return (
-    <SectionContainer component="section">
-      <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
-      {children}
-    </SectionContainer>
-  );
-};
+const Section = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => (
+  <SectionContainer component="section">
+    <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
+    {children}
+  </SectionContainer>
+);
 
 Section.defaultProps = {
   actions: undefined,

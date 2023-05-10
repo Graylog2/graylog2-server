@@ -64,9 +64,7 @@ const pluginManifest: PluginRegistration = {
         displayName: 'Some Dummy Visualization',
         visualizationComponent: () => <>dummy-visualization</>,
 
-        editComponent: ({ onChange }) => {
-          return <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>;
-        },
+        editComponent: ({ onChange }) => <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>,
         needsControlledHeight: () => true,
         searchTypes: () => [],
       },

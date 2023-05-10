@@ -86,7 +86,7 @@ module.exports = {
     'graylog',
   ],
   rules: {
-    'arrow-body-style': 'off',
+    'arrow-body-style': ['error', 'as-needed'],
     camelcase: 'off',
     'function-paren-newline': 'off',
     'import/extensions': 'off',

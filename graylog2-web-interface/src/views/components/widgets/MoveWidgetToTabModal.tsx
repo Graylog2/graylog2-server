@@ -33,13 +33,11 @@ type Props = {
 
 type TabEntry = { id: string, name: string };
 
-const _tabList = (view: View, queryIds): Array<TabEntry> => {
-  return queryIds.map((queryId) => {
-    const tabTitle = QueryTitle(view, queryId) || 'Unknown Page title';
+const _tabList = (view: View, queryIds): Array<TabEntry> => queryIds.map((queryId) => {
+  const tabTitle = QueryTitle(view, queryId) || 'Unknown Page title';
 
-    return ({ id: queryId, name: tabTitle });
-  });
-};
+  return ({ id: queryId, name: tabTitle });
+});
 
 const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => {
   const [selectedTab, setSelectedTab] = useState(null);

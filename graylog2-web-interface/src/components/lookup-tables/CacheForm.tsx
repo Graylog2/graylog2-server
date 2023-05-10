@@ -66,9 +66,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
   const [generateName, setGenerateName] = React.useState<boolean>(create);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
 
-  const plugin = React.useMemo(() => {
-    return PluginStore.exports('lookupTableCaches').find((p) => p.type === type);
-  }, [type]);
+  const plugin = React.useMemo(() => PluginStore.exports('lookupTableCaches').find((p) => p.type === type), [type]);
 
   const pluginName = React.useMemo(() => (plugin.displayName || type), [plugin, type]);
   const DocComponent = React.useMemo(() => (plugin.documentationComponent), [plugin]);
@@ -82,9 +80,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
     return null;
   }, [plugin, cache.config]);
 
-  const sanitizeName = (inName: string) => {
-    return inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
-  };
+  const sanitizeName = (inName: string) => inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
 
   const handleTitleChange = (values: LookupTableCache, setValues: any) => (event: React.BaseSyntheticEvent) => {
     if (!generateName) return;

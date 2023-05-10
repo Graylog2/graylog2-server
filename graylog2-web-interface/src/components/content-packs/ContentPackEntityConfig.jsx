@@ -46,21 +46,19 @@ class ContentPackEntityConfig extends React.Component {
     return this.props.parameters[paramIndex];
   };
 
-  _configKeyRowFormatter = (paths) => {
-    return (configKey) => {
-      const path = paths[configKey];
-      const parameter = this._getParameterForConfigKey(configKey);
-      const type = parameter ? (<b>{`parameter (${parameter.type})`}</b>) : path.getValueType();
-      const value = parameter ? (<b>{parameter.name}</b>) : path.getValue();
+  _configKeyRowFormatter = (paths) => (configKey) => {
+    const path = paths[configKey];
+    const parameter = this._getParameterForConfigKey(configKey);
+    const type = parameter ? (<b>{`parameter (${parameter.type})`}</b>) : path.getValueType();
+    const value = parameter ? (<b>{parameter.name}</b>) : path.getValue();
 
-      return (
-        <tr key={configKey}>
-          <td>{configKey}</td>
-          <td>{type}</td>
-          <td>{value}</td>
-        </tr>
-      );
-    };
+    return (
+      <tr key={configKey}>
+        <td>{configKey}</td>
+        <td>{type}</td>
+        <td>{value}</td>
+      </tr>
+    );
   };
 
   render() {
