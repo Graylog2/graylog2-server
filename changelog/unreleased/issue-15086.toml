@@ -1,5 +1,0 @@
-type = "fixed"
-message = "Fix saving and loading of views with decorators."
-
-issues = ["15086"]
-pulls = ["15229"]
