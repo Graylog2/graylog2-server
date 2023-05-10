@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseEntryDataType;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.junit.jupiter.api.Test;
@@ -36,9 +37,9 @@ class MessageFieldTypeMapperTest {
 
         final MessageFieldTypeMapper mapper = new MessageFieldTypeMapper(knownFields);
 
-        Assertions.assertThat(mapper.apply("age")).isEqualTo(ResponseSchemaEntry.field("age", ResponseEntryDataType.NUMERIC));
-        Assertions.assertThat(mapper.apply("salary")).isEqualTo(ResponseSchemaEntry.field("salary", ResponseEntryDataType.NUMERIC));
-        Assertions.assertThat(mapper.apply("position")).isEqualTo(ResponseSchemaEntry.field("position", ResponseEntryDataType.STRING));
-        Assertions.assertThat(mapper.apply("nvmd")).isEqualTo(ResponseSchemaEntry.field("nvmd", ResponseEntryDataType.UNKNOWN));
+        Assertions.assertThat(mapper.apply(RequestedField.parse("age"))).isEqualTo(ResponseSchemaEntry.field("age", ResponseEntryDataType.NUMERIC));
+        Assertions.assertThat(mapper.apply(RequestedField.parse("salary"))).isEqualTo(ResponseSchemaEntry.field("salary", ResponseEntryDataType.NUMERIC));
+        Assertions.assertThat(mapper.apply(RequestedField.parse("position"))).isEqualTo(ResponseSchemaEntry.field("position", ResponseEntryDataType.STRING));
+        Assertions.assertThat(mapper.apply(RequestedField.parse("nvmd"))).isEqualTo(ResponseSchemaEntry.field("nvmd", ResponseEntryDataType.UNKNOWN));
     }
 }

@@ -24,6 +24,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public record MessagesRequestSpec(@JsonProperty("query") String queryString,
                                   @JsonProperty("streams") Set<String> streams,
@@ -67,5 +68,19 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
             fields = DEFAULT_FIELDS;
         }
 
+    }
+
+    @Deprecated
+    @Override
+    public List<String> fields() {
+        return fieldNames();
+    }
+
+    public List<RequestedField> requestedFields() {
+        return fields.stream().map(RequestedField::parse).collect(Collectors.toList());
+    }
+
+    public List<String> fieldNames() {
+        return requestedFields().stream().map(RequestedField::name).collect(Collectors.toList());
     }
 }

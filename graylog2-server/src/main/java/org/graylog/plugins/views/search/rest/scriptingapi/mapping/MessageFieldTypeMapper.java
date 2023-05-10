@@ -17,13 +17,14 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseEntryDataType;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 
 import java.util.Set;
 import java.util.function.Function;
 
-public class MessageFieldTypeMapper implements Function<String, ResponseSchemaEntry> {
+public class MessageFieldTypeMapper implements Function<RequestedField, ResponseSchemaEntry> {
 
     private final Set<MappedFieldTypeDTO> knownFields;
 
@@ -32,13 +33,13 @@ public class MessageFieldTypeMapper implements Function<String, ResponseSchemaEn
     }
 
     @Override
-    public ResponseSchemaEntry apply(String name) {
+    public ResponseSchemaEntry apply(RequestedField field) {
         ResponseEntryDataType type = knownFields.stream()
-                .filter(f -> f.name().equals(name))
+                .filter(f -> f.name().equals(field.name()))
                 .findFirst()
                 .map(MappedFieldTypeDTO::type)
                 .map(ResponseEntryDataType::fromFieldType)
                 .orElse(ResponseEntryDataType.UNKNOWN);
-        return ResponseSchemaEntry.field(name, type);
+        return ResponseSchemaEntry.field(field.toString(), type);
     }
 }

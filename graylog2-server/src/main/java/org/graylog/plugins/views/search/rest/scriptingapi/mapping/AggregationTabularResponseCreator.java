@@ -17,29 +17,44 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.CachingDecorator;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.FieldDecorator;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AggregationTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationTabularResponseCreator.class);
+    private Set<FieldDecorator> decorators;
 
-    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob) throws QueryFailedException {
+    @Inject
+    public AggregationTabularResponseCreator(Set<FieldDecorator> decorators) {
+        this.decorators = decorators;
+    }
+
+    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob, Subject subject) throws QueryFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
 
 
@@ -51,7 +66,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
 
             if (aggregationResult instanceof PivotResult pivotResult) {
                 final List<SeriesSpec> seriesSpecs = extractSeriesSpec(queryResult);
-                return mapToResponse(searchRequestSpec, pivotResult, seriesSpecs);
+                return mapToResponse(searchRequestSpec, pivotResult, seriesSpecs, subject);
             }
         }
 
@@ -68,23 +83,25 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
     }
 
     private TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec,
-                                          final PivotResult pivotResult, List<SeriesSpec> seriesSpec) {
+                                          final PivotResult pivotResult, List<SeriesSpec> seriesSpec, Subject subject) {
         return new TabularResponse(
                 searchRequestSpec.getSchema(),
-                getDatarows(searchRequestSpec, pivotResult, seriesSpec),
+                getDatarows(searchRequestSpec, pivotResult, seriesSpec, subject),
                 new Metadata(pivotResult.effectiveTimerange())
         );
     }
 
-    private static List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
-                                                  final PivotResult pivotResult, List<SeriesSpec> seriesSpecs) {
+    private List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
+                                                  final PivotResult pivotResult, List<SeriesSpec> seriesSpecs, Subject subject) {
         final int numGroupings = searchRequestSpec.groupings().size();
+
+        final Set<FieldDecorator> cachedDecorators = this.decorators.stream().map(CachingDecorator::new).collect(Collectors.toSet());
 
         return pivotResult.rows()
                 .stream()
                 .map(pivRow -> {
-                    final Stream<String> groupings = Stream.concat(
-                            pivRow.key().stream(),
+                    final Stream<Object> groupings = Stream.concat(
+                            decorateGroupings(pivRow.key(), searchRequestSpec, decorators, subject),
                             Collections.nCopies(numGroupings - pivRow.key().size(), "-").stream()  //sometimes pivotRow does not have enough keys - empty value!
                     );
 
@@ -94,6 +111,30 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
                     return Stream.concat(groupings, metrics).collect(Collectors.toList());
                 })
                 .collect(Collectors.toList());
+    }
+
+    private Stream<Object> decorateGroupings(ImmutableList<String> keys, AggregationRequestSpec searchRequestSpec, Set<FieldDecorator> decorators, Subject subject) {
+        List<Object> result = new ArrayList<>();
+        for(int i = 0; i < keys.size(); i++) {
+            final String value = keys.get(i);
+            final RequestedField field = searchRequestSpec.groupings().get(i).requestedField();
+            final Object decorated = decorate(decorators, field, value, subject);
+            result.add(decorated);
+        }
+        return result.stream();
+    }
+
+    private Object decorate(Set<FieldDecorator> decorators, RequestedField field, Object val, Subject subject) {
+        final Optional<Object> decorated = decorators.stream()
+                .filter(d -> d.accept(field))
+                .findFirst()
+                .map(d -> d.decorate(field, val, subject));
+
+        if (decorated.isEmpty() && field.hasDecorator()) {
+            throw new IllegalArgumentException(StringUtils.f("Unsupported decorator '%s' on field '%s'", field.decorator(), field.name()));
+        } else {
+            return decorated.orElse(val);
+        }
     }
 
     private static Object metricValue(SeriesSpec seriesSpec, ImmutableList<PivotResult.Value> values) {
