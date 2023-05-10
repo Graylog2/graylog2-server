@@ -42,7 +42,7 @@ public abstract class RuleBuilderStep {
     @Nullable
     public abstract String outputvariable();
 
-    @JsonProperty(FIELD_OUTPUT)
+    @JsonProperty(FIELD_NEGATE)
     public abstract boolean negate();
 
     @JsonCreator
@@ -54,6 +54,7 @@ public abstract class RuleBuilderStep {
                 .function(function)
                 .parameters(parameters)
                 .outputvariable(outputvariable)
+                .negate(negate)
                 .build();
     }
 
