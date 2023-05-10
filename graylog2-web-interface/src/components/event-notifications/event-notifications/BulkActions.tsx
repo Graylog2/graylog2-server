@@ -43,8 +43,9 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
 
   const onDelete = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'event-notification',
-      eventElement: 'event-notification-bulk-delete',
+      app_pathname: 'event-notification',
+      app_section: 'event-notification-bulk',
+      app_action_value: 'delete-button',
     });
 
     // eslint-disable-next-line no-alert
@@ -52,12 +53,18 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
       const deleteCalls = selectedNotificationsIds.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
 
       Promise.allSettled(deleteCalls).then((result) => {
-        const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
+        const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{
+          status: 'fulfilled',
+          value: string
+        }>;
         const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
         const notDeletedNotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
 
         if (notDeletedNotificationIds.length) {
-          const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
+          const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{
+            status: 'rejected',
+            reason: FetchError
+          }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
           if (notDeletedNotificationIds.length !== selectedNotificationsIds.length) {

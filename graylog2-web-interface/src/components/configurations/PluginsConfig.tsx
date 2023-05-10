@@ -69,11 +69,7 @@ const PluginsConfig = () => {
     },
   ];
 
-  const onUpdate = (configType: string) => {
-    return (config) => {
-      return ConfigurationsActions.update(configType, config);
-    };
-  };
+  const onUpdate = (configType: string) => (config) => ConfigurationsActions.update(configType, config);
 
   if (!isLoaded || !pluginSystemConfigs) { return <Spinner />; }
 

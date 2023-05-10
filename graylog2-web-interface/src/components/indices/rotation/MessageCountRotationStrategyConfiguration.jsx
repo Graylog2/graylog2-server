@@ -25,15 +25,13 @@ const MessageCountRotationStrategyConfiguration = ({ config, updateConfig }) => 
   const { max_docs_per_index } = config;
   const [maxDocsPerIndex, setMaxDocsPerIndex] = useState(max_docs_per_index);
 
-  const _onInputUpdate = (field) => {
-    return (e) => {
-      const update = {};
-      const value = getValueFromInput(e.target);
-      update[field] = value;
+  const _onInputUpdate = (field) => (e) => {
+    const update = {};
+    const value = getValueFromInput(e.target);
+    update[field] = value;
 
-      setMaxDocsPerIndex(value);
-      updateConfig(update);
-    };
+    setMaxDocsPerIndex(value);
+    updateConfig(update);
   };
 
   return (

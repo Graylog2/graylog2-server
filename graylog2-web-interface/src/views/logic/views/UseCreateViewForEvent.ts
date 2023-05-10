@@ -50,21 +50,19 @@ export const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
   rowPivots: Array<Pivot>,
   fnSeries: Array<Series>,
   sort?: Array<SortConfig>
-}) => {
-  return AggregationWidget.builder()
-    .id(generateId())
-    .config(
-      AggregationWidgetConfig.builder()
-        .columnPivots([])
-        .rowPivots(rowPivots)
-        .series(fnSeries)
-        .sort(sort)
-        .visualization('table')
-        .rollup(true)
-        .build(),
-    )
-    .build();
-};
+}) => AggregationWidget.builder()
+  .id(generateId())
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots(rowPivots)
+      .series(fnSeries)
+      .sort(sort)
+      .visualization('table')
+      .rollup(true)
+      .build(),
+  )
+  .build();
 
 const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
   const isEven = (index + 1) % 2 === 0;
@@ -76,7 +74,8 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
 };
 
 const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
-  const rowPivots = [pivotForField(uniq([field, ...groupBy].filter((v) => !!v)), new FieldType('value', [], []))];
+  const uniqPivotFields = uniq([field, ...groupBy].filter((v) => !!v));
+  const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
   const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];

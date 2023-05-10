@@ -146,13 +146,9 @@ const CollectorsAdministration = ({
   // Filter out sidecars with no compatible collectors
   const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !isEmpty(collector));
 
-  const sidecarCollectorId = (sidecar: SidecarSummary, collector: Collector) => {
-    return `${sidecar.node_id}-${collector.name}`;
-  };
+  const sidecarCollectorId = (sidecar: SidecarSummary, collector: Collector) => `${sidecar.node_id}-${collector.name}`;
 
-  const isAllSelected = (_collectors: (SidecarCollectorPairType|Collector)[], _selected: string[]) => {
-    return _collectors.length > 0 && _collectors.length === _selected.length;
-  };
+  const isAllSelected = (_collectors: (SidecarCollectorPairType|Collector)[], _selected: string[]) => _collectors.length > 0 && _collectors.length === _selected.length;
 
   useEffect(() => {
     const selectAllCheckbox = selectAllInput ? selectAllInput.current.getInputDOMNode() : undefined;
@@ -227,39 +223,35 @@ const CollectorsAdministration = ({
     );
   };
 
-  const handleSidecarCollectorSelect = (collectorId: string) => {
-    return (event) => {
-      const newSelection = (event.target.checked
-        ? union(selected, [collectorId])
-        : without(selected, collectorId));
+  const handleSidecarCollectorSelect = (collectorId: string) => (event) => {
+    const newSelection = (event.target.checked
+      ? union(selected, [collectorId])
+      : without(selected, collectorId));
 
-      setSelected(newSelection);
-    };
+    setSelected(newSelection);
   };
 
-  const formatSidecarNoCollectors = (sidecar: SidecarSummary) => {
-    return (
-      <ControlledTableList.Item key={`sidecar-${sidecar.node_id}`}>
-        <DisabledCollector>
-          <Row>
-            <Col md={12}>
-              <h4 className="list-group-item-heading">
-                {sidecar.node_name} <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />
+  const formatSidecarNoCollectors = (sidecar: SidecarSummary) => (
+    <ControlledTableList.Item key={`sidecar-${sidecar.node_id}`}>
+      <DisabledCollector>
+        <Row>
+          <Col md={12}>
+            <h4 className="list-group-item-heading">
+              {sidecar.node_name} <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />
                 &emsp;<small>{sidecar.node_id}</small>
-              </h4>
-            </Col>
-          </Row>
-          <Row>
-            <Col md={12}>
-              <span>
-                No collectors compatible with {sidecar.node_details.operating_system}
-              </span>
-            </Col>
-          </Row>
-        </DisabledCollector>
-      </ControlledTableList.Item>
-    );
-  };
+            </h4>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <span>
+              No collectors compatible with {sidecar.node_details.operating_system}
+            </span>
+          </Col>
+        </Row>
+      </DisabledCollector>
+    </ControlledTableList.Item>
+  );
 
   const formatCollector = (sidecar: SidecarSummary, collector: Collector, _configurations: Configuration[]) => {
     const collectorId = sidecarCollectorId(sidecar, collector);
@@ -365,9 +357,7 @@ const CollectorsAdministration = ({
     onPageChange(page, pageSize);
   };
 
-  const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => {
-    return sidecarCollectorPairs.find(({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId);
-  });
+  const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => sidecarCollectorPairs.find(({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId));
 
   let formattedCollectors;
 

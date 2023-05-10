@@ -68,8 +68,8 @@ const InputStateControl = createReactClass({
     this.setState({ loading: true });
 
     this.props.sendTelemetry('click', {
-      appSection: 'inputs',
-      eventElement: 'start-input',
+      app_pathname: 'inputs',
+      app_action_value: 'start-input',
     });
 
     InputStatesStore.start(this.props.input)
@@ -82,8 +82,8 @@ const InputStateControl = createReactClass({
     this.setState({ loading: true });
 
     this.props.sendTelemetry('click', {
-      appSection: 'inputs',
-      eventElement: 'stop-input',
+      app_pathname: 'inputs',
+      app_action_value: 'stop-input',
     });
 
     InputStatesStore.stop(this.props.input)

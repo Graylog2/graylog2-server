@@ -17,9 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Popover = ({ children }) => {
-  return <>{children}</>;
-};
+const Popover = ({ children }) => <>{children}</>;
 
 Popover.propTypes = {
   children: PropTypes.any.isRequired,

@@ -24,9 +24,7 @@ import { Button } from 'components/bootstrap';
 import { LinkContainer } from './router';
 
 describe('LinkContainer', () => {
-  const hasHref = (element: HTMLElement | HTMLAnchorElement): element is HTMLAnchorElement => {
-    return 'href' in element;
-  };
+  const hasHref = (element: HTMLElement | HTMLAnchorElement): element is HTMLAnchorElement => 'href' in element;
 
   beforeEach(() => {
     jest.clearAllMocks();

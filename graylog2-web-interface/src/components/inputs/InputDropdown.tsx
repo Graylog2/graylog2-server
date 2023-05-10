@@ -44,9 +44,7 @@ type InputType = {
   type: string,
 };
 
-const _formatInput = ({ id, title, type }: InputType) => {
-  return <option key={id} value={id}>{title} ({type})</option>;
-};
+const _formatInput = ({ id, title, type }: InputType) => <option key={id} value={id}>{title} ({type})</option>;
 
 const _sortByTitle = (input1: InputType, input2: InputType) => input1.title.localeCompare(input2.title);
 

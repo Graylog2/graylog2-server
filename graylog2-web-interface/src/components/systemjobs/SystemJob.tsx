@@ -84,27 +84,23 @@ const SystemJob = ({ job }) => {
                     || job.job_status === JobStatus.Error;
   const mappedJobStatus = job.job_status === JobStatus.Runnable ? 'queued' : job.job_status;
 
-  const _onAcknowledge = () => {
-    return (e) => {
-      e.preventDefault();
+  const _onAcknowledge = () => (e) => {
+    e.preventDefault();
 
-      SystemJobsActions.acknowledgeJob(job.id).catch((error) => {
-        UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
-      });
-    };
+    SystemJobsActions.acknowledgeJob(job.id).catch((error) => {
+      UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
+    });
   };
 
-  const _onCancel = () => {
-    return (e) => {
-      e.preventDefault();
+  const _onCancel = () => (e) => {
+    e.preventDefault();
 
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
-        SystemJobsActions.cancelJob(job.id).catch((error) => {
-          UserNotification.error(error.responseMessage, 'Unable to cancel the job');
-        });
-      }
-    };
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
+      SystemJobsActions.cancelJob(job.id).catch((error) => {
+        UserNotification.error(error.responseMessage, 'Unable to cancel the job');
+      });
+    }
   };
 
   return (

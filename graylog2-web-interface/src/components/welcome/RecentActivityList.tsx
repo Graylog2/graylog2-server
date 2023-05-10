@@ -80,20 +80,18 @@ const RecentActivityList = () => {
       <Table striped>
         <tbody>
           {
-            recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => {
-              return (
-                <tr key={id}>
-                  <td style={{ width: 110 }}>
-                    <StyledLabel bsStyle="primary">
-                      <RelativeTime dateTime={timestamp} />
-                    </StyledLabel>
-                  </td>
-                  <td>
-                    <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
-                  </td>
-                </tr>
-              );
-            })
+            recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
+              <tr key={id}>
+                <td style={{ width: 110 }}>
+                  <StyledLabel bsStyle="primary">
+                    <RelativeTime dateTime={timestamp} />
+                  </StyledLabel>
+                </td>
+                <td>
+                  <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
+                </td>
+              </tr>
+            ))
           }
         </tbody>
       </Table>

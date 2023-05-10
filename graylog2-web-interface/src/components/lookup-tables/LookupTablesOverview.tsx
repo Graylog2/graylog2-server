@@ -136,19 +136,17 @@ const LUTItem = ({ table, caches, dataAdapters, errorStates }: ItemProps) => {
   );
 };
 
-const NoResults = ({ query }: { query: string }) => {
-  return (
-    <tbody>
-      <tr>
-        <td colSpan={6}>
-          {query
-            ? <NoSearchResult>No tables found with title &quot;{query}&quot;</NoSearchResult>
-            : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
-        </td>
-      </tr>
-    </tbody>
-  );
-};
+const NoResults = ({ query }: { query: string }) => (
+  <tbody>
+    <tr>
+      <td colSpan={6}>
+        {query
+          ? <NoSearchResult>No tables found with title &quot;{query}&quot;</NoSearchResult>
+          : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+      </td>
+    </tr>
+  </tbody>
+);
 
 const DataRow = ({
   tables,
@@ -162,22 +160,20 @@ const DataRow = ({
   dataAdapters: LookupTableAdapter[],
   query: string,
   errorStates: { [key: string]: { [key: string]: string } },
-}) => {
-  return tables.length > 0
-    ? (
-      <>
-        {tables.map((table: LookupTable) => (
-          <LUTItem key={`table-item-${table.id}`}
-                   table={table}
-                   caches={caches}
-                   dataAdapters={dataAdapters}
-                   errorStates={errorStates} />
-        ))}
-      </>
-    ) : (
-      <NoResults query={query} />
-    );
-};
+}) => (tables.length > 0
+  ? (
+    <>
+      {tables.map((table: LookupTable) => (
+        <LUTItem key={`table-item-${table.id}`}
+                 table={table}
+                 caches={caches}
+                 dataAdapters={dataAdapters}
+                 errorStates={errorStates} />
+      ))}
+    </>
+  ) : (
+    <NoResults query={query} />
+  ));
 
 type Props = {
   tables: LookupTable[],

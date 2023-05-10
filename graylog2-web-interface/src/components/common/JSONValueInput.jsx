@@ -47,12 +47,10 @@ class JSONValueInput extends React.Component {
     this.setState(this._computeInitialState());
   }
 
-  _computeInitialState = () => {
-    return {
-      value: this.props.value,
-      valueType: this.props.valueType,
-    };
-  };
+  _computeInitialState = () => ({
+    value: this.props.value,
+    valueType: this.props.valueType,
+  });
 
   _propagateState = () => {
     this.props.update(this.state.value, this.state.valueType);
@@ -69,9 +67,7 @@ class JSONValueInput extends React.Component {
   };
 
   render() {
-    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => {
-      return <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>;
-    });
+    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>);
 
     return (
       <FormGroup validationState={this.props.validationState}>

@@ -48,16 +48,14 @@ describe('StreamRuleModal', () => {
                      {...props} />
   );
 
-  const getStreamRule = (type = 1) => {
-    return {
-      id: 'dead-beef',
-      type,
-      field: 'field_1',
-      value: 'value_1',
-      inverted: false,
-      description: 'description',
-    };
-  };
+  const getStreamRule = (type = 1) => ({
+    id: 'dead-beef',
+    type,
+    field: 'field_1',
+    value: 'value_1',
+    inverted: false,
+    description: 'description',
+  });
 
   beforeEach(() => {
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });

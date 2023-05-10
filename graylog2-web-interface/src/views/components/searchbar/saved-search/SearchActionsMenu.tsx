@@ -61,12 +61,10 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
   || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)])
 );
 
-const _extractErrorMessage = (error: FetchError) => {
-  return (error
+const _extractErrorMessage = (error: FetchError) => ((error
     && error.additional
     && error.additional.body
-    && error.additional.body.message) ? error.additional.body.message : error;
-};
+    && error.additional.body.message) ? error.additional.body.message : error);
 
 const SearchActionsMenu = () => {
   const theme = useTheme();
@@ -149,18 +147,16 @@ const SearchActionsMenu = () => {
       .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
   }, [currentUser.permissions, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc]);
 
-  const deleteSavedSearch = useCallback((deletedView: View) => {
-    return ViewManagementActions.delete(deletedView)
-      .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
-      .then(() => {
-        if (deletedView.id === view.id) {
-          loadNewSearch(history);
-        }
+  const deleteSavedSearch = useCallback((deletedView: View) => ViewManagementActions.delete(deletedView)
+    .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
+    .then(() => {
+      if (deletedView.id === view.id) {
+        loadNewSearch(history);
+      }
 
-        return Promise.resolve();
-      })
-      .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  }, [history, view.id]);
+      return Promise.resolve();
+    })
+    .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!')), [history, view.id]);
 
   const _loadAsDashboard = useCallback(() => {
     loadAsDashboard(history, view);

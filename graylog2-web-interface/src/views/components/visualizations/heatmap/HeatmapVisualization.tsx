@@ -68,24 +68,18 @@ const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visual
 
 const _generateSeries = (visualizationConfig) => (type, name, x, y, z, idx, total, config) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
 
-const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue = 'None') => {
-  return z.map((series) => {
-    const newSeries = fill(Array(xLabels.length), defaultValue);
+const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue = 'None') => z.map((series) => {
+  const newSeries = fill(Array(xLabels.length), defaultValue);
 
-    return merge(newSeries, series);
-  });
-};
+  return merge(newSeries, series);
+});
 
 const _transposeMatrix = (z: Array<Array<any>> = []) => {
   if (!z[0]) {
     return z;
   }
 
-  return z[0].map((_, c) => {
-    return z.map((r) => {
-      return r[c];
-    });
-  });
+  return z[0].map((_, c) => z.map((r) => r[c]));
 };
 
 const _findSmallestValue = (valuesFound: Array<Array<number>>) => valuesFound.reduce((result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result), (valuesFound[0] || [])[0]);

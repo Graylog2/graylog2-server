@@ -17,13 +17,11 @@
 import * as React from 'react';
 import { Grid } from '@mantine/core';
 
-const Col = ({ children, ...props }: React.ComponentProps<typeof Grid.Col>) => {
-  return (
-    // eslint-disable-next-line react/prop-types
-    <Grid.Col {...props} style={{ ...props.style }}>
-      {children}
-    </Grid.Col>
-  );
-};
+const Col = ({ children, ...props }: React.ComponentProps<typeof Grid.Col>) => (
+  // eslint-disable-next-line react/prop-types
+  <Grid.Col {...props} style={{ ...props.style }}>
+    {children}
+  </Grid.Col>
+);
 
 export default Col;

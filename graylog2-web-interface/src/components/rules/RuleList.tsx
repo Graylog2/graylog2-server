@@ -49,9 +49,7 @@ class RuleList extends React.Component<Props, State> {
     rulesContext: undefined,
   };
 
-  _headerCellFormatter = (header) => {
-    return <th>{header}</th>;
-  };
+  _headerCellFormatter = (header) => <th>{header}</th>;
 
   _ruleInfoFormatter = (rule) => {
     const { onDelete, rulesContext: { used_in_pipelines: usingPipelines } = {} } = this.props;

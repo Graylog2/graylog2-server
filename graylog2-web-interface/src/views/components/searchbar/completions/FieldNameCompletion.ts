@@ -44,17 +44,15 @@ export const existsOperator: Suggestion = {
   },
 };
 
-const _matchesFieldName = (prefix) => {
-  return (field) => {
-    const result = field.name.indexOf(prefix);
+const _matchesFieldName = (prefix) => (field) => {
+  const result = field.name.indexOf(prefix);
 
-    if (result < 0) {
-      return 0;
-    }
+  if (result < 0) {
+    return 0;
+  }
 
-    // If substring occurs at start, return boost
-    return result === 0 ? 2 : 1;
-  };
+  // If substring occurs at start, return boost
+  return result === 0 ? 2 : 1;
 };
 
 const isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);

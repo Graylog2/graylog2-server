@@ -50,13 +50,9 @@ type TextareaProps = BaseProps & {
 };
 type Props = BaseProps | TextareaProps;
 
-const checkboxProps = (value) => {
-  return { defaultChecked: value ?? false };
-};
+const checkboxProps = (value) => ({ defaultChecked: value ?? false });
 
-const inputProps = (value) => {
-  return { value: value ?? '' };
-};
+const inputProps = (value) => ({ value: value ?? '' });
 
 /** Wraps the common Input component with a formik Field */
 const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {

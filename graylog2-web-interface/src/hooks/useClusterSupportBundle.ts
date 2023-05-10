@@ -28,9 +28,7 @@ export type BundleFile = {
   file_name: string;
 }
 
-const fetchSupportBundleList = async () => {
-  return fetch('GET', qualifyUrl(ApiRoutes.ClusterSupportBundleController.list().url));
-};
+const fetchSupportBundleList = async () => fetch('GET', qualifyUrl(ApiRoutes.ClusterSupportBundleController.list().url));
 
 const createSupportBundle = async (refetchList: () => Promise<QueryObserverResult<any, unknown>>, setLoading: (loading: boolean) => void) => {
   try {

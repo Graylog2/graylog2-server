@@ -68,9 +68,7 @@ const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken:
   return {};
 };
 
-const isEnumerableField = (field: FieldTypeMapping | undefined) => {
-  return field?.type.isEnumerable() ?? false;
-};
+const isEnumerableField = (field: FieldTypeMapping | undefined) => field?.type.isEnumerable() ?? false;
 
 const formatSuggestion = (value: string, occurrence: number, input: string | number, isQuoted: boolean): CompletionResult => ({
   name: value,

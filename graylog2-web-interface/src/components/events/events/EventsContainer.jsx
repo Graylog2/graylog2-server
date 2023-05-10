@@ -44,9 +44,7 @@ const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
   });
 };
 
-const fetchEventDefinitions = () => {
-  return EventDefinitionsActions.listPaginated({});
-};
+const fetchEventDefinitions = () => EventDefinitionsActions.listPaginated({});
 
 class EventsContainer extends React.Component {
   static propTypes = {
@@ -111,20 +109,18 @@ class EventsContainer extends React.Component {
     promise.finally(callback);
   };
 
-  handleAlertFilterChange = (nextAlertFilter) => {
-    return () => {
-      const { events } = this.props;
-      const { resetPage, pageSize } = this.props.paginationQueryParameter;
+  handleAlertFilterChange = (nextAlertFilter) => () => {
+    const { events } = this.props;
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
 
-      resetPage();
+    resetPage();
 
-      fetchEvents({
-        query: events.parameters.query,
-        pageSize: pageSize,
-        filter: { alerts: nextAlertFilter },
-        timerange: events.parameters.timerange,
-      });
-    };
+    fetchEvents({
+      query: events.parameters.query,
+      pageSize: pageSize,
+      filter: { alerts: nextAlertFilter },
+      timerange: events.parameters.timerange,
+    });
   };
 
   handleTimeRangeChange = (timeRangeType, range) => {

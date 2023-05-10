@@ -115,8 +115,9 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
 
   const _onSubmitAll = (validateForm) => {
     sendTelemetry('click', {
-      appSection: 'authentication_services_server_config_step',
-      eventElement: 'finish-and-save-service',
+      app_pathname: 'authentication',
+      app_section: 'directory-service',
+      app_action_value: 'server-configuration-save',
     });
 
     validateForm().then((errors) => {
@@ -254,8 +255,9 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                     disabled={isSubmitting}
                     onClick={() => {
                       sendTelemetry('click', {
-                        appSection: 'authentication_services_server_config_step',
-                        eventElement: 'next-user-synchronization',
+                        app_pathname: 'authentication',
+                        app_section: 'directory-service',
+                        app_action_value: 'usersync-button',
                       });
                     }}
                     type="submit">

@@ -48,12 +48,10 @@ class MessageShow extends React.Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  _getImmutableProps = (props) => {
-    return {
-      streams: props.streams ? Immutable.Map(props.streams) : props.streams,
-      nodes: props.nodes ? Immutable.Map(props.nodes) : props.nodes,
-    };
-  };
+  _getImmutableProps = (props) => ({
+    streams: props.streams ? Immutable.Map(props.streams) : props.streams,
+    nodes: props.nodes ? Immutable.Map(props.nodes) : props.nodes,
+  });
 
   renderForDisplay = (fieldName) => {
     // No highlighting for the message details view.

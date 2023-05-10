@@ -66,20 +66,18 @@ const handleQueryChange = jest.fn();
 const handleSortChange = jest.fn();
 const toggleShowInactive = jest.fn();
 
-const renderSUT = (sidecarsList: Array<SidecarSummary> = [], collectorsList: Array<Collector> = []) => {
-  return render(
-    <SidecarFailureTrackingList sidecars={sidecarsList}
-                                collectors={collectorsList}
-                                pagination={pagination}
-                                query={query}
-                                onlyActive={onlyActive}
-                                sort={sort}
-                                onPageChange={handlePageChange}
-                                onQueryChange={handleQueryChange}
-                                onSortChange={handleSortChange}
-                                toggleShowInactive={toggleShowInactive} />,
-  );
-};
+const renderSUT = (sidecarsList: Array<SidecarSummary> = [], collectorsList: Array<Collector> = []) => render(
+  <SidecarFailureTrackingList sidecars={sidecarsList}
+                              collectors={collectorsList}
+                              pagination={pagination}
+                              query={query}
+                              onlyActive={onlyActive}
+                              sort={sort}
+                              onPageChange={handlePageChange}
+                              onQueryChange={handleQueryChange}
+                              onSortChange={handleSortChange}
+                              toggleShowInactive={toggleShowInactive} />,
+);
 
 describe('SidecarFailureTrackingList', () => {
   it('should render empty list', async () => {

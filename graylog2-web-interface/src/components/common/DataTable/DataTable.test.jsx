@@ -30,9 +30,7 @@ const simulateTypeAheadFilter = (wrapper, filterText) => {
   filter.instance().filterData();
 };
 
-const filterRows = (rows, filterText) => {
-  return rows.filter((row) => row.title.match(filterText));
-};
+const filterRows = (rows, filterText) => rows.filter((row) => row.title.match(filterText));
 
 describe('<DataTable />', () => {
   const rows = [

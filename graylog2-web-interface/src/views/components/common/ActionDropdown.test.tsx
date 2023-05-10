@@ -23,9 +23,7 @@ import { MenuItem } from 'components/bootstrap';
 import ActionDropdown from './ActionDropdown';
 
 describe('ActionDropdown', () => {
-  const findLink = (wrapper: ReactWrapper, text: string) => wrapper.findWhere((node) => {
-    return node.type() === 'a' && node.text() === text;
-  });
+  const findLink = (wrapper: ReactWrapper, text: string) => wrapper.findWhere((node) => node.type() === 'a' && node.text() === text);
 
   it('opens menu when trigger element is clicked', () => {
     const wrapper = mount((

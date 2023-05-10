@@ -86,13 +86,9 @@ const EventsConfig = () => {
     setFormConfig({ ...formConfig, [key]: value });
   };
 
-  const searchTimeoutValidator = (milliseconds) => {
-    return milliseconds >= 1000;
-  };
+  const searchTimeoutValidator = (milliseconds) => milliseconds >= 1000;
 
-  const notificationsRetryValidator = (milliseconds) => {
-    return milliseconds >= 0;
-  };
+  const notificationsRetryValidator = (milliseconds) => milliseconds >= 0;
 
   const onSearchTimeoutUpdate = (nextValue, nextUnit, enabled) => {
     const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
@@ -133,9 +129,7 @@ const EventsConfig = () => {
     propagateChanges('events_notification_tcp_keepalive', value);
   };
 
-  const titleCase = (str) => {
-    return capitalize(str);
-  };
+  const titleCase = (str) => capitalize(str);
 
   if (!loaded || !viewConfig) { return <Spinner />; }
 
