@@ -57,16 +57,15 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     private static final RateLimitedLog log = getRateLimitedLog(RuleBuilderResource.class);
     private final FunctionRegistry functionRegistry;
     private final RuleResource ruleResource;
-    private final RuleBuilderService ruleBuilderService;
-
+    private final RuleBuilderService ruleBuilderParser;
 
     @Inject
     public RuleBuilderResource(FunctionRegistry functionRegistry,
                                RuleResource ruleResource,
-                               RuleBuilderService ruleBuilderService) {
+                               RuleBuilderService ruleBuilderParser) {
         this.functionRegistry = functionRegistry;
         this.ruleResource = ruleResource;
-        this.ruleBuilderService = ruleBuilderService;
+        this.ruleBuilderParser = ruleBuilderParser;
     }
 
 
@@ -79,7 +78,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .id(ruleBuilderRule.id())
                 .title(ruleBuilderRule.title())
                 .description(ruleBuilderRule.description())
-                .source(ruleBuilderService.generateRuleSource(ruleBuilderRule.title(), ruleBuilderRule.ruleBuilder(), true))
+                .source(ruleBuilderParser.generateRuleSource(ruleBuilderRule.title(), ruleBuilderRule.ruleBuilder(), true))
                 .build();
         return ruleResource.createFromParser(ruleSource);
     }

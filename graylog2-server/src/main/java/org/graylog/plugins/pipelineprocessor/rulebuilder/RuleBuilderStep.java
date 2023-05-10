@@ -58,7 +58,7 @@ public abstract class RuleBuilderStep {
     }
 
     public static Builder builder() {
-        return new AutoValue_RuleBuilderStep.Builder();
+        return new AutoValue_RuleBuilderStep.Builder().negate(false);
     }
 
     public abstract Builder toBuilder();
@@ -76,7 +76,7 @@ public abstract class RuleBuilderStep {
         public abstract Builder negate(boolean negate);
 
         public Builder negate() {
-            return negate(false);
+            return negate(true);
         }
 
         public abstract RuleBuilderStep build();
