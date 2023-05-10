@@ -28,10 +28,9 @@ import java.util.Map;
 
 public class TruststoreCreator {
 
-    public Path createTruststore(final Map<String, X509Certificate> rootCerts,
+    public void createTruststore(final Map<String, X509Certificate> rootCerts,
                                  final String truststorePassword,
-                                 final Path opensearchConfigDir,
-                                 final String trustStoreFileName) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+                                 final Path truststorePath) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         KeyStore trustStore = KeyStore.getInstance("PKCS12");
         trustStore.load(null, null);
 
@@ -39,9 +38,7 @@ public class TruststoreCreator {
             trustStore.setCertificateEntry(cert.getKey(), cert.getValue());
         }
 
-        final Path truststorePath = opensearchConfigDir.resolve(trustStoreFileName);
         trustStore.store(new FileOutputStream(truststorePath.toFile()), truststorePassword.toCharArray());
-        return truststorePath;
     }
 
 }

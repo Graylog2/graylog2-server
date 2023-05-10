@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 public class RootCertificateFinder {
 
@@ -33,12 +34,17 @@ public class RootCertificateFinder {
                                         final String alias) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         final KeyStore keystore = loadKeystore(keystorePath, password);
         final Certificate[] certs = keystore.getCertificateChain(alias);
-        final Certificate rootCert = certs[certs.length - 1]; //last one is root
-        if (rootCert instanceof final X509Certificate x509Certificate) {
-            return x509Certificate;
-        } else {
-            throw new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!");
-        }
+
+        return Arrays.stream(certs)
+                .filter(cert -> cert instanceof X509Certificate)
+                .map(cert -> (X509Certificate) cert)
+                .filter(this::isRootCaCertificate)
+                .findFirst()
+                .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
+    }
+
+    private boolean isRootCaCertificate(X509Certificate cert) {
+        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
     }
 
     private KeyStore loadKeystore(Path keystorePath, String password) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {

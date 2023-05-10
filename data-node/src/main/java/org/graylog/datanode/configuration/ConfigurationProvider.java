@@ -158,10 +158,11 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         }
 
         if (!rootCerts.isEmpty()) {
-            final Path trustStorePath = truststoreCreator.createTruststore(rootCerts,
+            final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
+            truststoreCreator.createTruststore(rootCerts,
                     truststorePassword,
-                    opensearchConfigDir,
-                    TRUSTSTORE_FILENAME);
+                    trustStorePath
+            );
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
             tlsConfigurationSupplier.addTrustStoreTlsConfig(config, truststorePassword);
