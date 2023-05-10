@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 public class ActionParser {
 
+    public static final String NL = System.lineSeparator();
     protected final Map<String, Function<?>> actions;
 
     @Inject
@@ -37,25 +39,46 @@ public class ActionParser {
     }
 
     public String generate(List<RuleBuilderStep> actions, boolean generateSimulatorFields) {
-        return actions.stream().map(s -> generateAction(s, generateSimulatorFields)).collect(Collectors.joining(System.lineSeparator()));
+        return actions.stream().map(s -> generateAction(s, generateSimulatorFields)).collect(Collectors.joining(NL));
     }
 
     String generateAction(RuleBuilderStep step, boolean generateSimulatorFields) {
+        if (!actions.containsKey(step.function())) {
+            throw new IllegalArgumentException("Function " + step.function() + " not available as action for rule builder.");
+        }
+
         FunctionDescriptor<?> function = actions.get(step.function()).descriptor();
         String syntax = "  ";
         if (Objects.nonNull(step.outputvariable())) {
+            if (function.returnType().equals(Void.class)) {
+                throw new IllegalArgumentException("Function " + step.function() + " does not return a value.");
+            }
             syntax += "let " + step.outputvariable() + " = ";
         }
-        final String name = function.name();
-        syntax += name + "(" + System.lineSeparator();
-        syntax += function.params().stream().map(p -> ParserUtil.addFunctionParameter(p, step))
+
+        if (step.negate()) {
+            if (!function.returnType().equals(Boolean.class)) {
+                throw new IllegalArgumentException("Function " + step.function() + " cannot be negated.");
+            }
+            syntax += "! ";
+        }
+
+        syntax += function.name() + "(";
+        String params = function.params().stream().map(p -> ParserUtil.addFunctionParameter(p, step))
                 .filter(Objects::nonNull)
-                .collect(Collectors.joining("," + System.lineSeparator()));
-        syntax += System.lineSeparator() + "  );";
+                .collect(Collectors.joining("," + NL));
+        if (StringUtils.isEmpty(params)) {
+            syntax += ");";
+        } else {
+            syntax += NL + params + NL + "  );";
+        }
+
+        // generate message fields for simulator
         if (generateSimulatorFields && Objects.nonNull(step.outputvariable())) {
-            syntax += System.lineSeparator();
+            syntax += NL;
             syntax += "  set_field(\"gl2_simulator_" + step.outputvariable() + "\", " + step.outputvariable() + ");";
         }
+
         return syntax;
     }
 

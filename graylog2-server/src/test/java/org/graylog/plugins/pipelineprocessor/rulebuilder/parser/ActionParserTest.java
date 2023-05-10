@@ -1,0 +1,192 @@
+/*
+ *  Copyright (C) 2020 Graylog, Inc.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the Server Side Public License, version 1,
+ *  as published by MongoDB, Inc.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  Server Side Public License for more details.
+ *
+ *  You should have received a copy of the Server Side Public License
+ *  along with this program. If not, see
+ *  <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+
+public class ActionParserTest {
+
+    public static final String NL = System.lineSeparator();
+    private static FunctionRegistry functionRegistry;
+    private ActionParser actionParser;
+
+    private static final String FUNCTION1_NAME = "function1";
+    private static final String FUNCTION2_NAME = "function2";
+    private static final String FUNCTION3_NAME = "function3";
+
+    @BeforeClass
+    public static void registerFunctions() {
+        final HashMap<String, Function<?>> functions = Maps.newHashMap();
+        functions.put(FUNCTION1_NAME, FunctionUtil.testFunction(
+                FUNCTION1_NAME, ImmutableList.of(
+                        string("required").build(),
+                        integer("optional").optional().build()
+                ), String.class
+        ));
+        functions.put(FUNCTION2_NAME, FunctionUtil.testFunction(
+                FUNCTION2_NAME, ImmutableList.of(
+                        integer("optional").optional().build()
+                ), Boolean.class
+        ));
+        functions.put(FUNCTION3_NAME, FunctionUtil.testFunction(
+                FUNCTION3_NAME, ImmutableList.of(
+                        integer("optional").optional().build()
+                ), Void.class
+        ));
+        functionRegistry = new FunctionRegistry(functions);
+    }
+
+    @Before
+    public void initialize() {
+        actionParser = new ActionParser(functionRegistry);
+    }
+
+
+    @Test
+    public void generateEmptyString_WhenRuleActionsEmpty() {
+        assertThat(actionParser.generate(new ArrayList<>(), false))
+                .isEqualTo("");
+    }
+
+    @Test
+    public void exception_WhenActionNotInRuleBuilderActions() {
+        RuleBuilderStep step = RuleBuilderStep.builder().function("unknownFunction").build();
+        assertThatThrownBy(() -> actionParser.generateAction(step, false))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageStartingWith("Function unknownFunction not available");
+    }
+
+    @Test
+    public void singleActionWithoutParamsGeneration() {
+        RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION2_NAME).build();
+        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+                "  function2();"
+        );
+    }
+
+    @Test
+    public void singleNegatedActionWithoutParamsGeneration() {
+        RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION2_NAME).negate().build();
+        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+                "  ! function2();"
+        );
+    }
+
+    @Test
+    public void exception_WhenNegatedActionNotReturningBoolean() {
+        RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME).negate().build();
+        assertThatThrownBy(() -> actionParser.generateAction(step, false))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageStartingWith("Function function1 cannot be negated");
+    }
+
+    @Test
+    public void exception_WhenOutputVariableForVoidReturnTypeGeneration() {
+        RuleBuilderStep step = RuleBuilderStep.builder()
+                .function(FUNCTION3_NAME)
+                .outputvariable("outvar")
+                .build();
+        assertThatThrownBy(() -> actionParser.generateAction(step, false))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageStartingWith("Function function3 does not return");
+    }
+
+    @Test
+    public void singleActionWithOutputVariableGeneration() {
+        RuleBuilderStep step = RuleBuilderStep.builder()
+                .function(FUNCTION2_NAME)
+                .outputvariable("outvar")
+                .build();
+        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+                "  let outvar = function2();"
+        );
+    }
+
+    @Test
+    public void singleActionWithSingleParamGeneration() {
+        RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME)
+                .parameters(Map.of("required", "val1")).build();
+        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+                "  function1(" + NL + "    required : \"val1\"" + NL + "  );"
+        );
+    }
+
+    @Test
+    public void singleActionWithMultipleParamsGeneration() {
+        RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME)
+                .parameters(Map.of("required", "val1", "optional", 1))
+                .outputvariable("outvar").build();
+        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+                "  let outvar = function1(" + NL +
+                        "    required : \"val1\"," + NL +
+                        "    optional : 1" + NL +
+                        "  );"
+        );
+    }
+
+    @Test
+    public void generate_WhenRuleActionsContainsOneValue() {
+        List<RuleBuilderStep> steps = List.of(
+                RuleBuilderStep.builder().function(FUNCTION2_NAME).build()
+        );
+        assertThat(actionParser.generate(steps, false)).isEqualTo("""
+                  function2();
+                """.stripTrailing());
+    }
+
+    @Test
+    public void generate_WhenRuleConditionsContainsMultipleValues() {
+        List<RuleBuilderStep> steps = List.of(
+                RuleBuilderStep.builder().function(FUNCTION1_NAME)
+                        .parameters(Map.of("required", "val1", "optional", 1))
+                        .outputvariable("result1")
+                        .build(),
+                RuleBuilderStep.builder().function(FUNCTION2_NAME)
+                        .parameters(Map.of("optional", "$result1"))
+                        .negate()
+                        .build()
+        );
+        assertThat(actionParser.generate(steps, false)).isEqualTo("""
+                  let result1 = function1(
+                    required : "val1",
+                    optional : 1
+                  );
+                  ! function2(
+                    optional : result1
+                  );
+                """.stripTrailing());
+    }
+
+
+}
