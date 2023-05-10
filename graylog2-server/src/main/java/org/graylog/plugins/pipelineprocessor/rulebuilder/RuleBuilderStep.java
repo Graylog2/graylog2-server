@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.db;
+package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,7 +28,8 @@ public abstract class RuleBuilderStep {
 
     public static final String FIELD_FUNCTION = "function";
     public static final String FIELD_PARAMETERS = "parameters";
-    public static final String FIELD_OUTPUT = "output";
+    public static final String FIELD_OUTPUT = "outputvariable";
+    public static final String FIELD_NEGATE = "negate";
 
     @JsonProperty(FIELD_FUNCTION)
     public abstract String function();
@@ -39,16 +40,20 @@ public abstract class RuleBuilderStep {
 
     @JsonProperty(FIELD_OUTPUT)
     @Nullable
-    public abstract String output();
+    public abstract String outputvariable();
+
+    @JsonProperty(FIELD_OUTPUT)
+    public abstract boolean negate();
 
     @JsonCreator
     public static RuleBuilderStep create(@JsonProperty(FIELD_FUNCTION) String function,
                                          @JsonProperty(FIELD_PARAMETERS) @Nullable Map<String, Object> parameters,
-                                         @JsonProperty(FIELD_OUTPUT) @Nullable String output) {
+                                         @JsonProperty(FIELD_OUTPUT) @Nullable String outputvariable,
+                                         @JsonProperty(FIELD_NEGATE) @Nullable boolean negate) {
         return builder()
                 .function(function)
                 .parameters(parameters)
-                .output(output)
+                .outputvariable(outputvariable)
                 .build();
     }
 
@@ -66,7 +71,13 @@ public abstract class RuleBuilderStep {
 
         public abstract Builder parameters(Map<String, Object> parameters);
 
-        public abstract Builder output(String output);
+        public abstract Builder outputvariable(String outputvariable);
+
+        public abstract Builder negate(boolean negate);
+
+        public Builder negate() {
+            return negate(false);
+        }
 
         public abstract RuleBuilderStep build();
     }

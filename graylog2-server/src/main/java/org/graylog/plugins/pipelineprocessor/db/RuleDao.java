@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;

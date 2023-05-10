@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.parser;
+package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.db.RuleBuilder;
-import org.graylog.plugins.pipelineprocessor.db.RuleBuilderStep;
+import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -87,8 +88,8 @@ public class RuleBuilderService {
     private String generateAction(RuleBuilderStep step, boolean generateSimulatorFields) {
         FunctionDescriptor<?> function = actions.get(step.function()).descriptor();
         String syntax = "  ";
-        if (Objects.nonNull(step.output())) {
-            syntax += "let " + step.output() + " = ";
+        if (Objects.nonNull(step.outputvariable())) {
+            syntax += "let " + step.outputvariable() + " = ";
         }
         final String name = function.name();
         syntax += name + "(" + System.lineSeparator();
@@ -96,9 +97,9 @@ public class RuleBuilderService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining("," + System.lineSeparator()));
         syntax += System.lineSeparator() + "  );";
-        if (generateSimulatorFields && Objects.nonNull(step.output())) {
+        if (generateSimulatorFields && Objects.nonNull(step.outputvariable())) {
             syntax += System.lineSeparator();
-            syntax += "  set_field(\"gl2_simulator_" + step.output() + "\", " + step.output() + ");";
+            syntax += "  set_field(\"gl2_simulator_" + step.outputvariable() + "\", " + step.outputvariable() + ");";
         }
         return syntax;
     }

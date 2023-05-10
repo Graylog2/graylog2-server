@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.rest;
+package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
@@ -26,7 +26,10 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.parser.RuleBuilderService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
+import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -52,7 +55,6 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @RequiresAuthentication
 public class RuleBuilderResource extends RestResource implements PluginRestResource {
     private static final RateLimitedLog log = getRateLimitedLog(RuleBuilderResource.class);
-
     private final FunctionRegistry functionRegistry;
     private final RuleResource ruleResource;
     private final RuleBuilderService ruleBuilderService;

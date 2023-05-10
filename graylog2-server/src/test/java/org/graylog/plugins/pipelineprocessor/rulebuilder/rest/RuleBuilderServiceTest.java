@@ -1,11 +1,12 @@
-package org.graylog.plugins.pipelineprocessor.parser;
+package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 
 import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.db.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
