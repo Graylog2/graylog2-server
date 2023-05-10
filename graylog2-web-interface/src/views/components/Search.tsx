@@ -53,8 +53,7 @@ import useAppSelector from 'stores/useAppSelector';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import useParameters from 'views/hooks/useParameters';
 
-const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
-  return interactive ? css`
+const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => (interactive ? css`
     display: flex;
     overflow: auto;
     height: 100%;
@@ -64,8 +63,7 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     }
 ` : css`
     flex: 1;
-`;
-});
+`));
 
 const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);

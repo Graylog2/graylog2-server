@@ -31,15 +31,11 @@ export const arrayOfMaps = (): Array<Map<string, number>> => [Map({ foo: 23 }), 
 export const mixedMapsAndObjects = (): MixedMapsAndObjects => ({ foo: Map({ bar: { baz: Map({ qux: 42 }) } }) });
 
 export class AlwaysEqual {
-  equals = () => {
-    return true;
-  };
+  equals = () => true;
 }
 
 export class NeverEqual {
-  equals = () => {
-    return false;
-  };
+  equals = () => false;
 }
 
 export class NonValueClass {

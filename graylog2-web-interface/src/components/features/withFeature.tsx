@@ -22,13 +22,11 @@ import IfFeatureEnabled from './IfFeatureEnabled';
 const withFeature = <Props extends {}>(
   featureName: string,
   Component: React.ComponentType<Props>,
-): React.ComponentType<Props> => {
-  return (props) => (
-    <IfFeatureEnabled name={featureName}>
-      <Component {...props} />
-    </IfFeatureEnabled>
+): React.ComponentType<Props> => (props) => (
+  <IfFeatureEnabled name={featureName}>
+    <Component {...props} />
+  </IfFeatureEnabled>
   );
-};
 
 withFeature.propTypes = {
   featureName: PropTypes.string,

@@ -81,13 +81,9 @@ class SelectableList extends React.Component {
     }
   }
 
-  _getOptionId = (option) => {
-    return (typeof option === 'string' ? option : option[this.props.idKey]);
-  };
+  _getOptionId = (option) => (typeof option === 'string' ? option : option[this.props.idKey]);
 
-  _getOptionDisplayValue = (option) => {
-    return (typeof option === 'string' ? option : option[this.props.displayKey]);
-  };
+  _getOptionDisplayValue = (option) => (typeof option === 'string' ? option : option[this.props.displayKey]);
 
   _onAddOption = (option) => {
     if (option === '') {
@@ -107,14 +103,12 @@ class SelectableList extends React.Component {
     }
   };
 
-  _onRemoveOption = (optionIndex) => {
-    return () => {
-      const newSelectedOptions = this.props.selectedOptions.filter((_, idx) => idx !== optionIndex);
+  _onRemoveOption = (optionIndex) => () => {
+    const newSelectedOptions = this.props.selectedOptions.filter((_, idx) => idx !== optionIndex);
 
-      if (typeof this.props.onChange === 'function') {
-        this.props.onChange(newSelectedOptions);
-      }
-    };
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange(newSelectedOptions);
+    }
   };
 
   render() {

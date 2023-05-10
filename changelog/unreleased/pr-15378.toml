@@ -1,0 +1,6 @@
+type = "change"
+message = "'Show received messages' for forwarder inputs now queries for messages using the new `gl2_forwarder_input` field."
+
+issues = ["Graylog2/graylog-plugin-enterprise#4586"]
+pulls = ["15378"]
+

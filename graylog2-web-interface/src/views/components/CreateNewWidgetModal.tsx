@@ -71,8 +71,9 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
       sendTelemetry('click', {
-        appSection: 'search-widget',
-        eventElement: `widget-create-${kebabCase(title)}-button`,
+        app_pathname: 'search',
+        app_section: 'widget',
+        app_action_value: `widget-create-${kebabCase(title)}-button`,
       });
 
       const newId = generateId();

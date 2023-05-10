@@ -35,11 +35,9 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
       name: 'pinnedColumns',
       title: 'Pinned Columns',
       type: 'multi-select',
-      options: ({ formValues }: { formValues: WidgetConfigFormValues }) => {
-        return formValues?.groupBy?.groupings
-          .filter((grouping) => (grouping?.direction === 'row' && grouping?.fields))
-          .flatMap((grouping) => grouping.fields) ?? [];
-      },
+      options: ({ formValues }: { formValues: WidgetConfigFormValues }) => formValues?.groupBy?.groupings
+        .filter((grouping) => (grouping?.direction === 'row' && grouping?.fields))
+        .flatMap((grouping) => grouping.fields) ?? [],
       required: false,
     }],
   },

@@ -68,6 +68,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,7 +79,7 @@ import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets", description = "Index sets", tags={CLOUD_VISIBLE})
+@Api(value = "System/IndexSets", description = "Index sets", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/index_sets")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
@@ -124,40 +125,63 @@ public class IndexSetsResource extends RestResource {
                                  @QueryParam("limit") @DefaultValue("0") int limit,
                                  @ApiParam(name = "stats", value = "Include index set stats.")
                                  @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
+
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+        List<IndexSetConfig> allowedConfigurations = indexSetService.findAll()
+                .stream()
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+                .toList();
 
-        List<IndexSetSummary> indexSets;
-        int count;
-
-        if (limit > 0) {
-            // First collect all index set ids the user is allowed to see.
-            final Set<String> allowedIds = indexSetService.findAll().stream()
-                    .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
-                    .map(IndexSetConfig::id)
-                    .collect(Collectors.toSet());
-
-            indexSets = indexSetService.findPaginated(allowedIds, limit, skip).stream()
-                    .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
-                    .collect(Collectors.toList());
-            count = allowedIds.size();
-        } else {
-            indexSets = indexSetService.findAll().stream()
-                    .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
-                    .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
-                    .collect(Collectors.toList());
-            count = indexSets.size();
-        }
-
-        final Map<String, IndexSetStats> stats;
-        if (computeStats) {
-            stats = indexSetRegistry.getAll().stream()
-                    .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
-        } else {
-            stats = Collections.emptyMap();
-        }
-
-        return IndexSetResponse.create(count, indexSets, stats);
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
     }
+
+    @GET
+    @Path("search")
+    @Timed
+    @ApiOperation(value = "Get a list of all index sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+    })
+    public IndexSetResponse search(@ApiParam(name = "searchTitle", value = "The number of elements to skip (offset).")
+                                   @QueryParam("searchTitle") String searchTitle,
+                                   @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+                                   @QueryParam("skip") @DefaultValue("0") int skip,
+                                   @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                   @QueryParam("limit") @DefaultValue("0") int limit,
+                                   @ApiParam(name = "stats", value = "Include index set stats.")
+                                   @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+        List<IndexSetConfig> allowedConfigurations = indexSetService.searchByTitle(searchTitle).stream()
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id())).toList();
+
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
+    }
+
+    private IndexSetResponse getPagedIndexSetResponse(int skip, int limit, boolean computeStats, IndexSetConfig defaultIndexSet, List<IndexSetConfig> allowedConfigurations) {
+        int calculatedLimit = limit > 0 ? limit : allowedConfigurations.size();
+        Comparator<IndexSetConfig> titleComparator = Comparator.comparing(IndexSetConfig::title, String.CASE_INSENSITIVE_ORDER);
+
+        List<IndexSetConfig> pagedConfigs = allowedConfigurations.stream()
+                .sorted(titleComparator)
+                .skip(skip)
+                .limit(calculatedLimit)
+                .toList();
+
+        List<IndexSetSummary> indexSets = pagedConfigs.stream()
+                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
+                .toList();
+
+
+        Map<String, IndexSetStats> stats = Collections.emptyMap();
+
+        if (computeStats) {
+            stats = indexSetRegistry.getFromIndexConfig(pagedConfigs).stream()
+                    .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet));
+        }
+
+        return IndexSetResponse.create(allowedConfigurations.size(), indexSets, stats);
+    }
+
 
     @GET
     @Path("stats")

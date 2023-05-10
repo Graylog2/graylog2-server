@@ -37,9 +37,7 @@ then
   set_field("transaction_year", new_date.year);
 end`;
 
-const _niceType = (typeName) => {
-  return typeName.replace(/^.*\.(.*?)$/, '$1');
-};
+const _niceType = (typeName) => typeName.replace(/^.*\.(.*?)$/, '$1');
 
 const _functionSignature = (descriptor) => {
   const args = descriptor.params.map((p) => (p.optional ? `[${p.name}]` : p.name));
@@ -47,18 +45,14 @@ const _functionSignature = (descriptor) => {
   return `${descriptor.name}(${args.join(', ')}) : ${_niceType(descriptor.return_type)}`;
 };
 
-const _parameters = (descriptor) => {
-  return descriptor.params.map((p) => {
-    return (
-      <tr key={p.name}>
-        <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
-        <td className={RuleHelperStyle.adjustedTableCellWidth}>{_niceType(p.type)}</td>
-        <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
-        <td>{p.description}</td>
-      </tr>
-    );
-  });
-};
+const _parameters = (descriptor) => descriptor.params.map((p) => (
+  <tr key={p.name}>
+    <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
+    <td className={RuleHelperStyle.adjustedTableCellWidth}>{_niceType(p.type)}</td>
+    <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
+    <td>{p.description}</td>
+  </tr>
+));
 
 class RuleHelper extends React.Component {
   constructor(props) {

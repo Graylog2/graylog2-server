@@ -67,17 +67,11 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-const _visualizationForType = (type: string) => {
-  return widgetDefinition(type).visualizationComponent;
-};
+const _visualizationForType = (type: string) => widgetDefinition(type).visualizationComponent;
 
-const _editComponentForType = (type: string) => {
-  return widgetDefinition(type).editComponent;
-};
+const _editComponentForType = (type: string) => widgetDefinition(type).editComponent;
 
-const _hasOwnEditSubmitButton = (type: string) => {
-  return widgetDefinition(type).hasEditSubmitButton;
-};
+const _hasOwnEditSubmitButton = (type: string) => widgetDefinition(type).hasEditSubmitButton;
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
@@ -197,9 +191,10 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const sendTelemetry = useSendTelemetry();
 
   const onToggleEdit = useCallback(() => {
-    sendTelemetry('toggle_input_button', {
-      appSection: 'search-widget',
-      eventElement: 'widget-edit-button',
+    sendTelemetry('input_button_toggle', {
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-edit-button',
     });
 
     if (editing) {
@@ -213,8 +208,9 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   }, [editing, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'search-widget',
-      eventElement: 'widget-edit-cancel-button',
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-edit-cancel-button',
     });
 
     if (oldWidget) {

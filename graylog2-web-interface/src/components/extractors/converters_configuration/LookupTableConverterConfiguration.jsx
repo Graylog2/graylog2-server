@@ -44,9 +44,7 @@ class LookupTableConverterConfiguration extends React.Component {
     });
   }
 
-  _getConverterObject = (configuration) => {
-    return { type: this.props.type, config: configuration || this.props.configuration };
-  };
+  _getConverterObject = (configuration) => ({ type: this.props.type, config: configuration || this.props.configuration });
 
   _toggleConverter = (event) => {
     let converter;
@@ -65,22 +63,16 @@ class LookupTableConverterConfiguration extends React.Component {
     this.props.onChange(this.props.type, this._getConverterObject(newConfig));
   };
 
-  _onChange = (key) => {
-    return (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
-  };
+  _onChange = (key) => (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
 
-  _onSelect = (key) => {
-    return (value) => this._updateConfigValue(key, value);
-  };
+  _onSelect = (key) => (value) => this._updateConfigValue(key, value);
 
   render() {
     if (!this.state.lookupTables) {
       return <Spinner />;
     }
 
-    const lookupTables = this.state.lookupTables.map((table) => {
-      return { label: table.title, value: table.name };
-    });
+    const lookupTables = this.state.lookupTables.map((table) => ({ label: table.title, value: table.name }));
 
     const helpMessage = (
       <span>

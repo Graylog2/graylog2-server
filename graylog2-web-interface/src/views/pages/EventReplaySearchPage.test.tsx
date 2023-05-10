@@ -45,7 +45,7 @@ jest.mock('routing/useParams');
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateViewForEvent');
 jest.mock('views/logic/views/UseProcessHooksForView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
 jest.mock('hooks/useAlertAndEventDefinitionData');

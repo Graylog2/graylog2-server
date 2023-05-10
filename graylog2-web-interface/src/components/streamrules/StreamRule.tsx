@@ -77,34 +77,30 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
     }
   };
 
-  const _onSubmit = (streamRuleId, data) => {
-    return StreamRulesStore.update(stream.id, streamRuleId, data, () => {
-      if (onSubmit) {
-        onSubmit(streamRuleId, data);
-      }
+  const _onSubmit = (streamRuleId, data) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+    if (onSubmit) {
+      onSubmit(streamRuleId, data);
+    }
 
-      UserNotification.success('Stream rule has been successfully updated.', 'Success');
-    });
-  };
+    UserNotification.success('Stream rule has been successfully updated.', 'Success');
+  });
 
-  const _formatActionItems = () => {
-    return (
-      <ActionButtonsWrap>
-        <Button bsStyle="link"
-                bsSize="xsmall"
-                onClick={_onDelete}
-                title="Delete stream rule">
-          <Icon name="trash-alt" type="regular" />
-        </Button>
-        <Button bsStyle="link"
-                bsSize="xsmall"
-                onClick={_onEdit}
-                title="Edit stream rule">
-          <Icon name="edit" />
-        </Button>
-      </ActionButtonsWrap>
-    );
-  };
+  const _formatActionItems = () => (
+    <ActionButtonsWrap>
+      <Button bsStyle="link"
+              bsSize="xsmall"
+              onClick={_onDelete}
+              title="Delete stream rule">
+        <Icon name="trash-alt" type="regular" />
+      </Button>
+      <Button bsStyle="link"
+              bsSize="xsmall"
+              onClick={_onEdit}
+              title="Edit stream rule">
+        <Icon name="edit" />
+      </Button>
+    </ActionButtonsWrap>
+  );
 
   const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger');
   const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;

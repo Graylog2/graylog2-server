@@ -16,12 +16,16 @@
  */
 package org.graylog2.rest.resources.system.logs;
 
+import okhttp3.ResponseBody;
 import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+import retrofit2.http.Streaming;
 
 public interface RemoteLoggersResource {
     @GET("system/loggers")
@@ -35,4 +39,9 @@ public interface RemoteLoggersResource {
 
     @PUT("system/loggers/{loggerName}/level/{level}")
     Call<Void> setSingleLoggerLevel(@Path("loggerName") String loggerName, @Path("level") String level);
+
+    @GET("system/loggers/messages/recent")
+    @Streaming
+    @Headers({"Accept: text/plain"})
+    Call<ResponseBody> messages(@Query("limit") int limit);
 }

@@ -25,22 +25,18 @@ class InputTypesDataTable extends React.Component {
     inputDescriptions: PropTypes.object,
   };
 
-  _headerCellFormatter = (header) => {
-    return <th>{header}</th>;
-  };
+  _headerCellFormatter = (header) => <th>{header}</th>;
 
-  _inputTypeFormatter = (inputType) => {
-    return (
-      <tr key={inputType.type}>
-        <td className="limited">{inputType.name}</td>
-        <td className="limited">{inputType.type}</td>
-        <td className="limited" style={{ width: 150 }}>
-          {inputType.link_to_docs
+  _inputTypeFormatter = (inputType) => (
+    <tr key={inputType.type}>
+      <td className="limited">{inputType.name}</td>
+      <td className="limited">{inputType.type}</td>
+      <td className="limited" style={{ width: 150 }}>
+        {inputType.link_to_docs
           && <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>}
-        </td>
-      </tr>
-    );
-  };
+      </td>
+    </tr>
+  );
 
   render() {
     if (!this.props.inputDescriptions) {

@@ -127,9 +127,7 @@ class EmailNotificationForm extends React.Component {
     this.propagateChange('html_body_template', nextValue);
   };
 
-  handleRecipientsChange = (key) => {
-    return (nextValue) => this.propagateChange(key, nextValue === '' ? [] : nextValue.split(','));
-  };
+  handleRecipientsChange = (key) => (nextValue) => this.propagateChange(key, nextValue === '' ? [] : nextValue.split(','));
 
   render() {
     const { config, validation } = this.props;

@@ -39,18 +39,14 @@ const ExtractorsList = ({ input, node }) => {
     fetchExtractors(input.id, setExtractors);
   }, [input.id]);
 
-  const _formatExtractor = (extractor) => {
-    return (
-      <ExtractorsListItem key={extractor.id}
-                          extractor={extractor}
-                          inputId={input.id}
-                          nodeId={node.node_id} />
-    );
-  };
+  const _formatExtractor = (extractor) => (
+    <ExtractorsListItem key={extractor.id}
+                        extractor={extractor}
+                        inputId={input.id}
+                        nodeId={node.node_id} />
+  );
 
-  const _isLoading = () => {
-    return !extractors;
-  };
+  const _isLoading = () => !extractors;
 
   const _openSortModal = () => {
     setShowSortModal(true);

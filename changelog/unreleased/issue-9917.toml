@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix GELF output to not block output processing."
+
+issues = ["9917", "graylog-plugin-enterprise#4623"]
+pulls = ["15385"]

@@ -20,13 +20,11 @@ import { mount } from 'wrappedEnzyme';
 import NumberRefExpression from './NumberRefExpression';
 
 describe('NumberRefExpression', () => {
-  const eventDefinition = (series = []) => {
-    return {
-      config: {
-        series: series,
-      },
-    };
-  };
+  const eventDefinition = (series = []) => ({
+    config: {
+      series: series,
+    },
+  });
 
   const aggregationFunctions = ['avg', 'card'];
   const formattedFields = [

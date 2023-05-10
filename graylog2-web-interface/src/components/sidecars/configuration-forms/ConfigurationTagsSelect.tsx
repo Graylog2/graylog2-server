@@ -31,9 +31,7 @@ const ConfigurationTagsSelect = ({
   onChange,
 }: Props) => {
   const tagsValue = tags.join(',');
-  const tagsOptions = availableTags.map((tag) => {
-    return { value: tag.name, label: tag.name };
-  });
+  const tagsOptions = availableTags.map((tag) => ({ value: tag.name, label: tag.name }));
 
   return (
     <MultiSelect options={tagsOptions}

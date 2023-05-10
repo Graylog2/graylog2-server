@@ -59,9 +59,7 @@ const CreateInputControl = createReactClass({
     if (inputTypes) {
       const inputTypesIds = Object.keys(inputTypes);
 
-      options = inputTypesIds.map((id) => {
-        return { value: id, label: inputTypes[id] };
-      });
+      options = inputTypesIds.map((id) => ({ value: id, label: inputTypes[id] }));
 
       options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
     } else {
@@ -78,10 +76,10 @@ const CreateInputControl = createReactClass({
 
     this.setState({ selectedInput: selectedInput });
 
-    this.props.sendTelemetry('change_input_value', {
-      appSection: 'inputs',
-      eventElement: 'select-input',
-      eventInfo: { value: selectedInput },
+    this.props.sendTelemetry('input_value_change', {
+      app_pathname: 'inputs',
+      app_action_value: 'input-select',
+      event_details: { value: selectedInput },
     });
 
     InputTypesActions.get.triggerPromise(selectedInput).then((inputDefinition) => this.setState({ selectedInputDefinition: inputDefinition }));
@@ -107,9 +105,9 @@ const CreateInputControl = createReactClass({
   },
 
   _createInput(data) {
-    this.props.sendTelemetry('submit_form', {
-      appSection: 'inputs',
-      eventElement: 'create-input',
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'inputs',
+      app_action_value: 'input-create',
     });
 
     InputsActions.create(data).then(() => {
@@ -125,7 +123,9 @@ const CreateInputControl = createReactClass({
       const inputTypeName = inputTypes[selectedInput];
 
       inputModal = (
-        <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+        <InputForm ref={(configurationForm) => {
+          this.configurationForm = configurationForm;
+        }}
                    key="configuration-form-input"
                    configFields={selectedInputDefinition.requested_configuration}
                    title={<span>Launch new <em>{inputTypeName}</em> input</span>}
@@ -153,8 +153,8 @@ const CreateInputControl = createReactClass({
                                 bsStyle="info"
                                 onClick={() => {
                                   this.props.sendTelemetry('click', {
-                                    appSection: 'inputs',
-                                    eventElement: 'find-more-inputs',
+                                    app_pathname: 'inputs',
+                                    app_action_value: 'inputs-find-more',
                                   });
                                 }}
                                 style={{ marginLeft: 10 }}>

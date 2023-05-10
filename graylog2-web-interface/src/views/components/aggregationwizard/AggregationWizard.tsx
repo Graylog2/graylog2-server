@@ -28,12 +28,10 @@ import VisualizationContainer from './VisualizationContainer';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => [element.key, element]));
 
-const _initialFormValues = (config: AggregationWidgetConfig) => {
-  return aggregationElements.reduce((formValues, element) => ({
-    ...formValues,
-    ...(element.fromConfig ? element.fromConfig(config) : {}),
-  }), {});
-};
+const _initialFormValues = (config: AggregationWidgetConfig) => aggregationElements.reduce((formValues, element) => ({
+  ...formValues,
+  ...(element.fromConfig ? element.fromConfig(config) : {}),
+}), {});
 
 const Controls = styled.div`
   height: 100%;

@@ -31,7 +31,7 @@ export type EventDefinitionAggregation = {
   value: number,
   function: string,
   fnSeries: string,
-  field: string
+  field?: string
 }
 export const definitionsUrl = (definitionId: string) => qualifyUrl(`/events/definitions/${definitionId}`);
 
@@ -89,9 +89,7 @@ const eventDefinitionDataMapper = (data: EventDefinition): { eventDefinition: Ev
     : [],
 });
 
-const fetchDefinition = (definitionId: string) => {
-  return fetch('GET', definitionsUrl(definitionId)).then(eventDefinitionDataMapper);
-};
+const fetchDefinition = (definitionId: string) => fetch('GET', definitionsUrl(definitionId)).then(eventDefinitionDataMapper);
 
 const useEventDefinition = (definitionId: string, { onErrorHandler }: { onErrorHandler?: (e: FetchError)=>void} = {}): {
   data: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },

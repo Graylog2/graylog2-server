@@ -38,30 +38,28 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteCalendar = ({ startDate, nextTimeRange, range }: Props) => {
-  return (
-    <Field name={`nextTimeRange[${range}]`}>
-      {({ field: { value, onChange, name }, meta: { error } }) => {
-        const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
+const AbsoluteCalendar = ({ startDate, nextTimeRange, range }: Props) => (
+  <Field name={`nextTimeRange[${range}]`}>
+    {({ field: { value, onChange, name }, meta: { error } }) => {
+      const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+      const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
 
-        return (
-          <>
-            <AbsoluteDatePicker onChange={_onChange}
-                                startDate={startDate}
-                                dateTime={dateTime} />
+      return (
+        <>
+          <AbsoluteDatePicker onChange={_onChange}
+                              startDate={startDate}
+                              dateTime={dateTime} />
 
-            <AbsoluteTimeInput onChange={_onChange}
-                               range={range}
-                               dateTime={dateTime} />
+          <AbsoluteTimeInput onChange={_onChange}
+                             range={range}
+                             dateTime={dateTime} />
 
-            <ErrorMessage>{error}</ErrorMessage>
-          </>
-        );
-      }}
-    </Field>
-  );
-};
+          <ErrorMessage>{error}</ErrorMessage>
+        </>
+      );
+    }}
+  </Field>
+);
 
 AbsoluteCalendar.propTypes = {
   nextTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,

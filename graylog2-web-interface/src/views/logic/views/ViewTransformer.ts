@@ -35,13 +35,11 @@ const ViewTransformer = (searchView: View): View => {
       .toList()
       .toArray();
 
-    const widgets: List<Widget> = viewState.widgets.map((widget: Widget) => {
-      return widget.toBuilder()
-        .timerange(timerange)
-        .query(query)
-        .streams(streams)
-        .build();
-    }).toList();
+    const widgets: List<Widget> = viewState.widgets.map((widget: Widget) => widget.toBuilder()
+      .timerange(timerange)
+      .query(query)
+      .streams(streams)
+      .build()).toList();
 
     return viewState.toBuilder()
       .widgets(widgets)
