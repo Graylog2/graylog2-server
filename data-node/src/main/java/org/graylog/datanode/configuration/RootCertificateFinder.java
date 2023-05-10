@@ -28,23 +28,17 @@ import java.security.cert.X509Certificate;
 
 public class RootCertificateFinder {
 
-    static final String ROOT_PRINCIPAL_NAME = "CN=root";
-
     public X509Certificate findRootCert(Path keystorePath,
                                         String password,
-                                        final String dataNodeAlias) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+                                        final String alias) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         final KeyStore keystore = loadKeystore(keystorePath, password);
-        final Certificate[] certs = keystore.getCertificateChain(dataNodeAlias);
-
-        for (Certificate cert : certs) {
-            if (cert instanceof final X509Certificate x509Certificate) {
-                final String alias = x509Certificate.getSubjectX500Principal().getName();
-                if (alias.equals(ROOT_PRINCIPAL_NAME)) {
-                    return x509Certificate;
-                }
-            }
+        final Certificate[] certs = keystore.getCertificateChain(alias);
+        final Certificate rootCert = certs[certs.length - 1]; //last one is root
+        if (rootCert instanceof final X509Certificate x509Certificate) {
+            return x509Certificate;
+        } else {
+            throw new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!");
         }
-        throw new KeyStoreException("Keystore does not contain root certificate in the certificate chain!");
     }
 
     private KeyStore loadKeystore(Path keystorePath, String password) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
