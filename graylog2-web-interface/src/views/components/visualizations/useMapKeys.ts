@@ -25,11 +25,11 @@ const useMapKeys = (): KeyMapper => {
 
     switch (fieldType?.type?.type) {
       case 'node':
-        return nodes[key] ? formatNode(nodes[key]) : key;
+        return nodes?.[key] ? formatNode(nodes[key]) : key;
       case 'input':
-        return inputs[key]?.title ?? key;
+        return inputs?.[key]?.title ?? key;
       case 'streams':
-        return streamsMap[key]?.title ?? key;
+        return streamsMap?.[key]?.title ?? key;
       default:
         return key;
     }
