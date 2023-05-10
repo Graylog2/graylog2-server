@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
-import { Overlay } from 'react-overlays';
+import { useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
@@ -42,16 +42,11 @@ const StyledRangePresetDropdown = styled(RangePresetDropdown)`
   padding: 6px;
 `;
 
-const RelativePosition = styled.div`
-  position: relative;
-`;
-
 const StyledButtonGroup = styled(ButtonGroup)`
   display: flex;
 `;
 
 const TimeRangeDropdownButton = ({
-  children,
   disabled,
   hasErrorOnMount,
   onPresetSelectOpen,
@@ -60,6 +55,7 @@ const TimeRangeDropdownButton = ({
   showPresetDropdown = true,
   toggleShow,
 }: Props) => {
+  const { showDropdownButton } = useContext(TimeRangeInputSettingsContext);
   const { submitForm, isValid } = useFormikContext();
   const containerRef = useRef();
 
@@ -98,21 +94,14 @@ const TimeRangeDropdownButton = ({
     : null;
 
   return (
-    <RelativePosition ref={containerRef}>
+    showDropdownButton && (
       <StyledButtonGroup>
         <TimeRangeButton hasError={hasErrorOnMount}
                          disabled={disabled}
                          onClick={_onClick} />
         {dropdown}
       </StyledButtonGroup>
-      <Overlay show={show}
-               trigger="click"
-               placement="bottom"
-               onHide={toggleShow}
-               container={containerRef.current}>
-        {children}
-      </Overlay>
-    </RelativePosition>
+    )
   );
 };
 

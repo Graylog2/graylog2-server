@@ -32,6 +32,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import 'moment-duration-format';
 
+import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 import QuickAccessTimeRangeForm from 'components/configurations/QuickAccessTimeRangeForm';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
@@ -77,6 +78,20 @@ const SearchesConfig = () => {
   const [surroundingFilterFieldsUpdate, setSurroundingFilterFieldsUpdate] = useState<string | undefined>(undefined);
   const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState<string | undefined>(undefined);
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
+  const [quickAccessTimeRangePresets, setQuickAccessTimeRangePresets] = useState<Array<QuickAccessTimeRange>>([
+    {
+      timerange: { type: 'relative', from: 300 },
+      description: 'My saved relative range',
+    },
+    {
+      timerange: { type: 'absolute', from: '2023-05-18T12:32:58.000+00:00', to: '2023-05-18T12:37:58.000+00:00' },
+      description: 'My saved absolute range',
+    },
+    {
+      timerange: { type: 'keyword', keyword: 'Last five minutes' },
+      description: 'My saved keyword range',
+    },
+  ]);
 
   const sendTelemetry = useSendTelemetry();
 
@@ -275,6 +290,7 @@ const SearchesConfig = () => {
 
       {showConfigModal && formConfig && (
       <BootstrapModalForm show
+                          bsSize="large"
                           title="Update Search Configuration"
                           onSubmitForm={saveConfig}
                           onCancel={handleModalCancel}
@@ -301,7 +317,7 @@ const SearchesConfig = () => {
                                 validator={relativeTimeRangeValidator}
                                 title="Relative Timerange Options"
                                 help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
-          <QuickAccessTimeRangeForm />
+          <QuickAccessTimeRangeForm quickAccessTimeRangePresets={quickAccessTimeRangePresets} setQuickAccessTimeRangePresets={setQuickAccessTimeRangePresets} />
           <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
                                 update={onSurroundingTimeRangeOptionsUpdate}
                                 validator={surroundingTimeRangeValidator}

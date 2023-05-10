@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Overlay } from 'react-overlays';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
@@ -48,6 +49,7 @@ const FlexContainer = styled.div`
   flex: 1;
   min-width: 430px;
   gap: ${SEARCH_BAR_GAP};
+  position: relative;
 `;
 
 const TimeRangeInput = ({
@@ -62,6 +64,7 @@ const TimeRangeInput = ({
   showPresetDropdown = true,
   limitDuration,
 }: Props) => {
+  const containerRef = useRef();
   const sendTelemetry = useSendTelemetry();
   const [show, setShow] = useState(false);
 
@@ -84,14 +87,19 @@ const TimeRangeInput = ({
   const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (
-    <FlexContainer className={className}>
+    <FlexContainer className={className} ref={containerRef}>
       <TimeRangeDropdownButton disabled={disabled}
                                show={show}
                                toggleShow={toggleShow}
                                onPresetSelectOpen={hideTimeRangeDropDown}
                                setCurrentTimeRange={onChange}
                                showPresetDropdown={showPresetDropdown}
-                               hasErrorOnMount={hasErrorOnMount}>
+                               hasErrorOnMount={hasErrorOnMount} />
+      <Overlay show={show}
+               trigger="click"
+               placement="bottom"
+               onHide={toggleShow}
+               container={containerRef.current}>
         <TimeRangeDropdown currentTimeRange={value}
                            limitDuration={limitDuration}
                            noOverride={noOverride}
@@ -99,7 +107,7 @@ const TimeRangeInput = ({
                            toggleDropdownShow={toggleShow}
                            validTypes={validTypes}
                            position={position} />
-      </TimeRangeDropdownButton>
+      </Overlay>
       <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
     </FlexContainer>
   );
