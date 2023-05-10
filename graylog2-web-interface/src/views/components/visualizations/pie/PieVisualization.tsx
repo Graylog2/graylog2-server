@@ -33,7 +33,7 @@ import GenericPlot from '../GenericPlot';
 
 const maxItemsPerRow = 4;
 
-const _verticalDimensions = (idx, total) => {
+const _verticalDimensions = (idx: number, total: number) => {
   const rows = Math.ceil(total / maxItemsPerRow);
   const position = Math.floor(idx / maxItemsPerRow);
 

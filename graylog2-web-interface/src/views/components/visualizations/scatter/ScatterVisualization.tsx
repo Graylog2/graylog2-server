@@ -25,12 +25,15 @@ import { makeVisualization, retrieveChartData } from 'views/components/aggregati
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
+import type { Generator } from 'views/components/visualizations/ChartData';
+import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import XYPlot from '../XYPlot';
 
-const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values, mode: 'markers' });
+const seriesGenerator: Generator = (type, name, labels, values) => ({ type, name, x: labels, y: values, mode: 'markers' });
 
-const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
+const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.name) } });
 
 const ScatterVisualization = makeVisualization(({
   config,

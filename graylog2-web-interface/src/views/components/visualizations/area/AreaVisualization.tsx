@@ -25,11 +25,13 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
 
-const getChartColor = (fullData, name) => {
+const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
   const data = fullData.find((d) => (d.name === name));
 
   if (data && data.line && data.line.color) {
@@ -41,7 +43,7 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
+const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.name) } });
 
 const AreaVisualization = makeVisualization(({
   config,
@@ -51,7 +53,7 @@ const AreaVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
-  const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
+  const chartGenerator = useCallback((type: string, name: string, labels: Array<string>, values: Array<any>): ChartDefinition => ({
     type,
     name,
     x: labels,

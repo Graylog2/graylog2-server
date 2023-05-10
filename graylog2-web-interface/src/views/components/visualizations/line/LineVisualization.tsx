@@ -51,7 +51,7 @@ const LineVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
-  const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
+  const chartGenerator = useCallback((type: string, name: string, labels: Array<string>, values: Array<any>): ChartDefinition => ({
     type,
     name,
     x: labels,

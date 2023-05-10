@@ -62,7 +62,7 @@ export type Generator = (type: string, name: string, labels: Array<string>, valu
 
 const _defaultKeyJoiner = (keys) => keys.join(keySeparator);
 
-const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({
+const _defaultChartGenerator = (type: string, name: string, labels: Array<string>, values: Array<any>): ChartDefinition => ({
   type,
   name,
   x: labels,
