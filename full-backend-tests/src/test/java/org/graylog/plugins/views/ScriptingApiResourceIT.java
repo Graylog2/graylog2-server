@@ -112,7 +112,7 @@ public class ScriptingApiResourceIT {
                          {
                            "group_by": [
                              {
-                               "field": "streams"
+                               "field": "streams.id"
                              }
                            ],
                            "metrics": [
