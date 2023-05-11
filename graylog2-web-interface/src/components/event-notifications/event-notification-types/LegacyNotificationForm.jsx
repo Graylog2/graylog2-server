@@ -24,10 +24,8 @@ import { ConfigurationFormField } from 'components/configurationforms';
 
 import commonStyles from './LegacyNotificationCommonStyles.css';
 
-const formatLegacyTypes = (legacyTypes) => {
-  return Object.keys(legacyTypes)
-    .map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
-};
+const formatLegacyTypes = (legacyTypes) => Object.keys(legacyTypes)
+  .map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
 
 class LegacyNotificationForm extends React.Component {
   static propTypes = {

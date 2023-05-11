@@ -89,9 +89,7 @@ const PipelineFilter = ({ query, onSearch }: { query: string, onSearch: (query: 
               topMargin={0} />
 );
 
-const _formatConnectedStreams = (streams) => {
-  return streams.map((s) => s.title).join(', ');
-};
+const _formatConnectedStreams = (streams) => streams.map((s) => s.title).join(', ');
 
 const _loadPipelines = (pagination, setLoading, setPaginatedPipelines) => {
   setLoading(true);
@@ -151,10 +149,10 @@ const ProcessingTimelineComponent = () => {
 
     return pipelines
       .map(({ stages: pipelineStages }) => pipelineStages.map(({ stage }) => stage))
-      .reduce((usedStagesAcc: number[], pipelineStages: number[]) => {
+      .reduce((usedStagesAcc: number[], pipelineStages: number[]) =>
         // Concat stages in a single array removing duplicates
-        return Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
-      }, [])
+        Array.from(new Set([...usedStagesAcc, ...pipelineStages])),
+      [])
       .sort(naturalSort)
       .map((usedStage) => {
         if (stageNumbers.indexOf(usedStage) === -1) {
@@ -165,17 +163,15 @@ const ProcessingTimelineComponent = () => {
       });
   };
 
-  const _deletePipeline = (pipeline) => {
-    return () => {
-      // TODO: Replace with ConfirmDialog components
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
-        PipelinesActions.delete(pipeline.id).then(() => {
-          _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
-          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
-        });
-      }
-    };
+  const _deletePipeline = (pipeline) => () => {
+    // TODO: Replace with ConfirmDialog components
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
+      PipelinesActions.delete(pipeline.id).then(() => {
+        _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
+        setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
+      });
+    }
   };
 
   const _pipelineFormatter = (pipeline) => {

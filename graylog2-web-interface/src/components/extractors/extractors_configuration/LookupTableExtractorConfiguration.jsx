@@ -58,13 +58,9 @@ class LookupTableExtractorConfiguration extends React.Component {
     this.props.onChange(newConfig);
   };
 
-  _onChange = (key) => {
-    return (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
-  };
+  _onChange = (key) => (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
 
-  _onSelect = (key) => {
-    return (value) => this._updateConfigValue(key, value);
-  };
+  _onSelect = (key) => (value) => this._updateConfigValue(key, value);
 
   _onTryClick = () => {
     this.setState({ trying: true });
@@ -88,18 +84,14 @@ class LookupTableExtractorConfiguration extends React.Component {
     promise.finally(() => this.setState({ trying: false }));
   };
 
-  _isTryButtonDisabled = () => {
-    return this.state.trying || !this.props.configuration.lookup_table_name || !this.props.exampleMessage;
-  };
+  _isTryButtonDisabled = () => this.state.trying || !this.props.configuration.lookup_table_name || !this.props.exampleMessage;
 
   render() {
     if (!this.state.lookupTables) {
       return <Spinner />;
     }
 
-    const lookupTables = this.state.lookupTables.map((table) => {
-      return { label: table.title, value: table.name };
-    });
+    const lookupTables = this.state.lookupTables.map((table) => ({ label: table.title, value: table.name }));
 
     const helpMessage = (
       <span>

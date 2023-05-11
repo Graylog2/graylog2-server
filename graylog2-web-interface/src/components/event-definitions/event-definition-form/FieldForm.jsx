@@ -83,9 +83,7 @@ class FieldForm extends React.Component {
     return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type) || {};
   };
 
-  getConfigProviderType = (config, defaultValue) => {
-    return get(config, 'providers[0].type', defaultValue);
-  };
+  getConfigProviderType = (config, defaultValue) => get(config, 'providers[0].type', defaultValue);
 
   validate = () => {
     const { isKey, keyPosition, config } = this.state;
@@ -195,10 +193,8 @@ class FieldForm extends React.Component {
     );
   };
 
-  formatFieldValueProviders = () => {
-    return PluginStore.exports('fieldValueProviders')
-      .map((type) => ({ label: type.displayName, value: type.type }));
-  };
+  formatFieldValueProviders = () => PluginStore.exports('fieldValueProviders')
+    .map((type) => ({ label: type.displayName, value: type.type }));
 
   render() {
     const { fieldName: prevFieldName, onCancel } = this.props;

@@ -74,13 +74,11 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
 `;
 });
 
-const FormGroup = memo(({ children, validationState, ...props }) => {
-  return (
-    <StyledFormGroup validationState={validationState} {...props}>
-      {children}
-    </StyledFormGroup>
-  );
-});
+const FormGroup = memo(({ children, validationState, ...props }) => (
+  <StyledFormGroup validationState={validationState} {...props}>
+    {children}
+  </StyledFormGroup>
+));
 
 FormGroup.propTypes = {
   children: PropTypes.node.isRequired,

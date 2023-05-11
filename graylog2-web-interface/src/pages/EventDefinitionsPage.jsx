@@ -24,34 +24,32 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
-const EventDefinitionsPage = () => {
-  return (
-    <DocumentTitle title="Event Definitions">
-      <EventsPageNavigation />
-      <PageHeader title="Event Definitions"
-                  actions={(
-                    <IfPermitted permissions="eventdefinitions:create">
-                      <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                        <Button bsStyle="success">Create event definition</Button>
-                      </LinkContainer>
-                    </IfPermitted>
+const EventDefinitionsPage = () => (
+  <DocumentTitle title="Event Definitions">
+    <EventsPageNavigation />
+    <PageHeader title="Event Definitions"
+                actions={(
+                  <IfPermitted permissions="eventdefinitions:create">
+                    <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                      <Button bsStyle="success">Create event definition</Button>
+                    </LinkContainer>
+                  </IfPermitted>
                   )}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Create new Event Definitions that will allow you to search for different Conditions and alert on them.
-        </span>
-      </PageHeader>
+                documentationLink={{
+                  title: 'Alerts documentation',
+                  path: DocsHelper.PAGES.ALERTS,
+                }}>
+      <span>
+        Create new Event Definitions that will allow you to search for different Conditions and alert on them.
+      </span>
+    </PageHeader>
 
-      <Row className="content">
-        <Col md={12}>
-          <EventDefinitionsContainer />
-        </Col>
-      </Row>
-    </DocumentTitle>
-  );
-};
+    <Row className="content">
+      <Col md={12}>
+        <EventDefinitionsContainer />
+      </Col>
+    </Row>
+  </DocumentTitle>
+);
 
 export default EventDefinitionsPage;

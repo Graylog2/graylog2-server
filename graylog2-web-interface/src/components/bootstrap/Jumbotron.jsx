@@ -34,10 +34,8 @@ export const StyledJumbotron = styled(BootstrapJumbotron)(({ theme }) => css`
   }
 `);
 
-const Jumbotron = forwardRef((props, ref) => {
-  return (
-    <StyledJumbotron ref={ref} {...props} />
-  );
-});
+const Jumbotron = forwardRef((props, ref) => (
+  <StyledJumbotron ref={ref} {...props} />
+));
 
 export default Jumbotron;

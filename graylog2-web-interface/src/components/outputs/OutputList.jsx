@@ -22,9 +22,7 @@ import { Col, Row } from 'components/bootstrap';
 import { Spinner, NoEntitiesExist } from 'components/common';
 import Output from 'components/outputs/Output';
 
-const sortByTitle = (output1, output2) => {
-  return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
-};
+const sortByTitle = (output1, output2) => naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
 
 class OutputList extends React.Component {
   static propTypes = {
@@ -37,18 +35,16 @@ class OutputList extends React.Component {
     types: PropTypes.object.isRequired,
   };
 
-  _formatOutput = (output) => {
-    return (
-      <Output key={output.id}
-              output={output}
-              streamId={this.props.streamId}
-              removeOutputFromStream={this.props.onRemove}
-              removeOutputGlobally={this.props.onTerminate}
-              onUpdate={this.props.onUpdate}
-              getTypeDefinition={this.props.getTypeDefinition}
-              types={this.props.types} />
-    );
-  };
+  _formatOutput = (output) => (
+    <Output key={output.id}
+            output={output}
+            streamId={this.props.streamId}
+            removeOutputFromStream={this.props.onRemove}
+            removeOutputGlobally={this.props.onTerminate}
+            onUpdate={this.props.onUpdate}
+            getTypeDefinition={this.props.getTypeDefinition}
+            types={this.props.types} />
+  );
 
   render() {
     if (!this.props.outputs) {

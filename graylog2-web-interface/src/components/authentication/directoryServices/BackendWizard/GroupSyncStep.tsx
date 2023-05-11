@@ -67,8 +67,9 @@ const GroupSyncStep = ({
           <Button bsStyle="primary"
                   onClick={() => {
                     sendTelemetry('click', {
-                      appSection: 'authentication_services_group_sync_step',
-                      eventElement: 'finish-and-save-service',
+                      app_pathname: 'authentication',
+                      app_section: 'directory-service',
+                      app_action_value: 'groupsync-save',
                     });
 
                     onSubmitAll(false);

@@ -127,21 +127,19 @@ class SelectPopover extends React.Component {
     this.handleSelectionChange([]);
   };
 
-  handleItemSelection = (item) => {
-    return () => {
-      const { multiple } = this.props;
-      const { selectedItems } = this.state;
-      let nextSelectedItems;
+  handleItemSelection = (item) => () => {
+    const { multiple } = this.props;
+    const { selectedItems } = this.state;
+    let nextSelectedItems;
 
-      if (multiple) {
-        // Clicking on a selected value on a multiselect input will toggle the item's select status
-        nextSelectedItems = selectedItems.includes(item) ? without(selectedItems, item) : concat(selectedItems, item);
-      } else {
-        nextSelectedItems = [item];
-      }
+    if (multiple) {
+      // Clicking on a selected value on a multiselect input will toggle the item's select status
+      nextSelectedItems = selectedItems.includes(item) ? without(selectedItems, item) : concat(selectedItems, item);
+    } else {
+      nextSelectedItems = [item];
+    }
 
-      this.handleSelectionChange(nextSelectedItems);
-    };
+    this.handleSelectionChange(nextSelectedItems);
   };
 
   filterData = (filterText, items) => {
@@ -150,12 +148,10 @@ class SelectPopover extends React.Component {
     this.setState({ filterText: filterText, filteredItems: newFilteredItems });
   };
 
-  handleFilterChange = (items) => {
-    return (event) => {
-      const filterText = event.target.value.trim();
+  handleFilterChange = (items) => (event) => {
+    const filterText = event.target.value.trim();
 
-      this.filterData(filterText, items);
-    };
+    this.filterData(filterText, items);
   };
 
   renderDataFilter = (items) => {
@@ -205,16 +201,14 @@ class SelectPopover extends React.Component {
         {selectedItems.length > 0 && this.renderClearSelectionItem()}
         <IsolatedScroll className={style.scrollableList}>
           <ListGroup>
-            {filteredItems.map((item) => {
-              return (
-                <ListGroupItem key={item}
-                               onClick={disabled ? () => {} : this.handleItemSelection(item)}
-                               active={selectedItems.includes(item)}
-                               disabled={disabled}>
-                  {itemFormatter(item)}
-                </ListGroupItem>
-              );
-            })}
+            {filteredItems.map((item) => (
+              <ListGroupItem key={item}
+                             onClick={disabled ? () => {} : this.handleItemSelection(item)}
+                             active={selectedItems.includes(item)}
+                             disabled={disabled}>
+                {itemFormatter(item)}
+              </ListGroupItem>
+            ))}
           </ListGroup>
         </IsolatedScroll>
       </Popover>

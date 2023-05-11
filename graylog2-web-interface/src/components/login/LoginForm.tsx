@@ -45,12 +45,10 @@ const LoginForm = ({ onErrorChange }: Props) => {
   let usernameInput;
   let passwordInput;
 
-  useEffect(() => {
-    return () => {
-      if (promise) {
-        promise.cancel();
-      }
-    };
+  useEffect(() => () => {
+    if (promise) {
+      promise.cancel();
+    }
   }, [promise]);
 
   const onSignInClicked = (event) => {

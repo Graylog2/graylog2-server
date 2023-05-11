@@ -42,13 +42,9 @@ const getUserTimezone = (userTimezone: string, tzOverride?: string) => {
  */
 
 const StaticTimezoneProvider = ({ children, tz }: Required<Props>) => {
-  const toUserTimezone = useCallback((time: DateTime) => {
-    return toDateObject(time, undefined, tz);
-  }, [tz]);
+  const toUserTimezone = useCallback((time: DateTime) => toDateObject(time, undefined, tz), [tz]);
 
-  const formatTime = useCallback((time: DateTime, format: DateTimeFormats = 'default') => {
-    return toUserTimezone(time).format(DATE_TIME_FORMATS[format]);
-  }, [toUserTimezone]);
+  const formatTime = useCallback((time: DateTime, format: DateTimeFormats = 'default') => toUserTimezone(time).format(DATE_TIME_FORMATS[format]), [toUserTimezone]);
 
   const contextValue = useMemo(
     () => ({ toUserTimezone, formatTime, userTimezone: tz }),

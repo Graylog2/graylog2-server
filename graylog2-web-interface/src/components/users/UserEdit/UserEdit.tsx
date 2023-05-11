@@ -40,13 +40,11 @@ type Props = {
   user: User,
 };
 
-const _updateUser = (data, currentUser, userId, fullName) => {
-  return UsersDomain.update(userId, data, fullName).then(() => {
-    if (userId === currentUser?.id) {
-      CurrentUserStore.reload();
-    }
-  });
-};
+const _updateUser = (data, currentUser, userId, fullName) => UsersDomain.update(userId, data, fullName).then(() => {
+  if (userId === currentUser?.id) {
+    CurrentUserStore.reload();
+  }
+});
 
 const UserEdit = ({ user }: Props) => {
   const currentUser = useCurrentUser();

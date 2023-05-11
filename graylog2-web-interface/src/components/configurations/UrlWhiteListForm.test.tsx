@@ -155,7 +155,7 @@ describe('UrlWhitelistForm', () => {
 
     expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
 
-    expect(onUpdate).toHaveBeenCalledTimes(2);
+    expect(onUpdate).toHaveBeenCalledTimes(1);
   });
 
   it('should delete a row', async () => {

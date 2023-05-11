@@ -32,19 +32,15 @@ import NumberVisualization from './NumberVisualization';
 
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
 
-jest.mock('views/components/messagelist/CustomHighlighting', () => {
+jest.mock('views/components/messagelist/CustomHighlighting', () =>
   /* eslint-disable-next-line react/prop-types */
-  return ({ children }) => {
-    return <div>{children}</div>;
-  };
-});
+  ({ children }) => <div>{children}</div>,
+);
 
-jest.mock('views/components/Value', () => {
+jest.mock('views/components/Value', () =>
   /* eslint-disable-next-line react/prop-types */
-  return ({ value }) => {
-    return <div>{value}</div>;
-  };
-});
+  ({ value }) => <div>{value}</div>,
+);
 
 type Data = Record<string, Rows>;
 type SUTProps = {
