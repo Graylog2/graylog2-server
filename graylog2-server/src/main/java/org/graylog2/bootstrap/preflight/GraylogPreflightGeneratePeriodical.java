@@ -43,12 +43,14 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private PrivateKey caPrivateKey;
     private X509Certificate caCertificate;
     private Integer DEFAULT_VALIDITY = 90;
+    private static final String DEFAULT_PASSWORD = "admin";
 
+    // TODO: include real ca that has been either generated or uploaded
     private void loadCA() {
         final Path caKeystorePath = Path.of(caKeystoreFilename);
 
         try {
-            char[] password = "12test34".toCharArray();
+            char[] password = DEFAULT_PASSWORD.toCharArray();
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 

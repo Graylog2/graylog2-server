@@ -4,8 +4,10 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.cluster.NodePreflightConfigService;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -21,13 +23,19 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodePreflightGeneratePeriodical.class);
 
     private final NodePreflightConfigService nodePreflightConfigService;
+    private final NodeService nodeService;
     private final NodeId nodeId;
     private final PrivateKeyEncryptedFileStorage privateKeyEncryptedStorage;
 
+    //TODO: decide on password handling
+    private static final String DEFAULT_PASSWORD = "admin";
+
     @Inject
-    public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService, final NodeId nodeId) {
+    public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService, final NodeService nodeService, final NodeId nodeId) {
         this.nodePreflightConfigService = nodePreflightConfigService;
+        this.nodeService = nodeService;
         this.nodeId = nodeId;
+        // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
     }
 
@@ -37,15 +45,16 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         var cfg = nodePreflightConfigService.getPreflightConfigFor(nodeId.getNodeId());
         if (cfg != null && NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
-                var csr = new CsrGenerator().generateCSR("admin".toCharArray(), "principal", cfg.altNames(), privateKeyEncryptedStorage);
+                var node = nodeService.byNodeId(nodeId);
+                var csr = new CsrGenerator().generateCSR(DEFAULT_PASSWORD.toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
                 var sw = new StringWriter();
                 var jcaPEMWriter = new JcaPEMWriter(sw);
                 jcaPEMWriter.writeObject(csr);
                 jcaPEMWriter.flush();
                 nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.CSR).csr(sw.toString()).build());
-                LOG.info("Created CSR for this node.");
-            } catch (CSRGenerationException | IOException ex) {
-                LOG.error("Error generating a CSR: " + ex.getMessage(), ex);
+                LOG.info("created CSR for this node");
+            } catch (CSRGenerationException | IOException | NodeNotFoundException ex) {
+                LOG.error("error generating a CSR: " + ex.getMessage(), ex);
                 nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(ex.getMessage()).build());
             }
         } else if (cfg != null && NodePreflightConfig.State.SIGNED.equals(cfg.state())) {
