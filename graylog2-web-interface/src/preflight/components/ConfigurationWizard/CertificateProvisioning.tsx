@@ -16,25 +16,43 @@
  */
 import * as React from 'react';
 import { Title, Space } from '@mantine/core';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import fetch from 'logic/rest/FetchProvider';
 import { Button } from 'preflight/components/common';
 import URLUtils from 'util/URLUtils';
+import UserNotification from 'preflight/util/UserNotification';
+import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
-const provisionCertificates = () => {
-  fetch('POST', URLUtils.qualifyUrl('api/preflight/generate'));
+const provisionCertificates = (queryClient: QueryClient, setIsProvisioning: React.Dispatch<React.SetStateAction<boolean>>) => {
+  fetch('POST', URLUtils.qualifyUrl('api/generate'), undefined, false).then(() => {
+    UserNotification.success('CA provisioned successfully');
+    queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+  }).catch((error) => {
+    UserNotification.error(`CA provisioning failed with error: ${error}`);
+  }).finally(() => {
+    setIsProvisioning(false);
+  });
 };
 
-const CertificateProvisioning = () => (
-  <div>
-    <Title order={3}>Provision certificates</Title>
-    <p>
-      Certificate authority has been configured successfully.<br />
-      You can now provision certificate for your data nodes.
-    </p>
-    <Space h="md" />
-    <Button onClick={provisionCertificates}>Provision certificates and continue</Button>
-  </div>
-);
+const CertificateProvisioning = () => {
+  const queryClient = useQueryClient();
+  const [isProvisioning, setIsProvisioning] = useState(false);
+
+  return (
+    <div>
+      <Title order={3}>Provision certificates</Title>
+      <p>
+        Certificate authority has been configured successfully.<br />
+        You can now provision certificate for your data nodes.
+      </p>
+      <Space h="md" />
+      <Button onClick={() => provisionCertificates(queryClient, setIsProvisioning)}>
+        {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}
+      </Button>
+    </div>
+  );
+};
 
 export default CertificateProvisioning;

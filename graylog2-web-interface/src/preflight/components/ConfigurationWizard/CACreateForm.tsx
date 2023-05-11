@@ -53,7 +53,7 @@ const CACreateForm = () => {
         Here you can quickly create a new certificate authority. It should only be used to secure your Graylog data nodes.
       </p>
       <Space h="sm" />
-      <Formik initialValues={{}} onSubmit={onSubmit}>
+      <Formik initialValues={{ 'input-1': '', 'input-2': '' }} onSubmit={onSubmit}>
         {({ isSubmitting, isValid }) => (
           <StyledForm>
             <FormikInput placeholder="Input 1 placeholder"

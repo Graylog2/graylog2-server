@@ -57,6 +57,7 @@ const CAUpload = () => {
   return (
     <CADropzone onDrop={onProcessUpload}
                 onReject={onRejectUpload}
+                data-testid="upload-dropzone"
                 loading={isUploading}>
       <Group position="center">
         <Dropzone.Accept>
