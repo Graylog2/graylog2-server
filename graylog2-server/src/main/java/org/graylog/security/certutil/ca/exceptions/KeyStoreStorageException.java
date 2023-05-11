@@ -16,9 +16,9 @@
  */
 package org.graylog.security.certutil.ca.exceptions;
 
-public class CAStorageException extends Exception {
+public class KeyStoreStorageException extends Exception {
 
-    public CAStorageException(String message, Throwable cause) {
+    public KeyStoreStorageException(String message, Throwable cause) {
         super(message, cause);
     }
 }

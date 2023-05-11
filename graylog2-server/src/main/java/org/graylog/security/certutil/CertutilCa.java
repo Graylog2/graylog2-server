@@ -19,9 +19,9 @@ package org.graylog.security.certutil;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import org.graylog.security.certutil.ca.CACreator;
-import org.graylog.security.certutil.ca.storage.CAKeystoreFileStorage;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
+import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.graylog2.bootstrap.CliCommand;
 
 import java.nio.file.Path;
@@ -35,19 +35,19 @@ public class CertutilCa implements CliCommand {
     protected String keystoreFilename = "datanode-ca.p12";
     private final CommandLineConsole console;
     private final CACreator caCreator;
-    private final CAKeystoreFileStorage caKeystoreStorage;
+    private final KeystoreFileStorage caKeystoreStorage;
 
     public CertutilCa() {
         this.console = new SystemConsole();
         this.caCreator = new CACreator();
-        this.caKeystoreStorage = new CAKeystoreFileStorage();
+        this.caKeystoreStorage = new KeystoreFileStorage();
     }
 
     public CertutilCa(String keystoreFilename, CommandLineConsole console) {
         this.keystoreFilename = keystoreFilename;
         this.console = console;
         this.caCreator = new CACreator();
-        this.caKeystoreStorage = new CAKeystoreFileStorage();
+        this.caKeystoreStorage = new KeystoreFileStorage();
     }
 
     @Override

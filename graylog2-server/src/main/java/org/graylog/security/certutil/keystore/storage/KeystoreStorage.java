@@ -14,24 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.storage;
+package org.graylog.security.certutil.keystore.storage;
 
-import org.graylog.security.certutil.ca.exceptions.CAStorageException;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 
-import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.security.KeyStore;
 
-public class CAKeystoreFileStorage implements CAKeystoreStorage {
+public interface KeystoreStorage {
 
-    @Override
-    public void writeCAKeyStore(final Path keystorePath,
-                                final KeyStore caKeyStore,
-                                final char[] password) throws CAStorageException {
-        try (FileOutputStream store = new FileOutputStream(keystorePath.toFile())) {
-            caKeyStore.store(store, password);
-        } catch (Exception ex) {
-            throw new CAStorageException("Failed to save keystore with CA information", ex);
-        }
-    }
+    void writeCAKeyStore(final Path keystorePath,
+                         final KeyStore keyStore,
+                         final char[] password)
+            throws KeyStoreStorageException;
+
 }
