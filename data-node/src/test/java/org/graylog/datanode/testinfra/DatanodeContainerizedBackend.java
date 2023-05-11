@@ -105,6 +105,7 @@ public class DatanodeContainerizedBackend {
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
                                 .run("mkdir -p config")
+                                .run("mkdir -p config/opensearch")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
                                 .add(opensearchTarArchive, ".") // this will automatically extract the tar
