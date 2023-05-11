@@ -46,8 +46,7 @@ public class FullDirSync {
                     LOG.info("Deleting obsolete directory " + path);
                     FileUtils.deleteDirectory(path.toFile());
                 } else {
-
-                    LOG.info("Deleting obsolete directory " + path);
+                    LOG.info("Deleting obsolete file " + path);
                     Files.deleteIfExists(path);
                 }
             } else {
