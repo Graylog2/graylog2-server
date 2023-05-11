@@ -73,12 +73,7 @@ const ConfigurationWizard = ({ onResumeStartup }: Props) => {
 
   return (
     <Grid>
-      <Grid.Col span={6}>
-        {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
-        {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning />}
-        {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && <ConfigurationFinished onResumeStartup={onResumeStartup} />}
-      </Grid.Col>
-      <Grid.Col span={6}>
+      <Grid.Col span={12} md={6} orderMd={2}>
         <List spacing="md"
               size="lg"
               center>
@@ -93,6 +88,11 @@ const ConfigurationWizard = ({ onResumeStartup }: Props) => {
             );
           })}
         </List>
+      </Grid.Col>
+      <Grid.Col span={12} md={6} orderMd={1}>
+        {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
+        {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning />}
+        {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && <ConfigurationFinished onResumeStartup={onResumeStartup} />}
       </Grid.Col>
     </Grid>
   );
