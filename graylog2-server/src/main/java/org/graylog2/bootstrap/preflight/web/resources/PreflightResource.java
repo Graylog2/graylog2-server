@@ -47,7 +47,6 @@ public class PreflightResource {
     private final NodeService nodeService;
     private final NodePreflightConfigService nodePreflightConfigService;
 
-
     //TODO: hardcoded in memory for now
     private static CA currentCA = null;
 

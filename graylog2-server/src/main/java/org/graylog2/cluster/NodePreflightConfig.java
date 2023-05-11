@@ -84,7 +84,7 @@ public abstract class  NodePreflightConfig {
     public abstract String certificate();
 
     public static Builder builder() {
-        return NodePreflightConfig.Builder.create();
+        return Builder.create();
     }
 
     public abstract Builder toBuilder();
