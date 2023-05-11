@@ -33,9 +33,7 @@ type Props = {
 };
 
 const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
-  const _getDefaultValidationSpecs = () => {
-    return { min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER };
-  };
+  const _getDefaultValidationSpecs = () => ({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER });
 
   const _mapValidationAttribute = (attribute) => {
     const { min, max } = _getDefaultValidationSpecs();

@@ -77,22 +77,20 @@ const RulesPage = () => {
     setQuery(nextQuery);
   };
 
-  const handleDelete = (rule: RuleType) => {
-    return () => {
-      // TODO: Replace with custom confirm dialog
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
-        RulesActions.delete(rule).then(() => {
-          if (count > 1) {
-            _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
+  const handleDelete = (rule: RuleType) => () => {
+    // TODO: Replace with custom confirm dialog
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
+      RulesActions.delete(rule).then(() => {
+        if (count > 1) {
+          _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
 
-            return;
-          }
+          return;
+        }
 
-          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
-        });
-      }
-    };
+        setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
+      });
+    }
   };
 
   const onCloseMetricsConfig = () => {

@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr;
+package org.graylog.aws;
 
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import com.google.inject.BindingAnnotation;
 
-import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public interface CsrStorage {
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    void writeCsr(PKCS10CertificationRequest csr)
-            throws IOException, OperatorCreationException;
-
-    PKCS10CertificationRequest readCsr()
-            throws IOException, OperatorCreationException;
+@BindingAnnotation
+@Target({FIELD, PARAMETER, METHOD})
+@Retention(RUNTIME)
+public @interface AWSObjectMapper {
 }

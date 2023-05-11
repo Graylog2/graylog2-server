@@ -22,52 +22,50 @@ import { Well } from 'components/bootstrap';
 import CommonNotificationSummary from './CommonNotificationSummary';
 import styles from './EmailNotificationSummary.css';
 
-const EmailNotificationSummary = ({ notification, ...otherProps }) => {
-  return (
-    <CommonNotificationSummary notification={notification} {...otherProps}>
-      <>
-        <tr>
-          <td>Sender</td>
-          <td>{notification.config.sender}</td>
-        </tr>
-        <tr>
-          <td>Subject</td>
-          <td>{notification.config.subject}</td>
-        </tr>
-        <tr>
-          <td>Reply-To</td>
-          <td>{notification.config.reply_to}</td>
-        </tr>
-        <tr>
-          <td>User recipients</td>
-          <td>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</td>
-        </tr>
-        <tr>
-          <td>Email recipients</td>
-          <td>
-            {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
-          </td>
-        </tr>
-        <tr>
-          <td>Email Body</td>
-          <td>
-            <Well bsSize="small" className={styles.bodyPreview}>
-              {notification.config.body_template || <em>Empty body</em>}
-            </Well>
-          </td>
-        </tr>
-        <tr>
-          <td>Email HTML Body</td>
-          <td>
-            <Well bsSize="small" className={styles.bodyPreview}>
-              {notification.config.html_body_template || <em>Empty HTML body</em>}
-            </Well>
-          </td>
-        </tr>
-      </>
-    </CommonNotificationSummary>
-  );
-};
+const EmailNotificationSummary = ({ notification, ...otherProps }) => (
+  <CommonNotificationSummary notification={notification} {...otherProps}>
+    <>
+      <tr>
+        <td>Sender</td>
+        <td>{notification.config.sender}</td>
+      </tr>
+      <tr>
+        <td>Subject</td>
+        <td>{notification.config.subject}</td>
+      </tr>
+      <tr>
+        <td>Reply-To</td>
+        <td>{notification.config.reply_to}</td>
+      </tr>
+      <tr>
+        <td>User recipients</td>
+        <td>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</td>
+      </tr>
+      <tr>
+        <td>Email recipients</td>
+        <td>
+          {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
+        </td>
+      </tr>
+      <tr>
+        <td>Email Body</td>
+        <td>
+          <Well bsSize="small" className={styles.bodyPreview}>
+            {notification.config.body_template || <em>Empty body</em>}
+          </Well>
+        </td>
+      </tr>
+      <tr>
+        <td>Email HTML Body</td>
+        <td>
+          <Well bsSize="small" className={styles.bodyPreview}>
+            {notification.config.html_body_template || <em>Empty HTML body</em>}
+          </Well>
+        </td>
+      </tr>
+    </>
+  </CommonNotificationSummary>
+);
 
 EmailNotificationSummary.propTypes = {
   type: PropTypes.string.isRequired,

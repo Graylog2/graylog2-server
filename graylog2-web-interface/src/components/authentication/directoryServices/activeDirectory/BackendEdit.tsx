@@ -32,9 +32,7 @@ type Props = {
   initialStepKey: string | null | undefined,
 };
 
-const _optionalWizardProps = (initialStepKey: string | null | undefined) => {
-  return { initialStepKey };
-};
+const _optionalWizardProps = (initialStepKey: string | null | undefined) => ({ initialStepKey });
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();

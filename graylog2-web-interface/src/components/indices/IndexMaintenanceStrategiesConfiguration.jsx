@@ -169,35 +169,21 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
   const getAvailableSelectOptions = () => {
     const availableStrategies = pluginExports
-      .filter((pluginOptions) => {
-        return strategies.find(({ type }) => type === pluginOptions.type);
-      });
+      .filter((pluginOptions) => strategies.find(({ type }) => type === pluginOptions.type));
 
-    const isSelectedItemInList = availableStrategies.filter((availableStrategy) => {
-      return availableStrategy.type === newStrategy;
-    }).length > 0;
+    const isSelectedItemInList = availableStrategies.filter((availableStrategy) => availableStrategy.type === newStrategy).length > 0;
 
     if (!isSelectedItemInList) {
-      return [...availableStrategies, pluginExports.find((pluginOptions) => {
-        return pluginOptions.type === newStrategy;
-      })].map((pluginOptions) => {
-        return { value: pluginOptions.type, label: pluginOptions.displayName };
-      });
+      return [...availableStrategies, pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy)].map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
     }
 
     return availableStrategies
-      .map((c) => {
-        return { value: c.type, label: c.displayName };
-      });
+      .map((c) => ({ value: c.type, label: c.displayName }));
   };
 
-  const getDisplayName = () => {
-    return pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy).displayName;
-  };
+  const getDisplayName = () => pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy).displayName;
 
-  const getActiveSelection = () => {
-    return newStrategy;
-  };
+  const getActiveSelection = () => newStrategy;
 
   const shouldShowInvalidRetentionWarning = () => (
     name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)

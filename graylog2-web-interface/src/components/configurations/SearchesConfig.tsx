@@ -38,31 +38,19 @@ import QuickAccessTimeRangeForm from 'components/configurations/QuickAccessTimeR
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
-const queryTimeRangeLimitValidator = (milliseconds: number) => {
-  return milliseconds >= 1;
-};
+const queryTimeRangeLimitValidator = (milliseconds: number) => milliseconds >= 1;
 
-const relativeTimeRangeValidator = (milliseconds: number, duration: string) => {
-  return milliseconds >= 1 || duration === 'PT0S';
-};
+const relativeTimeRangeValidator = (milliseconds: number, duration: string) => milliseconds >= 1 || duration === 'PT0S';
 
-const surroundingTimeRangeValidator = (milliseconds: number) => {
-  return milliseconds >= 1;
-};
+const surroundingTimeRangeValidator = (milliseconds: number) => milliseconds >= 1;
 
 function autoRefreshTimeRangeValidator(milliseconds: number) {
   return milliseconds >= 1000;
 }
 
-const splitStringList = (stringList: string) => {
-  return stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
-};
+const splitStringList = (stringList: string) => stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
 
-const buildTimeRangeOptions = (options: { [x: string]: string; }) => {
-  return Object.keys(options).map((key) => {
-    return { period: key, description: options[key] };
-  });
-};
+const buildTimeRangeOptions = (options: { [x: string]: string; }) => Object.keys(options).map((key) => ({ period: key, description: options[key] }));
 
 type Option = { period: string, description: string };
 
@@ -104,10 +92,8 @@ const SearchesConfig = () => {
     });
   }, [configuration]);
 
-  const onUpdate = (field: keyof SearchConfig) => {
-    return (newOptions) => {
-      setFormConfig({ ...formConfig, [field]: newOptions });
-    };
+  const onUpdate = (field: keyof SearchConfig) => (newOptions) => {
+    setFormConfig({ ...formConfig, [field]: newOptions });
   };
 
   const onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {
@@ -170,9 +156,10 @@ const SearchesConfig = () => {
   const saveConfig = () => {
     const update = { ...formConfig };
 
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_search',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'search',
+      app_action_value: 'configuration-save',
     });
 
     if (relativeTimeRangeOptionsUpdate) {
@@ -246,7 +233,8 @@ const SearchesConfig = () => {
       <dl className="deflist">
         <dt>Query time range limit</dt>
         <dd>{limit(viewConfig)}</dd>
-        <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries which
+        <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries
+          which
           span a lot of data and would need a long time and many resources to complete (if at all).
         </dd>
       </dl>
@@ -263,7 +251,10 @@ const SearchesConfig = () => {
             <Col>
               <strong>Surrounding search filter fields</strong>
               <ul>
-                {viewConfig.surrounding_filter_fields && viewConfig.surrounding_filter_fields.map((f: string) => <li key={f}>{f}</li>)}
+                {viewConfig.surrounding_filter_fields && viewConfig.surrounding_filter_fields.map((f: string) => (
+                  <li key={f}>{f}
+                  </li>
+                ))}
               </ul>
             </Col>
           </Row>
@@ -271,7 +262,10 @@ const SearchesConfig = () => {
             <Col>
               <strong>UI analysis disabled for fields</strong>
               <ul>
-                {viewConfig.analysis_disabled_fields && (viewConfig.analysis_disabled_fields.map((f: string) => <li key={f}>{f}</li>))}
+                {viewConfig.analysis_disabled_fields && (viewConfig.analysis_disabled_fields.map((f: string) => (
+                  <li key={f}>{f}
+                  </li>
+                )))}
               </ul>
             </Col>
           </Row>
@@ -289,76 +283,79 @@ const SearchesConfig = () => {
       </IfPermitted>
 
       {showConfigModal && formConfig && (
-      <BootstrapModalForm show
-                          bsSize="large"
-                          title="Update Search Configuration"
-                          onSubmitForm={saveConfig}
-                          onCancel={handleModalCancel}
-                          submitButtonText="Update configuration">
-        <fieldset>
-          <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
-          <Input id="query-limit-checkbox"
-                 type="checkbox"
-                 label="Enable query limit"
-                 name="enabled"
-                 checked={isLimitEnabled(formConfig)}
-                 onChange={onChecked} />
-          {isLimitEnabled(formConfig) && (
-          <ISODurationInput id="query-timerange-limit-field"
-                            duration={formConfig.query_time_range_limit}
-                            update={onUpdate('query_time_range_limit')}
-                            label="Query time range limit (ISO8601 Duration)"
-                            help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
-                            validator={queryTimeRangeLimitValidator}
-                            required />
-          )}
-          <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.relative_timerange_options)}
-                                update={onRelativeTimeRangeOptionsUpdate}
-                                validator={relativeTimeRangeValidator}
-                                title="Relative Timerange Options"
-                                help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
-          <QuickAccessTimeRangeForm quickAccessTimeRangePresets={quickAccessTimeRangePresets} setQuickAccessTimeRangePresets={setQuickAccessTimeRangePresets} />
-          <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
-                                update={onSurroundingTimeRangeOptionsUpdate}
-                                validator={surroundingTimeRangeValidator}
-                                title="Surrounding Timerange Options"
-                                help={<span>Configure the available options for the <strong>surrounding</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
+        <BootstrapModalForm show
+                            title="Update Search Configuration"
+                            onSubmitForm={saveConfig}
+                            onCancel={handleModalCancel}
+                            submitButtonText="Update configuration">
+          <fieldset>
+            <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
+            <Input id="query-limit-checkbox"
+                   type="checkbox"
+                   label="Enable query limit"
+                   name="enabled"
+                   checked={isLimitEnabled(formConfig)}
+                   onChange={onChecked} />
+            {isLimitEnabled(formConfig) && (
+              <ISODurationInput id="query-timerange-limit-field"
+                                duration={formConfig.query_time_range_limit}
+                                update={onUpdate('query_time_range_limit')}
+                                label="Query time range limit (ISO8601 Duration)"
+                                help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
+                                validator={queryTimeRangeLimitValidator}
+                                required />
+            )}
+            <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.relative_timerange_options)}
+                                  update={onRelativeTimeRangeOptionsUpdate}
+                                  validator={relativeTimeRangeValidator}
+                                  title="Relative Timerange Options"
+                                  help={
+                                    <span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>
+              } />
+            <QuickAccessTimeRangeForm quickAccessTimeRangePresets={quickAccessTimeRangePresets} setQuickAccessTimeRangePresets={setQuickAccessTimeRangePresets} />
+            <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
+                                  update={onSurroundingTimeRangeOptionsUpdate}
+                                  validator={surroundingTimeRangeValidator}
+                                  title="Surrounding Timerange Options"
+                                  help={
+                                    <span>Configure the available options for the <strong>surrounding</strong> time range selector as <strong>ISO8601 duration</strong></span>
+              } />
 
-          <Input id="filter-fields-input"
-                 type="text"
-                 label="Surrounding search filter fields"
-                 onChange={onFilterFieldsUpdate}
-                 value={surroundingFilterFieldsUpdate || (formConfig.surrounding_filter_fields && formConfig.surrounding_filter_fields.join(', '))}
-                 help="A ',' separated list of message fields that will be used as filter for the surrounding messages query."
-                 required />
+            <Input id="filter-fields-input"
+                   type="text"
+                   label="Surrounding search filter fields"
+                   onChange={onFilterFieldsUpdate}
+                   value={surroundingFilterFieldsUpdate || (formConfig.surrounding_filter_fields && formConfig.surrounding_filter_fields.join(', '))}
+                   help="A ',' separated list of message fields that will be used as filter for the surrounding messages query."
+                   required />
 
-          <Input id="disabled-fields-input"
-                 type="text"
-                 label="Disabled analysis fields"
-                 onChange={onAnalysisDisabledFieldsUpdate}
-                 value={analysisDisabledFieldsUpdate || (formConfig.analysis_disabled_fields && formConfig.analysis_disabled_fields.join(', '))}
-                 help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
-                 required />
-          <TimeRangeOptionsForm options={autoRefreshOptions(formConfig)}
-                                update={onAutoRefreshTimeRangeOptionsUpdate}
-                                validator={autoRefreshTimeRangeValidator}
-                                title="Auto-Refresh Interval Options"
-                                help={<span>Configure the available options for the <strong>auto-refresh</strong> interval selector as <strong>ISO8601 duration</strong></span>} />
-          <Input label="Default Auto-Refresh Option"
-                 id="default-auto-refresh-option"
-                 required
-                 help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
-            <Select placeholder="Select the default interval"
-                    clearable={false}
-                    options={autoRefreshOptions(formConfig)}
-                    displayKey="description"
-                    valueKey="period"
-                    matchProp="label"
-                    onChange={onAutoRefreshDefaultOptionsUpdate}
-                    value={defaultAutoRefreshOption(formConfig)} />
-          </Input>
-        </fieldset>
-      </BootstrapModalForm>
+            <Input id="disabled-fields-input"
+                   type="text"
+                   label="Disabled analysis fields"
+                   onChange={onAnalysisDisabledFieldsUpdate}
+                   value={analysisDisabledFieldsUpdate || (formConfig.analysis_disabled_fields && formConfig.analysis_disabled_fields.join(', '))}
+                   help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
+                   required />
+            <TimeRangeOptionsForm options={autoRefreshOptions(formConfig)}
+                                  update={onAutoRefreshTimeRangeOptionsUpdate}
+                                  validator={autoRefreshTimeRangeValidator}
+                                  title="Auto-Refresh Interval Options"
+                                  help={<span>Configure the available options for the <strong>auto-refresh</strong> interval selector as <strong>ISO8601 duration</strong></span>} />
+            <Input label="Default Auto-Refresh Option"
+                   id="default-auto-refresh-option"
+                   required
+                   help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
+              <Select placeholder="Select the default interval"
+                      clearable={false}
+                      options={autoRefreshOptions(formConfig)}
+                      displayKey="description"
+                      valueKey="period"
+                      matchProp="label"
+                      onChange={onAutoRefreshDefaultOptionsUpdate}
+                      value={defaultAutoRefreshOption(formConfig)} />
+            </Input>
+          </fieldset>
+        </BootstrapModalForm>
       )}
     </div>
   );

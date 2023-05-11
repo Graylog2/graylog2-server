@@ -24,6 +24,7 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.config.CachingJupiterConfiguration;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -98,12 +99,49 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
     }
 
-    private Set<SearchServer> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
+    /**
+     * Property has to be in the form of Elasticsearch|OpenSearch:x.x.x
+     *
+     * @return
+     */
+    public static Optional<SearchVersion> getSearchVersionOverride() {
+        final var property = System.getProperty("graylog.matrix.tests.search.version.override");
+        if(property == null) {
+            return Optional.empty();
+        }
+        return Optional.of(SearchVersion.decode(property));
+    }
+
+    private Stream<SearchVersion> defaultOrOverride() {
+        return Stream.of(getSearchVersionOverride().orElse(SearchServer.DEFAULT_VERSION.getSearchVersion()));
+    }
+
+    /**
+     * checks if a version is compatible to the override version - if not, the test should get dropped
+     *
+     * @param version
+     * @return
+     */
+    public static boolean isCompatible(SearchVersion override, SearchServer version) {
+        return version.getSearchVersion().satisfies(override.distribution(), "^" + override.version().getMajorVersion());
+    }
+
+    private Stream<SearchVersion> filterForCompatibleVersionOrDrop(SearchServer[] versions) {
+        final var optional = getSearchVersionOverride();
+        if(optional.isPresent()) {
+            final var override = optional.get();
+            return Stream.of(versions).anyMatch(version -> isCompatible(override, version)) ? Stream.of(override) : Stream.empty();
+        } else {
+            return Stream.of(versions).map(SearchServer::getSearchVersion);
+        }
+    }
+
+    private Set<SearchVersion> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.searchVersions().length == 0) {
-                return Stream.of(SearchServer.DEFAULT_VERSION);
+                return defaultOrOverride();
             } else {
-                return Stream.of(annotation.searchVersions());
+                return filterForCompatibleVersionOrDrop(annotation.searchVersions());
             }
         });
     }
@@ -205,7 +243,6 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                 PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
                                 // now add all grouped tests for Lifecycle.VM
                                 getSearchServerVersions(annotatedClasses)
-                                        .stream().map(SearchServer::getSearchVersion)
                                         .forEach(searchVersion -> getMongoVersions(annotatedClasses)
                                                 .forEach(mongoVersion -> {
                                                     ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
@@ -226,7 +263,6 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                         );
                                 // add separate test classes (Lifecycle.CLASS)
                                 getSearchServerVersions(annotatedClasses)
-                                        .stream().map(SearchServer::getSearchVersion)
                                         .forEach(esVersion -> getMongoVersions(annotatedClasses)
                                                         .forEach(mongoVersion -> {
                                                             ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,

@@ -80,7 +80,9 @@ const MessageActions = ({
   searchConfig,
 }: Props) => {
   const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
-  const menuActions = useMemo(() => pluggableMenuActions.map((PluggableMenuAction) => <PluggableMenuAction id={id} index={index} />), [id, index, pluggableMenuActions]);
+  const menuActions = useMemo(() => pluggableMenuActions.map(
+    ({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />,
+  ), [id, index, pluggableMenuActions]);
 
   if (disabled) {
     return <ButtonGroup bsSize="small" />;

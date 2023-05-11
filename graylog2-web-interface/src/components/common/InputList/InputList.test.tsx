@@ -98,7 +98,7 @@ describe('InputList Component', () => {
     removers = screen.getAllByText(/value\s*remover/i);
 
     expect(removers.length).toEqual(1);
-    expect(screen.getByText(/dir4/i)).toBeVisible();
+    expect(screen.getByText(/option dir4, selected/i)).toBeVisible();
   });
 
   it('should clear all values when clicking the clear trigger "X"', () => {

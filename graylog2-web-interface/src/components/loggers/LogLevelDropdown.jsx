@@ -48,10 +48,10 @@ const LogLevelDropdown = createReactClass({
       event.preventDefault();
       this._changeLoglevel(loglevel);
 
-      this.props.sendTelemetry('change_input_value', {
-        appSection: 'logging',
-        eventElement: 'change-log-level',
-        eventInfo: { value: loglevel },
+      this.props.sendTelemetry('input_value_change', {
+        app_pathname: 'logging',
+        app_action_value: 'log-level-change',
+        event_details: { value: loglevel },
       });
     };
   },
@@ -59,15 +59,13 @@ const LogLevelDropdown = createReactClass({
   render() {
     const { subsystem, nodeId } = this.props;
     const loglevels = this.state.availableLoglevels
-      .map((loglevel) => {
-        return (
-          <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`}
-                    active={subsystem.level === loglevel}
-                    onClick={this._menuLevelClick(loglevel)}>
-            {capitalize(loglevel)}
-          </MenuItem>
-        );
-      });
+      .map((loglevel) => (
+        <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`}
+                  active={subsystem.level === loglevel}
+                  onClick={this._menuLevelClick(loglevel)}>
+          {capitalize(loglevel)}
+        </MenuItem>
+      ));
 
     return (
       <DropdownButton id="loglevel" bsSize="xsmall" title={capitalize(subsystem.level)}>

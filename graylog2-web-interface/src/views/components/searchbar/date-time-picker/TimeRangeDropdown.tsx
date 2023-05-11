@@ -213,8 +213,10 @@ const TimeRangeTabs = ({
     setActiveTab(nextTab);
 
     sendTelemetry('click', {
-      appSection: 'search-time-range',
-      eventInfo: {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-time-range',
+      event_details: {
         tab: nextTab,
       },
     });
@@ -264,19 +266,23 @@ const TimeRangeDropdown = ({
     toggleDropdownShow();
 
     sendTelemetry('click', {
-      appSection: 'search_bar',
-      eventElement: 'search-time-range-cancel-button',
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-time-range-cancel-button',
     });
   }, [sendTelemetry, toggleDropdownShow]);
 
-  const handleSubmit = useCallback(({ nextTimeRange }: { nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange'] }) => {
+  const handleSubmit = useCallback(({ nextTimeRange }: {
+    nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']
+  }) => {
     setCurrentTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(nextTimeRange)));
 
     toggleDropdownShow();
 
     sendTelemetry('click', {
-      appSection: 'search_bar',
-      eventElement: 'search-time-range-confirm-button',
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-time-range-confirm-button',
     });
   }, [sendTelemetry, setCurrentTimeRange, toggleDropdownShow]);
 

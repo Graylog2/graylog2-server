@@ -44,9 +44,7 @@ const SyncedUsersOverviewItem = ({
   },
   roles,
 }: Props) => {
-  const userRolesNames = userRolesIds.map((roleId) => {
-    return roles.find((role) => role.id === roleId)?.name ?? 'Role not found';
-  }).toSet();
+  const userRolesNames = userRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found').toSet();
 
   return (
     <tr key={id}>

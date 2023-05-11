@@ -20,9 +20,7 @@ import moment from 'moment';
 
 import { Input } from 'components/bootstrap';
 
-const _validationLimit = (durationInMilliseconds, rotationLimit) => {
-  return durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
-};
+const _validationLimit = (durationInMilliseconds, rotationLimit) => durationInMilliseconds <= moment.duration(rotationLimit).asMilliseconds();
 
 class TimeBasedRotationStrategyConfiguration extends React.Component {
   static propTypes = {

@@ -276,9 +276,7 @@ export const AuthenticationStore = singletonStore(
       const promise = new Builder('GET', url)
         .build()
         .then((response) => response.json())
-        .then((result: { backend: string | undefined }) => {
-          return result.backend;
-        });
+        .then((result: { backend: string | undefined }) => result.backend);
 
       AuthenticationActions.loadActiveBackendType.promise(promise);
 

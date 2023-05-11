@@ -30,15 +30,13 @@ const MAX_USERS = 10;
 
 const UsersCell = ({ users = Immutable.Set() }: Props) => {
   const usersLength = users.size;
-  const usersComponents = users.take(MAX_USERS).toArray().map(({ id, username }, index) => {
-    return (
-      <IfPermitted permissions={[`users:read:${username}`]} key={id}>
-        <>
-          <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>{index < (usersLength - 1) && ',  '}
-        </>
-      </IfPermitted>
-    );
-  });
+  const usersComponents = users.take(MAX_USERS).toArray().map(({ id, username }, index) => (
+    <IfPermitted permissions={[`users:read:${username}`]} key={id}>
+      <>
+        <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>{index < (usersLength - 1) && ',  '}
+      </>
+    </IfPermitted>
+  ));
 
   if (usersLength > MAX_USERS) {
     usersComponents.push(<span key="dots">...</span>);

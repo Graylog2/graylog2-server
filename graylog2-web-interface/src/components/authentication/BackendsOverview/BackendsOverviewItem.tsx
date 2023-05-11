@@ -61,9 +61,7 @@ const EditButton = ({ authenticationBackend }: { authenticationBackend: Authenti
   );
 };
 
-const confirmMessage = (authBackendTitle: string, actionName: string) => {
-  return `Do you really want to ${actionName} the authentication service "${StringUtils.truncateWithEllipses(authBackendTitle, 30)}"`;
-};
+const confirmMessage = (authBackendTitle: string, actionName: string) => `Do you really want to ${actionName} the authentication service "${StringUtils.truncateWithEllipses(authBackendTitle, 30)}"`;
 
 const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBackend: AuthenticationBackend, isActive: boolean }) => {
   const { title, id } = authenticationBackend;

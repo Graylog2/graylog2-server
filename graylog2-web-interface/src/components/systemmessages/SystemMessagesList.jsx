@@ -33,23 +33,21 @@ const TimestampTH = styled.th`
   width: 200px;
 `;
 
-const SystemMessagesList = ({ messages }) => {
-  return (
-    <SystemMessagesTable striped hover condensed>
-      <thead>
-        <tr>
-          <TimestampTH>Timestamp</TimestampTH>
-          <th>Node</th>
-          <th>Message</th>
-        </tr>
-      </thead>
+const SystemMessagesList = ({ messages }) => (
+  <SystemMessagesTable striped hover condensed>
+    <thead>
+      <tr>
+        <TimestampTH>Timestamp</TimestampTH>
+        <th>Node</th>
+        <th>Message</th>
+      </tr>
+    </thead>
 
-      <tbody>
-        {messages.map((message) => <SystemMessage key={`message-${Math.random().toString(36).substring(7)}`} message={message} />)}
-      </tbody>
-    </SystemMessagesTable>
-  );
-};
+    <tbody>
+      {messages.map((message) => <SystemMessage key={`message-${Math.random().toString(36).substring(7)}`} message={message} />)}
+    </tbody>
+  </SystemMessagesTable>
+);
 
 SystemMessagesList.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,

@@ -46,11 +46,9 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 }));
 
 describe('<URLWhiteListFormModal>', () => {
-  const renderSUT = () => {
-    return render(
-      <URLWhiteListFormModal newUrlEntry="http://graylog.com" urlType="literal" />,
-    );
-  };
+  const renderSUT = () => render(
+    <URLWhiteListFormModal newUrlEntry="http://graylog.com" urlType="literal" />,
+  );
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);

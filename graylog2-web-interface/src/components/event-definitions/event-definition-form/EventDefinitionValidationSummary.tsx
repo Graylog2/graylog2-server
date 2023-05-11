@@ -43,13 +43,11 @@ const EventDefinitionValidationSummary = ({ validation }: Props) => {
           <h4>We found some errors!</h4>
           <p>Please correct the following errors before saving this Event Definition:</p>
           <ul>
-            {fieldsWithErrors.map((field) => {
-              return validation.errors[field].map((error) => {
-                const effectiveError = (field === 'config' ? error.replace('config', 'condition') : error);
+            {fieldsWithErrors.map((field) => validation.errors[field].map((error) => {
+              const effectiveError = (field === 'config' ? error.replace('config', 'condition') : error);
 
-                return <li key={`${field}-${effectiveError}`}>{effectiveError}</li>;
-              });
-            })}
+              return <li key={`${field}-${effectiveError}`}>{effectiveError}</li>;
+            }))}
           </ul>
         </Alert>
       </Col>
