@@ -19,7 +19,6 @@ package org.graylog2.cluster;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
-import org.graylog2.database.indices.MongoDbIndexTools;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
@@ -40,7 +39,6 @@ public class NodePreflightConfigService extends PaginatedDbService<NodePreflight
                                       final MongoConnection mongoConnection) {
         super(mongoConnection, mongoJackObjectMapperProvider, NodePreflightConfig.class, COLLECTION_NAME);
         this.dbCollection = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME), NodePreflightConfig.class, String.class, mongoJackObjectMapperProvider.get());
-        new MongoDbIndexTools(db).createUniqueIndex(FIELD_NODEID);
     }
 
     public NodePreflightConfig getPreflightConfigFor(Node node) {
