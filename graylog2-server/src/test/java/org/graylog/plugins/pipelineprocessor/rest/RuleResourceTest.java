@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -77,13 +78,17 @@ public class RuleResourceTest {
     @Mock
     StreamService streamService;
 
+    @Mock
+    RuleSimulator ruleSimulator;
+    @Mock
+    PipelineRuleService pipelineRuleService;
     RuleResource underTest;
 
     @Before
     public void setup() {
-        underTest = new RuleResource(ruleService, pipelineService, ruleMetricsConfigService,
-                pipelineRuleParser, paginatedRuleService, functionRegistry, pipelineServiceHelper,
-                configurationStateUpdater, streamService);
+        underTest = new RuleResource(ruleService, ruleSimulator, pipelineService, ruleMetricsConfigService,
+                pipelineRuleService, paginatedRuleService, functionRegistry,
+                pipelineServiceHelper, streamService);
     }
 
     @Test
