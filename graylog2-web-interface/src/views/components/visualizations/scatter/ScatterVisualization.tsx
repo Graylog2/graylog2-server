@@ -31,7 +31,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import XYPlot from '../XYPlot';
 
-const seriesGenerator: Generator = ({ type, name, labels, values }) => ({ type, name, x: labels, y: values, mode: 'markers' });
+const seriesGenerator: Generator = ({ type, name, labels, values, originalName }) => ({ type, name, x: labels, y: values, mode: 'markers', originalName });
 
 const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.name) } });
 

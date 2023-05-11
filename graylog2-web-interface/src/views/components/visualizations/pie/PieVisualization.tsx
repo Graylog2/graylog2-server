@@ -52,7 +52,7 @@ const _horizontalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries: Generator = ({ type, name, labels: x, values: y, idx, total }) => ({
+const _generateSeries: Generator = ({ type, name, labels: x, values: y, idx, total, originalName }) => ({
   type,
   name,
   hole: 0.4,
@@ -62,6 +62,7 @@ const _generateSeries: Generator = ({ type, name, labels: x, values: y, idx, tot
     x: _horizontalDimensions(idx, total),
     y: _verticalDimensions(idx, total),
   },
+  originalName,
 });
 
 const getChartColor = (fullDataArray: ChartConfig[], name: string) => {

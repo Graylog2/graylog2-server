@@ -50,7 +50,7 @@ export type ChartDefinition = {
   reversescale?: boolean,
   zmin?: boolean,
   zmax?: boolean,
-  originalName?: string,
+  originalName: string,
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
@@ -74,11 +74,12 @@ export type Generator = (chartInput: ChartInput) => ChartDefinition;
 
 const _defaultKeyJoiner = (keys: Array<any>) => keys.join(keySeparator);
 
-const _defaultChartGenerator = ({ type, name, labels, values }: ChartInput): ChartDefinition => ({
+const _defaultChartGenerator = ({ type, name, labels, values, originalName }: ChartInput): ChartDefinition => ({
   type,
   name,
   x: labels,
   y: values,
+  originalName,
 });
 
 export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));

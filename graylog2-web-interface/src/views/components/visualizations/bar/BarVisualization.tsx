@@ -39,6 +39,7 @@ type ChartDefinition = {
   y?: Array<any>,
   z?: Array<Array<any>>,
   opacity: number,
+  originalName: string,
 };
 
 const getChartColor = (fullData, name) => {
@@ -99,12 +100,13 @@ const BarVisualization = makeVisualization(({
 
   const opacity = visualizationConfig?.opacity ?? 1.0;
 
-  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values }): ChartDefinition => ({
+  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }): ChartDefinition => ({
     type,
     name,
     x: labels,
     y: values,
     opacity,
+    originalName,
   }), [opacity]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);

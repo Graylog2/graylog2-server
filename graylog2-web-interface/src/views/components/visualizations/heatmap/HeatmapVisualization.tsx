@@ -63,6 +63,7 @@ const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visual
     reversescale: reverseScale,
     zmin: zMin,
     zmax: zMax,
+    originalName: name,
   };
 };
 

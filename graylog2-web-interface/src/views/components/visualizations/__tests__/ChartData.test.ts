@@ -155,13 +155,13 @@ describe('Chart helper functions', () => {
 
     it('should allow passing a format series function to modify the series structure', () => {
       const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
-      const generatorFunction: Generator = ({ type, name, labels: x, values: y, data: z }) => ({ type, name, x, y, z });
+      const generatorFunction: Generator = ({ type, name, labels: x, values: y, data: z }) => ({ type, name, x, y, z, originalName: name });
 
       const formatSeriesCustom = ({
         valuesBySeries,
         xLabels,
       }: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
-        // In this example we want to create only one series, with an z value, which contains all series data
+        // In this example we want to create only one series, with a z value, which contains all series data
         const z: Array<any> = Object.values(valuesBySeries).map((series) => {
           const newSeries = fill(Array(xLabels.length), null);
 
@@ -212,6 +212,7 @@ describe('Chart helper functions', () => {
       const generatorFunction: Generator = ({ type, name, labels, values }) => ({
         type: 'md5',
         name: md5(JSON.stringify({ type, name, labels, values })),
+        originalName: name,
       });
       const pipeline = flow([
         transformKeys(config.rowPivots, config.columnPivots, formatTime),

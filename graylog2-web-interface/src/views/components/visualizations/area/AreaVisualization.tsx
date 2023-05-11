@@ -53,13 +53,14 @@ const AreaVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values }) => ({
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
     type,
     name,
     x: labels,
     y: values,
     fill: 'tozeroy',
     line: { shape: toPlotly(interpolation) },
+    originalName,
   }), [interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
