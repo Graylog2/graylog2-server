@@ -41,6 +41,7 @@ const Setup = ({ onResumeStartup }: Props) => (
       </P>
       <P>
         You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
+        For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the Graylog server. After the restart this page will not show up again.
       </P>
       <P>
         You can always skip the configuration and <Button variant="light" compact size="xs" onClick={onResumeStartup}>resume startup</Button>.
@@ -48,15 +49,7 @@ const Setup = ({ onResumeStartup }: Props) => (
     </Section>
     <Section title="Graylog Data Nodes" titleOrder={2}>
       <DataNodesOverview />
-
       <ConfigurationWizard onResumeStartup={onResumeStartup} />
-
-    </Section>
-    <Section title="Manual Data Node Configuration" titleOrder={2}>
-      <P>
-        If you want to configure an Elasticsearch or OpenSearch node manually, you need to adjust the Graylog configuration and restart the Graylog server.
-        After the restart this page will not show up again.
-      </P>
     </Section>
   </>
 );
