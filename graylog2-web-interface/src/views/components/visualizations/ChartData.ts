@@ -46,10 +46,10 @@ export type ChartDefinition = {
     color: string,
   },
   customdata?: any,
-  colorscale?: [number, string][],
+  colorscale?: string,
   reversescale?: boolean,
-  zmin?: boolean,
-  zmax?: boolean,
+  zmin?: number,
+  zmax?: number,
   originalName: string,
 };
 

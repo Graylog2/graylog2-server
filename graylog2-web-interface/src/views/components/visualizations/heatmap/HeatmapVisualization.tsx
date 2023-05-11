@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import values from 'lodash/values';
+import _values from 'lodash/values';
 import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
@@ -26,6 +26,8 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
+import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import GenericPlot from '../GenericPlot';
@@ -43,18 +45,29 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visualizationConfig): ChartDefinition => {
-  const xAxisTitle = config.rowPivots[idx].fields?.join(', ');
-  const yAxisTitle = config.columnPivots[idx].fields?.join(', ');
-  const zSeriesTitles = _generateSeriesTitles(config, y, x);
+const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKeys: KeyMapper): Generator => ({
+  type,
+  name,
+  labels,
+  values,
+  data: z,
+  config,
+}): ChartDefinition => {
+  const rowPivots = config.rowPivots.flatMap((pivot) => pivot.fields);
+  const columnPivots = config.columnPivots.flatMap((pivot) => pivot.fields);
+  const xAxisTitle = rowPivots.join('-');
+  const yAxisTitle = columnPivots.join('-');
+  const zSeriesTitles = _generateSeriesTitles(config, values, labels);
   const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
   const { colorScale, reverseScale, zMin, zMax } = visualizationConfig;
+  const y = labels.map((value) => mapKeys(value, rowPivots[0]));
+  const x = values.map((value) => mapKeys(value, columnPivots[0]));
 
   return {
     type,
     name,
-    x: y,
-    y: x,
+    x,
+    y,
     z,
     text: zSeriesTitles,
     customdata: z,
@@ -66,8 +79,6 @@ const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visual
     originalName: name,
   };
 };
-
-const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig): Generator => ({ type, name, labels: x, values: y, data: z, idx, total, config }) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
 
 const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue: number | 'None' = 'None') => z.map((series) => {
   const newSeries = fill(Array(xLabels.length), defaultValue);
@@ -89,7 +100,7 @@ const _formatSeries = (visualizationConfig: HeatmapVisualizationConfig) => ({
   valuesBySeries,
   xLabels,
 }: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
-  const valuesFoundBySeries = values(valuesBySeries);
+  const valuesFoundBySeries = _values(valuesBySeries);
   // When using the hovertemplate, we need to provide a value for empty z values.
   // Otherwise, plotly would throw errors when hovering over a field.
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
@@ -139,10 +150,11 @@ const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
+  const mapKeys = useMapKeys();
   const heatmapData = useChartData(rows, {
     widgetConfig: config,
     chartType: 'heatmap',
-    generator: _generateSeries(visualizationConfig),
+    generator: _generateSeries(visualizationConfig, mapKeys),
     seriesFormatter: _formatSeries(visualizationConfig),
     leafValueMatcher: _leafSourceMatcher,
   });
