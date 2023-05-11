@@ -22,5 +22,5 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 public record CertParameters(@JsonProperty List<String> altNames,
-                             @JsonProperty DateTime expiration) {
+                             @JsonProperty Integer validFor) {
 }

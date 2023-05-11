@@ -119,7 +119,7 @@ public class PreflightResource {
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
         var cfg = NodePreflightConfig.builder()
-                .altNames(params.altNames()).expiration(params.expiration());
+                .altNames(params.altNames()).validFor(params.validFor());
         nodePreflightConfigService.save(cfg.build());
     }
 }

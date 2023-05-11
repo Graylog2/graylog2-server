@@ -44,7 +44,7 @@ public abstract class  NodePreflightConfig {
     public static final String FIELD_ID = "id";
     public static final String FIELD_NODEID = "node_id";
     public static final String FIELD_ALTNAMES = "alt_names";
-    public static final String FIELD_EXPIRATION = "expiration";
+    public static final String FIELD_VALIDFOR = "valid_for";
     public static final String FIELD_STATE = "state";
     public static final String FIELD_ERRORMSG = "error_msg";
     public static final String FIELD_CSR = "csr";
@@ -65,7 +65,7 @@ public abstract class  NodePreflightConfig {
 
     @JsonProperty
     @Nullable
-    public abstract DateTime expiration();
+    public abstract Integer validFor();
 
     @JsonProperty
     @Nullable
@@ -102,8 +102,8 @@ public abstract class  NodePreflightConfig {
         @JsonProperty(FIELD_ALTNAMES)
         public abstract Builder altNames(List<String> altNames);
 
-        @JsonProperty(FIELD_EXPIRATION)
-        public abstract Builder expiration(DateTime expiration);
+        @JsonProperty(FIELD_VALIDFOR)
+        public abstract Builder validFor(Integer validFor);
 
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(State state);
