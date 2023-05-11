@@ -2,6 +2,7 @@
     {
        "type":"heatmap",
        "name":"XYZ Chart",
+       "originalName":"XYZ Chart",
        "x":[
           "00",
           "01",

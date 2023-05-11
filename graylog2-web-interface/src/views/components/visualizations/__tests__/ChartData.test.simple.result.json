@@ -2,6 +2,7 @@
   {
     "type": "scatter",
     "name": "index-count()",
+    "originalName": "index⸱count()",
     "x": [
       "2018-05-24T14:03:00.000Z-PostsController"
     ],
@@ -12,6 +13,7 @@
   {
     "type": "scatter",
     "name": "index-sum(took_ms)",
+    "originalName": "index⸱sum(took_ms)",
     "x": [
       "2018-05-24T14:03:00.000Z-PostsController"
     ],
@@ -22,6 +24,7 @@
   {
     "type": "scatter",
     "name": "edit-count()",
+    "originalName": "edit⸱count()",
     "x": [
       "2018-05-24T14:03:00.000Z-PostsController"
     ],
@@ -32,6 +35,7 @@
   {
     "type": "scatter",
     "name": "edit-sum(took_ms)",
+    "originalName": "edit⸱sum(took_ms)",
     "x": [
       "2018-05-24T14:03:00.000Z-PostsController"
     ],
@@ -42,6 +46,7 @@
   {
     "type": "scatter",
     "name": "count()",
+    "originalName": "count()",
     "x": [
       "2018-05-24T14:03:00.000Z-PostsController"
     ],
@@ -52,6 +57,7 @@
   {
     "type": "scatter",
     "name": "sum(took_ms)",
+    "originalName": "sum(took_ms)",
     "x": [
       "2018-05-24T14:03:00.000Z-PostsController"
     ],

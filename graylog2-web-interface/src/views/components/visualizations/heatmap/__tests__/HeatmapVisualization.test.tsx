@@ -71,6 +71,7 @@ describe('HeatmapVisualization', () => {
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
         colorscale: 'Viridis',
         reversescale: false,
+        originalName: 'Heatmap Chart',
       },
     ];
 
@@ -116,6 +117,7 @@ describe('HeatmapVisualization', () => {
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
         colorscale: 'Viridis',
         reversescale: false,
+        originalName: 'Heatmap Chart',
       },
     ];
 
