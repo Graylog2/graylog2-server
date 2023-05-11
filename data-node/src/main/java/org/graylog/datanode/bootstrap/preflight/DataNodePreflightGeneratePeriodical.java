@@ -59,7 +59,10 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     public void doRun() {
         LOG.debug("checking if this DataNode is supposed to take configuration steps.");
         var cfg = nodePreflightConfigService.getPreflightConfigFor(nodeId.getNodeId());
-        if (cfg != null && NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
+        if (cfg == null) {
+            // write default config if none exists for this node
+            nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
+        } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
                 var csr = new CsrGenerator().generateCSR(DEFAULT_PASSWORD.toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
@@ -73,7 +76,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                 LOG.error("error generating a CSR: " + ex.getMessage(), ex);
                 nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(ex.getMessage()).build());
             }
-        } else if (cfg != null && NodePreflightConfig.State.SIGNED.equals(cfg.state())) {
+        } else if (NodePreflightConfig.State.SIGNED.equals(cfg.state())) {
             // write certificate to local truststore
             // configure SSL
             // start DataNode
