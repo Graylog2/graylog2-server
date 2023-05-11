@@ -65,7 +65,20 @@ public class TitleDecorator implements FieldDecorator {
 
         return entityTitleService.getTitles(subject, req).entities().stream()
                 .map(EntityTitleResponse::title)
-                .collect(Collectors.toList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), this::unwrapIfSingleResult));
+    }
+
+    /**
+     * We need to unwrap single results, otherwise they'll appear in the output always as array, which is neither
+     * backwards compatible nor expected and causes only troubles. If the results are really a list of more items,
+     * we keep them and forward them as they are.
+     */
+    private Object unwrapIfSingleResult(List<String> titles) {
+        if (titles.size() == 1) {
+            return titles.iterator().next();
+        } else {
+            return titles;
+        }
     }
 
     private List<String> parseIDs(Object value) {

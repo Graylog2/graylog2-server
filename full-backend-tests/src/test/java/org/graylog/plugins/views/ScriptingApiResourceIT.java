@@ -132,6 +132,32 @@ public class ScriptingApiResourceIT {
     }
 
     @ContainerMatrixTest
+    void testAggregationByStreamTitle() {
+        final ValidatableResponse validatableResponse =
+                api.post("/search/aggregate","""
+                         {
+                           "group_by": [
+                             {
+                               "field": "streams.title"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                         """, 200);
+
+        validatableResponse.log().ifValidationFails()
+                .assertThat().body("datarows", Matchers.hasSize(3));
+
+        validateRow(validatableResponse, "Default Stream", 3);
+        validateRow(validatableResponse, "Stream #2", 2);
+        validateRow(validatableResponse, "Stream #1", 1);
+    }
+
+    @ContainerMatrixTest
     void testUserWithLimitedPermissionRequest() {
 
         final ValidatableResponse validatableResponse = given()
