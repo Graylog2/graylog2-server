@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, HasUser {
+public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, TitlePermissions, HasUser {
     private static final Logger LOG = LoggerFactory.getLogger(SearchUser.class);
     private final User currentUser;
     private final Predicate<String> isPermitted;
@@ -103,6 +103,11 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     @Override
     public boolean canReadStream(String streamId) {
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
+    }
+
+    @Override
+    public boolean canReadTitle(String readPermission, String idAsString) {
+        return isPermitted(readPermission, idAsString);
     }
 
     private boolean isPermitted(String permission) {

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -141,7 +142,7 @@ public class CatalogResourceTest {
                 .when(entityTitleService)
                 .getTitles(any(), eq(request));
 
-        final EntitiesTitleResponse actualResponse = catalogResource.getTitles(request);
+        final EntitiesTitleResponse actualResponse = catalogResource.getTitles(request, TestSearchUser.builder().build());
         assertEquals(expectedResponse, actualResponse);
     }
 }

@@ -20,10 +20,10 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
-import org.apache.shiro.subject.Subject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.search.permissions.TitlePermissions;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
@@ -59,7 +59,7 @@ public class EntityTitleService {
         this.entitiesCatalog = entitiesCatalog;
     }
 
-    public EntitiesTitleResponse getTitles(final Subject subject, final EntityTitleRequest request) {
+    public EntitiesTitleResponse getTitles(final TitlePermissions permissions, final EntityTitleRequest request) {
         if (request == null || request.entities() == null) {
             return EMPTY_RESPONSE;
         }
@@ -70,13 +70,13 @@ public class EntityTitleService {
 
         final Optional<EntitiesTitleResponse> entitiesTitleResponse = groupedByType.entrySet()
                 .stream()
-                .map(entry -> getTitlesForEntitiesFromSingleCollection(subject, entry.getKey(), entry.getValue()))
+                .map(entry -> getTitlesForEntitiesFromSingleCollection(permissions, entry.getKey(), entry.getValue()))
                 .reduce(EntitiesTitleResponse::merge);
 
         return entitiesTitleResponse.orElse(EMPTY_RESPONSE);
     }
 
-    private EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final Subject subject,
+    private EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final TitlePermissions permissions,
                                                                            final String collection,
                                                                            final List<EntityIdentifier> entities) {
         final Optional<DbEntityCatalogEntry> dbEntityCatalogEntry = this.entitiesCatalog.getByCollectionName(collection);
@@ -111,7 +111,7 @@ public class EntityTitleService {
         documents.forEach(doc ->
                 {
                     final String idAsString = doc.getObjectId("_id").toString();
-                    final boolean canReadTitle = checkCanReadTitle(subject, dbEntityCatalogEntry.get().readPermission(), idAsString);
+                    final boolean canReadTitle = checkCanReadTitle(permissions, dbEntityCatalogEntry.get().readPermission(), idAsString);
                     titles.add(
                             new EntityTitleResponse(
                                     idAsString,
@@ -128,10 +128,9 @@ public class EntityTitleService {
         return new EntitiesTitleResponse(titles, notPermitted);
     }
 
-    private boolean checkCanReadTitle(final Subject subject,
+    private boolean checkCanReadTitle(final TitlePermissions permissions,
                                       final String readPermission,
                                       final String idAsString) {
-        return DbEntity.ALL_ALLOWED.equals(readPermission) ||
-                subject.isPermitted(readPermission + ":" + idAsString);
+        return DbEntity.ALL_ALLOWED.equals(readPermission) || permissions.canReadTitle(readPermission, idAsString);
     }
 }
