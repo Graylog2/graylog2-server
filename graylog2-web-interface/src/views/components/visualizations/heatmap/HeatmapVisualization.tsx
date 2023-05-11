@@ -69,7 +69,7 @@ const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visual
 
 const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig): Generator => ({ type, name, labels: x, values: y, data: z, idx, total, config }) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
 
-const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue = 'None') => z.map((series) => {
+const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue: number | 'None' = 'None') => z.map((series) => {
   const newSeries = fill(Array(xLabels.length), defaultValue);
 
   return merge(newSeries, series);
@@ -85,7 +85,7 @@ const _transposeMatrix = (z: Array<Array<any>> = []) => {
 
 const _findSmallestValue = (valuesFound: Array<Array<number>>) => valuesFound.reduce((result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result), (valuesFound[0] || [])[0]);
 
-const _formatSeries = (visualizationConfig) => ({
+const _formatSeries = (visualizationConfig: HeatmapVisualizationConfig) => ({
   valuesBySeries,
   xLabels,
 }: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
@@ -107,7 +107,7 @@ const _formatSeries = (visualizationConfig) => ({
   ]];
 };
 
-const _axisConfg = (chartHasContent) => {
+const _axisConfig = (chartHasContent: ChartDefinition) => {
   const axisConfig = {
     type: undefined,
     fixedrange: true,
@@ -121,9 +121,9 @@ const _axisConfg = (chartHasContent) => {
   return axisConfig;
 };
 
-const _chartLayout = (heatmapData) => {
+const _chartLayout = (heatmapData: ChartDefinition[]) => {
   const hasContent = find(heatmapData, (series) => !isEmpty(series.z));
-  const axisConfig = _axisConfg(hasContent);
+  const axisConfig = _axisConfig(hasContent);
 
   return {
     yaxis: axisConfig,
@@ -134,7 +134,7 @@ const _chartLayout = (heatmapData) => {
   };
 };
 
-const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
+const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('leaf') && source !== 'row-leaf';
 
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
