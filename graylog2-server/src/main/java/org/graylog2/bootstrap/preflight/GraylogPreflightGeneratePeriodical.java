@@ -19,7 +19,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Path;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -29,13 +28,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 @Singleton
-public class CsrSigningPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(CsrSigningPeriodical.class);
+public class GraylogPreflightGeneratePeriodical extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogPreflightGeneratePeriodical.class);
 
     private final NodePreflightConfigService nodePreflightConfigService;
 
     @Inject
-    public CsrSigningPeriodical(final NodePreflightConfigService nodePreflightConfigService) {
+    public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         loadCA();
     }
@@ -43,12 +42,13 @@ public class CsrSigningPeriodical extends Periodical {
     private String caKeystoreFilename = "datanode-ca.p12";
     private PrivateKey caPrivateKey;
     private X509Certificate caCertificate;
+    private Integer DEFAULT_VALIDITY = 90;
 
     private void loadCA() {
         final Path caKeystorePath = Path.of(caKeystoreFilename);
 
         try {
-            char[] password = "".toCharArray();
+            char[] password = "12test34".toCharArray();
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
@@ -87,14 +87,15 @@ public class CsrSigningPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        LOG.info("checking for CSRs to sign...");
-        // if ca exists
+        LOG.debug("checking if there are configuration steps to take care of");
+
+        // TODO: check for CA existence
         nodePreflightConfigService.streamAll()
                 .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
                 .map(c -> {
                     try {
                         var csr = readCsr(c.csr());
-                        var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, 90);
+                        var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
                         return c.toBuilder().certificate(this.writeCert(cert)).state(NodePreflightConfig.State.SIGNED).build();
                     } catch (Exception e) {
                         LOG.error("Could not sign CSR: " + e.getMessage(), e);
@@ -102,6 +103,7 @@ public class CsrSigningPeriodical extends Periodical {
                     }
                  })
                 .forEach(nodePreflightConfigService::save);
+
     }
 
     @Override

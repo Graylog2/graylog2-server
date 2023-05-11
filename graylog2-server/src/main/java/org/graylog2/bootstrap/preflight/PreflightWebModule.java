@@ -16,10 +16,8 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
@@ -31,12 +29,10 @@ import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
-import org.graylog2.shared.initializers.PeriodicalsService;
 
 public class PreflightWebModule extends Graylog2Module {
 
@@ -57,7 +53,7 @@ public class PreflightWebModule extends Graylog2Module {
         addPreflightRestResource(PreflightAssetsResource.class);
 
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
-        periodicalBinder.addBinding().to(CsrSigningPeriodical.class);
+        periodicalBinder.addBinding().to(GraylogPreflightGeneratePeriodical.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);

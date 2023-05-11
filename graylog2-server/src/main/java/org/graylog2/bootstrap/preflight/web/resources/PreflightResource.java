@@ -118,8 +118,10 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
-        var cfg = NodePreflightConfig.builder()
-                .altNames(params.altNames()).validFor(params.validFor());
-        nodePreflightConfigService.save(cfg.build());
+        var cfg = nodePreflightConfigService.getPreflightConfigFor(nodeID);
+        var builder = cfg != null ? cfg.toBuilder() : NodePreflightConfig.builder().nodeId(nodeID);
+        builder.altNames(params.altNames()).validFor(params.validFor());
+        nodePreflightConfigService.save(builder.build());
+
     }
 }
