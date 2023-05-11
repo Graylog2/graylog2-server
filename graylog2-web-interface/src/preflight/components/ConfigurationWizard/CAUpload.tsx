@@ -15,15 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Group, Text } from '@mantine/core';
-import { Dropzone } from '@mantine/dropzone';
 import styled from 'styled-components';
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
-import { Icon } from 'preflight/components/common';
+import { Icon, Dropzone } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
@@ -32,6 +30,13 @@ const CADropzone = styled(Dropzone)`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const DopzoneInner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 `;
 
 const CAUpload = () => {
@@ -59,7 +64,7 @@ const CAUpload = () => {
                 onReject={onRejectUpload}
                 data-testid="upload-dropzone"
                 loading={isUploading}>
-      <Group position="center">
+      <DopzoneInner>
         <Dropzone.Accept>
           <Icon name="file" type="solid" size="2x" />
         </Dropzone.Accept>
@@ -70,11 +75,9 @@ const CAUpload = () => {
           <Icon name="file" type="regular" size="2x" />
         </Dropzone.Idle>
         <div>
-          <Text inline size="md">
-            Drag CA here or click to select file
-          </Text>
+          Drag CA here or click to select file
         </div>
-      </Group>
+      </DopzoneInner>
     </CADropzone>
   );
 };

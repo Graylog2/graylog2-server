@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Grid } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
 import useConfigurationStep from 'preflight/hooks/useConfigurationStep';
@@ -23,7 +22,7 @@ import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Consta
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-import { List } from 'preflight/components/common';
+import { List, Grid } from 'preflight/components/common';
 
 import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';

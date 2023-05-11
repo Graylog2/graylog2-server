@@ -18,9 +18,8 @@
 import * as React from 'react';
 import { Formik, Form } from 'formik';
 import styled from 'styled-components';
-import { Space } from '@mantine/core';
 
-import { Button, FormikInput } from 'preflight/components/common';
+import { Button, FormikInput, Space } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';

@@ -15,22 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { TabsProps } from '@mantine/core';
+import { Tabs as MantineTabs } from '@mantine/core';
 
-import { Button, Title, Space } from 'preflight/components/common';
+type Props = TabsProps
 
-type Props = {
-  onResumeStartup: () => void,
-}
-
-const ConfigurationFinished = ({ onResumeStartup }: Props) => (
-  <div>
-    <Title order={3}>All data nodes are secured and reachable.</Title>
-    <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
-    <Space h="md" />
-    <Button onClick={onResumeStartup} size="xs">
-      Resume startup
-    </Button>
-  </div>
+const Tabs = ({ children, ...props }: Props) => (
+  <MantineTabs {...props}>
+    {children}
+  </MantineTabs>
 );
 
-export default ConfigurationFinished;
+Tabs.List = MantineTabs.List;
+Tabs.Tab = MantineTabs.Tab;
+Tabs.Panel = MantineTabs.Panel;
+export default Tabs;

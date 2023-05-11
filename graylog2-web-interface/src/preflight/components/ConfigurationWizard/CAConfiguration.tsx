@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Title, Tabs, Space } from '@mantine/core';
 import styled, { css } from 'styled-components';
+
+import { Title, Space, Tabs } from 'preflight/components/common';
 
 import CACreateForm from './CACreateForm';
 import CAUpload from './CAUpload';

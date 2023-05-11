@@ -15,22 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { DropzoneProps } from '@mantine/dropzone';
+import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 
-import { Button, Title, Space } from 'preflight/components/common';
+type Props = DropzoneProps
 
-type Props = {
-  onResumeStartup: () => void,
-}
-
-const ConfigurationFinished = ({ onResumeStartup }: Props) => (
-  <div>
-    <Title order={3}>All data nodes are secured and reachable.</Title>
-    <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
-    <Space h="md" />
-    <Button onClick={onResumeStartup} size="xs">
-      Resume startup
-    </Button>
-  </div>
+const Dropzone = ({ children, ...props }: Props) => (
+  <MantineDropzone {...props}>
+    {children}
+  </MantineDropzone>
 );
 
-export default ConfigurationFinished;
+Dropzone.Accept = MantineDropzone.Accept;
+Dropzone.Reject = MantineDropzone.Reject;
+Dropzone.Reject = MantineDropzone.Reject;
+Dropzone.Idle = MantineDropzone.Idle;
+export default Dropzone;

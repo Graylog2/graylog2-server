@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Title, Space } from '@mantine/core';
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import fetch from 'logic/rest/FetchProvider';
-import { Button } from 'preflight/components/common';
+import { Button, Title, Space } from 'preflight/components/common';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
