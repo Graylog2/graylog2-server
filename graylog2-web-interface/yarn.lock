@@ -6498,10 +6498,10 @@ enhanced-resolve@^0.9.1:
     memory-fs "^0.2.0"
     tapable "^0.1.8"
 
-enhanced-resolve@^5.13.0:
-  version "5.13.0"
-  resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.13.0.tgz#26d1ecc448c02de997133217b5c1053f34a0a275"
-  integrity sha512-eyV8f0y1+bzyfh8xAwW/WTSZpLbjhqc4ne9eGSH4Zo2ejdyiNG9pU6mf9DG8a7+Auk6MFTlNOT4Y2y/9k8GKVg==
+enhanced-resolve@^5.14.0:
+  version "5.14.0"
+  resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.14.0.tgz#0b6c676c8a3266c99fa281e4433a706f5c0c61c4"
+  integrity sha512-+DCows0XNwLDcUhbFJPdlQEVnT2zXlCv7hPxemTz86/O+B/hCQ+mb7ydkPKiflpVraqLPCAfu7lDy+hBXueojw==
   dependencies:
     graceful-fs "^4.2.4"
     tapable "^2.2.0"
@@ -6927,7 +6927,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.1.4"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-cdf26a6a-cb8b-4741-a8eb-f9e4ab227032-1683806747543/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.2.1"
     eslint-plugin-jest-dom "4.0.3"
@@ -6935,7 +6935,7 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-jsx-a11y "6.7.1"
     eslint-plugin-react "7.32.2"
     eslint-plugin-react-hooks "4.6.0"
-    eslint-plugin-testing-library "5.10.3"
+    eslint-plugin-testing-library "5.11.0"
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"
@@ -7076,10 +7076,10 @@ eslint-plugin-react@7.32.2:
     semver "^6.3.0"
     string.prototype.matchall "^4.0.8"
 
-eslint-plugin-testing-library@5.10.3:
-  version "5.10.3"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-5.10.3.tgz#e613fbaf9a145e9eef115d080b32cb488fae622e"
-  integrity sha512-0yhsKFsjHLud5PM+f2dWr9K3rqYzMy4cSHs3lcmFYMa1CdSzRvHGgXvsFarBjZ41gU8jhTdMIkg8jHLxGJqLqw==
+eslint-plugin-testing-library@5.11.0:
+  version "5.11.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-5.11.0.tgz#0bad7668e216e20dd12f8c3652ca353009163121"
+  integrity sha512-ELY7Gefo+61OfXKlQeXNIDVVLPcvKTeiQOoMZG9TeuWa7Ln4dUNRv8JdRWBQI9Mbb427XGlVB1aa1QPZxBJM8Q==
   dependencies:
     "@typescript-eslint/utils" "^5.58.0"
 
@@ -8223,13 +8223,13 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.16"
     "@types/react" "18.2.6"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-1a75871f-7c0a-4e0a-8d2f-9ef5d8750ed4-1683806747326/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-1a75871f-7c0a-4e0a-8d2f-9ef5d8750ed4-1683806747326/node_modules/eslint-config-graylog"
     formik "2.2.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-1a75871f-7c0a-4e0a-8d2f-9ef5d8750ed4-1683806747326/node_modules/jest-preset-graylog"
     jquery "3.6.4"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -8241,7 +8241,7 @@ grapheme-splitter@^1.0.4:
     reflux "0.2.13"
     styled-components "5.3.10"
     typescript "5.0.4"
-    webpack "5.82.0"
+    webpack "5.82.1"
     webpack-cli "5.1.1"
     webpack-merge "4.2.2"
 
@@ -15218,10 +15218,10 @@ webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-webpack@5.82.0:
-  version "5.82.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.82.0.tgz#3c0d074dec79401db026b4ba0fb23d6333f88e7d"
-  integrity sha512-iGNA2fHhnDcV1bONdUu554eZx+XeldsaeQ8T67H6KKHl2nUSwX8Zm7cmzOA46ox/X1ARxf7Bjv8wQ/HsB5fxBg==
+webpack@5.82.1:
+  version "5.82.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.82.1.tgz#8f38c78e53467556e8a89054ebd3ef6e9f67dbab"
+  integrity sha512-C6uiGQJ+Gt4RyHXXYt+v9f+SN1v83x68URwgxNQ98cvH8kxiuywWGP4XeNZ1paOzZ63aY3cTciCEQJNFUljlLw==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^1.0.0"
@@ -15232,7 +15232,7 @@ webpack@5.82.0:
     acorn-import-assertions "^1.7.6"
     browserslist "^4.14.5"
     chrome-trace-event "^1.0.2"
-    enhanced-resolve "^5.13.0"
+    enhanced-resolve "^5.14.0"
     es-module-lexer "^1.2.1"
     eslint-scope "5.1.1"
     events "^3.2.0"
