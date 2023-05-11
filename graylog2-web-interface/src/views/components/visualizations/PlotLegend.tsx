@@ -33,6 +33,7 @@ import type Series from 'views/logic/aggregationbuilder/Series';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -107,7 +108,7 @@ const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series
   return null;
 };
 
-const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }) => name);
+const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({ name, originalName }) => originalName ?? name);
 
 const stringLenSort = (s1: string, s2: string) => {
   if (s1.length < s2.length) {

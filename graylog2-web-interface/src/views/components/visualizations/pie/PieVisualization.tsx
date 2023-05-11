@@ -52,7 +52,7 @@ const _horizontalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries: Generator = (type, name, x, y, _z, idx, total) => ({
+const _generateSeries: Generator = ({ type, name, labels: x, values: y, idx, total }) => ({
   type,
   name,
   hole: 0.4,

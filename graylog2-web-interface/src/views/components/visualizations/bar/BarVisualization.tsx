@@ -99,7 +99,7 @@ const BarVisualization = makeVisualization(({
 
   const opacity = visualizationConfig?.opacity ?? 1.0;
 
-  const _seriesGenerator: Generator = useCallback((type, name, labels, values): ChartDefinition => ({
+  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values }): ChartDefinition => ({
     type,
     name,
     x: labels,

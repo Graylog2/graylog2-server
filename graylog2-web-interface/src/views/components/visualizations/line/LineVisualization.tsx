@@ -26,7 +26,7 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
-import type { ChartDefinition } from '../ChartData';
+import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 const getChartColor = (fullData, name) => {
@@ -51,11 +51,12 @@ const LineVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
-  const chartGenerator = useCallback((type: string, name: string, labels: Array<string>, values: Array<any>): ChartDefinition => ({
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
     type,
     name,
     x: labels,
     y: values,
+    originalName,
     line: { shape: toPlotly(interpolation) },
   }), [interpolation]);
 

@@ -50,6 +50,7 @@ export type ChartDefinition = {
   reversescale?: boolean,
   zmin?: boolean,
   zmax?: boolean,
+  originalName?: string,
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
@@ -58,11 +59,22 @@ export type ValuesBySeries = { [key: string]: Array<number> };
 
 export type KeyJoiner = (keys: Array<any>) => string;
 
-export type Generator = (type: string, name: string, labels: Array<string>, values: Array<any>, data: Array<Array<any>>, idx: number, total: number, config: AggregationWidgetConfig) => ChartDefinition;
+type ChartInput = {
+  type: string,
+  name: string,
+  originalName: string,
+  labels: Array<string>,
+  values: Array<any>,
+  data: Array<Array<any>>,
+  idx: number,
+  total: number,
+  config: AggregationWidgetConfig
+};
+export type Generator = (chartInput: ChartInput) => ChartDefinition;
 
-const _defaultKeyJoiner = (keys) => keys.join(keySeparator);
+const _defaultKeyJoiner = (keys: Array<any>) => keys.join(keySeparator);
 
-const _defaultChartGenerator = (type: string, name: string, labels: Array<string>, values: Array<any>): ChartDefinition => ({
+const _defaultChartGenerator = ({ type, name, labels, values }: ChartInput): ChartDefinition => ({
   type,
   name,
   x: labels,
@@ -114,15 +126,16 @@ export const generateChart = (
   const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
 
   return (results: ExtractedSeries) => {
-    const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
-      chartType,
-      value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
-      x.map((key) => key.join(humanSeparator)),
+    const allCharts = results.map(([value, x, values, z]) => ({
+      type: chartType,
+      name: value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
+      labels: x.map((key) => key.join(humanSeparator)),
       values,
-      z,
-    ]);
+      data: z,
+      originalName: value,
+    }));
 
-    return allCharts.map((args, idx) => generator(...args, idx, allCharts.length, config));
+    return allCharts.map((args, idx) => generator({ ...args, idx, total: allCharts.length, config }));
   };
 };
 

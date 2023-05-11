@@ -27,7 +27,7 @@ import { makeVisualization, retrieveChartData } from 'views/components/aggregati
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 
-import type { ChartDefinition, ExtractedSeries, ValuesBySeries } from '../ChartData';
+import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 
 const _generateSeriesTitles = (config, x, y) => {
@@ -66,7 +66,7 @@ const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visual
   };
 };
 
-const _generateSeries = (visualizationConfig) => (type, name, x, y, z, idx, total, config) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
+const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig): Generator => ({ type, name, labels: x, values: y, data: z, idx, total, config }) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
 
 const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue = 'None') => z.map((series) => {
   const newSeries = fill(Array(xLabels.length), defaultValue);

@@ -28,7 +28,7 @@ import useEvents from 'views/components/visualizations/useEvents';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
-import type { ChartDefinition } from '../ChartData';
+import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
@@ -53,7 +53,7 @@ const AreaVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
-  const chartGenerator = useCallback((type: string, name: string, labels: Array<string>, values: Array<any>): ChartDefinition => ({
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values }) => ({
     type,
     name,
     x: labels,

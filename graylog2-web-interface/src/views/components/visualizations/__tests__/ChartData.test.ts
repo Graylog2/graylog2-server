@@ -155,7 +155,7 @@ describe('Chart helper functions', () => {
 
     it('should allow passing a format series function to modify the series structure', () => {
       const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
-      const generatorFunction: Generator = (type, name, x, y, z) => ({ type, name, x, y, z });
+      const generatorFunction: Generator = ({ type, name, labels: x, values: y, data: z }) => ({ type, name, x, y, z });
 
       const formatSeriesCustom = ({
         valuesBySeries,
@@ -209,7 +209,7 @@ describe('Chart helper functions', () => {
   describe('generateChart', () => {
     it('should allow passing a generator function modelling the chart config', () => {
       const input = readFixture('ChartData.test.simple.json');
-      const generatorFunction: Generator = (type, name, labels, values) => ({
+      const generatorFunction: Generator = ({ type, name, labels, values }) => ({
         type: 'md5',
         name: md5(JSON.stringify({ type, name, labels, values })),
       });
