@@ -15,12 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
 import { asMock } from 'helpers/mocking';
+import useDataNodes from 'preflight/hooks/useDataNodes';
+import { dataNodes } from 'fixtures/dataNodes';
 
 import CertificateProvisioning from './CertificateProvisioning';
 
@@ -29,11 +31,24 @@ jest.mock('preflight/util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('logic/rest/FetchProvider', () => jest.fn());
+
+jest.mock('preflight/hooks/useDataNodes');
 
 describe('CertificateProvisioning', () => {
+  beforeEach(() => {
+    asMock(fetch).mockReturnValue(Promise.resolve());
+
+    asMock(useDataNodes).mockReturnValue({
+      data: dataNodes,
+      isFetching: false,
+      isInitialLoading: false,
+      error: undefined,
+    });
+  });
+
   it('should provision CA', async () => {
-    render(<CertificateProvisioning />);
+    renderPreflight(<CertificateProvisioning />);
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
@@ -49,7 +64,7 @@ describe('CertificateProvisioning', () => {
 
   it('should show error when CA provisioning failed', async () => {
     asMock(fetch).mockImplementationOnce(() => Promise.reject(new Error('Error')));
-    render(<CertificateProvisioning />);
+    renderPreflight(<CertificateProvisioning />);
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
@@ -61,5 +76,20 @@ describe('CertificateProvisioning', () => {
     ));
 
     expect(UserNotification.error).toHaveBeenCalledWith('CA provisioning failed with error: Error: Error');
+  });
+
+  it('should disable provisioning when there are no data nodes', async () => {
+    asMock(useDataNodes).mockReturnValue({
+      data: [],
+      isFetching: false,
+      isInitialLoading: false,
+      error: undefined,
+    });
+
+    renderPreflight(<CertificateProvisioning />);
+
+    await screen.findByText('At least one Graylog data node needs to run before the certificate can be provisioned.');
+
+    expect(await screen.findByRole('button', { name: /provision certificate and continue/i })).toBeDisabled();
   });
 });

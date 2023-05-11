@@ -32,7 +32,7 @@ const CADropzone = styled(Dropzone)`
   justify-content: center;
 `;
 
-const DopzoneInner = styled.div`
+const DropzoneInner = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,7 +64,7 @@ const CAUpload = () => {
                 onReject={onRejectUpload}
                 data-testid="upload-dropzone"
                 loading={isUploading}>
-      <DopzoneInner>
+      <DropzoneInner>
         <Dropzone.Accept>
           <Icon name="file" type="solid" size="2x" />
         </Dropzone.Accept>
@@ -77,7 +77,7 @@ const CAUpload = () => {
         <div>
           Drag CA here or click to select file
         </div>
-      </DopzoneInner>
+      </DropzoneInner>
     </CADropzone>
   );
 };

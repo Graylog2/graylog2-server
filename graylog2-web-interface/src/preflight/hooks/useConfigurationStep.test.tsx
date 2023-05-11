@@ -4,6 +4,7 @@ import useDataNodesCA from 'preflight/hooks/useDataNodesCA';
 import { CONFIGURATION_STEPS } from 'preflight/Constants';
 import asMock from 'helpers/mocking/AsMock';
 import useDataNodes from 'preflight/hooks/useDataNodes';
+import { dataNodes } from 'fixtures/dataNodes';
 
 import useConfigurationStep from './useConfigurationStep';
 
@@ -12,47 +13,8 @@ jest.mock('preflight/hooks/useDataNodesCA');
 jest.mock('logic/rest/FetchProvider');
 
 describe('useConfigurationStep', () => {
-  const availableDataNodes = [
-    {
-      hostname: '192.168.0.10',
-      id: 'data-node-id-1',
-      is_leader: false,
-      is_master: false,
-      last_seen: '2020-01-10T10:40:00.000Z',
-      node_id: 'node-id-complete-1',
-      short_node_id: 'node-id-1',
-      transport_address: 'http://localhost:9200',
-      type: 'DATANODE',
-      status: 'UNCONFIGURED',
-    },
-    {
-      hostname: '192.168.0.11',
-      id: 'data-node-id-2',
-      is_leader: false,
-      is_master: false,
-      last_seen: '2020-01-10T10:40:00.000Z',
-      node_id: 'node-id-complete-2',
-      short_node_id: 'node-id-2',
-      transport_address: 'http://localhost:9201',
-      type: 'DATANODE',
-      status: 'UNCONFIGURED',
-    },
-    {
-      hostname: '192.168.0.12',
-      id: 'data-node-id-3',
-      is_leader: false,
-      is_master: false,
-      last_seen: '2020-01-10T10:40:00.000Z',
-      node_id: 'node-id-complete-3',
-      short_node_id: 'node-id-3',
-      transport_address: 'http://localhost:9202',
-      type: 'DATANODE',
-      status: 'UNCONFIGURED',
-    },
-  ];
-
   const useDataNodesResult = {
-    data: availableDataNodes,
+    data: dataNodes,
     isInitialLoading: false,
     isFetching: false,
     error: undefined,

@@ -16,7 +16,7 @@
  */
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
@@ -24,7 +24,7 @@ import UserNotification from 'preflight/util/UserNotification';
 
 import CAUpload from './CAUpload';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
@@ -32,6 +32,10 @@ jest.mock('preflight/util/UserNotification', () => ({
 }));
 
 describe('CAUpload', () => {
+  beforeEach(() => {
+    asMock(fetch).mockReturnValue(Promise.resolve());
+  });
+
   const files = [
     new File(['fileBits'], 'fileName', { type: 'application/x-pem-file' }),
   ];
@@ -44,7 +48,7 @@ describe('CAUpload', () => {
   };
 
   it('should upload CA', async () => {
-    render(<CAUpload />);
+    renderPreflight(<CAUpload />);
 
     const dropzone = await findDropZone();
     userEvent.upload(dropzone, files);
@@ -60,8 +64,8 @@ describe('CAUpload', () => {
   });
 
   it('should show error when CA upload fails', async () => {
-    asMock(fetch).mockImplementationOnce(() => Promise.reject(new Error('Error')));
-    render(<CAUpload />);
+    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    renderPreflight(<CAUpload />);
 
     const dropzone = await findDropZone();
     userEvent.upload(dropzone, files);

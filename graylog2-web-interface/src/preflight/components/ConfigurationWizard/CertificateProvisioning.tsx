@@ -19,10 +19,11 @@ import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import fetch from 'logic/rest/FetchProvider';
-import { Button, Title, Space } from 'preflight/components/common';
+import { Button, Title, Space, Alert } from 'preflight/components/common';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
+import useDataNodes from 'preflight/hooks/useDataNodes';
 
 const provisionCertificates = (queryClient: QueryClient, setIsProvisioning: React.Dispatch<React.SetStateAction<boolean>>) => {
   fetch('POST', URLUtils.qualifyUrl('api/generate'), undefined, false).then(() => {
@@ -37,6 +38,7 @@ const provisionCertificates = (queryClient: QueryClient, setIsProvisioning: Reac
 
 const CertificateProvisioning = () => {
   const queryClient = useQueryClient();
+  const { data: dataNodes, isInitialLoading } = useDataNodes();
   const [isProvisioning, setIsProvisioning] = useState(false);
 
   return (
@@ -47,7 +49,12 @@ const CertificateProvisioning = () => {
         You can now provision certificate for your data nodes.
       </p>
       <Space h="md" />
-      <Button onClick={() => provisionCertificates(queryClient, setIsProvisioning)}>
+      {(!dataNodes.length && !isInitialLoading) && (
+        <Alert type="warning">
+          At least one Graylog data node needs to run before the certificate can be provisioned.
+        </Alert>
+      )}
+      <Button onClick={() => provisionCertificates(queryClient, setIsProvisioning)} disabled={!dataNodes.length}>
         {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}
       </Button>
     </div>

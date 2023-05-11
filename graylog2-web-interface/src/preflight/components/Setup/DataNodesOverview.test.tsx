@@ -15,62 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
+import { renderPreflight, screen } from 'wrappedTestingLibrary';
 
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
 import FetchError from 'logic/errors/FetchError';
+import { dataNodes } from 'fixtures/dataNodes';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-
-const availableDataNodes = [
-  {
-    hostname: '192.168.0.10',
-    id: 'data-node-id-1',
-    is_leader: false,
-    is_master: false,
-    last_seen: '2020-01-10T10:40:00.000Z',
-    node_id: 'node-id-complete-1',
-    short_node_id: 'node-id-1',
-    transport_address: 'http://localhost:9200',
-    type: 'DATANODE',
-    status: 'UNCONFIGURED',
-  },
-  {
-    hostname: '192.168.0.11',
-    id: 'data-node-id-2',
-    is_leader: false,
-    is_master: false,
-    last_seen: '2020-01-10T10:40:00.000Z',
-    node_id: 'node-id-complete-2',
-    short_node_id: 'node-id-2',
-    transport_address: 'http://localhost:9201',
-    type: 'DATANODE',
-    status: 'UNCONFIGURED',
-  },
-  {
-    hostname: '192.168.0.12',
-    id: 'data-node-id-3',
-    is_leader: false,
-    is_master: false,
-    last_seen: '2020-01-10T10:40:00.000Z',
-    node_id: 'node-id-complete-3',
-    short_node_id: 'node-id-3',
-    transport_address: 'http://localhost:9202',
-    type: 'DATANODE',
-    status: 'UNCONFIGURED',
-  },
-];
 
 describe('DataNodesOverview', () => {
   let oldConfirm;
 
   beforeEach(() => {
     asMock(useDataNodes).mockReturnValue({
-      data: availableDataNodes,
+      data: dataNodes,
       isFetching: false,
       isInitialLoading: false,
       error: undefined,
@@ -89,21 +50,6 @@ describe('DataNodesOverview', () => {
 
     await screen.findByText('node-id-3');
     await screen.findByText('http://localhost:9200');
-  });
-
-  it('should resume startup', async () => {
-    const onResumeStartup = jest.fn();
-    renderPreflight(<DataNodesOverview />);
-
-    await screen.findByText('node-id-3');
-
-    const resumeStartupButton = screen.getByRole('button', {
-      name: /resume startup/i,
-    });
-
-    userEvent.click(resumeStartupButton);
-
-    await waitFor(() => expect(onResumeStartup).toHaveBeenCalledTimes(1));
   });
 
   it('should display error message when there was an error fetching data nodes', async () => {

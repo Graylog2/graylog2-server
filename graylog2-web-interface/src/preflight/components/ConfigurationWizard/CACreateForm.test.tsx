@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -24,7 +24,7 @@ import { asMock } from 'helpers/mocking';
 
 import CACreateForm from './CACreateForm';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
@@ -32,7 +32,11 @@ jest.mock('preflight/util/UserNotification', () => ({
 }));
 
 describe('CACreateForm', () => {
-  const filloutForm = async () => {
+  beforeEach(() => {
+    asMock(fetch).mockReturnValue(Promise.resolve());
+  });
+
+  const fillOutForm = async () => {
     userEvent.type(await screen.findByRole('textbox', { name: /input 1/i }), 'input 1 content');
     userEvent.type(await screen.findByRole('textbox', { name: /input 2/i }), 'input 2 content');
   };
@@ -42,9 +46,9 @@ describe('CACreateForm', () => {
   };
 
   it('should create CA', async () => {
-    render(<CACreateForm />);
+    renderPreflight(<CACreateForm />);
 
-    await filloutForm();
+    await fillOutForm();
     await submitForm();
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
@@ -61,10 +65,10 @@ describe('CACreateForm', () => {
   });
 
   it('should show error when CA creation fails', async () => {
-    asMock(fetch).mockImplementationOnce(() => Promise.reject(new Error('Error')));
-    render(<CACreateForm />);
+    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    renderPreflight(<CACreateForm />);
 
-    await filloutForm();
+    await fillOutForm();
     await submitForm();
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
