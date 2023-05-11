@@ -26,14 +26,10 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import type { Generator } from 'views/components/visualizations/ChartData';
-import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
-import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import XYPlot from '../XYPlot';
 
 const seriesGenerator: Generator = ({ type, name, labels, values, originalName }) => ({ type, name, x: labels, y: values, mode: 'markers', originalName });
-
-const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.name) } });
 
 const ScatterVisualization = makeVisualization(({
   config,
@@ -57,7 +53,6 @@ const ScatterVisualization = makeVisualization(({
     <XYPlot config={config}
             axisType={visualizationConfig.axisType}
             chartData={chartDataResult}
-            setChartColor={setChartColor}
             plotLayout={layout}
             height={height}
             effectiveTimerange={effectiveTimerange} />

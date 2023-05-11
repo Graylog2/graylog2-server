@@ -26,7 +26,6 @@ import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
-import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -42,8 +41,6 @@ const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
 
   return undefined;
 };
-
-const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.name) } });
 
 const AreaVisualization = makeVisualization(({
   config,
@@ -83,7 +80,6 @@ const AreaVisualization = makeVisualization(({
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             height={height}
-            setChartColor={setChartColor}
             chartData={chartDataResult} />
   );
 }, 'area');

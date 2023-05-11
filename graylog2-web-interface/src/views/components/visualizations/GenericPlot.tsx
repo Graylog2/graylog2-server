@@ -52,6 +52,7 @@ export type ChartConfig = {
   labels: Array<string>,
   line?: ChartMarker,
   marker?: ChartMarker,
+  originalName?: string,
 };
 
 export type ColorMap = {
