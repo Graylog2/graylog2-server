@@ -26,6 +26,8 @@ import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
+import { keySeparator, humanSeparator } from 'views/Constants';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -96,14 +98,22 @@ const BarVisualization = makeVisualization(({
 
   const opacity = visualizationConfig?.opacity ?? 1.0;
 
+  const mapKeys = useMapKeys();
+  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
+  const _mapKeys = useCallback((labels: string[]) => labels
+    .map((label) => label.split(keySeparator)
+      .map((l, i) => mapKeys(l, rowPivotFields[i]))
+      .join(humanSeparator),
+    ), [mapKeys, rowPivotFields]);
+
   const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }): ChartDefinition => ({
     type,
     name,
-    x: labels,
+    x: _mapKeys(labels),
     y: values,
     opacity,
     originalName,
-  }), [opacity]);
+  }), [_mapKeys, opacity]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, { widgetConfig: config, chartType: 'bar', generator: _seriesGenerator });

@@ -26,6 +26,8 @@ import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import { keySeparator, humanSeparator } from 'views/Constants';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -50,15 +52,22 @@ const AreaVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
+  const mapKeys = useMapKeys();
+  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
+  const _mapKeys = useCallback((labels: string[]) => labels
+    .map((label) => label.split(keySeparator)
+      .map((l, i) => mapKeys(l, rowPivotFields[i]))
+      .join(humanSeparator),
+    ), [mapKeys, rowPivotFields]);
   const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
     type,
     name,
-    x: labels,
+    x: _mapKeys(labels),
     y: values,
     fill: 'tozeroy',
     line: { shape: toPlotly(interpolation) },
     originalName,
-  }), [interpolation]);
+  }), [_mapKeys, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 

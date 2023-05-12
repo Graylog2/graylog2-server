@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
@@ -26,10 +26,25 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import type { Generator } from 'views/components/visualizations/ChartData';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
+import { keySeparator, humanSeparator } from 'views/Constants';
 
 import XYPlot from '../XYPlot';
 
-const seriesGenerator: Generator = ({ type, name, labels, values, originalName }) => ({ type, name, x: labels, y: values, mode: 'markers', originalName });
+const seriesGenerator = (mapKeys: (labels: string[]) => string[]): Generator => ({
+  type,
+  name,
+  labels,
+  values,
+  originalName,
+}) => ({
+  type,
+  name,
+  x: mapKeys(labels),
+  y: values,
+  mode: 'markers',
+  originalName,
+});
 
 const ScatterVisualization = makeVisualization(({
   config,
@@ -38,11 +53,18 @@ const ScatterVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
+  const mapKeys = useMapKeys();
+  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
+  const _mapKeys = useCallback((labels: string[]) => labels
+    .map((label) => label.split(keySeparator)
+      .map((l, i) => mapKeys(l, rowPivotFields[i]))
+      .join(humanSeparator),
+    ), [mapKeys, rowPivotFields]);
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
     chartType: 'scatter',
-    generator: seriesGenerator,
+    generator: seriesGenerator(_mapKeys),
   });
   const { eventChartData, shapes } = useEvents(config, data.events);
 
