@@ -81,7 +81,7 @@ public class EntityTitleServiceMongoTest {
                 .allowNodeRead("01020302e16f9a1d1f6b0741")
                 .build();
 
-        final EntitiesTitleResponse response = toTest.getTitles(searchUser, request);
+        final EntitiesTitleResponse response = toTest.getTitles(request, searchUser);
 
         assertThat(response.entities())
                 .isNotNull()

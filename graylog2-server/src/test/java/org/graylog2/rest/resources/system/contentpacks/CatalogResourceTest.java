@@ -140,7 +140,7 @@ public class CatalogResourceTest {
         );
         doReturn(expectedResponse)
                 .when(entityTitleService)
-                .getTitles(any(), eq(request));
+                .getTitles(eq(request), any());
 
         final EntitiesTitleResponse actualResponse = catalogResource.getTitles(request, TestSearchUser.builder().build());
         assertEquals(expectedResponse, actualResponse);

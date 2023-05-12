@@ -59,7 +59,7 @@ public class EntityTitleService {
         this.entitiesCatalog = entitiesCatalog;
     }
 
-    public EntitiesTitleResponse getTitles(final TitlePermissions permissions, final EntityTitleRequest request) {
+    public EntitiesTitleResponse getTitles(final EntityTitleRequest request, final TitlePermissions permissions) {
         if (request == null || request.entities() == null) {
             return EMPTY_RESPONSE;
         }

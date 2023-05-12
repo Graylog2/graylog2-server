@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system.contentpacks.titles;
 
-import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog2.database.DbEntity;
@@ -67,7 +66,7 @@ class EntityTitleServiceTest {
 
     @Test
     void returnsEmptyResponseOnNullRequest() {
-        final EntitiesTitleResponse response = toTest.getTitles(searchUser, null);
+        final EntitiesTitleResponse response = toTest.getTitles(null, searchUser);
         assertSame(EMPTY_RESPONSE, response);
         verifyNoInteractions(mongoConnection);
         verifyNoInteractions(entitiesCatalog);
@@ -75,7 +74,7 @@ class EntityTitleServiceTest {
 
     @Test
     void returnsEmptyResponseOnRequestWithNoEntities() {
-        final EntitiesTitleResponse response = toTest.getTitles(searchUser, new EntityTitleRequest(List.of()));
+        final EntitiesTitleResponse response = toTest.getTitles(new EntityTitleRequest(List.of()), searchUser);
         assertSame(EMPTY_RESPONSE, response);
         verifyNoInteractions(mongoConnection);
         verifyNoInteractions(entitiesCatalog);
@@ -83,7 +82,7 @@ class EntityTitleServiceTest {
 
     @Test
     void returnsEmptyResponseOnRequestWithNullEntities() {
-        final EntitiesTitleResponse response = toTest.getTitles(searchUser, new EntityTitleRequest(null));
+        final EntitiesTitleResponse response = toTest.getTitles(new EntityTitleRequest(null), searchUser);
         assertSame(EMPTY_RESPONSE, response);
         verifyNoInteractions(mongoConnection);
         verifyNoInteractions(entitiesCatalog);
@@ -91,12 +90,12 @@ class EntityTitleServiceTest {
 
     @Test
     void returnsEmptyResponseIfNoEntitiesArePresentInTheCatalog() {
-        final EntitiesTitleResponse response = toTest.getTitles(searchUser, new EntityTitleRequest(
+        final EntitiesTitleResponse response = toTest.getTitles(new EntityTitleRequest(
                 List.of(
                         new EntityIdentifier("1", "streams"),
                         new EntityIdentifier("2", "users")
                 )
-        ));
+        ), searchUser);
         assertSame(EMPTY_RESPONSE, response);
         verifyNoInteractions(mongoConnection);
     }
@@ -113,11 +112,11 @@ class EntityTitleServiceTest {
                 )
         ).when(entitiesCatalog).getByCollectionName("streams");
 
-        final EntitiesTitleResponse response = toTest.getTitles(searchUser, new EntityTitleRequest(
+        final EntitiesTitleResponse response = toTest.getTitles(new EntityTitleRequest(
                 List.of(
                         new EntityIdentifier("1", "streams")
                 )
-        ));
+        ), searchUser);
 
         assertEquals(
                 new EntitiesTitleResponse(

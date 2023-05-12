@@ -96,6 +96,6 @@ public class CatalogResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/entities/titles")
     public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request, @Context SearchUser searchUser) {
-        return entityTitleService.getTitles(searchUser, request);
+        return entityTitleService.getTitles(request, searchUser);
     }
 }
