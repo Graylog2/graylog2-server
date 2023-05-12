@@ -173,7 +173,7 @@ const RuleForm = ({ create }: Props) => {
                      placeholder="Message string"
                      value={rawMessageToSimulate}
                      onChange={handleRawMessageChange}
-                     rows={3} />
+                     rows={5} />
               <Button bsStyle="info"
                       bsSize="xsmall"
                       disabled={!rawMessageToSimulate || !ruleSource}
