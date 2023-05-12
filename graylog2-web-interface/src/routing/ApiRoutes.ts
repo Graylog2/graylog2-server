@@ -445,6 +445,14 @@ const ApiRoutes = {
     simulate: () => ({ url: '/system/pipelines/rule/simulate' }),
     metricsConfig: () => ({ url: '/system/pipelines/rule/config/metrics' }),
   },
+  RuleBuilderController: {
+    get: (ruleId: string) => ({ url: `/system/pipelines/rulebuilder/${ruleId}` }),
+    create: () => ({ url: '/system/pipelines/rulebuilder' }),
+    update: (ruleId: string) => ({ url: `/system/pipelines/rulebuilder/${ruleId}` }),
+    validate: () => ({ url: '/system/pipelines/rulebuilder/validate' }),
+    listConditions: () => ({ url: '/system/pipelines/rulebuilder/conditions' }),
+    listActions: () => ({ url: '/system/pipelines/rulebuilder/actions' }),
+  },
   ConnectionsController: {
     list: () => ({ url: '/system/pipelines/connections' }),
     to_stream: () => ({ url: '/system/pipelines/connections/to_stream' }),

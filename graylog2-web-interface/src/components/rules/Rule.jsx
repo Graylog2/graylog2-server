@@ -21,6 +21,7 @@ import { PageHeader } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 
+import RuleBuilder from './RuleBuilder';
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
 
@@ -34,6 +35,8 @@ const Rule = ({ create, title }) => {
   } else {
     pageTitle = <span>Pipeline rule <em>{title}</em></span>;
   }
+
+  const isRuleBuilder = false;
 
   return (
     <div>
@@ -50,14 +53,19 @@ const Rule = ({ create, title }) => {
         </span>
       </PageHeader>
 
-      <Row className="content">
-        <Col md={6}>
-          <RuleForm create={create} />
-        </Col>
-        <Col md={6}>
-          <RuleHelper />
-        </Col>
-      </Row>
+      {isRuleBuilder ? (
+        <RuleBuilder isNewRule={create} />
+      ) : (
+        <Row className="content">
+          <Col md={6}>
+            <RuleForm create={create} />
+          </Col>
+          <Col md={6}>
+            <RuleHelper />
+          </Col>
+        </Row>
+      )}
+
     </div>
   );
 };
