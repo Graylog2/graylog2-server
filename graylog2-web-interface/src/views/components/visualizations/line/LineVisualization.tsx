@@ -26,6 +26,7 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
+import { keySeparator, humanSeparator } from 'views/Constants';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -52,7 +53,11 @@ const LineVisualization = makeVisualization(({
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
-  const _mapKeys = useCallback((labels: string[]) => labels.map((label) => mapKeys(label, rowPivotFields[0])), [mapKeys, rowPivotFields]);
+  const _mapKeys = useCallback((labels: string[]) => labels
+    .map((label) => label.split(keySeparator)
+      .map((l, i) => mapKeys(l, rowPivotFields[i]))
+      .join(humanSeparator),
+    ), [mapKeys, rowPivotFields]);
   const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
     type,
     name,

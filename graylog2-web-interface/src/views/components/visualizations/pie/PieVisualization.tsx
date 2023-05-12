@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import union from 'lodash/union';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -98,7 +97,7 @@ const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc, { labels }) => union(acc, labels), []);
+const labelMapper = (data: Array<{ labels: Array<string> }>) => data.flatMap(({ labels }) => labels);
 
 const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots?.flatMap((pivot) => pivot.fields);
 

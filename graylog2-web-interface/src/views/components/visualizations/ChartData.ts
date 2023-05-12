@@ -130,7 +130,7 @@ export const generateChart = (
     const allCharts = results.map(([value, x, values, z]) => ({
       type: chartType,
       name: value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
-      labels: x.map((key) => key.join(humanSeparator)),
+      labels: x.map((key) => key.join(keySeparator)),
       values,
       data: z,
       originalName: value,
