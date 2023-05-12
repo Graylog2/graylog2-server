@@ -18,6 +18,7 @@ package org.graylog.datanode.periodicals;
 
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
@@ -34,23 +35,28 @@ public class NodePingPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingPeriodical.class);
     private final NodeService nodeService;
+    private final NodePreflightConfigService nodePreflightConfigService;
     private final NodeId nodeId;
     private final URI opensearchBaseUri;
     private final Supplier<Boolean> isLeader;
 
 
     @Inject
-    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, OpensearchProcess managedOpenSearch) {
-        this(nodeService, nodeId, managedOpenSearch.getOpensearchBaseUrl(), managedOpenSearch::isLeaderNode);
+    public NodePingPeriodical(NodeService nodeService,
+                              NodePreflightConfigService nodePreflightConfigService,
+                              NodeId nodeId,
+                              OpensearchProcess managedOpenSearch) {
+        this(nodeService, nodePreflightConfigService, nodeId, managedOpenSearch.getOpensearchBaseUrl(), managedOpenSearch::isLeaderNode);
     }
 
-    NodePingPeriodical(
-            NodeService nodeService,
-            NodeId nodeId,
-            URI opensearchBaseUri,
-            Supplier<Boolean> isLeader
+    NodePingPeriodical(NodeService nodeService,
+                       NodePreflightConfigService nodePreflightConfigService,
+                       NodeId nodeId,
+                       URI opensearchBaseUri,
+                       Supplier<Boolean> isLeader
     ) {
         this.nodeService = nodeService;
+        this.nodePreflightConfigService = nodePreflightConfigService;
         this.nodeId = nodeId;
         this.opensearchBaseUri = opensearchBaseUri;
         this.isLeader = isLeader;
@@ -101,6 +107,7 @@ public class NodePingPeriodical extends Periodical {
     public void doRun() {
         try {
             nodeService.markAsAlive(nodeId, isLeader.get(), opensearchBaseUri);
+            nodePreflightConfigService.updatePreflightConfig(nodeId); //TODO: it may be moved to different place at some point
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             registerServer();
