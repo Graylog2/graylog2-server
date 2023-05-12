@@ -18,32 +18,19 @@
 module.exports = (api) => {
   const isEnvTest = api.env('test');
 
-  return isEnvTest
-    ? {
-      presets: [
-        require('@babel/preset-env'),
-        require('@babel/preset-react'),
-        require('@babel/preset-typescript')],
-      plugins: [
-        require('@babel/plugin-syntax-dynamic-import'),
-        require('babel-plugin-styled-components'),
-        require('@babel/plugin-transform-runtime'),
-      ],
-    }
-    : {
-      presets: [
-        [require('@babel/preset-env'), {
-          modules: false,
-          useBuiltIns: 'entry',
-          corejs: '3.9',
-          shippedProposals: true,
-        }],
-        require('@babel/preset-react'),
-        require('@babel/preset-typescript'),
-      ],
-      plugins: [
-        require('@babel/plugin-syntax-dynamic-import'),
-        require('babel-plugin-styled-components'),
-      ],
-    };
+  if (!isEnvTest) {
+    throw Error('For transpiling the frontend assets we are no longer using Babel and it should only be used for tests.');
+  }
+
+  return {
+    presets: [
+      require('@babel/preset-env'),
+      require('@babel/preset-react'),
+      require('@babel/preset-typescript')],
+    plugins: [
+      require('@babel/plugin-syntax-dynamic-import'),
+      require('babel-plugin-styled-components'),
+      require('@babel/plugin-transform-runtime'),
+    ],
+  };
 };
