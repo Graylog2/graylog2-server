@@ -42,7 +42,7 @@ public class MavenPackager {
     }
 
     public static void packageJarIfNecessary(NodeContainerConfig config) {
-        if (isRunFromMaven() || true) {
+        if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else if (jarHasBeenPackagedInThisRun) {
             LOG.info("Assuming jars are current.");

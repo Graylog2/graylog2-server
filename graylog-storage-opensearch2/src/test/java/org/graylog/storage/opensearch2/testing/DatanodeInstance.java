@@ -128,12 +128,10 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", "false")
-                .withEnv("plugins.security.ssl.http.enabled", "false")
-                .withEnv("plugins.security.disabled", "true")
-                .withEnv("action.auto_create_index", "false")
-                .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", "<password-secret>")
+                .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", "<root-pw-sha2>")
+                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb:27017/graylog")
+                .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
@@ -142,5 +140,10 @@ public class DatanodeInstance extends TestableSearchServerInstance {
     @Override
     public Adapters adapters() {
         return this.adapters;
+    }
+
+    @Override
+    public String getLogs() {
+        return this.container.getLogs();
     }
 }
