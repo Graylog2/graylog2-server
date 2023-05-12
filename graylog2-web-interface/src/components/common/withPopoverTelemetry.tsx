@@ -17,6 +17,7 @@
 // eslint-disable-next-line no-restricted-imports
 import type { PopoverProps } from 'react-bootstrap';
 import React, { useEffect } from 'react';
+import kebabCase from 'lodash/kebabCase';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -27,18 +28,17 @@ const withPopoverTelemetry = (Component) => {
 
     useEffect(() => {
       const telemetryEvent = {
-        appSection,
-        eventElement,
-        eventInfo: {},
+        app_section: kebabCase(appSection),
+        app_action_value: kebabCase(eventElement),
       };
 
-      if (telemetryEvent.eventElement) {
-        sendTelemetry('open_popover', telemetryEvent);
+      if (telemetryEvent.app_action_value) {
+        sendTelemetry('popover_open', telemetryEvent);
       }
 
       return () => {
-        if (telemetryEvent.eventElement) {
-          sendTelemetry('close_popover', telemetryEvent);
+        if (telemetryEvent.app_action_value) {
+          sendTelemetry('popover_close', telemetryEvent);
         }
       };
     }, [eventElement, appSection, sendTelemetry]);

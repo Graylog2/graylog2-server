@@ -17,6 +17,7 @@
 // eslint-disable-next-line no-restricted-imports
 import type { ModalProps } from 'react-bootstrap';
 import React, { useEffect } from 'react';
+import kebabCase from 'lodash/kebabCase';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -27,18 +28,17 @@ const withModalTelemetry = (Component) => {
 
     useEffect(() => {
       const telemetryEvent = {
-        appSection,
-        eventElement,
-        eventInfo: {},
+        app_section: kebabCase(appSection),
+        app_action_value: kebabCase(eventElement),
       };
 
       if (show && eventElement) {
-        sendTelemetry('open_modal', telemetryEvent);
+        sendTelemetry('modal_open', telemetryEvent);
       }
 
       return () => {
         if (show && eventElement) {
-          sendTelemetry('close_modal', telemetryEvent);
+          sendTelemetry('modal_close', telemetryEvent);
         }
       };
     }, [show, eventElement, appSection, sendTelemetry]);

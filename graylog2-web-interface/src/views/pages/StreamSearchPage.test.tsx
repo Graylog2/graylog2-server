@@ -30,6 +30,8 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useCreateSearch from 'views/hooks/useCreateSearch';
+import type View from 'views/logic/views/View';
 
 import StreamSearchPage from './StreamSearchPage';
 
@@ -43,7 +45,7 @@ jest.mock('routing/useParams');
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 
 describe('StreamSearchPage', () => {
   const mockQuery = {
@@ -67,6 +69,7 @@ describe('StreamSearchPage', () => {
     asMock(useParams).mockReturnValue({ streamId });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
   it('shows loading spinner before rendering page', async () => {

@@ -70,9 +70,10 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
 
   const triggerTelemetry = () => {
     sendTelemetry('click', {
-      appSection: 'search_bar',
-      eventElement: 'search-button',
-      eventInfo: {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-button',
+      event_details: {
         disabled,
       },
     });

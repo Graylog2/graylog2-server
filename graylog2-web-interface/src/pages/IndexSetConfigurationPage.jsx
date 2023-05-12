@@ -64,14 +64,22 @@ class IndexSetConfigurationPage extends React.Component {
       return <Spinner />;
     }
 
-    const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies, history, sendTelemetry } = this.props;
+    const {
+      indexSet,
+      retentionStrategiesContext,
+      rotationStrategies,
+      retentionStrategies,
+      history,
+      sendTelemetry,
+    } = this.props;
 
     const saveConfiguration = (newIndexSet) => {
       _saveConfiguration(history, newIndexSet);
 
-      sendTelemetry('submit_form', {
-        appSection: 'index_sets',
-        eventElement: 'update-index-set',
+      sendTelemetry('form_submit', {
+        app_pathname: 'indexsets',
+        app_section: 'indexset',
+        app_action_value: 'configuration-form',
       });
     };
 
