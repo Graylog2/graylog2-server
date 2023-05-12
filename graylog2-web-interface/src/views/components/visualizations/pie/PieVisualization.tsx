@@ -97,7 +97,7 @@ const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string> }>) => data.flatMap(({ labels }) => labels);
+const labelMapper = (data: Array<{ labels: Array<string> }>) => [...new Set(data.flatMap(({ labels }) => labels))];
 
 const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots?.flatMap((pivot) => pivot.fields);
 
