@@ -25,9 +25,9 @@ import java.security.KeyStore;
 public class KeystoreFileStorage implements KeystoreStorage {
 
     @Override
-    public void writeCAKeyStore(final Path keystorePath,
-                                final KeyStore keyStore,
-                                final char[] password) throws KeyStoreStorageException {
+    public void writeKeyStore(final Path keystorePath,
+                              final KeyStore keyStore,
+                              final char[] password) throws KeyStoreStorageException {
         try (FileOutputStream store = new FileOutputStream(keystorePath.toFile())) {
             keyStore.store(store, password);
         } catch (Exception ex) {

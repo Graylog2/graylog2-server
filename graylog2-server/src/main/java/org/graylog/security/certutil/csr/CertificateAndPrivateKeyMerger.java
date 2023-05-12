@@ -54,6 +54,6 @@ public class CertificateAndPrivateKeyMerger {
 
         //TODO: should we check if public and private keys form a valid pair, before merging
 
-        keystoreFileStorage.writeCAKeyStore(mergedFilePath, nodeKeystore, certFilePassword);
+        keystoreFileStorage.writeKeyStore(mergedFilePath, nodeKeystore, certFilePassword);
     }
 }

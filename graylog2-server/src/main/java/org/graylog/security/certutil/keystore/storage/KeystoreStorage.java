@@ -23,9 +23,9 @@ import java.security.KeyStore;
 
 public interface KeystoreStorage {
 
-    void writeCAKeyStore(final Path keystorePath,
-                         final KeyStore keyStore,
-                         final char[] password)
+    void writeKeyStore(final Path keystorePath,
+                       final KeyStore keyStore,
+                       final char[] password)
             throws KeyStoreStorageException;
 
 }

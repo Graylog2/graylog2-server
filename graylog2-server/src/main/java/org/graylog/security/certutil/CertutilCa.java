@@ -65,7 +65,7 @@ public class CertutilCa implements CliCommand {
 
             final Path keystorePath = Path.of(keystoreFilename);
             //TODO: it is probably a bad idea to use the same password for CA and its storage...
-            caKeystoreStorage.writeCAKeyStore(keystorePath, caKeystore, password);
+            caKeystoreStorage.writeKeyStore(keystorePath, caKeystore, password);
             console.printLine("Keys and certificates stored in " + keystorePath.toAbsolutePath());
 
         } catch (Exception e) {
