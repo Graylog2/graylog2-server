@@ -25,6 +25,7 @@ import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightAssetsResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
+import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoConnection;
@@ -34,7 +35,7 @@ import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 
 public class PreflightWebModule extends Graylog2Module {
 
-    public static final String FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED = "preflight_config";
+    public static final String FEATURE_FLAG_PREFLIGHT_WEB_ENABLED = "preflight_web";
 
     @Override
     protected void configure() {
@@ -42,6 +43,7 @@ public class PreflightWebModule extends Graylog2Module {
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
+        bind(NodePreflightConfigService.class).asEagerSingleton();
 
         bind(PreflightConfigService.class);
 

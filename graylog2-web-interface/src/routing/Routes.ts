@@ -105,6 +105,7 @@ const Routes = {
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
     PROCESSBUFFERDUMP: (nodeId: string) => `/system/processbufferdump/${nodeId}`,
+    SYSTEMLOGS: (nodeId: string) => `/system/logs/recent/${nodeId}`,
     AUTHENTICATION: {
       BACKENDS: {
         OVERVIEW: '/system/authentication/services',
@@ -232,16 +233,12 @@ const Routes = {
 
     return route.resource();
   },
-  search: (query: string, timeRange: RoutesTimeRange, resolution?: number) => {
-    return Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution);
-  },
+  search: (query: string, timeRange: RoutesTimeRange, resolution?: number) => Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution),
   message_show: (index: string, messageId: string) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId: string) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId: string, index: string, messageId: string) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId: string) => `/streams/${streamId}/outputs`,
-  stream_search: (streamId: string, query?: string, timeRange?: RoutesTimeRange, resolution?: number) => {
-    return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
-  },
+  stream_search: (streamId: string, query?: string, timeRange?: RoutesTimeRange, resolution?: number) => Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution),
   stream_alerts: (streamId: string) => `/alerts/?stream_id=${streamId}`,
 
   legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,

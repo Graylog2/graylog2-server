@@ -36,9 +36,7 @@ const _saved = (history) => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 };
 
-const _isCreating = ({ action }) => {
-  return action === 'create';
-};
+const _isCreating = ({ action }) => action === 'create';
 
 const _validateAdapter = (adapter) => {
   LookupTableDataAdaptersActions.validate(adapter);

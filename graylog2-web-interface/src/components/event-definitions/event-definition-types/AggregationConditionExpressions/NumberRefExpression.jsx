@@ -24,11 +24,9 @@ import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
-const formatFunctions = (functions) => {
-  return functions
-    .sort(naturalSort)
-    .map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
-};
+const formatFunctions = (functions) => functions
+  .sort(naturalSort)
+  .map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
 
 const NumberRefExpression = ({
   aggregationFunctions,
@@ -39,21 +37,13 @@ const NumberRefExpression = ({
   renderLabel,
   validation,
 }) => {
-  const getSeries = (seriesId) => {
-    return eventDefinition.config.series.find((series) => series.id === seriesId);
-  };
+  const getSeries = (seriesId) => eventDefinition.config.series.find((series) => series.id === seriesId);
 
-  const createSeries = () => {
-    return { id: expression.ref };
-  };
+  const createSeries = () => ({ id: expression.ref });
 
-  const getOrCreateSeries = (seriesId) => {
-    return getSeries(seriesId) || createSeries();
-  };
+  const getOrCreateSeries = (seriesId) => getSeries(seriesId) || createSeries();
 
-  const getSeriesId = (currentSeries, func, field) => {
-    return `${defaultTo(func, currentSeries.function)}-${defaultTo(field, currentSeries.field || '')}`;
-  };
+  const getSeriesId = (currentSeries, func, field) => `${defaultTo(func, currentSeries.function)}-${defaultTo(field, currentSeries.field || '')}`;
 
   const handleFieldChange = ({ nextFunction, nextField }) => {
     const series = cloneDeep(eventDefinition.config.series);

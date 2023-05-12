@@ -39,7 +39,9 @@ type Props = {
   onSave: (newDecorators: Array<Decorator>) => unknown,
 };
 
-const _updateOrder = (orderedDecorators: Array<{ id: string }>, decorators: Array<Decorator>, onChange: (decorators: Array<Decorator>) => void) => {
+const _updateOrder = (orderedDecorators: Array<{
+  id: string
+}>, decorators: Array<Decorator>, onChange: (decorators: Array<Decorator>) => void) => {
   const newDecorators = cloneDeep(decorators);
 
   orderedDecorators.forEach((item, idx) => {
@@ -59,19 +61,25 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const sendTelemetry = useSendTelemetry();
 
   const onCreate = useCallback(
-    ({ stream, ...rest }: Decorator) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
+    ({ stream, ...rest }: Decorator) => setModifiedDecorators([...modifiedDecorators, {
+      ...rest,
+      stream: stream === DEFAULT_SEARCH_ID ? null : stream,
+    }]),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onReorder = useCallback(
-    (orderedDecorators: Array<{ id: string }>) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
+    (orderedDecorators: Array<{
+      id: string
+    }>) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onSubmit = useCallback(() => {
     onSave(modifiedDecorators);
 
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_decorators',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'decorators',
+      app_action_value: 'configuration-save',
     });
   }, [onSave, modifiedDecorators, sendTelemetry]);
 
@@ -103,7 +111,11 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
 
         <IfPermitted permissions="decorators:create">
           <p>Select the type to create a new decorator for this stream:</p>
-          <AddDecoratorButton stream={currentStream} nextOrder={nextOrder} decoratorTypes={types} onCreate={onCreate} showHelp={false} />
+          <AddDecoratorButton stream={currentStream}
+                              nextOrder={nextOrder}
+                              decoratorTypes={types}
+                              onCreate={onCreate}
+                              showHelp={false} />
         </IfPermitted>
 
         <p>Use drag and drop to change the execution order of the decorators.</p>

@@ -19,14 +19,17 @@ package org.graylog2.shared.rest.resources.csp;
 import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.rest.PaginationParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.stream.Collectors;
 
 public class CSPServiceImpl implements CSPService {
+    private static final Logger LOG = LoggerFactory.getLogger(CSPServiceImpl.class);
     private final String telemetryApiHost;
     private final DBAuthServiceBackendService dbService;
-    private String connectSrcValue;
+    private volatile String connectSrcValue;
 
     @Inject
     protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, DBAuthServiceBackendService dbService) {
@@ -36,11 +39,14 @@ public class CSPServiceImpl implements CSPService {
     }
 
     @Override
-    public void buildConnectSrc() {
+    public synchronized void buildConnectSrc() {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
-                .map(dto -> String.join(" ", dto.config().hostAllowList()))
+                .map(dto -> dto.config().externalHTTPHosts())
+                .filter(optList -> optList.isPresent())
+                .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));
         connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
+        LOG.debug("Updated CSP: {}", connectSrcValue);
     }
 
     @Override

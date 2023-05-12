@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Allow creating notification in event definition wizard when no notification exists"
+
+issues = ["13825"]
+pulls = ["15286"]

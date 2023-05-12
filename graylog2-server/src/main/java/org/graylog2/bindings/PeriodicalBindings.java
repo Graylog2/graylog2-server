@@ -37,6 +37,7 @@ import org.graylog2.periodical.TrafficCounterCalculator;
 import org.graylog2.periodical.UserSessionTerminationPeriodical;
 import org.graylog2.periodical.VersionCheckThread;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.telemetry.cluster.TelemetryClusterInfoPeriodical;
 
 public class PeriodicalBindings extends AbstractModule {
     @Override
@@ -60,5 +61,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
         periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
+        periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
     }
 }

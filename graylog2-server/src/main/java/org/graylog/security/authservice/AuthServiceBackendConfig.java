@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.plugin.rest.ValidationResult;
 
 import java.util.List;
+import java.util.Optional;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -40,7 +41,16 @@ public interface AuthServiceBackendConfig {
     }
 
     @JsonIgnore
-    List<String> hostAllowList();
+    /**
+     * Returns a list of hosts/ports related to the authentication backend in the format <host>:<port>.
+     * This is useful e.g. to populate the connect-src in Content Security Policy header.
+     * Backends that are not accessed via HTTP will return Optional.empty().
+     *
+     * @return list of host/port Strings
+     */
+    default Optional<List<String>> externalHTTPHosts() {
+        return Optional.empty();
+    }
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
@@ -54,7 +64,7 @@ public interface AuthServiceBackendConfig {
         }
 
         @Override
-        public List<String> hostAllowList() {
+        public Optional<List<String>> externalHTTPHosts() {
             throw new UnsupportedOperationException();
         }
     }

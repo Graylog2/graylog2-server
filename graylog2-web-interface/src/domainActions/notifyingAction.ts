@@ -53,8 +53,7 @@ const notifyingAction = <F extends (...args: Array<any>) => Promise<any>>({
   success: successNotification,
   error: errorNotification,
   notFoundRedirect,
-}: Props<F>) => {
-  return (...args: Parameters<typeof action>) => action(...args).then((result: PromiseResult<ReturnType<F>>) => {
+}: Props<F>) => (...args: Parameters<typeof action>) => action(...args).then((result: PromiseResult<ReturnType<F>>) => {
     if (successNotification) _displaySuccessNotification(successNotification, ...args);
 
     return result;
@@ -68,6 +67,5 @@ const notifyingAction = <F extends (...args: Array<any>) => Promise<any>>({
 
     throw error;
   });
-};
 
 export default notifyingAction;

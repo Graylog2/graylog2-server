@@ -60,9 +60,7 @@ const defaultConfig: GeoIpConfigType = {
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
-  const [curConfig, setCurConfig] = useState(() => {
-    return { ...defaultConfig };
-  });
+  const [curConfig, setCurConfig] = useState(() => ({ ...defaultConfig }));
 
   const sendTelemetry = useSendTelemetry();
 
@@ -76,9 +74,10 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   };
 
   const handleSubmit = (values: GeoIpConfigType) => {
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_geolocation_processor',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'geolocation-processor',
+      app_action_value: 'configuration-save',
     });
 
     updateConfig(values)
@@ -89,16 +88,12 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       });
   };
 
-  const availableVendorTypes = (): OptionType[] => {
-    return [
-      { value: 'MAXMIND', label: 'MaxMind GeoIP' },
-      { value: 'IPINFO', label: 'IPInfo Standard Location' },
-    ];
-  };
+  const availableVendorTypes = (): OptionType[] => [
+    { value: 'MAXMIND', label: 'MaxMind GeoIP' },
+    { value: 'IPINFO', label: 'IPInfo Standard Location' },
+  ];
 
-  const activeVendorType = (type: GeoVendorType) => {
-    return availableVendorTypes().filter((t) => t.value === type)[0].label;
-  };
+  const activeVendorType = (type: GeoVendorType) => availableVendorTypes().filter((t) => t.value === type)[0].label;
 
   const modalTitle = 'Update Geo-Location Processor Configuration';
 
@@ -149,92 +144,90 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
              data-app-section="configurations_geolocation_processor"
              data-event-element={modalTitle}>
         <Formik onSubmit={handleSubmit} initialValues={curConfig}>
-          {({ values, setFieldValue, isSubmitting }) => {
-            return (
-              <Form>
-                <Modal.Header>
-                  <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  <Row>
-                    <Col sm={6}>
-                      <FormikInput id="enabled"
-                                   type="checkbox"
-                                   label="Enable Geo-Location processor"
-                                   name="enabled" />
-                    </Col>
-                    <Col sm={6}>
-                      <FormikInput id="enforce_graylog_schema"
-                                   type="checkbox"
-                                   disabled={!values.enabled}
-                                   label="Enforce default Graylog schema"
-                                   name="enforce_graylog_schema" />
-                    </Col>
-                  </Row>
-                  <Field id="db_vendor_type_select"
-                         name="db_vendor_type_field">
-                    {() => (
-                      <Input id="db_vendor_type_input"
-                             label="Select the GeoIP database vendor">
-                        <Select id="db_vendor_type"
-                                name="db_vendor_type"
-                                clearable={false}
-                                placeholder="Select the GeoIP database vendor"
-                                required
-                                disabled={!values.enabled}
-                                options={availableVendorTypes()}
-                                matchProp="label"
-                                value={values.db_vendor_type}
-                                onChange={(option) => {
-                                  setFieldValue('db_vendor_type', option);
-                                }} />
-                      </Input>
-                    )}
-                  </Field>
-                  <FormikInput id="city_db_path"
-                               type="text"
-                               disabled={!values.enabled}
-                               label="Path to the city database"
-                               name="city_db_path"
-                               required />
-                  <FormikInput id="asn_db_path"
-                               type="text"
-                               disabled={!values.enabled}
-                               label="Path to the ASN database"
-                               name="asn_db_path" />
-                  <TimeUnitInput label="Database refresh interval"
-                                 update={(value, unit) => {
-                                   setFieldValue('refresh_interval', value);
-                                   setFieldValue('refresh_interval_unit', unit);
-                                 }}
-                                 help="Interval at which the database files are checked for modifications and refreshed changes are detected on disk."
-                                 value={values.refresh_interval}
-                                 unit={values.refresh_interval_unit || 'MINUTES'}
-                                 defaultEnabled={values.enabled}
-                                 enabled={values.enabled}
-                                 hideCheckbox
-                                 units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']} />
+          {({ values, setFieldValue, isSubmitting }) => (
+            <Form>
+              <Modal.Header>
+                <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Row>
+                  <Col sm={6}>
+                    <FormikInput id="enabled"
+                                 type="checkbox"
+                                 label="Enable Geo-Location processor"
+                                 name="enabled" />
+                  </Col>
+                  <Col sm={6}>
+                    <FormikInput id="enforce_graylog_schema"
+                                 type="checkbox"
+                                 disabled={!values.enabled}
+                                 label="Enforce default Graylog schema"
+                                 name="enforce_graylog_schema" />
+                  </Col>
+                </Row>
+                <Field id="db_vendor_type_select"
+                       name="db_vendor_type_field">
+                  {() => (
+                    <Input id="db_vendor_type_input"
+                           label="Select the GeoIP database vendor">
+                      <Select id="db_vendor_type"
+                              name="db_vendor_type"
+                              clearable={false}
+                              placeholder="Select the GeoIP database vendor"
+                              required
+                              disabled={!values.enabled}
+                              options={availableVendorTypes()}
+                              matchProp="label"
+                              value={values.db_vendor_type}
+                              onChange={(option) => {
+                                setFieldValue('db_vendor_type', option);
+                              }} />
+                    </Input>
+                  )}
+                </Field>
+                <FormikInput id="city_db_path"
+                             type="text"
+                             disabled={!values.enabled}
+                             label="Path to the city database"
+                             name="city_db_path"
+                             required />
+                <FormikInput id="asn_db_path"
+                             type="text"
+                             disabled={!values.enabled}
+                             label="Path to the ASN database"
+                             name="asn_db_path" />
+                <TimeUnitInput label="Database refresh interval"
+                               update={(value, unit) => {
+                                 setFieldValue('refresh_interval', value);
+                                 setFieldValue('refresh_interval_unit', unit);
+                               }}
+                               help="Interval at which the database files are checked for modifications and refreshed changes are detected on disk."
+                               value={values.refresh_interval}
+                               unit={values.refresh_interval_unit || 'MINUTES'}
+                               defaultEnabled={values.enabled}
+                               enabled={values.enabled}
+                               hideCheckbox
+                               units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']} />
 
-                  <Row>
-                    <Col sm={6}>
-                      <FormikInput id="use_s3"
-                                   type="checkbox"
-                                   disabled={!values.enabled}
-                                   label="Pull files from S3 bucket"
-                                   name="use_s3" />
-                    </Col>
-                  </Row>
-                </Modal.Body>
-                <Modal.Footer>
-                  <ModalSubmit onCancel={resetConfig}
-                               isSubmitting={isSubmitting}
-                               isAsyncSubmit
-                               submitButtonText="Update configuration"
-                               submitLoadingText="Updating configuration..." />
-                </Modal.Footer>
-              </Form>
-            );
-          }}
+                <Row>
+                  <Col sm={6}>
+                    <FormikInput id="use_s3"
+                                 type="checkbox"
+                                 disabled={!values.enabled}
+                                 label="Pull files from S3 bucket"
+                                 name="use_s3" />
+                  </Col>
+                </Row>
+              </Modal.Body>
+              <Modal.Footer>
+                <ModalSubmit onCancel={resetConfig}
+                             isSubmitting={isSubmitting}
+                             isAsyncSubmit
+                             submitButtonText="Update configuration"
+                             submitLoadingText="Updating configuration..." />
+              </Modal.Footer>
+            </Form>
+          )}
         </Formik>
       </Modal>
     </div>

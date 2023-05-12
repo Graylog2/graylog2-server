@@ -21,9 +21,11 @@ import { mappedDataResult, modalDataResult } from 'fixtures/createEventDefinitio
 import CreateEventDefinitionModal from 'views/logic/valueactions/createEventDefinition/CreateEventDefinitionModal';
 import asMock from 'helpers/mocking/AsMock';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
+import generateId from 'logic/generateId';
 
 const mockedOpen = jest.fn();
 jest.mock('views/logic/valueactions/createEventDefinition/hooks/useModalReducer', () => jest.fn());
+jest.mock('logic/generateId');
 
 const checked = {
   aggCondition: true,
@@ -258,6 +260,8 @@ describe('CreateEventDefinitionModal', () => {
   });
 
   it('has correct link', async () => {
+    asMock(generateId).mockReturnValue('session-id');
+
     asMock(useModalReducer).mockReturnValue([
       {
         strategy: 'EXACT',
@@ -273,7 +277,7 @@ describe('CreateEventDefinitionModal', () => {
 
     fireEvent.click(linkButton);
 
-    expect(mockedOpen).toHaveBeenCalledWith('/alerts/definitions/new?step=condition&config={"type":"aggregation-v1","query":"(http_method:GET) AND ((http_method:GET)) AND (action:show)","group_by":[],"loc_query_parameters":[{"data_type":"any","default_value":"GET","description":"","key":"lt","lookup_table":"http_method","name":"newParameter","optional":false,"title":"lt","type":"lut-parameter-v1"}],"search_within_ms":300000,"streams":["streamId"]}', '_blank');
+    expect(mockedOpen).toHaveBeenCalledWith('/alerts/definitions/new?step=condition&session-id=cedfv-session-id', '_blank');
   });
 
   it('takes strategy from hook', () => {

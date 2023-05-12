@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
@@ -35,41 +33,24 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public interface ViewUtils<T> {
-    ObjectMapper mapper();
-    MongoCollection<Document> collection();
-    Class<T> type();
+    MongoCollection<T> collection();
 
-    default T deserialize(final Document document) {
-        try {
-            // replace "_id" with "id", because the ViewDTO depends on it
-            if(document.containsKey("_id")) {
-                final var id = document.get("_id");
-                document.remove("_id");
-                document.put("id", id);
-            }
-            var json = mapper().writeValueAsString(document);
-            return mapper().readValue(json, type());
-        } catch (JsonProcessingException jpe) {
-            throw new RuntimeException("Could not deserialize view: " + jpe.getMessage(), jpe);
-        }
-    }
-
-    default Stream<Document> findViews(SearchUser searchUser,
-                                         Bson query,
-                                         DBSort.SortBuilder sort) {
+    default Stream<T> findViews(SearchUser searchUser,
+                                Bson query,
+                                DBSort.SortBuilder sort) {
         var user = searchUser.getUser().getId();
-        final AggregateIterable<Document> result = collection().aggregate(List.of(
-                        Aggregates.match(query),
-                        Aggregates.lookup(
-                                FavoritesService.COLLECTION_NAME,
-                                List.of(
-                                        new Variable<>("dashboardId", doc( "$concat", List.of( "grn::::dashboard:", doc("$toString",  "$_id")))),
-                                        new Variable<>("searchId", doc( "$concat", List.of( "grn::::search:", doc("$toString",  "$_id")))),
-                                        new Variable<>("userId", user)
-                                ),
-                                List.of(Aggregates.unwind("$items"),
-                                        Aggregates.match(
-                                                doc("$expr", doc("$and", List.of(
+        final AggregateIterable<T> result = collection().aggregate(List.of(
+                Aggregates.match(query),
+                Aggregates.lookup(
+                        FavoritesService.COLLECTION_NAME,
+                        List.of(
+                                new Variable<>("dashboardId", doc("$concat", List.of("grn::::dashboard:", doc("$toString", "$_id")))),
+                                new Variable<>("searchId", doc("$concat", List.of("grn::::search:", doc("$toString", "$_id")))),
+                                new Variable<>("userId", user)
+                        ),
+                        List.of(Aggregates.unwind("$items"),
+                                Aggregates.match(
+                                        doc("$expr", doc("$and", List.of(
                                                         doc("$or",
                                                                 List.of(
                                                                         doc("$eq", List.of("$items", "$$dashboardId")),
@@ -77,10 +58,10 @@ public interface ViewUtils<T> {
                                                                 )
                                                         ),
                                                         doc("$eq", List.of("$user_id", "$$userId"))
-                                                        )
-                                                ))),
-                                        Aggregates.project(doc("_id", 1))
-                                ),
+                                                )
+                                        ))),
+                                Aggregates.project(doc("_id", 1))
+                        ),
                                 "favorites"
                         ),
                         Aggregates.set(new Field<>("favorite", doc("$gt", List.of(doc("$size", "$favorites"), 0)))),

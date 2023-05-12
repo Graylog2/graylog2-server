@@ -69,9 +69,7 @@ class ProcessorSimulator extends React.Component {
     }
 
     return streams
-      .map((stream) => {
-        return { value: stream.id, label: stream.title };
-      })
+      .map((stream) => ({ value: stream.id, label: stream.title }))
       .sort((s1, s2) => naturalSort(s1.label, s2.label));
   };
 

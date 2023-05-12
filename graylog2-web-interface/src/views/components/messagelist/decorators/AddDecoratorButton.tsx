@@ -83,9 +83,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => {
-    return { value: typeName, label: typeDefinition.name };
-  };
+  _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => ({ value: typeName, label: typeDefinition.name });
 
   _handleCancel = () => this.setState({ typeName: undefined, typeDefinition: undefined });
 

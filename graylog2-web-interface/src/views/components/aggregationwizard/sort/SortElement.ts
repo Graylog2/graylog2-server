@@ -30,9 +30,7 @@ type SortError = {
   direction?: string,
 }
 
-const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
-  return errors.filter((error) => Object.keys(error).length > 0).length > 0;
-};
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
 
 const validateSorts = (values: WidgetConfigFormValues) => {
   const errors = {};

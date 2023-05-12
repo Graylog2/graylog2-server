@@ -22,6 +22,7 @@ import { loadNewViewForStream } from 'views/logic/views/Actions';
 import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
+import useCreateSearch from 'views/hooks/useCreateSearch';
 
 import SearchPage from './SearchPage';
 
@@ -34,11 +35,12 @@ const StreamSearchPage = () => {
   }
 
   const { timeRange, queryString } = useSearchURLQueryParams();
-  const newView = useCreateSavedSearch(streamId, timeRange, queryString);
+  const viewPromise = useCreateSavedSearch(streamId, timeRange, queryString);
+  const view = useCreateSearch(viewPromise);
 
   const _loadNewView = useCallback(() => loadNewViewForStream(history, streamId), [history, streamId]);
 
-  return <SearchPage loadNewView={_loadNewView} view={newView} isNew />;
+  return <SearchPage loadNewView={_loadNewView} view={view} isNew />;
 };
 
 export default StreamSearchPage;

@@ -77,18 +77,16 @@ const useColumnRenderers = (
                           queryClient.setQueriesData(['saved-searches', 'overview', searchParams], (cur: {
                           list: Array<View>,
                           pagination: { total: number }
-                        }) => {
-                            return ({
-                              ...cur,
-                              list: cur.list.map((view) => {
-                                if (view.id === search.id) {
-                                  return view.toBuilder().favorite(newValue).build();
-                                }
+                        }) => ({
+                            ...cur,
+                            list: cur.list.map((view) => {
+                              if (view.id === search.id) {
+                                return view.toBuilder().favorite(newValue).build();
+                              }
 
-                                return view;
-                              }),
-                            });
-                          });
+                              return view;
+                            }),
+                          }));
                         }} />
         ),
       },

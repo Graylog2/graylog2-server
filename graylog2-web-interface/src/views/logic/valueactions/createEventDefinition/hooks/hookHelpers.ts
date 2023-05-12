@@ -28,7 +28,7 @@ import type ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { FiltersType } from 'views/types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
+import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 
 export const getStreams = (filter: FilterType): Array<string> => {
   if (!filter) return [];
@@ -39,21 +39,17 @@ export const getStreams = (filter: FilterType): Array<string> => {
     .toArray();
 };
 
-export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) => {
-  return concatQueryStrings(valuePath.filter((path) => {
-    const key = Object.keys(path)[0];
+export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) => concatQueryStrings(valuePath.filter((path) => {
+  const key = Object.keys(path)[0];
 
-    return key !== '_exists_';
-  }).map((path) => {
-    const [field, value] = Object.entries(path)[0];
+  return key !== '_exists_';
+}).map((path) => {
+  const [field, value] = Object.entries(path)[0];
 
-    return `${field}:${value}`;
-  }), { withBrackets: false });
-};
+  return `${field}:${escape(value)}`;
+}), { withBrackets: false });
 
-export const getFlattenPivots = (pivots: Array<Pivot>): Set<string> => {
-  return new Set(pivots.flatMap(({ fields }) => fields));
-};
+export const getFlattenPivots = (pivots: Array<Pivot>): Set<string> => new Set(pivots.flatMap(({ fields }) => fields));
 
 export const filtratePathsByPivot = ({ flattenPivots, valuePath }: {flattenPivots: Set<string>, valuePath: Array<{ [name: string]: string }>}): Array<{[name:string]: string}> => {
   if (!valuePath) return [];
@@ -99,22 +95,18 @@ export const aggregationValueHandler: AggregationHandler = ({ widget, value, fie
   const rowValuePath = transformValuePathToQuery(rowPaths);
 
   return ({
-    searchFromValue: `${field}:${value}`,
+    searchFromValue: `${field}:${escape(value)}`,
     rowValuePath,
   });
 };
 
-export const messagesValueHandler: AggregationHandler = ({ value, field }) => {
-  return ({
-    searchFromValue: `${field}:${value}`,
-  });
-};
+export const messagesValueHandler: AggregationHandler = ({ value, field }) => ({
+  searchFromValue: `${field}:${escape(value)}`,
+});
 
-export const logsValueHandler: AggregationHandler = ({ value, field }) => {
-  return ({
-    searchFromValue: `${field}:${value}`,
-  });
-};
+export const logsValueHandler: AggregationHandler = ({ value, field }) => ({
+  searchFromValue: `${field}:${escape(value)}`,
+});
 
 export const getAggregationHandler = ({ widget, field }: { widget: Widget, field: string }): AggregationHandler => {
   if (widget.type === 'AGGREGATION') {
@@ -152,11 +144,9 @@ export const getRestParameterValues = (
   return res;
 }, {});
 
-export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => {
-  return concatQueryStrings(filters
-    .filter((filter) => (filter.queryString && !filter.disabled))
-    .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`).toArray(), { withBrackets: false });
-};
+export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => concatQueryStrings(filters
+  .filter((filter) => (filter.queryString && !filter.disabled))
+  .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`).toArray(), { withBrackets: false });
 
 export const replaceParametersInQueryString = ({ query, restParameterValues }: {
   query: string,

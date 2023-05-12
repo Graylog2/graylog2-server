@@ -132,6 +132,11 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
         return this.adapters;
     }
 
+    @Override
+    public String getLogs() {
+        return this.container.getLogs();
+    }
+
     public ElasticsearchClient elasticsearchClient() {
         return this.elasticsearchClient;
     }

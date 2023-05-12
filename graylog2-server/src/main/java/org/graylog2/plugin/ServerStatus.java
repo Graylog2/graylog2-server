@@ -24,7 +24,6 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
-import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
@@ -57,7 +56,8 @@ public class ServerStatus {
          */
         @Deprecated
         MASTER,
-        LOCALMODE
+        LOCALMODE,
+        CLOUD
     }
 
     private final EventBus eventBus;

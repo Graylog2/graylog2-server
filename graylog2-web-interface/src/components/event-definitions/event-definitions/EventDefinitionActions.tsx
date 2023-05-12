@@ -76,17 +76,11 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
-  const showActions = (): boolean => {
-    return scopePermissions?.is_mutable;
-  };
+  const showActions = (): boolean => scopePermissions?.is_mutable;
 
-  const isSystemEventDefinition = (): boolean => {
-    return eventDefinition?.config?.type === 'system-notifications-v1';
-  };
+  const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
-  const isAggregationEventDefinition = (): boolean => {
-    return eventDefinition?.config?.type === 'aggregation-v1';
-  };
+  const isAggregationEventDefinition = (): boolean => eventDefinition?.config?.type === 'aggregation-v1';
 
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
@@ -97,8 +91,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
 
   const handleAction = (action, definition) => {
     sendTelemetry('click', {
-      appSection: 'event-definition',
-      eventElement: `event-definition-action-${action}`,
+      app_pathname: 'event-definition',
+      app_action_value: `event-definition-action-${action}`,
     });
 
     switch (action) {
@@ -179,7 +173,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                      entityType="event_definition"
                      onClick={() => setShowEntityShareModal(true)}
                      bsSize="xsmall" />
-        <OverlayDropdownButton title="More Actions"
+        <OverlayDropdownButton title="More"
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
           {showActions() && (

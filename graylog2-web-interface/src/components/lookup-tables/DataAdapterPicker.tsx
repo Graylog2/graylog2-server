@@ -31,9 +31,7 @@ const DataAdapterPicker = ({
   dataAdapters,
 }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
-  const sortedAdapters = dataAdapters.map((adapter: LookupTableAdapter) => {
-    return { value: adapter.id, label: `${adapter.title} (${adapter.name})` };
-  }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+  const sortedAdapters = dataAdapters.map((adapter: LookupTableAdapter) => ({ value: adapter.id, label: `${adapter.title} (${adapter.name})` })).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
   const errorMessage = touched ? error : '';
 

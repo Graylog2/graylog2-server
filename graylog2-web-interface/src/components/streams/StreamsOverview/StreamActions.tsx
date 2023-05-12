@@ -61,9 +61,9 @@ const StreamActions = ({
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
   const onToggleStreamStatus = useCallback(async () => {
-    sendTelemetry('toggle_input_button', {
-      appSection: 'stream',
-      eventElement: 'stream-item-toggle-status',
+    sendTelemetry('input_button_toggle', {
+      app_pathname: 'streams',
+      app_action_value: ' stream-item-status',
     });
 
     setChangingStatus(true);
@@ -82,8 +82,8 @@ const StreamActions = ({
 
   const toggleEntityShareModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-share-action',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-share',
     });
 
     setShowEntityShareModal((cur) => !cur);
@@ -91,8 +91,8 @@ const StreamActions = ({
 
   const toggleUpdateModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-update-update',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-update',
     });
 
     setShowUpdateModal((cur) => !cur);
@@ -100,8 +100,8 @@ const StreamActions = ({
 
   const toggleCloneModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-clone-action',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-clone',
     });
 
     setShowCloneModal((cur) => !cur);
@@ -109,8 +109,8 @@ const StreamActions = ({
 
   const toggleStreamRuleModal = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-rule-action',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-rule',
     });
 
     setShowStreamRuleModal((cur) => !cur);
@@ -118,8 +118,8 @@ const StreamActions = ({
 
   const onDelete = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'stream',
-      eventElement: 'stream-item-delete',
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-delete',
     });
 
     // eslint-disable-next-line no-alert
@@ -134,25 +134,19 @@ const StreamActions = ({
     }
   }, [sendTelemetry, stream.id, stream.title]);
 
-  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => {
-    return StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
-  }, [stream.id]);
+  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success')), [stream.id]);
 
-  const onUpdate = useCallback((newStream: Stream) => {
-    return StreamsStore.update(stream.id, newStream, (response) => {
-      UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
+  const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
+    UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
 
-      return response;
-    });
-  }, [stream.id]);
+    return response;
+  }), [stream.id]);
 
-  const onCloneSubmit = useCallback((newStream: Stream) => {
-    return StreamsStore.cloneStream(stream.id, newStream, (response) => {
-      UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
+  const onCloneSubmit = useCallback((newStream: Stream) => StreamsStore.cloneStream(stream.id, newStream, (response) => {
+    UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
 
-      return response;
-    });
-  }, [stream.id]);
+    return response;
+  }), [stream.id]);
 
   return (
     <ButtonToolbar>
@@ -160,8 +154,9 @@ const StreamActions = ({
                    entityType="stream"
                    onClick={toggleEntityShareModal}
                    bsSize="xsmall" />
-      <OverlayDropdownButton title="More Actions"
+      <OverlayDropdownButton title="More"
                              bsSize="xsmall"
+                             buttonTitle="More actions"
                              disabled={isNotEditable}
                              dropdownZIndex={1000}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>

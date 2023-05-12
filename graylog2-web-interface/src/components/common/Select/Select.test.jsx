@@ -115,22 +115,23 @@ describe('Select', () => {
 
     it('should use matchProp to configure how options are filtered', () => {
       const matchAnyWrapper = mount(<Select options={options} onChange={onChange} />);
-      const matchAnyFilter = matchAnyWrapper.find(SelectComponent).props().filterOption;
+      const matchAnyFilter = matchAnyWrapper.find('Select').at(1).props().filterOption;
+      const prepareOption = (option) => ({ ...option, data: {} });
 
-      expect(matchAnyFilter(options[0], 'label')).toBeTruthy();
-      expect(matchAnyFilter(options[0], 'value')).toBeTruthy();
+      expect(matchAnyFilter(prepareOption(options[0]), 'label')).toBeTruthy();
+      expect(matchAnyFilter(prepareOption(options[0]), 'value')).toBeTruthy();
 
       const matchLabelWrapper = mount(<Select options={options} onChange={onChange} matchProp="label" />);
       const matchLabelFilter = matchLabelWrapper.find(SelectComponent).props().filterOption;
 
-      expect(matchLabelFilter(options[0], 'label')).toBeTruthy();
-      expect(matchLabelFilter(options[0], 'value')).toBeFalsy();
+      expect(matchLabelFilter(prepareOption(options[0]), 'label')).toBeTruthy();
+      expect(matchLabelFilter(prepareOption(options[0]), 'value')).toBeFalsy();
 
       const matchValueWrapper = mount(<Select options={options} onChange={onChange} matchProp="value" />);
       const matchValueFilter = matchValueWrapper.find(SelectComponent).props().filterOption;
 
-      expect(matchValueFilter(options[0], 'label')).toBeFalsy();
-      expect(matchValueFilter(options[0], 'value')).toBeTruthy();
+      expect(matchValueFilter(prepareOption(options[0]), 'label')).toBeFalsy();
+      expect(matchValueFilter(prepareOption(options[0]), 'value')).toBeTruthy();
     });
 
     it('should use optionRenderer to customize options\' appearance', () => {

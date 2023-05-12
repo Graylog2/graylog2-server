@@ -18,8 +18,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Title = styled.h3(({ theme }) => css`
-  height: 30px;
-
   a {
     color: ${theme.colors.global.textDefault};
   }
@@ -32,10 +30,8 @@ const Title = styled.h3(({ theme }) => css`
   }
 `);
 
-const MessageDetailsTitle = (props) => {
-  return (
-    <Title {...props} />
-  );
-};
+const MessageDetailsTitle = (props) => (
+  <Title {...props} />
+);
 
 export default MessageDetailsTitle;
