@@ -34,7 +34,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService.TITLE_IF_NOT_PERMITTED;
+import static org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleServiceImpl.TITLE_IF_NOT_PERMITTED;
 
 
 public class EntityTitleServiceMongoTest {
@@ -53,11 +53,11 @@ public class EntityTitleServiceMongoTest {
                 )
         );
         mongodb.start();
-        mongodb.importFixture("fixture_for_title_retrieval_testing.json", EntityTitleService.class);
+        mongodb.importFixture("fixture_for_title_retrieval_testing.json", EntityTitleServiceImpl.class);
 
         final MongoConnection connection = mongodb.mongoConnection();
 
-        toTest = new EntityTitleService(connection, entitiesCatalog);
+        toTest = new EntityTitleServiceImpl(connection, entitiesCatalog);
     }
 
     @Test

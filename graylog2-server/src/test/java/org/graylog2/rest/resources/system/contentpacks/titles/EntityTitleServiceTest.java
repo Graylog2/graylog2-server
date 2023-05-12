@@ -44,7 +44,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
- * Unit test for {@link EntityTitleService}.
+ * Unit test for {@link EntityTitleServiceImpl}.
  * Tests corner cases, more complex scenario is tested against MongoDB in {@link  EntityTitleServiceMongoTest}
  */
 @ExtendWith(MockitoExtension.class)
@@ -61,7 +61,7 @@ class EntityTitleServiceTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new EntityTitleService(mongoConnection, entitiesCatalog);
+        toTest = new EntityTitleServiceImpl(mongoConnection, entitiesCatalog);
     }
 
     @Test
