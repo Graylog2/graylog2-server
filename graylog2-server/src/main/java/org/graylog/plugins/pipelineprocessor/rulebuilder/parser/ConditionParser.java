@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
@@ -25,7 +24,6 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ConditionParser {
@@ -51,21 +49,21 @@ public class ConditionParser {
             throw new IllegalArgumentException("Function " + step.function() + " not available as condition for rule builder.");
         }
 
-        FunctionDescriptor<?> function = conditions.get(step.function()).descriptor();
         String syntax = "  && ";
         if (step.negate()) {
             syntax += "! ";
         }
-        syntax += function.name() + "(";
-        String params = function.params().stream()
-                .map(p -> ParserUtil.addFunctionParameter(p, step))
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("," + NL));
-        if (StringUtils.isEmpty(params)) {
-            return syntax + ")";
+
+        final RuleFragment ruleFragment = conditions.get(step.function());
+        FunctionDescriptor<?> function = ruleFragment.descriptor();
+
+        if (ruleFragment.isFragment()) {
+            syntax += ParserUtil.generateForFragment(step, ruleFragment);
         } else {
-            return syntax + NL + params + NL + "  )";
+            syntax += ParserUtil.generateForFunction(step, function);
         }
+        return syntax;
+
     }
 
 }

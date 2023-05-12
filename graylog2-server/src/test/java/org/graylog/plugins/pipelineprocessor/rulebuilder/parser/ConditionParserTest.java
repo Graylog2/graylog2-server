@@ -36,6 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ConditionParserTest {
 
@@ -45,6 +47,8 @@ public class ConditionParserTest {
 
     private static final String FUNCTION1_NAME = "function1";
     private static final String FUNCTION2_NAME = "function2";
+    private static final String FRAGMENT1_NAME = "fragment1";
+    private static final String FRAGMENT2_NAME = "fragment2";
 
     @BeforeClass
     public static void registerFunctions() {
@@ -60,8 +64,16 @@ public class ConditionParserTest {
                         integer("optional").optional().build()
                 ), Boolean.class
         ));
+//        functions.put(FRAGMENT1_NAME, FunctionUtil.testCondition(
+//                FRAGMENT1_NAME, "hasField(\"{field}\")",
+//                ImmutableList.of(string("field").build())
+//        ));
+
+        RuleFragmentService ruleFragmentService = mock(RuleFragmentService.class);
+        when(ruleFragmentService.all()).thenReturn(new ArrayList<>());
+
         ruleBuilderRegistry = new RuleBuilderRegistry(new FunctionRegistry(functions),
-                new RuleFragmentService(null));
+                ruleFragmentService);
     }
 
     @Before
@@ -121,7 +133,7 @@ public class ConditionParserTest {
     }
 
     @Test
-    public void generate_WhenRuleConditionsContainsOneValue() {
+    public void generate_WhenRuleConditionsContainsOneFunction() {
         List<RuleBuilderStep> steps = List.of(
                 RuleBuilderStep.builder().function(FUNCTION2_NAME).build()
         );
@@ -132,7 +144,7 @@ public class ConditionParserTest {
     }
 
     @Test
-    public void generate_WhenRuleConditionsContainsMultipleValues() {
+    public void generate_WhenRuleConditionsContainsMultipleFunctions() {
         List<RuleBuilderStep> steps = List.of(
                 RuleBuilderStep.builder().function(FUNCTION1_NAME)
                         .parameters(Map.of("required", "val1"))
@@ -146,6 +158,11 @@ public class ConditionParserTest {
                   )
                   && ! function2()
                 """.stripTrailing());
+    }
+
+    @Test
+    public void generate_WhenRuleConditionsContainsOneFragment() {
+
     }
 
 

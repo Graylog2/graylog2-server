@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
@@ -47,31 +46,41 @@ public class ActionParser {
             throw new IllegalArgumentException("Function " + step.function() + " not available as action for rule builder.");
         }
 
-        FunctionDescriptor<?> function = actions.get(step.function()).descriptor();
+        final RuleFragment ruleFragment = actions.get(step.function());
+        FunctionDescriptor<?> function = ruleFragment.descriptor();
+
         String syntax = "  ";
         if (Objects.nonNull(step.outputvariable())) {
-            if (function.returnType().equals(Void.class)) {
+            if (function.returnType().equals(Void.class)) { // cannot set output variables for functions returning void
                 throw new IllegalArgumentException("Function " + step.function() + " does not return a value.");
+            } else if (ruleFragment.isFunction()) { // only set output variables to result of functions
+                syntax += "let " + step.outputvariable() + " = ";
             }
-            syntax += "let " + step.outputvariable() + " = ";
         }
 
-        if (step.negate()) {
+        if (step.negate()) { // only functions with boolean return type can be negated
             if (!function.returnType().equals(Boolean.class)) {
                 throw new IllegalArgumentException("Function " + step.function() + " cannot be negated.");
             }
-            syntax += "! ";
+            if (ruleFragment.isFunction()) { // negate functions here, fragments below
+                syntax += "! ";
+            }
         }
 
-        syntax += function.name() + "(";
-        String params = function.params().stream().map(p -> ParserUtil.addFunctionParameter(p, step))
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("," + NL));
-        if (StringUtils.isEmpty(params)) {
-            syntax += ");";
+        if (ruleFragment.isFragment()) {
+            syntax += ParserUtil.generateForFragment(step, ruleFragment);
         } else {
-            syntax += NL + params + NL + "  );";
+            syntax += ParserUtil.generateForFunction(step, function) + ";";
         }
+
+        // set output variable to fragment output variable
+        if (ruleFragment.isFragment() && Objects.nonNull(ruleFragment.fragmentOutputVariable())
+                && Objects.nonNull(step.outputvariable())) {
+            syntax += "let " + step.outputvariable() + " = " +
+                    ((ruleFragment.isFragment() && step.negate()) ? "! " : "") +
+                    ruleFragment.fragmentOutputVariable();
+        }
+
 
         // generate message fields for simulator
         if (generateSimulatorFields && Objects.nonNull(step.outputvariable())) {

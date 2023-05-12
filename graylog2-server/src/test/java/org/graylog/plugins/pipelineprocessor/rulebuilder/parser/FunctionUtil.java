@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 
 public class FunctionUtil {
 
@@ -45,6 +46,20 @@ public class FunctionUtil {
                         .build();
             }
         };
+    }
+
+    protected static RuleFragment testCondition(String name,
+                                                String fragment,
+                                                ImmutableList<ParameterDescriptor> params) {
+        return RuleFragment.builder()
+                .isCondition()
+                .fragment(fragment)
+                .descriptor(FunctionDescriptor.builder()
+                        .name(name)
+                        .params(params)
+                        .returnType(Boolean.class)
+                        .build())
+                .build();
     }
 
 }

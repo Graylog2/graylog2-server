@@ -16,42 +16,15 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.db;
 
-import com.google.common.collect.ImmutableList;
-import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
-import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import java.util.Collection;
+import java.util.Optional;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+public interface RuleFragmentService {
+    RuleFragment save(RuleFragment ruleFragment);
 
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+    void delete(String name);
 
-public class RuleFragmentService {
+    Optional<RuleFragment> get(String name);
 
-    private final List<RuleFragment> fragments;
-
-    @Inject
-    public RuleFragmentService(FunctionRegistry functionRegistry) {
-        this.fragments = new ArrayList<>();
-        fragments.addAll(
-                List.of(
-                        RuleFragment.builder()
-                                .fragment("hasField($field) && $message.$field==\"$fieldValue\"")
-                                .descriptor(FunctionDescriptor.builder()
-                                        .name("test_fragment")
-                                        .params(ImmutableList.of(
-                                                string("field").build(),
-                                                string("fieldValue").build()
-                                        ))
-                                        .returnType(Boolean.class)
-                                        .build())
-                                .build()
-                ));
-    }
-
-    public List<RuleFragment> all() {
-        return fragments;
-    }
-
-
+    Collection<RuleFragment> all();
 }

@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -101,4 +102,22 @@ public abstract class FunctionDescriptor<T> {
 
         public abstract Builder<T> description(@Nullable String description);
     }
+
+    @JsonCreator
+    public static <T> FunctionDescriptor<T> createForRuleBuilder(
+            @JsonProperty("name") String name,
+            @JsonProperty("return_type") Class<? extends T> returnType,
+            @JsonProperty("params") @Nullable ImmutableList<ParameterDescriptor> params,
+            @JsonProperty("description") @Nullable String description,
+            @JsonProperty("rule_builder_title") @Nullable String ruleBuilderTitle) {
+        return FunctionDescriptor.<T>builder()
+                .name(name)
+                .returnType(returnType)
+                .params(params)
+                .description(description)
+                .ruleBuilderEnabled()
+                .ruleBuilderTitle(ruleBuilderTitle)
+                .build();
+    }
+
 }

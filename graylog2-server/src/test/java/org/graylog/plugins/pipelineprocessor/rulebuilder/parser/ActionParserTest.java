@@ -36,6 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ActionParserTest {
 
@@ -66,9 +68,14 @@ public class ActionParserTest {
                         integer("optional").optional().build()
                 ), Void.class
         ));
+
+
+        RuleFragmentService ruleFragmentService = mock(RuleFragmentService.class);
+        when(ruleFragmentService.all()).thenReturn(new ArrayList<>());
+
         ruleBuilderRegistry = new RuleBuilderRegistry(
                 new FunctionRegistry(functions),
-                new RuleFragmentService(null));
+                ruleFragmentService);
     }
 
     @Before

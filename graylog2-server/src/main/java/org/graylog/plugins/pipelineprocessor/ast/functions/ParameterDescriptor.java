@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -157,8 +158,23 @@ public abstract class ParameterDescriptor<T, R> {
         }
 
         public abstract Builder<T, R> transform(java.util.function.Function<T, R> transform);
+
         @Nullable
         public abstract java.util.function.Function<T, R> transform();
 
+    }
+
+    @JsonCreator
+    public static <T, R> ParameterDescriptor<T, R> createForRuleBuilder(
+            @JsonProperty("type") Class<? extends T> type,
+            @JsonProperty("transformed_type") Class<? extends R> transformedType,
+            @JsonProperty("name") String name,
+            @JsonProperty("description") @Nullable String description) {
+        return ParameterDescriptor.<T, R>param()
+                .type(type)
+                .transformedType(transformedType)
+                .name(name)
+                .description(description)
+                .build();
     }
 }
