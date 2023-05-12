@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import union from 'lodash/union';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
@@ -25,8 +25,9 @@ import PlotLegend from 'views/components/visualizations/PlotLegend';
 import useChartData from 'views/components/visualizations/useChartData';
 import type { Generator } from 'views/components/visualizations/ChartData';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
-import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import type Series from 'views/logic/aggregationbuilder/Series';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
+import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
@@ -52,18 +53,31 @@ const _horizontalDimensions = (idx: number, total: number) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries: Generator = ({ type, name, labels: x, values: y, idx, total, originalName }) => ({
+const _generateSeries = (mapKeys: KeyMapper): Generator => ({
   type,
   name,
-  hole: 0.4,
-  labels: x,
-  values: y,
-  domain: {
-    x: _horizontalDimensions(idx, total),
-    y: _verticalDimensions(idx, total),
-  },
+  labels,
+  values,
+  idx,
+  total,
   originalName,
-});
+  config,
+}) => {
+  const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+
+  return {
+    type,
+    name,
+    hole: 0.4,
+    labels: labels.map((label) => mapKeys(label, rowPivots[0])),
+    values,
+    domain: {
+      x: _horizontalDimensions(idx, total),
+      y: _verticalDimensions(idx, total),
+    },
+    originalName,
+  };
+};
 
 const getChartColor = (fullDataArray: ChartConfig[], name: string) => {
   const fullData = fullDataArray.find((d) => d.labels.indexOf(name) >= 0);
@@ -86,26 +100,15 @@ const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
 
 const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc, { labels }) => union(acc, labels), []);
 
-const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, isFunction: boolean) => {
-  if (rowPivots.length === 1 && series.length === 1 && rowPivots[0].fields?.length === 1 && !isFunction) {
-    return rowPivots[0].fields[0];
-  }
-
-  if (columnPivots.length === 1 && columnPivots[0].fields?.length === 1) {
-    return columnPivots[0].fields[0];
-  }
-
-  return null;
-};
+const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots?.flatMap((pivot) => pivot.fields);
 
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
-  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries });
-  const { columnPivots, rowPivots, series } = config;
-  const fieldMapper = useCallback((isFunction: boolean) => legendField(columnPivots, rowPivots, series, isFunction), [columnPivots, rowPivots, series]);
+  const mapKeys = useMapKeys();
+  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys) });
 
   return (
-    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} fieldMapper={fieldMapper} neverHide>
+    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide>
       <GenericPlot chartData={transformedData}
                    layout={{ showlegend: false }}
                    getChartColor={getChartColor}

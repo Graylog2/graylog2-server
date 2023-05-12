@@ -148,7 +148,7 @@ const _chartLayout = (heatmapData: ChartDefinition[]) => {
 const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('leaf') && source !== 'row-leaf';
 
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
+  const visualizationConfig = (config.visualizationConfig ?? HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const heatmapData = useChartData(rows, {
