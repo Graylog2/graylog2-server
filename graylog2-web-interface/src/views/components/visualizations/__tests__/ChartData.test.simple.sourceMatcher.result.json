@@ -4,7 +4,7 @@
     "originalName": "index⸱count()",
     "type": "scatter",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       2696
@@ -15,7 +15,7 @@
     "originalName": "index⸱sum(took_ms)",
     "type": "scatter",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       239622
@@ -26,7 +26,7 @@
     "originalName": "edit⸱count()",
     "type": "scatter",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       118
@@ -37,7 +37,7 @@
     "originalName": "edit⸱sum(took_ms)",
     "type": "scatter",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       6580

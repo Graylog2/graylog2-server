@@ -4,7 +4,7 @@
     "name": "index-count()",
     "originalName": "index⸱count()",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       2696
@@ -15,7 +15,7 @@
     "name": "index-sum(took_ms)",
     "originalName": "index⸱sum(took_ms)",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       239622
@@ -26,7 +26,7 @@
     "name": "edit-count()",
     "originalName": "edit⸱count()",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       118
@@ -37,7 +37,7 @@
     "name": "edit-sum(took_ms)",
     "originalName": "edit⸱sum(took_ms)",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       6580
@@ -48,7 +48,7 @@
     "name": "count()",
     "originalName": "count()",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       3680
@@ -59,7 +59,7 @@
     "name": "sum(took_ms)",
     "originalName": "sum(took_ms)",
     "x": [
-      "2018-05-24T14:03:00.000Z-PostsController"
+      "2018-05-24T14:03:00.000Z⸱PostsController"
     ],
     "y": [
       327284
