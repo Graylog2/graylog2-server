@@ -38,6 +38,8 @@ import java.util.Objects;
 
 import static org.graylog2.cluster.NodePreflightConfig.FIELD_CSR;
 import static org.graylog2.cluster.NodePreflightConfig.FIELD_NODEID;
+import static org.graylog2.cluster.NodePreflightConfig.FIELD_STATE;
+import static org.graylog2.cluster.NodePreflightConfig.State.CSR;
 
 public class NodePreflightConfigService extends PaginatedDbService<NodePreflightConfig> {
     public static final String COLLECTION_NAME = "node_preflight_config";
@@ -91,7 +93,9 @@ public class NodePreflightConfigService extends PaginatedDbService<NodePreflight
                             final String csr) {
         final WriteResult<NodePreflightConfig, String> result = dbCollection.update(
                 DBQuery.is(FIELD_NODEID, nodeId),
-                new DBUpdate.Builder().set(FIELD_CSR, csr),
+                new DBUpdate.Builder()
+                        .set(FIELD_CSR, csr)
+                        .set(FIELD_STATE, CSR),
                 false,
                 false);
 
