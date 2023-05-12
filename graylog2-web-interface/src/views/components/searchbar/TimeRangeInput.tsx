@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Overlay } from 'react-overlays';
@@ -23,6 +23,7 @@ import { Overlay } from 'react-overlays';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
@@ -65,6 +66,7 @@ const TimeRangeInput = ({
   limitDuration,
 }: Props) => {
   const containerRef = useRef();
+  const { showDropdownButton } = useContext(TimeRangeInputSettingsContext);
   const sendTelemetry = useSendTelemetry();
   const [show, setShow] = useState(false);
 
@@ -89,13 +91,14 @@ const TimeRangeInput = ({
 
   return (
     <FlexContainer className={className} ref={containerRef}>
+      {showDropdownButton && (
       <TimeRangeDropdownButton disabled={disabled}
-                               show={show}
                                toggleShow={toggleShow}
                                onPresetSelectOpen={hideTimeRangeDropDown}
                                setCurrentTimeRange={onChange}
                                showPresetDropdown={showPresetDropdown}
                                hasErrorOnMount={hasErrorOnMount} />
+      )}
       <Overlay show={show}
                trigger="click"
                placement="bottom"

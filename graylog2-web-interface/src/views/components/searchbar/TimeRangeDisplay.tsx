@@ -50,7 +50,7 @@ const TimeRangeWrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const dateOutput = (timerange: TimeRange) => {
+export const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 

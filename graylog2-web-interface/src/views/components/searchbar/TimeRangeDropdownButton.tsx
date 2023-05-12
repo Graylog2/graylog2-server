@@ -15,25 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
-import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
 
 type Props = {
-  children: React.ReactNode,
   disabled?: boolean,
   hasErrorOnMount?: boolean,
   onPresetSelectOpen: () => void,
   setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
-  show?: boolean,
   toggleShow: () => void,
   showPresetDropdown?: boolean,
 };
@@ -51,13 +47,10 @@ const TimeRangeDropdownButton = ({
   hasErrorOnMount,
   onPresetSelectOpen,
   setCurrentTimeRange,
-  show,
   showPresetDropdown = true,
   toggleShow,
 }: Props) => {
-  const { showDropdownButton } = useContext(TimeRangeInputSettingsContext);
   const { submitForm, isValid } = useFormikContext();
-  const containerRef = useRef();
 
   const _onClick = (e) => {
     e.currentTarget.blur();
@@ -94,21 +87,18 @@ const TimeRangeDropdownButton = ({
     : null;
 
   return (
-    showDropdownButton && (
-      <StyledButtonGroup>
-        <TimeRangeButton hasError={hasErrorOnMount}
-                         disabled={disabled}
-                         onClick={_onClick} />
-        {dropdown}
-      </StyledButtonGroup>
-    )
+    <StyledButtonGroup>
+      <TimeRangeButton hasError={hasErrorOnMount}
+                       disabled={disabled}
+                       onClick={_onClick} />
+      {dropdown}
+    </StyledButtonGroup>
   );
 };
 
 TimeRangeDropdownButton.defaultProps = {
   hasErrorOnMount: false,
   disabled: false,
-  show: false,
   showPresetDropdown: true,
 };
 

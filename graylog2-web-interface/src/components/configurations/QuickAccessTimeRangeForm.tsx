@@ -16,34 +16,32 @@
  */
 import type { Dispatch } from 'react';
 import React, { useCallback } from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import moment from 'moment/moment';
 import styled from 'styled-components';
+import Immutable from 'immutable';
+import debounce from 'lodash/debounce';
 
-import { Button, Input, Row } from 'components/bootstrap';
-import { Icon, Select } from 'components/common';
+import { Button, Input } from 'components/bootstrap';
+import { Icon, SortableList } from 'components/common';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { TimeRangeType } from 'views/components/searchbar/date-time-picker/TimeRangeDropdown';
-import TabRelativeTimeRange from 'views/components/searchbar/date-time-picker/TabRelativeTimeRange';
-import RelativeRangeSelect from 'views/components/searchbar/date-time-picker/RelativeRangeSelect';
-import {
-  classifyFromRange,
-  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-} from 'views/components/searchbar/date-time-picker/RelativeTimeRangeClassifiedHelper';
-import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import generateId from 'logic/generateId';
 
 export type QuickAccessTimeRange = {
   timerange: TimeRange,
   description: string,
+  id: string,
 }
 
 const ItemWrapper = styled.div`
   display: flex;
-  gap: 30px
+  align-items: stretch;
+  gap: 5px;
+  flex-grow: 1;
 `;
 
 const StyledInput = styled(Input)`
@@ -59,28 +57,28 @@ const Description = styled.div`
   display: flex;
 `;
 
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 5px
-`;
-
 type ItemProps = {
   idx: number,
+  id: string,
   timerange: TimeRange,
   description: string,
   onChange: (timerange: QuickAccessTimeRange, idx: number) => void,
   onRemove: (idx: number) => void,
 }
 
-const QuickAccessTimeRangeFormItem = ({ idx, timerange, description, onChange, onRemove }: ItemProps) => {
-  const handleOnChangeRange = useCallback((newTimerange) => {
-    onChange({ timerange: newTimerange, description }, idx);
-  }, [description, idx, onChange]);
+const contextSettings = {
+  showDropdownButton: false,
+  showRelativePresetsButton: false,
+};
 
-  const handleOnChangeDescription = useCallback(({ target: { value: newDescription } }) => {
-    onChange({ timerange, description: newDescription }, idx);
-  }, [onChange, timerange]);
+const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChange, onRemove }: ItemProps) => {
+  const handleOnChangeRange = useCallback((newTimerange) => {
+    onChange({ timerange: newTimerange, description, id }, idx);
+  }, [description, id, idx, onChange]);
+
+  const handleOnChangeDescription = useCallback((newDescription) => {
+    onChange({ timerange, description: newDescription, id }, idx);
+  }, [id, idx, onChange, timerange]);
 
   const handleOnRemove = useCallback(() => {
     onRemove(idx);
@@ -89,14 +87,16 @@ const QuickAccessTimeRangeFormItem = ({ idx, timerange, description, onChange, o
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
+  const debounceHandleOnChangeDescription = debounce((value: string) => handleOnChangeDescription(value), 1000);
+
   return (
     <ItemWrapper>
       <TimeRangeInput onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} />
       <Description>
         <StyledInput type="text"
                      placeholder="Add description..."
-                     value={description}
-                     onChange={handleOnChangeDescription}
+                     defaultValue={description}
+                     onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                      formGroupClassName="" />
         <IconWrapper className="input-group-addon">
           <Icon name="trash-alt" style={{ cursor: 'pointer' }} onClick={handleOnRemove} />
@@ -106,20 +106,35 @@ const QuickAccessTimeRangeFormItem = ({ idx, timerange, description, onChange, o
   );
 };
 
-const QuickAccessTimeRangeForm = ({ quickAccessTimeRangePresets, setQuickAccessTimeRangePresets }: {
-  quickAccessTimeRangePresets: Array<QuickAccessTimeRange>,
-  setQuickAccessTimeRangePresets: Dispatch<Array<QuickAccessTimeRange>>
+const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
+  options: Immutable.List<QuickAccessTimeRange>,
+  onUpdate: Dispatch<Immutable.List<QuickAccessTimeRange>>
 }) => {
   const onChange = useCallback((newPreset, idx) => {
-    const newState = [...quickAccessTimeRangePresets];
-    newState[idx] = newPreset;
-    setQuickAccessTimeRangePresets(newState);
-  }, [quickAccessTimeRangePresets, setQuickAccessTimeRangePresets]);
+    const newState = options.set(idx, newPreset);
+    onUpdate(newState);
+  }, [onUpdate, options]);
 
   const onRemove = useCallback((idx) => {
-    const newState = [...quickAccessTimeRangePresets].splice(idx, 1);
-    setQuickAccessTimeRangePresets(newState);
-  }, [quickAccessTimeRangePresets, setQuickAccessTimeRangePresets]);
+    const newState = options.delete(idx);
+    onUpdate(newState);
+  }, [onUpdate, options]);
+
+  const onMoveItem = useCallback((items) => {
+    onUpdate(Immutable.List(items));
+  }, [onUpdate]);
+
+  const addTimeRange = useCallback(() => {
+    onUpdate(options.push({
+      id: generateId(),
+      description: '',
+      timerange: { type: 'relative', from: 300 },
+    }));
+  }, [onUpdate, options]);
+
+  const customContentRender = useCallback(({ item: { id, description, timerange }, index }) => (
+    <QuickAccessTimeRangeFormItem id={id} onRemove={onRemove} idx={index} onChange={onChange} timerange={timerange} description={description} />
+  ), [onChange, onRemove]);
 
   return (
     <div className="form-group">
@@ -128,30 +143,19 @@ const QuickAccessTimeRangeForm = ({ quickAccessTimeRangePresets, setQuickAccessT
         <span>Configure the available options for the <strong>quick access</strong> time range selector</span>
       </span>
       <div className="wrapper">
-        <TimeRangeInputSettingsContext.Provider value={{
-          showDropdownButton: false,
-          showRelativePresetsButton: false,
-        }}>
+        <TimeRangeInputSettingsContext.Provider value={contextSettings}>
           <Formik initialValues={{}} onSubmit={() => {}}>
             <Form>
-              <List>
-                {
-                  quickAccessTimeRangePresets.map(({ timerange, description }, idx) => {
-                    return (
-                      <QuickAccessTimeRangeFormItem timerange={timerange}
-                                                    description={description}
-                                                    onChange={onChange}
-                                                    idx={idx}
-                                                    onRemove={onRemove} />
-                    );
-                  })
-                }
-              </List>
+              <SortableList items={options.toArray()}
+                            onMoveItem={onMoveItem}
+                            displayOverlayInPortal
+                            alignItemContent="center"
+                            customContentRender={customContentRender} />
             </Form>
           </Formik>
         </TimeRangeInputSettingsContext.Provider>
       </div>
-      <Button bsSize="xs" onClick={() => {}}>Add</Button>
+      <Button bsSize="xs" onClick={addTimeRange}>Add</Button>
     </div>
   );
 };
