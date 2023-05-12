@@ -108,41 +108,39 @@ class AggregationConditionExpression extends React.Component {
     onChange({ conditions: null });
   };
 
-  handleChildChange = (branch) => {
-    return (changes) => {
-      const { expression, onChange } = this.props;
+  handleChildChange = (branch) => (changes) => {
+    const { expression, onChange } = this.props;
 
-      if (!Object.keys(changes).includes('conditions')) {
-        onChange(changes);
+    if (!Object.keys(changes).includes('conditions')) {
+      onChange(changes);
 
-        return;
-      }
+      return;
+    }
 
-      const update = changes.conditions;
-      let nextUpdate;
+    const update = changes.conditions;
+    let nextUpdate;
 
-      // A null update indicates that one of the branches got removed
-      if (update === null) {
-        if (branch === 'child') {
-          // If this is the last branch of a group, remove the group altogether
-          nextUpdate = null;
-        } else {
-          // Otherwise replace the current tree with the still existing branch
-          nextUpdate = expression[(branch === 'left' ? 'right' : 'left')];
-        }
-      } else if (branch === 'child' && update.expr === 'group') {
-        // Avoid that a group's child is another group. Groups should at least have one expression
-        nextUpdate = update;
+    // A null update indicates that one of the branches got removed
+    if (update === null) {
+      if (branch === 'child') {
+        // If this is the last branch of a group, remove the group altogether
+        nextUpdate = null;
       } else {
-        // Propagate the update in the expression tree.
-        const nextExpression = cloneDeep(expression);
-
-        nextExpression[branch] = update;
-        nextUpdate = nextExpression;
+        // Otherwise replace the current tree with the still existing branch
+        nextUpdate = expression[(branch === 'left' ? 'right' : 'left')];
       }
+    } else if (branch === 'child' && update.expr === 'group') {
+      // Avoid that a group's child is another group. Groups should at least have one expression
+      nextUpdate = update;
+    } else {
+      // Propagate the update in the expression tree.
+      const nextExpression = cloneDeep(expression);
 
-      onChange({ ...changes, conditions: nextUpdate });
-    };
+      nextExpression[branch] = update;
+      nextUpdate = nextExpression;
+    }
+
+    onChange({ ...changes, conditions: nextUpdate });
   };
 
   handleOperatorChange = (nextOperator) => {

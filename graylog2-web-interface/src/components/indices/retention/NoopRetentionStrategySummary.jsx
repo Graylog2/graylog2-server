@@ -16,15 +16,13 @@
  */
 import React from 'react';
 
-const NoopRetentionStrategySummary = () => {
-  return (
-    <div>
-      <dl>
-        <dt>Index retention strategy:</dt>
-        <dd>Do nothing</dd>
-      </dl>
-    </div>
-  );
-};
+const NoopRetentionStrategySummary = () => (
+  <div>
+    <dl>
+      <dt>Index retention strategy:</dt>
+      <dd>Do nothing</dd>
+    </dl>
+  </div>
+);
 
 export default NoopRetentionStrategySummary;

@@ -37,13 +37,11 @@ describe('<UsersSelectField>', () => {
   const onChange = jest.fn();
   const value = 'Baker Owens,Wiggins Vicki,tester,Abbott Schneider';
 
-  const renderUSF = (values) => {
-    return render(
-      <CurrentUserContext.Provider value={adminUser}>
-        <UsersSelectField value={values} onChange={onChange} />
-      </CurrentUserContext.Provider>,
-    );
-  };
+  const renderUSF = (values) => render(
+    <CurrentUserContext.Provider value={adminUser}>
+      <UsersSelectField value={values} onChange={onChange} />
+    </CurrentUserContext.Provider>,
+  );
 
   it('should render UserSelectField', async () => {
     UsersDomain.loadUsersPaginated = mockAction(jest.fn(() => mockLoadUserPaginatedPromise));

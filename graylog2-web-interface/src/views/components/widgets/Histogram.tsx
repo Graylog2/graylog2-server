@@ -21,9 +21,7 @@ import moment from 'moment';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 
-const _formatTimestamp = (epoch) => {
-  return moment.unix(epoch).format('YYYY-MM-DD HH:mm:ss');
-};
+const _formatTimestamp = (epoch) => moment.unix(epoch).format('YYYY-MM-DD HH:mm:ss');
 
 const _generateSeries = (results): Plotly.Data[] => {
   const data = Immutable.OrderedMap<string, number>(results);

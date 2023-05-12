@@ -46,14 +46,12 @@ class NodesActions extends React.Component {
     }
   };
 
-  _changeLBStatus = (status) => {
-    return () => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`You are about to change the load balancer status for this node to ${status}. Are you sure?`)) {
-        const { node } = this.props;
-        SystemLoadBalancerStore.override(node.node_id, status);
-      }
-    };
+  _changeLBStatus = (status) => () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`You are about to change the load balancer status for this node to ${status}. Are you sure?`)) {
+      const { node } = this.props;
+      SystemLoadBalancerStore.override(node.node_id, status);
+    }
   };
 
   render() {

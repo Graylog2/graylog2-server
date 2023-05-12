@@ -69,13 +69,9 @@ const ConfigurationForm = ({
     CollectorsActions.all().then((response) => setCollectors(response.collectors));
   }, []);
 
-  const _isTemplateSet = (template) => {
-    return template !== undefined && template !== '';
-  };
+  const _isTemplateSet = (template) => template !== undefined && template !== '';
 
-  const _hasErrors = () => {
-    return error || !_isTemplateSet(formData.template);
-  };
+  const _hasErrors = () => error || !_isTemplateSet(formData.template);
 
   const _validateFormData = (nextFormData, checkForRequiredFields) => {
     CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
@@ -109,18 +105,16 @@ const ConfigurationForm = ({
 
   const _debouncedValidateFormData = debounce(_validateFormData, 200);
 
-  const _formDataUpdate = (key) => {
-    return (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
-      const nextFormData = cloneDeep(formData);
+  const _formDataUpdate = (key) => (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
+    const nextFormData = cloneDeep(formData);
 
-      nextFormData[key] = nextValue;
-      _debouncedValidateFormData(nextFormData, false);
-      setFormData(nextFormData);
+    nextFormData[key] = nextValue;
+    _debouncedValidateFormData(nextFormData, false);
+    setFormData(nextFormData);
 
-      if (hideCallback) {
-        hideCallback();
-      }
-    };
+    if (hideCallback) {
+      hideCallback();
+    }
   };
 
   const _onTemplateChange = (nextTemplate) => {
@@ -208,9 +202,7 @@ const ConfigurationForm = ({
     setShowUploadsModal(true);
   };
 
-  const _formatCollector = (collector) => {
-    return collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector';
-  };
+  const _formatCollector = (collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
 
   const _formatCollectorOptions = () => {
     const options = [];

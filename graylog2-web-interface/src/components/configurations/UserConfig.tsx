@@ -66,9 +66,10 @@ const UserConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values) => {
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_user',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'user',
+      app_action_value: 'configuration-save',
     });
 
     ConfigurationsActions.update(ConfigurationType.USER_CONFIG, values).then(() => {
@@ -81,9 +82,7 @@ const UserConfig = () => {
     setFormConfig(viewConfig);
   };
 
-  const timeoutIntervalValidator = (milliseconds: number) => {
-    return milliseconds >= 1000;
-  };
+  const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
 
   const modalTitle = 'Update User Configuration';
 
@@ -121,52 +120,50 @@ const UserConfig = () => {
                  data-app-section="configurations_user"
                  data-event-element={modalTitle}>
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
-              {({ isSubmitting, values, setFieldValue }) => {
-                return (
-                  <Form>
-                    <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
-                    </Modal.Header>
+              {({ isSubmitting, values, setFieldValue }) => (
+                <Form>
+                  <Modal.Header closeButton>
+                    <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                  </Modal.Header>
 
-                    <Modal.Body>
-                      <div>
-                        <Row>
-                          <Col sm={12}>
-                            <FormikInput type="checkbox"
-                                         name="enable_global_session_timeout"
-                                         id="enable_global_session_timeout"
-                                         label={(
-                                           <LabelSpan>Enable global session timeout</LabelSpan>
+                  <Modal.Body>
+                    <div>
+                      <Row>
+                        <Col sm={12}>
+                          <FormikInput type="checkbox"
+                                       name="enable_global_session_timeout"
+                                       id="enable_global_session_timeout"
+                                       label={(
+                                         <LabelSpan>Enable global session timeout</LabelSpan>
                                          )} />
-                            <InputDescription help="If enabled, it will be set for all the users." />
-                          </Col>
-                          <Col sm={12}>
-                            <fieldset>
-                              <ISODurationInput id="global_session_timeout_interval"
-                                                duration={values.global_session_timeout_interval}
-                                                update={(value) => setFieldValue('global_session_timeout_interval', value)}
-                                                label="Global session timeout interval (as ISO8601 Duration)"
-                                                help="Session automatically end after this amount of time, unless they are actively used."
-                                                validator={timeoutIntervalValidator}
-                                                errorText="invalid (min: 1 second)"
-                                                disabled={!values.enable_global_session_timeout}
-                                                required />
-                            </fieldset>
-                          </Col>
-                        </Row>
-                      </div>
-                    </Modal.Body>
+                          <InputDescription help="If enabled, it will be set for all the users." />
+                        </Col>
+                        <Col sm={12}>
+                          <fieldset>
+                            <ISODurationInput id="global_session_timeout_interval"
+                                              duration={values.global_session_timeout_interval}
+                                              update={(value) => setFieldValue('global_session_timeout_interval', value)}
+                                              label="Global session timeout interval (as ISO8601 Duration)"
+                                              help="Session automatically end after this amount of time, unless they are actively used."
+                                              validator={timeoutIntervalValidator}
+                                              errorText="invalid (min: 1 second)"
+                                              disabled={!values.enable_global_session_timeout}
+                                              required />
+                          </fieldset>
+                        </Col>
+                      </Row>
+                    </div>
+                  </Modal.Body>
 
-                    <Modal.Footer>
-                      <ModalSubmit onCancel={resetConfig}
-                                   isSubmitting={isSubmitting}
-                                   isAsyncSubmit
-                                   submitLoadingText="Update configuration"
-                                   submitButtonText="Update configuration" />
-                    </Modal.Footer>
-                  </Form>
-                );
-              }}
+                  <Modal.Footer>
+                    <ModalSubmit onCancel={resetConfig}
+                                 isSubmitting={isSubmitting}
+                                 isAsyncSubmit
+                                 submitLoadingText="Update configuration"
+                                 submitButtonText="Update configuration" />
+                  </Modal.Footer>
+                </Form>
+              )}
             </Formik>
           </Modal>
         </>

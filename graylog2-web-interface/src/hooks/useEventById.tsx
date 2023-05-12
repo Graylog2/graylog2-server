@@ -24,11 +24,7 @@ import type FetchError from 'logic/errors/FetchError';
 
 export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
 
-const fetchEvent = (eventId: string) => {
-  return fetch('GET', eventsUrl(eventId)).then((data) => {
-    return data.event;
-  });
-};
+const fetchEvent = (eventId: string) => fetch('GET', eventsUrl(eventId)).then((data) => data.event);
 
 const useEventById = (eventId: string, { onErrorHandler }: { onErrorHandler?: (e: FetchError)=>void} = {}): {
   data: Event,

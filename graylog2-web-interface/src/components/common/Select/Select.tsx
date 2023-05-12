@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import type { Theme as SelectTheme, InputActionMeta } from 'react-select';
+import type { Theme as SelectTheme, InputActionMeta, GroupBase, SelectInstance } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import isEqual from 'lodash/isEqual';
 import type { DefaultTheme } from 'styled-components';
@@ -224,7 +224,7 @@ export type Props<OptionValue> = {
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
-  forwardedRef?: React.Ref<React.ComponentType>,
+  forwardedRef?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
   id?: string,
   ignoreAccents?: boolean,
   inputId?: string,
@@ -243,7 +243,7 @@ export type Props<OptionValue> = {
   placeholder: string,
   persistSelection: boolean,
   // eslint-disable-next-line react/require-default-props
-  ref?: React.Ref<React.ComponentType>,
+  ref?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   required?: boolean,
@@ -591,7 +591,11 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       ...customComponents,
     };
 
-    const selectProps: React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect> = {
+    const selectProps: (React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect>) & {
+      async: boolean,
+      loadOptions: () => void,
+      total: number,
+    } = {
       ...rest,
       onChange: onReactSelectChange || this._onChange,
       onInputChange,
@@ -600,12 +604,12 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       isDisabled,
       isClearable,
       loadOptions,
-      getOptionLabel: (option) => option[displayKey] || option.label,
+      getOptionLabel: (option: { label?: string }) => option[displayKey] || option.label,
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
       components: mergedComponents,
       menuPortalTarget: menuPortalTarget,
-      isOptionDisabled: (option) => !!option.disabled,
+      isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
       styles: _styles({ size, theme }),
       theme: this._selectTheme,
       total,

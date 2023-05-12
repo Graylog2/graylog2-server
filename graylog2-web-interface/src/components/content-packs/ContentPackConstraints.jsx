@@ -84,7 +84,7 @@ class ContentPackConstraints extends React.Component {
         <DataTable id="content-packs-constraints"
                    headers={headers}
                    headerCellFormatter={(header) => <th>{header}</th>}
-                   sortBy={(row) => { return row.constraint ? row.constraint.type : row.type; }}
+                   sortBy={(row) => (row.constraint ? row.constraint.type : row.type)}
                    dataRowFormatter={this._rowFormatter}
                    rows={constraints}
                    filterKeys={[]} />

@@ -229,9 +229,7 @@ class ExtractorsListItem extends React.Component {
 
     const attributes = Object.keys(options);
 
-    return attributes.map((attribute) => {
-      return <li key={`${attribute}-${extractor.id}`}>{attribute}: {options[attribute]}</li>;
-    });
+    return attributes.map((attribute) => <li key={`${attribute}-${extractor.id}`}>{attribute}: {options[attribute]}</li>);
   };
 
   _formatConfiguration = (extractorConfig) => {
@@ -251,14 +249,12 @@ class ExtractorsListItem extends React.Component {
     );
   };
 
-  _formatConverter = (key, converter) => {
-    return (
-      <li key={`converter-${key}`}>
-        {converter.type}
-        {converter.config && <ul>{this._formatOptions(converter.config)}</ul>}
-      </li>
-    );
-  };
+  _formatConverter = (key, converter) => (
+    <li key={`converter-${key}`}>
+      {converter.type}
+      {converter.config && <ul>{this._formatOptions(converter.config)}</ul>}
+    </li>
+  );
 
   _formatConverters = (converters) => {
     const converterKeys = Object.keys(converters);

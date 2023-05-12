@@ -81,64 +81,58 @@ class KeyValueTable extends React.Component {
     this.setState({ newKey: '', newValue: '' });
   };
 
-  _deleteRow = (key) => {
-    return () => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
-        const newPairs = ObjectUtils.clone(this.props.pairs);
+  _deleteRow = (key) => () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
+      const newPairs = ObjectUtils.clone(this.props.pairs);
 
-        delete newPairs[key];
-        this._onPairsChange(newPairs);
-      }
-    };
+      delete newPairs[key];
+      this._onPairsChange(newPairs);
+    }
   };
 
-  _formattedHeaders = (headers) => {
-    return (
-      <tr>
-        {headers.map((header, idx) => {
-          const customStyle = {};
+  _formattedHeaders = (headers) => (
+    <tr>
+      {headers.map((header, idx) => {
+        const customStyle = {};
 
-          // Hide last column or apply width so it sticks to the right
-          if (idx === headers.length - 1) {
-            if (!this.props.editable) {
-              return null;
-            }
-
-            customStyle.width = 75;
+        // Hide last column or apply width so it sticks to the right
+        if (idx === headers.length - 1) {
+          if (!this.props.editable) {
+            return null;
           }
 
-          return <th key={header} style={customStyle}>{header}</th>;
-        })}
+          customStyle.width = 75;
+        }
+
+        return <th key={header} style={customStyle}>{header}</th>;
+      })}
+    </tr>
+  );
+
+  _formattedRows = (pairs) => Object.keys(pairs).sort().map((key) => {
+    let actionsColumn;
+
+    if (this.props.editable) {
+      const actions = [];
+
+      actions.push(
+        <Button key={`delete-${key}`} bsStyle="danger" bsSize={this.props.actionsSize} onClick={this._deleteRow(key)}>
+          Delete
+        </Button>,
+      );
+
+      actionsColumn = <td>{actions}</td>;
+    }
+
+    return (
+      <tr key={key}>
+        <td>{key}</td>
+        <td>{pairs[key]}</td>
+        {actionsColumn}
       </tr>
     );
-  };
-
-  _formattedRows = (pairs) => {
-    return Object.keys(pairs).sort().map((key) => {
-      let actionsColumn;
-
-      if (this.props.editable) {
-        const actions = [];
-
-        actions.push(
-          <Button key={`delete-${key}`} bsStyle="danger" bsSize={this.props.actionsSize} onClick={this._deleteRow(key)}>
-            Delete
-          </Button>,
-        );
-
-        actionsColumn = <td>{actions}</td>;
-      }
-
-      return (
-        <tr key={key}>
-          <td>{key}</td>
-          <td>{pairs[key]}</td>
-          {actionsColumn}
-        </tr>
-      );
-    });
-  };
+  });
 
   _newRow = () => {
     if (!this.props.editable) {

@@ -52,9 +52,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
-    const nextErrorAnnotations = nextErrors.map((e) => {
-      return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
-    });
+    const nextErrorAnnotations = nextErrors.map((e) => ({ row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' }));
 
     ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
   }, []);

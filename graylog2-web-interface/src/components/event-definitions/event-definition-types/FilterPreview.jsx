@@ -38,16 +38,12 @@ class FilterPreview extends React.Component {
     displayPreview: false,
   };
 
-  renderMessages = (messages) => {
-    return messages.map(({ index, message }) => {
-      return (
-        <tr key={`${index}-${message._id}`}>
-          <td>{message.timestamp}</td>
-          <td>{message.message}</td>
-        </tr>
-      );
-    });
-  };
+  renderMessages = (messages) => messages.map(({ index, message }) => (
+    <tr key={`${index}-${message._id}`}>
+      <td>{message.timestamp}</td>
+      <td>{message.message}</td>
+    </tr>
+  ));
 
   renderSearchResult = (searchResult = {}) => {
     if (!searchResult.messages || searchResult.messages.length === 0) {

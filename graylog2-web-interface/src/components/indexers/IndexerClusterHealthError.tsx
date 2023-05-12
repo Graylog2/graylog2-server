@@ -26,13 +26,11 @@ const ESClusterError = styled(Alert)`
   margin-bottom: 5px;
 `;
 
-const IndexerClusterHealthError = ({ error }: { error: FetchError }) => {
-  return (
-    <ESClusterError bsStyle="danger">
-      <Icon name="exclamation-triangle" /> &nbsp;
-      Could not retrieve Elasticsearch cluster health. Fetching Elasticsearch cluster health failed: {error.message}
-    </ESClusterError>
-  );
-};
+const IndexerClusterHealthError = ({ error }: { error: FetchError }) => (
+  <ESClusterError bsStyle="danger">
+    <Icon name="exclamation-triangle" /> &nbsp;
+    Could not retrieve Elasticsearch cluster health. Fetching Elasticsearch cluster health failed: {error.message}
+  </ESClusterError>
+);
 
 export default IndexerClusterHealthError;

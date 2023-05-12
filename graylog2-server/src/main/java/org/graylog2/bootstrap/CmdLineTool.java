@@ -428,6 +428,14 @@ public abstract class CmdLineTool implements CliCommand {
                 coreConfigInjector);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
             final PluginMetaData metadata = plugin.metadata();
+
+            final Configuration config = coreConfigInjector.getInstance(Configuration.class);
+            // TODO do we want this here? We are also considering removing the deprecated CollectorPlugin entirely
+            if (config.isCloud()) {
+                if (metadata.getUniqueId().equals("org.graylog.plugins.collector.CollectorPlugin")) {
+                    continue;
+                }
+            }
             if (capabilities().containsAll(metadata.getRequiredCapabilities())) {
                 if (version.sameOrHigher(metadata.getRequiredVersion())) {
                     LOG.info("Loaded plugin: {}", plugin);

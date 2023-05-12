@@ -58,8 +58,9 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
 
   const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => {
     sendTelemetry('click', {
-      appSection: 'edit_role',
-      eventElement: 'assign-user',
+      app_pathname: 'roles',
+      app_section: 'role-edit',
+      app_action_value: 'assign-user',
     });
 
     return AuthzRolesDomain.addMembers(id,
@@ -73,8 +74,9 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
 
   const _onUnassignUser = (user) => {
     sendTelemetry('click', {
-      appSection: 'edit_role',
-      eventElement: 'unassign-user',
+      app_pathname: 'roles',
+      app_section: 'role-edit',
+      app_action_value: 'unassign-user',
     });
 
     if ((role.name === 'Reader' || role.name === 'Admin')

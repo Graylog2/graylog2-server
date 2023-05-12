@@ -207,12 +207,10 @@ export const MetricsStore = singletonStore(
       const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
         const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
 
-        return fetch('GET', url).then((response) => {
-          return { nodeId: nodeId, names: response.metrics };
-        }, (error) => {
+        return fetch('GET', url).then((response) => ({ nodeId: nodeId, names: response.metrics }), (error) =>
         // When fetching metrics fails, keep previous available metrics around, letting user see them
-          return { nodeId: nodeId, names: this.metricsNames[nodeId], error: error };
-        });
+          ({ nodeId: nodeId, names: this.metricsNames[nodeId], error: error }),
+        );
       })).then((responses) => {
         const metricsNames = {};
         const metricsErrors = {};

@@ -113,6 +113,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
+import static org.graylog2.plugin.ServerStatus.Capability.CLOUD;
+import static org.graylog2.plugin.ServerStatus.Capability.MASTER;
+import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
 
 @Command(name = "server", description = "Start the Graylog server")
 public class Server extends ServerBootstrap {
@@ -285,12 +288,18 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
+        final EnumSet<ServerStatus.Capability> capabilities = EnumSet.of(SERVER);
+
         if (configuration.isLeader()) {
             //noinspection deprecation
-            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
-        } else {
-            return EnumSet.of(ServerStatus.Capability.SERVER);
+            capabilities.add(MASTER);
         }
+
+        if (configuration.isCloud()) {
+            capabilities.add(CLOUD);
+        }
+
+        return capabilities;
     }
 
     private static class ShutdownHook implements Runnable {

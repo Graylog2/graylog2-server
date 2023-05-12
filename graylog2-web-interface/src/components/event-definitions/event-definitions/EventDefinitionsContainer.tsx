@@ -36,9 +36,7 @@ import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
 import { SYSTEM_EVENT_DEFINITION_TYPE, ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
 
-const isSystemEventDefinition = (eventDefinition: EventDefinition): boolean => {
-  return eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
-};
+const isSystemEventDefinition = (eventDefinition: EventDefinition): boolean => eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
 
 const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
   attributes: {

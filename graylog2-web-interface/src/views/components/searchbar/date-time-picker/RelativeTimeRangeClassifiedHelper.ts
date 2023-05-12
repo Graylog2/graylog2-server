@@ -81,9 +81,7 @@ export const classifyRelativeTimeRange = (timeRange: RelativeTimeRange): Relativ
   };
 };
 
-export const isTypeRelativeClassified = (timeRange): timeRange is RelativeTimeRangeClassified => {
-  return (timeRange.type === 'relative' && typeof timeRange.from === 'object' && typeof timeRange.to === 'object');
-};
+export const isTypeRelativeClassified = (timeRange): timeRange is RelativeTimeRangeClassified => (timeRange.type === 'relative' && typeof timeRange.from === 'object' && typeof timeRange.to === 'object');
 
 export const normalizeClassifiedRange = ({ value, unit, isAllTime }: RangeClassified) => {
   if (isAllTime) {

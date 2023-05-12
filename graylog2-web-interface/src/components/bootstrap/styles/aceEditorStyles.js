@@ -16,8 +16,7 @@
  */
 import { css } from 'styled-components';
 
-const aceEditorStyles = ({ colors }) => {
-  return css`
+const aceEditorStyles = ({ colors }) => css`
     .ace_editor {
       border: 1px solid ${colors.gray[80]};
       border-radius: 5px;
@@ -146,6 +145,5 @@ const aceEditorStyles = ({ colors }) => {
       }
     }
 `;
-};
 
 export default aceEditorStyles;

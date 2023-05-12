@@ -104,9 +104,9 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
       event.stopPropagation();
     }
 
-    sendTelemetry('submit_form', {
-      appSection: 'configurations_url_whitelist',
-      eventElement: 'update_configuration_button',
+    sendTelemetry('form_submit', {
+      app_section: 'urlwhitelist',
+      app_action_value: 'configuration-update',
     });
 
     if (isValid) {
@@ -154,7 +154,8 @@ URLWhiteListFormModal.propTypes = {
 
 URLWhiteListFormModal.defaultProps = {
   newUrlEntry: '',
-  onUpdate: () => {},
+  onUpdate: () => {
+  },
   urlType: undefined,
 };
 

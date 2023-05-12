@@ -30,9 +30,7 @@ import generateId from 'logic/generateId';
 import FilterPreview from './FilterPreview';
 
 const isPermittedToSeePreview = (currentUser, config) => {
-  const missingPermissions = config.streams.some((stream) => {
-    return !isPermitted(currentUser.permissions, `streams:read:${stream}`);
-  });
+  const missingPermissions = config.streams.some((stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`));
 
   return !missingPermissions;
 };

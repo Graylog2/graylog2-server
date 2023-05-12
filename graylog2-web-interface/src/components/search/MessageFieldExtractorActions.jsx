@@ -43,15 +43,13 @@ class MessageFieldExtractorActions extends React.Component {
       props.message.id);
   };
 
-  _formatExtractorMenuItem = (extractorType) => {
-    return (
-      <LinkContainer key={`menu-item-${extractorType}`} to={this.newExtractorRoutes[extractorType]}>
-        <MenuItem>
-          {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
-        </MenuItem>
-      </LinkContainer>
-    );
-  };
+  _formatExtractorMenuItem = (extractorType) => (
+    <LinkContainer key={`menu-item-${extractorType}`} to={this.newExtractorRoutes[extractorType]}>
+      <MenuItem>
+        {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
+      </MenuItem>
+    </LinkContainer>
+  );
 
   render() {
     const { fieldName, message } = this.props;

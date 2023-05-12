@@ -23,10 +23,12 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.searches.timerangepresets.TimerangePreset;
 import org.graylog2.plugin.Message;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,6 +83,9 @@ public abstract class SearchesClusterConfig {
 
     private static final Period DEFAULT_AUTO_REFRESH_DEFAULT_OPTION = Period.seconds(5);
 
+    @JsonProperty("quick_access_timerange_presets")
+    public abstract List<TimerangePreset> quickAccessTimerangePresets();
+
     @JsonProperty("query_time_range_limit")
     public abstract Period queryTimeRangeLimit();
 
@@ -109,8 +114,11 @@ public abstract class SearchesClusterConfig {
                                                @JsonProperty("surrounding_filter_fields") Set<String> surroundingFilterFields,
                                                @JsonProperty("analysis_disabled_fields") @Nullable Set<String> analysisDisabledFields,
                                                @JsonProperty("auto_refresh_timerange_options") @Nullable Map<Period, String> autoRefreshTimerangeOptions,
-                                               @JsonProperty("default_auto_refresh_option") Period defaultAutoRefreshOption) {
+                                               @JsonProperty("default_auto_refresh_option") Period defaultAutoRefreshOption,
+                                               @JsonProperty("quick_access_timerange_presets") @Nullable List<TimerangePreset> quickAccessTimerangePresets
+    ) {
         return builder()
+                .quickAccessTimerangePresets(quickAccessTimerangePresets == null ? List.of() : quickAccessTimerangePresets)
                 .queryTimeRangeLimit(queryTimeRangeLimit)
                 .relativeTimerangeOptions(relativeTimerangeOptions)
                 .surroundingTimerangeOptions(surroundingTimerangeOptions)
@@ -130,6 +138,7 @@ public abstract class SearchesClusterConfig {
                 .analysisDisabledFields(DEFAULT_ANALYSIS_DISABLED_FIELDS)
                 .autoRefreshTimerangeOptions(DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS)
                 .defaultAutoRefreshOption(DEFAULT_AUTO_REFRESH_DEFAULT_OPTION)
+                .quickAccessTimerangePresets(List.of())
                 .build();
     }
 
@@ -141,12 +150,20 @@ public abstract class SearchesClusterConfig {
 
     @AutoValue.Builder
     public static abstract class Builder {
+        public abstract Builder quickAccessTimerangePresets(List<TimerangePreset> quickAccessTimerangePresets);
+
         public abstract Builder queryTimeRangeLimit(Period queryTimeRangeLimit);
+
         public abstract Builder relativeTimerangeOptions(Map<Period, String> relativeTimerangeOptions);
+
         public abstract Builder surroundingTimerangeOptions(Map<Period, String> surroundingTimerangeOptions);
+
         public abstract Builder surroundingFilterFields(Set<String> surroundingFilterFields);
+
         public abstract Builder analysisDisabledFields(Set<String> analysisDisabledFields);
+
         public abstract Builder autoRefreshTimerangeOptions(Map<Period, String> autoRefreshTimerangeOptions);
+
         public abstract Builder defaultAutoRefreshOption(Period defaultAutoRefreshOption);
 
         public abstract SearchesClusterConfig build();

@@ -34,7 +34,7 @@
         <Logger name="com.azure.messaging.eventhubs.PartitionPumpManager" level="off"/>
         <Logger name="com.azure.core.amqp.implementation.ReactorReceiver" level="off"/>
         <Logger name="com.azure.core.amqp.implementation.ReactorDispatcher" level="off"/>
-        <Root level="warn">
+        <Root level="info">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>
         </Root>

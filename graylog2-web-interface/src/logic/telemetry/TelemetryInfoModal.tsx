@@ -25,18 +25,16 @@ type Props = {
   onConfirm: () => void,
 }
 
-const TelemetryInfoModal = ({ show, onConfirm }: Props) => {
-  return (
-    <ConfirmDialog show={show}
-                   onConfirm={onConfirm}
-                   hideCancelButton={false}
-                   onCancel={onConfirm}
-                   title="Help us improve Graylog"
-                   btnConfirmText="Ok">
-      <TelemetryInfoText showProfile />
-    </ConfirmDialog>
-  );
-};
+const TelemetryInfoModal = ({ show, onConfirm }: Props) => (
+  <ConfirmDialog show={show}
+                 onConfirm={onConfirm}
+                 hideCancelButton={false}
+                 onCancel={onConfirm}
+                 title="Help us improve Graylog"
+                 btnConfirmText="Ok">
+    <TelemetryInfoText showProfile />
+  </ConfirmDialog>
+);
 
 TelemetryInfoModal.propTypes = {
   show: PropTypes.bool.isRequired,

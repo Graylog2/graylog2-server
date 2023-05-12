@@ -179,14 +179,12 @@ const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
     }).format(DATE_TIME_FORMATS.default);
   };
 
-  const handleTimeToggle = (eod = false) => {
-    return moment({
-      ...initialDateTime,
-      hours: eod ? 23 : 0,
-      minutes: eod ? 59 : 0,
-      seconds: eod ? 59 : 0,
-    }).format(DATE_TIME_FORMATS.default);
-  };
+  const handleTimeToggle = (eod = false) => moment({
+    ...initialDateTime,
+    hours: eod ? 23 : 0,
+    minutes: eod ? 59 : 0,
+    seconds: eod ? 59 : 0,
+  }).format(DATE_TIME_FORMATS.default);
 
   return {
     initialDateTime,
