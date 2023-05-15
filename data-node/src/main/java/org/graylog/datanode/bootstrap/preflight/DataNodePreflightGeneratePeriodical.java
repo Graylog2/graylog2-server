@@ -44,6 +44,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final NodeId nodeId;
     private final PrivateKeyEncryptedFileStorage privateKeyEncryptedStorage;
     private final CsrStorage csrStorage;
+    private final CsrGenerator csrGenerator;
 
     //TODO: decide on password handling
     private static final String DEFAULT_PASSWORD = "admin";
@@ -52,11 +53,13 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
                                                final NodeService nodeService,
                                                final NodeId nodeId,
-                                               final CsrMongoStorage csrStorage) {
+                                               final CsrMongoStorage csrStorage,
+                                               final CsrGenerator csrGenerator) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.csrStorage = csrStorage;
+        this.csrGenerator = csrGenerator;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
     }
@@ -71,7 +74,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
-                var csr = new CsrGenerator().generateCSR(DEFAULT_PASSWORD.toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
+                var csr = csrGenerator.generateCSR(DEFAULT_PASSWORD.toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
                 csrStorage.writeCsr(csr);
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorCreationException ex) {
