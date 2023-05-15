@@ -22,6 +22,7 @@ import com.google.common.collect.Streams;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.shaded.opensearch2.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
@@ -155,6 +156,9 @@ public class OpenSearchClient {
                 throw new BatchSizeTooLargeException(openSearchException.getMessage());
             }
         }
+        if (e instanceof ResponseException) {
+
+        }
         return new OpenSearchException(errorMessage, e);
     }
 
@@ -187,6 +191,10 @@ public class OpenSearchClient {
             if (parsedException.type().equals("search_phase_execution_exception")) {
                 ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getRootCause().getMessage());
                 return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (OpenSearchStatusException openSearchStatusException) {
+            if (openSearchStatusException.getCause() instanceof ResponseException responseException) {
+                return responseException.getMessage().contains("429 Too Many Requests");
             }
         } catch (Exception e) {
             return false;
