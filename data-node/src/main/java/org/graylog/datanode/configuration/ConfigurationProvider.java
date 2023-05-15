@@ -67,6 +67,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         final var cfg = sharedConfiguration.test();
 
         final String opensearchConfigLocation = localConfiguration.getOpensearchConfigLocation();
+        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
         final Path datanodeConfigDir = Path.of(localConfiguration.getConfigLocation());
         final Path opensearchConfigDir = Path.of(opensearchConfigLocation).resolve("opensearch");
 
