@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
-import { parameters } from 'test/fixtures/createEventDefinitionFromValue';
+import React, { useEffect, useState } from 'react';
 
 import { Input } from 'components/bootstrap';
 import { RuleBuilderSupportedTypes } from 'hooks/useRuleBuilder';
-import type { RuleBlock, BlockDict, RuleBlockField, BlockFieldDict } from 'hooks/useRuleBuilder';
+import type { RuleBlock, BlockDict, BlockFieldDict } from 'hooks/useRuleBuilder';
 
 import Select from '../common/Select';
 
@@ -34,6 +33,11 @@ type Props = {
 
 const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
+
+  useEffect(() => {
+    if (block) { setCurrentBlockDict(blockDict.find(((b) => b.name === block.function))); }
+  },
+  [block, blockDict]);
 
   const buildParamField = (paramDict: BlockFieldDict) => {
     const paramValue = block?.parameters[paramDict.name];
@@ -60,12 +64,12 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
               onChange={(option: string) => {
                 setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
               }}
-              value={currentBlockDict.name} />
+              value={currentBlockDict?.name || ''} />
 
       {currentBlockDict && (
         <>
           <p>{currentBlockDict.name}</p>
-          {/* {currentBlockDict.params.map((param) => buildParamField(param))} */}
+          {currentBlockDict.params.map((param) => buildParamField(param))}
         </>
       )}
     </div>
