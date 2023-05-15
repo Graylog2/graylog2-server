@@ -25,8 +25,6 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
@@ -61,9 +59,6 @@ public class RuleResourceTest {
     RuleMetricsConfigService ruleMetricsConfigService;
 
     @Mock
-    PipelineRuleParser pipelineRuleParser;
-
-    @Mock
     PaginatedRuleService paginatedRuleService;
 
     @Mock
@@ -71,9 +66,6 @@ public class RuleResourceTest {
 
     @Mock
     PipelineServiceHelper pipelineServiceHelper;
-
-    @Mock
-    ConfigurationStateUpdater configurationStateUpdater;
 
     @Mock
     StreamService streamService;
@@ -146,11 +138,12 @@ public class RuleResourceTest {
     }
 
     public RuleDao ruleDao(String id, String title) {
-        return RuleDao.create(id, title, null, f("rule \"%s\"\n" +
-                "when true\n" +
-                "then\n" +
-                "   debug(\"OK\");\n" +
-                "end", title), null, null);
+        return RuleDao.create(id, title, null, f("""
+                rule "%s"
+                when true
+                then
+                   debug("OK");
+                end""", title), null, null);
     }
 
     private PipelineDao pipelineDao(String id, String title) {

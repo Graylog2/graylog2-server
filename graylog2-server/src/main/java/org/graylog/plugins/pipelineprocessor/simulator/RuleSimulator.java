@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.simulator;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSortedSet;
+import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
@@ -80,6 +81,10 @@ public class RuleSimulator {
             message = new Message(map);
         } catch (JacksonException e) {
             message = new Message(messageString, "127.0.0.1", DateTime.now(DateTimeZone.UTC));
+            if (StringUtils.startsWith(StringUtils.trim(messageString), "{")) {
+                message.addField("gl2_simulator_json_error",
+                        "Cannot parse simulation message as JSON. Using as raw message field instead: " + e.getMessage());
+            }
         }
 
         return message;
