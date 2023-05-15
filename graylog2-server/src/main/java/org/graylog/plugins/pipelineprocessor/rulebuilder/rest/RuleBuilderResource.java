@@ -89,7 +89,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     public RuleBuilderDto updateFromBuilder(@ApiParam(name = "id") @PathParam("id") String id,
                                             @ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) throws NotFoundException {
         RuleSource ruleSource = toRuleSource(ruleBuilderDto);
-        final RuleSource stored = ruleResource.update(ruleBuilderDto.ruleId(), ruleSource);
+        final RuleSource stored = ruleResource.update(id, ruleSource);
         return ruleBuilderDto.toBuilder().ruleId(stored.id()).build();
     }
 
