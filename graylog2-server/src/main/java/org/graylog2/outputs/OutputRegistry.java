@@ -27,7 +27,6 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -60,10 +59,6 @@ import java.util.stream.Collectors;
 @Singleton
 public class OutputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(OutputRegistry.class);
-    private static final Logger RATE_LIMITED_LOG = RateLimitedLog.withRateLimit(LOG)
-            .maxRate(1)
-            .every(Duration.ofSeconds(5))
-            .build();
 
     private final Cache<String, MessageOutput> runningMessageOutputs;
     private final MessageOutput defaultMessageOutput;
@@ -156,7 +151,7 @@ public class OutputRegistry {
             }
         } catch (ExecutionException | UncheckedExecutionException e) {
             if (e.getCause() instanceof NotFoundException || e.getCause() instanceof IllegalArgumentException) {
-                RATE_LIMITED_LOG.debug("Unable to fetch output <{}> for stream <{}/{}>: {}", id, stream.getTitle(), stream.getId(), e.getMessage());
+                LOG.debug("Unable to fetch output <{}> for stream <{}/{}>: {}", id, stream.getTitle(), stream.getId(), e.getMessage());
             } else {
                 final int number = faultCount.addAndGet(1);
                 LOG.error("Unable to fetch output " + id + ", fault #" + number, e);
