@@ -49,8 +49,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final CertMongoStorage certMongoStorage;
 
     private String caKeystoreFilename = "datanode-ca.p12";
-    private PrivateKey caPrivateKey;
-    private X509Certificate caCertificate;
     private Integer DEFAULT_VALIDITY = 90;
     private static final String DEFAULT_PASSWORD = "admin";
 
@@ -61,11 +59,11 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
-        loadCA();
     }
 
-    // TODO: include real ca that has been either generated or uploaded
-    private void loadCA() {
+    @Override
+    public void doRun() {
+        LOG.debug("checking if there are configuration steps to take care of");
         final Path caKeystorePath = Path.of(caKeystoreFilename);
 
         try {
@@ -73,36 +71,31 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
-            caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
-            caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
+            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
+            var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
             // TODO: delete?
 //            final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+
+            nodePreflightConfigService.streamAll()
+                    .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
+                    .forEach(c -> {
+                        try {
+                            var csr = csrStorage.readCsr();
+                            var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                            certMongoStorage.writeCert(cert);
+                        } catch (Exception e) {
+                            LOG.error("Could not sign CSR: " + e.getMessage(), e);
+                            nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                        }
+                    });
+
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException |
                  UnrecoverableKeyException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void doRun() {
-        LOG.debug("checking if there are configuration steps to take care of");
-
-        // TODO: check for CA existence
-        nodePreflightConfigService.streamAll()
-                .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
-                .forEach(c -> {
-                    try {
-                        var csr = csrStorage.readCsr();
-                        var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
-                        certMongoStorage.writeCert(cert);
-                    } catch (Exception e) {
-                        LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                        nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
-                    }
-                 });
     }
 
     @Override
