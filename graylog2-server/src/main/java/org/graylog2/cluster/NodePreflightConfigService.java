@@ -20,6 +20,7 @@ import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.indices.MongoDbIndexTools;
 import org.mongojack.DBQuery;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
@@ -29,10 +30,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import static org.graylog2.cluster.NodePreflightConfig.FIELD_CERTIFICATE;
 import static org.graylog2.cluster.NodePreflightConfig.FIELD_CSR;
 import static org.graylog2.cluster.NodePreflightConfig.FIELD_NODEID;
 import static org.graylog2.cluster.NodePreflightConfig.FIELD_STATE;
 import static org.graylog2.cluster.NodePreflightConfig.State.CSR;
+import static org.graylog2.cluster.NodePreflightConfig.State.SIGNED;
 
 public class NodePreflightConfigService extends PaginatedDbService<NodePreflightConfig> {
     public static final String COLLECTION_NAME = "node_preflight_config";
@@ -47,6 +50,7 @@ public class NodePreflightConfigService extends PaginatedDbService<NodePreflight
                                       final CsrGenerator csrGenerator) {
         super(mongoConnection, mongoJackObjectMapperProvider, NodePreflightConfig.class, COLLECTION_NAME);
         this.dbCollection = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME), NodePreflightConfig.class, String.class, mongoJackObjectMapperProvider.get());
+        new MongoDbIndexTools(db).createUniqueIndex(FIELD_NODEID);
         this.csrGenerator = csrGenerator;
     }
 
@@ -58,31 +62,6 @@ public class NodePreflightConfigService extends PaginatedDbService<NodePreflight
         return dbCollection.findOne(DBQuery.is(FIELD_NODEID, nodeId));
     }
 
-    //TODO: To be decided by Jan if something is worth merging into his DataNodePreflightGeneratePeriodical
-//    public void updatePreflightConfig(final NodeId nodeId) {
-//        final NodePreflightConfig preflightConfigFor = getPreflightConfigFor(nodeId.getNodeId());
-//        if (preflightConfigFor == null) {
-//            dbCollection.insert(NodePreflightConfig.builder()
-//                    .nodeId(nodeId.getNodeId())
-//                    .state(NodePreflightConfig.State.UNCONFIGURED)
-//                    .build());
-//        } else if (Objects.equals(preflightConfigFor.state(), NodePreflightConfig.State.CONFIGURED) && preflightConfigFor.csr() == null) {
-//            try {
-//                //TODO: most of the parameters are hardcoded, so that we can just check if CSR is generated and stored in Mongo
-//                //TODO: the details will be changed in one of the next PRs
-//                final PKCS10CertificationRequest csr = csrGenerator.generateCSR(
-//                        "changeMe".toCharArray(),
-//                        "localhost",
-//                        List.of("data-node"),
-//                        new PrivateKeyEncryptedFileStorage("tbd.key"));
-//                final CsrStorage csrStorage = new CsrMongoStorage(this, nodeId);
-//                csrStorage.writeCsr(csr);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
     public boolean writeCsr(final String nodeId,
                             final String csr) {
         final WriteResult<NodePreflightConfig, String> result = dbCollection.update(
@@ -90,6 +69,19 @@ public class NodePreflightConfigService extends PaginatedDbService<NodePreflight
                 new DBUpdate.Builder()
                         .set(FIELD_CSR, csr)
                         .set(FIELD_STATE, CSR),
+                false,
+                false);
+
+        return result.getN() > 0;
+    }
+
+    public boolean writeCert(final String nodeId,
+                            final String cert) {
+        final WriteResult<NodePreflightConfig, String> result = dbCollection.update(
+                DBQuery.is(FIELD_NODEID, nodeId),
+                new DBUpdate.Builder()
+                        .set(FIELD_CERTIFICATE, cert)
+                        .set(FIELD_STATE, SIGNED),
                 false,
                 false);
 
