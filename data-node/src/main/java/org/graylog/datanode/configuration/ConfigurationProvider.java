@@ -67,7 +67,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         final var cfg = sharedConfiguration.test();
 
         final String opensearchConfigLocation = localConfiguration.getOpensearchConfigLocation();
-        final Path datanodeConfigDir = Path.of(localConfiguration.getDatanodeConfigLocation());
+        final Path datanodeConfigDir = Path.of(localConfiguration.getConfigLocation());
         final Path opensearchConfigDir = Path.of(opensearchConfigLocation).resolve("opensearch");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();

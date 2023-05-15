@@ -83,8 +83,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_config_location")
     private String opensearchConfigLocation = "config";
 
-    @Parameter(value = "datanode_config_location")
-    private String datanodeConfigLocation = "bin/config";
+    @Parameter(value = "config_location")
+    private String configLocation = "bin/config";
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
@@ -159,8 +159,8 @@ public class Configuration extends BaseConfiguration {
         return opensearchConfigLocation;
     }
 
-    public String getDatanodeConfigLocation() {
-        return datanodeConfigLocation;
+    public String getConfigLocation() {
+        return configLocation;
     }
 
     public String getOpensearchDataLocation() {
