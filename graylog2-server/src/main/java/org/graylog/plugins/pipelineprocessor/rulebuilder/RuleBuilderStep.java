@@ -27,7 +27,7 @@ import java.util.Map;
 public abstract class RuleBuilderStep {
 
     public static final String FIELD_FUNCTION = "function";
-    public static final String FIELD_PARAMETERS = "parameters";
+    public static final String FIELD_PARAMETERS = "params";
     public static final String FIELD_OUTPUT = "outputvariable";
     public static final String FIELD_NEGATE = "negate";
 

@@ -42,7 +42,7 @@ public abstract class RuleBuilderDto {
     public static RuleBuilderDto create(@JsonProperty("rule_id") @Id @ObjectId @Nullable String ruleId,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
-                                        @JsonProperty("rulebuilder") RuleBuilder ruleBuilder,
+                                        @JsonProperty("rule_builder") RuleBuilder ruleBuilder,
                                         @JsonProperty("created_at") @Nullable DateTime createdAt,
                                         @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
         return builder()
