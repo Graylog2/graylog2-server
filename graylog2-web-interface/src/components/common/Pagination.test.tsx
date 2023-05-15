@@ -27,9 +27,9 @@ describe('<Pagination />', () => {
     render(<Pagination currentPage={currentPage}
                        totalPages={totalPages} />);
 
-    await screen.findByTestId('graylog-pagination');
-
     const activePage = await screen.findByTitle('Active page');
+
+    await screen.findByTestId('graylog-pagination');
     await screen.findByRole('button', { name: /open page 5/i });
 
     expect(within(activePage).getByText(1)).toBeInTheDocument();
