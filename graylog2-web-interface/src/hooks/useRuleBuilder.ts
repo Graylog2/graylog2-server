@@ -31,6 +31,25 @@ export type RuleBuilderRule = {
   modified_at: string,
 }
 
+export type BlockDictionary = {
+        name: string,
+        pure: boolean,
+        return_type: string,
+        params: Array<
+          {
+            type: string,
+            transformed_type: string,
+            name: string,
+            optional: boolean,
+            primary: boolean,
+            description: string | null
+          }
+        >,
+        description: string | null,
+        rule_builder_enabled: boolean,
+        rule_builder_title: string | null
+    }
+
 const createRule = async (rule: RuleBuilderRule) => {
   try {
     await fetch(
@@ -77,7 +96,7 @@ const useRuleBuilder = (rule?: RuleBuilderRule) => {
       keepPreviousData: true,
     },
   );
-  const { data: conditionsDict, refetch: refetchConditionsDict, isFetching: isLoadingConditionsDict } = useQuery<any[]>(
+  const { data: conditionsDict, refetch: refetchConditionsDict, isFetching: isLoadingConditionsDict } = useQuery<Array<BlockDictionary>>(
     ['conditions'],
     fetchConditionsDict,
     {
@@ -88,7 +107,7 @@ const useRuleBuilder = (rule?: RuleBuilderRule) => {
       keepPreviousData: true,
     },
   );
-  const { data: actionsDict, refetch: refetchActionsDict, isFetching: isLoadingActionsDict } = useQuery<any[]>(
+  const { data: actionsDict, refetch: refetchActionsDict, isFetching: isLoadingActionsDict } = useQuery<Array<BlockDictionary>>(
     ['actions'],
     fetchActionsDict,
     {
