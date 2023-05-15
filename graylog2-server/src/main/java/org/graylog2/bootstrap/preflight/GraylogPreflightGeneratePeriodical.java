@@ -16,10 +16,10 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.security.certutil.cert.storage.CertMongoStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
+import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
+import org.graylog.security.certutil.csr.storage.CsrStorage;
 import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -28,12 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -49,17 +45,24 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
     private final NodePreflightConfigService nodePreflightConfigService;
 
-    @Inject
-    public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService) {
-        this.nodePreflightConfigService = nodePreflightConfigService;
-        loadCA();
-    }
+    private final CsrStorage csrStorage;
+    private final CertMongoStorage certMongoStorage;
 
     private String caKeystoreFilename = "datanode-ca.p12";
     private PrivateKey caPrivateKey;
     private X509Certificate caCertificate;
     private Integer DEFAULT_VALIDITY = 90;
     private static final String DEFAULT_PASSWORD = "admin";
+
+    @Inject
+    public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
+                                              final CsrMongoStorage csrStorage,
+                                              final CertMongoStorage certMongoStorage) {
+        this.nodePreflightConfigService = nodePreflightConfigService;
+        this.csrStorage = csrStorage;
+        this.certMongoStorage = certMongoStorage;
+        loadCA();
+    }
 
     // TODO: include real ca that has been either generated or uploaded
     private void loadCA() {
@@ -72,35 +75,15 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
             caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
             caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
-            final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+
+            // TODO: delete?
+//            final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException |
                  UnrecoverableKeyException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private PKCS10CertificationRequest readCsr(String pem)
-            throws IOException {
-
-        Reader pemReader = new BufferedReader(new StringReader(pem));
-        PEMParser pemParser = new PEMParser(pemReader);
-        Object parsedObj = pemParser.readObject();
-        if (parsedObj instanceof PKCS10CertificationRequest) {
-            return (PKCS10CertificationRequest) parsedObj;
-        }
-       throw new IOException("Could not decode PEM");
-    }
-
-    private String writeCert(X509Certificate cert)
-            throws IOException {
-
-        var sw = new StringWriter();
-        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(sw)) {
-            jcaPEMWriter.writeObject(cert);
-        }
-        return sw.toString();
     }
 
     @Override
@@ -110,18 +93,16 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         // TODO: check for CA existence
         nodePreflightConfigService.streamAll()
                 .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
-                .map(c -> {
+                .forEach(c -> {
                     try {
-                        var csr = readCsr(c.csr());
+                        var csr = csrStorage.readCsr();
                         var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
-                        return c.toBuilder().certificate(this.writeCert(cert)).state(NodePreflightConfig.State.SIGNED).build();
+                        certMongoStorage.writeCert(cert);
                     } catch (Exception e) {
                         LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                        return c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build();
+                        nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
                     }
-                 })
-                .forEach(nodePreflightConfigService::save);
-
+                 });
     }
 
     @Override
