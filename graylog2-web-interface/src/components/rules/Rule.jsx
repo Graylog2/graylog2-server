@@ -36,7 +36,7 @@ const Rule = ({ create, title }) => {
     pageTitle = <span>Pipeline rule <em>{title}</em></span>;
   }
 
-  const isRuleBuilder = true;
+  const isRuleBuilder = false;
 
   return (
     <div>
