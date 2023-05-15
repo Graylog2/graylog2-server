@@ -13,13 +13,11 @@ import javax.annotation.Nullable;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class RuleBuilderRule {
+public abstract class RuleBuilderDto {
 
-    @JsonProperty("id")
+    @JsonProperty("rule_id")
     @Nullable
-    @Id
-    @ObjectId
-    public abstract String id();
+    public abstract String ruleId();
 
     @JsonProperty
     @Nullable
@@ -41,14 +39,14 @@ public abstract class RuleBuilderRule {
     public abstract DateTime modifiedAt();
 
     @JsonCreator
-    public static RuleBuilderRule create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
-                                         @JsonProperty("title") String title,
-                                         @JsonProperty("description") @Nullable String description,
-                                         @JsonProperty("rulebuilder") RuleBuilder ruleBuilder,
-                                         @JsonProperty("created_at") @Nullable DateTime createdAt,
-                                         @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
+    public static RuleBuilderDto create(@JsonProperty("rule_id") @Id @ObjectId @Nullable String ruleId,
+                                        @JsonProperty("title") String title,
+                                        @JsonProperty("description") @Nullable String description,
+                                        @JsonProperty("rulebuilder") RuleBuilder ruleBuilder,
+                                        @JsonProperty("created_at") @Nullable DateTime createdAt,
+                                        @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
         return builder()
-                .id(id)
+                .ruleId(ruleId)
                 .title(title)
                 .description(description)
                 .ruleBuilder(ruleBuilder)
@@ -58,14 +56,14 @@ public abstract class RuleBuilderRule {
     }
 
     public static Builder builder() {
-        return new AutoValue_RuleBuilderRule.Builder();
+        return new AutoValue_RuleBuilderDto.Builder();
     }
 
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder id(String id);
+        public abstract Builder ruleId(String ruleId);
 
         public abstract Builder title(String title);
 
@@ -77,6 +75,7 @@ public abstract class RuleBuilderRule {
 
         public abstract Builder modifiedAt(DateTime modifiedAt);
 
-        public abstract RuleBuilderRule build();
+        public abstract RuleBuilderDto build();
     }
+
 }

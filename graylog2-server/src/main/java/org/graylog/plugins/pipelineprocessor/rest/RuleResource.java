@@ -150,6 +150,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .source(ruleSource.source())
                 .createdAt(now)
                 .modifiedAt(now)
+                .ruleBuilder(ruleSource.ruleBuilder())
                 .build();
 
         final RuleDao save;
@@ -328,6 +329,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
+                .ruleBuilder(update.ruleBuilder())
                 .build();
 
         final RuleDao savedRule;
