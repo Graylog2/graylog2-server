@@ -84,6 +84,10 @@ java.util.Collections#EMPTY_SET
 
 java.util.Collections#shuffle(java.util.List) @ Use java.util.Collections#shuffle(java.util.List, java.util.Random) with a reproducible source of randomness
 
-edu.emory.mathcs.backport.java.util.** @ Use java.util.*
-
 com.google.common.base.Charsets @ Use java.nio.charset.StandardCharsets
+
+@defaultMessage Don't use imports from shaded or denied dependencies
+joptsimple.internal.**
+org.testcontainers.shaded.**
+com.google.inject.Inject
+edu.emory.mathcs.backport.java.util.**
