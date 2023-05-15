@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.ImagePullPolicy;
+import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
@@ -125,6 +127,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new OpenSearchContainer(DockerImageName.parse(image))
+                .withImagePullPolicy(PullPolicy.alwaysPull())
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
