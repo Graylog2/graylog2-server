@@ -16,10 +16,10 @@
  */
 package org.graylog2.rest.resources.system.contentpacks.titles;
 
-import org.graylog.plugins.views.search.permissions.TitlePermissions;
+import org.graylog.plugins.views.search.permissions.EntityPermissions;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 
 public interface EntityTitleService {
-    EntitiesTitleResponse getTitles(EntityTitleRequest request, TitlePermissions permissions);
+    EntitiesTitleResponse getTitles(EntityTitleRequest request, EntityPermissions permissions);
 }

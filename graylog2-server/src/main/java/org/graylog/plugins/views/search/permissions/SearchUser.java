@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.security.HasUser;
+import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTimeZone;
@@ -36,7 +37,7 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, TitlePermissions, HasUser {
+public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, EntityPermissions, HasUser {
     private static final Logger LOG = LoggerFactory.getLogger(SearchUser.class);
     private final User currentUser;
     private final Predicate<String> isPermitted;
@@ -107,7 +108,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
 
     @Override
     public boolean canReadTitle(String readPermission, String idAsString) {
-        return isPermitted(readPermission, idAsString);
+        return DbEntity.ALL_ALLOWED.equals(readPermission) || isPermitted(readPermission, idAsString);
     }
 
     private boolean isPermitted(String permission) {

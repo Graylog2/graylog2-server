@@ -23,8 +23,7 @@ import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog.plugins.views.search.permissions.TitlePermissions;
-import org.graylog2.database.DbEntity;
+import org.graylog.plugins.views.search.permissions.EntityPermissions;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
@@ -60,7 +59,7 @@ public class EntityTitleServiceImpl implements EntityTitleService {
     }
 
     @Override
-    public EntitiesTitleResponse getTitles(final EntityTitleRequest request, final TitlePermissions permissions) {
+    public EntitiesTitleResponse getTitles(final EntityTitleRequest request, final EntityPermissions permissions) {
         if (request == null || request.entities() == null) {
             return EMPTY_RESPONSE;
         }
@@ -77,7 +76,7 @@ public class EntityTitleServiceImpl implements EntityTitleService {
         return entitiesTitleResponse.orElse(EMPTY_RESPONSE);
     }
 
-    private EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final TitlePermissions permissions,
+    private EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final EntityPermissions permissions,
                                                                            final String collection,
                                                                            final List<EntityIdentifier> entities) {
         final Optional<DbEntityCatalogEntry> dbEntityCatalogEntry = this.entitiesCatalog.getByCollectionName(collection);
@@ -129,9 +128,9 @@ public class EntityTitleServiceImpl implements EntityTitleService {
         return new EntitiesTitleResponse(titles, notPermitted);
     }
 
-    private boolean checkCanReadTitle(final TitlePermissions permissions,
+    private boolean checkCanReadTitle(final EntityPermissions permissions,
                                       final String readPermission,
                                       final String idAsString) {
-        return DbEntity.ALL_ALLOWED.equals(readPermission) || permissions.canReadTitle(readPermission, idAsString);
+        return permissions.canReadTitle(readPermission, idAsString);
     }
 }

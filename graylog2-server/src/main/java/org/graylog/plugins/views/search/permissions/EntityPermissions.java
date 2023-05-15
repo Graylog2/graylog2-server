@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.permissions;
 
-public interface TitlePermissions {
+public interface EntityPermissions {
     boolean canReadTitle(String readPermission, String idAsString);
 
 }
