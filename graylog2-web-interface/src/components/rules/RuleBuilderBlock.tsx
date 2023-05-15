@@ -14,18 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React, { useState } from 'react';
+import Select from '../common/Select';
 
 type Props = {
   type: 'condition'|'action',
-  blockDict: object,
+  blockDict: object[],
+  block: object,
   addBlock: (type: string, block: object) => void,
   updateBlock: (orderIndex: number, type: string, block: object) => void,
   deleteBlock: (orderIndex: number, type: string,) => void,
   errors: object[],
 };
 
-const RuleBuilderBlock = ({ type, blockDict, addBlock, updateBlock, deleteBlock, errors }: Props) => {
-  return (null);
+const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock, errors }: Props) => {
+  const [currentBlock, setCurrentBlock] = useState<string>(undefined);
+
+  return (
+    <div>
+      <Select id="block-select"
+              name="block-select"
+              placeholder={`Select a ${type}`}
+              options={blockDict.map(({ name }) => ({ label: name, value: name }))}
+              matchProp="label"
+              onChange={(option: string) => {
+                setCurrentBlock(option);
+              }}
+              value={currentBlock} />
+    </div>
+  );
 };
 
 export default RuleBuilderBlock;

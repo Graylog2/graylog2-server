@@ -62,7 +62,23 @@ const RuleBuilder = ({ isNewRule }: Props) => {
   const [actions, setActions] = useState<any[]>(initialActions);
   const [errors, setErrors] = useState<any[]>([]);
 
-  const addBlock = (type: string, block: object) => {
+  const validateBlock = () => {
+    return fetchValidateRule().then((errors) => {
+      if (errors) {
+        setErrors(errors);
+
+        return false;
+      }
+
+      return true;
+    });
+  };
+
+  const addBlock = async (type: string, block: object) => {
+    const isValid = await validateBlock();
+
+    if (!isValid) return;
+
     if (type === 'condition') {
       setConditions([...conditions, block]);
     } else {
@@ -70,7 +86,11 @@ const RuleBuilder = ({ isNewRule }: Props) => {
     }
   };
 
-  const updateBlock = (orderIndex: number, type: string, block: object) => {
+  const updateBlock = async (orderIndex: number, type: string, block: object) => {
+    const isValid = await validateBlock();
+
+    if (!isValid) return;
+
     if (type === 'condition') {
       const currentConditions = [...conditions];
       currentConditions[orderIndex] = block;
@@ -96,6 +116,8 @@ const RuleBuilder = ({ isNewRule }: Props) => {
 
       setActions(currentActions);
     }
+
+    validateBlock();
   };
 
   return (
@@ -104,12 +126,12 @@ const RuleBuilder = ({ isNewRule }: Props) => {
         {
           conditions.map((condition) => (
             <RuleBuilderBlock blockDict={conditionsDict}
+                              block={condition}
                               type="condition"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
                               deleteBlock={deleteBlock}
-                              errors={errors}
-                            />
+                              errors={errors} />
           ))
         }
       </Col>
@@ -117,12 +139,12 @@ const RuleBuilder = ({ isNewRule }: Props) => {
         {
           actions.map((action) => (
             <RuleBuilderBlock blockDict={actionsDict}
+                              block={action}
                               type="action"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
                               deleteBlock={deleteBlock}
-                              errors={errors}
-                            />
+                              errors={errors} />
           ))
         }
       </Col>
