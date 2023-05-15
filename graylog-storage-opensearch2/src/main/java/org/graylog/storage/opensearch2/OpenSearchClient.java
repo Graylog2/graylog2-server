@@ -156,9 +156,6 @@ public class OpenSearchClient {
                 throw new BatchSizeTooLargeException(openSearchException.getMessage());
             }
         }
-        if (e instanceof ResponseException) {
-
-        }
         return new OpenSearchException(errorMessage, e);
     }
 
