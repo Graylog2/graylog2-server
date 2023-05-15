@@ -67,6 +67,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         final var cfg = sharedConfiguration.test();
 
         final String opensearchConfigLocation = localConfiguration.getOpensearchConfigLocation();
+        final Path datanodeConfigDir = Path.of(localConfiguration.getDatanodeConfigLocation());
         final Path opensearchConfigDir = Path.of(opensearchConfigLocation).resolve("opensearch");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
@@ -85,12 +86,17 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                 networkHost -> config.put("network.host", networkHost));
 
 
-        final Path transportKeystorePath = opensearchConfigDir
+        //copy from read-only data node configuration, to read-write configuration directory
+        Path transportKeystorePath = datanodeConfigDir
                 .resolve(localConfiguration.getDatanodeTransportCertificate());
-
-
-        final Path httpKeystorePath = opensearchConfigDir
+        if (Files.exists(transportKeystorePath)) {
+            transportKeystorePath = Files.copy(transportKeystorePath, opensearchConfigDir.resolve(localConfiguration.getDatanodeTransportCertificate()));
+        }
+        Path httpKeystorePath = datanodeConfigDir
                 .resolve(localConfiguration.getDatanodeHttpCertificate());
+        if (Files.exists(httpKeystorePath)) {
+            httpKeystorePath = Files.copy(httpKeystorePath, opensearchConfigDir.resolve(localConfiguration.getDatanodeHttpCertificate()));
+        }
 
         if (Files.exists(transportKeystorePath) && Files.exists(httpKeystorePath)) {
             config.put("plugins.security.disabled", "false");
