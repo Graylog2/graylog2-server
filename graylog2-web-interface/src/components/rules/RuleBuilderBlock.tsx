@@ -15,22 +15,40 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { parameters } from 'test/fixtures/createEventDefinitionFromValue';
 
-import type { Block } from './RuleBuilder';
+import { Input } from 'components/bootstrap';
+import { RuleBuilderSupportedTypes } from 'hooks/useRuleBuilder';
+import type { RuleBlock, BlockDict, RuleBlockField, BlockFieldDict } from 'hooks/useRuleBuilder';
 
 import Select from '../common/Select';
 
 type Props = {
-  type: 'condition'|'action',
-  blockDict: object[],
-  block: Block,
-  addBlock: (type: string, block: object) => void,
-  updateBlock: (orderIndex: number, type: string, block: object) => void,
+  type: 'condition' | 'action',
+  blockDict: Array<BlockDict>,
+  block: RuleBlock,
+  addBlock: (type: string, block: RuleBlock) => void,
+  updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
   deleteBlock: (orderIndex: number, type: string,) => void,
 };
 
 const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock }: Props) => {
-  const [currentBlock, setCurrentBlock] = useState<string>(undefined);
+  const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
+
+  const buildParamField = (paramDict: BlockFieldDict) => {
+    const paramValue = block?.parameters[paramDict.name];
+
+    switch (paramDict.type) {
+      case RuleBuilderSupportedTypes.String:
+        return (<Input type="text" label={paramDict.name}>{paramValue || ''}</Input>);
+      case RuleBuilderSupportedTypes.Number:
+        return (<div>Number</div>);
+      case RuleBuilderSupportedTypes.Boolean:
+        return (<div>Boolean</div>);
+      default:
+        return null;
+    }
+  };
 
   return (
     <div>
@@ -40,9 +58,16 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
               options={blockDict.map(({ name }) => ({ label: name, value: name }))}
               matchProp="label"
               onChange={(option: string) => {
-                setCurrentBlock(option);
+                setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
               }}
-              value={currentBlock} />
+              value={currentBlockDict.name} />
+
+      {currentBlockDict && (
+        <>
+          <p>{currentBlockDict.name}</p>
+          {/* {currentBlockDict.params.map((param) => buildParamField(param))} */}
+        </>
+      )}
     </div>
   );
 };

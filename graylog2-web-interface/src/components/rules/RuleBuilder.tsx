@@ -18,26 +18,10 @@ import React, { useContext, useState } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
+import type { RuleBlock, RuleBuilderType } from 'hooks/useRuleBuilder';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
 import { PipelineRulesContext } from './RuleContext';
-
-type BlockParameter = {
-  [key:string]: string | number | boolean
-}
-
-export type Block = {
-  function: string,
-  parameters: Array<BlockParameter>,
-  output?: string,
-  errors?: Array<string>
-}
-
-export type RuleBuilderType = {
-  errors?: Array<string>,
-  conditions: Array<Block>,
-  actions: Array<Block>
-}
 
 type Props = {
   isNewRule: boolean,
@@ -80,7 +64,7 @@ const RuleBuilder = ({ isNewRule }: Props) => {
     setRuleBuilder(result.rule_builder);
   });
 
-  const addBlock = async (type: string, block: Block) => {
+  const addBlock = async (type: string, block: RuleBlock) => {
     validateRuleBuilder();
     const isValid = true;
 
@@ -93,7 +77,7 @@ const RuleBuilder = ({ isNewRule }: Props) => {
     }
   };
 
-  const updateBlock = async (orderIndex: number, type: string, block: Block) => {
+  const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
     validateRuleBuilder();
     const isValid = true;
 
