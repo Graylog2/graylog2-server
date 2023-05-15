@@ -15,42 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { AppShell, Title, Space } from '@mantine/core';
-import styled from 'styled-components';
+import { AppShell } from '@mantine/core';
+import { useState, useCallback } from 'react';
 
-import Section from 'preflight/components/common/Section';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 import Navigation from 'preflight/navigation/Navigation';
-import DataNodesOverview from 'preflight/components/DataNodesOverview';
+import Setup from 'preflight/components/Setup';
+import useDataNodes from 'preflight/hooks/useDataNodes';
+import UserNotification from 'preflight/util/UserNotification';
+import WaitingForStartup from 'preflight/components/WaitingForStartup';
 
-import DocumentationLink from '../components/support/DocumentationLink';
+const App = () => {
+  const { data: dataNodes } = useDataNodes();
+  const [waitingForStartup, setWaitingForStartup] = useState(false);
 
-const P = styled.p`
-  max-width: 700px;
-`;
+  const onResumeStartup = useCallback(() => {
+    // eslint-disable-next-line no-alert
+    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
+      fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
+        .then(() => {
+          setWaitingForStartup(true);
+        })
+        .catch((error) => {
+          setWaitingForStartup(false);
 
-const App = () => (
-  <AppShell padding="md" header={<Navigation />}>
-    <Section title="Welcome!" titleOrder={1}>
-      <P>
-        It looks like you are starting Graylog for the first time and have not configured a data node.<br />
-        Data nodes allow you to index and search through all the messages in your Graylog message database.
-      </P>
-      <P>
-        You can either implement a <DocumentationLink page="" text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page="" text="Elasticsearch" /> or <DocumentationLink page="" text="OpenSearch" /> node manually.
-      </P>
+          UserNotification.error(`Resuming startup failed with error: ${error}`,
+            'Could not resume startup');
+        });
+    }
+  }, [dataNodes?.length]);
 
-      <Space h="md" />
-      <Title order={2}>Graylog Data Nodes</Title>
-      <DataNodesOverview />
-
-      <Space h="md" />
-      <Title order={2}>Manual Data Node Configuration</Title>
-      <P>
-        If you want to configure an Elasticsearch or OpenSearch node manually, you need to adjust the Graylog configuration and restart the Graylog server.
-        After the restart this page will not show up again.
-      </P>
-    </Section>
-  </AppShell>
-);
+  return (
+    <AppShell padding="md" header={<Navigation />}>
+      {!waitingForStartup && <Setup onResumeStartup={onResumeStartup} />}
+      {waitingForStartup && <WaitingForStartup />}
+    </AppShell>
+  );
+};
 
 export default App;

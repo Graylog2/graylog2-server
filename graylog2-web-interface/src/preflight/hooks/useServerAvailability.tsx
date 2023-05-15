@@ -18,35 +18,21 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import type { DataNodes } from 'preflight/types';
-import type FetchError from 'logic/errors/FetchError';
+import { Builder } from 'logic/rest/FetchProvider';
 
-const DEFAULT_DATA = [];
-const fetchDataNodes = () => (
-  fetch('GET', qualifyUrl('/api/data_nodes'), undefined, false)
-);
+const fetchServerAvailability = () => new Builder('GET', qualifyUrl('/api'))
+  .json()
+  .setHeader('X-Graylog-No-Session-Extension', 'true')
+  .build();
 
-const useDataNodes = (): {
-  data: DataNodes,
-  isFetching: boolean,
-  isInitialLoading: boolean,
-  error: FetchError
-} => {
-  const {
-    data,
-    isFetching,
-    error,
-    isInitialLoading,
-  } = useQuery<DataNodes, FetchError>(
-    ['data-nodes', 'overview'],
-    fetchDataNodes,
-    {
-      refetchInterval: 3000,
-      keepPreviousData: true,
-    });
+const useServerAvailability = () => {
+  const { data } = useQuery(
+    ['server-availability'],
+    fetchServerAvailability,
+    { refetchInterval: 2000 },
+  );
 
-  return { data: data ?? DEFAULT_DATA, isFetching, isInitialLoading, error };
+  return { data: !!data };
 };
 
-export default useDataNodes;
+export default useServerAvailability;
