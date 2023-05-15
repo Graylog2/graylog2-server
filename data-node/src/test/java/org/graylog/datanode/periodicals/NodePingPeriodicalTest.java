@@ -17,7 +17,6 @@
 package org.graylog.datanode.periodicals;
 
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
@@ -33,11 +32,9 @@ class NodePingPeriodicalTest {
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
         final NodeService nodeService = Mockito.mock(NodeService.class);
-        final NodePreflightConfigService nodePreflightConfigService = Mockito.mock(NodePreflightConfigService.class);
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
-                nodePreflightConfigService,
                 nodeID,
                 uri,
                 () -> true
@@ -59,13 +56,11 @@ class NodePingPeriodicalTest {
         final URI uri = URI.create("http://localhost:9200");
 
         final NodeService nodeService = Mockito.mock(NodeService.class);
-        final NodePreflightConfigService nodePreflightConfigService = Mockito.mock(NodePreflightConfigService.class);
 
         Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri);
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
-                nodePreflightConfigService,
                 nodeID,
                 uri,
                 () -> true
