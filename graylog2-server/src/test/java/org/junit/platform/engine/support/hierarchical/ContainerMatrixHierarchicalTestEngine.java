@@ -60,9 +60,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
             if (descriptor instanceof ContainerMatrixTestWithRunningESMongoTestsDescriptor) {
                 GraylogBackend backend = RunningGraylogBackend.createStarted();
                 this.execute(request, descriptor.getChildren(), backend);
-            } else if (descriptor instanceof ContainerMatrixTestsDescriptor) {
-                ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = (ContainerMatrixTestsDescriptor) descriptor;
-
+            } else if (descriptor instanceof ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor) {
                 SearchVersion esVersion = containerMatrixTestsDescriptor.getEsVersion();
                 MongodbServer mongoVersion = containerMatrixTestsDescriptor.getMongoVersion();
                 int[] extraPorts = containerMatrixTestsDescriptor.getExtraPorts();

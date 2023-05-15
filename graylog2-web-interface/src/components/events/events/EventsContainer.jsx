@@ -26,7 +26,7 @@ import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-def
 import { EventsActions, EventsStore } from 'stores/events/EventsStore';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 
-import Events, { PAGE_SIZES } from './Events';
+import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
 
 import 'components/event-definitions/event-definition-types';
 
@@ -80,15 +80,17 @@ class EventsContainer extends React.Component {
   }
 
   handlePageChange = (nextPage, nextPageSize) => {
-    const { events } = this.props;
+    if (nextPage * nextPageSize <= EVENTS_MAX_OFFSET_LIMIT) {
+      const { events } = this.props;
 
-    fetchEvents({
-      page: nextPage,
-      pageSize: nextPageSize,
-      query: events.parameters.query,
-      filter: events.parameters.filter,
-      timerange: events.parameters.timerange,
-    });
+      fetchEvents({
+        page: nextPage,
+        pageSize: nextPageSize,
+        query: events.parameters.query,
+        filter: events.parameters.filter,
+        timerange: events.parameters.timerange,
+      });
+    }
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
