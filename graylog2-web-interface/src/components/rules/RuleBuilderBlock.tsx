@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 
-import { Input } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
 import { RuleBuilderSupportedTypes } from 'hooks/useRuleBuilder';
 import type { RuleBlock, BlockDict, BlockFieldDict } from 'hooks/useRuleBuilder';
 
@@ -33,6 +33,10 @@ type Props = {
 
 const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
+  const [editMode, setEditMode] = useState<boolean>(false);
+
+  // Todo: add temp state
+  // Todo: add save button
 
   useEffect(() => {
     if (block) { setCurrentBlockDict(blockDict.find(((b) => b.name === block.function))); }
@@ -54,8 +58,8 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
     }
   };
 
-  return (
-    <div>
+  const blockForm = () => (
+    <>
       <Select id="block-select"
               name="block-select"
               placeholder={`Select a ${type}`}
@@ -65,13 +69,23 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
                 setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
               }}
               value={currentBlockDict?.name || ''} />
+      {currentBlockDict.params.map((param) => buildParamField(param))}
+      <Button onClick={() => setEditMode(false)}>Cancel</Button>
+    </>
+  );
 
-      {currentBlockDict && (
-        <>
-          <p>{currentBlockDict.name}</p>
-          {currentBlockDict.params.map((param) => buildParamField(param))}
-        </>
-      )}
+  const blockDisplay = () => (
+    <>
+      <p>{currentBlockDict?.name || ''}</p>
+      <Button onClick={() => setEditMode(true)}>Edit</Button>
+    </>
+  );
+
+  const showForm = !block || editMode;
+
+  return (
+    <div>
+      {showForm ? blockForm() : blockDisplay()}
     </div>
   );
 };
