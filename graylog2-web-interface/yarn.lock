@@ -2106,7 +2106,7 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@graylog/sawmill@^1.0.4":
+"@graylog/sawmill@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-1.0.5.tgz#180026fa7cf109c395092cf83386dc9568e536a5"
   integrity sha512-G68cdxnxmyIyEKJvqjJHrWUADPp9F3iIX6/YLiamTqvrewXJvmHPFslm+n5nD9qjnhMcOxOZGu17kwPbNx2tVw==

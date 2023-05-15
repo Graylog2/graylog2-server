@@ -18,10 +18,15 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
+import suppressConsole from 'helpers/suppressConsole';
 
 import useDataNodes from './useDataNodes';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
+
+jest.mock('preflight/util/UserNotification', () => ({
+  error: jest.fn(),
+}));
 
 describe('useDataNodes', () => {
   const availableDataNodes = [
@@ -63,5 +68,22 @@ describe('useDataNodes', () => {
     expect(fetch).toHaveBeenCalledWith('GET', expect.stringContaining('/api/data_nodes'), undefined, false);
 
     await waitFor(() => expect(result.current.data).toEqual(availableDataNodes));
+  });
+
+  it('should return fetch error', async () => {
+    asMock(fetch).mockReturnValue(Promise.reject(new Error('Error')));
+
+    const { result, waitFor } = renderHook(() => useDataNodes());
+
+    expect(result.current.data).toEqual([]);
+
+    suppressConsole(async () => {
+      await waitFor(() => result.current.isFetching);
+      await waitFor(() => !result.current.isFetching);
+    });
+
+    await waitFor(() => expect(result.current.error).toEqual(new Error('Error')));
+
+    expect(result.current.data).toEqual([]);
   });
 });
