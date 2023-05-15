@@ -22,6 +22,23 @@ import useRuleBuilder from 'hooks/useRuleBuilder';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import { PipelineRulesContext } from './RuleContext';
 
+type BlockParameter = {
+  [key:string]: string | number | boolean
+}
+
+export type Block = {
+  function: string,
+  parameters: Array<BlockParameter>,
+  output?: string,
+  errors?: Array<string>
+}
+
+export type RuleBuilderType = {
+  errors?: Array<string>,
+  conditions: Array<Block>,
+  actions: Array<Block>
+}
+
 type Props = {
   isNewRule: boolean,
 };
@@ -47,8 +64,7 @@ const RuleBuilder = ({ isNewRule }: Props) => {
   const {
     isLoadingConditions,
     isLoadingActions,
-    conditions: initialConditions,
-    actions: initialActions,
+    rule,
     conditionsDict,
     actionsDict,
     refetchConditions,
@@ -58,93 +74,83 @@ const RuleBuilder = ({ isNewRule }: Props) => {
     fetchValidateRule,
   } = useRuleBuilder();
 
-  const [conditions, setConditions] = useState<any[]>(initialConditions);
-  const [actions, setActions] = useState<any[]>(initialActions);
-  const [errors, setErrors] = useState<any[]>([]);
+  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(rule.rule_builder);
 
-  const validateBlock = () => {
-    return fetchValidateRule().then((errors) => {
-      if (errors) {
-        setErrors(errors);
+  const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
+    setRuleBuilder(result.rule_builder);
+  });
 
-        return false;
-      }
-
-      return true;
-    });
-  };
-
-  const addBlock = async (type: string, block: object) => {
-    const isValid = await validateBlock();
+  const addBlock = async (type: string, block: Block) => {
+    validateRuleBuilder();
+    const isValid = true;
 
     if (!isValid) return;
 
     if (type === 'condition') {
-      setConditions([...conditions, block]);
+      setRuleBuilder({ ...ruleBuilder, conditions: [...ruleBuilder.conditions, block] });
     } else {
-      setActions([...actions, block]);
+      setRuleBuilder({ ...ruleBuilder, actions: [...ruleBuilder.actions, block] });
     }
   };
 
-  const updateBlock = async (orderIndex: number, type: string, block: object) => {
-    const isValid = await validateBlock();
+  const updateBlock = async (orderIndex: number, type: string, block: Block) => {
+    validateRuleBuilder();
+    const isValid = true;
 
     if (!isValid) return;
 
     if (type === 'condition') {
-      const currentConditions = [...conditions];
+      const currentConditions = [...ruleBuilder.conditions];
       currentConditions[orderIndex] = block;
 
-      setConditions(currentConditions);
+      setRuleBuilder({ ...ruleBuilder, conditions: currentConditions });
     } else {
-      const currentActions = [...actions];
+      const currentActions = [...ruleBuilder.actions];
       currentActions[orderIndex] = block;
 
-      setActions(currentActions);
+      setRuleBuilder({ ...ruleBuilder, actions: currentActions });
     }
   };
 
   const deleteBlock = (orderIndex: number, type: string) => {
     if (type === 'condition') {
-      const currentConditions = [...conditions];
+      const currentConditions = [...ruleBuilder.conditions];
       currentConditions.splice(orderIndex, 1);
 
-      setConditions(currentConditions);
+      setRuleBuilder({ ...ruleBuilder, conditions: currentConditions });
     } else {
-      const currentActions = [...actions];
+      const currentActions = [...ruleBuilder.actions];
       currentActions.splice(orderIndex, 1);
 
-      setActions(currentActions);
+      setRuleBuilder({ ...ruleBuilder, actions: currentActions });
     }
 
-    validateBlock();
+    validateRuleBuilder();
   };
 
   return (
     <Row className="content">
       <Col md={6}>
         {
-          conditions.map((condition) => (
+          ruleBuilder.conditions.map((condition) => (
             <RuleBuilderBlock blockDict={conditionsDict}
                               block={condition}
                               type="condition"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
-                              deleteBlock={deleteBlock}
-                              errors={errors} />
+                              deleteBlock={deleteBlock} />
           ))
         }
       </Col>
       <Col md={6}>
         {
-          actions.map((action) => (
+          ruleBuilder.actions.map((action) => (
             <RuleBuilderBlock blockDict={actionsDict}
                               block={action}
                               type="action"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
-                              deleteBlock={deleteBlock}
-                              errors={errors} />
+                              deleteBlock={deleteBlock} />
           ))
         }
       </Col>

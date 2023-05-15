@@ -20,9 +20,10 @@ import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
+import type { RuleBuilderType } from 'components/rules/RuleBuilder';
 
 export type RuleBuilderRule = {
-  rule_builder: object,
+  rule_builder: RuleBuilderType,
   description: string,
   created_at: string,
   id: string,
@@ -54,20 +55,18 @@ const updateRule = async (rule: RuleBuilderRule) => {
   }
 };
 
-const fetchValidateRule = async (rule: RuleBuilderRule) => {
-  return fetch(
-    'POST',
-    qualifyUrl(ApiRoutes.RuleBuilderController.validate().url),
-    rule,
-  );
-};
+const fetchValidateRule = async (rule: RuleBuilderRule): Promise<RuleBuilderRule> => fetch(
+  'POST',
+  qualifyUrl(ApiRoutes.RuleBuilderController.validate().url),
+  rule,
+);
 
-const fetchRule = async (ruleId: string) => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.get(ruleId).url));
-const fetchConditions = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listConditions().url));
-const fetchActions = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listActions().url));
+const fetchRule = async (ruleId: string): Promise<RuleBuilderRule> => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.get(ruleId).url));
+const fetchConditionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listConditionsDict().url));
+const fetchActionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listActionsDict().url));
 
 const useRuleBuilder = (rule?: RuleBuilderRule) => {
-  const { data, refetch: refetchRule, isFetching: isLoadingRule } = useQuery<any>(
+  const { data, refetch: refetchRule, isFetching: isLoadingRule } = useQuery<RuleBuilderRule>(
     ['rule'],
     () => fetchRule(rule?.id),
     {
@@ -80,7 +79,7 @@ const useRuleBuilder = (rule?: RuleBuilderRule) => {
   );
   const { data: conditionsDict, refetch: refetchConditionsDict, isFetching: isLoadingConditionsDict } = useQuery<any[]>(
     ['conditions'],
-    fetchConditions,
+    fetchConditionsDict,
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading Rule Builder Conditions list failed with status: ${errorThrown}`,
@@ -91,7 +90,7 @@ const useRuleBuilder = (rule?: RuleBuilderRule) => {
   );
   const { data: actionsDict, refetch: refetchActionsDict, isFetching: isLoadingActionsDict } = useQuery<any[]>(
     ['actions'],
-    fetchActions,
+    fetchActionsDict,
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading Rule Builder Actions list failed with status: ${errorThrown}`,
@@ -107,8 +106,7 @@ const useRuleBuilder = (rule?: RuleBuilderRule) => {
     isLoadingActionsDict,
     conditionsDict,
     actionsDict,
-    conditions: data?.conditions || [],
-    actions: data?.actions || [],
+    rule: data,
     refetchRule,
     refetchConditionsDict,
     refetchActionsDict,

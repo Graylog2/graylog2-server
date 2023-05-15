@@ -450,8 +450,8 @@ const ApiRoutes = {
     create: () => ({ url: '/system/pipelines/rulebuilder' }),
     update: (ruleId: string) => ({ url: `/system/pipelines/rulebuilder/${ruleId}` }),
     validate: () => ({ url: '/system/pipelines/rulebuilder/validate' }),
-    listConditions: () => ({ url: '/system/pipelines/rulebuilder/conditions' }),
-    listActions: () => ({ url: '/system/pipelines/rulebuilder/actions' }),
+    listConditionsDict: () => ({ url: '/system/pipelines/rulebuilder/conditions' }),
+    listActionsDict: () => ({ url: '/system/pipelines/rulebuilder/actions' }),
   },
   ConnectionsController: {
     list: () => ({ url: '/system/pipelines/connections' }),

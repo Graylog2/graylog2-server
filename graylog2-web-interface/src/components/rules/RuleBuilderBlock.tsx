@@ -15,19 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+
+import type { Block } from './RuleBuilder';
+
 import Select from '../common/Select';
 
 type Props = {
   type: 'condition'|'action',
   blockDict: object[],
-  block: object,
+  block: Block,
   addBlock: (type: string, block: object) => void,
   updateBlock: (orderIndex: number, type: string, block: object) => void,
   deleteBlock: (orderIndex: number, type: string,) => void,
-  errors: object[],
 };
 
-const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock, errors }: Props) => {
+const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlock, setCurrentBlock] = useState<string>(undefined);
 
   return (
