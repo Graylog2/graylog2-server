@@ -47,16 +47,26 @@ const RuleBlockForm = ({
   selectedBlockDict,
   type,
 }: Props) => {
-  const buildParamField = (paramDict: BlockFieldDict) => {
-    const paramValue = block?.function === selectedBlockDict.name && block?.params[paramDict.name];
+  const buildParamField = (param: BlockFieldDict) => {
+    const paramValue = block?.function === selectedBlockDict.name && block?.params[param.name];
 
-    switch (paramDict.type) {
+    switch (param.type) {
       case RuleBuilderSupportedTypes.String:
-        return (<Input type="text" label={paramDict.name} onChange={(e) => handleFieldChange(paramDict.name, e.target.value)} value={fieldValues[paramDict.name] || paramValue || ''} />);
+      case RuleBuilderSupportedTypes.Message:
+        return (
+          <Input type="text"
+                 label={param.name}
+                 required={!param.optional}
+                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
+                 help={param.description}
+                 value={fieldValues[param.name] || paramValue || ''} />
+        );
       case RuleBuilderSupportedTypes.Number:
         return (<div>Number</div>);
       case RuleBuilderSupportedTypes.Boolean:
         return (<div>Boolean</div>);
+      case RuleBuilderSupportedTypes.Object:
+        return (<div>Object</div>);
       default:
         return null;
     }
@@ -64,6 +74,8 @@ const RuleBlockForm = ({
 
   return (
     <>
+      <h2>{selectedBlockDict?.rule_builder_title}</h2>
+      <p><i>{selectedBlockDict?.description}</i></p>
       <Select id="block-select"
               name="block-select"
               placeholder={`Select a ${type}`}

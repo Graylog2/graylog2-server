@@ -318,9 +318,11 @@ export type RuleBuilderType = {
 }
 
 export enum RuleBuilderSupportedTypes {
-  String = 'java.lang.String',
-  Number = 'java.lang.Number',
   Boolean = 'java.lang.Boolean',
+  Message = 'org.graylog2.plugin.Message',
+  Number = 'java.lang.Long',
+  Object = 'java.lang.Object',
+  String = 'java.lang.String',
 }
 
 export type BlockFieldDict = {
