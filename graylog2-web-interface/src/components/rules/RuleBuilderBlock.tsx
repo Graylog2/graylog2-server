@@ -34,8 +34,8 @@ type Props = {
 const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [fieldValues, setFieldValues] = useState<{[key: string]: any}>({});
 
-  // Todo: add temp state
   // Todo: add save button
 
   useEffect(() => {
@@ -43,12 +43,14 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
   },
   [block, blockDict]);
 
+  const handleFieldChange = (event, fieldName) => { setFieldValues({ ...fieldValues, [fieldName]: event.target.value }); };
+
   const buildParamField = (paramDict: BlockFieldDict) => {
     const paramValue = block?.parameters[paramDict.name];
 
     switch (paramDict.type) {
       case RuleBuilderSupportedTypes.String:
-        return (<Input type="text" label={paramDict.name}>{paramValue || ''}</Input>);
+        return (<Input type="text" label={paramDict.name} onChange={(e) => handleFieldChange(e, paramDict.name)} value={fieldValues[paramDict.name] || paramValue || ''} />);
       case RuleBuilderSupportedTypes.Number:
         return (<div>Number</div>);
       case RuleBuilderSupportedTypes.Boolean:
@@ -56,6 +58,21 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
       default:
         return null;
     }
+  };
+
+  const resetBlock = () => {
+    if (block) {
+      setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
+    } else {
+      setCurrentBlockDict(undefined);
+    }
+
+    setFieldValues({});
+  };
+
+  const onCancel = () => {
+    setEditMode(false);
+    resetBlock();
   };
 
   const blockForm = () => (
@@ -70,7 +87,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
               }}
               value={currentBlockDict?.name || ''} />
       {currentBlockDict.params.map((param) => buildParamField(param))}
-      <Button onClick={() => setEditMode(false)}>Cancel</Button>
+      <Button onClick={onCancel}>Cancel</Button>
     </>
   );
 
