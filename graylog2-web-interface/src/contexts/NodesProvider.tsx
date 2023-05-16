@@ -15,18 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import isEqual from 'lodash/isEqual';
 
 import NodesContext from 'contexts/NodesContext';
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
+const MemoNodesProvider = React.memo(({ children, value }: React.PropsWithChildren<{ value: React.ComponentProps<typeof NodesContext.Provider>['value'] }>) => (
+  <NodesContext.Provider value={value}>
+    {children}
+  </NodesContext.Provider>
+), isEqual);
+
 const NodesProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const value = useStore(NodesStore, ({ nodes }) => nodes);
+  const value = useStore(NodesStore, ({ nodes }) => Object.fromEntries(
+    Object.entries(nodes ?? {}).map(([id, { short_node_id, hostname }]) => [id, { id, short_node_id, hostname }]),
+  ));
 
   return (
-    <NodesContext.Provider value={value}>
+    <MemoNodesProvider value={value}>
       {children}
-    </NodesContext.Provider>
+    </MemoNodesProvider>
   );
 };
 

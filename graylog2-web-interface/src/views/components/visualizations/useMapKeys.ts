@@ -23,9 +23,8 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
 import NodesContext from 'contexts/NodesContext';
 import InputsContext from 'contexts/InputsContext';
-import type { NodeInfo } from 'stores/nodes/NodesStore';
 
-const formatNode = (node: NodeInfo) => `${node.short_node_id} / ${node.hostname}`;
+const formatNode = (node: { short_node_id: string, hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
 
 const useMapKeys = (): KeyMapper => {
   const streams = useContext(StreamsContext);
