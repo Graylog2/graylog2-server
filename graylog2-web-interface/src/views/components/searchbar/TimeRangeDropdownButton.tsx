@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
-import type { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 
@@ -40,6 +40,7 @@ const StyledRangePresetDropdown = styled(RangePresetDropdown)`
 
 const StyledButtonGroup = styled(ButtonGroup)`
   display: flex;
+  align-items: start;
 `;
 
 const TimeRangeDropdownButton = ({
@@ -57,12 +58,8 @@ const TimeRangeDropdownButton = ({
     toggleShow();
   };
 
-  const selectRelativeTimeRangePreset = (from) => {
-    const nextTimeRange: RelativeTimeRangeWithEnd = {
-      type: 'relative',
-      from,
-    };
-    setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
+  const selectRelativeTimeRangePreset = (timerange) => {
+    setCurrentTimeRange(normalizeIfAllMessagesRange(timerange));
 
     if (isValid) {
       submitForm();

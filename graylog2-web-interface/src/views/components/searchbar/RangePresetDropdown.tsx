@@ -23,6 +23,9 @@ import { Icon, IfPermitted } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useUserDateTime from 'hooks/useUserDateTime';
+import { onInitializingTimerange } from 'views/components/TimerangeForForm';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 type Props = {
   onToggle?: (open: boolean) => void,
@@ -31,7 +34,7 @@ type Props = {
   bsSize?: string,
   header: string,
   disabled?: boolean,
-  onChange?: (range: number) => void,
+  onChange?: (timerange: TimeRange) => void,
 };
 
 const ExternalIcon = styled(Icon)`
@@ -45,31 +48,26 @@ const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
 const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
   const { config } = useSearchConfiguration();
   const sendTelemetry = useSendTelemetry();
-  const availableOptions = config?.relative_timerange_options;
+  const availableOptions = config?.quick_access_timerange_presets;
   const timeRangeLimit = moment.duration(config?.query_time_range_limit);
   const title = displayTitle && (availableOptions ? 'Preset Times' : 'Loading Ranges...');
   let options;
 
   if (availableOptions) {
-    let all = null;
+    const all = null;
 
-    options = Object.keys(availableOptions).map((key) => {
-      const seconds = moment.duration(key).asSeconds();
-
+    options = availableOptions.map(({ description, timerange, id }) => {
+      /*
       if (timeRangeLimit.asSeconds() > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
         return null;
       }
+      */
+      const optionLabel = description.replace(/Search\sin(\sthe\slast)?\s/, '');
 
-      const optionLabel = availableOptions[key].replace(/Search\sin(\sthe\slast)?\s/, '');
       const option = (
-        <MenuItem eventKey={seconds} key={`relative-option-${key}`} disabled={disabled}>{optionLabel}</MenuItem>);
+        <MenuItem eventKey={timerange} key={`timerange-option-${id}`} disabled={disabled}>{optionLabel}</MenuItem>);
 
       // The "search in all messages" option should be the last one.
-      if (key === 'PT0S') {
-        all = option;
-
-        return null;
-      }
 
       return option;
     });
@@ -81,16 +79,18 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
     options = (<MenuItem eventKey="300" disabled>Loading...</MenuItem>);
   }
 
-  const _onChange = (range) => {
-    if (range !== null && range !== undefined) {
+  const { formatTime } = useUserDateTime();
+
+  const _onChange = (timerange) => {
+    if (timerange !== null && timerange !== undefined) {
       sendTelemetry('input_value_change', {
         app_pathname: 'search',
         app_section: 'search-bar',
-        app_action_value: 'relative-timerange-selector',
-        event_details: { range },
+        app_action_value: 'quick-access-timerange-selector',
+        event_details: { timerange },
       });
 
-      onChange(parseInt(range, 10));
+      onChange(onInitializingTimerange(timerange, formatTime));
     }
   };
 

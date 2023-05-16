@@ -26,7 +26,7 @@ const useSearchConfiguration = () => {
     SearchConfigActions.refresh();
   }, []);
 
-  return { config: searchesClusterConfig };
+  return { config: searchesClusterConfig, refresh: SearchConfigActions.refresh };
 };
 
 export default useSearchConfiguration;

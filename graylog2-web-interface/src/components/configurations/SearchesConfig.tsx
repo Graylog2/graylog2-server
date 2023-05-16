@@ -35,6 +35,9 @@ import type { QuickAccessTimeRange } from 'components/configurations/QuickAccess
 import QuickAccessTimeRangeForm from 'components/configurations/QuickAccessTimeRangeForm';
 import generateId from 'logic/generateId';
 import QuickAccessTimeRangeOptionsSummary from 'components/configurations/QuickAccessTimeRangeOptionsSummary';
+import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import useUserDateTime from 'hooks/useUserDateTime';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
@@ -55,13 +58,14 @@ const buildTimeRangeOptions = (options: { [x: string]: string; }) => Object.keys
 
 type Option = { period: string, description: string };
 
-const mapBEData = (items: Array<QuickAccessTimeRange>): Immutable.List<QuickAccessTimeRange> => Immutable.List(items.map((item) => {
+const mapBEData = (items: Array<QuickAccessTimeRange>, formatTime: (time: DateTime, format?: DateTimeFormats) => string): Immutable.List<QuickAccessTimeRange> => Immutable.List(items.map(({ timerange, description }) => {
   const id = generateId();
 
-  return { ...item, id };
+  return { description, id, timerange: onInitializingTimerange(timerange, formatTime) };
 }));
 
 const SearchesConfig = () => {
+  const { userTimezone, formatTime } = useUserDateTime();
   const isLimitEnabled = (config) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
@@ -170,9 +174,9 @@ const SearchesConfig = () => {
     }
 
     if (quickAccessTimeRangePresetsUpdated) {
-      update.quick_access_timerange_presets = quickAccessTimeRangePresetsUpdated.toArray().map(({ description, timerange }) => (
-        { description, timerange }
-      ));
+      update.quick_access_timerange_presets = quickAccessTimeRangePresetsUpdated.toArray().map(({ description, timerange }) => ({
+        description, timerange: onSubmittingTimerange(timerange, userTimezone),
+      }));
 
       setQuickAccessTimeRangePresetsUpdated(undefined);
     }
@@ -219,7 +223,7 @@ const SearchesConfig = () => {
     });
   };
 
-  const quickAccessTimeRangePresets = useMemo(() => mapBEData(quickAccessTimeRangePresetsUpdated || formConfig?.quick_access_timerange_presets || []), [formConfig, quickAccessTimeRangePresetsUpdated]);
+  const quickAccessTimeRangePresets = useMemo(() => mapBEData(quickAccessTimeRangePresetsUpdated || formConfig?.quick_access_timerange_presets || [], formatTime), [formConfig, formatTime, quickAccessTimeRangePresetsUpdated]);
 
   if (!viewConfig) {
     return <Spinner />;
@@ -251,7 +255,7 @@ const SearchesConfig = () => {
           <strong>Relative time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
           <strong>Relative time range options</strong>
-          <QuickAccessTimeRangeOptionsSummary options={viewConfig.quick_access_timerange_presets} />
+          <QuickAccessTimeRangeOptionsSummary options={quickAccessTimeRangePresets.toArray()} />
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>

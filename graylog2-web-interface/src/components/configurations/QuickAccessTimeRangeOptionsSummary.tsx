@@ -19,7 +19,6 @@ import React from 'react';
 
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 import type {
-  AbsoluteTimeRange,
   KeywordTimeRange,
   TimeRange,
 } from 'views/logic/queries/Query';
@@ -27,12 +26,12 @@ import { dateOutput } from 'views/components/searchbar/TimeRangeDisplay';
 
 type Props = { options : Array<QuickAccessTimeRange>};
 
-const getTimeRangeValueSummary = (timerange: TimeRange) => {
+export const getTimeRangeValueSummary = (timerange: TimeRange) => {
   switch (timerange.type) {
     case 'relative':
       return `${dateOutput(timerange).from} - ${dateOutput(timerange).until}`;
     case 'absolute':
-      return `${(timerange as AbsoluteTimeRange).from} - ${(timerange as AbsoluteTimeRange).to}`;
+      return `${dateOutput(timerange).from} - ${dateOutput(timerange).until}`;
     case 'keyword':
       return (timerange as KeywordTimeRange).keyword;
     default:

@@ -69,6 +69,7 @@ type ItemProps = {
 const contextSettings = {
   showDropdownButton: false,
   showRelativePresetsButton: false,
+  showAddToQuickListButton: false,
 };
 
 const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChange, onRemove }: ItemProps) => {
@@ -87,7 +88,7 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
-  const debounceHandleOnChangeDescription = debounce((value: string) => handleOnChangeDescription(value), 1000);
+  const debounceHandleOnChangeDescription = debounce((value: string) => handleOnChangeDescription(value), 300);
 
   return (
     <ItemWrapper>
