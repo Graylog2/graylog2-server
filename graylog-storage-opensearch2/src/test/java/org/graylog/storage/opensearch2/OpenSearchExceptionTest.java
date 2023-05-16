@@ -1,0 +1,133 @@
+package org.graylog.storage.opensearch2;
+
+import org.graylog.shaded.opensearch2.org.apache.http.Header;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.graylog.shaded.opensearch2.org.apache.http.ProtocolVersion;
+import org.graylog.shaded.opensearch2.org.apache.http.RequestLine;
+import org.graylog.shaded.opensearch2.org.apache.http.StatusLine;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
+import org.graylog.shaded.opensearch2.org.opensearch.rest.RestStatus;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog2.indexer.BatchSizeTooLargeException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
+public class OpenSearchExceptionTest {
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    Response response;
+
+    @Test
+    public void handle429() throws IOException {
+        when(response.getHost()).thenReturn(new HttpHost("myHost"));
+
+        RequestLine requestLine = new RequestLine() {
+            @Override
+            public String getMethod() {
+                return "POST";
+            }
+
+            @Override
+            public ProtocolVersion getProtocolVersion() {
+                return null;
+            }
+
+            @Override
+            public String getUri() {
+                return "http://myTest.com";
+            }
+        };
+        when(response.getRequestLine()).thenReturn(requestLine);
+
+        StatusLine statusLine = new StatusLine() {
+            @Override
+            public ProtocolVersion getProtocolVersion() {
+                return null;
+            }
+
+            @Override
+            public int getStatusCode() {
+                return 429;
+            }
+
+            @Override
+            public String getReasonPhrase() {
+                return null;
+            }
+        };
+        when(response.getStatusLine()).thenReturn(statusLine);
+
+        HttpEntity httpEntity = new HttpEntity() {
+            @Override
+            public boolean isRepeatable() {
+                return false;
+            }
+
+            @Override
+            public boolean isChunked() {
+                return false;
+            }
+
+            @Override
+            public long getContentLength() {
+                return 0;
+            }
+
+            @Override
+            public Header getContentType() {
+                return null;
+            }
+
+            @Override
+            public Header getContentEncoding() {
+                return null;
+            }
+
+            @Override
+            public InputStream getContent() throws IOException, UnsupportedOperationException {
+                return null;
+            }
+
+            @Override
+            public void writeTo(OutputStream outputStream) throws IOException {
+
+            }
+
+            @Override
+            public boolean isStreaming() {
+                return false;
+            }
+
+            @Override
+            public void consumeContent() throws IOException {
+
+            }
+        };
+        when(response.getEntity()).thenReturn(httpEntity);
+
+        ResponseException responseException = new ResponseException(response);
+        RestStatus restStatus = RestStatus.BAD_REQUEST;
+        OpenSearchStatusException statusException = new OpenSearchStatusException(
+                "status msg", restStatus, responseException);
+
+        OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+        final OpenSearchClient openSearchClient = openSearchInstance.openSearchClient();
+
+        Exception exception = assertThrows(BatchSizeTooLargeException.class, () -> {
+            openSearchClient.execute((a, b) -> {throw statusException;});
+        });
+    }
+}

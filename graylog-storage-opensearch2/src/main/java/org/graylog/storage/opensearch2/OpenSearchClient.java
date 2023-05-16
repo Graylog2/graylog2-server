@@ -183,15 +183,17 @@ public class OpenSearchClient {
     }
 
     private boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
+        if (openSearchException instanceof OpenSearchStatusException statusException) {
+            if (statusException.getCause() instanceof ResponseException responseException) {
+                return (responseException.getResponse().getStatusLine().getStatusCode() == 429);
+            }
+        }
+
         try {
             final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
             if (parsedException.type().equals("search_phase_execution_exception")) {
                 ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getRootCause().getMessage());
                 return parsedCause.reason().contains("Batch size is too large");
-            }
-        } catch (OpenSearchStatusException openSearchStatusException) {
-            if (openSearchStatusException.getCause() instanceof ResponseException responseException) {
-                return responseException.getMessage().contains("429 Too Many Requests");
             }
         } catch (Exception e) {
             return false;
