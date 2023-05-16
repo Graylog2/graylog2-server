@@ -347,11 +347,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>com.github.luben</groupId>
-                <artifactId>zstd-jni</artifactId>
-                <version>${zstd.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.rabbitmq</groupId>
