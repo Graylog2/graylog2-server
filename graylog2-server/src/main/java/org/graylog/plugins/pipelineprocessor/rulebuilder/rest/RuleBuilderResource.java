@@ -81,7 +81,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleBuilderDto.toBuilder().ruleId(stored.id()).build();
     }
 
-    @ApiOperation(value = "Create a processing rule from rule builder", notes = "")
+    @ApiOperation(value = "Update a processing rule from rule builder", notes = "")
     @Path("/{id}")
     @PUT
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
