@@ -2709,13 +2709,14 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
 
-"@puppeteer/browsers@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-0.4.1.tgz#fae81939adb743420cc2466f3aa37481f7081712"
-  integrity sha512-4IICvy1McAkT/HyNZHIs7sp8ngBX1dmO0TPQ+FWq9ATQMqI8p+Ulm5A3kS2wYDh5HDHHkYrrETOu6rlj64VuTw==
+"@puppeteer/browsers@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-1.2.0.tgz#bee5ce47a5f55e7d68b884bb288136c5bcccc9aa"
+  integrity sha512-F2ygRTaNKq2HQQGsvypvy2S/Dg7aqqp2zxv4uolkxxTQvdbYfI0DcLPFNdqenaC+rZX5ldSPs/s39yAPpTVZ0A==
   dependencies:
     debug "4.3.4"
     extract-zip "2.0.1"
+    http-proxy-agent "5.0.0"
     https-proxy-agent "5.0.1"
     progress "2.0.3"
     proxy-from-env "1.1.0"
@@ -5173,10 +5174,10 @@ chrome-trace-event@^1.0.2:
   dependencies:
     tslib "^1.9.0"
 
-chromium-bidi@0.4.6:
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/chromium-bidi/-/chromium-bidi-0.4.6.tgz#a082151834083ed002624f12fa35e748817b2ee5"
-  integrity sha512-TQOkWRaLI/IWvoP8XC+7jO4uHTIiAUiklXU1T0qszlUFEai9LgKXIBXy3pOS3EnQZ3bQtMbKUPkug0fTAEHCSw==
+chromium-bidi@0.4.7:
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/chromium-bidi/-/chromium-bidi-0.4.7.tgz#4c022c2b0fb1d1c9b571fadf373042160e71d236"
+  integrity sha512-6+mJuFXwTMU6I3vYLs6IL8A1DyQTPjCfIL971X0aMPVGRbGnNfl6i6Cl0NMbxi2bRYLGESt9T2ZIMRM5PAEcIQ==
   dependencies:
     mitt "3.0.0"
 
@@ -6168,10 +6169,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
 
-devtools-protocol@0.0.1107588:
-  version "0.0.1107588"
-  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1107588.tgz#f8cac707840b97cc30b029359341bcbbb0ad8ffa"
-  integrity sha512-yIR+pG9x65Xko7bErCUSQaDLrO/P1p3JUzEk7JCU4DowPcGHkTGUGQapcfcLc4qj0UaALwZ+cr0riFgiqpixcg==
+devtools-protocol@0.0.1120988:
+  version "0.0.1120988"
+  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1120988.tgz#8fe49088919ae3b8df7235774633763f1f925066"
+  integrity sha512-39fCpE3Z78IaIPChJsP6Lhmkbf4dWXOmzLk/KFTdRkNk/0JymRIfUynDVRndV9HoDz8PyalK1UH21ST/ivwW5Q==
 
 diff-match-patch@^1.0.5:
   version "1.0.5"
@@ -6927,7 +6928,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.1.4"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-cdf26a6a-cb8b-4741-a8eb-f9e4ab227032-1683806747543/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.2.1"
     eslint-plugin-jest-dom "4.0.3"
@@ -8223,14 +8224,14 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.16"
     "@types/react" "18.2.6"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-1a75871f-7c0a-4e0a-8d2f-9ef5d8750ed4-1683806747326/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-1a75871f-7c0a-4e0a-8d2f-9ef5d8750ed4-1683806747326/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-1a75871f-7c0a-4e0a-8d2f-9ef5d8750ed4-1683806747326/node_modules/jest-preset-graylog"
-    jquery "3.6.4"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jquery "3.7.0"
     moment "2.29.4"
     moment-timezone "0.5.43"
     prop-types "15.8.1"
@@ -8553,7 +8554,7 @@ http-parser-js@>=0.5.1:
   resolved "https://registry.yarnpkg.com/http-parser-js/-/http-parser-js-0.5.8.tgz#af23090d9ac4e24573de6f6aecc9d84a48bf20e3"
   integrity sha512-SGeBX54F94Wgu5RH3X5jsDtf4eHyRogWX1XGT3b4HuW3tQPM4AaBzoUji/4AAJNXCEOWZ5O0DgZmJw1947gD5Q==
 
-http-proxy-agent@^5.0.0:
+http-proxy-agent@5.0.0, http-proxy-agent@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/http-proxy-agent/-/http-proxy-agent-5.0.0.tgz#5129800203520d434f142bc78ff3c170800f2b43"
   integrity sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==
@@ -9919,10 +9920,10 @@ jest@29.5.0:
     import-local "^3.0.2"
     jest-cli "^29.5.0"
 
-jquery@3.6.4:
-  version "3.6.4"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.4.tgz#ba065c188142100be4833699852bf7c24dc0252f"
-  integrity sha512-v28EW9DWDFpzcD9O5iyJXg3R3+q+mET5JhnjJzQUZMHOv67bpSIHq81GEYpPNZHG+XXHsfSme3nxp/hndKEcsQ==
+jquery@3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.7.0.tgz#fe2c01a05da500709006d8790fe21c8a39d75612"
+  integrity sha512-umpJ0/k8X0MvD1ds0P9SfowREz2LenHsQaxSohMZ5OMNEU2r0tf8pdeEFTHMFxWVxKNyU9rTtK3CWzUCTKJUeQ==
 
 jquery@>=1.12.0, jquery@>=1.7:
   version "3.5.1"
@@ -11980,34 +11981,26 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer-core@19.9.0:
-  version "19.9.0"
-  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-19.9.0.tgz#b4fdf6a7ce6b595a7a45ed6436d07cdde688433e"
-  integrity sha512-IJYfCE0oFpi5dTvNFqOwo8Dey6zzx7hANy7z6K2bjpCux9oPOSOIubq40awNhaHlfi8soYtgU4qabnzMXB7xBQ==
+puppeteer-core@20.2.0:
+  version "20.2.0"
+  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-20.2.0.tgz#9a240f50bbc25d723c5ae9e7e30c73518e41b790"
+  integrity sha512-QKLu4ELW/609vlLqp/NvQA564LzvLaF6x1ZH+4BhPhxPgreoY8WR/AYOzXS12hgtPPjNCqPKiRLxmyXGnlIK8A==
   dependencies:
-    "@puppeteer/browsers" "0.4.1"
-    chromium-bidi "0.4.6"
+    "@puppeteer/browsers" "1.2.0"
+    chromium-bidi "0.4.7"
     cross-fetch "3.1.5"
     debug "4.3.4"
-    devtools-protocol "0.0.1107588"
-    extract-zip "2.0.1"
-    https-proxy-agent "5.0.1"
-    proxy-from-env "1.1.0"
-    tar-fs "2.1.1"
-    unbzip2-stream "1.4.3"
+    devtools-protocol "0.0.1120988"
     ws "8.13.0"
 
-puppeteer@^19.0.0:
-  version "19.9.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-19.9.0.tgz#dba4ac9a4d686fa88a744ed933b4e722ecd7b018"
-  integrity sha512-JDx8WwGlkdQYTaa3OMYDF+uFWimiwNnacg5FGEC5J6+VxDsLK30wHKU/Db2LqEhtAoIu4RwS+BRH4zRPlCsFpA==
+puppeteer@^20.2.0:
+  version "20.2.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-20.2.0.tgz#4655d515dd05b3c7b92afabe7143e2e89865be3e"
+  integrity sha512-mGiCtWGq7S8MRUefZQV0AUiYGSPGmVlL/eYKPB4X9s9x0kuhzJmbSXSoWYFyo8MXaFmjUOqeMNP/3KeLZw207A==
   dependencies:
-    "@puppeteer/browsers" "0.4.1"
+    "@puppeteer/browsers" "1.2.0"
     cosmiconfig "8.1.3"
-    https-proxy-agent "5.0.1"
-    progress "2.0.3"
-    proxy-from-env "1.1.0"
-    puppeteer-core "19.9.0"
+    puppeteer-core "20.2.0"
 
 pure-rand@^6.0.0:
   version "6.0.1"
