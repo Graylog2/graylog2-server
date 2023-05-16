@@ -46,6 +46,7 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
+import org.graylog2.rest.resources.system.SlidingExpirationCookieFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.ContentTypeOptionFilter;
 import org.graylog2.shared.rest.EmbeddingControlFilter;
@@ -263,7 +264,8 @@ public class JerseyService extends AbstractIdleService {
                         WebAppNotFoundResponseFilter.class,
                         EmbeddingControlFilter.class,
                         OptionalResponseFilter.class,
-                        ContentTypeOptionFilter.class)
+                        ContentTypeOptionFilter.class,
+                        SlidingExpirationCookieFilter.class)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
