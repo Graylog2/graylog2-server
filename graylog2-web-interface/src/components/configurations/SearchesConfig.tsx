@@ -254,7 +254,7 @@ const SearchesConfig = () => {
         <Col md={4}>
           <strong>Relative time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
-          <strong>Relative time range options</strong>
+          <strong>Quick access time range options</strong>
           <QuickAccessTimeRangeOptionsSummary options={quickAccessTimeRangePresets.toArray()} />
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
