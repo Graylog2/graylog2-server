@@ -106,9 +106,9 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
                 setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
               }}
               value={currentBlockDict?.name || ''} />
-      {currentBlockDict.params.map((param) => buildParamField(param))}
+      {currentBlockDict?.params.map((param) => buildParamField(param))}
       {block ? <Button onClick={onUpdate}>Update</Button> : <Button onClick={onAdd}>Add</Button>}
-      <Button onClick={onCancel}>Cancel</Button>
+      {(block || currentBlockDict) && <Button onClick={onCancel}>Cancel</Button>}
     </>
   );
 

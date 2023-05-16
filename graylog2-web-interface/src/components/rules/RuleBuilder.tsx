@@ -126,6 +126,11 @@ const RuleBuilder = ({ isNewRule }: Props) => {
                               deleteBlock={deleteBlock} />
           ))
         }
+        <RuleBuilderBlock blockDict={conditionsDict}
+                          type="condition"
+                          addBlock={addBlock}
+                          updateBlock={updateBlock}
+                          deleteBlock={deleteBlock} />
       </Col>
       <Col md={6}>
         {
@@ -139,6 +144,11 @@ const RuleBuilder = ({ isNewRule }: Props) => {
                               deleteBlock={deleteBlock} />
           ))
         }
+        <RuleBuilderBlock blockDict={actionsDict}
+                          type="action"
+                          addBlock={addBlock}
+                          updateBlock={updateBlock}
+                          deleteBlock={deleteBlock} />
       </Col>
     </Row>
   );
