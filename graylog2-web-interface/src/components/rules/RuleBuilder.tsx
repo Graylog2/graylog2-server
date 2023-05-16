@@ -44,19 +44,22 @@ const RuleBuilder = ({ isNewRule }: Props) => {
   console.log('conditionsDict', conditionsDict);
   console.log('actionsDict', actionsDict);
 
-  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(rule?.rule_builder);
+  const initialRuleBuilder = rule?.rule_builder || { errors: [], conditions: [], actions: [] };
+
+  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(initialRuleBuilder);
   const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
   const [showNewActionBlock, setShowNewActionBlock] = useState<boolean>(false);
 
   const newConditionBlockOrder = ruleBuilder?.conditions.length || 0;
   const newActionBlockOrder = ruleBuilder?.actions.length || 0;
 
-  const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
-    setRuleBuilder(result.rule_builder);
-  });
+  // const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
+  //   setRuleBuilder(result.rule_builder);
+  // });
 
   const addBlock = async (type: string, block: RuleBlock) => {
-    validateRuleBuilder();
+    // validateRuleBuilder();
+
     const isValid = true;
 
     if (!isValid) return;
@@ -69,7 +72,7 @@ const RuleBuilder = ({ isNewRule }: Props) => {
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
-    validateRuleBuilder();
+    // validateRuleBuilder();
     const isValid = true;
 
     if (!isValid) return;
@@ -100,7 +103,7 @@ const RuleBuilder = ({ isNewRule }: Props) => {
       setRuleBuilder({ ...ruleBuilder, actions: currentActions });
     }
 
-    validateRuleBuilder();
+    // validateRuleBuilder();
   };
 
   return (
