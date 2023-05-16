@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.system.contentpacks.titles;
+package org.graylog.plugins.views.search.permissions;
 
-import org.graylog.plugins.views.search.permissions.EntityPermissions;
-import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
-import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
+public interface EntityPermissions {
+    boolean canReadTitle(String readPermission, String idAsString);
 
-public interface EntityTitleService {
-    EntitiesTitleResponse getTitles(EntityTitleRequest request, EntityPermissions permissions);
 }
