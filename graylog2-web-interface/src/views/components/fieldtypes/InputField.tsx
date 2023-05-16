@@ -15,16 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
-import InputsContext from 'contexts/InputsContext';
+import useInputs from 'hooks/useInputs';
 
 type Props = {
   value: string,
 }
 
 const InputField = ({ value }: Props) => {
-  const inputsMap = useContext(InputsContext);
+  const inputsMap = useInputs();
 
   const inputTitle = inputsMap[value]?.title ?? value;
 

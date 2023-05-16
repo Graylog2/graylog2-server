@@ -14,21 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext } from 'react';
 
-import useNodeSummaries from 'hooks/useNodeSummaries';
+import NodesContext from 'contexts/NodesContext';
 
-type Props = {
-  value: string,
-}
+const useNodeSummaries = () => useContext(NodesContext);
 
-const NodeField = ({ value }: Props) => {
-  const nodes = useNodeSummaries();
-  const node = nodes?.[value];
-
-  return node
-    ? <span title={value}>{node.short_node_id} / {node.hostname}</span>
-    : <span>{value}</span>;
-};
-
-export default NodeField;
+export default useNodeSummaries;

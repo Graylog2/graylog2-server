@@ -21,16 +21,16 @@ import StreamsContext from 'contexts/StreamsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
-import NodesContext from 'contexts/NodesContext';
-import InputsContext from 'contexts/InputsContext';
+import useInputs from 'hooks/useInputs';
+import useNodeSummaries from 'hooks/useNodeSummaries';
 
 const formatNode = (node: { short_node_id: string, hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
 
 const useMapKeys = (): KeyMapper => {
   const streams = useContext(StreamsContext);
   const streamsMap = useMemo(() => Object.fromEntries(streams?.map((stream) => [stream.id, stream]) ?? []), [streams]);
-  const nodes = useContext(NodesContext);
-  const inputs = useContext(InputsContext);
+  const nodes = useNodeSummaries();
+  const inputs = useInputs();
   const fieldTypes = useContext(FieldTypesContext);
   const activeQuery = useActiveQueryId();
   const currentFields = useMemo(() => fieldTypes?.queryFields?.get(activeQuery), [activeQuery, fieldTypes?.queryFields]);
