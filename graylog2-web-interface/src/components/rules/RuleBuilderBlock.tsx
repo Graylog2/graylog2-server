@@ -35,19 +35,18 @@ type Props = {
 const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [fieldValues, setFieldValues] = useState<{[key: string]: any}>({});
 
   useEffect(() => {
     if (block) { setCurrentBlockDict(blockDict.find(((b) => b.name === block.function))); }
   },
   [block, blockDict]);
 
-  const buildBlockData = () => {
+  const buildBlockData = (newParams) => {
     if (block) {
-      return { ...block, params: { ...block.params, ...fieldValues } };
+      return { ...block, params: { ...block.params, ...newParams } };
     }
 
-    return { function: currentBlockDict.name, params: fieldValues };
+    return { function: currentBlockDict.name, params: newParams };
   };
 
   const resetBlock = () => {
@@ -56,14 +55,10 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
     } else {
       setCurrentBlockDict(undefined);
     }
-
-    setFieldValues({});
   };
 
-  const handleFieldChange = (fieldName, fieldValue) => { setFieldValues({ ...fieldValues, [fieldName]: fieldValue }); };
-
-  const onAdd = () => {
-    addBlock(type, buildBlockData());
+  const onAdd = (paramsToAdd) => {
+    addBlock(type, buildBlockData(paramsToAdd));
 
     setEditMode(false);
   };
@@ -81,13 +76,12 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
     setEditMode(true);
   };
 
-  const onUpdate = () => {
-    updateBlock(order, type, buildBlockData());
+  const onUpdate = (params) => {
+    updateBlock(order, type, buildBlockData(params));
     setEditMode(false);
   };
 
   const onSelect = (option: string) => {
-    setFieldValues({});
     setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
   };
 
@@ -98,9 +92,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
   return (
     <div>
       {showForm ? (
-        <RuleBlockForm block={block}
-                       fieldValues={fieldValues}
-                       handleFieldChange={handleFieldChange}
+        <RuleBlockForm existingBlock={block}
                        onAdd={onAdd}
                        onCancel={onCancel}
                        onUpdate={onUpdate}

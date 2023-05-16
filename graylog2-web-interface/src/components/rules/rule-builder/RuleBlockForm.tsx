@@ -14,31 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
+import { Form, Formik } from 'formik';
 
-import { Select } from 'components/common';
-import { Button, Input } from 'components/bootstrap';
+import { Select, FormikInput } from 'components/common';
+import { Button } from 'components/bootstrap';
 import { RuleBuilderSupportedTypes } from 'hooks/useRuleBuilder';
 import type { BlockDict, BlockFieldDict, RuleBlock } from 'hooks/useRuleBuilder';
 import type { BlockType } from 'components/rules/RuleBuilderBlock';
 
 type Props = {
-  block: RuleBlock,
-  fieldValues: {[key: string]: any},
-  handleFieldChange: (fieldName: string, fieldValue: any) => void,
-  onAdd: () => void,
+  existingBlock: RuleBlock,
+  onAdd: (values: {[key: string]: any}) => void,
   onCancel: () => void,
   onSelect: (option: string) => void,
-  onUpdate: () => void
+  onUpdate: (values: {[key: string]: any}) => void
   options: Array<{ label: string, value: any }>,
   selectedBlockDict: BlockDict,
   type: BlockType,
 }
 
 const RuleBlockForm = ({
-  block,
-  fieldValues,
-  handleFieldChange,
+  existingBlock,
   onAdd,
   onCancel,
   onSelect,
@@ -48,68 +45,94 @@ const RuleBlockForm = ({
   type,
 }: Props) => {
   const buildParamField = (param: BlockFieldDict) => {
-    const paramValue = block?.function === selectedBlockDict.name && block?.params[param.name];
-
     switch (param.type) {
       case RuleBuilderSupportedTypes.String:
       case RuleBuilderSupportedTypes.Message:
         return (
-          <Input type="text"
-                 label={param.name}
-                 required={!param.optional}
-                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
-                 help={param.description}
-                 value={fieldValues[param.name] || paramValue || ''} />
+          <FormikInput type="text"
+                       key={`${selectedBlockDict.name}_${param.name}`}
+                       name={param.name}
+                       id={param.name}
+                       label={param.name}
+                       required={!param.optional}
+                       help={param.description} />
         );
       case RuleBuilderSupportedTypes.Number:
         return (
-          <Input type="number"
-                 rows={4}
-                 label={param.name}
-                 required={!param.optional}
-                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
-                 help={param.description}
-                 value={fieldValues[param.name] || paramValue} />
+          <FormikInput type="number"
+                       key={`${selectedBlockDict.name}_${param.name}`}
+                       name={param.name}
+                       id={param.name}
+                       label={param.name}
+                       required={!param.optional}
+                       help={param.description} />
         );
       case RuleBuilderSupportedTypes.Boolean:
         return (
-          <Input type="checkbox"
-                 rows={4}
-                 label={param.name}
-                 required={!param.optional}
-                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
-                 help={param.description}
-                 checked={fieldValues[param.name] || paramValue || false} />
+          <FormikInput type="checkbox"
+                       key={`${selectedBlockDict.name}_${param.name}`}
+                       name={param.name}
+                       id={param.name}
+                       label={param.name}
+                       required={!param.optional}
+                       help={param.description} />
         );
       case RuleBuilderSupportedTypes.Object:
         return (
-          <Input type="textarea"
-                 rows={4}
-                 label={param.name}
-                 required={!param.optional}
-                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
-                 help={param.description}
-                 value={fieldValues[param.name] || paramValue || ''} />
+          <FormikInput type="textarea"
+                       id={param.name}
+                       name={param.name}
+                       key={`${selectedBlockDict.name}_${param.name}`}
+                       rows={4}
+                       label={param.name}
+                       required={!param.optional}
+                       help={param.description} />
         );
       default:
         return null;
     }
   };
 
+  const buildInitialValues = useCallback(() => {
+    const initialValues = {};
+
+    if (!selectedBlockDict) { return initialValues; }
+
+    selectedBlockDict.params.forEach((param) => {
+      const initialBlockValue = existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
+
+      initialValues[param.name] = initialBlockValue;
+    },
+    );
+
+    return initialValues;
+  }, [selectedBlockDict, existingBlock]);
+
   return (
     <>
       <h2>{selectedBlockDict?.rule_builder_title || selectedBlockDict?.name}</h2>
       <p>{selectedBlockDict?.description}</p>
-      <Select id="block-select"
-              name="block-select"
-              placeholder={`Select a ${type}`}
-              options={options}
-              matchProp="label"
-              onChange={onSelect}
-              value={selectedBlockDict?.name || ''} />
-      {selectedBlockDict?.params.map((param) => buildParamField(param))}
-      {block ? <Button onClick={onUpdate}>Update</Button> : <Button onClick={onAdd}>Add</Button>}
-      {(block || selectedBlockDict) && <Button onClick={onCancel}>Cancel</Button>}
+      <Formik onSubmit={existingBlock ? onUpdate : onAdd} initialValues={buildInitialValues()}>
+        {({ resetForm }) => (
+          <Form>
+            <Select id="existingBlock-select"
+                    name="existingBlock-select"
+                    placeholder={`Select a ${type}`}
+                    options={options}
+                    clearable={false}
+                    matchProp="label"
+                    onChange={(option: string) => { resetForm(); onSelect(option); }}
+                    value={selectedBlockDict?.name || ''} />
+            {selectedBlockDict && (
+            <>
+              {selectedBlockDict.params.map((param) => buildParamField(param))}
+              <Button type="submit">{existingBlock ? 'Update' : 'Add'}</Button>
+              {(existingBlock || selectedBlockDict) && <Button onClick={() => { resetForm(); onCancel(); }}>Cancel</Button>}
+            </>
+            )}
+          </Form>
+        )}
+      </Formik>
     </>
   );
 };
