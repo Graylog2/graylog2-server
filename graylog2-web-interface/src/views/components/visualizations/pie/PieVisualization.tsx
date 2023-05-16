@@ -27,6 +27,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { keySeparator, humanSeparator } from 'views/Constants';
 
 import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
@@ -68,7 +69,7 @@ const _generateSeries = (mapKeys: KeyMapper): Generator => ({
     type,
     name,
     hole: 0.4,
-    labels: labels.map((label) => mapKeys(label, rowPivots[0])),
+    labels: labels.map((label) => label.split(keySeparator).map((l, i) => mapKeys(l, rowPivots[i])).join(humanSeparator)),
     originalLabels: labels,
     values,
     domain: {
