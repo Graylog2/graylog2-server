@@ -87,6 +87,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
   };
 
   const onSelect = (option: string) => {
+    setFieldValues({});
     setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
   };
 
