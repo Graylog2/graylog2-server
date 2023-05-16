@@ -16,14 +16,14 @@
  */
 import React, { useEffect, useState } from 'react';
 
-import { Button, Input } from 'components/bootstrap';
-import { RuleBuilderSupportedTypes } from 'hooks/useRuleBuilder';
-import type { RuleBlock, BlockDict, BlockFieldDict } from 'hooks/useRuleBuilder';
+import type { RuleBlock, BlockDict } from 'hooks/useRuleBuilder';
+import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
+import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 
-import Select from '../common/Select';
+export type BlockType = 'condition' | 'action'
 
 type Props = {
-  type: 'condition' | 'action',
+  type: BlockType,
   blockDict: Array<BlockDict>,
   block: RuleBlock,
   order: number,
@@ -37,29 +37,12 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
   const [editMode, setEditMode] = useState<boolean>(false);
   const [fieldValues, setFieldValues] = useState<{[key: string]: any}>({});
 
-  // Todo: add save button
-
   useEffect(() => {
     if (block) { setCurrentBlockDict(blockDict.find(((b) => b.name === block.function))); }
   },
   [block, blockDict]);
 
-  const handleFieldChange = (event, fieldName) => { setFieldValues({ ...fieldValues, [fieldName]: event.target.value }); };
-
-  const buildParamField = (paramDict: BlockFieldDict) => {
-    const paramValue = block?.params[paramDict.name];
-
-    switch (paramDict.type) {
-      case RuleBuilderSupportedTypes.String:
-        return (<Input type="text" label={paramDict.name} onChange={(e) => handleFieldChange(e, paramDict.name)} value={fieldValues[paramDict.name] || paramValue || ''} />);
-      case RuleBuilderSupportedTypes.Number:
-        return (<div>Number</div>);
-      case RuleBuilderSupportedTypes.Boolean:
-        return (<div>Boolean</div>);
-      default:
-        return null;
-    }
-  };
+  const handleFieldChange = (fieldName, fieldValue) => { setFieldValues({ ...fieldValues, [fieldName]: fieldValue }); };
 
   const buildBlockData = () => {
     if (block) {
@@ -85,6 +68,10 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
     setEditMode(false);
   };
 
+  const onEdit = () => {
+    setEditMode(true);
+  };
+
   const onUpdate = () => {
     updateBlock(order, type, buildBlockData());
     setEditMode(false);
@@ -95,35 +82,30 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
     resetBlock();
   };
 
-  const blockForm = () => (
-    <>
-      <Select id="block-select"
-              name="block-select"
-              placeholder={`Select a ${type}`}
-              options={blockDict.map(({ name }) => ({ label: name, value: name }))}
-              matchProp="label"
-              onChange={(option: string) => {
-                setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
-              }}
-              value={currentBlockDict?.name || ''} />
-      {currentBlockDict?.params.map((param) => buildParamField(param))}
-      {block ? <Button onClick={onUpdate}>Update</Button> : <Button onClick={onAdd}>Add</Button>}
-      {(block || currentBlockDict) && <Button onClick={onCancel}>Cancel</Button>}
-    </>
-  );
+  const onSelect = (option: string) => {
+    setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
+  };
 
-  const blockDisplay = () => (
-    <>
-      <p>{currentBlockDict?.name || ''}</p>
-      <Button onClick={() => setEditMode(true)}>Edit</Button>
-    </>
-  );
+  const options = blockDict.map(({ name }) => ({ label: name, value: name }));
 
   const showForm = !block || editMode;
 
   return (
     <div>
-      {showForm ? blockForm() : blockDisplay()}
+      {showForm ? (
+        <RuleBlockForm block={block}
+                       fieldValues={fieldValues}
+                       handleFieldChange={handleFieldChange}
+                       onAdd={onAdd}
+                       onCancel={onCancel}
+                       onUpdate={onUpdate}
+                       onSelect={onSelect}
+                       options={options}
+                       selectedBlockDict={currentBlockDict}
+                       type={type} />
+      ) : (
+        <RuleBlockDisplay blockDict={currentBlockDict} onEdit={onEdit} />
+      )}
     </div>
   );
 };
