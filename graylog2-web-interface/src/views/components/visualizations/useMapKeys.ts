@@ -36,7 +36,7 @@ const useMapKeys = (): KeyMapper => {
   const currentFields = useMemo(() => fieldTypes?.queryFields?.get(activeQuery), [activeQuery, fieldTypes?.queryFields]);
 
   return useCallback((key: Key, field: string) => {
-    const fieldType = currentFields.find((type) => type.name === field);
+    const fieldType = currentFields?.find((type) => type.name === field);
 
     switch (fieldType?.type?.type) {
       case 'node':
