@@ -18,29 +18,24 @@ import React, { useState } from 'react';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
-import type { RuleBlock, RuleBuilderType } from 'hooks/useRuleBuilder';
+import type { RuleBlock, RuleBuilderType, RuleBuilderRule } from 'hooks/useRuleBuilder';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
 
-type Props = {
-  isNewRule: boolean,
-};
+import ConfirmDialog from '../common/ConfirmDialog';
 
-const RuleBuilder = ({ isNewRule }: Props) => {
+const RuleBuilder = () => {
   const {
-    isLoadingConditions,
-    isLoadingActions,
     rule,
     conditionsDict,
     actionsDict,
-    refetchConditions,
-    refetchActions,
     createRule,
     updateRule,
-    fetchValidateRule,
-  } = useRuleBuilder(isNewRule);
+    deleteRule,
+    //fetchValidateRule,
+  } = useRuleBuilder();
 
-  console.log('rule', rule);
+  console.log('currentRule', rule);
   console.log('conditionsDict', conditionsDict);
   console.log('actionsDict', actionsDict);
 
@@ -49,6 +44,7 @@ const RuleBuilder = ({ isNewRule }: Props) => {
   const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(initialRuleBuilder);
   const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
   const [showNewActionBlock, setShowNewActionBlock] = useState<boolean>(false);
+  const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: 'condition'|'action' } | null>(null);
 
   const newConditionBlockOrder = ruleBuilder?.conditions.length || 0;
   const newActionBlockOrder = ruleBuilder?.actions.length || 0;
@@ -58,17 +54,29 @@ const RuleBuilder = ({ isNewRule }: Props) => {
   // });
 
   const addBlock = async (type: string, block: RuleBlock) => {
-    // validateRuleBuilder();
-
+    //validateRuleBuilder();
     const isValid = true;
 
     if (!isValid) return;
 
+    const newRule: Partial<RuleBuilderRule> = {
+      title: '', // TODO
+      description: '', // TODO
+      rule_builder: {
+        conditions: [],
+        actions: [],
+      },
+    };
+
     if (type === 'condition') {
       setRuleBuilder({ ...ruleBuilder, conditions: [...ruleBuilder.conditions, block] });
+      newRule.rule_builder.conditions = [...newRule.rule_builder.conditions, block];
     } else {
       setRuleBuilder({ ...ruleBuilder, actions: [...ruleBuilder.actions, block] });
+      newRule.rule_builder.actions = [...newRule.rule_builder.actions, block];
     }
+
+    await createRule(newRule as RuleBuilderRule);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
@@ -77,20 +85,26 @@ const RuleBuilder = ({ isNewRule }: Props) => {
 
     if (!isValid) return;
 
+    const newRule: RuleBuilderRule = { ...rule };
+
     if (type === 'condition') {
-      const currentConditions = [...ruleBuilder.conditions];
+      const currentConditions = [...newRule.rule_builder.conditions];
       currentConditions[orderIndex] = block;
 
       setRuleBuilder({ ...ruleBuilder, conditions: currentConditions });
+      newRule.rule_builder.conditions = currentConditions;
     } else {
-      const currentActions = [...ruleBuilder.actions];
+      const currentActions = [...newRule.rule_builder.actions];
       currentActions[orderIndex] = block;
 
       setRuleBuilder({ ...ruleBuilder, actions: currentActions });
+      newRule.rule_builder.actions = currentActions;
     }
+
+    await updateRule(newRule);
   };
 
-  const deleteBlock = (orderIndex: number, type: string) => {
+  const deleteBlock = async (orderIndex: number, type: 'condition'|'action') => {
     if (type === 'condition') {
       const currentConditions = [...ruleBuilder.conditions];
       currentConditions.splice(orderIndex, 1);
@@ -103,62 +117,76 @@ const RuleBuilder = ({ isNewRule }: Props) => {
       setRuleBuilder({ ...ruleBuilder, actions: currentActions });
     }
 
-    // validateRuleBuilder();
+    await deleteRule(rule.id);
+    //validateRuleBuilder();
   };
 
   return (
-    <Row className="content">
-      <Col md={6}>
-        {
-          ruleBuilder?.conditions.map((condition, index) => (
-            <RuleBuilderBlock blockDict={conditionsDict}
-                              block={condition}
-                              order={index}
+    <>
+      <Row className="content">
+        <Col md={6}>
+          {
+            ruleBuilder?.conditions.map((condition, index) => (
+              <RuleBuilderBlock blockDict={conditionsDict}
+                                block={condition}
+                                order={index}
+                                type="condition"
+                                addBlock={addBlock}
+                                updateBlock={updateBlock}
+                                deleteBlock={deleteBlock} />
+            ))
+          }
+          {(showNewConditionBlock || !newConditionBlockOrder) && (
+            <RuleBuilderBlock blockDict={conditionsDict || []}
+                              block={null}
+                              order={newConditionBlockOrder}
                               type="condition"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
                               deleteBlock={deleteBlock} />
-          ))
-        }
-        {(showNewConditionBlock || !newConditionBlockOrder) && (
-          <RuleBuilderBlock blockDict={conditionsDict || []}
-                            block={null}
-                            order={newConditionBlockOrder}
-                            type="condition"
-                            addBlock={addBlock}
-                            updateBlock={updateBlock}
-                            deleteBlock={deleteBlock} />
-        )}
-        {(newConditionBlockOrder > 0) && (
-          <Button bsStyle="info" onClick={() => setShowNewConditionBlock(true)}>Add Condition</Button>
-        )}
-      </Col>
-      <Col md={6}>
-        {
-          ruleBuilder?.actions.map((action, index) => (
-            <RuleBuilderBlock blockDict={actionsDict}
-                              block={action}
-                              order={index}
+          )}
+          {(newConditionBlockOrder > 0) && (
+            <Button bsStyle="info" onClick={() => setShowNewConditionBlock(true)}>Add Condition</Button>
+          )}
+        </Col>
+        <Col md={6}>
+          {
+            ruleBuilder?.actions.map((action, index) => (
+              <RuleBuilderBlock blockDict={actionsDict}
+                                block={action}
+                                order={index}
+                                type="action"
+                                addBlock={addBlock}
+                                updateBlock={updateBlock}
+                                deleteBlock={deleteBlock} />
+            ))
+          }
+          {(showNewActionBlock || !newActionBlockOrder) && (
+            <RuleBuilderBlock blockDict={actionsDict || []}
+                              block={null}
+                              order={newActionBlockOrder}
                               type="action"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
                               deleteBlock={deleteBlock} />
-          ))
-        }
-        {(showNewActionBlock || !newActionBlockOrder) && (
-          <RuleBuilderBlock blockDict={actionsDict || []}
-                            block={null}
-                            order={newActionBlockOrder}
-                            type="action"
-                            addBlock={addBlock}
-                            updateBlock={updateBlock}
-                            deleteBlock={deleteBlock} />
-        )}
-        {(newActionBlockOrder > 0) && (
-          <Button bsStyle="info" onClick={() => setShowNewActionBlock(true)}>Add Action</Button>
-        )}
-      </Col>
-    </Row>
+          )}
+          {(newActionBlockOrder > 0) && (
+            <Button bsStyle="info" onClick={() => setShowNewActionBlock(true)}>Add Action</Button>
+          )}
+        </Col>
+      </Row>
+      {blockToDelete && (
+        <ConfirmDialog title={`Delete ${blockToDelete.type}`}
+                       show
+                       onConfirm={async () => {
+                         await deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
+                         setBlockToDelete(null);
+                       }}
+                       onCancel={() => setBlockToDelete(null)}>
+          <>Are you sure you want to delete <strong>{blockToDelete.type} [{blockToDelete.orderIndex}]</strong>?</>
+        </ConfirmDialog>
+      )}
+    </>
   );
 };
 
