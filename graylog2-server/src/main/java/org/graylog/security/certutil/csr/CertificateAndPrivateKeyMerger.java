@@ -22,14 +22,13 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 /**
@@ -38,13 +37,21 @@ import java.security.cert.X509Certificate;
  */
 public class CertificateAndPrivateKeyMerger {
 
+    private final KeyPairChecker keyPairChecker;
+
+    @Inject
+    public CertificateAndPrivateKeyMerger(final KeyPairChecker keyPairChecker) {
+        this.keyPairChecker = keyPairChecker;
+    }
+
     public void merge(final X509Certificate signedCertificate,
                       final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
                       final char[] privateKeyStoragePassword,
                       final char[] certFilePassword,
                       final String alias,
                       final Path mergedFilePath,
-                      final KeystoreFileStorage keystoreFileStorage) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, OperatorCreationException, PKCSException, KeyStoreStorageException {
+                      final KeystoreFileStorage keystoreFileStorage) throws GeneralSecurityException, IOException,
+            OperatorCreationException, PKCSException, KeyStoreStorageException {
 
         KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
         nodeKeystore.load(null, null);
@@ -52,8 +59,11 @@ public class CertificateAndPrivateKeyMerger {
         final PrivateKey privateKey = privateKeyEncryptedStorage.readEncryptedKey(privateKeyStoragePassword);
         nodeKeystore.setKeyEntry(alias, privateKey, privateKeyStoragePassword, new Certificate[]{signedCertificate});
 
-        //TODO: should we check if public and private keys form a valid pair, before merging
+        if (!keyPairChecker.matchingKeys(privateKey, signedCertificate.getPublicKey())) {
+            throw new GeneralSecurityException("Private key from CSR and public key from certificate do not form a valid pair");
+        }
 
+        //TODO: there is a risk that final result will be stored in Mongo, not in a filesystem
         keystoreFileStorage.writeKeyStore(mergedFilePath, nodeKeystore, certFilePassword);
     }
 }
