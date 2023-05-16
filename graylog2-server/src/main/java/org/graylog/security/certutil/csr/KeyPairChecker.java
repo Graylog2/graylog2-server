@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil.csr;
 
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -31,7 +32,7 @@ public class KeyPairChecker {
                                 final PublicKey publicKey) throws GeneralSecurityException {
         Signature sign = Signature.getInstance(SIGNING_ALGORITHM);
 
-        byte[] bytes = SAMPLE_CHALLANGE.getBytes();
+        byte[] bytes = SAMPLE_CHALLANGE.getBytes(StandardCharsets.UTF_8);
 
         sign.initSign(privateKey);
         sign.update(bytes);
