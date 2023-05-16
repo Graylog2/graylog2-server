@@ -19,7 +19,7 @@ package org.graylog.testing.completebackend;
 import java.util.Optional;
 
 public class TimeoutHelpers {
-    private static final double DEFAULT_MULTIPLIER = 1.5;
+    private static final double DEFAULT_MULTIPLIER = 1.0;
 
     public static Number applyTimeoutMultiplier(Number timeout) {
         return timeout.doubleValue() * timeoutMultiplier();
