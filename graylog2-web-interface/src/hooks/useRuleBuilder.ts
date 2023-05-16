@@ -21,7 +21,6 @@ import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-
 import { PipelineRulesContext } from 'components/rules/RuleContext';
 
 const mockUseRuleBuilder = {
@@ -307,7 +306,7 @@ type RuleBlockField = {
 
 export type RuleBlock = {
   function: string,
-  parameters: RuleBlockField,
+  params: RuleBlockField,
   output?: string,
   errors?: Array<string>
 }
