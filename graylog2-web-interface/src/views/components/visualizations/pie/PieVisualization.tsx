@@ -69,6 +69,7 @@ const _generateSeries = (mapKeys: KeyMapper): Generator => ({
     name,
     hole: 0.4,
     labels: labels.map((label) => mapKeys(label, rowPivots[0])),
+    originalLabels: labels,
     values,
     domain: {
       x: _horizontalDimensions(idx, total),
@@ -97,7 +98,9 @@ const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string> }>) => [...new Set(data.flatMap(({ labels }) => labels))];
+const labelMapper = (data: Array<{ labels: Array<string>, originalLabels?: Array<string> }>) => [
+  ...new Set(data.flatMap(({ labels, originalLabels }) => originalLabels ?? labels)),
+];
 
 const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots?.flatMap((pivot) => pivot.fields);
 
