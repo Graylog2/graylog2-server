@@ -14,37 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import type { RuleBlock, RuleBuilderType } from 'hooks/useRuleBuilder';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
-import { PipelineRulesContext } from './RuleContext';
 
 type Props = {
   isNewRule: boolean,
 };
 
 const RuleBuilder = ({ isNewRule }: Props) => {
-  const {
-    description,
-    handleDescription,
-    handleSavePipelineRule,
-    ruleSourceRef,
-    onAceLoaded,
-    onChangeSource,
-    ruleSource,
-    simulateRule,
-    rawMessageToSimulate,
-    setRawMessageToSimulate,
-    ruleSimulationResult,
-    setRuleSimulationResult,
-    startRuleSimulation,
-    setStartRuleSimulation,
-  } = useContext(PipelineRulesContext);
-
   const {
     isLoadingConditions,
     isLoadingActions,
@@ -56,9 +38,18 @@ const RuleBuilder = ({ isNewRule }: Props) => {
     createRule,
     updateRule,
     fetchValidateRule,
-  } = useRuleBuilder();
+  } = useRuleBuilder(isNewRule);
 
-  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(rule.rule_builder);
+  console.log('rule', rule);
+  console.log('conditionsDict', conditionsDict);
+  console.log('actionsDict', actionsDict);
+
+  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(rule?.rule_builder);
+  const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
+  const [showNewActionBlock, setShowNewActionBlock] = useState<boolean>(false);
+
+  const newConditionBlockOrder = ruleBuilder?.conditions.length || 0;
+  const newActionBlockOrder = ruleBuilder?.actions.length || 0;
 
   const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
     setRuleBuilder(result.rule_builder);
@@ -116,7 +107,7 @@ const RuleBuilder = ({ isNewRule }: Props) => {
     <Row className="content">
       <Col md={6}>
         {
-          ruleBuilder.conditions.map((condition, index) => (
+          ruleBuilder?.conditions.map((condition, index) => (
             <RuleBuilderBlock blockDict={conditionsDict}
                               block={condition}
                               order={index}
@@ -126,15 +117,22 @@ const RuleBuilder = ({ isNewRule }: Props) => {
                               deleteBlock={deleteBlock} />
           ))
         }
-        <RuleBuilderBlock blockDict={conditionsDict}
-                          type="condition"
-                          addBlock={addBlock}
-                          updateBlock={updateBlock}
-                          deleteBlock={deleteBlock} />
+        {(showNewConditionBlock || !newConditionBlockOrder) && (
+          <RuleBuilderBlock blockDict={conditionsDict || []}
+                            block={null}
+                            order={newConditionBlockOrder}
+                            type="condition"
+                            addBlock={addBlock}
+                            updateBlock={updateBlock}
+                            deleteBlock={deleteBlock} />
+        )}
+        {(newConditionBlockOrder > 0) && (
+          <Button bsStyle="info" onClick={() => setShowNewConditionBlock(true)}>Add Condition</Button>
+        )}
       </Col>
       <Col md={6}>
         {
-          ruleBuilder.actions.map((action, index) => (
+          ruleBuilder?.actions.map((action, index) => (
             <RuleBuilderBlock blockDict={actionsDict}
                               block={action}
                               order={index}
@@ -144,11 +142,18 @@ const RuleBuilder = ({ isNewRule }: Props) => {
                               deleteBlock={deleteBlock} />
           ))
         }
-        <RuleBuilderBlock blockDict={actionsDict}
-                          type="action"
-                          addBlock={addBlock}
-                          updateBlock={updateBlock}
-                          deleteBlock={deleteBlock} />
+        {(showNewActionBlock || !newActionBlockOrder) && (
+          <RuleBuilderBlock blockDict={actionsDict || []}
+                            block={null}
+                            order={newActionBlockOrder}
+                            type="action"
+                            addBlock={addBlock}
+                            updateBlock={updateBlock}
+                            deleteBlock={deleteBlock} />
+        )}
+        {(newActionBlockOrder > 0) && (
+          <Button bsStyle="info" onClick={() => setShowNewActionBlock(true)}>Add Action</Button>
+        )}
       </Col>
     </Row>
   );
