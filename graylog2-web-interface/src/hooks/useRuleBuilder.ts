@@ -26,10 +26,10 @@ import { PipelineRulesContext } from 'components/rules/RuleContext';
 export type RuleBuilderRule = {
   rule_builder: RuleBuilderType,
   description: string,
-  created_at: string,
-  id: string,
+  created_at?: string,
+  id?: string,
   title: string,
-  modified_at: string,
+  modified_at?: string,
 }
 
 type RuleBlockField = {
@@ -91,12 +91,23 @@ const createRule = async (rule: RuleBuilderRule) => {
 const updateRule = async (rule: RuleBuilderRule) => {
   try {
     await fetch(
-      'POST',
+      'PUT',
       qualifyUrl(ApiRoutes.RuleBuilderController.update(rule.id).url),
       rule,
     );
   } catch (errorThrown) {
     UserNotification.error(`Updating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Update the Rule Builder Rule.');
+  }
+};
+
+const deleteRule = async (ruleId: string) => {
+  try {
+    await fetch(
+      'DELETE',
+      qualifyUrl(ApiRoutes.RulesController.delete(ruleId).url),
+    );
+  } catch (errorThrown) {
+    UserNotification.error(`Deleting the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Delete the Rule Builder Rule.');
   }
 };
 
@@ -106,25 +117,12 @@ const fetchValidateRule = async (rule: RuleBuilderRule): Promise<RuleBuilderRule
   rule,
 );
 
-const fetchRule = async (ruleId: string): Promise<RuleBuilderRule> => fetch('GET', qualifyUrl(ApiRoutes.RulesController.get(ruleId).url));
 const fetchConditionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listConditionsDict().url));
 const fetchActionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listActionsDict().url));
 
-const useRuleBuilder = (isNewRule: boolean) => {
+const useRuleBuilder = () => {
   const { rule } = useContext(PipelineRulesContext);
 
-  const { data, refetch: refetchRule, isFetching: isLoadingRule } = useQuery<RuleBuilderRule>(
-    ['rule'],
-    () => fetchRule(rule?.id),
-    {
-      enabled: !isNewRule && Boolean(rule?.id),
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Rule Builder Rule list failed with status: ${errorThrown}`,
-          'Could not load Rule Builder Rule list.');
-      },
-      keepPreviousData: true,
-    },
-  );
   const { data: conditionsDict, refetch: refetchConditionsDict, isFetching: isLoadingConditionsDict } = useQuery<Array<BlockDict>>(
     ['conditions'],
     fetchConditionsDict,
@@ -149,17 +147,16 @@ const useRuleBuilder = (isNewRule: boolean) => {
   );
 
   return {
-    isLoadingRule,
     isLoadingConditionsDict,
     isLoadingActionsDict,
     conditionsDict,
     actionsDict,
-    rule: data,
-    refetchRule,
+    rule: rule as RuleBuilderRule|null,
     refetchConditionsDict,
     refetchActionsDict,
     createRule,
     updateRule,
+    deleteRule,
     fetchValidateRule,
   };
 };

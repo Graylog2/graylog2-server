@@ -54,7 +54,7 @@ const Rule = ({ create, title }) => {
       </PageHeader>
 
       {isRuleBuilder ? (
-        <RuleBuilder isNewRule={create} />
+        <RuleBuilder />
       ) : (
         <Row className="content">
           <Col md={6}>
