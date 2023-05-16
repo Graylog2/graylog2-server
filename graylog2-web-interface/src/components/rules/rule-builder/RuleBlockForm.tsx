@@ -48,7 +48,7 @@ const RuleBlockForm = ({
   type,
 }: Props) => {
   const buildParamField = (paramDict: BlockFieldDict) => {
-    const paramValue = block?.params[paramDict.name];
+    const paramValue = block?.function === selectedBlockDict.name && block?.params[paramDict.name];
 
     switch (paramDict.type) {
       case RuleBuilderSupportedTypes.String:
