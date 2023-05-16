@@ -14,33 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.util;
+package org.graylog.plugins.views.search.permissions;
 
-/**
- * Utility class to generate unique names.
- *
- * Not threadsafe, you need to lock externally.
- */
-public class UniqueNamer {
-
-    private final String prefix;
-
-    private long number = 0;
-
-    public UniqueNamer() {
-        this("name-");
-    }
-
-    public UniqueNamer(String prefix) {
-        this.prefix = prefix;
-    }
-
-    public String nextName() {
-        return prefix + ++number;
-    }
-
-    public String currentName() {
-        return prefix + number;
-    }
+public interface EntityPermissions {
+    boolean canReadTitle(String readPermission, String idAsString);
 
 }

@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import fetch, { fetchStreamingPlainText } from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically, fetchStreamingPlainText } from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
@@ -43,7 +43,7 @@ export const ClusterOverviewStore = singletonStore(
     },
 
     cluster() {
-      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+      const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(this.sourceUrl));
 
       promise.then(
         (response) => {

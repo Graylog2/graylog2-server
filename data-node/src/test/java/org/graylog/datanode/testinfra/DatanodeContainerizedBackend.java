@@ -68,6 +68,7 @@ public class DatanodeContainerizedBackend {
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
+                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/bin/config")
 
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
@@ -105,6 +106,9 @@ public class DatanodeContainerizedBackend {
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
                                 .run("mkdir -p config")
+                                .run("mkdir -p config/opensearch")
+                                .run("mkdir -p bin")
+                                .run("mkdir -p bin/config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
                                 .add(opensearchTarArchive, ".") // this will automatically extract the tar
