@@ -16,10 +16,10 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.response.decorators;
 
-import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 
 public interface FieldDecorator {
     boolean accept(RequestedField field);
-    Object decorate(RequestedField field, Object value, Subject subject);
+    Object decorate(RequestedField field, Object value, SearchUser searchUser);
 }

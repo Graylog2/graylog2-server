@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.response.decorators;
 
-import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -26,6 +26,7 @@ import org.graylog2.shared.utilities.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.function.Function;
 
 
 public class NodeTitleDecorator implements FieldDecorator {
@@ -48,7 +49,7 @@ public class NodeTitleDecorator implements FieldDecorator {
     }
 
     @Override
-    public Object decorate(RequestedField field, Object value, Subject subject) {
+    public Object decorate(RequestedField field, Object value, SearchUser searchUser) {
         try {
             final Node node = nodeService.byNodeId(value.toString());
             return StringUtils.f("%s / %s", node.getShortNodeId(), node.getHostname());

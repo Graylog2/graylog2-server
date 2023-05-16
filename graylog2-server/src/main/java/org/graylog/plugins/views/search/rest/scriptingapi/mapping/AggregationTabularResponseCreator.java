@@ -21,6 +21,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
@@ -47,14 +48,14 @@ import java.util.stream.Stream;
 public class AggregationTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationTabularResponseCreator.class);
-    private Set<FieldDecorator> decorators;
+    private final Set<FieldDecorator> decorators;
 
     @Inject
     public AggregationTabularResponseCreator(Set<FieldDecorator> decorators) {
         this.decorators = decorators;
     }
 
-    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob, Subject subject) throws QueryFailedException {
+    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob, SearchUser searchUser) throws QueryFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
 
 
@@ -66,7 +67,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
 
             if (aggregationResult instanceof PivotResult pivotResult) {
                 final List<SeriesSpec> seriesSpecs = extractSeriesSpec(queryResult);
-                return mapToResponse(searchRequestSpec, pivotResult, seriesSpecs, subject);
+                return mapToResponse(searchRequestSpec, pivotResult, seriesSpecs, searchUser);
             }
         }
 
@@ -83,16 +84,16 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
     }
 
     private TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec,
-                                          final PivotResult pivotResult, List<SeriesSpec> seriesSpec, Subject subject) {
+                                          final PivotResult pivotResult, List<SeriesSpec> seriesSpec, SearchUser searchUser) {
         return new TabularResponse(
                 searchRequestSpec.getSchema(),
-                getDatarows(searchRequestSpec, pivotResult, seriesSpec, subject),
+                getDatarows(searchRequestSpec, pivotResult, seriesSpec, searchUser),
                 new Metadata(pivotResult.effectiveTimerange())
         );
     }
 
     private List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
-                                                  final PivotResult pivotResult, List<SeriesSpec> seriesSpecs, Subject subject) {
+                                                  final PivotResult pivotResult, List<SeriesSpec> seriesSpecs, SearchUser searchUser) {
         final int numGroupings = searchRequestSpec.groupings().size();
 
         final Set<FieldDecorator> cachedDecorators = this.decorators.stream().map(CachingDecorator::new).collect(Collectors.toSet());
@@ -101,7 +102,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
                 .stream()
                 .map(pivRow -> {
                     final Stream<Object> groupings = Stream.concat(
-                            decorateGroupings(pivRow.key(), searchRequestSpec, decorators, subject),
+                            decorateGroupings(pivRow.key(), searchRequestSpec, decorators, searchUser),
                             Collections.nCopies(numGroupings - pivRow.key().size(), "-").stream()  //sometimes pivotRow does not have enough keys - empty value!
                     );
 
@@ -113,22 +114,22 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
                 .collect(Collectors.toList());
     }
 
-    private Stream<Object> decorateGroupings(ImmutableList<String> keys, AggregationRequestSpec searchRequestSpec, Set<FieldDecorator> decorators, Subject subject) {
+    private Stream<Object> decorateGroupings(ImmutableList<String> keys, AggregationRequestSpec searchRequestSpec, Set<FieldDecorator> decorators, SearchUser searchUser) {
         List<Object> result = new ArrayList<>();
         for(int i = 0; i < keys.size(); i++) {
             final String value = keys.get(i);
             final RequestedField field = searchRequestSpec.groupings().get(i).requestedField();
-            final Object decorated = decorate(decorators, field, value, subject);
+            final Object decorated = decorate(decorators, field, value, searchUser);
             result.add(decorated);
         }
         return result.stream();
     }
 
-    private Object decorate(Set<FieldDecorator> decorators, RequestedField field, Object val, Subject subject) {
+    private Object decorate(Set<FieldDecorator> decorators, RequestedField field, Object val, SearchUser searchUser) {
         final Optional<Object> decorated = decorators.stream()
                 .filter(d -> d.accept(field))
                 .findFirst()
-                .map(d -> d.decorate(field, val, subject));
+                .map(d -> d.decorate(field, val, searchUser));
 
         if (decorated.isEmpty() && field.hasDecorator()) {
             throw new IllegalArgumentException(StringUtils.f("Unsupported decorator '%s' on field '%s'", field.decorator(), field.name()));

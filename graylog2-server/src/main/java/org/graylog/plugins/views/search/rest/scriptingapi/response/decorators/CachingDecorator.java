@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.response.decorators;
 
-import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 
 import java.util.HashMap;
@@ -37,10 +37,10 @@ public class CachingDecorator implements FieldDecorator {
     }
 
     @Override
-    public Object decorate(RequestedField field, Object value, Subject subject) {
-        final CachingDecoratorKey key = new CachingDecoratorKey(field, value, subject);
+    public Object decorate(RequestedField field, Object value, SearchUser searchUser) {
+        final CachingDecoratorKey key = new CachingDecoratorKey(field, value, searchUser);
         if (!cache.containsKey(key)) {
-            cache.put(key, delegate.decorate(field, value, subject));
+            cache.put(key, delegate.decorate(field, value, searchUser));
         }
         return cache.get(key);
     }

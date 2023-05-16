@@ -16,10 +16,11 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.response.decorators;
 
-import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog2.plugin.Message;
 import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
@@ -30,6 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TitleDecorator implements FieldDecorator {
@@ -57,15 +60,30 @@ public class TitleDecorator implements FieldDecorator {
     }
 
     @Override
-    public Object decorate(RequestedField field, Object value, Subject subject) {
+    public Object decorate(RequestedField field, Object value, SearchUser searchUser) {
 
-        final EntityTitleRequest req = parseIDs(value).stream()
+        final List<String> ids = parseIDs(value);
+        final EntityTitleRequest req = ids.stream()
                 .map(id -> new EntityIdentifier(id, FIELD_ENTITY_MAPPER.get(field.name())))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), EntityTitleRequest::new));
 
-        return entityTitleService.getTitles(subject, req).entities().stream()
-                .map(EntityTitleResponse::title)
+        final EntitiesTitleResponse response = entityTitleService.getTitles(req, searchUser);
+        return extractTitles(ids, response.entities()).stream()
                 .collect(Collectors.collectingAndThen(Collectors.toList(), this::unwrapIfSingleResult));
+    }
+
+    private List<String> extractTitles(List<String> ids, Set<EntityTitleResponse> entities) {
+        return ids.stream()
+                .map(id -> extractTitle(entities, id))
+                .collect(Collectors.toList());
+    }
+
+    private static String extractTitle(Set<EntityTitleResponse> entities, String id) {
+        return entities.stream().
+                filter(e -> Objects.equals(id, e.id()))
+                .findFirst()
+                .map(EntityTitleResponse::title)
+                .orElse(id);
     }
 
     /**

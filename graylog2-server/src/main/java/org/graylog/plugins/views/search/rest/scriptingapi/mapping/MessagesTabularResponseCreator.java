@@ -66,7 +66,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
             throwErrorIfAnyAvailable(queryResult);
             final SearchType.Result messageListResult = queryResult.searchTypes().get(MessagesSpecToMessageListMapper.MESSAGE_LIST_ID);
             if (messageListResult instanceof MessageList.Result messagesResult) {
-                return mapToResponse(messagesRequestSpec, messagesResult, searchUser, subject);
+                return mapToResponse(messagesRequestSpec, messagesResult, searchUser);
             }
         }
 
@@ -76,10 +76,10 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     private TabularResponse mapToResponse(final MessagesRequestSpec searchRequestSpec,
                                           final MessageList.Result messageListResult,
-                                          final SearchUser searchUser, Subject subject) {
+                                          final SearchUser searchUser) {
         return new TabularResponse(
                 getSchema(searchRequestSpec, searchUser),
-                getDatarows(searchRequestSpec, messageListResult, subject),
+                getDatarows(searchRequestSpec, messageListResult, searchUser),
                 new Metadata(messageListResult.effectiveTimerange())
         );
     }
@@ -96,7 +96,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
     }
 
     private List<List<Object>> getDatarows(final MessagesRequestSpec messagesRequestSpec,
-                                           final MessageList.Result messageListResult, Subject subject) {
+                                           final MessageList.Result messageListResult, SearchUser searchUser) {
 
         final Set<FieldDecorator> cachedDecorators = this.decorators.stream().map(CachingDecorator::new).collect(Collectors.toSet());
 
@@ -104,21 +104,21 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
                 .stream()
                 .map(message -> messagesRequestSpec.requestedFields()
                         .stream()
-                        .map(field -> extractValue(message, field, cachedDecorators, subject))
+                        .map(field -> extractValue(message, field, cachedDecorators, searchUser))
                         .collect(Collectors.toList())).collect(Collectors.toList());
     }
 
-    private Object extractValue(ResultMessageSummary message, RequestedField field, Set<FieldDecorator> decorators, Subject subject) {
+    private Object extractValue(ResultMessageSummary message, RequestedField field, Set<FieldDecorator> decorators, SearchUser searchUser) {
         return Optional.ofNullable(message.message().get(field.name()))
-                .map(value -> decorate(decorators, field, value, subject))
+                .map(value -> decorate(decorators, field, value, searchUser))
                 .orElse("-");
     }
 
-    private Object decorate(Set<FieldDecorator> decorators, RequestedField field, Object val, Subject subject) {
+    private Object decorate(Set<FieldDecorator> decorators, RequestedField field, Object val, SearchUser searchUser) {
         final Optional<Object> decorated = decorators.stream()
                 .filter(d -> d.accept(field))
                 .findFirst()
-                .map(d -> d.decorate(field, val, subject));
+                .map(d -> d.decorate(field, val, searchUser));
 
         if (decorated.isEmpty() && field.hasDecorator()) {
             throw new IllegalArgumentException(StringUtils.f("Unsupported decorator '%s' on field '%s'", field.decorator(), field.name()));

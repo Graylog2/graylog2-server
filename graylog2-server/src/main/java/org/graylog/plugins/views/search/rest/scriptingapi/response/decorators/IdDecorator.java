@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.response.decorators;
 
 import com.google.common.collect.Sets;
-import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog2.plugin.Message;
 
@@ -42,7 +42,7 @@ public class IdDecorator implements FieldDecorator {
     }
 
     @Override
-    public Object decorate(RequestedField field, Object value, Subject subject) {
+    public Object decorate(RequestedField field, Object value, SearchUser searchUser) {
         // ID is the default value, we don't need to map anything, just forward it directly
         return value;
     }
