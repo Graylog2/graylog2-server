@@ -1,0 +1,7 @@
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "added"
+message = "Allow simulation of json messages on the rule creation page"
+
+issues = ["15490"]
+pulls = ["15480"]
+

@@ -14,33 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.util;
+import { notifications } from '@mantine/notifications';
 
-/**
- * Utility class to generate unique names.
- *
- * Not threadsafe, you need to lock externally.
- */
-public class UniqueNamer {
+const UserNotification = {
+  error(message, title) {
+    notifications.show({
+      message,
+      title: title || 'Error',
+      autoClose: 10000,
+      color: 'red',
+    });
+  },
+  warning(message, title) {
+    notifications.show({
+      message,
+      title: title || 'Attention',
+    });
+  },
+  success(message, title) {
+    notifications.show({
+      message,
+      title: title || 'Information',
+      color: 'green',
+    });
+  },
+};
 
-    private final String prefix;
-
-    private long number = 0;
-
-    public UniqueNamer() {
-        this("name-");
-    }
-
-    public UniqueNamer(String prefix) {
-        this.prefix = prefix;
-    }
-
-    public String nextName() {
-        return prefix + ++number;
-    }
-
-    public String currentName() {
-        return prefix + number;
-    }
-
-}
+export default UserNotification;
