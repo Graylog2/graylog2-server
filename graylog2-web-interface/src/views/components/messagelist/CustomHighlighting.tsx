@@ -43,7 +43,6 @@ const extractDecorators = ({
   fieldTypes: FieldTypes,
   highlightingRules: Array<HighlightingRule>
 }) => {
-  const decorators = [];
   let type;
 
   if (fieldTypes) {
@@ -51,35 +50,30 @@ const extractDecorators = ({
     type = (all.find((f) => f.name === fieldName) || { type: FieldType.Unknown }).type.type;
   }
 
-  const highlightingRulesMap = highlightingRules.reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {});
-  const rules = highlightingRulesMap[fieldName] ?? [];
+  const rules = highlightingRules.filter((rule) => rule.field === fieldName);
   const formattedValue = type === 'date' ? formatTime(fieldValue) : fieldValue;
 
-  rules.forEach((rule) => {
-    const ranges = [];
+  const decorators = rules
+    .filter((rule) => rule.conditionFunc(fieldValue, rule.value))
+    .map((rule) => {
+      const ranges = {
+        [fieldName]: [{
+          start: 0,
+          length: String(formattedValue).length,
+        }],
+      };
 
-    if (rule.conditionFunc(fieldValue, rule.value)) {
-      ranges.push({
-        start: String(formattedValue).indexOf(formattedValue),
-        length: String(formattedValue).length,
-      });
-    }
-
-    if (ranges.length > 0) {
-      decorators.push(({ field, value }) => (
+      return ({ field, value }: { field: string, value: any }) => (
         <PossiblyHighlight field={field}
                            value={value}
-                           highlightRanges={ranges.length > 0 ? { [fieldName]: ranges } : {}}
+                           highlightRanges={ranges}
                            color={rule.color} />
-      ));
-    }
-  });
+      );
+    });
 
-  if (decorators.length === 0) {
-    decorators.push(Highlight);
-  }
-
-  return decorators;
+  return decorators.length > 0
+    ? decorators
+    : [Highlight];
 };
 
 type Props = {

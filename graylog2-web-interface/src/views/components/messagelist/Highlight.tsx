@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import get from 'lodash/get';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
@@ -34,7 +33,7 @@ const Highlight = ({ field, value }: Props) => (
       <PossiblyHighlight field={field}
                          color={DEFAULT_HIGHLIGHT_COLOR}
                          value={value}
-                         highlightRanges={get(message, 'highlight_ranges')} />
+                         highlightRanges={message?.highlight_ranges} />
     )}
   </AdditionalContext.Consumer>
 );
