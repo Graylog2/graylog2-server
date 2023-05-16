@@ -20,6 +20,7 @@ import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 
 import javax.inject.Inject;
+import java.util.Locale;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
@@ -46,7 +47,7 @@ public class RuleBuilderService {
 
     public String generateRuleSource(String title, RuleBuilder ruleBuilder, boolean generateSimulatorFields) {
         //TODO: possible injection here, sanitize input!
-        final String rule = String.format(RULE_TEMPLATE, title,
+        final String rule = String.format(Locale.ROOT, RULE_TEMPLATE, title,
                 conditionParser.generate(ruleBuilder.conditions()),
                 actionParser.generate(ruleBuilder.actions(), generateSimulatorFields));
         log.debug(rule);
