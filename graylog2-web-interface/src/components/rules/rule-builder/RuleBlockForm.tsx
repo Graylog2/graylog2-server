@@ -62,11 +62,35 @@ const RuleBlockForm = ({
                  value={fieldValues[param.name] || paramValue || ''} />
         );
       case RuleBuilderSupportedTypes.Number:
-        return (<div>Number</div>);
+        return (
+          <Input type="number"
+                 rows={4}
+                 label={param.name}
+                 required={!param.optional}
+                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
+                 help={param.description}
+                 value={fieldValues[param.name] || paramValue} />
+        );
       case RuleBuilderSupportedTypes.Boolean:
-        return (<div>Boolean</div>);
+        return (
+          <Input type="checkbox"
+                 rows={4}
+                 label={param.name}
+                 required={!param.optional}
+                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
+                 help={param.description}
+                 checked={fieldValues[param.name] || paramValue || false} />
+        );
       case RuleBuilderSupportedTypes.Object:
-        return (<div>Object</div>);
+        return (
+          <Input type="textarea"
+                 rows={4}
+                 label={param.name}
+                 required={!param.optional}
+                 onChange={(e) => handleFieldChange(param.name, e.target.value)}
+                 help={param.description}
+                 value={fieldValues[param.name] || paramValue || ''} />
+        );
       default:
         return null;
     }
@@ -74,8 +98,8 @@ const RuleBlockForm = ({
 
   return (
     <>
-      <h2>{selectedBlockDict?.rule_builder_title}</h2>
-      <p><i>{selectedBlockDict?.description}</i></p>
+      <h2>{selectedBlockDict?.rule_builder_title || selectedBlockDict?.name}</h2>
+      <p>{selectedBlockDict?.description}</p>
       <Select id="block-select"
               name="block-select"
               placeholder={`Select a ${type}`}

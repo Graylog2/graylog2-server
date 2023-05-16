@@ -27,7 +27,7 @@ type Props = {
 
 const RuleBlockDisplay = ({ blockDict, onEdit, onDelete }:Props) => (
   <>
-    <p>{blockDict?.rule_builder_title}</p>
+    <p>{blockDict?.rule_builder_title || blockDict?.name}</p>
     <Button onClick={onEdit}>Edit</Button>
     <Button onClick={onDelete}>Delete</Button>
   </>
