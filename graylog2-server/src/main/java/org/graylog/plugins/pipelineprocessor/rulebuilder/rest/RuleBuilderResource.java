@@ -29,6 +29,8 @@ import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidationResult;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -45,6 +47,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -60,14 +63,16 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     private final RuleBuilderRegistry ruleBuilderRegistry;
     private final RuleResource ruleResource;
     private final RuleBuilderService ruleBuilderParser;
+    private final ValidatorService validatorService;
 
     @Inject
     public RuleBuilderResource(RuleBuilderRegistry ruleBuilderRegistry,
                                RuleResource ruleResource,
-                               RuleBuilderService ruleBuilderParser) {
+                               RuleBuilderService ruleBuilderParser, ValidatorService validatorService) {
         this.ruleBuilderRegistry = ruleBuilderRegistry;
         this.ruleResource = ruleResource;
         this.ruleBuilderParser = ruleBuilderParser;
+        this.validatorService = validatorService;
     }
 
 
@@ -113,7 +118,13 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .collect(Collectors.toList());
     }
 
-
+    @ApiOperation("Validate rule builder")
+    @Path("/validate")
+    @POST
+    public List<ValidationResult> validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
+        return validatorService.validate(ruleBuilderDto.ruleBuilder());
+    }
+    
     private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto) {
         return RuleSource.builder()
                 .title(ruleBuilderDto.title())

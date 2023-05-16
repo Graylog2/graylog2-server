@@ -17,9 +17,13 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.MongoDBRuleFragmentService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations.V20220512123200_AddSystemRuleFragments;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.action.ValidAction;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.condition.ValidCondition;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderResource;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.PluginModule;
@@ -33,8 +37,14 @@ public class RuleBuilderModule extends PluginModule {
 
         addSystemRestResource(RuleBuilderResource.class);
 
-        final Multibinder<Migration> binder = Multibinder.newSetBinder(binder(), Migration.class);
-        binder.addBinding().to(V20220512123200_AddSystemRuleFragments.class);
+        final Multibinder<Migration> migrationBinder = Multibinder.newSetBinder(binder(), Migration.class);
+        migrationBinder.addBinding().to(V20220512123200_AddSystemRuleFragments.class);
+
+        final Multibinder<Validator> condition = Multibinder.newSetBinder(binder(), Validator.class, Names.named("conditionValidators"));
+        condition.addBinding().to(ValidCondition.class);
+
+        final Multibinder<Validator> action = Multibinder.newSetBinder(binder(), Validator.class, Names.named("actionValidators"));
+        action.addBinding().to(ValidAction.class);
 
     }
 }
