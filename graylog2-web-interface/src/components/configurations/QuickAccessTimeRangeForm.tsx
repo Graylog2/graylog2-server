@@ -73,11 +73,11 @@ const contextSettings = {
 };
 
 const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChange, onRemove }: ItemProps) => {
-  const handleOnChangeRange = useCallback((newTimerange) => {
+  const handleOnChangeRange = useCallback((newTimerange: TimeRange) => {
     onChange({ timerange: newTimerange, description, id }, idx);
   }, [description, id, idx, onChange]);
 
-  const handleOnChangeDescription = useCallback((newDescription) => {
+  const handleOnChangeDescription = useCallback((newDescription: string) => {
     onChange({ timerange, description: newDescription, id }, idx);
   }, [id, idx, onChange, timerange]);
 
@@ -111,17 +111,17 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
   options: Immutable.List<QuickAccessTimeRange>,
   onUpdate: Dispatch<Immutable.List<QuickAccessTimeRange>>
 }) => {
-  const onChange = useCallback((newPreset, idx) => {
+  const onChange = useCallback((newPreset: QuickAccessTimeRange, idx: number) => {
     const newState = options.set(idx, newPreset);
     onUpdate(newState);
   }, [onUpdate, options]);
 
-  const onRemove = useCallback((idx) => {
+  const onRemove = useCallback((idx: number) => {
     const newState = options.delete(idx);
     onUpdate(newState);
   }, [onUpdate, options]);
 
-  const onMoveItem = useCallback((items) => {
+  const onMoveItem = useCallback((items: Array<QuickAccessTimeRange>) => {
     onUpdate(Immutable.List(items));
   }, [onUpdate]);
 
@@ -134,7 +134,12 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
   }, [onUpdate, options]);
 
   const customContentRender = useCallback(({ item: { id, description, timerange }, index }) => (
-    <QuickAccessTimeRangeFormItem id={id} onRemove={onRemove} idx={index} onChange={onChange} timerange={timerange} description={description} />
+    <QuickAccessTimeRangeFormItem id={id}
+                                  onRemove={onRemove}
+                                  idx={index}
+                                  onChange={onChange}
+                                  timerange={timerange}
+                                  description={description} />
   ), [onChange, onRemove]);
 
   return (
