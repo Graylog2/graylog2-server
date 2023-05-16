@@ -26,12 +26,13 @@ type Props = {
   type: 'condition' | 'action',
   blockDict: Array<BlockDict>,
   block: RuleBlock,
+  order: number,
   addBlock: (type: string, block: RuleBlock) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
   deleteBlock: (orderIndex: number, type: string,) => void,
 };
 
-const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, deleteBlock }: Props) => {
+const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [fieldValues, setFieldValues] = useState<{[key: string]: any}>({});
@@ -46,7 +47,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
   const handleFieldChange = (event, fieldName) => { setFieldValues({ ...fieldValues, [fieldName]: event.target.value }); };
 
   const buildParamField = (paramDict: BlockFieldDict) => {
-    const paramValue = block?.parameters[paramDict.name];
+    const paramValue = block?.params[paramDict.name];
 
     switch (paramDict.type) {
       case RuleBuilderSupportedTypes.String:
@@ -60,6 +61,14 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
     }
   };
 
+  const buildBlockData = () => {
+    if (block) {
+      return { ...block, params: { ...block.params, ...fieldValues } };
+    }
+
+    return { function: currentBlockDict.name, params: fieldValues };
+  };
+
   const resetBlock = () => {
     if (block) {
       setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
@@ -68,6 +77,17 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
     }
 
     setFieldValues({});
+  };
+
+  const onAdd = () => {
+    addBlock(type, buildBlockData());
+
+    setEditMode(false);
+  };
+
+  const onUpdate = () => {
+    updateBlock(order, type, buildBlockData());
+    setEditMode(false);
   };
 
   const onCancel = () => {
@@ -87,6 +107,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, addBlock, updateBlock, delet
               }}
               value={currentBlockDict?.name || ''} />
       {currentBlockDict.params.map((param) => buildParamField(param))}
+      {block ? <Button onClick={onUpdate}>Update</Button> : <Button onClick={onAdd}>Add</Button>}
       <Button onClick={onCancel}>Cancel</Button>
     </>
   );

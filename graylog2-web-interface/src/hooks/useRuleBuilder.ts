@@ -36,7 +36,7 @@ type RuleBlockField = {
 
 export type RuleBlock = {
   function: string,
-  parameters: RuleBlockField,
+  params: RuleBlockField,
   output?: string,
   errors?: Array<string>
 }
@@ -378,7 +378,7 @@ const useRuleBuilder = (rule?: RuleBuilderRule) => {
         conditions: [
           {
             function: 'has_field',
-            parameters: {
+            params: {
               field: 'message',
             },
           },
@@ -386,14 +386,14 @@ const useRuleBuilder = (rule?: RuleBuilderRule) => {
         actions: [
           {
             function: 'get_field',
-            parameters: {
+            params: {
               field: 'message',
             },
             outputvariable: 'field1',
           },
           {
             function: 'set_field',
-            parameters: {
+            params: {
               field: 'set_this_field',
               value: '$field1',
             },

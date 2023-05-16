@@ -116,9 +116,10 @@ const RuleBuilder = ({ isNewRule }: Props) => {
     <Row className="content">
       <Col md={6}>
         {
-          ruleBuilder.conditions.map((condition) => (
+          ruleBuilder.conditions.map((condition, index) => (
             <RuleBuilderBlock blockDict={conditionsDict}
                               block={condition}
+                              order={index}
                               type="condition"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
@@ -128,9 +129,10 @@ const RuleBuilder = ({ isNewRule }: Props) => {
       </Col>
       <Col md={6}>
         {
-          ruleBuilder.actions.map((action) => (
+          ruleBuilder.actions.map((action, index) => (
             <RuleBuilderBlock blockDict={actionsDict}
                               block={action}
+                              order={index}
                               type="action"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
