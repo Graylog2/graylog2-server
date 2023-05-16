@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import fetch from 'logic/rest/FetchProvider';
-import DataNodesOverview from 'preflight/components/DataNodesOverview';
+import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
+import FetchError from 'logic/errors/FetchError';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -63,6 +63,8 @@ const availableDataNodes = [
 ];
 
 describe('DataNodesOverview', () => {
+  let oldConfirm;
+
   beforeEach(() => {
     asMock(useDataNodes).mockReturnValue({
       data: availableDataNodes,
@@ -70,17 +72,25 @@ describe('DataNodesOverview', () => {
       isInitialLoading: false,
       error: undefined,
     });
+
+    oldConfirm = window.confirm;
+    window.confirm = jest.fn(() => true);
+  });
+
+  afterEach(() => {
+    window.confirm = oldConfirm;
   });
 
   it('should list available data nodes', async () => {
-    render(<DataNodesOverview />);
+    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
 
     await screen.findByText('node-id-3');
     await screen.findByText('http://localhost:9200');
   });
 
   it('should resume startup', async () => {
-    render(<DataNodesOverview />);
+    const onResumeStartup = jest.fn();
+    renderPreflight(<DataNodesOverview onResumeStartup={onResumeStartup} />);
 
     await screen.findByText('node-id-3');
 
@@ -90,6 +100,19 @@ describe('DataNodesOverview', () => {
 
     userEvent.click(resumeStartupButton);
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(onResumeStartup).toHaveBeenCalledTimes(1));
+  });
+
+  it('should display error message when there was an error fetching data nodes', async () => {
+    asMock(useDataNodes).mockReturnValue({
+      data: [],
+      isFetching: false,
+      isInitialLoading: false,
+      error: new FetchError('The request error message', 500, { status: 500, body: { message: 'The request error message' } }),
+    });
+
+    renderPreflight(<DataNodesOverview onResumeStartup={() => {}} />);
+    await screen.findByText(/There was an error fetching the data nodes:/);
+    await screen.findByText(/There was an error fetching a resource: The request error message. Additional information: Not available/);
   });
 });

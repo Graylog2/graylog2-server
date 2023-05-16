@@ -14,37 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { Notifications } from '@mantine/notifications';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { MemoryRouter } from 'react-router-dom';
 
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
-import GlobalThemeStyles from 'preflight/theme/GlobalThemeStyles';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
-import App from './App';
+import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 
-ReactDOM.render((
-  <React.StrictMode>
-    <PreflightThemeProvider>
-      <GlobalThemeStyles />
-      <DefaultQueryClientProvider>
+type Props = {
+  children: React.ReactElement,
+}
+
+const PreflightWrappingContainer = ({ children }: Props) => (
+  <PreflightThemeProvider>
+    <DefaultQueryClientProvider>
+      <MemoryRouter>
         <ThemeWrapper>
-          <>
-            <Notifications />
-            <App />
-          </>
+          {children}
         </ThemeWrapper>
-      </DefaultQueryClientProvider>
-    </PreflightThemeProvider>
-  </React.StrictMode>
-),
-document.getElementById('app-root'),
+      </MemoryRouter>
+    </DefaultQueryClientProvider>
+  </PreflightThemeProvider>
 );
 
-// @ts-ignore
-if (import.meta.webpackHot) {
-  // @ts-ignore
-  import.meta.webpackHot.accept();
-}
+PreflightWrappingContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default PreflightWrappingContainer;
