@@ -83,7 +83,7 @@ const _generateSeries = (mapKeys: KeyMapper): Generator => ({
 const getChartColor = (fullDataArray: ChartConfig[], name: string) => {
   const fullData = fullDataArray.find((d) => d.labels.indexOf(name) >= 0);
 
-  if (fullData && fullData.labels && fullData.marker && fullData.marker.colors) {
+  if (fullData?.labels && fullData?.marker?.colors) {
     const indexOfName = fullData.labels.indexOf(name);
     const { marker: { colors } } = fullData;
 
@@ -94,7 +94,7 @@ const getChartColor = (fullDataArray: ChartConfig[], name: string) => {
 };
 
 const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
-  const colors = chart.labels.map((label) => colorMap.get(label));
+  const colors = chart.originalLabels.map((label) => colorMap.get(label));
 
   return { marker: { colors } };
 };

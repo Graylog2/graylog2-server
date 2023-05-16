@@ -32,7 +32,8 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
-import { keySeparator } from 'views/Constants';
+import { keySeparator, humanSeparator } from 'views/Constants';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -90,6 +91,7 @@ type Props = {
 
 type ColorPickerConfig = {
   name: string,
+  label: string,
   target: EventTarget,
 };
 
@@ -117,11 +119,12 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   const { focusedWidget } = useContext(WidgetFocusContext);
   const fieldTypes = useContext(FieldTypesContext);
   const activeQuery = useActiveQueryId();
+  const mapKeys = useMapKeys();
 
   const _onCloseColorPicker = useCallback(() => setColorPickerConfig(undefined), [setColorPickerConfig]);
 
-  const _onOpenColorPicker = useCallback((field: string) => (event) => {
-    setColorPickerConfig({ name: field, target: event.currentTarget });
+  const _onOpenColorPicker = useCallback((field: string, label: string) => (event) => {
+    setColorPickerConfig({ name: field, label, target: event.currentTarget });
   }, [setColorPickerConfig]);
 
   const _onColorSelect = useCallback((field: string, color: string) => {
@@ -147,11 +150,12 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     const val = labelsWithField.map(({ label, field, type }) => (field
       ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
       : label));
+    const humanLabel = Object.values(labelsWithField).map(({ label, field }) => mapKeys(label, field)).join(humanSeparator);
 
     return (
       <LegendCell key={value}>
         <LegendEntry>
-          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value)} color={colors.get(value, defaultColor)} />
+          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value, humanLabel)} color={colors.get(value, defaultColor)} />
           <ValueContainer>
             {val}
           </ValueContainer>
@@ -180,7 +184,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
                    placement="top"
                    target={colorPickerConfig.target}>
             <Popover id="legend-config"
-                     title={`Configuration for ${colorPickerConfig.name}`}
+                     title={`Configuration for ${colorPickerConfig.label}`}
                      data-event-element="Plot Legend">
               <ColorPicker color={colors.get(colorPickerConfig.name)}
                            colors={defaultColors}
