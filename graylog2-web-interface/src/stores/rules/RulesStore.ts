@@ -33,6 +33,7 @@ export type RuleType = {
   description: string,
   created_at: string,
   modified_at: string,
+  rule_builder: object,
   errors?: [],
 };
 export type MetricsConfigType = {

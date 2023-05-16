@@ -116,6 +116,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     };
 
     return ({
+      rule,
       description,
       handleDescription: setDescription,
       handleSavePipelineRule,
