@@ -42,8 +42,6 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
   },
   [block, blockDict]);
 
-  const handleFieldChange = (fieldName, fieldValue) => { setFieldValues({ ...fieldValues, [fieldName]: fieldValue }); };
-
   const buildBlockData = () => {
     if (block) {
       return { ...block, params: { ...block.params, ...fieldValues } };
@@ -62,10 +60,21 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
     setFieldValues({});
   };
 
+  const handleFieldChange = (fieldName, fieldValue) => { setFieldValues({ ...fieldValues, [fieldName]: fieldValue }); };
+
   const onAdd = () => {
     addBlock(type, buildBlockData());
 
     setEditMode(false);
+  };
+
+  const onCancel = () => {
+    setEditMode(false);
+    resetBlock();
+  };
+
+  const onDelete = () => {
+    deleteBlock(order, type);
   };
 
   const onEdit = () => {
@@ -75,11 +84,6 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
   const onUpdate = () => {
     updateBlock(order, type, buildBlockData());
     setEditMode(false);
-  };
-
-  const onCancel = () => {
-    setEditMode(false);
-    resetBlock();
   };
 
   const onSelect = (option: string) => {
@@ -104,7 +108,9 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
                        selectedBlockDict={currentBlockDict}
                        type={type} />
       ) : (
-        <RuleBlockDisplay blockDict={currentBlockDict} onEdit={onEdit} />
+        <RuleBlockDisplay blockDict={currentBlockDict}
+                          onDelete={onDelete}
+                          onEdit={onEdit} />
       )}
     </div>
   );

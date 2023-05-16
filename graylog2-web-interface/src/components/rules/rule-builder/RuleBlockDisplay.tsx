@@ -21,13 +21,15 @@ import type { BlockDict } from 'hooks/useRuleBuilder';
 
 type Props = {
   blockDict: BlockDict,
-  onEdit: () => void
+  onDelete: () => void,
+  onEdit: () => void,
 }
 
-const RuleBlockDisplay = ({ blockDict, onEdit }:Props) => (
+const RuleBlockDisplay = ({ blockDict, onEdit, onDelete }:Props) => (
   <>
     <p>{blockDict?.name || ''}</p>
     <Button onClick={onEdit}>Edit</Button>
+    <Button onClick={onDelete}>Delete</Button>
   </>
 );
 
