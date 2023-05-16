@@ -21,7 +21,7 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
-public interface Node extends Persisted, NodeTitle {
+public interface Node extends Persisted {
     enum Type {
         SERVER, DATANODE
     }
