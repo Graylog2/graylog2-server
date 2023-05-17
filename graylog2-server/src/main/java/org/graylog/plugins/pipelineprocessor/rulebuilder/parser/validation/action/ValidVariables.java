@@ -69,7 +69,6 @@ public class ValidVariables implements Validator {
             }
 
             //Check if variable type matches function expectation
-            variableType = variableType == Integer.class ? Long.class : variableType;
             Class paramType = parameterDescriptor.type();
             if (value != null && paramType != Object.class && variableType != paramType) {
                 String errorMsg = "Function %s found wrong parameter type %s for parameter %s. Required type %s";
@@ -97,7 +96,7 @@ public class ValidVariables implements Validator {
     private Class<?> getVariableType(Object type) {
         return switch (type) {
             case Double aDouble -> Double.class;
-            case Integer integer -> Integer.class;
+            case Integer integer -> Long.class;
             case Long l -> Long.class;
             case String s -> String.class;
             case Boolean aBoolean -> Boolean.class;
