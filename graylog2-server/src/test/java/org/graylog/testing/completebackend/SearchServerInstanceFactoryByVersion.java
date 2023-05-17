@@ -43,10 +43,10 @@ public class SearchServerInstanceFactoryByVersion implements SearchServerInstanc
             return doCreate("org.graylog.storage.elasticsearch7.testing.OpenSearch13Instance", version, network);
         } else if (version.satisfies(OPENSEARCH, "^2.0.0")) {
             return doCreate("org.graylog.storage.opensearch2.testing.OpenSearchInstance", version, network);
-        } else if (version.satisfies(DATANODE, "^1.0.0")) {
+        } else if (version.satisfies(DATANODE, "^5.2.0")) {
             return doCreate("org.graylog.storage.opensearch2.testing.DatanodeInstance", version, network);
         } else {
-            throw new NotImplementedException("Search version " + version + " not supported.");
+            throw new UnsupportedOperationException("Search version " + version + " not supported.");
         }
     }
 
