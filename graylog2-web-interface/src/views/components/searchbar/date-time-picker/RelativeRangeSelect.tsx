@@ -24,6 +24,7 @@ import { RELATIVE_RANGE_TYPES } from 'views/Constants';
 import { Select } from 'components/common';
 import type { RangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import RelativeRangeValueInput from './RelativeRangeValueInput';
@@ -145,23 +146,8 @@ const RelativeRangeSelectInner = ({
   name: string,
   onChange: (changeEvent: { target: { name: string, value: RangeClassified } }) => void,
 }) => {
-  console.log({
-    classifiedRange,
-    classifyRange,
-    defaultRange,
-    disableUnsetRange,
-    disabled,
-    error,
-    fieldName,
-    limitDuration,
-    name,
-    onChange,
-    onUnsetRange,
-    title,
-    unsetRangeLabel,
-    unsetRangeValue,
-  });
-
+  const { config } = useSearchConfiguration();
+  const availableOptions = config?.quick_access_timerange_presets;
   const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
   const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
@@ -254,15 +240,18 @@ const RelativeRangeSelectInner = ({
           {error}
         </ErrorMessage>
       )}
+      {/*
       {showRelativePresetsButton
         && (
         <ConfiguredWrapper>
           <TimerangeSelector className="relative">
             <RangePresetDropdown disabled={disabled}
-                                 onChange={_onSetPreset} />
+                                 onChange={_onSetPreset}
+                                 availableOptions={availableOptions} />
           </TimerangeSelector>
         </ConfiguredWrapper>
         )}
+      */}
     </RangeWrapper>
   );
 };

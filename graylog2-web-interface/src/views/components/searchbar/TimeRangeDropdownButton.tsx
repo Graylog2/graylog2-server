@@ -21,6 +21,7 @@ import { useFormikContext } from 'formik';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
@@ -52,6 +53,8 @@ const TimeRangeDropdownButton = ({
   toggleShow,
 }: Props) => {
   const { submitForm, isValid } = useFormikContext();
+  const { config } = useSearchConfiguration();
+  const availableOptions = config?.quick_access_timerange_presets;
 
   const _onClick = (e) => {
     e.currentTarget.blur();
@@ -72,23 +75,21 @@ const TimeRangeDropdownButton = ({
     }
   };
 
-  const dropdown = showPresetDropdown
-    ? (
-      <StyledRangePresetDropdown disabled={disabled}
-                                 displayTitle={false}
-                                 onChange={selectRelativeTimeRangePreset}
-                                 onToggle={_onPresetSelectToggle}
-                                 header="From (Until Now)"
-                                 bsSize={null} />
-    )
-    : null;
-
   return (
     <StyledButtonGroup>
       <TimeRangeButton hasError={hasErrorOnMount}
                        disabled={disabled}
                        onClick={_onClick} />
-      {dropdown}
+      {showPresetDropdown
+        && (
+          <StyledRangePresetDropdown disabled={disabled}
+                                     displayTitle={false}
+                                     onChange={selectRelativeTimeRangePreset}
+                                     onToggle={_onPresetSelectToggle}
+                                     header="From (Until Now)"
+                                     bsSize={null}
+                                     availableOptions={availableOptions} />
+        )}
     </StyledButtonGroup>
   );
 };

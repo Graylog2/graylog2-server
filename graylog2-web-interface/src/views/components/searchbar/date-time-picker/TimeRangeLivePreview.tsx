@@ -72,7 +72,7 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 5px;
 `);
 
-const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
+export const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 

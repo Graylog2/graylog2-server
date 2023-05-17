@@ -18,10 +18,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useContext, useMemo } from 'react';
 
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
+import TimerangeSelector from 'views/components/searchbar/TimerangeSelector';
+import RangePresetDropdown from 'views/components/searchbar/RangePresetDropdown';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
 import { classifyToRange, classifyFromRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
@@ -38,7 +43,11 @@ const RelativeWrapper = styled.div`
   flex-wrap: wrap;
   justify-content: space-around;
 `;
-
+const ConfiguredWrapper = styled.div`
+  grid-area: 3 / 5 / 3 / 7;
+  margin: 3px 12px 3px 0;
+  justify-self: end;
+`;
 const StyledIcon = styled(Icon)`
   flex: 0.75;
 `;
@@ -46,6 +55,20 @@ const StyledIcon = styled(Icon)`
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangeDropDownFormValues>();
   const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
+  const { config } = useSearchConfiguration();
+  const availableOptions = config?.quick_access_timerange_presets;
+  const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
+  const relativeOptions = useMemo(() => availableOptions.filter((option) => option?.timerange?.type === 'relative'), [availableOptions]);
+
+  const onSetPreset = (range) => {
+    const isUnsetting = range === 0;
+
+    if (isUnsetting) {
+      setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE);
+    }
+
+    setFieldValue('nextTimeRange', classifyFromRange(range));
+  };
 
   return (
     <RelativeWrapper>
@@ -72,6 +95,16 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
                              unsetRangeLabel="Now"
                              unsetRangeValue={undefined} />
       </>
+      {showRelativePresetsButton
+        && (
+          <ConfiguredWrapper>
+            <TimerangeSelector className="relative">
+              <RangePresetDropdown disabled={disabled}
+                                   onChange={onSetPreset}
+                                   availableOptions={relativeOptions} />
+            </TimerangeSelector>
+          </ConfiguredWrapper>
+        )}
     </RelativeWrapper>
   );
 };
