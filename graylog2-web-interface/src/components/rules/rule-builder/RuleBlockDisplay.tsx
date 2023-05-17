@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Button } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import type { BlockDict, RuleBlock } from 'hooks/useRuleBuilder';
 
 type Props = {
@@ -27,21 +27,37 @@ type Props = {
 }
 
 const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => (
-  <>
-    <h3>{blockDict?.rule_builder_title || blockDict?.name}</h3>
-    {Object.keys(block.params).map((paramName) => {
-      const paramValue = block.params[paramName];
-      const paramValueExists = paramValue && paramValue !== '' && paramValue !== null;
+  <Row>
+    <Col md={12}>
+      <Row>
+        <Col md={12}>
+          <h3>{blockDict?.rule_builder_title || blockDict?.name}</h3>
+        </Col>
+      </Row>
+      {Object.keys(block.params).map((paramName) => {
+        const paramValue = block.params[paramName];
+        const paramValueExists = paramValue && paramValue !== '' && paramValue !== null;
 
-      if (paramValueExists) {
-        return (<p><strong>{paramName}:</strong> {paramValue}</p>);
-      }
+        if (paramValueExists) {
+          return (
+            <Row>
+              <Col md={12}>
+                <p><strong>{paramName}:</strong> {paramValue}</p>
+              </Col>
+            </Row>
+          );
+        }
 
-      return null;
-    })}
-    <Button onClick={onEdit}>Edit</Button>
-    <Button onClick={onDelete}>Delete</Button>
-  </>
+        return null;
+      })}
+      <Row>
+        <Col md={12}>
+          <Button onClick={onEdit}>Edit</Button>
+          <Button onClick={onDelete}>Delete</Button>
+        </Col>
+      </Row>
+    </Col>
+  </Row>
 );
 
 export default RuleBlockDisplay;
