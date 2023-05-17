@@ -58,10 +58,10 @@ const buildTimeRangeOptions = (options: { [x: string]: string; }) => Object.keys
 
 type Option = { period: string, description: string };
 
-const mapBEData = (items: Array<QuickAccessTimeRange>, formatTime: (time: DateTime, format?: DateTimeFormats) => string): Immutable.List<QuickAccessTimeRange> => Immutable.List(items.map(({ timerange, description }) => {
-  const id = generateId();
+const mapBEData = (items: Array<QuickAccessTimeRange>, formatTime: (time: DateTime, format?: DateTimeFormats) => string): Immutable.List<QuickAccessTimeRange> => Immutable.List(items.map(({ timerange, description, id }) => {
+  const presetId = id ?? generateId();
 
-  return { description, id, timerange: onInitializingTimerange(timerange, formatTime) };
+  return { description, id: presetId, timerange: onInitializingTimerange(timerange, formatTime) };
 }));
 
 const SearchesConfig = () => {
