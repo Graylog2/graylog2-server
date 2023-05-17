@@ -223,7 +223,8 @@ const SearchesConfig = () => {
     });
   };
 
-  const quickAccessTimeRangePresets = useMemo(() => quickAccessTimeRangePresetsUpdated ?? mapBEData(formConfig?.quick_access_timerange_presets ?? [], formatTime), [formConfig, formatTime, quickAccessTimeRangePresetsUpdated]);
+  const quickAccessTimeRangePresetsFromBE = useMemo(() => mapBEData(formConfig?.quick_access_timerange_presets ?? [], formatTime), [formConfig?.quick_access_timerange_presets, formatTime]);
+  const quickAccessTimeRangePresets = useMemo(() => quickAccessTimeRangePresetsUpdated ?? quickAccessTimeRangePresetsFromBE, [quickAccessTimeRangePresetsFromBE, quickAccessTimeRangePresetsUpdated]);
 
   if (!viewConfig) {
     return <Spinner />;
@@ -255,7 +256,7 @@ const SearchesConfig = () => {
           <strong>Relative time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
           <strong>Quick access time range options</strong>
-          <QuickAccessTimeRangeOptionsSummary options={quickAccessTimeRangePresets.toArray()} />
+          <QuickAccessTimeRangeOptionsSummary options={quickAccessTimeRangePresetsFromBE.toArray()} />
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>
