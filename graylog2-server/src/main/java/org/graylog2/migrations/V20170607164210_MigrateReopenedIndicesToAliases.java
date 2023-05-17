@@ -124,7 +124,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
             settings = indexSettings;
         } else if (searchVersion.satisfies(ELASTICSEARCH, "^5.0.0 | ^6.0.0 | ^7.0.0")
                 || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
-                || searchVersion.satisfies(DATANODE, "^1.0.0")
+                || searchVersion.satisfies(DATANODE, "^5.2.0")
         ) {
             settings = indexSettings.path("archived");
         } else {

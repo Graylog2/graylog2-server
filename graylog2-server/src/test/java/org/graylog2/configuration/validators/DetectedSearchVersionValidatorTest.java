@@ -36,7 +36,7 @@ class DetectedSearchVersionValidatorTest {
     void validateMajorVersion() {
         assertDoesNotThrow(() -> validator.validate("OS1", SearchVersion.create(OPENSEARCH, forIntegers(1, 0, 0))));
         assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, forIntegers(7, 0, 0))));
-        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(DATANODE, forIntegers(1, 0, 0))));
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(DATANODE, forIntegers(5, 2, 0))));
     }
 
     @Test

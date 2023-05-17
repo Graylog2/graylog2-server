@@ -32,7 +32,7 @@ public class ElasticsearchVersionValidator implements Validator<SearchVersion> {
             SearchVersionRange.of(OPENSEARCH, "^1.0.0"),
             SearchVersionRange.of(OPENSEARCH, "^2.0.0"),
             SearchVersionRange.of(ELASTICSEARCH, "^7.0.0"),
-            SearchVersionRange.of(DATANODE, "^1.0.0")
+            SearchVersionRange.of(DATANODE, "^5.2.0")
     );
 
 

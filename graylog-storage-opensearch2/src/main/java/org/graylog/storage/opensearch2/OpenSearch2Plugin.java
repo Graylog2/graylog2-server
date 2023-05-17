@@ -32,7 +32,7 @@ import static com.github.zafarkhaja.semver.Version.forIntegers;
 public class OpenSearch2Plugin implements Plugin {
     public static final Set<SearchVersion> SUPPORTED_OS_VERSIONS = ImmutableSet.of(
             SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, forIntegers(2, 0, 0)),
-            SearchVersion.create(SearchVersion.Distribution.DATANODE, forIntegers(1, 0, 0))
+            SearchVersion.create(SearchVersion.Distribution.DATANODE, forIntegers(5, 0, 0))
     );
 
     @Override

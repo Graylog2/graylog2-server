@@ -33,7 +33,7 @@ public class EventIndexTemplateProvider implements IndexTemplateProvider {
     public IndexMappingTemplate create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig) {
         if (searchVersion.satisfies(ELASTICSEARCH, "^7.0.0")
                 || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
-                || searchVersion.satisfies(DATANODE, "^1.0.0")
+                || searchVersion.satisfies(DATANODE, "^5.2.0")
         ) {
             return new EventsIndexMapping7();
         } else {
