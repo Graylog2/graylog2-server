@@ -475,6 +475,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-left: 20px;
   }
 
+  .form-horizontal .input-description {
+    margin-bottom: 0 !important;
+  }
+
   form.extractor-form .control-group label {
     display: inline-block;
   }
