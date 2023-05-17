@@ -16,9 +16,19 @@
  */
 import * as React from 'react';
 
-import { singleton } from 'logic/singleton';
-import type { Stream } from 'views/stores/StreamsStore';
+import useNodeSummaries from 'hooks/useNodeSummaries';
 
-const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
+type Props = {
+  value: string,
+}
 
-export default singleton('contexts.StreamsContext', () => StreamsContext);
+const NodeField = ({ value }: Props) => {
+  const nodes = useNodeSummaries();
+  const node = nodes?.[value];
+
+  return node
+    ? <span title={value}>{node.short_node_id} / {node.hostname}</span>
+    : <span>{value}</span>;
+};
+
+export default NodeField;

@@ -99,6 +99,7 @@ export default {
       x: xValues,
       y: yValues,
       text: textValues,
+      originalName: eventsDisplayName,
     };
   },
 

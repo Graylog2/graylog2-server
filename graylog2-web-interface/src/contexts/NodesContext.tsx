@@ -17,8 +17,13 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type { Stream } from 'views/stores/StreamsStore';
 
-const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
+type NodeSummary = {
+  id: string,
+  short_node_id: string,
+  hostname: string,
+};
+type NodesMap = { [id: string]: NodeSummary };
+const NodesContext = React.createContext<NodesMap | undefined>(undefined);
 
-export default singleton('contexts.StreamsContext', () => StreamsContext);
+export default singleton('contexts.NodesContext', () => NodesContext);

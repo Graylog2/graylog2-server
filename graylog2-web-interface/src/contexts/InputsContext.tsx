@@ -17,8 +17,9 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Input } from 'components/messageloaders/Types';
 
-const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
+type InputsMap = { [id: string]: Input };
+const InputsContext = React.createContext<InputsMap | undefined>(undefined);
 
-export default singleton('contexts.StreamsContext', () => StreamsContext);
+export default singleton('contexts.InputsContext', () => InputsContext);

@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext } from 'react';
 
-import { singleton } from 'logic/singleton';
-import type { Stream } from 'views/stores/StreamsStore';
+import NodesContext from 'contexts/NodesContext';
 
-const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
+const useNodeSummaries = () => useContext(NodesContext);
 
-export default singleton('contexts.StreamsContext', () => StreamsContext);
+export default useNodeSummaries;

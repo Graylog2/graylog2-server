@@ -61,7 +61,7 @@ describe('ShowViewPage', () => {
     .search(Search.create().toBuilder().parameters([]).build())
     .build();
   const SimpleShowViewPage = () => (
-    <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
+    <StreamsContext.Provider value={[{ id: 'stream-id-1', title: 'Stream 1' }]}>
       <ShowViewPage />
     </StreamsContext.Provider>
   );
