@@ -34,7 +34,7 @@ import java.util.Objects;
 public class ValidVariables implements Validator {
 
     private final Map<String, RuleFragment> actions;
-    private Map<String, Variable> variables;
+    private Map<String, Object> variables;
 
     @Inject
     public ValidVariables(RuleBuilderRegistry ruleBuilderRegistry) {
@@ -45,52 +45,51 @@ public class ValidVariables implements Validator {
     @Override
     public ValidationResult validate(RuleBuilderStep step) {
         final RuleFragment ruleFragment = actions.get(step.function());
-        FunctionDescriptor<?> function = ruleFragment.descriptor();
+        FunctionDescriptor<?> functionDescriptor = ruleFragment.descriptor();
         Map<String, Object> stepParameters = step.parameters();
 
-        ImmutableList<ParameterDescriptor> parameterDescriptors = function.params();
+        ImmutableList<ParameterDescriptor> parameterDescriptors = functionDescriptor.params();
         for(ParameterDescriptor parameterDescriptor: parameterDescriptors) {
             String parameterName = parameterDescriptor.name();
             Object value = stepParameters.get(parameterName);
             Class<?> variableType = getVariableType(value);
 
             if (!parameterDescriptor.optional() && value == null) {
-                return new ValidationResult(step, true,"Function %s missing parameter %s ".formatted(function.name(), parameterName));
+                return new ValidationResult(step, true, "Function %s missing parameter %s ".formatted(functionDescriptor.name(), parameterName));
             }
 
             //$ means it is stored in another variable and we need to fetch and verify that type
             if (value instanceof String s && s.startsWith("$")) {
                 String substring = s.substring(1);
-                Variable variable = variables.get(substring);
+                Object variable = variables.get(substring);
                 if(Objects.isNull(variable)) {
-                    return new ValidationResult(step, true,"Function %s missing variable %s ".formatted(function.name(), value));
+                    return new ValidationResult(step, true, "Function %s missing variable %s ".formatted(functionDescriptor.name(), value));
                 }
                 variableType = variable.getClass();
             }
 
-            //Check if variable type matches function expectation
+            //Check if variable type matches functionDescriptor expectation
             if (value != null &&  variableType != parameterDescriptor.type()) {
                 String errorMsg = "Function %s found wrong parameter type %s for parameter %s. Required type %s";
-                return new ValidationResult(step, true, errorMsg.formatted(function.name(), variableType, parameterName, parameterDescriptor.type()) );
+                return new ValidationResult(step, true, errorMsg.formatted(functionDescriptor.name(), variableType, parameterName, parameterDescriptor.type()));
             }
         }
 
         //Add output to map
         String outputvariable = step.outputvariable();
         if (StringUtils.isNotBlank(outputvariable)) {
-            Variable variable = variables.get(outputvariable);
 
-            if (Objects.nonNull(variable) && variable.isFragmentVariable) {
-                return new ValidationResult(step, true,"Can not store variable %s. Already declared in a fragment. ".formatted(outputvariable));
+            if (functionDescriptor.returnType() == Void.class) {
+                return new ValidationResult(step, true, "Function %s is of return typ void. No out put variable allowed ".formatted(functionDescriptor.name()));
             }
 
-            storeVariable(ruleFragment, outputvariable, function.returnType());
+            storeVariable(ruleFragment, outputvariable, functionDescriptor.returnType());
         }
         return new ValidationResult(step, false,"");
     }
 
     private void storeVariable(RuleFragment ruleFragment, String name, Class<?> type) {
-        variables.put(name, new Variable(type, ruleFragment.isFragment()));
+        variables.put(name, type);
     }
 
     private Class<?> getVariableType(Object type) {
@@ -102,6 +101,4 @@ public class ValidVariables implements Validator {
             case null, default -> Object.class;
         };
     }
-
-    record Variable(Class<?> type, boolean isFragmentVariable) {};
 }

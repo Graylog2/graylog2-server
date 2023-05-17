@@ -20,12 +20,16 @@ public class ValidNegation implements Validator {
     public ValidationResult validate(RuleBuilderStep step) {
         final RuleFragment ruleFragment = actions.get(step.function());
 
-        if (step.negate() && ruleFragment.isFunction()) { // only functions with boolean return type can be negated
-            FunctionDescriptor<?> function = ruleFragment.descriptor();
-            if (!function.returnType().equals(Boolean.class)) {
-                return new ValidationResult(step, true, "None boolean function " + step.function() + " cannot be negated.");
+        if (step.negate()) {
+            if (ruleFragment.isFragment()) {
+                return new ValidationResult(step, true, "Negation of fragments not possible ");
+            } else {
+                FunctionDescriptor<?> function = ruleFragment.descriptor();
+                if (!function.returnType().equals(Boolean.class)) {
+                    return new ValidationResult(step, true, "None boolean function " + step.function() + " cannot be negated.");
+                }
             }
         }
-            return new ValidationResult(step, false, "");
+        return new ValidationResult(step, false, "");
     }
 }
