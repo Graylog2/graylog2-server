@@ -462,6 +462,8 @@
                                         <exclude>org.apache.logging.log4j:*:(,2.16)</exclude>
                                         <!-- Pulling in slf4j-simple creates warnings about multiple SLF4J bindings on server startup -->
                                         <exclude>org.slf4j:slf4j-simple</exclude>
+                                        <!-- Newer asm versions are published under the org.ow2.asm groupId. Avoid conflicts by banning the old one.  -->
+                                        <exclude>asm:asm</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>

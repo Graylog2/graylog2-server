@@ -424,6 +424,13 @@
                 <groupId>com.floreysoft</groupId>
                 <artifactId>jmte</artifactId>
                 <version>${jmte.version}</version>
+                <exclusions>
+                    <!-- Exclude the ancient asm:asm version because it conflicts with the org.ow2.asm:asm version. -->
+                    <exclusion>
+                        <groupId>asm</groupId>
+                        <artifactId>asm</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
