@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 import type {
@@ -25,6 +26,24 @@ import type {
 import { dateOutput } from 'views/components/searchbar/TimeRangeDisplay';
 
 type Props = { options : Array<QuickAccessTimeRange>};
+
+const StyledDL = styled.dl`
+  && {
+    > span {
+      display: flex;
+      gap: 5px;
+    }
+    
+    dt {
+      white-space: nowrap;
+      flex-basis: 175px
+    }
+    dd {
+      margin: 0;
+      flex: 1
+    }
+  }
+`;
 
 export const getTimeRangeValueSummary = (timerange: TimeRange) => {
   switch (timerange.type) {
@@ -40,14 +59,14 @@ export const getTimeRangeValueSummary = (timerange: TimeRange) => {
 };
 
 const QuickAccessTimeRangeOptionsSummary = ({ options }: Props) => (
-  <dl className="deflist">
+  <StyledDL className="deflist">
     {options.map(({ timerange, id, description }) => (
       <span key={`timerange-options-summary-${id}`}>
-        <dt>{description}</dt>
-        <dd>{getTimeRangeValueSummary(timerange)}</dd>
+        <dt>{getTimeRangeValueSummary(timerange)}</dt>
+        <dd>{description}</dd>
       </span>
     ))}
-  </dl>
+  </StyledDL>
 );
 
 QuickAccessTimeRangeOptionsSummary.propTypes = {
