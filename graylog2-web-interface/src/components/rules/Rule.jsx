@@ -21,7 +21,7 @@ import { PageHeader } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 
-import RuleBuilder from './RuleBuilder';
+import RuleBuilder from './rule-builder/RuleBuilder';
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
 

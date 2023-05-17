@@ -22,7 +22,8 @@ import type { RuleBlock, RuleBuilderType, RuleBuilderRule } from 'hooks/useRuleB
 
 import RuleBuilderBlock from './RuleBuilderBlock';
 
-import ConfirmDialog from '../common/ConfirmDialog';
+import ConfirmDialog from '../../common/ConfirmDialog';
+import RuleBuilderForm from './RuleBuilderForm';
 
 const RuleBuilder = () => {
   const {
@@ -124,6 +125,10 @@ const RuleBuilder = () => {
   return (
     <>
       <Row className="content">
+        <Col md={12}>
+          <RuleBuilderForm rule={rule}
+                           onSave={rule ? updateRule : createRule} />
+        </Col>
         <Col md={6}>
           {
             ruleBuilder?.conditions.map((condition, index) => (

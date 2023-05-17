@@ -21,7 +21,7 @@ import { Select, FormikInput } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { RuleBuilderSupportedTypes } from 'hooks/useRuleBuilder';
 import type { BlockDict, BlockFieldDict, RuleBlock } from 'hooks/useRuleBuilder';
-import type { BlockType } from 'components/rules/RuleBuilderBlock';
+import type { BlockType } from 'src/components/rules/rule-builder/RuleBuilderBlock';
 
 type Props = {
   existingBlock: RuleBlock,
