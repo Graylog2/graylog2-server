@@ -94,6 +94,7 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
       <TimeRangeInput onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} />
       <Description>
         <StyledInput type="text"
+                     id={`quick-access-time-range-description-${id}`}
                      placeholder="Add description..."
                      defaultValue={description}
                      onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
