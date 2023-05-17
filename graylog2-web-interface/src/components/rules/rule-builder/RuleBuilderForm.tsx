@@ -14,65 +14,48 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React from 'react';
 
-import { Button, Input } from 'components/bootstrap';
+import { Input } from 'components/bootstrap';
 
 import type { RuleBuilderRule } from './types';
 
 import PipelinesUsingRule from '../PipelinesUsingRule';
 
 type Props = {
-  rule: RuleBuilderRule|null,
-  onSave: (rule: Partial<RuleBuilderRule>) => void,
+  rule: RuleBuilderRule,
+  onChange: (rule: RuleBuilderRule) => void,
 };
 
-const RuleBuilderForm = ({ rule, onSave }: Props) => {
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-
+const RuleBuilderForm = ({ rule, onChange }: Props) => {
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
+    onChange({ ...rule, title: event.target.value });
   };
 
   const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value);
-  };
-
-  const handleSave = () => {
-    onSave({
-      ...rule,
-      title,
-      description,
-    });
+    onChange({ ...rule, description: event.target.value });
   };
 
   return (
-    <>
-      <fieldset>
-        <Input type="text"
-               id="title"
-               label="Title"
-               value={title}
-               onChange={handleTitleChange}
-               autoFocus
-               help="Rule title." />
+    <fieldset>
+      <Input type="text"
+             id="title"
+             label="Title"
+             value={rule.title}
+             onChange={handleTitleChange}
+             autoFocus
+             help="Rule title." />
 
-        <Input type="textarea"
-               id="description"
-               label="Description"
-               value={description}
-               onChange={handleDescriptionChange}
-               autoFocus
-               help="Rule description (optional)." />
+      <Input type="textarea"
+             id="description"
+             label="Description"
+             value={rule.description}
+             onChange={handleDescriptionChange}
+             autoFocus
+             help="Rule description (optional)." />
 
-        <PipelinesUsingRule create={Boolean(rule)} />
-      </fieldset>
-
-      <Button type="button" bsStyle="success" onClick={handleSave}>
-        Save
-      </Button>
-    </>
+      <PipelinesUsingRule create={Boolean(rule)} />
+    </fieldset>
   );
 };
 

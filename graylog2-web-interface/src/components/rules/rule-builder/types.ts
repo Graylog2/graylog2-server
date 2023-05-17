@@ -18,7 +18,7 @@ export type BlockType = 'condition' | 'action'
 
 export type RuleBuilderRule = {
   rule_builder: RuleBuilderType,
-  description: string,
+  description?: string,
   created_at?: string,
   id?: string,
   title: string,

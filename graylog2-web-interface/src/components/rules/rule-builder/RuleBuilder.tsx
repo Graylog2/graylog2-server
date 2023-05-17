@@ -21,34 +21,35 @@ import useRuleBuilder from 'hooks/useRuleBuilder';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
-import type { RuleBlock, RuleBuilderRule, RuleBuilderType } from './types';
+import type { RuleBlock, RuleBuilderRule } from './types';
 
 import ConfirmDialog from '../../common/ConfirmDialog';
 
 const RuleBuilder = () => {
   const {
-    rule: initialRule,
+    rule: _rule,
     conditionsDict,
     actionsDict,
-    createRule,
-    updateRule,
+    // createRule,
+    // updateRule,
     // deleteRule,
     // fetchValidateRule,
   } = useRuleBuilder();
 
-  console.log('currentRule', initialRule);
-  console.log('conditionsDict', conditionsDict);
-  console.log('actionsDict', actionsDict);
+  const initialRule = _rule || { description: '', title: '', rule_builder: { errors: [], conditions: [], actions: [] } };
 
-  const rule = initialRule || { description: '', title: '', rule_builder: { errors: [], conditions: [], actions: [] } };
-
-  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(rule.rule_builder);
+  const [rule, setRule] = useState<RuleBuilderRule>(initialRule);
   const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
   const [showNewActionBlock, setShowNewActionBlock] = useState<boolean>(false);
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: 'condition'|'action' } | null>(null);
 
-  const newConditionBlockOrder = ruleBuilder?.conditions.length || 0;
-  const newActionBlockOrder = ruleBuilder?.actions.length || 0;
+  console.log('conditionsDict', conditionsDict);
+  console.log('actionsDict', actionsDict);
+  console.log('initialRule', initialRule);
+  console.log('currentRule', rule);
+
+  const newConditionBlockOrder = rule.rule_builder.conditions.length || 0;
+  const newActionBlockOrder = rule.rule_builder.actions.length || 0;
 
   // const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
   //   setRuleBuilder(result.rule_builder);
@@ -60,24 +61,21 @@ const RuleBuilder = () => {
 
     if (!isValid) return;
 
-    const newRule: Partial<RuleBuilderRule> = {
-      title: '', // TODO
-      description: '', // TODO
-      rule_builder: {
-        conditions: [],
-        actions: [],
-      },
-    };
-
     if (type === 'condition') {
-      setRuleBuilder({ ...ruleBuilder, conditions: [...ruleBuilder.conditions, block] });
-      newRule.rule_builder.conditions = [...newRule.rule_builder.conditions, block];
+      setRule({
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, conditions: [...rule.rule_builder.conditions, block],
+        },
+      });
     } else {
-      setRuleBuilder({ ...ruleBuilder, actions: [...ruleBuilder.actions, block] });
-      newRule.rule_builder.actions = [...newRule.rule_builder.actions, block];
+      setRule({
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, actions: [...rule.rule_builder.actions, block],
+        },
+      });
     }
-
-    await createRule(newRule as RuleBuilderRule);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
@@ -86,36 +84,50 @@ const RuleBuilder = () => {
 
     if (!isValid) return;
 
-    const newRule: RuleBuilderRule = { ...rule };
-
     if (type === 'condition') {
-      const currentConditions = [...newRule.rule_builder.conditions];
+      const currentConditions = [...rule.rule_builder.conditions];
       currentConditions[orderIndex] = block;
 
-      setRuleBuilder({ ...ruleBuilder, conditions: currentConditions });
-      newRule.rule_builder.conditions = currentConditions;
+      setRule({
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, conditions: currentConditions,
+        },
+      });
     } else {
-      const currentActions = [...newRule.rule_builder.actions];
+      const currentActions = [...rule.rule_builder.actions];
       currentActions[orderIndex] = block;
 
-      setRuleBuilder({ ...ruleBuilder, actions: currentActions });
-      newRule.rule_builder.actions = currentActions;
+      setRule({
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, actions: currentActions,
+        },
+      });
     }
-
-    await updateRule(newRule);
   };
 
   const deleteBlock = async (orderIndex: number, type: 'condition'|'action') => {
     if (type === 'condition') {
-      const currentConditions = [...ruleBuilder.conditions];
+      const currentConditions = [...rule.rule_builder.conditions];
       currentConditions.splice(orderIndex, 1);
 
-      setRuleBuilder({ ...ruleBuilder, conditions: currentConditions });
+      setRule({
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, conditions: currentConditions,
+        },
+      });
     } else {
-      const currentActions = [...ruleBuilder.actions];
+      const currentActions = [...rule.rule_builder.actions];
       currentActions.splice(orderIndex, 1);
 
-      setRuleBuilder({ ...ruleBuilder, actions: currentActions });
+      setRule({
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, actions: currentActions,
+        },
+      });
     }
 
     // await deleteRule(rule.id);
@@ -127,11 +139,11 @@ const RuleBuilder = () => {
       <Row className="content">
         <Col md={12}>
           <RuleBuilderForm rule={rule}
-                           onSave={rule ? updateRule : createRule} />
+                           onChange={setRule} />
         </Col>
         <Col md={6}>
           {
-            ruleBuilder?.conditions.map((condition, index) => (
+            rule.rule_builder.conditions.map((condition, index) => (
               <RuleBuilderBlock blockDict={conditionsDict}
                                 block={condition}
                                 order={index}
@@ -156,7 +168,7 @@ const RuleBuilder = () => {
         </Col>
         <Col md={6}>
           {
-            ruleBuilder?.actions.map((action, index) => (
+            rule.rule_builder.actions.map((action, index) => (
               <RuleBuilderBlock blockDict={actionsDict}
                                 block={action}
                                 order={index}
