@@ -104,6 +104,7 @@
         <classgraph.version>4.8.157</classgraph.version>
         <commons-codec.version>1.14</commons-codec.version>
         <commons-email.version>1.5</commons-email.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-validator.version>1.6</commons-validator.version>
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
@@ -281,6 +282,18 @@
                 <artifactId>netty-tcnative-boringssl-static</artifactId>
                 <version>${netty-tcnative-boringssl-static.version}</version>
                 <classifier>linux-x86_64</classifier>
+            </dependency>
+            <!-- Ensure consistent commons-lang3 versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <!-- Ensure consistent zstd-jni versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>com.github.luben</groupId>
+                <artifactId>zstd-jni</artifactId>
+                <version>${zstd.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

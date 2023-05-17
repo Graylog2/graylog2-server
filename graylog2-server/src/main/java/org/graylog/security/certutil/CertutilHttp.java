@@ -50,6 +50,8 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Locale;
 
+import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
+
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilHttp implements CliCommand {
 
@@ -86,7 +88,7 @@ public class CertutilHttp implements CliCommand {
                 KeyPair keyPair = CertificateGenerator.generate(certReq);
                 PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
                         new X500Principal("CN=Requested Test Certificate"), keyPair.publicKey());
-                JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
+                JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(SIGNING_ALGORITHM);
                 ContentSigner signer = csBuilder.build(keyPair.privateKey());
                 PKCS10CertificationRequest csr = p10Builder.build(signer);
 

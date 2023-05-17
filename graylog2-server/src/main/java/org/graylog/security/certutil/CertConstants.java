@@ -14,20 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.storage;
+package org.graylog.security.certutil;
 
-import org.graylog.security.certutil.ca.exceptions.CAStorageException;
+/**
+ * Place to store constants that are not a subject of user/client configuration.
+ */
+public interface CertConstants {
 
-import java.nio.file.Path;
-import java.security.KeyStore;
-
-public interface CAKeystoreStorage {
-
-    void writeCAKeyStore(final Path keystorePath,
-                         final KeyStore caKeyStore,
-                         final char[] password)
-            throws CAStorageException;
-
-    //TODO: we may need a read method as well, for CSR processing
-
+    String KEY_GENERATION_ALGORITHM = "RSA";
+    String SIGNING_ALGORITHM = "SHA256withRSA";
 }
