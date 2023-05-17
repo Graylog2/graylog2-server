@@ -27,17 +27,19 @@ import org.junit.jupiter.api.Test;
 import javax.security.auth.x500.X500Principal;
 import java.security.KeyPairGenerator;
 
+import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
+import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CsrFileStorageTest {
 
     @Test
     void testCsrStorageSaveAndRetrieve() throws Exception {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
                 new X500Principal("CN=localhost"), certKeyPair.getPublic());
-        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
+        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(SIGNING_ALGORITHM);
         ContentSigner signer = csBuilder.build(certKeyPair.getPrivate());
         PKCS10CertificationRequest csr = p10Builder.build(signer);
 

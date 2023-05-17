@@ -14,11 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.exceptions;
+package org.graylog.security.certutil.keystore.storage;
 
-public class CAStorageException extends Exception {
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 
-    public CAStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
+import java.nio.file.Path;
+import java.security.KeyStore;
+
+public interface KeystoreStorage {
+
+    void writeKeyStore(final Path keystorePath,
+                       final KeyStore keyStore,
+                       final char[] password)
+            throws KeyStoreStorageException;
+
 }
