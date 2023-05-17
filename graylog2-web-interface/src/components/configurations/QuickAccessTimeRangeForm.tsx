@@ -161,7 +161,7 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
           </Formik>
         </TimeRangeInputSettingsContext.Provider>
       </div>
-      <Button bsSize="xs" onClick={addTimeRange}>Add</Button>
+      <Button bsSize="xs" onClick={addTimeRange}>Add option</Button>
     </div>
   );
 };
