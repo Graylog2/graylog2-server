@@ -16,7 +16,6 @@
  */
 import type { Dispatch } from 'react';
 import React, { useCallback } from 'react';
-import { Formik, Form } from 'formik';
 import moment from 'moment/moment';
 import styled from 'styled-components';
 import Immutable from 'immutable';
@@ -150,15 +149,11 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
       </span>
       <div className="wrapper">
         <TimeRangeInputSettingsContext.Provider value={contextSettings}>
-          <Formik initialValues={{}} onSubmit={() => {}}>
-            <Form>
-              <SortableList items={options.toArray()}
-                            onMoveItem={onMoveItem}
-                            displayOverlayInPortal
-                            alignItemContent="center"
-                            customContentRender={customContentRender} />
-            </Form>
-          </Formik>
+          <SortableList items={options.toArray()}
+                        onMoveItem={onMoveItem}
+                        displayOverlayInPortal
+                        alignItemContent="center"
+                        customContentRender={customContentRender} />
         </TimeRangeInputSettingsContext.Provider>
       </div>
       <Button bsSize="xs" onClick={addTimeRange}>Add option</Button>
