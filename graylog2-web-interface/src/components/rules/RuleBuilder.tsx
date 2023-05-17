@@ -31,7 +31,7 @@ const RuleBuilder = () => {
     actionsDict,
     createRule,
     updateRule,
-    deleteRule,
+    // deleteRule,
     // fetchValidateRule,
   } = useRuleBuilder();
 
@@ -117,7 +117,7 @@ const RuleBuilder = () => {
       setRuleBuilder({ ...ruleBuilder, actions: currentActions });
     }
 
-    await deleteRule(rule.id);
+    // await deleteRule(rule.id);
     // validateRuleBuilder();
   };
 
