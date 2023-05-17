@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7.testing;
+package org.graylog.storage.opensearch2.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
-import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
-import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
@@ -36,40 +36,41 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.images.ImagePullPolicy;
+import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
-    protected static final String ES_VERSION = "7.10.2";
-    private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
-    public static final String DEFAULT_HEAP_SIZE = "2g";
+public class DatanodeInstance extends TestableSearchServerInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
 
-    private final RestHighLevelClient restHighLevelClient;
-    private final ElasticsearchClient elasticsearchClient;
+    public static final String DEFAULT_HEAP_SIZE = "2g";
+    public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
+
+    private final OpenSearchClient openSearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
-    private Adapters adapters;
+    private final Adapters adapters;
 
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network, String heapSize) {
+    protected DatanodeInstance(String image, SearchVersion version, Network network, String heapSize) {
         super(image, version, network, heapSize);
-        this.restHighLevelClient = buildRestClient();
-        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
-        this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
-        this.adapters = new AdaptersES7(elasticsearchClient);
+        RestHighLevelClient restHighLevelClient = buildRestClient();
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
+        this.client = new ClientOS2(this.openSearchClient);
+        this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
+        adapters = new AdaptersOS2(openSearchClient);
     }
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network) {
+    protected DatanodeInstance(String image, SearchVersion version, Network network) {
         this(image, version, network, DEFAULT_HEAP_SIZE);
     }
 
     @Override
     public SearchServer searchServer() {
-        return SearchServer.ES7;
+        return DATANODE_VERSION;
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -92,29 +93,21 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 .get();
     }
 
-    public static ElasticsearchInstanceES7 create() {
-        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
-    }
-
-    public static ElasticsearchInstanceES7 create(String heapSize) {
-        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), heapSize);
-    }
-
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network) {
+    public static DatanodeInstance create(SearchVersion searchVersion, Network network) {
         return create(searchVersion, network, DEFAULT_HEAP_SIZE);
     }
 
-    private static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network, String heapSize) {
+    private static DatanodeInstance create(SearchVersion searchVersion, Network network, String heapSize) {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
 
-        return new ElasticsearchInstanceES7(image, searchVersion, network, heapSize);
+        return new DatanodeInstance(image, searchVersion, network, heapSize);
     }
 
     protected static String imageNameFrom(Version version) {
-        return DEFAULT_IMAGE_OSS + ":" + version.toString();
+        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev"); // TODO:use the requested version
     }
 
     @Override
@@ -127,6 +120,26 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
         return this.fixtureImporter;
     }
 
+    public OpenSearchClient openSearchClient() {
+        return this.openSearchClient;
+    }
+
+    @Override
+    public GenericContainer<?> buildContainer(String image, Network network) {
+        return new OpenSearchContainer(DockerImageName.parse(image))
+                .withImagePullPolicy(PullPolicy.alwaysPull())
+                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
+                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
+                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", "<password-secret>")
+                .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", "<root-pw-sha2>")
+                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb:27017/graylog")
+                .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
+                .withNetwork(network)
+                .withNetworkAliases(NETWORK_ALIAS)
+                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
+    }
+
     @Override
     public Adapters adapters() {
         return this.adapters;
@@ -135,27 +148,5 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     @Override
     public String getLogs() {
         return this.container.getLogs();
-    }
-
-    public ElasticsearchClient elasticsearchClient() {
-        return this.elasticsearchClient;
-    }
-
-    public RestHighLevelClient restHighLevelClient() {
-        return this.restHighLevelClient;
-    }
-
-    @Override
-    public GenericContainer<?> buildContainer(String image, Network network) {
-        return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
-                .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", "false")
-                .withEnv("cluster.info.update.interval", "10s")
-                .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
     }
 }

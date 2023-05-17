@@ -23,9 +23,17 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.storage.SearchVersion;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.github.zafarkhaja.semver.Version.forIntegers;
 
 public class OpenSearch2Plugin implements Plugin {
-    public static final SearchVersion SUPPORTED_OPENSEARCH_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(2, 0, 0));
+    public static final Set<SearchVersion> SUPPORTED_OS_VERSIONS = ImmutableSet.of(
+            SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, forIntegers(2, 0, 0)),
+            SearchVersion.create(SearchVersion.Distribution.DATANODE, forIntegers(5, 0, 0))
+    );
 
     @Override
     public PluginMetaData metadata() {
@@ -34,9 +42,10 @@ public class OpenSearch2Plugin implements Plugin {
 
     @Override
     public Collection<PluginModule> modules() {
-        return ImmutableSet.of(
-                new OpenSearch2Module(SUPPORTED_OPENSEARCH_VERSION),
-                new ViewsOSBackendModule(SUPPORTED_OPENSEARCH_VERSION)
-        );
+        return SUPPORTED_OS_VERSIONS.stream()
+                .flatMap(version -> Stream.of(
+                        new OpenSearch2Module(version),
+                        new ViewsOSBackendModule(version)))
+                .collect(Collectors.toList());
     }
 }
