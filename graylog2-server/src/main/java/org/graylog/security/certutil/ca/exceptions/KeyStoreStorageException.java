@@ -14,25 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@tanstack/react-query',
-  '@emotion/react',
-  'chroma-js',
-  'create-react-class',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment-timezone',
-  'moment',
-  'react-bootstrap',
-  'react-dom',
-  'react-router-bootstrap',
-  'react-router',
-  'react',
-  'reflux-core',
-  'reflux',
-  'styled-components',
-  'redux',
-  'react-redux',
-  'use-query-params',
-];
+package org.graylog.security.certutil.ca.exceptions;
+
+public class KeyStoreStorageException extends Exception {
+
+    public KeyStoreStorageException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

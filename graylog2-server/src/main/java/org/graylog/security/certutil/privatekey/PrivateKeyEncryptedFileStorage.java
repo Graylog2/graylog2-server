@@ -44,7 +44,7 @@ public record PrivateKeyEncryptedFileStorage(String privateKeyFilename) implemen
     }
 
     @Override
-    public void writeEncryptedKey(char[] passwd, PrivateKey privateKey)
+    public void writeEncryptedKey(char[] password, PrivateKey privateKey)
             throws IOException, OperatorCreationException {
 
         JcaPEMWriter pemWriter = new JcaPEMWriter(new FileWriter(privateKeyFilename, Charset.defaultCharset()));
@@ -53,7 +53,7 @@ public record PrivateKeyEncryptedFileStorage(String privateKeyFilename) implemen
         pemWriter.writeObject(pkcs8Builder.build(new JcePKCSPBEOutputEncryptorBuilder(
                 NISTObjectIdentifiers.id_aes256_CBC)
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME)
-                .build(passwd)));
+                .build(password)));
         pemWriter.close();
 
     }

@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 
+import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -34,7 +35,7 @@ class PrivateKeyEncryptedFileStorageTest {
         PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key").toString());
         char[] passwd = "password".toCharArray();
 
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         final PrivateKey privateKey = certKeyPair.getPrivate();
 
@@ -49,7 +50,7 @@ class PrivateKeyEncryptedFileStorageTest {
         PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key").toString());
         char[] passwd = "password".toCharArray();
 
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         final PrivateKey privateKey = certKeyPair.getPrivate();
 
