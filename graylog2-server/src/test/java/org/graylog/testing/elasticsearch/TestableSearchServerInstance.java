@@ -35,14 +35,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
+ * This rule starts a Datanode instance and provides a configured {@link Client}.
  */
 public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
 
     private static final Map<SearchVersion, GenericContainer<?>> containersByVersion = new HashMap<>();
 
-    protected static final int ES_PORT = 9200;
+    protected static final int OPENSEARCH_PORT = 9200;
     protected static final String NETWORK_ALIAS = "elasticsearch";
 
     private final SearchVersion version;
@@ -93,7 +93,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public String internalUri() {
-        return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, ES_PORT);
+        return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, OPENSEARCH_PORT);
     }
 
     @Override

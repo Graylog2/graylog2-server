@@ -14,17 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.privatekey;
+package org.graylog.security.certutil.ca.exceptions;
 
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCSException;
+public class KeyStoreStorageException extends Exception {
 
-import java.io.IOException;
-import java.security.PrivateKey;
-
-public interface PrivateKeyEncryptedStorage {
-
-    void writeEncryptedKey(char[] password, PrivateKey privateKey) throws IOException, OperatorCreationException;
-
-    PrivateKey readEncryptedKey(char[] password) throws IOException, OperatorCreationException, PKCSException;
+    public KeyStoreStorageException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
