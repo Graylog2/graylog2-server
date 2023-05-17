@@ -86,6 +86,7 @@ public class TimeBasedRotationStrategyTest {
         when(indexSetConfig.title()).thenReturn("index-set-title");
         when(indices.getIndices(eq(indexSet))).thenReturn(Collections.singleton(IGNORED));
         when(indices.numberOfMessages(eq(IGNORED))).thenReturn(20L);
+        when(indices.isOpen(anyString())).thenReturn(true);
         rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
     }
 
@@ -452,6 +453,7 @@ public class TimeBasedRotationStrategyTest {
         // ideally we wouldn't rotate here, because the index is only 1 hour old
         when(indices.getIndices(eq(indexSet))).thenReturn(Collections.singleton(IGNORED));
         when(indices.numberOfMessages(eq(IGNORED))).thenReturn(20L);
+        when(indices.isOpen(anyString())).thenReturn(true);
         rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
     }
