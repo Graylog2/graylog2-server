@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
 import org.graylog2.database.NotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,11 +46,14 @@ public class RuleBuilderResourceTest {
     @Mock
     RuleBuilderService ruleBuilderService;
 
+    @Mock
+    ValidatorService validatorService;
+
     RuleBuilderResource ruleBuilderResource;
 
     @Before
     public void setUp() {
-        ruleBuilderResource = new RuleBuilderResource(ruleBuilderRegistry, ruleResource, ruleBuilderService);
+        ruleBuilderResource = new RuleBuilderResource(ruleBuilderRegistry, ruleResource, ruleBuilderService, validatorService);
     }
 
     @Test

@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations.V20220512123200_AddSystemRuleFragments;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.action.ValidAction;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.action.ValidVariables;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.condition.ValidCondition;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderResource;
 import org.graylog2.migrations.Migration;
@@ -45,6 +46,7 @@ public class RuleBuilderModule extends PluginModule {
 
         final Multibinder<Validator> action = Multibinder.newSetBinder(binder(), Validator.class, Names.named("actionValidators"));
         action.addBinding().to(ValidAction.class);
+        action.addBinding().to(ValidVariables.class);
 
     }
 }

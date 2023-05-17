@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class ValidAction implements Validator {
 
-    protected final Map<String, RuleFragment> actions;
+    private final Map<String, RuleFragment> actions;
 
     @Inject
     public ValidAction(RuleBuilderRegistry ruleBuilderRegistry) {
