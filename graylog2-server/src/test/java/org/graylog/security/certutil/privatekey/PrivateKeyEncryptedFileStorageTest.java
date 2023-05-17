@@ -18,7 +18,9 @@ package org.graylog.security.certutil.privatekey;
 
 import org.bouncycastle.pkcs.PKCSException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Path;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 
@@ -28,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PrivateKeyEncryptedFileStorageTest {
 
     @Test
-    void testKeyStorageSaveAndRetrieve() throws Exception {
-        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage("temp.key");
+    void testKeyStorageSaveAndRetrieve(@TempDir Path tmpDir) throws Exception {
+        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key").toString());
         char[] passwd = "password".toCharArray();
 
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
@@ -43,8 +45,8 @@ class PrivateKeyEncryptedFileStorageTest {
     }
 
     @Test
-    void testKeyStorageThrowsExceptionWhenUsingWrongPasswordDuringRead() throws Exception {
-        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage("temp.key");
+    void testKeyStorageThrowsExceptionWhenUsingWrongPasswordDuringRead(@TempDir Path tmpDir) throws Exception {
+        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key").toString());
         char[] passwd = "password".toCharArray();
 
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");

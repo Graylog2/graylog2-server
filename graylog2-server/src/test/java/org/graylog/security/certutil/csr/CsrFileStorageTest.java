@@ -23,8 +23,10 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.security.certutil.csr.storage.CsrFileStorage;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import javax.security.auth.x500.X500Principal;
+import java.nio.file.Path;
 import java.security.KeyPairGenerator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CsrFileStorageTest {
 
     @Test
-    void testCsrStorageSaveAndRetrieve() throws Exception {
+    void testCsrStorageSaveAndRetrieve(@TempDir Path tmpDir) throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
@@ -41,7 +43,7 @@ class CsrFileStorageTest {
         ContentSigner signer = csBuilder.build(certKeyPair.getPrivate());
         PKCS10CertificationRequest csr = p10Builder.build(signer);
 
-        CsrFileStorage csrFileStorage = new CsrFileStorage("test.csr");
+        CsrFileStorage csrFileStorage = new CsrFileStorage(tmpDir.resolve("test.csr").toString());
         csrFileStorage.writeCsr(csr);
         final PKCS10CertificationRequest readCsr = csrFileStorage.readCsr();
 
