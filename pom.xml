@@ -94,6 +94,7 @@
         <apache-httpasyncclient.version>4.1.4</apache-httpasyncclient.version>
         <apache-httpclient.version>4.5.13</apache-httpclient.version>
         <apache-httpcore.version>4.4.14</apache-httpcore.version>
+        <asm.version>9.5</asm.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.412</aws-java-sdk-1.version>
@@ -293,6 +294,12 @@
                 <groupId>com.github.luben</groupId>
                 <artifactId>zstd-jni</artifactId>
                 <version>${zstd.version}</version>
+            </dependency>
+            <!-- Ensure consistent asm versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>${asm.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
