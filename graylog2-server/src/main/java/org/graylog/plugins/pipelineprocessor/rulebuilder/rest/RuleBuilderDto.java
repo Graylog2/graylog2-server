@@ -26,6 +26,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 @AutoValue
 @JsonAutoDetect
@@ -54,13 +55,18 @@ public abstract class RuleBuilderDto {
     @Nullable
     public abstract DateTime modifiedAt();
 
+    @JsonProperty
+    @Nullable
+    public abstract List<String> errors();
+
     @JsonCreator
     public static RuleBuilderDto create(@JsonProperty("rule_id") @Id @ObjectId @Nullable String ruleId,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("rule_builder") RuleBuilder ruleBuilder,
                                         @JsonProperty("created_at") @Nullable DateTime createdAt,
-                                        @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
+                                        @JsonProperty("modified_at") @Nullable DateTime modifiedAt,
+                                        @JsonProperty("errors") @Nullable List<String> errors) {
         return builder()
                 .ruleId(ruleId)
                 .title(title)
@@ -68,6 +74,7 @@ public abstract class RuleBuilderDto {
                 .ruleBuilder(ruleBuilder)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
+                .errors(errors)
                 .build();
     }
 
@@ -90,6 +97,8 @@ public abstract class RuleBuilderDto {
         public abstract Builder createdAt(DateTime createdAt);
 
         public abstract Builder modifiedAt(DateTime modifiedAt);
+
+        public abstract Builder errors(List<String> errors);
 
         public abstract RuleBuilderDto build();
     }

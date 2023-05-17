@@ -38,6 +38,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -46,6 +47,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,6 +83,13 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleBuilderDto createFromBuilder(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
+        List<ValidationResult> validationResults = validatorService.validate(ruleBuilderDto.ruleBuilder())
+                .stream().filter(ValidationResult::failed).toList();
+
+        if (!validationResults.isEmpty()) {
+            throw new BadRequestException("RuleBuilder failed validation");
+        }
+
         RuleSource ruleSource = toRuleSource(ruleBuilderDto);
         final RuleSource stored = ruleResource.createFromParser(ruleSource);
         return ruleBuilderDto.toBuilder().ruleId(stored.id()).build();
@@ -121,10 +130,13 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @ApiOperation("Validate rule builder")
     @Path("/validate")
     @POST
-    public List<ValidationResult> validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
-        return validatorService.validate(ruleBuilderDto.ruleBuilder());
+    public RuleBuilderDto validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
+        List<ValidationResult> validationResults = validatorService.validate(ruleBuilderDto.ruleBuilder());
+        List<String> errors = new ArrayList<>();
+        validationResults.stream().filter(ValidationResult::failed).forEach(result -> errors.add(result.failureReason()));
+        return ruleBuilderDto.toBuilder().errors(errors).build();
     }
-    
+
     private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto) {
         return RuleSource.builder()
                 .title(ruleBuilderDto.title())

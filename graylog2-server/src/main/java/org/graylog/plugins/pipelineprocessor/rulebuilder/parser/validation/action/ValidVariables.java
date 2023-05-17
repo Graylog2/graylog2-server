@@ -34,7 +34,7 @@ import java.util.Objects;
 public class ValidVariables implements Validator {
 
     private final Map<String, RuleFragment> actions;
-    private Map<String, Object> variables;
+    private Map<String, Class<?>> variables;
 
     @Inject
     public ValidVariables(RuleBuilderRegistry ruleBuilderRegistry) {
@@ -61,17 +61,19 @@ public class ValidVariables implements Validator {
             //$ means it is stored in another variable and we need to fetch and verify that type
             if (value instanceof String s && s.startsWith("$")) {
                 String substring = s.substring(1);
-                Object variable = variables.get(substring);
-                if(Objects.isNull(variable)) {
-                    return new ValidationResult(step, true, "Function %s missing variable %s ".formatted(functionDescriptor.name(), value));
+                Class<?> passedVariableType = variables.get(substring);
+                if (Objects.isNull(passedVariableType)) {
+                    return new ValidationResult(step, true, "Function %s missing passed variable %s ".formatted(functionDescriptor.name(), value));
                 }
-                variableType = variable.getClass();
+                variableType = passedVariableType;
             }
 
-            //Check if variable type matches functionDescriptor expectation
-            if (value != null &&  variableType != parameterDescriptor.type()) {
+            //Check if variable type matches function expectation
+            variableType = variableType == Integer.class ? Long.class : variableType;
+            Class paramType = parameterDescriptor.type();
+            if (value != null && paramType != Object.class && variableType != paramType) {
                 String errorMsg = "Function %s found wrong parameter type %s for parameter %s. Required type %s";
-                return new ValidationResult(step, true, errorMsg.formatted(functionDescriptor.name(), variableType, parameterName, parameterDescriptor.type()));
+                return new ValidationResult(step, true, errorMsg.formatted(functionDescriptor.name(), variableType, parameterName, paramType));
             }
         }
 
@@ -96,6 +98,7 @@ public class ValidVariables implements Validator {
         return switch (type) {
             case Double aDouble -> Double.class;
             case Integer integer -> Integer.class;
+            case Long l -> Long.class;
             case String s -> String.class;
             case Boolean aBoolean -> Boolean.class;
             case null, default -> Object.class;

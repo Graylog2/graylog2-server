@@ -42,29 +42,16 @@ public class ActionParser {
     }
 
     String generateAction(RuleBuilderStep step, boolean generateSimulatorFields) {
-        if (!actions.containsKey(step.function())) {
-            throw new IllegalArgumentException("Function " + step.function() + " not available as action for rule builder.");
-        }
-
         final RuleFragment ruleFragment = actions.get(step.function());
         FunctionDescriptor<?> function = ruleFragment.descriptor();
 
         String syntax = "  ";
-        if (Objects.nonNull(step.outputvariable())) {
-            if (function.returnType().equals(Void.class)) { // cannot set output variables for functions returning void
-                throw new IllegalArgumentException("Function " + step.function() + " does not return a value.");
-            } else if (ruleFragment.isFunction()) { // only set output variables to result of functions
-                syntax += "let " + step.outputvariable() + " = ";
-            }
+        if (Objects.nonNull(step.outputvariable()) && ruleFragment.isFunction()) { // only set output variables to result of functions
+            syntax += "let " + step.outputvariable() + " = ";
         }
 
-        if (step.negate()) { // only functions with boolean return type can be negated
-            if (!function.returnType().equals(Boolean.class)) {
-                throw new IllegalArgumentException("Function " + step.function() + " cannot be negated.");
-            }
-            if (ruleFragment.isFunction()) { // negate functions here, fragments below
-                syntax += "! ";
-            }
+        if (step.negate() && ruleFragment.isFunction()) { // only functions with boolean return type can be negated
+            syntax += "! ";
         }
 
         if (ruleFragment.isFragment()) {
@@ -80,7 +67,6 @@ public class ActionParser {
                     ((ruleFragment.isFragment() && step.negate()) ? "! " : "") +
                     ruleFragment.fragmentOutputVariable();
         }
-
 
         // generate message fields for simulator
         if (generateSimulatorFields && Objects.nonNull(step.outputvariable())) {

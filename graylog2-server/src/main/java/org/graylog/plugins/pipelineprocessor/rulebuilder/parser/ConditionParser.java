@@ -45,10 +45,6 @@ public class ConditionParser {
     }
 
     String generateCondition(RuleBuilderStep step) {
-        if (!conditions.containsKey(step.function())) {
-            throw new IllegalArgumentException("Function " + step.function() + " not available as condition for rule builder.");
-        }
-
         String syntax = "  && ";
         if (step.negate()) {
             syntax += "! ";
@@ -63,7 +59,6 @@ public class ConditionParser {
             syntax += ParserUtil.generateForFunction(step, function);
         }
         return syntax;
-
     }
 
 }
