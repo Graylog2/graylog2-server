@@ -223,7 +223,7 @@ const SearchesConfig = () => {
     });
   };
 
-  const quickAccessTimeRangePresets = useMemo(() => mapBEData(quickAccessTimeRangePresetsUpdated || formConfig?.quick_access_timerange_presets || [], formatTime), [formConfig, formatTime, quickAccessTimeRangePresetsUpdated]);
+  const quickAccessTimeRangePresets = useMemo(() => quickAccessTimeRangePresetsUpdated ?? mapBEData(formConfig?.quick_access_timerange_presets ?? [], formatTime), [formConfig, formatTime, quickAccessTimeRangePresetsUpdated]);
 
   if (!viewConfig) {
     return <Spinner />;
