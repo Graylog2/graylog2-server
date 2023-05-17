@@ -26,22 +26,22 @@ import ConfirmDialog from '../common/ConfirmDialog';
 
 const RuleBuilder = () => {
   const {
-    rule,
+    rule: initialRule,
     conditionsDict,
     actionsDict,
     createRule,
     updateRule,
     deleteRule,
-    //fetchValidateRule,
+    // fetchValidateRule,
   } = useRuleBuilder();
 
-  console.log('currentRule', rule);
+  console.log('currentRule', initialRule);
   console.log('conditionsDict', conditionsDict);
   console.log('actionsDict', actionsDict);
 
-  const initialRuleBuilder = rule?.rule_builder || { errors: [], conditions: [], actions: [] };
+  const rule = initialRule || { description: '', title: '', rule_builder: { errors: [], conditions: [], actions: [] } };
 
-  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(initialRuleBuilder);
+  const [ruleBuilder, setRuleBuilder] = useState<RuleBuilderType>(rule.rule_builder);
   const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
   const [showNewActionBlock, setShowNewActionBlock] = useState<boolean>(false);
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: 'condition'|'action' } | null>(null);
@@ -54,7 +54,7 @@ const RuleBuilder = () => {
   // });
 
   const addBlock = async (type: string, block: RuleBlock) => {
-    //validateRuleBuilder();
+    // validateRuleBuilder();
     const isValid = true;
 
     if (!isValid) return;
@@ -118,7 +118,7 @@ const RuleBuilder = () => {
     }
 
     await deleteRule(rule.id);
-    //validateRuleBuilder();
+    // validateRuleBuilder();
   };
 
   return (
