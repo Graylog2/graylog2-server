@@ -20,9 +20,9 @@ import styled from 'styled-components';
 
 import { FormikFormGroup, Select, FormSubmit } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
-import { RuleBuilderSupportedTypes } from 'hooks/useRuleBuilder';
-import type { BlockDict, BlockFieldDict, RuleBlock } from 'hooks/useRuleBuilder';
-import type { BlockType } from 'src/components/rules/rule-builder/RuleBuilderBlock';
+
+import { RuleBuilderSupportedTypes } from './types';
+import type { BlockDict, BlockFieldDict, BlockType, RuleBlock } from './types';
 
 type Props = {
   existingBlock: RuleBlock,

@@ -17,7 +17,8 @@
 import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
-import type { RuleBuilderRule } from 'hooks/useRuleBuilder';
+
+import type { RuleBuilderRule } from './types';
 
 import PipelinesUsingRule from '../PipelinesUsingRule';
 

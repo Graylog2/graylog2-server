@@ -18,12 +18,12 @@ import React, { useState } from 'react';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
-import type { RuleBlock, RuleBuilderType, RuleBuilderRule } from 'hooks/useRuleBuilder';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
+import RuleBuilderForm from './RuleBuilderForm';
+import type { RuleBlock, RuleBuilderRule, RuleBuilderType } from './types';
 
 import ConfirmDialog from '../../common/ConfirmDialog';
-import RuleBuilderForm from './RuleBuilderForm';
 
 const RuleBuilder = () => {
   const {

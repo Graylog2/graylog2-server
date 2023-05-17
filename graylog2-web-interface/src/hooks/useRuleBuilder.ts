@@ -22,59 +22,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { PipelineRulesContext } from 'components/rules/RuleContext';
-
-export type RuleBuilderRule = {
-  rule_builder: RuleBuilderType,
-  description: string,
-  created_at?: string,
-  id?: string,
-  title: string,
-  modified_at?: string,
-}
-
-type RuleBlockField = {
-  [key:string]: string | number | boolean
-}
-
-export type RuleBlock = {
-  function: string,
-  params: RuleBlockField,
-  output?: string,
-  errors?: Array<string>
-}
-
-export type RuleBuilderType = {
-  errors?: Array<string>,
-  conditions: Array<RuleBlock>,
-  actions: Array<RuleBlock>
-}
-
-export enum RuleBuilderSupportedTypes {
-  Boolean = 'java.lang.Boolean',
-  Message = 'org.graylog2.plugin.Message',
-  Number = 'java.lang.Long',
-  Object = 'java.lang.Object',
-  String = 'java.lang.String',
-}
-
-export type BlockFieldDict = {
-  type: RuleBuilderSupportedTypes,
-  transformed_type: RuleBuilderSupportedTypes,
-  name: string,
-  optional: boolean,
-  primary: boolean,
-  description: string | null
-}
-
-export type BlockDict = {
-  name: string,
-  pure: boolean,
-  return_type: RuleBuilderSupportedTypes,
-  params: Array<BlockFieldDict>,
-  description: string | null,
-  rule_builder_enabled: boolean,
-  rule_builder_title: string | null
-}
+import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
 
 const createRule = async (rule: RuleBuilderRule) => {
   try {

@@ -17,7 +17,8 @@
 import React from 'react';
 
 import { Button, Col, Row } from 'components/bootstrap';
-import type { BlockDict, RuleBlock } from 'hooks/useRuleBuilder';
+
+import type { BlockDict, RuleBlock } from './types';
 
 type Props = {
   block: RuleBlock,

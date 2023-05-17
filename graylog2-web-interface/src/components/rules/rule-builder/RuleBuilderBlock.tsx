@@ -16,11 +16,10 @@
  */
 import React, { useEffect, useState } from 'react';
 
-import type { RuleBlock, BlockDict } from 'hooks/useRuleBuilder';
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 
-export type BlockType = 'condition' | 'action'
+import type { RuleBlock, BlockType, BlockDict } from './types';
 
 type Props = {
   type: BlockType,
