@@ -110,7 +110,7 @@ const RuleBlockForm = ({
 
   return (
     <>
-      <h2>{selectedBlockDict?.rule_builder_title || selectedBlockDict?.name}</h2>
+      <h3>{selectedBlockDict?.rule_builder_title || selectedBlockDict?.name}</h3>
       <p>{selectedBlockDict?.description}</p>
       <Formik onSubmit={existingBlock ? onUpdate : onAdd} initialValues={buildInitialValues()}>
         {({ resetForm }) => (

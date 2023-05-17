@@ -101,7 +101,8 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
                        selectedBlockDict={currentBlockDict}
                        type={type} />
       ) : (
-        <RuleBlockDisplay blockDict={currentBlockDict}
+        <RuleBlockDisplay block={block}
+                          blockDict={currentBlockDict}
                           onDelete={onDelete}
                           onEdit={onEdit} />
       )}

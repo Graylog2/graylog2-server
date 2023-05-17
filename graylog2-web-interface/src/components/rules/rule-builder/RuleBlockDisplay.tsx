@@ -17,17 +17,28 @@
 import React from 'react';
 
 import { Button } from 'components/bootstrap';
-import type { BlockDict } from 'hooks/useRuleBuilder';
+import type { BlockDict, RuleBlock } from 'hooks/useRuleBuilder';
 
 type Props = {
+  block: RuleBlock,
   blockDict: BlockDict,
   onDelete: () => void,
   onEdit: () => void,
 }
 
-const RuleBlockDisplay = ({ blockDict, onEdit, onDelete }:Props) => (
+const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => (
   <>
-    <p>{blockDict?.rule_builder_title || blockDict?.name}</p>
+    <h3>{blockDict?.rule_builder_title || blockDict?.name}</h3>
+    {Object.keys(block.params).map((paramName) => {
+      const paramValue = block.params[paramName];
+      const paramValueExists = paramValue && paramValue !== '' && paramValue !== null;
+
+      if (paramValueExists) {
+        return (<p><strong>{paramName}:</strong> {paramValue}</p>);
+      }
+
+      return null;
+    })}
     <Button onClick={onEdit}>Edit</Button>
     <Button onClick={onDelete}>Delete</Button>
   </>
