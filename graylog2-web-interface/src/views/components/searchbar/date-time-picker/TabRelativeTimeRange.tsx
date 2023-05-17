@@ -28,7 +28,12 @@ import RangePresetDropdown from 'views/components/searchbar/RangePresetDropdown'
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
-import { classifyToRange, classifyFromRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
+import {
+  classifyToRange,
+  classifyFromRange,
+  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  classifyRelativeTimeRange,
+} from './RelativeTimeRangeClassifiedHelper';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
@@ -44,9 +49,9 @@ const RelativeWrapper = styled.div`
   justify-content: space-around;
 `;
 const ConfiguredWrapper = styled.div`
-  grid-area: 3 / 5 / 3 / 7;
-  margin: 3px 12px 3px 0;
-  justify-self: end;
+  display: flex;
+  margin: 3px 0;
+  justify-content: end;
 `;
 const StyledIcon = styled(Icon)`
   flex: 0.75;
@@ -61,40 +66,32 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const relativeOptions = useMemo(() => availableOptions.filter((option) => option?.timerange?.type === 'relative'), [availableOptions]);
 
   const onSetPreset = (range) => {
-    const isUnsetting = range === 0;
-
-    if (isUnsetting) {
-      setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE);
-    }
-
-    setFieldValue('nextTimeRange', classifyFromRange(range));
+    setFieldValue('nextTimeRange', classifyRelativeTimeRange(range));
   };
 
   return (
-    <RelativeWrapper>
-      <>
-        <RelativeRangeSelect classifyRange={(range) => classifyFromRange(range)}
-                             defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
-                             disableUnsetRange={limitDuration !== 0}
-                             disabled={disabled}
-                             fieldName="from"
-                             limitDuration={limitDuration}
-                             onUnsetRange={() => { setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
-                             title="From:"
-                             unsetRangeLabel="All Time"
-                             unsetRangeValue={0} />
-        <StyledIcon name="arrow-right" />
+    <div>
+      <RelativeWrapper>
+        <>
+          <RelativeRangeSelect defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
+                               disableUnsetRange={limitDuration !== 0}
+                               disabled={disabled}
+                               fieldName="from"
+                               limitDuration={limitDuration}
+                               onUnsetRange={() => { setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
+                               title="From:"
+                               unsetRangeLabel="All Time" />
+          <StyledIcon name="arrow-right" />
 
-        <RelativeRangeSelect classifyRange={(range) => classifyToRange(range)}
-                             defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
-                             disableUnsetRange={disableUntil}
-                             disabled={disableUntil}
-                             fieldName="to"
-                             limitDuration={limitDuration}
-                             title="Until:"
-                             unsetRangeLabel="Now"
-                             unsetRangeValue={undefined} />
-      </>
+          <RelativeRangeSelect defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
+                               disableUnsetRange={disableUntil}
+                               disabled={disableUntil}
+                               fieldName="to"
+                               limitDuration={limitDuration}
+                               title="Until:"
+                               unsetRangeLabel="Now" />
+        </>
+      </RelativeWrapper>
       {showRelativePresetsButton
         && (
           <ConfiguredWrapper>
@@ -105,7 +102,7 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
             </TimerangeSelector>
           </ConfiguredWrapper>
         )}
-    </RelativeWrapper>
+    </div>
   );
 };
 

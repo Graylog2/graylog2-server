@@ -18,20 +18,14 @@ import * as React from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
-import { useContext } from 'react';
 
 import { RELATIVE_RANGE_TYPES } from 'views/Constants';
 import { Select } from 'components/common';
 import type { RangeClassified } from 'views/components/searchbar/date-time-picker/types';
-import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import RelativeRangeValueInput from './RelativeRangeValueInput';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
-
-import TimerangeSelector from '../TimerangeSelector';
-import RangePresetDropdown from '../RangePresetDropdown';
 
 const RangeWrapper = styled.div`
   flex: 4;
@@ -96,12 +90,6 @@ const ErrorMessage = styled.span(({ theme }) => css`
   padding: 3px;
 `);
 
-const ConfiguredWrapper = styled.div`
-  grid-area: 3 / 5 / 3 / 7;
-  margin: 3px 12px 3px 0;
-  justify-self: end;
-`;
-
 const buildRangeTypes = (limitDuration) => RELATIVE_RANGE_TYPES.map(({ label, type }) => {
   const typeDuration = moment.duration(1, type).asSeconds();
 
@@ -113,7 +101,6 @@ const buildRangeTypes = (limitDuration) => RELATIVE_RANGE_TYPES.map(({ label, ty
 }).filter(Boolean);
 
 type Props = {
-  classifyRange: (range: number) => RangeClassified,
   defaultRange: RangeClassified
   disableUnsetRange?: boolean,
   disabled?: boolean,
@@ -122,12 +109,10 @@ type Props = {
   onUnsetRange?: () => void,
   title: string,
   unsetRangeLabel: string,
-  unsetRangeValue: number | undefined,
 }
 
 const RelativeRangeSelectInner = ({
   classifiedRange,
-  classifyRange,
   defaultRange,
   disableUnsetRange,
   disabled,
@@ -139,16 +124,12 @@ const RelativeRangeSelectInner = ({
   onUnsetRange,
   title,
   unsetRangeLabel,
-  unsetRangeValue,
 }: Required<Props> & {
   classifiedRange: RangeClassified,
   error: string | undefined,
   name: string,
   onChange: (changeEvent: { target: { name: string, value: RangeClassified } }) => void,
 }) => {
-  const { config } = useSearchConfiguration();
-  const availableOptions = config?.quick_access_timerange_presets;
-  const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
   const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
   const { isAllTime, value, unit } = classifiedRange;
@@ -191,17 +172,6 @@ const RelativeRangeSelectInner = ({
     _onChange(isUnsetting ? RELATIVE_CLASSIFIED_ALL_TIME_RANGE : _defaultRange);
   };
 
-  const _onSetPreset = (range) => {
-    const isUnsetting = range === 0;
-    const newRange = isUnsetting ? unsetRangeValue : range;
-
-    if (isUnsetting && !!onUnsetRange) {
-      onUnsetRange();
-    }
-
-    _onChange(classifyRange(newRange));
-  };
-
   return (
     <RangeWrapper>
       <RangeTitle>{title}</RangeTitle>
@@ -240,24 +210,11 @@ const RelativeRangeSelectInner = ({
           {error}
         </ErrorMessage>
       )}
-      {/*
-      {showRelativePresetsButton
-        && (
-        <ConfiguredWrapper>
-          <TimerangeSelector className="relative">
-            <RangePresetDropdown disabled={disabled}
-                                 onChange={_onSetPreset}
-                                 availableOptions={availableOptions} />
-          </TimerangeSelector>
-        </ConfiguredWrapper>
-        )}
-      */}
     </RangeWrapper>
   );
 };
 
 const RelativeRangeSelect = ({
-  classifyRange,
   defaultRange,
   disableUnsetRange,
   disabled,
@@ -266,12 +223,10 @@ const RelativeRangeSelect = ({
   onUnsetRange,
   title,
   unsetRangeLabel,
-  unsetRangeValue,
 }: Props) => (
   <Field name={`nextTimeRange.${fieldName}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => (
       <RelativeRangeSelectInner classifiedRange={value}
-                                classifyRange={classifyRange}
                                 defaultRange={defaultRange}
                                 disableUnsetRange={disableUnsetRange}
                                 disabled={disabled}
@@ -282,8 +237,7 @@ const RelativeRangeSelect = ({
                                 onUnsetRange={onUnsetRange}
                                 onChange={onChange}
                                 title={title}
-                                unsetRangeLabel={unsetRangeLabel}
-                                unsetRangeValue={unsetRangeValue} />
+                                unsetRangeLabel={unsetRangeLabel} />
     )}
   </Field>
 );
