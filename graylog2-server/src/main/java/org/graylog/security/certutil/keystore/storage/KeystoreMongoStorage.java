@@ -42,7 +42,7 @@ public class KeystoreMongoStorage {
         final String nodeIdValue = nodeId.getNodeId();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             keyStore.store(baos, password);
-            final String keystoreDataAsString = baos.toString();
+            final String keystoreDataAsString = baos.toString(StandardCharsets.UTF_8);
             certificatesService.writeCert(nodeIdValue, keystoreDataAsString);
         } catch (Exception ex) {
             throw new KeyStoreStorageException("Failed to save keystore to Mongo collection for node " + nodeIdValue, ex);
