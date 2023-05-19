@@ -45,13 +45,12 @@ const RuleBuilder = () => {
     actionsDict,
     createRule,
     updateRule,
-    // deleteRule,
     // fetchValidateRule,
   } = useRuleBuilder();
 
   const history = useHistory();
 
-  const initialRule = fetchedRule || { description: '', title: '', rule_builder: { errors: [], conditions: [], actions: [] } };
+  const initialRule = fetchedRule || { description: '', title: '', rule_builder: { conditions: [], actions: [] } };
 
   const [rule, setRule] = useState<RuleBuilderRule>(initialRule);
   const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
@@ -63,8 +62,8 @@ const RuleBuilder = () => {
   console.log('initialRule', initialRule);
   console.log('currentRule', rule);
 
-  const newConditionBlockOrder = rule.rule_builder.conditions.length || 0;
-  const newActionBlockOrder = rule.rule_builder.actions.length || 0;
+  const newConditionBlockOrder = rule.rule_builder.conditions.length;
+  const newActionBlockOrder = rule.rule_builder.actions.length;
 
   // const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
   //   setRuleBuilder(result.rule_builder);
@@ -145,7 +144,6 @@ const RuleBuilder = () => {
       });
     }
 
-    // await deleteRule(rule.id);
     // validateRuleBuilder();
   };
 
@@ -173,17 +171,17 @@ const RuleBuilder = () => {
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
-          {
-            rule.rule_builder.conditions.map((condition, index) => (
-              <RuleBuilderBlock blockDict={conditionsDict}
-                                block={condition}
-                                order={index}
-                                type="condition"
-                                addBlock={addBlock}
-                                updateBlock={updateBlock}
-                                deleteBlock={deleteBlock} />
-            ))
-          }
+          {rule.rule_builder.conditions.map((condition, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <RuleBuilderBlock key={index}
+                              blockDict={conditionsDict || []}
+                              block={condition}
+                              order={index}
+                              type="condition"
+                              addBlock={addBlock}
+                              updateBlock={updateBlock}
+                              deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+          ))}
           {(showNewConditionBlock || !newConditionBlockOrder) && (
             <RuleBuilderBlock blockDict={conditionsDict || []}
                               block={null}
@@ -191,7 +189,7 @@ const RuleBuilder = () => {
                               type="condition"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
-                              deleteBlock={deleteBlock} />
+                              deleteBlock={() => setBlockToDelete({ orderIndex: newConditionBlockOrder, type: 'condition' })} />
           )}
           {(newConditionBlockOrder > 0) && (
             <AddButton bsSize="small" bsStyle="info" onClick={() => setShowNewConditionBlock(true)}>Add Condition</AddButton>
@@ -199,17 +197,17 @@ const RuleBuilder = () => {
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-          {
-            rule.rule_builder.actions.map((action, index) => (
-              <RuleBuilderBlock blockDict={actionsDict}
-                                block={action}
-                                order={index}
-                                type="action"
-                                addBlock={addBlock}
-                                updateBlock={updateBlock}
-                                deleteBlock={deleteBlock} />
-            ))
-          }
+          {rule.rule_builder.actions.map((action, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <RuleBuilderBlock key={index}
+                              blockDict={actionsDict || []}
+                              block={action}
+                              order={index}
+                              type="action"
+                              addBlock={addBlock}
+                              updateBlock={updateBlock}
+                              deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+          ))}
           {(showNewActionBlock || !newActionBlockOrder) && (
             <RuleBuilderBlock blockDict={actionsDict || []}
                               block={null}
@@ -217,7 +215,7 @@ const RuleBuilder = () => {
                               type="action"
                               addBlock={addBlock}
                               updateBlock={updateBlock}
-                              deleteBlock={deleteBlock} />
+                              deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockOrder, type: 'action' })} />
           )}
           {(newActionBlockOrder > 0) && (
             <AddButton bsSize="small" bsStyle="info" onClick={() => setShowNewActionBlock(true)}>Add Action</AddButton>
@@ -236,12 +234,12 @@ const RuleBuilder = () => {
       {blockToDelete && (
         <ConfirmDialog title={`Delete ${blockToDelete.type}`}
                        show
-                       onConfirm={async () => {
-                         await deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
+                       onConfirm={() => {
+                         deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
                          setBlockToDelete(null);
                        }}
                        onCancel={() => setBlockToDelete(null)}>
-          <>Are you sure you want to delete <strong>{blockToDelete.type} [{blockToDelete.orderIndex}]</strong>?</>
+          <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
         </ConfirmDialog>
       )}
     </form>

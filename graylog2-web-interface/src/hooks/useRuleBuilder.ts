@@ -32,30 +32,24 @@ const createRule = async (rule: RuleBuilderRule) => {
       rule,
     );
   } catch (errorThrown) {
+    console.log('createRule', errorThrown, rule);
     UserNotification.error(`Creating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Create the Rule Builder Rule.');
   }
 };
 
 const updateRule = async (rule: RuleBuilderRule) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { source, errors, ...ruleToUpdate }: any = rule;
+
   try {
     await fetch(
       'PUT',
       qualifyUrl(ApiRoutes.RuleBuilderController.update(rule.id).url),
-      rule,
+      ruleToUpdate,
     );
   } catch (errorThrown) {
+    console.log('updateRule', errorThrown, rule);
     UserNotification.error(`Updating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Update the Rule Builder Rule.');
-  }
-};
-
-const deleteRule = async (ruleId: string) => {
-  try {
-    await fetch(
-      'DELETE',
-      qualifyUrl(ApiRoutes.RulesController.delete(ruleId).url),
-    );
-  } catch (errorThrown) {
-    UserNotification.error(`Deleting the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Delete the Rule Builder Rule.');
   }
 };
 
@@ -104,7 +98,6 @@ const useRuleBuilder = () => {
     refetchActionsDict,
     createRule,
     updateRule,
-    deleteRule,
     fetchValidateRule,
   };
 };
