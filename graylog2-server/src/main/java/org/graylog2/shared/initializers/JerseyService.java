@@ -45,7 +45,6 @@ import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
-import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.rest.resources.system.SlidingExpirationCookieFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.ContentTypeOptionFilter;
@@ -261,7 +260,6 @@ public class JerseyService extends AbstractIdleService {
                         RequestIdFilter.class,
                         XHRFilter.class,
                         NotAuthorizedResponseFilter.class,
-                        WebAppNotFoundResponseFilter.class,
                         EmbeddingControlFilter.class,
                         OptionalResponseFilter.class,
                         ContentTypeOptionFilter.class,

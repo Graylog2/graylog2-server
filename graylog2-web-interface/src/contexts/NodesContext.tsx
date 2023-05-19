@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web;
+import * as React from 'react';
 
-import javax.ws.rs.core.MultivaluedMap;
+import { singleton } from 'logic/singleton';
 
-/**
- * Implementations provide HTML content for an "index.html" file. This file will be served to browser clients.
- */
-public interface IndexHtmlGenerator {
-    /**
-     * Get the HTML content.
-     *
-     * @param headers the HTTP request headers of the web request
-     * @return the HTML string
-     */
-    String get(MultivaluedMap<String, String> headers, String nonce);
-}
+type NodeSummary = {
+  id: string,
+  short_node_id: string,
+  hostname: string,
+};
+type NodesMap = { [id: string]: NodeSummary };
+const NodesContext = React.createContext<NodesMap | undefined>(undefined);
+
+export default singleton('contexts.NodesContext', () => NodesContext);

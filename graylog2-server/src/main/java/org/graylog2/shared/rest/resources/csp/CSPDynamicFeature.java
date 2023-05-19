@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 
 public class CSPDynamicFeature implements DynamicFeature {
     private static final Logger LOG = LoggerFactory.getLogger(CSPDynamicFeature.class);
+    public static final String CSP_NONCE_PROPERTY = "cspNonce";
     private final CSPService cspService;
 
     @Inject
@@ -59,8 +60,9 @@ public class CSPDynamicFeature implements DynamicFeature {
             LOG.debug("CSP method annotation for {}: {}", resourceMethod.getName(), cspValue);
         }
         if (cspValue != null) {
-            CSPResponseFilter filter = new CSPResponseFilter(cspValue);
-            context.register(filter);
+            context.register(new CSPNonceRequestFilter());
+            context.register(new CSPResponseFilter(cspValue));
         }
     }
+
 }

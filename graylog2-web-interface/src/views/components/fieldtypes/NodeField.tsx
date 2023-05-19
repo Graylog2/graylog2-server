@@ -14,19 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web;
+import * as React from 'react';
 
-import javax.ws.rs.core.MultivaluedMap;
+import useNodeSummaries from 'hooks/useNodeSummaries';
 
-/**
- * Implementations provide HTML content for an "index.html" file. This file will be served to browser clients.
- */
-public interface IndexHtmlGenerator {
-    /**
-     * Get the HTML content.
-     *
-     * @param headers the HTTP request headers of the web request
-     * @return the HTML string
-     */
-    String get(MultivaluedMap<String, String> headers, String nonce);
+type Props = {
+  value: string,
 }
+
+const NodeField = ({ value }: Props) => {
+  const nodes = useNodeSummaries();
+  const node = nodes?.[value];
+
+  return node
+    ? <span title={value}>{node.short_node_id} / {node.hostname}</span>
+    : <span>{value}</span>;
+};
+
+export default NodeField;

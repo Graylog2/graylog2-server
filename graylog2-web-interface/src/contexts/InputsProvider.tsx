@@ -17,27 +17,22 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import connect from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsActions, StreamsStore } from 'views/stores/StreamsStore';
+import type { ExtractStoreState } from 'stores/connect';
+import { useStore } from 'stores/connect';
+import InputsContext from 'contexts/InputsContext';
+import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 
-import StreamsContext from './StreamsContext';
+const mapInputs = (state: ExtractStoreState<typeof InputsStore>) => Object.fromEntries(state?.inputs?.map((input) => [input.id, input]) ?? []);
 
-type Props = {
-  children: React.ReactElement,
-  streams: Array<Stream> | undefined | null,
-};
-
-const StreamsProvider = ({ children, streams }: Props) => {
-  useEffect(() => {
-    StreamsActions.refresh();
-  }, []);
+const InputsProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  useEffect(() => { InputsActions.list(); }, []);
+  const value = useStore(InputsStore, mapInputs);
 
   return (
-    <StreamsContext.Provider value={streams}>
+    <InputsContext.Provider value={value}>
       {children}
-    </StreamsContext.Provider>
+    </InputsContext.Provider>
   );
 };
 
-export default connect(StreamsProvider, { streams: StreamsStore }, ({ streams: { streams } = { streams: undefined } }) => ({ streams }));
+export default InputsProvider;

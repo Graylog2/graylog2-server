@@ -14,19 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web;
+import { useContext } from 'react';
 
-import javax.ws.rs.core.MultivaluedMap;
+import NodesContext from 'contexts/NodesContext';
 
-/**
- * Implementations provide HTML content for an "index.html" file. This file will be served to browser clients.
- */
-public interface IndexHtmlGenerator {
-    /**
-     * Get the HTML content.
-     *
-     * @param headers the HTTP request headers of the web request
-     * @return the HTML string
-     */
-    String get(MultivaluedMap<String, String> headers, String nonce);
-}
+const useNodeSummaries = () => useContext(NodesContext);
+
+export default useNodeSummaries;

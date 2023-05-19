@@ -17,10 +17,12 @@
       4954,
       4986,
       4071
-    ]
+    ],
+    "originalName": "index⸱PostsController⸱count()"
   },
   {
     "name": "index-UsersController-count()",
+    "originalName": "index⸱UsersController⸱count()",
     "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
@@ -41,6 +43,7 @@
   },
   {
     "name": "show-PostsController-count()",
+    "originalName": "show⸱PostsController⸱count()",
     "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
@@ -61,6 +64,7 @@
   },
   {
     "name": "login-LoginController-count()",
+    "originalName": "login⸱LoginController⸱count()",
     "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
@@ -81,6 +85,7 @@
   },
   {
     "name": "edit-PostsController-count()",
+    "originalName": "edit⸱PostsController⸱count()",
     "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
@@ -101,6 +106,7 @@
   },
   {
     "name": "count()",
+    "originalName": "count()",
     "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",

@@ -87,7 +87,7 @@ class FieldType {
 
 export default FieldType;
 
-const createType = (type, properties: Array<Property> = []) => (indices: Array<string> = []) => FieldType.create(type, properties, indices);
+const createType = (type: string, properties: Array<Property> = []) => (indices: Array<string> = []) => FieldType.create(type, properties, indices);
 
 export const FieldTypes = {
   STRING: createType('string', [Properties.Enumerable]),
