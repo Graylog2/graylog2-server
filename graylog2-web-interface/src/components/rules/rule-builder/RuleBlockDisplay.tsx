@@ -35,13 +35,14 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => (
           <h3>{blockDict?.rule_builder_title || blockDict?.name}</h3>
         </Col>
       </Row>
-      {Object.keys(block.params).map((paramName) => {
+      {Object.keys(block.params).map((paramName, key) => {
         const paramValue = block.params[paramName];
         const paramValueExists = paramValue && paramValue !== '' && paramValue !== null;
 
         if (paramValueExists) {
           return (
-            <Row>
+            // eslint-disable-next-line react/no-array-index-key
+            <Row key={key}>
               <Col md={12}>
                 <p><strong>{paramName}:</strong> {paramValue}</p>
               </Col>

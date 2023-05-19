@@ -142,7 +142,8 @@ const RuleBlockForm = ({
                     </Col>
                   </SelectedBlockInfo>
 
-                  {selectedBlockDict.params.map((param) => <Row>{buildParamField(param)}</Row>)}
+                  {/* eslint-disable-next-line react/no-array-index-key */}
+                  {selectedBlockDict.params.map((param, key) => <Row key={key}>{buildParamField(param)}</Row>)}
 
                   <FormSubmit bsSize="small"
                               submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
