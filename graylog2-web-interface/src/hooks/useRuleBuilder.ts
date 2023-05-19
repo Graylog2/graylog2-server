@@ -48,7 +48,7 @@ const updateRule = async (rule: RuleBuilderRule) => {
       ruleToUpdate,
     );
   } catch (errorThrown) {
-    console.log('updateRule', errorThrown, rule);
+    console.log('updateRule', errorThrown, ruleToUpdate);
     UserNotification.error(`Updating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Update the Rule Builder Rule.');
   }
 };

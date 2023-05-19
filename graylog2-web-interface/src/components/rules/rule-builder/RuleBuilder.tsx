@@ -40,7 +40,7 @@ const SubTitle = styled.label`
 
 const RuleBuilder = () => {
   const {
-    rule: fetchedRule,
+    rule: existingRule,
     conditionsDict,
     actionsDict,
     createRule,
@@ -50,7 +50,7 @@ const RuleBuilder = () => {
 
   const history = useHistory();
 
-  const initialRule = fetchedRule || { description: '', title: '', rule_builder: { conditions: [], actions: [] } };
+  const initialRule = existingRule || { description: '', title: '', rule_builder: { conditions: [], actions: [] } };
 
   const [rule, setRule] = useState<RuleBuilderRule>(initialRule);
   const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
@@ -147,18 +147,19 @@ const RuleBuilder = () => {
     // validateRuleBuilder();
   };
 
+  const handleCancel = () => {
+    history.goBack();
+  };
+
   const handleSave = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
 
-    if (fetchedRule) {
+    if (existingRule) {
       await updateRule(rule);
+      handleCancel();
     } else {
       await createRule(rule);
     }
-  };
-
-  const handleCancel = () => {
-    history.goBack();
   };
 
   return (
@@ -222,8 +223,8 @@ const RuleBuilder = () => {
           )}
         </Col>
         <ActionsCol md={12}>
-          <FormSubmit submitButtonText={`${!fetchedRule ? 'Create rule' : 'Update rule & close'}`}
-                      centerCol={fetchedRule && (
+          <FormSubmit submitButtonText={`${!existingRule ? 'Create rule' : 'Update rule & close'}`}
+                      centerCol={existingRule && (
                         <Button type="button" bsStyle="info" onClick={handleSave}>
                           Update rule
                         </Button>
