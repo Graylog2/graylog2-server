@@ -424,4 +424,74 @@ describe('GridGaps', () => {
       },
     }]);
   });
+
+  it('does not generate invalid gaps', () => {
+    const items = [
+      {
+        start: {
+          x: 1,
+          y: 1,
+        },
+        end: {
+          x: 5,
+          y: 3,
+        },
+      },
+      {
+        start: {
+          x: 5,
+          y: 1,
+        },
+        end: {
+          x: 9,
+          y: 7,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 3,
+        },
+        end: {
+          x: 5,
+          y: 6,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 6,
+        },
+        end: {
+          x: 4,
+          y: 9,
+        },
+      },
+    ];
+
+    const result = findGaps(items);
+
+    expect(result).toEqual([
+      {
+        end: {
+          x: 13,
+          y: 7,
+        },
+        start: {
+          x: 9,
+          y: 1,
+        },
+      },
+      {
+        end: {
+          x: 13,
+          y: 9,
+        },
+        start: {
+          x: 4,
+          y: 7,
+        },
+      },
+    ]);
+  });
 });
