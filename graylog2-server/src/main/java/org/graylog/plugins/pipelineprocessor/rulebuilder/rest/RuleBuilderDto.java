@@ -32,9 +32,9 @@ import java.util.List;
 @JsonAutoDetect
 public abstract class RuleBuilderDto {
 
-    @JsonProperty("rule_id")
+    @JsonProperty
     @Nullable
-    public abstract String ruleId();
+    public abstract String id();
 
     @JsonProperty
     @Nullable
@@ -60,7 +60,7 @@ public abstract class RuleBuilderDto {
     public abstract List<String> errors();
 
     @JsonCreator
-    public static RuleBuilderDto create(@JsonProperty("rule_id") @Id @ObjectId @Nullable String ruleId,
+    public static RuleBuilderDto create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("rule_builder") RuleBuilder ruleBuilder,
@@ -68,7 +68,7 @@ public abstract class RuleBuilderDto {
                                         @JsonProperty("modified_at") @Nullable DateTime modifiedAt,
                                         @JsonProperty("errors") @Nullable List<String> errors) {
         return builder()
-                .ruleId(ruleId)
+                .id(id)
                 .title(title)
                 .description(description)
                 .ruleBuilder(ruleBuilder)
@@ -86,7 +86,7 @@ public abstract class RuleBuilderDto {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder ruleId(String ruleId);
+        public abstract Builder id(String id);
 
         public abstract Builder title(String title);
 

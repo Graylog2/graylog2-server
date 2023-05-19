@@ -92,7 +92,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
 
         RuleSource ruleSource = toRuleSource(ruleBuilderDto);
         final RuleSource stored = ruleResource.createFromParser(ruleSource);
-        return ruleBuilderDto.toBuilder().ruleId(stored.id()).build();
+        return ruleBuilderDto.toBuilder().id(stored.id()).build();
     }
 
     @ApiOperation(value = "Update a processing rule from rule builder", notes = "")
@@ -104,7 +104,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                                             @ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) throws NotFoundException {
         RuleSource ruleSource = toRuleSource(ruleBuilderDto);
         final RuleSource stored = ruleResource.update(id, ruleSource);
-        return ruleBuilderDto.toBuilder().ruleId(stored.id()).build();
+        return ruleBuilderDto.toBuilder().id(stored.id()).build();
     }
 
     @ApiOperation("Get action descriptors for rule builder")
