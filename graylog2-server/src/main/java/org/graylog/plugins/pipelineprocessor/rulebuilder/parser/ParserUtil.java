@@ -78,8 +78,8 @@ public class ParserUtil {
         return freemarkerConfiguration;
     }
 
-    static final String generateForFragment(RuleBuilderStep step, RuleFragment ruleFragment, Configuration configuration) {
-        final String fragmentName = ruleFragment.getName();
+    static final String generateForFragment(RuleBuilderStep step, Configuration configuration) {
+        final String fragmentName = step.function();
         try {
             Template template = configuration.getTemplate(fragmentName);
             StringWriter writer = new StringWriter();

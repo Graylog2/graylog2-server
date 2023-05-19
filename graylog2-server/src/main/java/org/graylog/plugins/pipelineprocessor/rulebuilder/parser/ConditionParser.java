@@ -64,7 +64,7 @@ public class ConditionParser {
         FunctionDescriptor<?> function = ruleFragment.descriptor();
 
         if (ruleFragment.isFragment()) {
-            syntax += ParserUtil.generateForFragment(step, ruleFragment, freemarkerConfiguration);
+            syntax += ParserUtil.generateForFragment(step, freemarkerConfiguration);
         } else {
             syntax += ParserUtil.generateForFunction(step, function);
         }

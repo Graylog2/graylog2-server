@@ -66,7 +66,7 @@ public class ActionParser {
         }
 
         if (ruleFragment.isFragment()) {
-            syntax += ParserUtil.generateForFragment(step, ruleFragment, freemarkerConfiguration);
+            syntax += ParserUtil.generateForFragment(step, freemarkerConfiguration);
         } else {
             syntax += ParserUtil.generateForFunction(step, function) + ";";
         }

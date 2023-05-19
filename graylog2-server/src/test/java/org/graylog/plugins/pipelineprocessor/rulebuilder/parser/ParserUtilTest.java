@@ -22,7 +22,6 @@ import freemarker.template.Configuration;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -164,29 +163,26 @@ public class ParserUtilTest {
     @Test
     public void generateForFragmentThrowsException_WhenTemplateNotFound() {
         RuleBuilderStep step = mock(RuleBuilderStep.class);
-        RuleFragment fragment = mock(RuleFragment.class);
-        when(fragment.getName()).thenReturn("unknown");
-        assertThatThrownBy(() -> ParserUtil.generateForFragment(step, fragment, configuration))
+        when(step.function()).thenReturn("unknown");
+        assertThatThrownBy(() -> ParserUtil.generateForFragment(step, configuration))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void generateForFragmentThrowsException_WhenParameterNotSet() {
         RuleBuilderStep step = mock(RuleBuilderStep.class);
-        RuleFragment fragment = mock(RuleFragment.class);
-        when(fragment.getName()).thenReturn("test_fragment1");
-        assertThatThrownBy(() -> ParserUtil.generateForFragment(step, fragment, configuration))
+        when(step.function()).thenReturn("test_fragment1");
+        assertThatThrownBy(() -> ParserUtil.generateForFragment(step, configuration))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void generateForFragmentConvertsFreemarkerTemplate() {
         RuleBuilderStep step = mock(RuleBuilderStep.class);
+        when(step.function()).thenReturn("test_fragment1");
         Map<String, Object> params = Map.of("field", "my_field");
         when(step.parameters()).thenReturn(params);
-        RuleFragment fragment = mock(RuleFragment.class);
-        when(fragment.getName()).thenReturn("test_fragment1");
-        assertThat(ParserUtil.generateForFragment(step, fragment, configuration))
+        assertThat(ParserUtil.generateForFragment(step, configuration))
                 .isEqualTo("let gl2_fragmentvar_v1 = $message.my_field;");
     }
 
