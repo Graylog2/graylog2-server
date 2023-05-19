@@ -16,16 +16,21 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import java.io.IOException;
+import java.util.UUID;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface CSP {
-    final String CSP_DEFAULT = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'strict-dynamic' 'nonce-{nonce}' 'unsafe-eval'; img-src data: *; connect-src *";
-    final String CSP_SWAGGER = "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; img-src *; connect-src *";
+import static org.graylog2.shared.rest.resources.csp.CSPDynamicFeature.CSP_NONCE_PROPERTY;
 
-    String value();
+public class CSPNonceRequestFilter implements ContainerRequestFilter {
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        final var cspNonce = generateNonce();
+        requestContext.setProperty(CSP_NONCE_PROPERTY, cspNonce);
+    }
+
+    private String generateNonce() {
+        return UUID.randomUUID().toString();
+    }
 }
