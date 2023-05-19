@@ -66,7 +66,7 @@ public class RuleBuilderResourceTest {
                 .ruleBuilder(RuleBuilder.builder().build())
                 .build();
         final RuleBuilderDto saved = ruleBuilderResource.createFromBuilder(toSave);
-        assertThat(saved.ruleId()).isEqualTo("new_id");
+        assertThat(saved.id()).isEqualTo("new_id");
         verify(ruleResource).createFromParser(any());
     }
 
@@ -81,7 +81,7 @@ public class RuleBuilderResourceTest {
                 .ruleBuilder(RuleBuilder.builder().build())
                 .build();
         final RuleBuilderDto saved = ruleBuilderResource.updateFromBuilder(updatedId, toSave);
-        assertThat(saved.ruleId()).isEqualTo(updatedId);
+        assertThat(saved.id()).isEqualTo(updatedId);
         verify(ruleResource).update(eq(updatedId), any());
     }
 
