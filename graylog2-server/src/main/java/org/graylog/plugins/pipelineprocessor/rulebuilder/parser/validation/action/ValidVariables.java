@@ -94,13 +94,18 @@ public class ValidVariables implements Validator {
     }
 
     private Class<?> getVariableType(Object type) {
-        return switch (type) {
-            case Double aDouble -> Double.class;
-            case Integer integer -> Long.class;
-            case Long l -> Long.class;
-            case String s -> String.class;
-            case Boolean aBoolean -> Boolean.class;
-            case null, default -> Object.class;
-        };
+        if (type instanceof Double) {
+            return Double.class;
+        } else if (type instanceof Integer) {
+            return Long.class;
+        } else if (type instanceof Long) {
+            return Long.class;
+        } else if (type instanceof String) {
+            return String.class;
+        } else if (type instanceof Boolean) {
+            return Boolean.class;
+        } else {
+            return Object.class;
+        }
     }
 }
