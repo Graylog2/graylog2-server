@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.mockito.Mockito.mock;
@@ -78,7 +78,7 @@ public class ConditionParserTest {
 
     @Before
     public void initialize() {
-        conditionParser = new ConditionParser(ruleBuilderRegistry);
+        conditionParser = new ConditionParser(ruleBuilderRegistry, new SecureFreemarkerConfigProvider());
     }
 
 
@@ -88,11 +88,9 @@ public class ConditionParserTest {
     }
 
     @Test
-    public void exception_WhenConditionNotInRuleBuilderConditions() {
+    public void emptyString_WhenConditionNotInRuleBuilderConditions() {
         RuleBuilderStep step = RuleBuilderStep.builder().function("unknownFunction").build();
-        assertThatThrownBy(() -> conditionParser.generateCondition(step))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Function unknownFunction not available");
+        assertThat(conditionParser.generateCondition(step)).isEqualTo("");
     }
 
     @Test

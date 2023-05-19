@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.mockito.Mockito.mock;
@@ -80,7 +80,7 @@ public class ActionParserTest {
 
     @Before
     public void initialize() {
-        actionParser = new ActionParser(ruleBuilderRegistry);
+        actionParser = new ActionParser(ruleBuilderRegistry, new SecureFreemarkerConfigProvider());
     }
 
 
@@ -91,11 +91,9 @@ public class ActionParserTest {
     }
 
     @Test
-    public void exception_WhenActionNotInRuleBuilderActions() {
+    public void emptyString_WhenActionNotInRuleBuilderActions() {
         RuleBuilderStep step = RuleBuilderStep.builder().function("unknownFunction").build();
-        assertThatThrownBy(() -> actionParser.generateAction(step, false))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Function unknownFunction not available");
+        assertThat(actionParser.generateAction(step, false)).isEqualTo("");
     }
 
     @Test
@@ -112,25 +110,6 @@ public class ActionParserTest {
         assertThat(actionParser.generateAction(step, false)).isEqualTo(
                 "  ! function2();"
         );
-    }
-
-    @Test
-    public void exception_WhenNegatedActionNotReturningBoolean() {
-        RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME).negate().build();
-        assertThatThrownBy(() -> actionParser.generateAction(step, false))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Function function1 cannot be negated");
-    }
-
-    @Test
-    public void exception_WhenOutputVariableForVoidReturnTypeGeneration() {
-        RuleBuilderStep step = RuleBuilderStep.builder()
-                .function(FUNCTION3_NAME)
-                .outputvariable("outvar")
-                .build();
-        assertThatThrownBy(() -> actionParser.generateAction(step, false))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Function function3 does not return");
     }
 
     @Test

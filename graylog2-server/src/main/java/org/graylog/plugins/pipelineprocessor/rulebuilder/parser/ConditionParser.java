@@ -16,26 +16,33 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
+import freemarker.template.Configuration;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Singleton
 public class ConditionParser {
 
     public static final String NL = System.lineSeparator();
     protected final Map<String, RuleFragment> conditions;
 
-    @Inject
-    public ConditionParser(RuleBuilderRegistry ruleBuilderRegistry) {
-        this.conditions = ruleBuilderRegistry.conditions();
-    }
+    private final Configuration freemarkerConfiguration;
 
+    @Inject
+    public ConditionParser(RuleBuilderRegistry ruleBuilderRegistry, SecureFreemarkerConfigProvider secureFreemarkerConfigProvider) {
+        this.conditions = ruleBuilderRegistry.conditions();
+        freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, conditions);
+    }
 
     public String generate(List<RuleBuilderStep> ruleConditions) {
         return "  true" + NL +
@@ -51,10 +58,13 @@ public class ConditionParser {
         }
 
         final RuleFragment ruleFragment = conditions.get(step.function());
+        if (Objects.isNull(ruleFragment)) {
+            return "";
+        }
         FunctionDescriptor<?> function = ruleFragment.descriptor();
 
         if (ruleFragment.isFragment()) {
-            syntax += ParserUtil.generateForFragment(step, ruleFragment);
+            syntax += ParserUtil.generateForFragment(step, ruleFragment, freemarkerConfiguration);
         } else {
             syntax += ParserUtil.generateForFunction(step, function);
         }

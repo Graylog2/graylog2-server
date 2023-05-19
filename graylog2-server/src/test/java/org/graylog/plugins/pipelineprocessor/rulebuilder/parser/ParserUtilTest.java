@@ -17,10 +17,14 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
 import com.google.common.collect.ImmutableList;
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -37,6 +41,18 @@ public class ParserUtilTest {
 
 
     private static final String NL = System.lineSeparator();
+
+    Configuration configuration;
+
+    @Before
+    public void initializeFreemarkerConfig() {
+        SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
+        this.configuration = secureFreemarkerConfigProvider.get();
+        StringTemplateLoader templateLoader = new StringTemplateLoader();
+        templateLoader.putTemplate("test_fragment1", "let gl2_fragmentvar_v1 = $message.${field};");
+        templateLoader.putTemplate("test_fragment2", "let gl2_fragmentvar_v1 = $message.${field!\"defaultField\"};");
+        configuration.setTemplateLoader(templateLoader);
+    }
 
     @Test
     public void generateFunctionWithNoParamGeneration() {
@@ -95,17 +111,6 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void throwException_WhenNoParameterValueForRequiredParamIsSet() {
-        RuleBuilderStep step = mock(RuleBuilderStep.class);
-        Map<String, Object> params = new HashMap<>();
-        when(step.parameters()).thenReturn(params);
-        ParameterDescriptor descriptor = mock(ParameterDescriptor.class);
-        when(descriptor.optional()).thenReturn(false);
-        assertThatThrownBy(() -> ParserUtil.addFunctionParameter(descriptor, step)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-
-    @Test
     public void addFunctionParameterNull_WhenNoParameterValueIsSet() {
         RuleBuilderStep step = mock(RuleBuilderStep.class);
         Map<String, Object> params = new HashMap<>();
@@ -156,100 +161,33 @@ public class ParserUtilTest {
 
     // Fragment Building
 
-    static final String fragment = "( hasField(\"{field}\") and to_string($message.{field})==\"{fieldValue}\" )";
-    static RuleFragment ruleFragment = RuleFragment.builder()
-            .fragment(fragment)
-            .descriptor(FunctionDescriptor.builder()
-                    .name("testfunction")
-                    .params(ImmutableList.of(
-                            string("field").build(),
-                            string("fieldValue").build()
-                    ))
-                    .returnType(Boolean.class)
-                    .build())
-            .build();
-
     @Test
-    public void generateForFragmentWithoutParams() {
-        RuleFragment verySimpleFragment = RuleFragment.builder()
-                .fragment("true")
-                .descriptor(FunctionDescriptor.builder()
-                        .name("simpleFragment")
-                        .params(ImmutableList.of())
-                        .returnType(Boolean.class)
-                        .build())
-                .build();
+    public void generateForFragmentThrowsException_WhenTemplateNotFound() {
         RuleBuilderStep step = mock(RuleBuilderStep.class);
-        assertThat(ParserUtil.generateForFragment(step, verySimpleFragment))
-                .isEqualTo("true");
+        RuleFragment fragment = mock(RuleFragment.class);
+        when(fragment.getName()).thenReturn("unknown");
+        assertThatThrownBy(() -> ParserUtil.generateForFragment(step, fragment, configuration))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void generateForFragmentThrowsException_WhenNotAllParametersAreSet() {
-        RuleFragment incompleteFragment = RuleFragment.builder()
-                .fragment(fragment)
-                .descriptor(FunctionDescriptor.builder()
-                        .name("testfunction")
-                        .params(ImmutableList.of(
-                                string("field").build()
-                        ))
-                        .returnType(Boolean.class)
-                        .build())
-                .build();
+    public void generateForFragmentThrowsException_WhenParameterNotSet() {
         RuleBuilderStep step = mock(RuleBuilderStep.class);
-        when(step.parameters()).thenReturn(Map.of("field", "my_field"));
-        assertThatThrownBy(() -> ParserUtil.generateForFragment(step, incompleteFragment))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Could not replace all");
+        RuleFragment fragment = mock(RuleFragment.class);
+        when(fragment.getName()).thenReturn("test_fragment1");
+        assertThatThrownBy(() -> ParserUtil.generateForFragment(step, fragment, configuration))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void generateForFragment_WhenAllParametersAreSet() {
+    public void generateForFragmentConvertsFreemarkerTemplate() {
         RuleBuilderStep step = mock(RuleBuilderStep.class);
-        when(step.parameters()).thenReturn(Map.of("field", "my_field", "fieldValue", "my_value"));
-        assertThat(ParserUtil.generateForFragment(step, ruleFragment)).isEqualTo(
-                "( hasField(\"my_field\") and to_string($message.my_field)==\"my_value\" )"
-        );
-    }
-
-    @Test
-    public void addFragmentParameterThrowsException_WhenNoParametersPresent() {
-        RuleBuilderStep step = mock(RuleBuilderStep.class);
-        when(step.parameters()).thenReturn(null);
-        ParameterDescriptor descriptor = string("test").build();
-        assertThatThrownBy(() -> ParserUtil.addFragmentParameter(fragment, descriptor, step))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Cannot replace test");
-    }
-
-    @Test
-    public void addFragmentParameterThrowsException_WhenParameterNotPresent() {
-        RuleBuilderStep step = mock(RuleBuilderStep.class);
-        when(step.parameters()).thenReturn(new HashMap<>());
-        ParameterDescriptor descriptor = string("test").build();
-        assertThatThrownBy(() -> ParserUtil.addFragmentParameter(fragment, descriptor, step))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Required parameter test");
-    }
-
-    @Test
-    public void addFragmentParameterThrowsException_WhenParameterNotInFragment() {
-        RuleBuilderStep step = mock(RuleBuilderStep.class);
-        when(step.parameters()).thenReturn(Map.of("test", "val"));
-        ParameterDescriptor descriptor = string("test").build();
-        assertThatThrownBy(() -> ParserUtil.addFragmentParameter(fragment, descriptor, step))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Parameter test not set in fragment");
-    }
-
-    @Test
-    public void addFragmentParameterReplacesParameter() {
-        RuleBuilderStep step = mock(RuleBuilderStep.class);
-        when(step.parameters()).thenReturn(Map.of("field", "my_field"));
-        ParameterDescriptor descriptor = string("field").build();
-        assertThat(ParserUtil.addFragmentParameter(fragment, descriptor, step)).isEqualTo(
-                "( hasField(\"my_field\") and to_string($message.my_field)==\"{fieldValue}\" )"
-        );
+        Map<String, Object> params = Map.of("field", "my_field");
+        when(step.parameters()).thenReturn(params);
+        RuleFragment fragment = mock(RuleFragment.class);
+        when(fragment.getName()).thenReturn("test_fragment1");
+        assertThat(ParserUtil.generateForFragment(step, fragment, configuration))
+                .isEqualTo("let gl2_fragmentvar_v1 = $message.my_field;");
     }
 
 

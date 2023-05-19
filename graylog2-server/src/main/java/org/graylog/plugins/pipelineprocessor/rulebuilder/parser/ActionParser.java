@@ -16,25 +16,32 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
+import freemarker.template.Configuration;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Singleton
 public class ActionParser {
 
     public static final String NL = System.lineSeparator();
     protected final Map<String, RuleFragment> actions;
 
+    private final Configuration freemarkerConfiguration;
+
     @Inject
-    public ActionParser(RuleBuilderRegistry ruleBuilderRegistry) {
+    public ActionParser(RuleBuilderRegistry ruleBuilderRegistry, SecureFreemarkerConfigProvider secureFreemarkerConfigProvider) {
         this.actions = ruleBuilderRegistry.actions();
+        this.freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, actions);
     }
 
     public String generate(List<RuleBuilderStep> actions, boolean generateSimulatorFields) {
@@ -43,6 +50,10 @@ public class ActionParser {
 
     String generateAction(RuleBuilderStep step, boolean generateSimulatorFields) {
         final RuleFragment ruleFragment = actions.get(step.function());
+        if (Objects.isNull(ruleFragment)) {
+            return "";
+        }
+
         FunctionDescriptor<?> function = ruleFragment.descriptor();
 
         String syntax = "  ";
@@ -55,7 +66,7 @@ public class ActionParser {
         }
 
         if (ruleFragment.isFragment()) {
-            syntax += ParserUtil.generateForFragment(step, ruleFragment);
+            syntax += ParserUtil.generateForFragment(step, ruleFragment, freemarkerConfiguration);
         } else {
             syntax += ParserUtil.generateForFunction(step, function) + ";";
         }
