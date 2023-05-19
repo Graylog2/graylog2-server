@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.searches.timerangepresets.TimerangePreset;
+import org.graylog2.indexer.searches.timerangepresets.conversion.PeriodToRelativeRangeConverter;
+import org.graylog2.indexer.searches.timerangepresets.conversion.TimerangeOptionsToTimerangePresetsConversion;
 import org.graylog2.plugin.Message;
 import org.joda.time.Period;
 
@@ -117,6 +119,12 @@ public abstract class SearchesClusterConfig {
                                                @JsonProperty("default_auto_refresh_option") Period defaultAutoRefreshOption,
                                                @JsonProperty("quick_access_timerange_presets") @Nullable List<TimerangePreset> quickAccessTimerangePresets
     ) {
+        //TODO: temporary piece of code, will be replaced with migration when all the final details are discussed
+        TimerangeOptionsToTimerangePresetsConversion conversion = new TimerangeOptionsToTimerangePresetsConversion(new PeriodToRelativeRangeConverter());
+        final List<TimerangePreset> converted = conversion.convert(relativeTimerangeOptions);
+        if (quickAccessTimerangePresets != null) {
+            quickAccessTimerangePresets.addAll(converted);
+        }
         return builder()
                 .quickAccessTimerangePresets(quickAccessTimerangePresets == null ? List.of() : quickAccessTimerangePresets)
                 .queryTimeRangeLimit(queryTimeRangeLimit)
