@@ -124,7 +124,7 @@ const RuleBlockForm = ({
                 <Col md={12}>
                   <Select id="existingBlock-select"
                           name="existingBlock-select"
-                          placeholder={`Select a ${type}`}
+                          placeholder={`Select ${type}`}
                           options={options}
                           clearable={false}
                           matchProp="label"
@@ -144,7 +144,8 @@ const RuleBlockForm = ({
 
                   {selectedBlockDict.params.map((param) => <Row>{buildParamField(param)}</Row>)}
 
-                  <FormSubmit submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
+                  <FormSubmit bsSize="small"
+                              submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
                               onCancel={() => { resetForm(); onCancel(); }} />
 
                 </>

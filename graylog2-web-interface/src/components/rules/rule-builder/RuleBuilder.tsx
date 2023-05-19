@@ -15,28 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import styled from 'styled-components';
 
+import useHistory from 'routing/useHistory';
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
+import { FormSubmit, ConfirmDialog } from 'components/common';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import type { RuleBlock, RuleBuilderRule } from './types';
 
-import ConfirmDialog from '../../common/ConfirmDialog';
+const ActionsCol = styled(Col)`
+  margin-top: 50px;
+`;
+
+const AddButton = styled(Button)`
+  margin-top: 20px;
+`;
+
+const SubTitle = styled.label`
+  color: #aaa;
+`;
 
 const RuleBuilder = () => {
   const {
-    rule: _rule,
+    rule: fetchedRule,
     conditionsDict,
     actionsDict,
-    // createRule,
-    // updateRule,
+    createRule,
+    updateRule,
     // deleteRule,
     // fetchValidateRule,
   } = useRuleBuilder();
 
-  const initialRule = _rule || { description: '', title: '', rule_builder: { errors: [], conditions: [], actions: [] } };
+  const history = useHistory();
+
+  const initialRule = fetchedRule || { description: '', title: '', rule_builder: { errors: [], conditions: [], actions: [] } };
 
   const [rule, setRule] = useState<RuleBuilderRule>(initialRule);
   const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
@@ -134,14 +149,30 @@ const RuleBuilder = () => {
     // validateRuleBuilder();
   };
 
+  const handleSave = async (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
+    if (fetchedRule) {
+      await updateRule(rule);
+    } else {
+      await createRule(rule);
+    }
+  };
+
+  const handleCancel = () => {
+    history.goBack();
+  };
+
   return (
-    <>
+    <form onSubmit={handleSave}>
       <Row className="content">
         <Col md={12}>
           <RuleBuilderForm rule={rule}
                            onChange={setRule} />
+          <label htmlFor="rule_builder">Rule Builder</label>
         </Col>
         <Col md={6}>
+          <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
           {
             rule.rule_builder.conditions.map((condition, index) => (
               <RuleBuilderBlock blockDict={conditionsDict}
@@ -163,10 +194,11 @@ const RuleBuilder = () => {
                               deleteBlock={deleteBlock} />
           )}
           {(newConditionBlockOrder > 0) && (
-            <Button bsStyle="info" onClick={() => setShowNewConditionBlock(true)}>Add Condition</Button>
+            <AddButton bsSize="small" bsStyle="info" onClick={() => setShowNewConditionBlock(true)}>Add Condition</AddButton>
           )}
         </Col>
         <Col md={6}>
+          <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
           {
             rule.rule_builder.actions.map((action, index) => (
               <RuleBuilderBlock blockDict={actionsDict}
@@ -188,9 +220,18 @@ const RuleBuilder = () => {
                               deleteBlock={deleteBlock} />
           )}
           {(newActionBlockOrder > 0) && (
-            <Button bsStyle="info" onClick={() => setShowNewActionBlock(true)}>Add Action</Button>
+            <AddButton bsSize="small" bsStyle="info" onClick={() => setShowNewActionBlock(true)}>Add Action</AddButton>
           )}
         </Col>
+        <ActionsCol md={12}>
+          <FormSubmit submitButtonText={`${!fetchedRule ? 'Create rule' : 'Update rule & close'}`}
+                      centerCol={fetchedRule && (
+                        <Button type="button" bsStyle="info" onClick={handleSave}>
+                          Update rule
+                        </Button>
+                      )}
+                      onCancel={handleCancel} />
+        </ActionsCol>
       </Row>
       {blockToDelete && (
         <ConfirmDialog title={`Delete ${blockToDelete.type}`}
@@ -203,7 +244,7 @@ const RuleBuilder = () => {
           <>Are you sure you want to delete <strong>{blockToDelete.type} [{blockToDelete.orderIndex}]</strong>?</>
         </ConfirmDialog>
       )}
-    </>
+    </form>
   );
 };
 

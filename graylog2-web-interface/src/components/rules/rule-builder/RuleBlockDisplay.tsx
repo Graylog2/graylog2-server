@@ -53,8 +53,8 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => (
       })}
       <Row>
         <Col md={12}>
-          <Button onClick={onEdit}>Edit</Button>
-          <Button onClick={onDelete}>Delete</Button>
+          <Button bsSize="small" onClick={onEdit}>Edit</Button>
+          <Button bsSize="small" onClick={onDelete}>Delete</Button>
         </Col>
       </Row>
     </Col>
