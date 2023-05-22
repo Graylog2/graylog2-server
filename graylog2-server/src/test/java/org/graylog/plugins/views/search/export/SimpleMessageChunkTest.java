@@ -34,9 +34,8 @@ class SimpleMessageChunkTest {
                 msg2Values
         );
 
-        assertThat(sut.getAllValuesInOrder())
-                .contains(msg1Values, Index.atIndex(0))
-                .contains(msg2Values, Index.atIndex(1));
+        assertThat(Arrays.stream(sut.getAllValuesInOrder()).toList()).asList()
+                .containsExactly(msg1Values, msg2Values);
     }
 
     @Test
