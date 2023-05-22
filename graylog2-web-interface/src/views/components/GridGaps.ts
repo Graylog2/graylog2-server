@@ -118,17 +118,19 @@ const findGaps = (_items: Position[], minWidth: number = 1, maxWidth: number = 1
           gap.width += 1;
         }
 
-        while (gap.row + gap.height <= maxY) {
-          if (range(gap.col, gap.col + gap.width - 1).every((k) => !grid[gap.row + gap.height]?.[k])) {
-            gap.height += 1;
-          } else {
-            break;
+        if (gap.width > 1) {
+          while (!rowIsEmpty(grid, gap.row + gap.height) && gap.row + gap.height <= maxY) {
+            if (range(gap.col, gap.col + gap.width - 1).every((k) => !grid[gap.row + gap.height]?.[k])) {
+              gap.height += 1;
+            } else {
+              break;
+            }
           }
+
+          placeItemInGrid(grid, gap, true);
+
+          gaps.push(gap);
         }
-
-        placeItemInGrid(grid, gap, true);
-
-        gaps.push(gap);
       }
     }
   }
