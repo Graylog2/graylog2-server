@@ -25,6 +25,7 @@ import com.google.common.io.Resources;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.shared.rest.resources.csp.CSP;
+import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
 
@@ -119,27 +120,28 @@ public class WebInterfaceAssetsResource {
 
     @Path("assets/{filename: .*}")
     @GET
-    public Response get(@Context Request request,
+    public Response get(@Context ContainerRequest request,
                         @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
         if (filename == null || filename.isEmpty() || "/".equals(filename) || "index.html".equals(filename)) {
-            return getDefaultResponse(headers);
+            return getDefaultResponse(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
         }
         try {
             final URL resourceUrl = getResourceUri(false, filename, this.getClass());
             return getResponse(request, filename, resourceUrl, false);
         } catch (IOException | URISyntaxException e) {
-            return getDefaultResponse(headers);
+            return getDefaultResponse(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
         }
     }
 
     @GET
     @Path("index.html")
-    public Response getIndex(@Context HttpHeaders headers) {
-        return getDefaultResponse(headers);
+    public Response getIndexHtml(@Context ContainerRequest request, @Context HttpHeaders headers) {
+        return getDefaultResponse(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
     }
 
     @GET
+    @Path("{filename:.*}")
     public Response getIndex(@Context ContainerRequest request, @Context HttpHeaders headers) {
         final URI originalLocation = request.getRequestUri();
         if (originalLocation.getPath().endsWith("/")) {
@@ -213,9 +215,9 @@ public class WebInterfaceAssetsResource {
         }
     }
 
-    private Response getDefaultResponse(HttpHeaders headers) {
+    private Response getDefaultResponse(HttpHeaders headers, String nonce) {
         return Response
-                .ok(indexHtmlGenerator.get(headers.getRequestHeaders()))
+                .ok(indexHtmlGenerator.get(headers.getRequestHeaders(), nonce))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML)
                 .header("X-UA-Compatible", "IE=edge")
                 .build();

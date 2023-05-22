@@ -52,7 +52,7 @@ public class DevelopmentIndexHtmlGenerator implements IndexHtmlGenerator {
     }
 
     @Override
-    public String get(MultivaluedMap<String, String> headers) {
+    public String get(MultivaluedMap<String, String> headers, String nonce) {
         final URI relativePath = RestTools.buildRelativeExternalUri(headers, httpConfiguration.getHttpExternalUri());
         final Map<String, Object> model = ImmutableMap.<String, Object>builder()
                 .put("title", "Graylog DEVELOPMENT Web Interface")

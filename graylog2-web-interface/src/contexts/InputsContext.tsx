@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.exceptions;
+import * as React from 'react';
 
-public class CAStorageException extends Exception {
+import { singleton } from 'logic/singleton';
+import type { Input } from 'components/messageloaders/Types';
 
-    public CAStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
-}
+type InputsMap = { [id: string]: Input };
+const InputsContext = React.createContext<InputsMap | undefined>(undefined);
+
+export default singleton('contexts.InputsContext', () => InputsContext);

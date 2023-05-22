@@ -36,6 +36,7 @@ public abstract class  NodePreflightConfig {
         CONFIGURED, // the DataNode has been configured by the Preflight UI
         CSR, // DataNode created the CSR
         SIGNED, // Graylog CA signed the CSR
+        STORED, // Certificate is combined with private key and stored in Mongo
         CONNECTED, // DataNode started with the certificate
         ERROR // sh*t happened
     }

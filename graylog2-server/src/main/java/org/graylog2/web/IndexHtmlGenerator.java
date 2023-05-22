@@ -28,5 +28,5 @@ public interface IndexHtmlGenerator {
      * @param headers the HTTP request headers of the web request
      * @return the HTML string
      */
-    String get(MultivaluedMap<String, String> headers);
+    String get(MultivaluedMap<String, String> headers, String nonce);
 }

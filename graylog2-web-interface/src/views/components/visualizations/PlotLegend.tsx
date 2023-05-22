@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useCallback } from 'react';
+import { useContext, useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 import chunk from 'lodash/chunk';
@@ -29,8 +29,11 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type Series from 'views/logic/aggregationbuilder/Series';
-import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { ChartDefinition } from 'views/components/visualizations/ChartData';
+import { keySeparator, humanSeparator } from 'views/Constants';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -81,31 +84,18 @@ type Props = {
   children: React.ReactNode,
   config: AggregationWidgetConfig,
   chartData: any,
-  fieldMapper?: (isFunction: boolean) => string,
+  labelFields?: (config: Props['config']) => Array<string>,
   labelMapper?: (data: Array<any>) => Array<string> | undefined | null,
   neverHide?: boolean,
 };
 
 type ColorPickerConfig = {
   name: string,
+  label: string,
   target: EventTarget,
 };
 
-const isLabelAFunction = (label: string, series: Series) => series.function === label || series.config.name === label;
-
-const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, neverHide: boolean, isFunction: boolean) => {
-  if (columnPivots.length === 1 && series.length === 1 && columnPivots[0].fields?.length === 1 && !isFunction) {
-    return columnPivots[0].fields[0];
-  }
-
-  if (!neverHide && rowPivots.length === 1 && rowPivots[0].fields?.length === 1) {
-    return rowPivots[0].fields[0];
-  }
-
-  return null;
-};
-
-const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }) => name);
+const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({ name, originalName }) => originalName ?? name);
 
 const stringLenSort = (s1: string, s2: string) => {
   if (s1.length < s2.length) {
@@ -119,18 +109,22 @@ const stringLenSort = (s1: string, s2: string) => {
   return 1;
 };
 
-const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, fieldMapper, neverHide }: Props) => {
+const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
+
+const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, labelFields = columnPivotsToFields, neverHide }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
-  const { rowPivots, columnPivots, series } = config;
+  const { columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
   const { colors, setColor } = useContext(ChartColorContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const defaultFieldMapper = useCallback((isFunction: boolean) => legendField(columnPivots, rowPivots, series, !neverHide, isFunction), [columnPivots, neverHide, rowPivots, series]);
+  const fieldTypes = useContext(FieldTypesContext);
+  const activeQuery = useActiveQueryId();
+  const mapKeys = useMapKeys();
 
   const _onCloseColorPicker = useCallback(() => setColorPickerConfig(undefined), [setColorPickerConfig]);
 
-  const _onOpenColorPicker = useCallback((field) => (event) => {
-    setColorPickerConfig({ name: field, target: event.currentTarget });
+  const _onOpenColorPicker = useCallback((field: string, label: string) => (event) => {
+    setColorPickerConfig({ name: field, label, target: event.currentTarget });
   }, [setColorPickerConfig]);
 
   const _onColorSelect = useCallback((field: string, color: string) => {
@@ -138,21 +132,30 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     setColorPickerConfig(undefined);
   }, [setColor]);
 
+  const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
+
   if (!neverHide && (!focusedWidget || !focusedWidget.editing) && series.length <= 1 && columnPivots.length <= 0) {
     // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{children}</>;
   }
 
   const tableCells = labels.sort(stringLenSort).map((value) => {
+    const labelsWithField = value.split(keySeparator).map((label, idx) => {
+      const field = _labelFields[idx];
+      const fieldType = fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+
+      return { label, field, type: fieldType };
+    });
     const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
-    const isFunction = isLabelAFunction(value, series[0]);
-    const field = (fieldMapper ?? defaultFieldMapper)(isFunction);
-    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field}>{value}</Value> : value;
+    const val = labelsWithField.map(({ label, field, type }) => (field
+      ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
+      : label));
+    const humanLabel = Object.values(labelsWithField).map(({ label, field }) => mapKeys(label, field)).join(humanSeparator);
 
     return (
       <LegendCell key={value}>
         <LegendEntry>
-          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value)} color={colors.get(value, defaultColor)} />
+          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value, humanLabel)} color={colors.get(value, defaultColor)} />
           <ValueContainer>
             {val}
           </ValueContainer>
@@ -162,12 +165,10 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   });
 
   const result = chunk(tableCells, 5).map((cells, index) => (
-    (
-      // eslint-disable-next-line react/no-array-index-key
-      <LegendRow key={index}>
-        {cells}
-      </LegendRow>
-    )
+    // eslint-disable-next-line react/no-array-index-key
+    <LegendRow key={index}>
+      {cells}
+    </LegendRow>
   ));
 
   return (
@@ -183,7 +184,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
                    placement="top"
                    target={colorPickerConfig.target}>
             <Popover id="legend-config"
-                     title={`Configuration for ${colorPickerConfig.name}`}
+                     title={`Configuration for ${colorPickerConfig.label}`}
                      data-event-element="Plot Legend">
               <ColorPicker color={colors.get(colorPickerConfig.name)}
                            colors={defaultColors}
@@ -197,7 +198,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
 };
 
 PlotLegend.defaultProps = {
-  fieldMapper: undefined,
+  labelFields: columnPivotsToFields,
   labelMapper: defaultLabelMapper,
   neverHide: false,
 };

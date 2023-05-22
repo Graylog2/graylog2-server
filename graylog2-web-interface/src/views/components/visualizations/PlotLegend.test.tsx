@@ -23,6 +23,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
+import { keySeparator } from 'views/Constants';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -105,7 +106,7 @@ describe('PlotLegend', () => {
   });
 
   it('should not add value action menu for series', async () => {
-    render(<SUT chartDataProp={[{ name: 'name1' }, { name: 'count' }]} />);
+    render(<SUT chartDataProp={[{ name: `name1${keySeparator}count` }]} />);
 
     const value = await screen.findByText('count');
     fireEvent.click(value);

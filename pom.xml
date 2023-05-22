@@ -295,6 +295,11 @@
                 <artifactId>zstd-jni</artifactId>
                 <version>${zstd.version}</version>
             </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

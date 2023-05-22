@@ -18,11 +18,10 @@ package org.graylog.security.certutil.csr.storage;
 
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.cluster.NodePreflightConfigService;
-import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import java.io.BufferedReader;
@@ -30,40 +29,41 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Optional;
 
-public class CsrMongoStorage implements CsrStorage {
+public class CsrMongoStorage {
 
     private NodePreflightConfigService mongoService;
-    private NodeId nodeId;
 
     @Inject
-    public CsrMongoStorage(final NodePreflightConfigService mongoService,
-                           final NodeId nodeId) {
+    public CsrMongoStorage(final NodePreflightConfigService mongoService) {
         this.mongoService = mongoService;
-        this.nodeId = nodeId;
     }
 
-    @Override
-    public void writeCsr(PKCS10CertificationRequest csr) throws IOException, OperatorCreationException {
+    public void writeCsr(PKCS10CertificationRequest csr, String nodeId) throws IOException, OperatorException {
         try (StringWriter writer = new StringWriter()) {
             try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
                 jcaPEMWriter.writeObject(csr);
             }
-            mongoService.writeCsr(nodeId.getNodeId(), writer.toString());
+            mongoService.writeCsr(nodeId, writer.toString());
         }
     }
 
-    @Override
-    public PKCS10CertificationRequest readCsr() throws IOException, OperatorCreationException {
-        final NodePreflightConfig preflightConfig = mongoService.getPreflightConfigFor(nodeId.getNodeId());
-        final String csr = preflightConfig.csr();
 
-        Reader pemReader = new BufferedReader(new StringReader(csr));
-        PEMParser pemParser = new PEMParser(pemReader);
-        Object parsedObj = pemParser.readObject();
-        if (parsedObj instanceof PKCS10CertificationRequest) {
-            return (PKCS10CertificationRequest) parsedObj;
+    public Optional<PKCS10CertificationRequest> readCsr(String nodeId) throws IOException, OperatorException {
+        final NodePreflightConfig preflightConfig = mongoService.getPreflightConfigFor(nodeId);
+        if (preflightConfig != null) {
+            final String csr = preflightConfig.csr();
+
+            if (csr != null) {
+                Reader pemReader = new BufferedReader(new StringReader(csr));
+                PEMParser pemParser = new PEMParser(pemReader);
+                Object parsedObj = pemParser.readObject();
+                if (parsedObj instanceof PKCS10CertificationRequest) {
+                    return Optional.of((PKCS10CertificationRequest) parsedObj);
+                }
+            }
         }
-        return null;
+        return Optional.empty();
     }
 }
