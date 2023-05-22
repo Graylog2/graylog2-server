@@ -37,6 +37,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -94,11 +95,11 @@ public class CaService {
         return currentCA.get();
     }
 
-    public CA upload(String password, String ca) throws CACreationException {
+    public CA upload(String password, List<String> caFiles) throws CACreationException {
         try {
             this.password = Optional.ofNullable(password);
             final var pass = this.password.orElse("").toCharArray();
-            KeyStore keyStore = caCreator.uploadCA(pass, ca);
+            KeyStore keyStore = caCreator.uploadCA(pass, caFiles.get(0));
             keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
         } catch (KeyStoreStorageException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);

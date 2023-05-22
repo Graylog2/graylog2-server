@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -76,7 +77,7 @@ public class PreflightResource {
     @POST
     @Path("/ca/create")
     @NoAuditEvent("No Audit Event needed")
-    public void createCA(@QueryParam("password") String password) throws CACreationException {
+    public void createCA(@FormParam("password") String password) throws CACreationException {
         caService.create(password);
     }
 
@@ -84,8 +85,8 @@ public class PreflightResource {
     @Path("/ca/upload")
     @NoAuditEvent("No Audit Event needed")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void uploadCA(@QueryParam("password") String password, String caFile) throws CACreationException {
-        caService.upload(password, caFile);
+    public void uploadCA(@FormParam("password") String password, @FormParam("files") List<String> caFiles) throws CACreationException {
+        caService.upload(password, caFiles);
     }
 
     @DELETE
