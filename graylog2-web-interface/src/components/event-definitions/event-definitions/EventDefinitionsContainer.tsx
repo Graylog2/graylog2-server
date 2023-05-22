@@ -52,7 +52,7 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     },
     status: {
       renderCell: (_status: string, eventDefinition) => (
-        <StatusCell status={eventDefinition?.scheduler?.is_scheduled}
+        <StatusCell status={eventDefinition?.scheduler?.is_scheduled || eventDefinition?.enabled}
                     isSystemEvent={isSystemEventDefinition(eventDefinition)} />
       ),
       staticWidth: 100,

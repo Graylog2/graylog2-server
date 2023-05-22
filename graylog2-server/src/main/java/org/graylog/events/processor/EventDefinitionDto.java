@@ -69,6 +69,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_SCHEDULERCTX = "scheduler";
+    private static final String FIELD_ENABLED = "enabled";
     private static final String UPDATED_AT = "updated_at";
 
     @Override
@@ -127,6 +128,10 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
     @Nullable
     public abstract EventDefinitionContextService.SchedulerCtx schedulerCtx();
+
+    @JsonProperty(FIELD_ENABLED)
+    @Nullable
+    public abstract Boolean enabled();
 
     public static Builder builder() {
         return Builder.create();
@@ -211,6 +216,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
+
+        @JsonProperty(FIELD_ENABLED)
+        public abstract Builder enabled(Boolean enabled);
 
         @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
         public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
