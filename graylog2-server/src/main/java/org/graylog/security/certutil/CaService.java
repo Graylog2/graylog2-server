@@ -33,22 +33,24 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Optional;
 
 @Singleton
 public class CaService {
     private static final Logger LOG = LoggerFactory.getLogger(CaService.class);
-    public static final String keystoreFilename = "graylog-ca.p12";
     private final KeystoreFileStorage keystoreFileStorage;
     private final KeystoreMongoStorage keystoreMongoStorage;
     private final NodeId nodeId;
     private final CACreator caCreator;
+    private final CaConfiguration configuration;
 
     private Optional<CA> currentCA = Optional.empty();
 
     private Optional<String> password;
-    private Optional<Path> caKeystoreFile;
 
     @Inject
     public CaService(final CaConfiguration configuration,
@@ -60,10 +62,10 @@ public class CaService {
         this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
+        this.configuration = configuration;
 
         if(configuration.getCaKeystoreFile() != null && Files.exists(configuration.getCaKeystoreFile())) {
             currentCA = Optional.of(new CA("local CA", CAType.LOCAL));
-            caKeystoreFile = Optional.of(configuration.getCaKeystoreFile());
         }
         password = Optional.ofNullable(configuration.getCaPassword());
     }
@@ -94,13 +96,11 @@ public class CaService {
 
     public CA upload(String password, String ca) throws CACreationException {
         try {
-            this.caKeystoreFile = Optional.of(Path.of(keystoreFilename));
-            Files.write(caKeystoreFile.get(), ca.getBytes());
             this.password = Optional.ofNullable(password);
             final var pass = this.password.orElse("").toCharArray();
             KeyStore keyStore = caCreator.uploadCA(pass, ca);
             keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
-        } catch (IOException | KeyStoreStorageException ex) {
+        } catch (KeyStoreStorageException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
             throw new CACreationException("Could not write CA: " + ex.getMessage(), ex);
         }
@@ -112,6 +112,20 @@ public class CaService {
         if(currentCA.isPresent() && !currentCA.get().type().equals(CAType.LOCAL)) {
             // TODO: cleanup in MongoDB
             currentCA = Optional.empty();
+        }
+    }
+
+    public KeyStore loadKeyStore() throws KeyStoreException, KeyStoreStorageException, CertificateException, IOException, NoSuchAlgorithmException {
+        if(currentCA.isPresent()) {
+            if(currentCA.get().type().equals(CAType.LOCAL)) {
+                // TODO: use real password
+                return keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), this.password.orElse("").toCharArray()).orElseThrow();
+            } else {
+                // TODO: use real password
+                return keystoreMongoStorage.readKeyStore(nodeId, this.password.orElse("").toCharArray()).orElseThrow();
+            }
+        } else {
+            throw new KeyStoreException("No KeyStore exists.");
         }
     }
 }

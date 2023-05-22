@@ -16,10 +16,14 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import org.graylog.security.certutil.CaConfiguration;
+import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.cert.storage.CertMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
+import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
+import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -48,6 +52,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
     private final CsrMongoStorage csrStorage;
     private final CertStorage certMongoStorage;
+    private final CaService caService;
 
     private String caKeystoreFilename = "datanode-ca.p12";
     private Integer DEFAULT_VALIDITY = 90;
@@ -56,16 +61,17 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     @Inject
     public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
                                               final CsrMongoStorage csrStorage,
-                                              final CertMongoStorage certMongoStorage) {
+                                              final CertMongoStorage certMongoStorage,
+                                              final CaService caService) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
+        this.caService = caService;
     }
 
     @Override
     public void doRun() {
         LOG.debug("checking if there are configuration steps to take care of");
-        final Path caKeystorePath = Path.of(caKeystoreFilename);
 
         if(!Files.exists(caKeystorePath)) {
             LOG.warn("mandatory keystore file does not exist.");
@@ -73,15 +79,12 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         }
 
         try {
+            KeyStore caKeystore = caService.loadKeyStore();
+            // TODO: get real password
             char[] password = DEFAULT_PASSWORD.toCharArray();
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
-            caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
             var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
             var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
-
-            // TODO: delete?
-//            final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
             nodePreflightConfigService.streamAll()
                     .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
@@ -104,8 +107,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                         }
                     });
 
-        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException |
-                 UnrecoverableKeyException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
