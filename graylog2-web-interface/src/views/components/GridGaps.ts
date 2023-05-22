@@ -47,22 +47,6 @@ const placeItemInGrid = <T extends boolean | string | number>(grid: Grid<T>, ite
   return overlap;
 };
 
-const drawGrid = (items: Position[]) => {
-  const grid = [];
-
-  items.forEach((item, idx) => placeItemInGrid(grid, item, String(idx), 'X'));
-
-  const plot = [];
-
-  for (let x = 0; x < 12; x++) {
-    for (let y = 0; y < grid.length; y++) {
-      (plot[y] ??= [])[x] = grid[y]?.[x] ?? '.';
-    }
-  }
-
-  return plot.map((row) => row.join('')).join('\n');
-};
-
 const itemsOverlap = (items: Position[]) => {
   if (items.length === 0) {
     return false;
@@ -95,7 +79,6 @@ const findGaps = (_items: Position[], minWidth: number = 1, maxWidth: number = 1
   }
 
   const items = _items.map((item) => normalizeInfinity(item, maxWidth));
-  console.log(drawGrid(items));
   const minY = Math.min(...items.map(({ row }) => row));
   const maxY = Math.max(...items.map(({ row, height }) => row + height - 1));
 
