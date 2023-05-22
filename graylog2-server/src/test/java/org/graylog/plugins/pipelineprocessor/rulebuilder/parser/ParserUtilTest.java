@@ -47,6 +47,7 @@ public class ParserUtilTest {
     public void initializeFreemarkerConfig() {
         SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
         this.configuration = secureFreemarkerConfigProvider.get();
+        configuration.setLogTemplateExceptions(false);
         StringTemplateLoader templateLoader = new StringTemplateLoader();
         templateLoader.putTemplate("test_fragment1", "let gl2_fragmentvar_v1 = $message.${field};");
         templateLoader.putTemplate("test_fragment2", "let gl2_fragmentvar_v1 = $message.${field!\"defaultField\"};");

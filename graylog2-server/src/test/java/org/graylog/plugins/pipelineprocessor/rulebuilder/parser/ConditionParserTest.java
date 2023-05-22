@@ -78,7 +78,9 @@ public class ConditionParserTest {
 
     @Before
     public void initialize() {
-        conditionParser = new ConditionParser(ruleBuilderRegistry, new SecureFreemarkerConfigProvider());
+        final SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
+        secureFreemarkerConfigProvider.get().setLogTemplateExceptions(false);
+        conditionParser = new ConditionParser(ruleBuilderRegistry, secureFreemarkerConfigProvider);
     }
 
 

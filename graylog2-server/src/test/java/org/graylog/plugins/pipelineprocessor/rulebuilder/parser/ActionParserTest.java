@@ -80,7 +80,9 @@ public class ActionParserTest {
 
     @Before
     public void initialize() {
-        actionParser = new ActionParser(ruleBuilderRegistry, new SecureFreemarkerConfigProvider());
+        final SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
+        secureFreemarkerConfigProvider.get().setLogTemplateExceptions(false);
+        actionParser = new ActionParser(ruleBuilderRegistry, secureFreemarkerConfigProvider);
     }
 
 
