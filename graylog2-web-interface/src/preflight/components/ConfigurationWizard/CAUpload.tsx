@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
@@ -39,31 +39,29 @@ const DropzoneInner = styled.div`
   gap: 10px;
 `;
 
+const submitUpload = (files: Array<File>) => fetch('POST', qualifyUrl('/api/ca/upload'), { files }, false);
+
 const CAUpload = () => {
   const queryClient = useQueryClient();
-  const [isUploading, setIsUploading] = useState(false);
   const onRejectUpload = useCallback(() => {
     UserNotification.error('CA upload failed');
   }, []);
 
-  const onProcessUpload = useCallback((files: Array<File>) => {
-    setIsUploading(true);
-
-    fetch('POST', qualifyUrl('/api/ca/upload'), { files }, false).then(() => {
+  const { mutate: onProcessUpload, isLoading } = useMutation(submitUpload, {
+    onSuccess: () => {
       UserNotification.success('CA uploaded successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
-    }).catch((error) => {
+    },
+    onError: (error) => {
       UserNotification.error(`CA upload failed with error: ${error}`);
-    }).finally(() => {
-      setIsUploading(false);
-    });
-  }, [queryClient]);
+    },
+  });
 
   return (
     <CADropzone onDrop={onProcessUpload}
                 onReject={onRejectUpload}
                 data-testid="upload-dropzone"
-                loading={isUploading}>
+                loading={isLoading}>
       <DropzoneInner>
         <Dropzone.Accept>
           <Icon name="file" type="solid" size="2x" />

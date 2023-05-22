@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { Button, Title, Space, Alert } from 'preflight/components/common';
@@ -25,21 +24,26 @@ import UserNotification from 'preflight/util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 
-const provisionCertificates = (queryClient: QueryClient, setIsProvisioning: React.Dispatch<React.SetStateAction<boolean>>) => {
-  fetch('POST', URLUtils.qualifyUrl('api/generate'), undefined, false).then(() => {
-    UserNotification.success('CA provisioned successfully');
-    queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
-  }).catch((error) => {
-    UserNotification.error(`CA provisioning failed with error: ${error}`);
-  }).finally(() => {
-    setIsProvisioning(false);
-  });
-};
+const onProvisionCertificates = () => fetch(
+  'POST',
+  URLUtils.qualifyUrl('api/generate'),
+  undefined,
+  false,
+);
 
 const CertificateProvisioning = () => {
   const queryClient = useQueryClient();
   const { data: dataNodes, isInitialLoading } = useDataNodes();
-  const [isProvisioning, setIsProvisioning] = useState(false);
+
+  const { mutate: provisionCertificates, isLoading } = useMutation(onProvisionCertificates, {
+    onSuccess: () => {
+      UserNotification.success('CA provisioned successfully');
+      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+    },
+    onError: (error) => {
+      UserNotification.error(`CA provisioning failed with error: ${error}`);
+    },
+  });
 
   return (
     <div>
@@ -54,8 +58,8 @@ const CertificateProvisioning = () => {
           At least one Graylog data node needs to run before the certificate can be provisioned.
         </Alert>
       )}
-      <Button onClick={() => provisionCertificates(queryClient, setIsProvisioning)} disabled={!dataNodes.length}>
-        {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}
+      <Button onClick={() => provisionCertificates()} disabled={!dataNodes.length}>
+        {isLoading ? 'Provisioning certificate...' : 'Provision certificate and continue'}
       </Button>
     </div>
   );
