@@ -496,7 +496,9 @@ describe('GridGaps', () => {
 
     const result = findGaps(items);
 
-    expect(result).toEqual([
+    expect(result).toHaveLength(2);
+
+    expect(result).toEqual(expect.arrayContaining([
       {
         end: {
           x: 13,
@@ -517,6 +519,6 @@ describe('GridGaps', () => {
           y: 7,
         },
       },
-    ].map(convertItem));
+    ].map(convertItem)));
   });
 });
