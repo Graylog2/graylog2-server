@@ -30,10 +30,6 @@ const ActionsCol = styled(Col)`
   margin-top: 50px;
 `;
 
-const AddButton = styled(Button)`
-  margin-top: 20px;
-`;
-
 const SubTitle = styled.label`
   color: #aaa;
 `;
@@ -53,8 +49,6 @@ const RuleBuilder = () => {
   const initialRule = existingRule || { description: '', title: '', rule_builder: { conditions: [], actions: [] } };
 
   const [rule, setRule] = useState<RuleBuilderRule>(initialRule);
-  const [showNewConditionBlock, setShowNewConditionBlock] = useState<boolean>(false);
-  const [showNewActionBlock, setShowNewActionBlock] = useState<boolean>(false);
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: 'condition'|'action' } | null>(null);
 
   console.log('conditionsDict', conditionsDict);
@@ -183,18 +177,13 @@ const RuleBuilder = () => {
                               updateBlock={updateBlock}
                               deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
           ))}
-          {(showNewConditionBlock || !newConditionBlockOrder) && (
-            <RuleBuilderBlock blockDict={conditionsDict || []}
-                              block={null}
-                              order={newConditionBlockOrder}
-                              type="condition"
-                              addBlock={addBlock}
-                              updateBlock={updateBlock}
-                              deleteBlock={() => setBlockToDelete({ orderIndex: newConditionBlockOrder, type: 'condition' })} />
-          )}
-          {(newConditionBlockOrder > 0) && (
-            <AddButton bsSize="small" bsStyle="info" onClick={() => setShowNewConditionBlock(true)}>Add Condition</AddButton>
-          )}
+          <RuleBuilderBlock blockDict={conditionsDict || []}
+                            block={null}
+                            order={newConditionBlockOrder}
+                            type="condition"
+                            addBlock={addBlock}
+                            updateBlock={updateBlock}
+                            deleteBlock={() => setBlockToDelete({ orderIndex: newConditionBlockOrder, type: 'condition' })} />
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
@@ -209,18 +198,13 @@ const RuleBuilder = () => {
                               updateBlock={updateBlock}
                               deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
           ))}
-          {(showNewActionBlock || !newActionBlockOrder) && (
-            <RuleBuilderBlock blockDict={actionsDict || []}
-                              block={null}
-                              order={newActionBlockOrder}
-                              type="action"
-                              addBlock={addBlock}
-                              updateBlock={updateBlock}
-                              deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockOrder, type: 'action' })} />
-          )}
-          {(newActionBlockOrder > 0) && (
-            <AddButton bsSize="small" bsStyle="info" onClick={() => setShowNewActionBlock(true)}>Add Action</AddButton>
-          )}
+          <RuleBuilderBlock blockDict={actionsDict || []}
+                            block={null}
+                            order={newActionBlockOrder}
+                            type="action"
+                            addBlock={addBlock}
+                            updateBlock={updateBlock}
+                            deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockOrder, type: 'action' })} />
         </Col>
         <ActionsCol md={12}>
           <FormSubmit submitButtonText={`${!existingRule ? 'Create rule' : 'Update rule & close'}`}

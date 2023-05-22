@@ -61,15 +61,15 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
     }
   };
 
-  const onAdd = (paramsToAdd) => {
-    addBlock(type, buildBlockData(paramsToAdd));
-
-    setEditMode(false);
-  };
-
   const onCancel = () => {
     setEditMode(false);
     resetBlock();
+  };
+
+  const onAdd = (paramsToAdd) => {
+    addBlock(type, buildBlockData(paramsToAdd));
+
+    onCancel();
   };
 
   const onDelete = () => {
