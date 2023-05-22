@@ -16,33 +16,61 @@
  */
 package org.graylog.security.certutil.cert.storage;
 
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.graylog2.cluster.NodePreflightConfigService;
-import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 
 public class CertMongoStorage implements CertStorage {
 
     private NodePreflightConfigService mongoService;
-    private NodeId nodeId;
 
     @Inject
-    public CertMongoStorage(final NodePreflightConfigService mongoService,
-                           final NodeId nodeId) {
+    public CertMongoStorage(final NodePreflightConfigService mongoService) {
         this.mongoService = mongoService;
-        this.nodeId = nodeId;
     }
 
-    public void writeCert(X509Certificate cert) throws IOException, OperatorCreationException {
+    @Override
+    public void writeCert(final X509Certificate cert,
+                          final String nodeId) throws IOException, OperatorCreationException {
         var writer = new StringWriter();
         try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
             jcaPEMWriter.writeObject(cert);
         }
-        mongoService.writeCert(nodeId.getNodeId(), writer.toString());
+        mongoService.writeCert(nodeId, writer.toString());
+    }
+
+    @Override
+    public Optional<X509Certificate> readCert(final String nodeId) throws IOException, GeneralSecurityException {
+        final Optional<String> certAsString = mongoService.readCert(nodeId);
+
+        if (certAsString.isPresent()) {
+            Reader pemReader = new BufferedReader(new StringReader(certAsString.get()));
+            PEMParser pemParser = new PEMParser(pemReader);
+            var parsedObj = pemParser.readObject();
+            if (parsedObj instanceof X509Certificate) {
+                return Optional.of((X509Certificate) parsedObj);
+            } else if (parsedObj instanceof X509CertificateHolder) {
+                return Optional.of(
+                        new JcaX509CertificateConverter().getCertificate(
+                                (X509CertificateHolder) parsedObj
+                        )
+                );
+            }
+        }
+
+        return Optional.empty();
     }
 }

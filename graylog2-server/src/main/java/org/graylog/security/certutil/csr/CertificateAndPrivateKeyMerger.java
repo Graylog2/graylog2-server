@@ -19,12 +19,12 @@ package org.graylog.security.certutil.csr;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
+import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
+import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -33,24 +33,28 @@ import java.security.cert.X509Certificate;
 
 /**
  * Merges signed certificate, received after CSR was processed, with private key, that was awaiting in a safe file.
- * Saves the result of the merge into password-protected PKCS12 file.
+ * Saves the result of the merge into Mongo collection.
  */
 public class CertificateAndPrivateKeyMerger {
 
     private final KeyPairChecker keyPairChecker;
+    private final KeystoreMongoStorage keystoreMongoStorage;
+    private final NodeId nodeId;
 
     @Inject
-    public CertificateAndPrivateKeyMerger(final KeyPairChecker keyPairChecker) {
+    public CertificateAndPrivateKeyMerger(final KeyPairChecker keyPairChecker,
+                                          final KeystoreMongoStorage keystoreMongoStorage,
+                                          final NodeId nodeId) {
         this.keyPairChecker = keyPairChecker;
+        this.keystoreMongoStorage = keystoreMongoStorage;
+        this.nodeId = nodeId;
     }
 
     public void merge(final X509Certificate signedCertificate,
                       final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
                       final char[] privateKeyStoragePassword,
                       final char[] certFilePassword,
-                      final String alias,
-                      final Path mergedFilePath,
-                      final KeystoreFileStorage keystoreFileStorage) throws GeneralSecurityException, IOException,
+                      final String alias) throws GeneralSecurityException, IOException,
             OperatorCreationException, PKCSException, KeyStoreStorageException {
 
         KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
@@ -63,7 +67,6 @@ public class CertificateAndPrivateKeyMerger {
             throw new GeneralSecurityException("Private key from CSR and public key from certificate do not form a valid pair");
         }
 
-        //TODO: there is a risk that final result will be stored in Mongo, not in a filesystem
-        keystoreFileStorage.writeKeyStore(mergedFilePath, nodeKeystore, certFilePassword);
+        keystoreMongoStorage.writeKeyStore(nodeId, nodeKeystore, certFilePassword);
     }
 }
