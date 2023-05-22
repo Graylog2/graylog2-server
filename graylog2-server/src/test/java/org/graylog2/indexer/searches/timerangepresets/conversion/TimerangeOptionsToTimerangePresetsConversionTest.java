@@ -22,10 +22,12 @@ import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
@@ -62,17 +64,22 @@ class TimerangeOptionsToTimerangePresetsConversionTest {
 
         assertThat(result)
                 .isNotNull()
+                .hasSize(1)
+                .extracting(TimerangePreset::timeRange, TimerangePreset::description)
                 .containsOnly(
-                        new TimerangePreset(rangeFromConversion, "Long, long time")
+                        tuple(rangeFromConversion, "Long, long time")
                 );
+
     }
 
     @Test
     void testConversionOnSomeDefaultRelativeTimerangeOptions() {
-        Map<Period, String> defaults = Map.of(
-                Period.minutes(15), "15 minutes",
-                Period.hours(8), "8 hours",
-                Period.days(1), "1 day"
+        Map<Period, String> defaults = new LinkedHashMap(
+                Map.of(
+                        Period.minutes(15), "15 minutes",
+                        Period.hours(8), "8 hours",
+                        Period.days(1), "1 day"
+                )
         );
 
         doCallRealMethod().when(periodConverter).apply(any(Period.class));
@@ -80,27 +87,20 @@ class TimerangeOptionsToTimerangePresetsConversionTest {
 
         assertThat(result)
                 .isNotNull()
-                .isNotEmpty()
-                .containsOnly(
-                        new TimerangePreset(
-                                RelativeRange.Builder.builder()
-                                        .from(15 * 60)
-                                        .build(),
-                                "15 minutes"
-                        ),
-                        new TimerangePreset(
-                                RelativeRange.Builder.builder()
-                                        .from(8 * 60 * 60)
-                                        .build(),
-                                "8 hours"
-                        ),
-                        new TimerangePreset(
-                                RelativeRange.Builder.builder()
-                                        .from(24 * 60 * 60)
-                                        .build(),
-                                "1 day"
-                        )
+                .hasSize(3)
+                .extracting(TimerangePreset::timeRange, TimerangePreset::description)
+                .containsExactlyInAnyOrder(
+                        tuple(RelativeRange.Builder.builder()
+                                .from(15 * 60)
+                                .build(), "15 minutes"),
+                        tuple(RelativeRange.Builder.builder()
+                                .from(8 * 60 * 60)
+                                .build(), "8 hours"),
+                        tuple(RelativeRange.Builder.builder()
+                                .from(24 * 60 * 60)
+                                .build(), "1 day")
                 );
+
     }
 
 
