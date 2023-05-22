@@ -16,8 +16,9 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import org.assertj.core.data.Index;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
