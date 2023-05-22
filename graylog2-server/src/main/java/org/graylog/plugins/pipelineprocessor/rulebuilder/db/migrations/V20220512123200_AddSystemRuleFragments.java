@@ -25,6 +25,7 @@ import org.graylog2.migrations.Migration;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
 public class V20220512123200_AddSystemRuleFragments extends Migration {
@@ -46,7 +47,7 @@ public class V20220512123200_AddSystemRuleFragments extends Migration {
         ruleFragmentService.delete("has_field_equals");
         ruleFragmentService.save(
                 RuleFragment.builder()
-                        .fragment("( hasField(\"{field}\") && to_string($message.{field}) == \"{fieldValue}\" )")
+                        .fragment("( hasField(\"${field}\") && to_string($message.${field}) == \"${fieldValue}\" )")
                         .descriptor(FunctionDescriptor.builder()
                                 .name("has_field_equals")
                                 .params(ImmutableList.of(
@@ -54,7 +55,45 @@ public class V20220512123200_AddSystemRuleFragments extends Migration {
                                         string("fieldValue").build()
                                 ))
                                 .returnType(Boolean.class)
+                                .description("Checks if the message has a field and if this field's string value is equal to the given fieldValue")
                                 .ruleBuilderEnabled()
+                                .ruleBuilderTitle("Field '${field}' equals '${fieldValue}'")
+                                .build())
+                        .isCondition()
+                        .build()
+        );
+        ruleFragmentService.delete("has_field_greater_or_equal");
+        ruleFragmentService.save(
+                RuleFragment.builder()
+                        .fragment("( hasField(\"${field}\") && to_double($message.${field}) >= ${fieldValue} )")
+                        .descriptor(FunctionDescriptor.builder()
+                                .name("has_field_greater_or_equal")
+                                .params(ImmutableList.of(
+                                        string("field").build(),
+                                        integer("fieldValue").build()
+                                ))
+                                .returnType(Boolean.class)
+                                .description("Checks if the message has a field and if this field's numeric value is greater than or equal to the given fieldValue")
+                                .ruleBuilderEnabled()
+                                .ruleBuilderTitle("Field '${field}' greater than or equal '${fieldValue}'")
+                                .build())
+                        .isCondition()
+                        .build()
+        );
+        ruleFragmentService.delete("has_field_less_or_equal");
+        ruleFragmentService.save(
+                RuleFragment.builder()
+                        .fragment("( hasField(\"${field}\") && to_double($message.${field}) <= ${fieldValue} )")
+                        .descriptor(FunctionDescriptor.builder()
+                                .name("has_field_less_or_equal")
+                                .params(ImmutableList.of(
+                                        string("field").build(),
+                                        integer("fieldValue").build()
+                                ))
+                                .returnType(Boolean.class)
+                                .description("Checks if the message has a field and if this field's numeric value is less than or equal to the given fieldValue")
+                                .ruleBuilderEnabled()
+                                .ruleBuilderTitle("Field '${field}' less than or equal '${fieldValue}'")
                                 .build())
                         .isCondition()
                         .build()
