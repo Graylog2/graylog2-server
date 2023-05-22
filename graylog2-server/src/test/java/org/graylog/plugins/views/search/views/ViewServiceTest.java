@@ -22,8 +22,10 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -56,6 +58,8 @@ public class ViewServiceTest {
     public void setUp() throws Exception {
         final var mapper = new ObjectMapperProvider();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
+        final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(mapper),
+                mongodb.mongoConnection());
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
                 mongodb.mongoConnection(),
@@ -66,11 +70,11 @@ public class ViewServiceTest {
         this.dbService = new ViewService(
                 mongodb.mongoConnection(),
                 objectMapperProvider,
-                mapper.get(),
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityOwnershipService.class),
-                mock(ViewSummaryService.class));
+                mock(ViewSummaryService.class),
+                mongoCollections);
         this.searchUser = TestSearchUser.builder().build();
     }
 

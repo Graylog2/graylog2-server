@@ -127,7 +127,7 @@ class ContentPackEditParameter extends React.Component {
     }
 
     if ((this.props.parameterToEdit || {}).name !== value
-      && this.props.parameters.findIndex((parameter) => { return parameter.name === value; }) >= 0) {
+      && this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0) {
       this.setState({ nameError: 'The parameter name must be unique.' });
 
       return false;

@@ -79,9 +79,7 @@ class MetricContainer extends React.Component<Props> {
 
     let throughput = Object.keys(metrics)
       .map((nodeId) => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
-      .reduce((accumulator: { throughput?: number }, currentMetric: { throughput: number | undefined | null }): { throughput?: number } => {
-        return { throughput: (accumulator.throughput || 0) + (currentMetric.throughput || 0) };
-      }, {});
+      .reduce((accumulator: { throughput?: number }, currentMetric: { throughput: number | undefined | null }): { throughput?: number } => ({ throughput: (accumulator.throughput || 0) + (currentMetric.throughput || 0) }), {});
 
     if (zeroOnMissing && (!throughput || !throughput.throughput)) {
       throughput = { throughput: 0 };
@@ -90,9 +88,7 @@ class MetricContainer extends React.Component<Props> {
     return (
       <div>
         {
-        React.Children.map(children, (child) => {
-          return React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput } });
-        })
+        React.Children.map(children, (child) => React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput } }))
       }
       </div>
     );

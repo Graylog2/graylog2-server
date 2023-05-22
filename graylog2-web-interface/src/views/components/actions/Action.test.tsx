@@ -61,16 +61,14 @@ describe('Action', () => {
     handlerArgs = exampleHandlerArgs,
     menuContainer = undefined,
     type = 'field',
-  }: Props) => {
-    return (
-      <Action element={OpenActionsMenu}
-              handlerArgs={handlerArgs}
-              menuContainer={menuContainer}
-              type={type}>
-        {children}
-      </Action>
-    );
-  };
+  }: Props) => (
+    <Action element={OpenActionsMenu}
+            handlerArgs={handlerArgs}
+            menuContainer={menuContainer}
+            type={type}>
+      {children}
+    </Action>
+  );
 
   const openDropdown = async (headerTitle = 'The dropdown header') => {
     const dropdownToggle = screen.getByText('Open Actions Menu');

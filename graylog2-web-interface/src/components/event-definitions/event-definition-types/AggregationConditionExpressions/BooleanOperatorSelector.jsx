@@ -32,34 +32,32 @@ const BooleanOperatorSelect = styled(({ isFirstElement, ...props }) => <FormGrou
   margin-right: 1em;
 `;
 
-const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) => {
-  return (
-    <Col md={12}>
-      <OperatorSelector className="form-inline">
-        {initialText && (
-          <FormGroup>
-            <FormControl.Static>{initialText} </FormControl.Static>
-          </FormGroup>
-        )}
-        <BooleanOperatorSelect isFirstElement={!initialText}>
-          <Select className="boolean-operator"
-                  matchProp="label"
-                  size="small"
-                  onChange={onOperatorChange}
-                  options={[
-                    { label: 'all', value: '&&' },
-                    { label: 'any', value: '||' },
-                  ]}
-                  value={operator}
-                  clearable={false} />
-        </BooleanOperatorSelect>
-        <FormGroup>
-          <FormControl.Static> of the following rules:</FormControl.Static>
-        </FormGroup>
-      </OperatorSelector>
-    </Col>
-  );
-};
+const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) => (
+  <Col md={12}>
+    <OperatorSelector className="form-inline">
+      {initialText && (
+      <FormGroup>
+        <FormControl.Static>{initialText} </FormControl.Static>
+      </FormGroup>
+      )}
+      <BooleanOperatorSelect isFirstElement={!initialText}>
+        <Select className="boolean-operator"
+                matchProp="label"
+                size="small"
+                onChange={onOperatorChange}
+                options={[
+                  { label: 'all', value: '&&' },
+                  { label: 'any', value: '||' },
+                ]}
+                value={operator}
+                clearable={false} />
+      </BooleanOperatorSelect>
+      <FormGroup>
+        <FormControl.Static> of the following rules:</FormControl.Static>
+      </FormGroup>
+    </OperatorSelector>
+  </Col>
+);
 
 BooleanOperatorSelector.propTypes = {
   initialText: PropTypes.string,

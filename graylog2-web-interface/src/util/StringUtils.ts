@@ -39,9 +39,7 @@ const StringUtils = {
     return text.replace(/\s/g, newCharacter);
   },
   toTitleCase(str: string, splitCharacter: string = ' ') {
-    return str.toLowerCase().split(splitCharacter).map((word) => {
-      return (`${word.charAt(0).toUpperCase()}${word.slice(1)}`);
-    }).join(' ');
+    return str.toLowerCase().split(splitCharacter).map((word) => (`${word.charAt(0).toUpperCase()}${word.slice(1)}`)).join(' ');
   },
   truncateWithEllipses(text = '', maxLength = 10, end = '...') {
     if (text.length > maxLength) {

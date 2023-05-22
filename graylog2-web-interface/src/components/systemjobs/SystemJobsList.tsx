@@ -46,13 +46,11 @@ const StyledAlert = styled(Alert)`
 `;
 
 const SystemJobsList = ({ jobs }): React.ReactElement => {
-  const formatSystemJob = (job) => {
-    return (
-      <SystemJobWrap key={`job-${job.id}`}>
-        <SystemJob job={job} />
-      </SystemJobWrap>
-    );
-  };
+  const formatSystemJob = (job) => (
+    <SystemJobWrap key={`job-${job.id}`}>
+      <SystemJob job={job} />
+    </SystemJobWrap>
+  );
 
   const formattedJobs = jobs.map(formatSystemJob);
 

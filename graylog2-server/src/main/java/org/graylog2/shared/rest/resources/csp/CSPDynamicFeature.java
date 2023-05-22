@@ -17,6 +17,8 @@
 package org.graylog2.shared.rest.resources.csp;
 
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
@@ -25,6 +27,8 @@ import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
 public class CSPDynamicFeature implements DynamicFeature {
+    private static final Logger LOG = LoggerFactory.getLogger(CSPDynamicFeature.class);
+    public static final String CSP_NONCE_PROPERTY = "cspNonce";
     private final CSPService cspService;
 
     @Inject
@@ -41,8 +45,10 @@ public class CSPDynamicFeature implements DynamicFeature {
         final Method resourceMethod = resourceInfo.getResourceMethod();
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         if (resourceClass != null && resourceClass.isAnnotationPresent(CSP.class)) {
+            context.register(new CSPNonceRequestFilter());
             context.register(new CSPResponseFilter(resourceClass.getAnnotation(CSP.class).group(), cspService));
         } else if (resourceMethod != null && resourceMethod.isAnnotationPresent(CSP.class)) {
+            context.register(new CSPNonceRequestFilter());
             context.register(new CSPResponseFilter(resourceMethod.getAnnotation(CSP.class).group(), cspService));
         }
     }

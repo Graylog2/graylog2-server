@@ -19,12 +19,10 @@ import * as React from 'react';
 import { DocumentTitle } from 'components/common';
 import Welcome from 'components/welcome/Welcome';
 
-const WelcomePage = () => {
-  return (
-    <DocumentTitle title="Welcome">
-      <Welcome />
-    </DocumentTitle>
-  );
-};
+const WelcomePage = () => (
+  <DocumentTitle title="Welcome">
+    <Welcome />
+  </DocumentTitle>
+);
 
 export default WelcomePage;

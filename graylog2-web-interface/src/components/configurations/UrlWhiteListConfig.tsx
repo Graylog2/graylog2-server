@@ -52,16 +52,14 @@ const UrlWhiteListConfig = () => {
     const literal = 'literal';
     const { entries } = viewConfig;
 
-    return entries.map((urlConfig, idx) => {
-      return (
-        <tr key={urlConfig.id}>
-          <td>{idx + 1}</td>
-          <td>{urlConfig.title}</td>
-          <td>{urlConfig.value}</td>
-          <td>{urlConfig.type === literal ? 'Exact match' : 'Regex'}</td>
-        </tr>
-      );
-    });
+    return entries.map((urlConfig, idx) => (
+      <tr key={urlConfig.id}>
+        <td>{idx + 1}</td>
+        <td>{urlConfig.title}</td>
+        <td>{urlConfig.value}</td>
+        <td>{urlConfig.type === literal ? 'Exact match' : 'Regex'}</td>
+      </tr>
+    ));
   };
 
   const openModal = () => {

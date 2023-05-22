@@ -26,7 +26,7 @@ import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import type FetchError from 'logic/errors/FetchError';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -43,13 +43,13 @@ const GET_INDEXER_CLUSTER_NAME = 'indexerCluster.name';
 const getIndexerClusterHealth = () => {
   const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
 
-  return fetch('GET', url);
+  return fetchPeriodically('GET', url);
 };
 
 const getIndexerClusterName = () => {
   const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.name().url);
 
-  return fetch('GET', url);
+  return fetchPeriodically('GET', url);
 };
 
 const useLoadHealthAndName = (enabled: boolean) => {

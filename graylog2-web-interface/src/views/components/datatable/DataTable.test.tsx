@@ -41,12 +41,10 @@ import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
-const createWidget = (config: AggregationWidgetConfig = AggregationWidgetConfig.builder().build()) => {
-  return AggregationWidget.builder()
-    .id('deadbeef')
-    .config(config)
-    .build();
-};
+const createWidget = (config: AggregationWidgetConfig = AggregationWidgetConfig.builder().build()) => AggregationWidget.builder()
+  .id('deadbeef')
+  .config(config)
+  .build();
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),

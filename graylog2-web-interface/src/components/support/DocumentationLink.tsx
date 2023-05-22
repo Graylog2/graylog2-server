@@ -38,14 +38,12 @@ type Props = {
   displayIcon?: boolean
 }
 
-const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => {
-  return (
-    <Container href={DocsHelper.toString(page)} title={title} target="_blank">
-      {text}
-      {displayIcon && <StyledIcon name="lightbulb" type="regular" size="lg" />}
-    </Container>
-  );
-};
+const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => (
+  <Container href={DocsHelper.toString(page)} title={title} target="_blank">
+    {text}
+    {displayIcon && <StyledIcon name="lightbulb" type="regular" size="lg" />}
+  </Container>
+);
 
 DocumentationLink.defaultProps = {
   title: '',

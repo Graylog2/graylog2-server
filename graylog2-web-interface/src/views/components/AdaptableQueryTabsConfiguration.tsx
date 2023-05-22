@@ -54,16 +54,14 @@ const ListItem = ({
   onUpdateTitle: (id: string, title: string) => void,
   onRemove: (id: string) => void,
   disableDelete: boolean,
-}) => {
-  return (
-    <ListItemContainer>
-      <EditableTitle key={title} disabled={!onUpdateTitle} value={title} onChange={(newTitle) => onUpdateTitle(id, newTitle)} />
-      <div>
-        <IconButton title={`Remove page ${title}`} name="trash-alt" onClick={() => onRemove(id)} disabled={disableDelete} />
-      </div>
-    </ListItemContainer>
-  );
-};
+}) => (
+  <ListItemContainer>
+    <EditableTitle key={title} disabled={!onUpdateTitle} value={title} onChange={(newTitle) => onUpdateTitle(id, newTitle)} />
+    <div>
+      <IconButton title={`Remove page ${title}`} name="trash-alt" onClick={() => onRemove(id)} disabled={disableDelete} />
+    </div>
+  </ListItemContainer>
+);
 
 type Props = {
   show: boolean,

@@ -23,14 +23,12 @@ const TimeRangeOptionsSummary = ({ options }: Props) => {
   let timerangeOptionsSummary = null;
 
   if (options) {
-    timerangeOptionsSummary = Object.keys(options).map((key) => {
-      return (
-        <span key={`timerange-options-summary-${key}`}>
-          <dt>{key}</dt>
-          <dd>{options[key]}</dd>
-        </span>
-      );
-    });
+    timerangeOptionsSummary = Object.keys(options).map((key) => (
+      <span key={`timerange-options-summary-${key}`}>
+        <dt>{key}</dt>
+        <dd>{options[key]}</dd>
+      </span>
+    ));
   }
 
   return (

@@ -21,9 +21,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 
-const formatOutputType = (type, typeName) => {
-  return (<option key={typeName} value={typeName}>{type.name}</option>);
-};
+const formatOutputType = (type, typeName) => (<option key={typeName} value={typeName}>{type.name}</option>);
 
 class CreateOutputDropdown extends React.Component {
   PLACEHOLDER = 'placeholder';

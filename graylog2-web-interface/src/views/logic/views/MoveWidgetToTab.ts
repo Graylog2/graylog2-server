@@ -94,9 +94,7 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
     .build();
 };
 
-const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => {
-  return view.state.get(queryId).titles.getIn(['widget', widgetId]);
-};
+const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => view.state.get(queryId).titles.getIn(['widget', widgetId]);
 
 const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): View | undefined | null => {
   if (dashboard.type !== View.Type.Dashboard) {

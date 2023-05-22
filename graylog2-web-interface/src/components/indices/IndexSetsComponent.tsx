@@ -83,22 +83,18 @@ const IndexSetsComponent = () => {
     setStatsEnabled(!statsEnabled);
   };
 
-  const onSetDefault = (indexSet: IndexSet) => {
-    return () => {
-      sendTelemetry('click', {
-        app_pathname: 'indices',
-        app_section: 'index-sets',
-        app_action_value: 'set-default-index-set',
-      });
+  const onSetDefault = (indexSet: IndexSet) => () => {
+    sendTelemetry('click', {
+      app_pathname: 'indices',
+      app_section: 'index-sets',
+      app_action_value: 'set-default-index-set',
+    });
 
-      IndexSetsActions.setDefault(indexSet).then(() => loadData());
-    };
+    IndexSetsActions.setDefault(indexSet).then(() => loadData());
   };
 
-  const onDelete = (indexSet: IndexSet) => {
-    return () => {
-      formsRef.current[`index-set-deletion-form-${indexSet.id}`].open();
-    };
+  const onDelete = (indexSet: IndexSet) => () => {
+    formsRef.current[`index-set-deletion-form-${indexSet.id}`].open();
   };
 
   const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {

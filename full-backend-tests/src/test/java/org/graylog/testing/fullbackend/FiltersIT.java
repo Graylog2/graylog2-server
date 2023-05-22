@@ -21,24 +21,26 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.shared.rest.resources.csp.CSP;
-import org.graylog2.shared.rest.resources.csp.CSPResources;
 import org.graylog2.shared.rest.resources.csp.CSPResponseFilter;
 import org.hamcrest.Matchers;
+
+import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
     private final GraylogApis api;
-    private final CSPResources cspResources;
+    private static final Pattern defaultCSPPattern = Pattern.compile(Pattern.quote(CSP.CSP_DEFAULT)
+            .replaceAll("\\{nonce}", "\\\\E[a-zA-Z0-9-]+\\\\Q"));
 
     public FiltersIT(GraylogApis api) {
         this.api = api;
-        this.cspResources = new CSPResources();
     }
 
     @ContainerMatrixTest
     void cspDocumentationBrowser() {
+        String expected = CSP.CSP_SWAGGER;
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -46,7 +48,7 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.containsString(cspResources.cspString(CSP.SWAGGER)));
+                        Matchers.equalTo(expected));
     }
 
     @ContainerMatrixTest
@@ -59,7 +61,7 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.containsString(cspResources.cspString(CSP.DEFAULT)));
+                        Matchers.matchesPattern(defaultCSPPattern));
     }
 
     @ContainerMatrixTest
@@ -71,6 +73,6 @@ public class FiltersIT {
                 .get("streams")
                 .then()
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.containsString(cspResources.cspString(CSP.DEFAULT)));
+                        Matchers.matchesPattern(defaultCSPPattern));
     }
 }

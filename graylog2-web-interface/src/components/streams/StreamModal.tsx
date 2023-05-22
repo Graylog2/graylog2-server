@@ -26,14 +26,12 @@ import IndexSetSelect from 'components/streams/IndexSetSelect';
 
 type FormValues = Partial<Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>>
 
-const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => {
-  return {
-    index_set_id: initialValues.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
-    description: initialValues.description ?? undefined,
-    title: initialValues.title ?? undefined,
-    remove_matches_from_default_stream: initialValues.remove_matches_from_default_stream ?? undefined,
-  };
-};
+const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => ({
+  index_set_id: initialValues.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
+  description: initialValues.description ?? undefined,
+  title: initialValues.title ?? undefined,
+  remove_matches_from_default_stream: initialValues.remove_matches_from_default_stream ?? undefined,
+});
 
 const validate = (values: FormValues) => {
   let errors = {};

@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -45,6 +46,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
@@ -93,7 +95,7 @@ public class CatalogResource extends RestResource {
     @NoAuditEvent("This endpoint does not change any data")
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/entities/titles")
-    public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request) {
-        return entityTitleService.getTitles(getSubject(), request);
+    public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request, @Context SearchUser searchUser) {
+        return entityTitleService.getTitles(request, searchUser);
     }
 }

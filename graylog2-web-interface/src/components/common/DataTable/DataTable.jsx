@@ -115,7 +115,7 @@ class DataTable extends React.Component {
     rowClassName: '',
     useResponsiveTable: true,
     // eslint-disable-next-line react/no-unstable-nested-components
-    headerCellFormatter: (header) => { return (<th>{header}</th>); },
+    headerCellFormatter: (header) => (<th>{header}</th>),
     sortByKey: undefined,
     sortBy: undefined,
     useNumericSort: false,
@@ -150,13 +150,9 @@ class DataTable extends React.Component {
     let sortedDataRows = this._getEffectiveRows();
 
     if (sortByKey) {
-      sortedDataRows = sortedDataRows.sort((a, b) => {
-        return a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: useNumericSort });
-      });
+      sortedDataRows = sortedDataRows.sort((a, b) => a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: useNumericSort }));
     } else if (sortBy) {
-      sortedDataRows = sortedDataRows.sort((a, b) => {
-        return sortBy(a).localeCompare(sortBy(b), undefined, { numeric: useNumericSort });
-      });
+      sortedDataRows = sortedDataRows.sort((a, b) => sortBy(a).localeCompare(sortBy(b), undefined, { numeric: useNumericSort }));
     }
 
     const formattedDataRows = sortedDataRows.map((row) => {

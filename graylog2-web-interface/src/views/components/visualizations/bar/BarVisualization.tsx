@@ -26,6 +26,8 @@ import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
+import { keySeparator, humanSeparator } from 'views/Constants';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -37,6 +39,7 @@ type ChartDefinition = {
   y?: Array<any>,
   z?: Array<Array<any>>,
   opacity: number,
+  originalName: string,
 };
 
 const getChartColor = (fullData, name) => {
@@ -50,8 +53,6 @@ const getChartColor = (fullData, name) => {
 
   return undefined;
 };
-
-const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
 
 const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom: string, timeRangeTo: string) => {
   const barWidth = 0.03; // width in percentage, relative to chart width
@@ -97,13 +98,22 @@ const BarVisualization = makeVisualization(({
 
   const opacity = visualizationConfig?.opacity ?? 1.0;
 
-  const _seriesGenerator: Generator = useCallback((type, name, labels, values): ChartDefinition => ({
+  const mapKeys = useMapKeys();
+  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
+  const _mapKeys = useCallback((labels: string[]) => labels
+    .map((label) => label.split(keySeparator)
+      .map((l, i) => mapKeys(l, rowPivotFields[i]))
+      .join(humanSeparator),
+    ), [mapKeys, rowPivotFields]);
+
+  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }): ChartDefinition => ({
     type,
     name,
-    x: labels,
+    x: _mapKeys(labels),
     y: values,
     opacity,
-  }), [opacity]);
+    originalName,
+  }), [_mapKeys, opacity]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, { widgetConfig: config, chartType: 'bar', generator: _seriesGenerator });
@@ -120,7 +130,6 @@ const BarVisualization = makeVisualization(({
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             height={height}
-            setChartColor={setChartColor}
             plotLayout={layout} />
   );
 }, 'bar');

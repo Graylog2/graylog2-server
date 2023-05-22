@@ -43,13 +43,11 @@ const findOptionByValue = (options: Array<Option>, value: number) => options.fin
 
 const currentValue = (sort: Array<SortConfig>, options: Array<Option>) => sort && sort.length > 0 && findOptionByLabel(options, sort[0].field)?.value;
 
-const sortedOptions = (fields: Immutable.List<FieldTypeMapping>): Array<Option> => {
-  return fields.sort(
-    (field1, field2) => defaultCompare(field1.name, field2.name),
-  ).map(
-    (field, idx) => ({ label: field.name, value: idx }),
-  ).toArray();
-};
+const sortedOptions = (fields: Immutable.List<FieldTypeMapping>): Array<Option> => fields.sort(
+  (field1, field2) => defaultCompare(field1.name, field2.name),
+).map(
+  (field, idx) => ({ label: field.name, value: idx }),
+).toArray();
 
 const onOptionChange = (options: Array<Option>, onChange, value) => {
   const option = findOptionByValue(options, value);

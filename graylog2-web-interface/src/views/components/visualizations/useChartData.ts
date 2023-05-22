@@ -21,14 +21,17 @@ import type { ChartDataConfig } from 'views/components/visualizations/ChartData'
 import { chartData } from 'views/components/visualizations/ChartData';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import useUserDateTime from 'hooks/useUserDateTime';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'>) => {
   const { formatTime } = useUserDateTime();
+  const mapKeys = useMapKeys();
 
   return useMemo(() => chartData(rows, {
     formatTime,
+    mapKeys,
     ...config,
-  }), [config, formatTime, rows]);
+  }), [config, formatTime, mapKeys, rows]);
 };
 
 export default useChartData;

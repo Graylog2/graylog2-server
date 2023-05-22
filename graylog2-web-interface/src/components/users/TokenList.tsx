@@ -81,10 +81,8 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
     });
   };
 
-  const deleteToken = (token) => {
-    return () => {
-      onDelete(token.id, token.name);
-    };
+  const deleteToken = (token) => () => {
+    onDelete(token.id, token.name);
   };
 
   const updateQuery = (nextQuery?: string) => setQuery(nextQuery || '');

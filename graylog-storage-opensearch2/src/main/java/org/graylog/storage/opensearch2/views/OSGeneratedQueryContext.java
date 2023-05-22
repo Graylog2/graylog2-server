@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.util.UniqueNamer;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
@@ -42,7 +41,6 @@ public class OSGeneratedQueryContext implements GeneratedQueryContext {
     private final OpenSearchBackend openSearchBackend;
     private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
     private final Map<Object, Object> contextMap = Maps.newHashMap();
-    private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private final Set<SearchError> errors;
     private final SearchSourceBuilder ssb;
 
@@ -92,10 +90,6 @@ public class OSGeneratedQueryContext implements GeneratedQueryContext {
 
     public Map<Object, Object> contextMap() {
         return contextMap;
-    }
-
-    public String nextName() {
-        return uniqueNamer.nextName();
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {

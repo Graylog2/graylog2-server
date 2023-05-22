@@ -29,9 +29,7 @@ const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
 `;
 
 const SharingDisabledPopover = ({ type, description }: Props) => {
-  const getReadableType = (_type: string) => {
-    return _type.replaceAll('_', ' ');
-  };
+  const getReadableType = (_type: string) => _type.replaceAll('_', ' ');
 
   return (
     <StyledHoverForHelp title="Sharing not possible" pullRight={false}>

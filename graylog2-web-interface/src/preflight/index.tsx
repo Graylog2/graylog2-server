@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Notifications } from '@mantine/notifications';
 
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
 import GlobalThemeStyles from 'preflight/theme/GlobalThemeStyles';
@@ -30,7 +31,10 @@ ReactDOM.render((
       <GlobalThemeStyles />
       <DefaultQueryClientProvider>
         <ThemeWrapper>
-          <App />
+          <>
+            <Notifications />
+            <App />
+          </>
         </ThemeWrapper>
       </DefaultQueryClientProvider>
     </PreflightThemeProvider>

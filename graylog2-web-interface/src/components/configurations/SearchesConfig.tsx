@@ -35,31 +35,19 @@ import 'moment-duration-format';
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
-const queryTimeRangeLimitValidator = (milliseconds: number) => {
-  return milliseconds >= 1;
-};
+const queryTimeRangeLimitValidator = (milliseconds: number) => milliseconds >= 1;
 
-const relativeTimeRangeValidator = (milliseconds: number, duration: string) => {
-  return milliseconds >= 1 || duration === 'PT0S';
-};
+const relativeTimeRangeValidator = (milliseconds: number, duration: string) => milliseconds >= 1 || duration === 'PT0S';
 
-const surroundingTimeRangeValidator = (milliseconds: number) => {
-  return milliseconds >= 1;
-};
+const surroundingTimeRangeValidator = (milliseconds: number) => milliseconds >= 1;
 
 function autoRefreshTimeRangeValidator(milliseconds: number) {
   return milliseconds >= 1000;
 }
 
-const splitStringList = (stringList: string) => {
-  return stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
-};
+const splitStringList = (stringList: string) => stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
 
-const buildTimeRangeOptions = (options: { [x: string]: string; }) => {
-  return Object.keys(options).map((key) => {
-    return { period: key, description: options[key] };
-  });
-};
+const buildTimeRangeOptions = (options: { [x: string]: string; }) => Object.keys(options).map((key) => ({ period: key, description: options[key] }));
 
 type Option = { period: string, description: string };
 
@@ -87,10 +75,8 @@ const SearchesConfig = () => {
     });
   }, [configuration]);
 
-  const onUpdate = (field: keyof SearchConfig) => {
-    return (newOptions) => {
-      setFormConfig({ ...formConfig, [field]: newOptions });
-    };
+  const onUpdate = (field: keyof SearchConfig) => (newOptions) => {
+    setFormConfig({ ...formConfig, [field]: newOptions });
   };
 
   const onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {

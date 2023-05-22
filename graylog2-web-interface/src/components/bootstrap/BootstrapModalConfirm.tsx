@@ -48,32 +48,30 @@ const BootstrapModalConfirm = ({
   onCancel,
   onConfirm,
   ...restProps
-}: Props) => {
-  return (
-    <BootstrapModalWrapper showModal={showModal}
-                           onHide={onCancel}
-                           role="alertdialog"
-                           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
-                           {...restProps}>
-      <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
+}: Props) => (
+  <BootstrapModalWrapper showModal={showModal}
+                         onHide={onCancel}
+                         role="alertdialog"
+                         data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
+                         {...restProps}>
+    <Modal.Header closeButton>
+      <Modal.Title>{title}</Modal.Title>
+    </Modal.Header>
 
-      <Modal.Body>
-        {children}
-      </Modal.Body>
+    <Modal.Body>
+      {children}
+    </Modal.Body>
 
-      <Modal.Footer>
-        <ModalSubmit disabledCancel={cancelButtonDisabled}
-                     disabledSubmit={confirmButtonDisabled}
-                     onCancel={onCancel}
-                     onSubmit={onConfirm}
-                     submitButtonText={confirmButtonText}
-                     submitButtonType="button" />
-      </Modal.Footer>
-    </BootstrapModalWrapper>
-  );
-};
+    <Modal.Footer>
+      <ModalSubmit disabledCancel={cancelButtonDisabled}
+                   disabledSubmit={confirmButtonDisabled}
+                   onCancel={onCancel}
+                   onSubmit={onConfirm}
+                   submitButtonText={confirmButtonText}
+                   submitButtonType="button" />
+    </Modal.Footer>
+  </BootstrapModalWrapper>
+);
 
 BootstrapModalConfirm.propTypes = {
   /** Control whether the modal is shown or not. Prop updates should trigger opening (if show changes from false to true), respectively closing the modal (if show changes from false to true). */

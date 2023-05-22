@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Props } from 'react-select';
 import InfiniteLoader from 'react-window-infinite-loader';
 import styled from 'styled-components';
 
@@ -29,16 +28,20 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
-const getNoOptionMessgage = () => {
-  return (
-    <StyledDiv key="noOptions" className="menu-notice menu-notice--no-options">
-      No Options
-    </StyledDiv>
-  );
-};
+const getNoOptionMessage = () => (
+  <StyledDiv key="noOptions" className="menu-notice menu-notice--no-options">
+    No Options
+  </StyledDiv>
+);
 
-const AsyncCustomMenuList = ({ children, selectProps: { loadOptions, total } }: Props.MenuList) => {
-  const items = children?.length ? children : [getNoOptionMessgage()];
+const AsyncCustomMenuList = ({
+  children,
+  selectProps: { loadOptions, total },
+}: {
+  children: Array<React.ReactNode>,
+  selectProps: { loadOptions: () => void, total: number }
+}) => {
+  const items = children?.length ? children : [getNoOptionMessage()];
 
   return (
     <InfiniteLoader isItemLoaded={(index: number) => index < children.length}

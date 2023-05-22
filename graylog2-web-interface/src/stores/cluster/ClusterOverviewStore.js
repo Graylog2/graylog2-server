@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import fetch, { fetchStreamingPlainText } from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically, fetchStreamingPlainText } from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
@@ -43,7 +43,7 @@ export const ClusterOverviewStore = singletonStore(
     },
 
     cluster() {
-      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+      const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(this.sourceUrl));
 
       promise.then(
         (response) => {
@@ -59,9 +59,7 @@ export const ClusterOverviewStore = singletonStore(
     threadDump(nodeId) {
       const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/threaddump`))
         .then(
-          (response) => {
-            return response.threaddump;
-          },
+          (response) => response.threaddump,
           (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
         );
 
@@ -71,9 +69,7 @@ export const ClusterOverviewStore = singletonStore(
     processbufferDump(nodeId) {
       const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/processbufferdump`))
         .then(
-          (response) => {
-            return response.processbuffer_dump;
-          },
+          (response) => response.processbuffer_dump,
           (error) => UserNotification.error(`Getting process buffer dump for node '${nodeId}' failed: ${error}`, 'Could not get process buffer dump'),
         );
 

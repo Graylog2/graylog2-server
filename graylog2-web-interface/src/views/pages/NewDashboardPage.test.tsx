@@ -39,7 +39,7 @@ jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 
 const SimpleNewDashboardPage = () => (
-  <StreamsContext.Provider value={[{}]}>
+  <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' }]}>
     <NewDashboardPage />
   </StreamsContext.Provider>
 );
