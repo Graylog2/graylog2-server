@@ -30,6 +30,7 @@ public abstract class RuleBuilderStep {
     public static final String FIELD_PARAMETERS = "params";
     public static final String FIELD_OUTPUT = "outputvariable";
     public static final String FIELD_NEGATE = "negate";
+    public static final String FIELD_TITLE = "title";
 
     @JsonProperty(FIELD_FUNCTION)
     public abstract String function();
@@ -45,16 +46,22 @@ public abstract class RuleBuilderStep {
     @JsonProperty(FIELD_NEGATE)
     public abstract boolean negate();
 
+    @JsonProperty(FIELD_TITLE)
+    @Nullable
+    public abstract String title();
+
     @JsonCreator
     public static RuleBuilderStep create(@JsonProperty(FIELD_FUNCTION) String function,
                                          @JsonProperty(FIELD_PARAMETERS) @Nullable Map<String, Object> parameters,
                                          @JsonProperty(FIELD_OUTPUT) @Nullable String outputvariable,
-                                         @JsonProperty(FIELD_NEGATE) @Nullable boolean negate) {
+                                         @JsonProperty(FIELD_NEGATE) @Nullable boolean negate,
+                                         @JsonProperty(FIELD_TITLE) @Nullable String title) {
         return builder()
                 .function(function)
                 .parameters(parameters)
                 .outputvariable(outputvariable)
                 .negate(negate)
+                .title(title)
                 .build();
     }
 
@@ -80,6 +87,9 @@ public abstract class RuleBuilderStep {
             return negate(true);
         }
 
+        public abstract Builder title(String title);
+
         public abstract RuleBuilderStep build();
+
     }
 }

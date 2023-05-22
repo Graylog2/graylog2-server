@@ -54,7 +54,7 @@ public class HasField extends AbstractFunction<Boolean> {
                 .params(ImmutableList.of(fieldParam, messageParam))
                 .description("Checks whether a message contains a value for a field")
                 .ruleBuilderEnabled()
-                .ruleBuilderTitle("Message has field \"$field\"")
+                .ruleBuilderTitle("Message has field '${field}'")
                 .build();
     }
 }

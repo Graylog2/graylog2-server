@@ -64,6 +64,7 @@ public class Substring extends AbstractFunction<String> {
                 ))
                 .description("Extract a substring from a string")
                 .ruleBuilderEnabled()
+                .ruleBuilderTitle("Get substring from '${start}' to '${end!\"end\"}' of value")
                 .build();
     }
 }
