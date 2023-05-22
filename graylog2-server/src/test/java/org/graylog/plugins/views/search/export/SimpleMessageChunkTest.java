@@ -47,8 +47,10 @@ class SimpleMessageChunkTest {
                 linkedHashSetOf("timestamp", "source"),
                 msg1, msg2);
 
-        assertThat(sut.getAllValuesInOrder())
-                .contains(new Object[]{"2015-01-01 01:00:00.000", "source-1"}, Index.atIndex(0))
-                .contains(new Object[]{"2015-01-02 01:00:00.000", null}, Index.atIndex(1));
+        assertThat(Arrays.stream(sut.getAllValuesInOrder()).toList()).asList()
+                .containsExactly(
+                        new Object[]{"2015-01-01 01:00:00.000", "source-1"},
+                        new Object[]{"2015-01-02 01:00:00.000", null}
+                );
     }
 }
