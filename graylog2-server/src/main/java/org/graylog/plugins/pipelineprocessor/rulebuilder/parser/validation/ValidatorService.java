@@ -18,8 +18,11 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 
 import java.util.ArrayList;
@@ -31,11 +34,15 @@ public class ValidatorService {
 
     private final Set<Validator> conditionValidators;
     private final Set<Validator> actionValidators;
+    private final PipelineRuleParser pipelineRuleParser;
+    private final RuleBuilderService ruleBuilderService;
 
     @Inject
-    public ValidatorService(@Named("conditionValidators") final Set<Validator> conditionValidators, @Named("actionValidators") Set<Validator> actionValidators) {
+    public ValidatorService(@Named("conditionValidators") final Set<Validator> conditionValidators, @Named("actionValidators") Set<Validator> actionValidators, PipelineRuleParser pipelineRuleParser, RuleBuilderService ruleBuilderService) {
         this.conditionValidators = conditionValidators;
         this.actionValidators = actionValidators;
+        this.pipelineRuleParser = pipelineRuleParser;
+        this.ruleBuilderService = ruleBuilderService;
     }
 
     public RuleBuilderDto validate(RuleBuilderDto ruleBuilderDto) {
@@ -48,14 +55,26 @@ public class ValidatorService {
         List<RuleBuilderStep> validatedConditions = validateWithResults(ruleBuilder.conditions(), conditionValidators);
         validationBuilder.conditions(validatedConditions);
 
-        return ruleBuilderDto.toBuilder().ruleBuilder(validationBuilder.build()).build();
+        try {
+            parseRule(ruleBuilderDto, validationBuilder.build());
+        } catch (ParseException exception) {
+            validationBuilder.errors(List.of(exception.getMessage()));
+        }
+
+        RuleBuilder validatedRuleBuilder = validationBuilder.build();
+        return ruleBuilderDto.toBuilder().ruleBuilder(validatedRuleBuilder).build();
     }
 
-    public void validateAndFailFast(RuleBuilderDto ruleBuilderDto) throws IllegalArgumentException {
+    private void parseRule(RuleBuilderDto ruleBuilderDto, RuleBuilder validatedRuleBuilder) throws ParseException {
+        String source = ruleBuilderService.generateRuleSource(ruleBuilderDto.title(), validatedRuleBuilder, true);
+        pipelineRuleParser.parseRule(source, true);
+    }
+
+    public void validateAndFailFast(RuleBuilderDto ruleBuilderDto) throws IllegalArgumentException, ParseException {
         RuleBuilder ruleBuilder = ruleBuilderDto.ruleBuilder();
         validateAndFail(ruleBuilder.actions(), actionValidators);
         validateAndFail(ruleBuilder.conditions(), conditionValidators);
-
+        parseRule(ruleBuilderDto, ruleBuilder);
     }
 
     private void validateAndFail(List<RuleBuilderStep> steps, Set<Validator> validators) {
@@ -91,5 +110,4 @@ public class ValidatorService {
 
         return validatedSteps;
     }
-
 }
