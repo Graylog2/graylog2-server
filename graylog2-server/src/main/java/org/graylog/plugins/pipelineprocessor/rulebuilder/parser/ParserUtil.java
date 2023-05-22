@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class ParserUtil {
 
 
@@ -87,7 +89,7 @@ public class ParserUtil {
             writer.close();
             return writer.toString();
         } catch (TemplateNotFoundException e) {
-            throw new IllegalArgumentException("No template found for fragment %s".formatted(fragmentName));
+            throw new IllegalArgumentException(f("No template found for fragment %s", fragmentName));
         } catch (Exception e) {
             throw new IllegalArgumentException("Error converting fragment template to fragment.", e);
         }
