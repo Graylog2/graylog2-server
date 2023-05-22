@@ -16,6 +16,8 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
@@ -35,6 +37,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +49,15 @@ public class PreflightResource {
 
     private final NodeService nodeService;
     private final NodePreflightConfigService nodePreflightConfigService;
-
-    //TODO: hardcoded in memory for now
-    private static CA currentCA = null;
+    private final CaService caService;
 
     @Inject
-    public PreflightResource(final NodeService nodeService, final NodePreflightConfigService nodePreflightConfigService) {
+    public PreflightResource(final NodeService nodeService,
+                             final NodePreflightConfigService nodePreflightConfigService,
+                             final CaService caService) {
         this.nodeService = nodeService;
         this.nodePreflightConfigService = nodePreflightConfigService;
+        this.caService = caService;
     }
 
     @GET
@@ -66,30 +70,29 @@ public class PreflightResource {
     @GET
     @Path("/ca")
     public CA get() {
-        return currentCA; //TODO
+        return caService.get();
     }
 
     @POST
     @Path("/ca/create")
     @NoAuditEvent("No Audit Event needed")
-    public void createCA() {
-        currentCA = new CA("generated CA", CAType.GENERATED); //TODO
+    public void createCA(@QueryParam("password") String password) throws CACreationException {
+        caService.create(password);
     }
 
     @POST
     @Path("/ca/upload")
     @NoAuditEvent("No Audit Event needed")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void uploadCA() { //TODO: input
-        currentCA = new CA("uploaded CA", CAType.UPLOADED); //TODO
+    public void uploadCA(@QueryParam("password") String password, String caFile) throws CACreationException {
+        caService.upload(password, caFile);
     }
 
     @DELETE
     @Path("/startOver")
     @NoAuditEvent("No Audit Event needed")
     public void startOver() {
-        //TODO: reset all datanodes
-        currentCA = null;
+        caService.startOver();
         nodePreflightConfigService.deleteAll();
     }
 
@@ -107,6 +110,7 @@ public class PreflightResource {
     public void generate() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         activeDataNodes.values().forEach(node -> {
+            // TODO: only set nodes to "CONFIGURED" that really are configured correctly or not already connected
             nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(node.getNodeId()).state(NodePreflightConfig.State.CONFIGURED).build());
         });
     }

@@ -16,11 +16,14 @@
  */
 package org.graylog.security.certutil.ca;
 
+import com.amazonaws.util.StringInputStream;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 
+import java.io.InputStream;
+import java.io.StringReader;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -59,6 +62,17 @@ public class CACreator {
         } catch (Exception e) {
             throw new CACreationException("Failed to create a Certificate Authority", e);
         }
+    }
 
+    public KeyStore uploadCA(final char[] password, String ca) throws CACreationException {
+        try {
+            var caKeystore = KeyStore.getInstance("PKCS12");
+            var is = new StringInputStream(ca);
+            caKeystore.load(is, password);
+
+            return caKeystore;
+        } catch (Exception e) {
+            throw new CACreationException("Failed to create a Certificate Authority", e);
+        }
     }
 }
