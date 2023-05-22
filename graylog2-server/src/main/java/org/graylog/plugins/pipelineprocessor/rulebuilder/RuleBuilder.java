@@ -26,8 +26,9 @@ import java.util.List;
 @AutoValue
 public abstract class RuleBuilder {
 
-    public static final String FIELD_CONDITIONS = "conditions";
-    public static final String FIELD_ACTIONS = "actions";
+    protected static final String FIELD_CONDITIONS = "conditions";
+    protected static final String FIELD_ACTIONS = "actions";
+    protected static final String FIELD_ERRORS = "errors";
 
     @JsonProperty(FIELD_CONDITIONS)
     @Nullable
@@ -37,6 +38,10 @@ public abstract class RuleBuilder {
     @Nullable
     public abstract List<RuleBuilderStep> actions();
 
+    @JsonProperty(FIELD_ERRORS)
+    @Nullable
+    public abstract List<String> errors();
+
     public static Builder builder() {
         return new AutoValue_RuleBuilder.Builder();
     }
@@ -45,10 +50,12 @@ public abstract class RuleBuilder {
 
     @JsonCreator
     public static RuleBuilder create(@JsonProperty(FIELD_CONDITIONS) @Nullable List<RuleBuilderStep> conditions,
-                                     @JsonProperty(FIELD_ACTIONS) @Nullable List<RuleBuilderStep> actions) {
+                                     @JsonProperty(FIELD_ACTIONS) @Nullable List<RuleBuilderStep> actions,
+                                     @JsonProperty(FIELD_ERRORS) @Nullable List<String> errors) {
         return builder()
                 .conditions(conditions)
                 .actions(actions)
+                .errors(errors)
                 .build();
     }
 
@@ -59,6 +66,8 @@ public abstract class RuleBuilder {
         public abstract Builder conditions(List<RuleBuilderStep> conditions);
 
         public abstract Builder actions(List<RuleBuilderStep> actions);
+
+        public abstract Builder errors(List<String> errors);
     }
 
 }

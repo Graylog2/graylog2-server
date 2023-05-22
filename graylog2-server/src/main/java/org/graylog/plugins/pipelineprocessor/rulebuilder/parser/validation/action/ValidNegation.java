@@ -22,14 +22,14 @@ public class ValidNegation implements Validator {
 
         if (step.negate()) {
             if (ruleFragment.isFragment()) {
-                return new ValidationResult(step, true, "Negation of fragments not possible ");
+                return new ValidationResult(true, "Negation of fragments not possible ");
             } else {
                 FunctionDescriptor<?> function = ruleFragment.descriptor();
                 if (!function.returnType().equals(Boolean.class)) {
-                    return new ValidationResult(step, true, "None boolean function " + step.function() + " cannot be negated.");
+                    return new ValidationResult(true, "None boolean function " + step.function() + " cannot be negated.");
                 }
             }
         }
-        return new ValidationResult(step, false, "");
+        return new ValidationResult(false, "");
     }
 }

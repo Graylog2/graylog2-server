@@ -21,7 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
+
+import static org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder.FIELD_ERRORS;
 
 @AutoValue
 public abstract class RuleBuilderStep {
@@ -50,18 +53,24 @@ public abstract class RuleBuilderStep {
     @Nullable
     public abstract String title();
 
+    @JsonProperty(FIELD_ERRORS)
+    @Nullable
+    public abstract List<String> errors();
+
     @JsonCreator
     public static RuleBuilderStep create(@JsonProperty(FIELD_FUNCTION) String function,
                                          @JsonProperty(FIELD_PARAMETERS) @Nullable Map<String, Object> parameters,
                                          @JsonProperty(FIELD_OUTPUT) @Nullable String outputvariable,
                                          @JsonProperty(FIELD_NEGATE) @Nullable boolean negate,
-                                         @JsonProperty(FIELD_TITLE) @Nullable String title) {
+                                         @JsonProperty(FIELD_TITLE) @Nullable String title,
+                                         @JsonProperty(FIELD_ERRORS) @Nullable List<String> errors) {
         return builder()
                 .function(function)
                 .parameters(parameters)
                 .outputvariable(outputvariable)
                 .negate(negate)
                 .title(title)
+                .errors(errors)
                 .build();
     }
 
@@ -88,6 +97,8 @@ public abstract class RuleBuilderStep {
         }
 
         public abstract Builder title(String title);
+
+        public abstract Builder errors(List<String> errors);
 
         public abstract RuleBuilderStep build();
 

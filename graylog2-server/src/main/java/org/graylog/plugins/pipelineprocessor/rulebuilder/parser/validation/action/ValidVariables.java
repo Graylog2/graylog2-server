@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class ValidVariables implements Validator {
 
     private final Map<String, RuleFragment> actions;
@@ -55,7 +57,7 @@ public class ValidVariables implements Validator {
             Class<?> variableType = getVariableType(value);
 
             if (!parameterDescriptor.optional() && value == null) {
-                return new ValidationResult(step, true, "Function %s missing parameter %s ".formatted(functionDescriptor.name(), parameterName));
+                return new ValidationResult(true, f("Function %s missing parameter %s ", parameterName));
             }
 
             //$ means it is stored in another variable and we need to fetch and verify that type
@@ -63,16 +65,16 @@ public class ValidVariables implements Validator {
                 String substring = s.substring(1);
                 Class<?> passedVariableType = variables.get(substring);
                 if (Objects.isNull(passedVariableType)) {
-                    return new ValidationResult(step, true, "Function %s missing passed variable %s ".formatted(functionDescriptor.name(), value));
+                    return new ValidationResult(true, f("Function %s missing passed variable %s ", functionDescriptor.name(), value));
                 }
                 variableType = passedVariableType;
             }
 
             //Check if variable type matches function expectation
-            Class paramType = parameterDescriptor.type();
+            Class<?> paramType = parameterDescriptor.type();
             if (value != null && paramType != Object.class && variableType != paramType) {
                 String errorMsg = "Function %s found wrong parameter type %s for parameter %s. Required type %s";
-                return new ValidationResult(step, true, errorMsg.formatted(functionDescriptor.name(), variableType, parameterName, paramType));
+                return new ValidationResult(true, f(errorMsg, functionDescriptor.name(), variableType, parameterName, paramType));
             }
         }
 
@@ -81,12 +83,12 @@ public class ValidVariables implements Validator {
         if (StringUtils.isNotBlank(outputvariable)) {
 
             if (functionDescriptor.returnType() == Void.class) {
-                return new ValidationResult(step, true, "Function %s is of return typ void. No out put variable allowed ".formatted(functionDescriptor.name()));
+                return new ValidationResult(true, f("Function %s is of return typ void. No out put variable allowed ", functionDescriptor.name()));
             }
 
             storeVariable(ruleFragment, outputvariable, functionDescriptor.returnType());
         }
-        return new ValidationResult(step, false,"");
+        return new ValidationResult(false, "");
     }
 
     private void storeVariable(RuleFragment ruleFragment, String name, Class<?> type) {

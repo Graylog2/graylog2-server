@@ -37,9 +37,9 @@ public class ValidCondition implements Validator {
     @Override
     public ValidationResult validate(RuleBuilderStep step) {
         if (!conditions.containsKey(step.function())) {
-            return new ValidationResult(step, true, "Function " + step.function() + " not available as condition for rule builder.");
+            return new ValidationResult(true, "Function " + step.function() + " not available as condition for rule builder.");
         }
 
-        return new ValidationResult(step, false, "");
+        return new ValidationResult(false, "");
     }
 }

@@ -16,7 +16,5 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation;
 
-import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
-
-public record ValidationResult(RuleBuilderStep step, boolean failed, String failureReason) {
+public record ValidationResult(boolean failed, String failureReason) {
 }

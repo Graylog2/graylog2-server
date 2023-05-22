@@ -29,7 +29,6 @@ import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidationResult;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -47,9 +46,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -83,11 +80,10 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleBuilderDto createFromBuilder(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
-        List<ValidationResult> validationResults = validatorService.validate(ruleBuilderDto.ruleBuilder())
-                .stream().filter(ValidationResult::failed).toList();
-
-        if (!validationResults.isEmpty()) {
-            throw new BadRequestException("RuleBuilder failed validation");
+        try {
+            validatorService.validateAndFailFast(ruleBuilderDto);
+        } catch (IllegalArgumentException exception) {
+            throw new BadRequestException(exception.getMessage());
         }
 
         RuleSource ruleSource = toRuleSource(ruleBuilderDto);
@@ -137,10 +133,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @Path("/validate")
     @POST
     public RuleBuilderDto validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
-        List<ValidationResult> validationResults = validatorService.validate(ruleBuilderDto.ruleBuilder());
-        List<String> errors = new ArrayList<>();
-        validationResults.stream().filter(ValidationResult::failed).forEach(result -> errors.add(result.failureReason()));
-        return ruleBuilderDto.toBuilder().errors(errors).build();
+        return validatorService.validate(ruleBuilderDto);
     }
 
     private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto) {

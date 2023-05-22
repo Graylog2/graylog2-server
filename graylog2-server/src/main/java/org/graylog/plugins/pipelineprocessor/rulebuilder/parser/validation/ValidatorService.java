@@ -19,9 +19,12 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class ValidatorService {
@@ -30,24 +33,63 @@ public class ValidatorService {
     private final Set<Validator> actionValidators;
 
     @Inject
-    public ValidatorService(@Named("conditionValidators") final Set<Validator> conditionValidators, @Named("actionValidators")  Set<Validator> actionValidators) {
+    public ValidatorService(@Named("conditionValidators") final Set<Validator> conditionValidators, @Named("actionValidators") Set<Validator> actionValidators) {
         this.conditionValidators = conditionValidators;
         this.actionValidators = actionValidators;
     }
 
-    public List<ValidationResult> validate(RuleBuilder ruleBuilder) {
-        List<ValidationResult> validationResults = new ArrayList<>();
-        ruleBuilder.actions().forEach(ruleBuilderStep -> {
-            for (Validator actionValidator : actionValidators) {
-                validationResults.add(actionValidator.validate(ruleBuilderStep));
-            }
-        });
+    public RuleBuilderDto validate(RuleBuilderDto ruleBuilderDto) {
+        RuleBuilder ruleBuilder = ruleBuilderDto.ruleBuilder();
+        RuleBuilder.Builder validationBuilder = ruleBuilder.toBuilder();
 
-        ruleBuilder.conditions().forEach(ruleBuilderStep -> {
-            for (Validator conditionValidator : conditionValidators) {
-                validationResults.add(conditionValidator.validate(ruleBuilderStep));
-            }
-        });
-        return validationResults;
+        List<RuleBuilderStep> validatedActions = validateWithResults(ruleBuilder.actions(), actionValidators);
+        validationBuilder.actions(validatedActions);
+
+        List<RuleBuilderStep> validatedConditions = validateWithResults(ruleBuilder.conditions(), conditionValidators);
+        validationBuilder.conditions(validatedConditions);
+
+        return ruleBuilderDto.toBuilder().ruleBuilder(validationBuilder.build()).build();
     }
+
+    public void validateAndFailFast(RuleBuilderDto ruleBuilderDto) throws IllegalArgumentException {
+        RuleBuilder ruleBuilder = ruleBuilderDto.ruleBuilder();
+        validateAndFail(ruleBuilder.actions(), actionValidators);
+        validateAndFail(ruleBuilder.conditions(), conditionValidators);
+
+    }
+
+    private void validateAndFail(List<RuleBuilderStep> steps, Set<Validator> validators) {
+        if (Objects.nonNull(steps)) {
+            steps.forEach(ruleBuilderStep -> {
+                for (Validator actionValidator : validators) {
+                    ValidationResult result = actionValidator.validate(ruleBuilderStep);
+                    if (result.failed()) {
+                        throw new IllegalArgumentException("Validation failed: " + result.failureReason());
+                    }
+                }
+            });
+        }
+    }
+
+    private List<RuleBuilderStep> validateWithResults(List<RuleBuilderStep> actionSteps, Set<Validator> validators) {
+        List<RuleBuilderStep> validatedSteps = new ArrayList<>();
+        if (Objects.nonNull(actionSteps)) {
+            actionSteps.forEach(ruleBuilderStep -> {
+                List<String> errors = new ArrayList<>();
+                for (Validator actionValidator : validators) {
+                    ValidationResult result = actionValidator.validate(ruleBuilderStep);
+
+                    if (result.failed()) {
+                        errors.add(result.failureReason());
+                    }
+
+                }
+                ruleBuilderStep = ruleBuilderStep.toBuilder().errors(errors).build();
+                validatedSteps.add(ruleBuilderStep);
+            });
+        }
+
+        return validatedSteps;
+    }
+
 }
