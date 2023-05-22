@@ -113,17 +113,4 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
                 .map(value -> decorate(decorators, field, value, searchUser))
                 .orElse("-");
     }
-
-    private Object decorate(Set<FieldDecorator> decorators, RequestedField field, Object val, SearchUser searchUser) {
-        final Optional<Object> decorated = decorators.stream()
-                .filter(d -> d.accept(field))
-                .findFirst()
-                .map(d -> d.decorate(field, val, searchUser));
-
-        if (decorated.isEmpty() && field.hasDecorator()) {
-            throw new IllegalArgumentException(StringUtils.f("Unsupported decorator '%s' on field '%s'", field.decorator(), field.name()));
-        } else {
-            return decorated.orElse(val);
-        }
-    }
 }

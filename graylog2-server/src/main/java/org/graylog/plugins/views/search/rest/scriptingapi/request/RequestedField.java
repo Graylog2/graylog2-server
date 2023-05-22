@@ -38,10 +38,9 @@ public record RequestedField(String name, @Nullable String decorator) {
         }
     }
 
-    @JsonCreator
     @Override
     public String toString() {
-        if(decorator == null) {
+        if (decorator == null) {
             return name;
         } else {
             return name + "." + decorator;
