@@ -111,11 +111,7 @@ const findGaps = (_items: Position[], minWidth: number = 1, maxWidth: number = 1
 
   for (let x = minWidth; x < maxWidth - 1; x++) {
     for (let y = minY; y <= maxY; y++) {
-      if (rowIsEmpty(grid, y)) {
-        continue;
-      }
-
-      if (grid[y]?.[x] === undefined) {
+      if (!rowIsEmpty(grid, y) && grid[y]?.[x] === undefined) {
         const gap = { col: x, row: y, height: 1, width: 1 };
 
         while (gap.col + gap.width < maxWidth && grid[y]?.[gap.col + gap.width] === undefined) {
