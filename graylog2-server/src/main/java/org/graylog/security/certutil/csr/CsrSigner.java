@@ -31,6 +31,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
+import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
+
 public class CsrSigner {
     public static X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
         // TODO: cert serial number?
@@ -48,7 +50,7 @@ public class CsrSigner {
                 Date.from(validFrom), Date.from(validUntil),
                 csr.getSubject(), csr.getSubjectPublicKeyInfo());
 
-        ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(issuerKey);
+        ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(issuerKey);
         X509CertificateHolder certHolder = builder.build(signer);
         X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
         return cert;

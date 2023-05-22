@@ -65,7 +65,7 @@ public class RunningGraylogBackend implements GraylogBackend {
 
     @Override
     public void importMongoDBFixture(String resourcePath, Class<?> testClass) {
-        throw new NotImplementedException("Feature needs implementation...");
+        throw new UnsupportedOperationException("Feature needs implementation...");
     }
 
     @Override
@@ -75,7 +75,7 @@ public class RunningGraylogBackend implements GraylogBackend {
 
     @Override
     public Network network() {
-        throw new NotImplementedException("Feature not implemented on Running backends (no container)");
+        throw new UnsupportedOperationException("Feature not implemented on Running backends (no container)");
     }
 
     @Override

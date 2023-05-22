@@ -17,7 +17,8 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
+import type { Stream } from 'views/stores/StreamsStore';
 
-const StreamsContext = React.createContext<Array<any> | undefined>(undefined);
+const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
 
 export default singleton('contexts.StreamsContext', () => StreamsContext);

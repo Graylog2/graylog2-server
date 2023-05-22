@@ -25,11 +25,14 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import { keySeparator, humanSeparator } from 'views/Constants';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
 
-import type { ChartDefinition } from '../ChartData';
+import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
 
-const getChartColor = (fullData, name) => {
+const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
   const data = fullData.find((d) => (d.name === name));
 
   if (data && data.line && data.line.color) {
@@ -41,8 +44,6 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
-
 const AreaVisualization = makeVisualization(({
   config,
   data,
@@ -51,14 +52,22 @@ const AreaVisualization = makeVisualization(({
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
-  const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
+  const mapKeys = useMapKeys();
+  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
+  const _mapKeys = useCallback((labels: string[]) => labels
+    .map((label) => label.split(keySeparator)
+      .map((l, i) => mapKeys(l, rowPivotFields[i]))
+      .join(humanSeparator),
+    ), [mapKeys, rowPivotFields]);
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
     type,
     name,
-    x: labels,
+    x: _mapKeys(labels),
     y: values,
     fill: 'tozeroy',
     line: { shape: toPlotly(interpolation) },
-  }), [interpolation]);
+    originalName,
+  }), [_mapKeys, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -80,7 +89,6 @@ const AreaVisualization = makeVisualization(({
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             height={height}
-            setChartColor={setChartColor}
             chartData={chartDataResult} />
   );
 }, 'area');

@@ -34,9 +34,12 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
 
+import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
+import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
+
 public class CertificateGenerator {
     public static KeyPair generate(CertRequest request) throws Exception {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         X500Name name = new X500Name("CN=" + request.cnName());
 
@@ -76,7 +79,7 @@ public class CertificateGenerator {
                     new GeneralNames(generalNames));
         }
 
-        ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(issuerKey);
+        ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(issuerKey);
         X509CertificateHolder certHolder = builder.build(signer);
         X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
         return new KeyPair(certKeyPair.getPrivate(), certKeyPair.getPublic(), cert);

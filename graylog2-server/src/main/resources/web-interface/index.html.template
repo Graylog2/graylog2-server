@@ -7,14 +7,14 @@
     <title>${title}</title>
     <link rel="shortcut icon" href="${appPrefix}assets/favicon.png">
     ${foreach cssFiles cssFile}
-    <link href="${appPrefix}assets/${cssfile}" rel="stylesheet">
+    <link nonce="${nonce}" href="${appPrefix}assets/${cssfile}" rel="stylesheet">
     ${end}
   </head>
   <body>
     <div id="app-root" />
-    <script src="${appPrefix}config.js"></script>
+    <script nonce="${nonce}" src="${appPrefix}config.js"></script>
     ${foreach jsFiles jsFile}
-    <script src="${appPrefix}assets/${jsFile}"></script>
+    <script nonce="${nonce}" src="${appPrefix}assets/${jsFile}"></script>
     ${end}
   </body>
 </html>

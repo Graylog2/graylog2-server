@@ -111,7 +111,6 @@
     "twix": "^1.1.4",
     "typeahead.js": "^0.11.1",
     "urijs": "^1.19.6",
-    "use-query-params": "^2.2.0",
     "uuid": "9.0.0",
     "whatwg-fetch": "^3.6.2"
   },

@@ -19,9 +19,13 @@ package org.graylog.security.certutil.cert.storage;
 import org.bouncycastle.operator.OperatorCreationException;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 
 public interface CertStorage {
-    void writeCert(X509Certificate cert)
+    void writeCert(X509Certificate cert, String nodeId)
             throws IOException, OperatorCreationException;
+
+    Optional<X509Certificate> readCert(String nodeId) throws IOException, GeneralSecurityException;
 }
