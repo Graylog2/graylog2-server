@@ -16,13 +16,16 @@
  */
 import React from 'react';
 import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
+import Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
+import { adminUser } from 'fixtures/users';
 
 import SavedSearchList from './SavedSearchList';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 const createPaginatedSearches = (count = 1) => {
   const views: Array<View> = [];
@@ -108,9 +111,13 @@ describe('SavedSearchList', () => {
       asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
       const onDelete = jest.fn(() => Promise.resolve(views[0]));
 
-      render(<SavedSearchList toggleModal={() => {}}
-                              deleteSavedSearch={onDelete}
-                              activeSavedSearchId="search-id-0" />);
+      render(
+        <CurrentUserContext.Provider value={adminUser}>
+          <SavedSearchList toggleModal={() => {}}
+                           deleteSavedSearch={onDelete}
+                           activeSavedSearchId="search-id-0" />
+        </CurrentUserContext.Provider>
+      );
 
       await screen.findByText('search-title-0');
       const deleteBtn = screen.getByTitle('Delete search search-title-0');
@@ -141,5 +148,22 @@ describe('SavedSearchList', () => {
 
       expect(onLoad).toBeCalledTimes(1);
     });
+  });
+
+  it('should not display delete action for saved search when user is missing required permissions', async () => {
+    const views = createPaginatedSearches(1);
+    asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
+    const currentUser = adminUser.toBuilder().permissions(Immutable.List(['view:read:search-id-0}'])).build();
+
+    render(
+      <CurrentUserContext.Provider value={currentUser}>
+        <SavedSearchList toggleModal={() => {}}
+                         deleteSavedSearch={jest.fn()}
+                         activeSavedSearchId="search-id-0" />
+      </CurrentUserContext.Provider>);
+
+    await screen.findByText('search-title-0');
+
+    expect(screen.queryByTitle('Delete search search-title-0')).not.toBeInTheDocument();
   });
 });

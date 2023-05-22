@@ -1,0 +1,4 @@
+type = "f"
+message = "Only display delete icon for saved searches when user has required permissions."
+
+pulls = ["15190"]

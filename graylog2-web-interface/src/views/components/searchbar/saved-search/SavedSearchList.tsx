@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import type { PaginatedViews } from 'views/stores/ViewManagementStore';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
-import { Icon, PaginatedList, SearchForm, Spinner } from 'components/common';
+import { Icon, PaginatedList, SearchForm, Spinner, IfPermitted } from 'components/common';
 import type View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -149,12 +149,14 @@ const SavedSearchList = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }
                                      header={savedSearch.title}
                                      active={savedSearch.id === activeSavedSearchId}>
                         {savedSearch.summary}
-                        <DeleteButton onClick={(e) => onDelete(e, savedSearches, deleteSavedSearch, savedSearch.id)}
-                                      role="button"
-                                      title={`Delete search ${savedSearch.title}`}
-                                      tabIndex={0}>
-                          <Icon name="trash-alt" />
-                        </DeleteButton>
+                        <IfPermitted permissions={[`view:edit:${savedSearch.id}`, 'view:edit']} anyPermissions>
+                          <DeleteButton onClick={(e) => onDelete(e, savedSearches, deleteSavedSearch, savedSearch.id)}
+                                        role="button"
+                                        title={`Delete search ${savedSearch.title}`}
+                                        tabIndex={0}>
+                            <Icon name="trash-alt" />
+                          </DeleteButton>
+                        </IfPermitted>
                       </ListGroupItem>
                     )}
                   </ViewLoaderContext.Consumer>
