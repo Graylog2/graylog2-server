@@ -28,12 +28,12 @@ import java.time.ZonedDateTime;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class V20220512123200_AddSystemRuleFragments extends Migration {
+public class V20220512123200_AddSimpleConditionFragments extends Migration {
 
     private final RuleFragmentService ruleFragmentService;
 
     @Inject
-    public V20220512123200_AddSystemRuleFragments(RuleFragmentService ruleFragmentService) {
+    public V20220512123200_AddSimpleConditionFragments(RuleFragmentService ruleFragmentService) {
         this.ruleFragmentService = ruleFragmentService;
     }
 
@@ -51,8 +51,8 @@ public class V20220512123200_AddSystemRuleFragments extends Migration {
                         .descriptor(FunctionDescriptor.builder()
                                 .name("has_field_equals")
                                 .params(ImmutableList.of(
-                                        string("field").build(),
-                                        string("fieldValue").build()
+                                        string("field").description("Message field to check against").build(),
+                                        string("fieldValue").description("Field value to check for").build()
                                 ))
                                 .returnType(Boolean.class)
                                 .description("Checks if the message has a field and if this field's string value is equal to the given fieldValue")
@@ -69,8 +69,8 @@ public class V20220512123200_AddSystemRuleFragments extends Migration {
                         .descriptor(FunctionDescriptor.builder()
                                 .name("has_field_greater_or_equal")
                                 .params(ImmutableList.of(
-                                        string("field").build(),
-                                        integer("fieldValue").build()
+                                        string("field").description("Message field to check against").build(),
+                                        integer("fieldValue").description("Field value to check for").build()
                                 ))
                                 .returnType(Boolean.class)
                                 .description("Checks if the message has a field and if this field's numeric value is greater than or equal to the given fieldValue")
@@ -87,8 +87,8 @@ public class V20220512123200_AddSystemRuleFragments extends Migration {
                         .descriptor(FunctionDescriptor.builder()
                                 .name("has_field_less_or_equal")
                                 .params(ImmutableList.of(
-                                        string("field").build(),
-                                        integer("fieldValue").build()
+                                        string("field").description("Message field to check against").build(),
+                                        integer("fieldValue").description("Field value to check for").build()
                                 ))
                                 .returnType(Boolean.class)
                                 .description("Checks if the message has a field and if this field's numeric value is less than or equal to the given fieldValue")

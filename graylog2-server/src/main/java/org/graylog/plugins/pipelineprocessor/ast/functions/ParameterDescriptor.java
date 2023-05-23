@@ -139,7 +139,7 @@ public abstract class ParameterDescriptor<T, R> {
         }
 
         public Builder<T, R> primary() {
-            return primary(false);
+            return primary(true);
         }
 
         public abstract Builder<T, R> description(String description);
