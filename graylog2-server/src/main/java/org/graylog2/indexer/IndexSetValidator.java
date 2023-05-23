@@ -37,8 +37,7 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_RETENTION_MAX_LEEWAY;
-import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_ROTATION_PERIOD;
+import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY;
 import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_MAX;
 import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_MIN;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -121,14 +120,10 @@ public class IndexSetValidator {
                 return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_MAX, config.indexLifetimeMax(),
                         INDEX_LIFETIME_MIN, config.indexLifetimeMin()));
             }
-            if (leeway.toStandardSeconds().isLessThan(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod().toStandardSeconds())) {
-                return Violation.create(f("The duration between %s and %s <%s> cannot be shorter than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
-                        leeway, TIME_SIZE_OPTIMIZING_ROTATION_PERIOD, elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()));
-            }
 
-            if (leeway.toStandardSeconds().isGreaterThan(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLeeway().toStandardSeconds())) {
-                return Violation.create(f("The duration between %s and %s is: <%s> and cannot be longer than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
-                        leeway, TIME_SIZE_OPTIMIZING_RETENTION_MAX_LEEWAY, elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLeeway()));
+            if (leeway.toStandardSeconds().isLessThan(elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway().toStandardSeconds())) {
+                return Violation.create(f("The duration between %s and %s <%s> cannot be shorter than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
+                        leeway, TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY, elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway()));
             }
 
             final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();

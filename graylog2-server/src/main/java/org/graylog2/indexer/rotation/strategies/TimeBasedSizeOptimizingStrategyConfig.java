@@ -33,20 +33,14 @@ import org.joda.time.Period;
 public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationStrategyConfig {
     public static final String INDEX_LIFETIME_MIN = "index_lifetime_min";
     public static final String INDEX_LIFETIME_MAX = "index_lifetime_max";
-    public static final String INDEX_LIFETIME_MAX_LEEWAY = "index_lifetime_max_leeway";
 
     public static final Period DEFAULT_LIFETIME_MIN = Period.days(30);
     public static final Period DEFAULT_LIFETIME_MAX = Period.days(40);
-    public static final Period DEFAULT_LIFETIME_MAX_LEEWAY = Period.days(10);
-
     @JsonProperty(INDEX_LIFETIME_MIN)
     public abstract Period indexLifetimeMin();
 
     @JsonProperty(INDEX_LIFETIME_MAX)
     public abstract Period indexLifetimeMax();
-
-    @JsonProperty(INDEX_LIFETIME_MAX_LEEWAY)
-    public abstract Period indexLifetimeMaxLeeway();
 
     public static Builder builder() {
         return Builder.create();
@@ -59,8 +53,7 @@ public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationS
             return new AutoValue_TimeBasedSizeOptimizingStrategyConfig.Builder()
                     .type(TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName())
                     .indexLifetimeMin(DEFAULT_LIFETIME_MIN)
-                    .indexLifetimeMax(DEFAULT_LIFETIME_MAX)
-                    .indexLifetimeMaxLeeway(DEFAULT_LIFETIME_MAX_LEEWAY);
+                    .indexLifetimeMax(DEFAULT_LIFETIME_MAX);
         }
 
         @JsonProperty(TYPE_FIELD)
@@ -71,9 +64,6 @@ public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationS
 
         @JsonProperty(INDEX_LIFETIME_MAX)
         public abstract Builder indexLifetimeMax(Period hardLimit);
-
-        @JsonProperty(INDEX_LIFETIME_MAX_LEEWAY)
-        public abstract Builder indexLifetimeMaxLeeway(Period leeway);
 
         public abstract TimeBasedSizeOptimizingStrategyConfig build();
     }
