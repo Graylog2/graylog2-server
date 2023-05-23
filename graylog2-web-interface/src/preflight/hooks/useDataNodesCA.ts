@@ -17,37 +17,35 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import type { DataNodes } from 'preflight/types';
+import type { DataNodesCA } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
-const DEFAULT_DATA = [];
-export const DATA_NODES_OVERVIEW_QUERY_KEY = ['data-nodes', 'overview'];
-const fetchDataNodes = () => (
-  fetch('GET', qualifyUrl('/api/data_nodes'), undefined, false)
+export const QUERY_KEY = ['data-nodes', 'ca-status'];
+const fetchDataNodesCA = (): Promise<DataNodesCA> => (
+  fetch('GET', qualifyUrl('/api/ca'), undefined, false)
 );
 
-const useDataNodes = (): {
-  data: DataNodes,
+const useDataNodesCA = (): {
+  data: DataNodesCA,
   isFetching: boolean,
-  isInitialLoading: boolean,
-  error: FetchError
+  error: FetchError,
+  isInitialLoading: boolean
 } => {
   const {
     data,
     isFetching,
     error,
     isInitialLoading,
-  } = useQuery<DataNodes, FetchError>(
-    DATA_NODES_OVERVIEW_QUERY_KEY,
-    fetchDataNodes,
-    {
-      refetchInterval: 3000,
-      keepPreviousData: true,
-    });
+  } = useQuery<DataNodesCA, FetchError>({
+    queryKey: QUERY_KEY,
+    queryFn: fetchDataNodesCA,
+    initialData: undefined,
+    retry: 3000,
+  });
 
-  return { data: data ?? DEFAULT_DATA, isFetching, isInitialLoading, error };
+  return { data, isFetching, error, isInitialLoading };
 };
 
-export default useDataNodes;
+export default useDataNodesCA;

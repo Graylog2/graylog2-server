@@ -14,30 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { notifications } from '@mantine/notifications';
+import * as React from 'react';
+import type { DropzoneProps } from '@mantine/dropzone';
+import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 
-const UserNotification = {
-  error(message: string, title = 'Error') {
-    notifications.show({
-      message,
-      title,
-      autoClose: 10000,
-      color: 'red',
-    });
-  },
-  warning(message: string, title = 'Attention') {
-    notifications.show({
-      message,
-      title,
-    });
-  },
-  success(message: string, title = 'Success') {
-    notifications.show({
-      message,
-      title,
-      color: 'green',
-    });
-  },
-};
+type Props = DropzoneProps
 
-export default UserNotification;
+const Dropzone = ({ children, ...props }: Props) => (
+  <MantineDropzone {...props}>
+    {children}
+  </MantineDropzone>
+);
+
+Dropzone.Accept = MantineDropzone.Accept;
+Dropzone.Reject = MantineDropzone.Reject;
+Dropzone.Reject = MantineDropzone.Reject;
+Dropzone.Idle = MantineDropzone.Idle;
+export default Dropzone;

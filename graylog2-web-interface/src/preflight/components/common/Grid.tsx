@@ -14,30 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { notifications } from '@mantine/notifications';
+import * as React from 'react';
+import type { GridProps } from '@mantine/core';
+import { Grid as MantineGrid } from '@mantine/core';
 
-const UserNotification = {
-  error(message: string, title = 'Error') {
-    notifications.show({
-      message,
-      title,
-      autoClose: 10000,
-      color: 'red',
-    });
-  },
-  warning(message: string, title = 'Attention') {
-    notifications.show({
-      message,
-      title,
-    });
-  },
-  success(message: string, title = 'Success') {
-    notifications.show({
-      message,
-      title,
-      color: 'green',
-    });
-  },
-};
+type Props = GridProps
 
-export default UserNotification;
+const Grid = ({ children, ...props }: Props) => (
+  <MantineGrid {...props}>
+    {children}
+  </MantineGrid>
+);
+
+Grid.Col = MantineGrid.Col;
+export default Grid;

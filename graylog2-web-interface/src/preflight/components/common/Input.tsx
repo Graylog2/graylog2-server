@@ -14,30 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { notifications } from '@mantine/notifications';
+import * as React from 'react';
+import { TextInput as MantineTextInput } from '@mantine/core';
 
-const UserNotification = {
-  error(message: string, title = 'Error') {
-    notifications.show({
-      message,
-      title,
-      autoClose: 10000,
-      color: 'red',
-    });
-  },
-  warning(message: string, title = 'Attention') {
-    notifications.show({
-      message,
-      title,
-    });
-  },
-  success(message: string, title = 'Success') {
-    notifications.show({
-      message,
-      title,
-      color: 'green',
-    });
-  },
-};
+const Input = (props: React.ComponentProps<typeof MantineTextInput>) => (
+  <MantineTextInput {...props} />
+);
 
-export default UserNotification;
+export default Input;

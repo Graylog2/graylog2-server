@@ -14,30 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { notifications } from '@mantine/notifications';
+import * as React from 'react';
+import type { SpaceProps } from '@mantine/core';
+import { Space as MantineSpace } from '@mantine/core';
 
-const UserNotification = {
-  error(message: string, title = 'Error') {
-    notifications.show({
-      message,
-      title,
-      autoClose: 10000,
-      color: 'red',
-    });
-  },
-  warning(message: string, title = 'Attention') {
-    notifications.show({
-      message,
-      title,
-    });
-  },
-  success(message: string, title = 'Success') {
-    notifications.show({
-      message,
-      title,
-      color: 'green',
-    });
-  },
-};
+type Props = SpaceProps
 
-export default UserNotification;
+const Space = (props: Props) => (
+  <MantineSpace {...props} />
+);
+export default Space;
