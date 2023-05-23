@@ -32,6 +32,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import generateId from 'logic/generateId';
 
 type Props = {
   addTimerange: (title: string) => void,
@@ -116,7 +117,7 @@ const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timeran
         ...config,
         quick_access_timerange_presets: [
           ...config.quick_access_timerange_presets,
-          { description, timerange: onSubmittingTimerange(timerange, userTimezone) }],
+          { description, timerange: onSubmittingTimerange(timerange, userTimezone), id: generateId() }],
       }).then(() => {
       refresh();
       toggleModal();

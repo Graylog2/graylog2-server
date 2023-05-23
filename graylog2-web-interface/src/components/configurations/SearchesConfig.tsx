@@ -44,8 +44,6 @@ import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
 const queryTimeRangeLimitValidator = (milliseconds: number) => milliseconds >= 1;
 
-const relativeTimeRangeValidator = (milliseconds: number, duration: string) => milliseconds >= 1 || duration === 'PT0S';
-
 const surroundingTimeRangeValidator = (milliseconds: number) => milliseconds >= 1;
 
 function autoRefreshTimeRangeValidator(milliseconds: number) {
@@ -58,7 +56,7 @@ const buildTimeRangeOptions = (options: { [x: string]: string; }) => Object.keys
 
 type Option = { period: string, description: string };
 
-const mapBEData = (items: Array<QuickAccessTimeRange>, formatTime: (time: DateTime, format?: DateTimeFormats) => string): Immutable.List<QuickAccessTimeRange> => Immutable.List(items.map(({ timerange, description, id }) => {
+const mapQuickAccessBEData = (items: Array<QuickAccessTimeRange>, formatTime: (time: DateTime, format?: DateTimeFormats) => string): Immutable.List<QuickAccessTimeRange> => Immutable.List(items.map(({ timerange, description, id }) => {
   const presetId = id ?? generateId();
 
   return { description, id: presetId, timerange: onInitializingTimerange(timerange, formatTime) };
@@ -90,10 +88,6 @@ const SearchesConfig = () => {
 
   const onUpdate = (field: keyof SearchConfig) => (newOptions) => {
     setFormConfig({ ...formConfig, [field]: newOptions });
-  };
-
-  const onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {
-    setRelativeTimeRangeOptionsUpdate(data);
   };
 
   const onQuickAccessTimeRangePresetsUpdate = (data: Immutable.List<QuickAccessTimeRange>) => {
@@ -174,8 +168,8 @@ const SearchesConfig = () => {
     }
 
     if (quickAccessTimeRangePresetsUpdated) {
-      update.quick_access_timerange_presets = quickAccessTimeRangePresetsUpdated.toArray().map(({ description, timerange }) => ({
-        description, timerange: onSubmittingTimerange(timerange, userTimezone),
+      update.quick_access_timerange_presets = quickAccessTimeRangePresetsUpdated.toArray().map(({ description, timerange, id }) => ({
+        description, timerange: onSubmittingTimerange(timerange, userTimezone), id,
       }));
 
       setQuickAccessTimeRangePresetsUpdated(undefined);
@@ -223,7 +217,7 @@ const SearchesConfig = () => {
     });
   };
 
-  const quickAccessTimeRangePresetsFromBE = useMemo(() => mapBEData(formConfig?.quick_access_timerange_presets ?? [], formatTime), [formConfig?.quick_access_timerange_presets, formatTime]);
+  const quickAccessTimeRangePresetsFromBE = useMemo(() => mapQuickAccessBEData(formConfig?.quick_access_timerange_presets ?? [], formatTime), [formConfig?.quick_access_timerange_presets, formatTime]);
   const quickAccessTimeRangePresets = useMemo(() => quickAccessTimeRangePresetsUpdated ?? quickAccessTimeRangePresetsFromBE, [quickAccessTimeRangePresetsFromBE, quickAccessTimeRangePresetsUpdated]);
 
   if (!viewConfig) {
@@ -253,8 +247,6 @@ const SearchesConfig = () => {
 
       <Row>
         <Col md={4}>
-          <strong>Relative time range options</strong>
-          <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
           <strong>Quick access time range options</strong>
           <QuickAccessTimeRangeOptionsSummary options={quickAccessTimeRangePresetsFromBE.toArray()} />
           <strong>Surrounding time range options</strong>
@@ -320,13 +312,6 @@ const SearchesConfig = () => {
                                 validator={queryTimeRangeLimitValidator}
                                 required />
             )}
-            <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.relative_timerange_options)}
-                                  update={onRelativeTimeRangeOptionsUpdate}
-                                  validator={relativeTimeRangeValidator}
-                                  title="Relative Timerange Options"
-                                  help={
-                                    <span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>
-              } />
             <QuickAccessTimeRangeForm options={quickAccessTimeRangePresets} onUpdate={onQuickAccessTimeRangePresetsUpdate} />
             <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
                                   update={onSurroundingTimeRangeOptionsUpdate}

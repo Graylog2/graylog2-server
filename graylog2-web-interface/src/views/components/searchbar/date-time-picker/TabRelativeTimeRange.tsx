@@ -23,10 +23,9 @@ import { useContext, useMemo } from 'react';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
-import TimerangeSelector from 'views/components/searchbar/TimerangeSelector';
-import RangePresetDropdown from 'views/components/searchbar/RangePresetDropdown';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import TabPresetDropdown from 'views/components/searchbar/date-time-picker/TabPresetDropdown';
 
 import {
   classifyToRange,
@@ -48,11 +47,7 @@ const RelativeWrapper = styled.div`
   flex-wrap: wrap;
   justify-content: space-around;
 `;
-const ConfiguredWrapper = styled.div`
-  display: flex;
-  margin: 3px 0;
-  justify-content: end;
-`;
+
 const StyledIcon = styled(Icon)`
   flex: 0.75;
 `;
@@ -61,9 +56,8 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangeDropDownFormValues>();
   const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
   const { config } = useSearchConfiguration();
-  const availableOptions = config?.quick_access_timerange_presets;
   const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
-  const relativeOptions = useMemo(() => availableOptions?.filter((option) => option?.timerange?.type === 'relative'), [availableOptions]);
+  const relativeOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'relative'), [config?.quick_access_timerange_presets]);
 
   const onSetPreset = (range) => {
     setFieldValue('nextTimeRange', classifyRelativeTimeRange(range));
@@ -93,15 +87,7 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
         </>
       </RelativeWrapper>
       {showRelativePresetsButton
-        && (
-          <ConfiguredWrapper>
-            <TimerangeSelector className="relative">
-              <RangePresetDropdown disabled={disabled}
-                                   onChange={onSetPreset}
-                                   availableOptions={relativeOptions} />
-            </TimerangeSelector>
-          </ConfiguredWrapper>
-        )}
+        && (<TabPresetDropdown disabled={disabled} onSetPreset={onSetPreset} availableOptions={relativeOptions} />)}
     </div>
   );
 };
