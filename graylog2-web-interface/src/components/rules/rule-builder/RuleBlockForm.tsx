@@ -15,23 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormikFormGroup, Select, FormSubmit } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 
-import { RuleBuilderSupportedTypes } from './types';
-import type { BlockDict, BlockFieldDict, BlockType, RuleBlock } from './types';
+import { RuleBuilderSupportedTypes, ruleBlockPropType, blockDictPropType } from './types';
+import type { BlockFieldDict, BlockType, RuleBlock, BlockDict } from './types';
 
 type Props = {
-  existingBlock: RuleBlock,
+  existingBlock?: RuleBlock,
   onAdd: (values: {[key: string]: any}) => void,
   onCancel: () => void,
   onSelect: (option: string) => void,
   onUpdate: (values: {[key: string]: any}) => void
   options: Array<{ label: string, value: any }>,
-  selectedBlockDict: BlockDict,
+  selectedBlockDict?: BlockDict,
   type: BlockType,
 }
 
@@ -41,6 +42,10 @@ const FormTitle = styled.h3(({ theme }) => css`
 
 const BlockTitle = styled.h3(({ theme }) => css`
   margin-bottom: ${theme.spacings.xs};
+`);
+
+const BlockDescription = styled.p(({ theme }) => css`
+  color: ${theme.colors.gray[50]};
 `);
 
 const SelectedBlock = styled.div(({ theme }) => css`
@@ -151,7 +156,7 @@ const RuleBlockForm = ({
                       <BlockTitle>
                         {selectedBlockDict.rule_builder_title || selectedBlockDict.name}
                       </BlockTitle>
-                      <p>{selectedBlockDict.description}</p>
+                      <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>
                   </SelectedBlockInfo>
 
@@ -170,6 +175,27 @@ const RuleBlockForm = ({
       </Col>
     </Row>
   );
+};
+
+RuleBlockForm.propTypes = {
+  existingBlock: ruleBlockPropType,
+  onAdd: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.any,
+    }),
+  ).isRequired,
+  selectedBlockDict: blockDictPropType,
+  type: PropTypes.oneOf(['action', 'condition']).isRequired,
+};
+
+RuleBlockForm.defaultProps = {
+  existingBlock: undefined,
+  selectedBlockDict: undefined,
 };
 
 export default RuleBlockForm;

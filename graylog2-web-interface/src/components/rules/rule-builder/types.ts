@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import PropTypes from 'prop-types';
+
 export type BlockType = 'condition' | 'action'
 
 export type RuleBuilderRule = {
@@ -68,3 +70,27 @@ export type BlockDict = {
   rule_builder_enabled: boolean,
   rule_builder_title: string | null
 }
+
+export const ruleBlockPropType = PropTypes.shape({
+  function: PropTypes.string.isRequired,
+  params: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool])).isRequired,
+  output: PropTypes.string,
+  errors: PropTypes.arrayOf(PropTypes.string),
+});
+
+export const blockDictPropType = PropTypes.shape({
+  name: PropTypes.string.isRequired,
+  pure: PropTypes.bool.isRequired,
+  return_type: PropTypes.string.isRequired,
+  params: PropTypes.arrayOf(PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    transformed_type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    optional: PropTypes.bool.isRequired,
+    primary: PropTypes.bool.isRequired,
+    description: PropTypes.string,
+  })).isRequired,
+  description: PropTypes.string,
+  rule_builder_enabled: PropTypes.bool.isRequired,
+  rule_builder_title: PropTypes.string,
+});

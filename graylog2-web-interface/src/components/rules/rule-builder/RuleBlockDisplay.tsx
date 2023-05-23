@@ -15,12 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
 import { IconButton } from 'components/common';
 
-import type { BlockDict, RuleBlock } from './types';
+import type { RuleBlock, BlockDict } from './types';
+import { ruleBlockPropType, blockDictPropType } from './types';
 
 type Props = {
   block: RuleBlock,
@@ -43,7 +45,7 @@ const Param = styled.p`
   margin-bottom: 0;
 `;
 
-const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => {
+const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
   const paramNames = Object.keys(block.params);
 
   const paramValueExists = (paramValue: string | number | boolean) : boolean => (
@@ -90,6 +92,18 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => {
       </Col>
     </Row>
   );
+};
+
+RuleBlockDisplay.propTypes = {
+  block: ruleBlockPropType,
+  blockDict: blockDictPropType,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+};
+
+RuleBlockDisplay.defaultProps = {
+  block: undefined,
+  blockDict: undefined,
 };
 
 export default RuleBlockDisplay;

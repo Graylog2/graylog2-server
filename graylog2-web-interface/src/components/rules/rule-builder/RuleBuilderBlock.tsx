@@ -15,12 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 
 import type { RuleBlock, BlockType, BlockDict } from './types';
+import { ruleBlockPropType, blockDictPropType } from './types';
 
 const BlockContainer = styled.div(({ theme }) => css`
   border-radius: 4px;
@@ -31,7 +33,7 @@ const BlockContainer = styled.div(({ theme }) => css`
 type Props = {
   type: BlockType,
   blockDict: Array<BlockDict>,
-  block: RuleBlock,
+  block?: RuleBlock,
   order: number,
   addBlock: (type: string, block: RuleBlock) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
@@ -114,6 +116,20 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
       )}
     </BlockContainer>
   );
+};
+
+RuleBuilderBlock.propTypes = {
+  type: PropTypes.oneOf(['action', 'condition']).isRequired,
+  blockDict: PropTypes.arrayOf(blockDictPropType).isRequired,
+  block: ruleBlockPropType,
+  order: PropTypes.number.isRequired,
+  addBlock: PropTypes.func.isRequired,
+  updateBlock: PropTypes.func.isRequired,
+  deleteBlock: PropTypes.func.isRequired,
+};
+
+RuleBuilderBlock.defaultProps = {
+  block: undefined,
 };
 
 export default RuleBuilderBlock;
