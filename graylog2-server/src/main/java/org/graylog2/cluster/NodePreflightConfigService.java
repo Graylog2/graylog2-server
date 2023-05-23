@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 import static org.graylog2.cluster.NodePreflightConfig.FIELD_CERTIFICATE;
 import static org.graylog2.cluster.NodePreflightConfig.FIELD_CSR;
@@ -86,6 +87,29 @@ public class NodePreflightConfigService extends PaginatedDbService<NodePreflight
                 false);
 
         return result.getN() > 0;
+    }
+
+    public Optional<String> readCert(final String nodeId) {
+        final NodePreflightConfig config = dbCollection.findOne(
+                DBQuery.is(FIELD_NODEID, nodeId)
+        );
+        if (config != null) {
+            return Optional.ofNullable(config.certificate());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public boolean changeState(final String nodeId, final NodePreflightConfig.State state) {
+        final WriteResult<NodePreflightConfig, String> result = dbCollection.update(
+                DBQuery.is(FIELD_NODEID, nodeId),
+                new DBUpdate.Builder()
+                        .set(FIELD_STATE, state),
+                false,
+                false);
+
+        return result.getN() > 0;
+
     }
 
     public void deleteAll() {

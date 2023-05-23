@@ -137,7 +137,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
+                .waitingFor(Wait.forHttp("/_cluster/health").forPort(OPENSEARCH_PORT).forStatusCode(200).forResponsePredicate(s -> s.contains("\"status\":\"green\"")));
     }
 
     @Override

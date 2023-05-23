@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr.storage;
+package org.graylog2.cluster.certificates;
 
-import org.bouncycastle.operator.OperatorException;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.security.encryption.EncryptedValue;
 
-import java.io.IOException;
+public record NodeCertificate(@JsonProperty(FIELD_NODEID) String nodeId,
+                              @JsonProperty(FIELD_ENCR_CERTIFICATE) EncryptedValue encryptedCertificate) {
 
-public interface CsrStorage {
+    public static final String FIELD_NODEID = "node_id";
+    public static final String FIELD_ENCR_CERTIFICATE = "encrypted_certificate_keystore";
 
-    void writeCsr(PKCS10CertificationRequest csr)
-            throws IOException, OperatorException;
-
-    PKCS10CertificationRequest readCsr()
-            throws IOException, OperatorException;
 }
