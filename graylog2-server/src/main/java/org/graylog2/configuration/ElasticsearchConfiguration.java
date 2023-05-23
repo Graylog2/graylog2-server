@@ -135,7 +135,7 @@ public class ElasticsearchConfiguration {
     private Period timeSizeOptimizingRotationMaxLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MAX;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
-    private Period timeSizeOptimizingRotationFixedLeeway = Period.days(1);
+    private Period timeSizeOptimizingRotationFixedLeeway;
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -316,7 +316,8 @@ public class ElasticsearchConfiguration {
         }
 
         Seconds calculatedLeeway = timeSizeOptimizingRotationMaxLifeTimeSeconds.minus(timeSizeOptimizingRotationMinLifeTimeSeconds);
-        if (calculatedLeeway.isLessThan(getTimeSizeOptimizingRotationFixedLeeway().toStandardSeconds())) {
+        if (getTimeSizeOptimizingRotationFixedLeeway() != null &&
+                calculatedLeeway.isLessThan(getTimeSizeOptimizingRotationFixedLeeway().toStandardSeconds())) {
             throw new ValidationException(f("\"%s=%s\" and \"%s=%s\" leeway cannot be less than \"%s=%s\"",
                     TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRotationMinLifeTime(),
                     TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME, getTimeSizeOptimizingRotationMaxLifeTime(),
