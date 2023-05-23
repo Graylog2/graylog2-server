@@ -78,7 +78,8 @@ public class PreflightResource {
     @Path("/ca/create")
     @NoAuditEvent("No Audit Event needed")
     public void createCA(@FormParam("password") String password) throws CACreationException {
-        caService.create(password);
+        // TODO: get validity from preflight UI
+        caService.create(password, null);
     }
 
     @POST

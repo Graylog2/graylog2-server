@@ -43,6 +43,8 @@ import java.util.Optional;
 @Singleton
 public class CaService {
     private static final Logger LOG = LoggerFactory.getLogger(CaService.class);
+    // TODO: clarify default value
+    private static int DEFAULT_VALIDITY = 10 * 365;
     private final KeystoreFileStorage keystoreFileStorage;
     private final KeystoreMongoStorage keystoreMongoStorage;
     private final NodeId nodeId;
@@ -77,7 +79,7 @@ public class CaService {
 
     // TODO: write local CA and password / also password for generated/uploaded CA into MongoDB
 
-    public CA create(final String password, final int daysValid) throws CACreationException {
+    public CA create(final String password, final Integer daysValid) throws CACreationException {
         // a given password overrides an eventually configured password from the config
         if(password != null) {
             this.password = Optional.of(password);
@@ -85,7 +87,7 @@ public class CaService {
 
         try {
             final var pass = this.password.map(String::toCharArray).orElse(null);
-            final Duration certificateValidity = Duration.ofDays(daysValid);
+            final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
             KeyStore keyStore = caCreator.createCA(pass, certificateValidity);
             keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
         } catch (Exception ex) {
