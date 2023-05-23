@@ -54,7 +54,6 @@ public class V20230523160600_PopulateEventDefinitionEnabled extends Migration {
 
     @Override
     public void upgrade() {
-        LOG.info("V20230523160600_PopulateEventDefinitionEnabled");
         if (clusterConfigService.get(V20230523160600_PopulateEventDefinitionEnabled.MigrationCompleted.class) != null) {
             LOG.debug("Migration already completed!");
             return;
