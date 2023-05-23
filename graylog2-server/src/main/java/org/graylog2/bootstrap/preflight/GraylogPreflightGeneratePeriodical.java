@@ -73,11 +73,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     public void doRun() {
         LOG.debug("checking if there are configuration steps to take care of");
 
-        if(!Files.exists(caKeystorePath)) {
-            LOG.warn("mandatory keystore file does not exist.");
-            return;
-        }
-
         try {
             KeyStore caKeystore = caService.loadKeyStore();
             // TODO: get real password
