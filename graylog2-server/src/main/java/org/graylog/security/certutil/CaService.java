@@ -75,15 +75,17 @@ public class CaService {
         return currentCA.get();
     }
 
+    // TODO: write local CA and password / also password for generated/uploaded CA into MongoDB
 
-    public CA create(String password) throws CACreationException {
+    public CA create(final String password, final int daysValid) throws CACreationException {
+        // a given password overrides an eventually configured password from the config
         if(password != null) {
             this.password = Optional.of(password);
         }
 
         try {
-            final var pass = this.password.orElse("").toCharArray();
-            final Duration certificateValidity = Duration.ofDays(10 * 365);
+            final var pass = this.password.map(String::toCharArray).orElse(null);
+            final Duration certificateValidity = Duration.ofDays(daysValid);
             KeyStore keyStore = caCreator.createCA(pass, certificateValidity);
             keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
         } catch (Exception ex) {
@@ -96,9 +98,11 @@ public class CaService {
     }
 
     public CA upload(String password, List<String> caFiles) throws CACreationException {
+        // TODO: if the upload consists of more than one file, handle accordingly
+        // or: decide that it's always only one file containing all certificates
         try {
             this.password = Optional.ofNullable(password);
-            final var pass = this.password.orElse("").toCharArray();
+            final var pass = this.password.map(String::toCharArray).orElse(null);
             KeyStore keyStore = caCreator.uploadCA(pass, caFiles.get(0));
             keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
         } catch (KeyStoreStorageException ex) {
@@ -118,12 +122,11 @@ public class CaService {
 
     public KeyStore loadKeyStore() throws KeyStoreException, KeyStoreStorageException, CertificateException, IOException, NoSuchAlgorithmException {
         if(currentCA.isPresent()) {
+            final var pass = this.password.map(String::toCharArray).orElse(null);
             if(currentCA.get().type().equals(CAType.LOCAL)) {
-                // TODO: use real password
-                return keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), this.password.orElse("").toCharArray()).orElseThrow();
+                return keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), pass).orElseThrow();
             } else {
-                // TODO: use real password
-                return keystoreMongoStorage.readKeyStore(nodeId, this.password.orElse("").toCharArray()).orElseThrow();
+                return keystoreMongoStorage.readKeyStore(nodeId, pass).orElseThrow();
             }
         } else {
             throw new KeyStoreException("No KeyStore exists.");
