@@ -34,9 +34,7 @@ import BulkActions from './BulkActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
-import { SYSTEM_EVENT_DEFINITION_TYPE, ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
-
-const isSystemEventDefinition = (eventDefinition: EventDefinition): boolean => eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
+import { ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
 
 const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
   attributes: {
@@ -52,8 +50,7 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     },
     status: {
       renderCell: (_status: string, eventDefinition) => (
-        <StatusCell status={eventDefinition?.scheduler?.is_scheduled || eventDefinition?.enabled}
-                    isSystemEvent={isSystemEventDefinition(eventDefinition)} />
+        <StatusCell status={eventDefinition?.enabled} />
       ),
       staticWidth: 100,
     },

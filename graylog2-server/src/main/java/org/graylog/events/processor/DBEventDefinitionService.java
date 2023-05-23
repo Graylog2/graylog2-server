@@ -17,6 +17,7 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
+import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -30,6 +31,7 @@ import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBQuery;
+import org.mongojack.DBUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +45,7 @@ import java.util.function.Supplier;
 public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
-    private static final String COLLECTION_NAME = "event_definitions";
+    public static final String COLLECTION_NAME = "event_definitions";
 
     private final DBEventProcessorStateService stateService;
     private final EntityOwnershipService entityOwnerShipService;
@@ -79,6 +81,10 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
         return super.save(enrichedWithUpdateDate);
     }
 
+    public void bulkEnableDisable(List<String> ids, boolean enabled) {
+        // Strictly enabling/disabling event definitions does not require a scope check nor an updated updated_at field
+        ids.forEach(id -> db.updateById(new ObjectId(id), new DBUpdate.Builder().set(EventDefinitionDto.FIELD_ENABLED, enabled)));
+    }
 
     public int deleteUnregister(String id) {
         // Must ensure deletability and mutability before deleting, so that de-registration is only performed if entity exists

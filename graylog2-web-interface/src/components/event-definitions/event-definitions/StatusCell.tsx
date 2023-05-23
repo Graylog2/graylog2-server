@@ -26,12 +26,11 @@ const StatusLabel = styled(Label)`
 `;
 
 type Props ={
-  status: boolean,
-  isSystemEvent: boolean,
+  status: boolean
 }
 
-const StatusCell = ({ status, isSystemEvent } : Props) => {
-  const isSuccess = status || isSystemEvent;
+const StatusCell = ({ status } : Props) => {
+  const isSuccess = status;
 
   return (
     <StatusLabel bsStyle={isSuccess ? 'success' : 'warning'}>

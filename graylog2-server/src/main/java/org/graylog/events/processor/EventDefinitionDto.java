@@ -61,6 +61,8 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_NOTIFICATIONS = "notifications";
+    public static final String FIELD_ENABLED = "enabled";
+    public static final String UPDATED_AT = "updated_at";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
@@ -69,8 +71,6 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_SCHEDULERCTX = "scheduler";
-    private static final String FIELD_ENABLED = "enabled";
-    private static final String UPDATED_AT = "updated_at";
 
     @Override
     @Id
@@ -130,8 +130,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     public abstract EventDefinitionContextService.SchedulerCtx schedulerCtx();
 
     @JsonProperty(FIELD_ENABLED)
-    @Nullable
-    public abstract Boolean enabled();
+    public abstract boolean enabled();
 
     public static Builder builder() {
         return Builder.create();
@@ -175,7 +174,8 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
             return new AutoValue_EventDefinitionDto.Builder()
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
-                    .storage(ImmutableList.of());
+                    .storage(ImmutableList.of())
+                    .enabled(false);
         }
 
         @Override
@@ -218,7 +218,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
 
         @JsonProperty(FIELD_ENABLED)
-        public abstract Builder enabled(Boolean enabled);
+        public abstract Builder enabled(boolean enabled);
 
         @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
         public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
