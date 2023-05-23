@@ -21,6 +21,7 @@ import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
+import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.plugin.system.NodeId;
@@ -56,7 +57,7 @@ public class CaService {
     private Optional<String> password;
 
     @Inject
-    public CaService(final CaConfiguration configuration,
+    public CaService(final Configuration configuration,
                      final KeystoreFileStorage keystoreFileStorage,
                      final KeystoreMongoStorage keystoreMongoStorage,
                      final NodeId nodeId,
