@@ -122,13 +122,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Deprecated
     @Override
     public Map<String, Node> allActive() {
-        Map<String, Node> nodes = Maps.newHashMap();
-
-        for (Node.Type type : Node.Type.values()) {
-            nodes.putAll(allActive(type));
-        }
-
-        return nodes;
+        return allActive(type());
     }
 
     private List<? extends DBObject> recentHeartbeat(List<? extends Map<String, Object>> additionalMatches) {
