@@ -1,0 +1,5 @@
+type = "a"
+message = "Postpone OpenSearch startup inside the DataNode until the certificate provisioning process has run."
+
+pulls = ["15567"]
+
