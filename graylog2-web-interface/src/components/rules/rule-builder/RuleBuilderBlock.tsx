@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 
 import type { RuleBlock, BlockType, BlockDict } from './types';
 
-const BlockContainer = styled.div`
-  margin-bottom: 20px;
-`;
+const BlockContainer = styled.div(({ theme }) => css`
+  border-radius: 4px;
+  padding: ${theme.spacings.md};
+  margin-bottom: ${theme.spacings.md};
+`);
 
 type Props = {
   type: BlockType,
@@ -94,7 +96,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
   const showForm = !block || editMode;
 
   return (
-    <BlockContainer>
+    <BlockContainer className="content">
       {showForm ? (
         <RuleBlockForm existingBlock={block}
                        onAdd={onAdd}

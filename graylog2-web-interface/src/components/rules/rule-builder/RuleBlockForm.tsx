@@ -16,7 +16,7 @@
  */
 import React, { useCallback } from 'react';
 import { Form, Formik } from 'formik';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { FormikFormGroup, Select, FormSubmit } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
@@ -35,14 +35,24 @@ type Props = {
   type: BlockType,
 }
 
-const Title = styled.h3`
-  margin-bottom: 5px;
-`;
+const FormTitle = styled.h3(({ theme }) => css`
+  margin-bottom: ${theme.spacings.sm};
+`);
 
-const SelectedBlockInfo = styled(Row)`
-  margin-bottom: 20px;
-  margin-top: 20px;
-`;
+const BlockTitle = styled.h3(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+`);
+
+const SelectedBlock = styled.div(({ theme }) => css`
+  border-left: 1px solid ${theme.colors.input.border};
+  border-right: 1px solid ${theme.colors.input.border};
+  border-bottom: 1px solid ${theme.colors.input.border};
+  padding: ${theme.spacings.md};
+`);
+
+const SelectedBlockInfo = styled(Row)(({ theme }) => css`
+  margin-bottom: ${theme.spacings.md};
+`);
 
 const RuleBlockForm = ({
   existingBlock,
@@ -117,6 +127,7 @@ const RuleBlockForm = ({
   return (
     <Row>
       <Col md={12}>
+        <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
         <Formik onSubmit={existingBlock ? onUpdate : onAdd} initialValues={buildInitialValues()}>
           {({ resetForm }) => (
             <Form>
@@ -134,10 +145,12 @@ const RuleBlockForm = ({
               </Row>
 
               {selectedBlockDict && (
-                <>
+                <SelectedBlock>
                   <SelectedBlockInfo>
                     <Col md={12}>
-                      <Title>{selectedBlockDict.rule_builder_title || selectedBlockDict.name}</Title>
+                      <BlockTitle>
+                        {selectedBlockDict.rule_builder_title || selectedBlockDict.name}
+                      </BlockTitle>
                       <p>{selectedBlockDict.description}</p>
                     </Col>
                   </SelectedBlockInfo>
@@ -149,7 +162,7 @@ const RuleBlockForm = ({
                               submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
                               onCancel={() => { resetForm(); onCancel(); }} />
 
-                </>
+                </SelectedBlock>
               )}
             </Form>
           )}

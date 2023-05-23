@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Col, Row } from 'components/bootstrap';
+import { IconButton } from 'components/common';
 
 import type { BlockDict, RuleBlock } from './types';
 
@@ -28,23 +29,18 @@ type Props = {
   onEdit: () => void,
 }
 
-const BlockInfo = styled(Row)`
-  margin-bottom: 20px;
-`;
+const BlockInfo = styled(Row)(({ theme }) => css`
+  margin-bottom: ${theme.spacings.md};
+`);
 
-const ActionsRow = styled(Row)`
-  margin-top: 20px;
-`;
-
-const ParamsRow = styled(Row)`
+const ParamsCol = styled(Col)(({ theme }) => css`
   display: flex;
   flex-wrap: wrap;
-  max-width: 50%;
-`;
+  gap: ${theme.spacings.sm};
+`);
 
-const ParamCol = styled(Col)`
-  padding-right: 15px;
-  padding-left: 15px;
+const Param = styled.p`
+  margin-bottom: 0;
 `;
 
 const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => {
@@ -60,7 +56,7 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => {
 
   return (
     <Row>
-      <Col md={12}>
+      <Col xs={9} md={10}>
         <BlockInfo>
           <Col md={12}>
             <h3>{blockDict?.rule_builder_title || blockDict?.name}</h3>
@@ -68,32 +64,29 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete }:Props) => {
         </BlockInfo>
         {anyParamsSet
         && (
-        <ParamsRow>
-          {paramNames.map((paramName, key) => {
-            const paramValue = block.params[paramName];
+        <Row>
+          <ParamsCol sm={12} md={6}>
+            {paramNames.map((paramName, key) => {
+              const paramValue = block.params[paramName];
 
-            if (paramValueExists(paramValue)) {
-              return (
-              // eslint-disable-next-line react/no-array-index-key
-                <ParamCol key={key} sm="auto" md="auto" lg="auto">
-                  <p><strong>{paramName}:</strong> {paramValue}</p>
-                </ParamCol>
-              );
-            }
+              if (paramValueExists(paramValue)) {
+                return (
+                // eslint-disable-next-line react/no-array-index-key
+                  <Col key={key}>
+                    <Param><strong>{paramName}:</strong> {paramValue}</Param>
+                  </Col>
+                );
+              }
 
-            return null;
-          })}
-        </ParamsRow>
+              return null;
+            })}
+          </ParamsCol>
+        </Row>
         )}
-
-        <ActionsRow>
-          <Col md={12}>
-            <ButtonToolbar>
-              <Button bsStyle="success" bsSize="small" onClick={onEdit}>Edit</Button>
-              <Button bsSize="small" onClick={onDelete}>Delete</Button>
-            </ButtonToolbar>
-          </Col>
-        </ActionsRow>
+      </Col>
+      <Col xs={3} md={2} className="text-right">
+        <IconButton name="edit" onClick={onEdit} title="Edit" />
+        <IconButton name="trash" onClick={onDelete} title="Delete" />
       </Col>
     </Row>
   );
