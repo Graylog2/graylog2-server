@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import useHistory from 'routing/useHistory';
@@ -36,7 +36,7 @@ const SubTitle = styled.label`
 
 const RuleBuilder = () => {
   const {
-    rule: existingRule,
+    rule: initialRule,
     conditionsDict,
     actionsDict,
     createRule,
@@ -44,12 +44,16 @@ const RuleBuilder = () => {
     // fetchValidateRule,
   } = useRuleBuilder();
 
-  const history = useHistory();
-
-  const initialRule = existingRule || { description: '', title: '', rule_builder: { conditions: [], actions: [] } };
-
-  const [rule, setRule] = useState<RuleBuilderRule>(initialRule);
+  const [rule, setRule] = useState<RuleBuilderRule>({ description: '', title: '', rule_builder: { conditions: [], actions: [] } });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: 'condition'|'action' } | null>(null);
+
+  useEffect(() => {
+    if (initialRule) {
+      setRule(initialRule);
+    }
+  }, [initialRule]);
+
+  const history = useHistory();
 
   console.log('conditionsDict', conditionsDict);
   console.log('actionsDict', actionsDict);
@@ -145,19 +149,19 @@ const RuleBuilder = () => {
     history.goBack();
   };
 
-  const handleSave = async (event?: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event?: React.FormEvent<HTMLFormElement>, closeAfter: boolean = false) => {
     event?.preventDefault();
 
-    if (existingRule) {
+    if (initialRule) {
       await updateRule(rule);
-      handleCancel();
+      if (closeAfter) handleCancel();
     } else {
       await createRule(rule);
     }
   };
 
   return (
-    <form onSubmit={handleSave}>
+    <form onSubmit={(e) => handleSave(e, true)}>
       <Row className="content">
         <Col md={12}>
           <RuleBuilderForm rule={rule}
@@ -207,8 +211,8 @@ const RuleBuilder = () => {
                             deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockOrder, type: 'action' })} />
         </Col>
         <ActionsCol md={12}>
-          <FormSubmit submitButtonText={`${!existingRule ? 'Create rule' : 'Update rule & close'}`}
-                      centerCol={existingRule && (
+          <FormSubmit submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
+                      centerCol={initialRule && (
                         <Button type="button" bsStyle="info" onClick={handleSave}>
                           Update rule
                         </Button>
