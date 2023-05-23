@@ -54,32 +54,26 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
     const nextErrorAnnotations = nextErrors.map((e) => ({ row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' }));
 
-    ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
+    ruleSourceRef?.current?.editor?.getSession().setAnnotations(nextErrorAnnotations);
   }, []);
 
   const validateNewRule = useCallback((callback) => {
     const nextRule = {
       ...rule,
-      source: ruleSourceRef.current.editor.getSession().getValue(),
+      source: ruleSourceRef?.current?.editor?.getSession().getValue(),
       description,
     };
 
     RulesActions.parse(nextRule, callback);
   }, [rule, description]);
 
-  const simulateRule = useCallback((messageString: string, callback: () => void) => {
-    const nextRule = {
-      ...rule,
-      source: ruleSourceRef.current.editor.getSession().getValue(),
-      description,
-    };
-
-    RulesActions.simulate(messageString, nextRule, callback);
-  }, [rule, description]);
+  const simulateRule = useCallback((messageString: string, _rule: RuleType, callback: () => void) => {
+    RulesActions.simulate(messageString, _rule, callback);
+  }, []);
 
   useEffect(() => {
-    if (ruleSourceRef.current) {
-      ruleSourceRef.current.editor.session.setOption('useWorker', false);
+    if (ruleSourceRef?.current) {
+      ruleSourceRef?.current?.editor?.session.setOption('useWorker', false);
     }
   });
 
@@ -87,7 +81,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     const validateBeforeSave = (callback: (nextRule: RuleType) => void = () => {}) => {
       const savedRule = {
         ...rule,
-        source: ruleSourceRef.current.editor.getSession().getValue(),
+        source: ruleSourceRef?.current?.editor?.getSession().getValue(),
         description,
       };
 

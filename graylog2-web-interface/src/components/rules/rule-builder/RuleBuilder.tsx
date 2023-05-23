@@ -26,6 +26,8 @@ import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import type { RuleBlock, RuleBuilderRule } from './types';
 
+import RuleSimulation from '../RuleSimulation';
+
 const ActionsCol = styled(Col)`
   margin-top: 50px;
 `;
@@ -215,6 +217,9 @@ const RuleBuilder = () => {
                             addBlock={addBlock}
                             updateBlock={updateBlock}
                             deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockOrder, type: 'action' })} />
+        </Col>
+        <Col md={12}>
+          <RuleSimulation rule={rule} />
         </Col>
         <ActionsCol md={12}>
           <FormSubmit submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
