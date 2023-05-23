@@ -19,7 +19,7 @@ const replaceVariablesWithParams = (params: RuleBlockField | undefined, str: str
 
   variables.forEach(({ variableName, variable }) => {
     if (params[variableName]) {
-      newString = str.replace(variable, params[variableName] as string);
+      newString = str.replaceAll(variable, params[variableName] as string);
     }
   });
 
