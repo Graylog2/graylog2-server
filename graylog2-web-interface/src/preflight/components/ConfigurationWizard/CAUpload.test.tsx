@@ -17,6 +17,7 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import fetch from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
@@ -30,6 +31,14 @@ jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
+
+const logger = {
+  // eslint-disable-next-line no-console
+  log: console.log,
+  // eslint-disable-next-line no-console
+  warn: console.warn,
+  error: () => {},
+};
 
 describe('CAUpload', () => {
   beforeEach(() => {
@@ -65,7 +74,12 @@ describe('CAUpload', () => {
 
   it('should show error when CA upload fails', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
-    renderPreflight(<CAUpload />);
+
+    renderPreflight(
+      <DefaultQueryClientProvider options={{ logger }}>
+        <CAUpload />
+      </DefaultQueryClientProvider>,
+    );
 
     const dropzone = await findDropZone();
     userEvent.upload(dropzone, files);

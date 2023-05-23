@@ -17,6 +17,7 @@
 import React from 'react';
 import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
@@ -34,6 +35,14 @@ jest.mock('preflight/util/UserNotification', () => ({
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 jest.mock('preflight/hooks/useDataNodes');
+
+const logger = {
+  // eslint-disable-next-line no-console
+  log: console.log,
+  // eslint-disable-next-line no-console
+  warn: console.warn,
+  error: () => {},
+};
 
 describe('CertificateProvisioning', () => {
   beforeEach(() => {
@@ -64,7 +73,12 @@ describe('CertificateProvisioning', () => {
 
   it('should show error when CA provisioning failed', async () => {
     asMock(fetch).mockImplementationOnce(() => Promise.reject(new Error('Error')));
-    renderPreflight(<CertificateProvisioning />);
+
+    renderPreflight(
+      <DefaultQueryClientProvider options={{ logger }}>
+        <CertificateProvisioning />
+      </DefaultQueryClientProvider>,
+    );
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
