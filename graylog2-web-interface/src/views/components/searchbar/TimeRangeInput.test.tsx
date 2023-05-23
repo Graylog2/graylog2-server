@@ -124,7 +124,7 @@ describe('TimeRangeInput', () => {
 
     fireEvent.click(dropdown);
 
-    await screen.findByRole('heading', { name: 'From (Until Now)' });
+    await screen.findByRole('heading', { name: 'Select time range' });
   });
 
   it('allows hiding the dropdown button for quick-selecting presets', async () => {

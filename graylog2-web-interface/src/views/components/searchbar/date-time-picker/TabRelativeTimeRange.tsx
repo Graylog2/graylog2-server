@@ -63,7 +63,7 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const { config } = useSearchConfiguration();
   const availableOptions = config?.quick_access_timerange_presets;
   const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
-  const relativeOptions = useMemo(() => availableOptions.filter((option) => option?.timerange?.type === 'relative'), [availableOptions]);
+  const relativeOptions = useMemo(() => availableOptions?.filter((option) => option?.timerange?.type === 'relative'), [availableOptions]);
 
   const onSetPreset = (range) => {
     setFieldValue('nextTimeRange', classifyRelativeTimeRange(range));

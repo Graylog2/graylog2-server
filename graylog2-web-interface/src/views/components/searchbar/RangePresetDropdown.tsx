@@ -86,10 +86,12 @@ const RangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, c
 
   useEffect(() => {
     const filtrateOptions = async () => {
-      const res = timeRangeLimit === 0 ? availableOptions : await Promise
+      const res = !timeRangeLimit ? availableOptions : await Promise
         .all(availableOptions?.map((quickAccessTimeRange) => getPassedByLimit(quickAccessTimeRange, timeRangeLimit)));
 
-      setFiltratedByLimitOptions(res.filter((item) => item !== null));
+      if (res) {
+        setFiltratedByLimitOptions(res.filter((item) => item !== null));
+      }
     };
 
     filtrateOptions();

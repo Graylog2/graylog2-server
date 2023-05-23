@@ -86,7 +86,7 @@ const TimeRangeDropdownButton = ({
                                      displayTitle={false}
                                      onChange={selectRelativeTimeRangePreset}
                                      onToggle={_onPresetSelectToggle}
-                                     header="From (Until Now)"
+                                     header="Select time range"
                                      bsSize={null}
                                      availableOptions={availableOptions} />
         )}
