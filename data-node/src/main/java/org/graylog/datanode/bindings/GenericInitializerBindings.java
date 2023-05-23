@@ -24,8 +24,6 @@ import org.graylog.datanode.configuration.DataNodeConfig;
 import org.graylog.datanode.initializers.JerseyService;
 import org.graylog.datanode.management.OpensearchProcessService;
 import org.graylog.datanode.initializers.PeriodicalsService;
-import org.graylog.datanode.configuration.ConfigurationProvider;
-import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
 
@@ -35,7 +33,6 @@ public class GenericInitializerBindings extends AbstractModule {
 //        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
 
 
-        bind(OpensearchConfiguration.class).toProvider(ConfigurationProvider.class);
         bind(DataNodeConfig.class).toProvider(DataNodeConfigProvider.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);

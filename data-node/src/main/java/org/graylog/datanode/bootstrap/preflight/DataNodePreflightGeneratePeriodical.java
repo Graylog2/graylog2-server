@@ -18,6 +18,7 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import org.bouncycastle.operator.OperatorException;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.management.OpensearchProcessService;
 import org.graylog.security.certutil.cert.storage.CertMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertStorage;
 import org.graylog.security.certutil.csr.CertificateAndPrivateKeyMerger;
@@ -29,6 +30,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -55,6 +57,8 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final CertStorage certMongoStorage;
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
     private final Configuration configuration;
+    private final OpensearchProcessService opensearchProcessService;
+    private final Periodicals periodicals;
 
     //TODO: decide on password handling
     private static final String DEFAULT_PASSWORD = "admin";
@@ -67,7 +71,9 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                                final CsrGenerator csrGenerator,
                                                final CertMongoStorage certMongoStorage,
                                                final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
-                                               final Configuration configuration) {
+                                               final Configuration configuration,
+                                               final OpensearchProcessService opensearchProcessService,
+                                               final Periodicals periodicals) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -76,6 +82,8 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         this.certMongoStorage = certMongoStorage;
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
         this.configuration = configuration;
+        this.opensearchProcessService = opensearchProcessService;
+        this.periodicals = periodicals;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
     }
@@ -104,7 +112,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                 try {
                     final Optional<X509Certificate> x509Certificate = certMongoStorage.readCert(nodeId.getNodeId());
                     if (x509Certificate.isPresent()) {
-                        //TODO: done for HTTP cert, we still need to make decision if we want to process HTTP and transport certs separetely
+                        //TODO: done for HTTP cert, we still need to make decision if we want to process HTTP and transport certs separately
                         certificateAndPrivateKeyMerger.merge(
                                 x509Certificate.get(),
                                 privateKeyEncryptedStorage,
@@ -120,12 +128,19 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                     LOG.error("Config entry in signed state, but no certificate data present in Mongo");
                 }
             }
+        } else if (NodePreflightConfig.State.STORED.equals(cfg.state())) {
 
             // write certificate to local truststore
             // configure SSL
-            // start DataNode
-            // set state to State.CONNECTED
-            // nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
+
+            nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.CONNECTED);
+        } else if (NodePreflightConfig.State.CONNECTED.equals(cfg.state())) {
+            try {
+                opensearchProcessService.start();
+                periodicals.unregisterAndStop(this);
+            } catch (Exception ex) {
+                LOG.error("Failed to start OpenSearch: " + ex.getMessage(), ex);
+            }
         }
     }
 

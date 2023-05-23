@@ -18,14 +18,14 @@ package org.graylog.datanode.configuration;
 
 import java.util.Map;
 
-import static org.graylog.datanode.configuration.ConfigurationProvider.SSL_PREFIX;
+import static org.graylog.datanode.management.OpensearchProcessService.SSL_PREFIX;
 
 public class TlsConfigurationSupplier {
 
     static final String KEYSTORE_FORMAT = "PKCS12";
     static final String TRUSTSTORE_FORMAT = "PKCS12";
 
-    static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
+    public static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
 
     public void addTransportTlsConfig(Map<String, String> config,
                                       final String alias,
