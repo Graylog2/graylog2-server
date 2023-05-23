@@ -154,7 +154,7 @@ const AppRouter = () => {
         ...pluginRoutesWithParent,
         ...pluginRoutesWithAppParent,
         {
-          path: '/',
+          path: `${AppConfig.gl2AppPathPrefix()}/`,
           element: <PageContentLayout />,
           children: [
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
