@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Title, Space } from '@mantine/core';
 import styled from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
 import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
+import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
+import { Button } from 'preflight/components/common';
 
 const P = styled.p`
   max-width: 700px;
@@ -32,26 +33,25 @@ type Props = {
 }
 
 const Setup = ({ onResumeStartup }: Props) => (
-  <Section title="Welcome!" titleOrder={1}>
-    <P>
-      It looks like you are starting Graylog for the first time and have not configured a data node.<br />
-      Data nodes allow you to index and search through all the messages in your Graylog message database.
-    </P>
-    <P>
-      You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
-    </P>
-
-    <Space h="md" />
-    <Title order={2}>Graylog Data Nodes</Title>
-    <DataNodesOverview onResumeStartup={onResumeStartup} />
-
-    <Space h="md" />
-    <Title order={2}>Manual Data Node Configuration</Title>
-    <P>
-      If you want to configure an Elasticsearch or OpenSearch node manually, you need to adjust the Graylog configuration and restart the Graylog server.
-      After the restart this page will not show up again.
-    </P>
-  </Section>
+  <>
+    <Section title="Welcome!" titleOrder={1}>
+      <P>
+        It looks like you are starting Graylog for the first time and have not configured a data node.<br />
+        Data nodes allow you to index and search through all the messages in your Graylog message database.
+      </P>
+      <P>
+        You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
+        For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the Graylog server. After the restart this page will not show up again.
+      </P>
+      <P>
+        You can always skip the configuration and <Button variant="light" compact size="xs" onClick={onResumeStartup}>resume startup</Button>.
+      </P>
+    </Section>
+    <Section title="Graylog Data Nodes" titleOrder={2}>
+      <DataNodesOverview />
+      <ConfigurationWizard onResumeStartup={onResumeStartup} />
+    </Section>
+  </>
 );
 
 export default Setup;
