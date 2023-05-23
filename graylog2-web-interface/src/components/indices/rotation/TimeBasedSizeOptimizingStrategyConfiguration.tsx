@@ -21,6 +21,7 @@ import moment from 'moment';
 
 import useMaxIndexRotationLimit from 'hooks/useMaxIndexRotationLimit';
 import RangeInput from 'components/common/RangeInput';
+import useTimeSizeOptimizingFixedLeeway from 'hooks/useTimeSizeOptimizingFixedLeeway';
 
 export type TimeBasedSizeOptimizingStrategyConfig = {
   index_lifetime_max: string,
@@ -35,7 +36,11 @@ type Props = {
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-const getInitialRangeInDays = (indexLifeTimeMin, IndexLifeTimeMax) => [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
+const getInitialRangeInDays = (indexLifeTimeMin, IndexLifeTimeMax, timeSizeOptimizingFixedLeeway) => (
+  timeSizeOptimizingFixedLeeway
+    ? [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(indexLifeTimeMin) + durationToRoundedDays(timeSizeOptimizingFixedLeeway)]
+    : [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)]
+);
 
 const YEAR_IN_DAYS = 365;
 
@@ -47,8 +52,12 @@ const getInitialMaxRange = (maxRotationPeriod: number, maxLifetime: number) => {
   return maxLifetime > YEAR_IN_DAYS ? maxLifetime + YEAR_IN_DAYS : YEAR_IN_DAYS;
 };
 
-const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_max, index_lifetime_min }, updateConfig }: Props) => {
-  const [indexLifetimeRange, setIndexLifetimeRange] = useState(getInitialRangeInDays(index_lifetime_min, index_lifetime_max));
+const TimeBasedSizeOptimizingStrategyConfiguration = ({
+  config: { index_lifetime_max, index_lifetime_min },
+  updateConfig,
+}: Props) => {
+  const timeSizeOptimizingFixedLeeway = useTimeSizeOptimizingFixedLeeway();
+  const [indexLifetimeRange, setIndexLifetimeRange] = useState(getInitialRangeInDays(index_lifetime_min, index_lifetime_max, timeSizeOptimizingFixedLeeway));
   const maxRotationPeriod = useMaxIndexRotationLimit();
   const [maxRange, setMaxRange] = useState(getInitialMaxRange(durationToRoundedDays(maxRotationPeriod), indexLifetimeRange[1]));
 
@@ -70,12 +79,16 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
     }
   };
 
-  const onRangeChange = (range: Array<number>) => {
-    setIndexLifetimeRange(range);
-    addYearToMaxRange(maxRange, range[1]);
+  const onRangeChange = (range: Array<number> | number) => {
+    const currentRange = Array.isArray(range) ? range : [range, range + durationToRoundedDays(timeSizeOptimizingFixedLeeway)];
+    setIndexLifetimeRange(currentRange);
+    addYearToMaxRange(maxRange, currentRange[1]);
 
-    if (isValidRange(range)) {
-      updateConfig({ index_lifetime_min: moment.duration(range[0], 'days').toISOString(), index_lifetime_max: moment.duration(range[1], 'days').toISOString() });
+    if (isValidRange(currentRange)) {
+      updateConfig({
+        index_lifetime_min: moment.duration(currentRange[0], 'days').toISOString(),
+        index_lifetime_max: moment.duration(currentRange[1], 'days').toISOString(),
+      });
     }
   };
 
@@ -87,7 +100,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
                   id="lifetime-range"
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
-                  value={indexLifetimeRange}
+                  value={timeSizeOptimizingFixedLeeway ? indexLifetimeRange[0] : indexLifetimeRange}
                   help={isValidRange(indexLifetimeRange) ? `The minimum / maximum number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText}` : errorMessage}
                   min={1}
                   step={1}

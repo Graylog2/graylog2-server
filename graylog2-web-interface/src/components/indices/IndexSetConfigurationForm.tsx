@@ -73,9 +73,15 @@ const _validateIndexPrefix = (value: string) => {
   return error;
 };
 
-const _getRotationConfigState = (strategy: string, data: string) => ({ rotation_strategy_class: strategy, rotation_strategy: data });
+const _getRotationConfigState = (strategy: string, data: string) => ({
+  rotation_strategy_class: strategy,
+  rotation_strategy: data,
+});
 
-const _getRetentionConfigState = (strategy: string, data: string) => ({ retention_strategy_class: strategy, retention_strategy: data });
+const _getRetentionConfigState = (strategy: string, data: string) => ({
+  retention_strategy_class: strategy,
+  retention_strategy: data,
+});
 
 class IndexSetConfigurationForm extends React.Component<Props, State> {
   static propTypes = {
@@ -84,6 +90,9 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     retentionStrategies: PropTypes.array.isRequired,
     retentionStrategiesContext: PropTypes.shape({
       max_index_retention_period: PropTypes.string,
+    }).isRequired,
+    rotationStrategiesContext: PropTypes.shape({
+      time_size_optimizing_retention_fixed_leeway: PropTypes.string,
     }).isRequired,
     create: PropTypes.bool,
     onUpdate: PropTypes.func.isRequired,
