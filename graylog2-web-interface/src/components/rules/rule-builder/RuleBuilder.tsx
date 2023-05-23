@@ -77,14 +77,20 @@ const RuleBuilder = () => {
       setRule({
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, conditions: [...rule.rule_builder.conditions, block],
+          ...rule.rule_builder,
+          conditions: [...rule.rule_builder.conditions,
+            { ...block, outputvariable: `output_conditions_${newConditionBlockOrder + 1}` },
+          ],
         },
       });
     } else {
       setRule({
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, actions: [...rule.rule_builder.actions, block],
+          ...rule.rule_builder,
+          actions: [...rule.rule_builder.actions,
+            { ...block, outputvariable: `output_actions_${newActionBlockOrder + 1}` },
+          ],
         },
       });
     }

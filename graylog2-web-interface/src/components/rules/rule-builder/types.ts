@@ -34,7 +34,7 @@ export type RuleBlockField = {
 export type RuleBlock = {
   function: string,
   params: RuleBlockField,
-  output?: string,
+  outputvariable?: string,
   errors?: Array<string>
 }
 
