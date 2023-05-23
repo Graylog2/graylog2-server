@@ -135,7 +135,7 @@ public class ElasticsearchConfiguration {
     private Period timeSizeOptimizingRotationMaxLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MAX;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
-    private Period timeSizeOptimizingRotationFixedLeeway = Period.days(10);
+    private Period timeSizeOptimizingRotationFixedLeeway = Period.days(1);
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
