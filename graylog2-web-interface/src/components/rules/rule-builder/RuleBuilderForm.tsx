@@ -51,7 +51,6 @@ const RuleBuilderForm = ({ rule, onChange }: Props) => {
              label="Description"
              value={rule.description}
              onChange={handleDescriptionChange}
-             autoFocus
              help="Rule description (optional)." />
 
       <PipelinesUsingRule create={Boolean(rule)} />
