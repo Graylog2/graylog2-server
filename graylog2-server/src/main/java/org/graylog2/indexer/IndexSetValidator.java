@@ -127,7 +127,7 @@ public class IndexSetValidator {
             }
 
             if (leeway.toStandardSeconds().isGreaterThan(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLeeway().toStandardSeconds())) {
-                return Violation.create(f("The duration between %s and %s <%s> cannot be longer than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
+                return Violation.create(f("The duration between %s and %s is: <%s> and cannot be longer than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
                         leeway, TIME_SIZE_OPTIMIZING_RETENTION_MAX_LEEWAY, elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLeeway()));
             }
 

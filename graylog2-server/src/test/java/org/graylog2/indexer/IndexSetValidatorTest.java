@@ -169,6 +169,8 @@ public class IndexSetValidatorTest {
                 assertThat(v.message()).contains("effective index retention period of P1W3D")
         );
 
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLeeway()).thenReturn(Period.days(28));
+
         // rotation strategy is not time-based
         final IndexSetConfig modifiedConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
@@ -194,6 +196,7 @@ public class IndexSetValidatorTest {
     @Test
     public void timeBasedSizeOptimizingOnlyWithMultipleOfDays() {
         when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLeeway()).thenReturn(Period.days(28));
 
         when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
         final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
@@ -213,6 +216,36 @@ public class IndexSetValidatorTest {
         assertThat(validator.periodOtherThanDays(Period.days(5))).isFalse();
         assertThat(validator.periodOtherThanDays(Period.weeks(5))).isTrue();
         assertThat(validator.periodOtherThanDays(Period.days(5).withHours(3))).isTrue();
+    }
+
+    @Test
+    public void timeBasedSizeOptimizingHonorsMaxLeeWay() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLeeway()).thenReturn(Period.days(10));
+
+        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
+        final IndexSetConfig failingConfig = testIndexSetConfig().toBuilder()
+                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
+                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                        .indexLifetimeMin(Period.days(10))
+                        .indexLifetimeMax(Period.days(21))
+                        .build()
+                )
+                .build();
+
+        assertThat(validator.validate(failingConfig)).hasValueSatisfying(v -> assertThat(v.message()).contains("The duration between index_lifetime_max and index_lifetime_min is: <P11D> " +
+                "and cannot be longer than time_size_optimizing_retention_max_leeway <P10D>"));
+
+        final IndexSetConfig successfullConfig = testIndexSetConfig().toBuilder()
+                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
+                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                        .indexLifetimeMin(Period.days(10))
+                        .indexLifetimeMax(Period.days(20))
+                        .build()
+                )
+                .build();
+
+        assertThat(validator.validate(successfullConfig)).isEmpty();
     }
 
     @Test
