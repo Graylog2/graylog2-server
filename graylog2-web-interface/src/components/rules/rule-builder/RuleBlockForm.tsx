@@ -24,6 +24,7 @@ import { Col, Row } from 'components/bootstrap';
 
 import { RuleBuilderSupportedTypes, ruleBlockPropType, blockDictPropType } from './types';
 import type { BlockFieldDict, BlockType, RuleBlock, BlockDict } from './types';
+import { replaceVariablesWithParams } from './helpers';
 
 type Props = {
   existingBlock?: RuleBlock,
@@ -154,7 +155,7 @@ const RuleBlockForm = ({
                   <SelectedBlockInfo>
                     <Col md={12}>
                       <BlockTitle>
-                        {selectedBlockDict.rule_builder_title || selectedBlockDict.name}
+                        {replaceVariablesWithParams(existingBlock?.params, selectedBlockDict.rule_builder_title || selectedBlockDict.name)}
                       </BlockTitle>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>

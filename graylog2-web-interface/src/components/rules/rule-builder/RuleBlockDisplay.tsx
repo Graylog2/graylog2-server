@@ -23,6 +23,7 @@ import { IconButton } from 'components/common';
 
 import type { RuleBlock, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType } from './types';
+import { replaceVariablesWithParams } from './helpers';
 
 type Props = {
   block: RuleBlock,
@@ -61,7 +62,7 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
       <Col xs={9} md={10}>
         <BlockInfo>
           <Col md={12}>
-            <h3>{blockDict?.rule_builder_title || blockDict?.name}</h3>
+            <h3>{replaceVariablesWithParams(block.params, blockDict?.rule_builder_title || blockDict?.name)}</h3>
           </Col>
         </BlockInfo>
         {anyParamsSet
