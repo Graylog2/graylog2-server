@@ -48,10 +48,10 @@ import java.util.stream.Stream;
 public class AggregationTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationTabularResponseCreator.class);
-    private final List<FieldDecorator> decorators;
+    private final Set<FieldDecorator> decorators;
 
     @Inject
-    public AggregationTabularResponseCreator(List<FieldDecorator> decorators) {
+    public AggregationTabularResponseCreator(Set<FieldDecorator> decorators) {
         this.decorators = decorators;
     }
 
