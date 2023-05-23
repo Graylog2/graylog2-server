@@ -383,7 +383,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
                 new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to disable", definitionId)));
         eventDefinitionHandler.unschedule(definitionId);
-        dbService.bulkEnableDisable(List.of(definitionId), true);
+        dbService.bulkEnableDisable(List.of(definitionId), false);
         return eventDefinitionDto.toBuilder().enabled(false).build();
     }
 
