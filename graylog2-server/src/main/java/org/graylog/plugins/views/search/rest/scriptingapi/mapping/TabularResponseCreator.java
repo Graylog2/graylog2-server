@@ -25,10 +25,8 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.Fi
 import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public interface TabularResponseCreator {
 
@@ -45,16 +43,22 @@ public interface TabularResponseCreator {
                 .map(d -> d.decorate(field, val, searchUser))
                 .toList();
 
+        checkDecoratorErrors(field, decorated);
+
+        return decorated.stream().findFirst().orElse(val);
+    }
+
+    default void checkDecoratorErrors(RequestedField field, List<Object> decorated) {
+        // we tried to decorate, some decorator is defined but no value returned
         if (decorated.isEmpty() && field.hasDecorator()) {
             throw new UnsupportedOperationException(StringUtils.f("Unsupported property '%s' on field '%s'", field.decorator(), field.name()));
-        } else if (decorated.size() > 1) {
+        }
+
+        // more decorators deliver a value, we don't know what's correct. This is not supported case.
+        if (decorated.size() > 1) {
             throw new UnsupportedOperationException(
                     StringUtils.f("Found more decorators supporting '%s' on field '%s', this is not supported operation.", field.decorator(), field.name())
             );
-        } else {
-            return decorated.iterator().next();
         }
     }
-
-
 }
