@@ -124,7 +124,7 @@ public class ViewServiceTest {
                 .isPresent()
                 .get()
                 .extracting("title")
-                .containsExactly("View 1");
+                .isEqualTo("View 1");
 
         dbService.delete(savedDto2.id());
 

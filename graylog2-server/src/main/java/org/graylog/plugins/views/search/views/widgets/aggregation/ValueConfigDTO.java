@@ -17,8 +17,6 @@
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -38,6 +36,12 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
 
     public static ValueConfigDTO create() {
         return Builder.builder().build();
+    }
+
+    abstract Builder toBuilder();
+
+    public ValueConfigDTO withLimit(int limit) {
+        return toBuilder().limit(limit).build();
     }
 
     @AutoValue.Builder

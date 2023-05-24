@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 
 import useServerAvailability from 'preflight/hooks/useServerAvailability';
 import { asMock } from 'helpers/mocking';
@@ -47,7 +47,7 @@ describe('WaitingForStartup', () => {
   });
 
   it('should not reload page while server is starting', async () => {
-    render(<WaitingForStartup />);
+    renderPreflight(<WaitingForStartup />);
 
     await screen.findByText(/The Graylog server is currently starting./);
 
@@ -59,7 +59,7 @@ describe('WaitingForStartup', () => {
       data: true,
     }));
 
-    render(<WaitingForStartup />);
+    renderPreflight(<WaitingForStartup />);
 
     await screen.findByText(/The Graylog server is currently starting./);
     await waitFor(() => expect(window.location.reload).toHaveBeenCalledTimes(1));

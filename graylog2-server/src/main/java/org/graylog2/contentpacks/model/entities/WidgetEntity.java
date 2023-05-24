@@ -160,8 +160,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                         .map(object -> {
                             if (object == null) {
                                 throw new ContentPackException("Missing Stream for widget entity");
-                            } else if (object instanceof Stream) {
-                                Stream stream = (Stream) object;
+                            } else if (object instanceof final Stream stream) {
                                 return stream.getId();
                             } else {
                                 throw new ContentPackException(
@@ -179,7 +178,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     }
 
     public List<SearchTypeEntity> createSearchTypeEntity() {
-        if (! type().matches(AggregationConfigDTO.NAME)) {
+        if (!type().matches(AggregationConfigDTO.NAME)) {
             return ImmutableList.of();
         }
         AggregationConfigDTO config = (AggregationConfigDTO) config();
