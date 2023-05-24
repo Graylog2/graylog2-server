@@ -44,9 +44,9 @@ const getInitialRangeInDays = (indexLifeTimeMin, IndexLifeTimeMax, timeSizeOptim
 
 const YEAR_IN_DAYS = 365;
 
-const getInitialMaxRange = (maxRotationPeriod: number, maxLifetime: number) => {
+const getInitialMaxRange = (maxRotationPeriod: number, maxLifetime: number, timeSizeOptimizingFixedLeeway: number | null) => {
   if (maxRotationPeriod) {
-    return maxRotationPeriod;
+    return timeSizeOptimizingFixedLeeway ? maxRotationPeriod - timeSizeOptimizingFixedLeeway : maxRotationPeriod;
   }
 
   return maxLifetime > YEAR_IN_DAYS ? maxLifetime + YEAR_IN_DAYS : YEAR_IN_DAYS;
@@ -61,7 +61,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
   const timeSizeOptimizingFixedLeeway = useTimeSizeOptimizingFixedLeeway();
   const [indexLifetimeRange, setIndexLifetimeRange] = useState(getInitialRangeInDays(index_lifetime_min, index_lifetime_max, timeSizeOptimizingFixedLeeway));
   const maxRotationPeriod = useMaxIndexRotationLimit();
-  const [maxRange, setMaxRange] = useState(getInitialMaxRange(durationToRoundedDays(maxRotationPeriod), indexLifetimeRange[1]));
+  const [maxRange, setMaxRange] = useState(getInitialMaxRange(durationToRoundedDays(maxRotationPeriod), indexLifetimeRange[1], durationToRoundedDays(timeSizeOptimizingFixedLeeway)));
 
   const isValidRange = useCallback((range: Array<number>) => range[0] < range[1] && range[1] <= maxRange, [maxRange]);
 
