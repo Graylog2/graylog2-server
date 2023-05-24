@@ -24,6 +24,7 @@ type TimeRangeInputSettings = {
   showAbsolutePresetsButton: boolean,
   showKeywordPresetsButton: boolean,
   showAddToQuickListButton: boolean,
+  ignoreLimitDurationInTimeRangeDropdown: boolean
 }
 
 const defaultValue = {
@@ -32,6 +33,7 @@ const defaultValue = {
   showAbsolutePresetsButton: true,
   showKeywordPresetsButton: true,
   showAddToQuickListButton: true,
+  ignoreLimitDurationInTimeRangeDropdown: false,
 };
 
 const TimeRangeInputSettingsContext = React.createContext<TimeRangeInputSettings>(defaultValue);

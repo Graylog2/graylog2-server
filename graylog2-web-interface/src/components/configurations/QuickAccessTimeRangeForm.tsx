@@ -71,6 +71,7 @@ const contextSettings = {
   showAbsolutePresetsButton: false,
   showKeywordPresetsButton: false,
   showAddToQuickListButton: false,
+  ignoreLimitDurationInTimeRangeDropdown: true,
 };
 
 const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChange, onRemove }: ItemProps) => {
