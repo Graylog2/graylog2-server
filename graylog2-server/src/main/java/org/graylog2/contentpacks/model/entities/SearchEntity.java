@@ -34,6 +34,7 @@ import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -115,11 +116,11 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
     @Override
     public Search toNativeEntity(Map<String, ValueReference> parameters,
                                  Map<EntityDescriptor, Object> nativeEntities) {
+        var queries = queries().stream()
+                .map(q -> q.toNativeEntity(parameters, nativeEntities))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         final Search.Builder searchBuilder = Search.builder()
-                .queries(ImmutableSet.copyOf(
-                        queries().stream()
-                                .map(q -> q.toNativeEntity(parameters, nativeEntities))
-                                .collect(Collectors.toSet())))
+                .queries(ImmutableSet.copyOf(queries))
                 .parameters(this.parameters())
                 .requires(this.requires())
                 .createdAt(this.createdAt());
