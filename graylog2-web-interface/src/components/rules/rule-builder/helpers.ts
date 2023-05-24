@@ -1,4 +1,4 @@
-import type { RuleBlockField } from './types';
+import type { BlockDict, BlockFieldDict, RuleBlockField } from './types';
 
 const extractVariablesFromString = (str : string = '') : Array<{variable: string, variableName: string}> => {
   const variableRegExp = /\$\{(.*?)\}/g;
@@ -26,4 +26,12 @@ const replaceVariablesWithParams = (params: RuleBlockField | undefined, str: str
   return newString;
 };
 
-export { extractVariablesFromString, replaceVariablesWithParams };
+const getDictForFunction = (dict: BlockDict[], functionName: string) : BlockDict | undefined => (
+  dict.find((entry) => entry.name === functionName)
+);
+
+const getDictForParam = (dict: BlockDict, paramName: string) : BlockFieldDict | undefined => (
+  dict.params.find((param) => param.name === paramName)
+);
+
+export { extractVariablesFromString, getDictForFunction, getDictForParam, replaceVariablesWithParams };

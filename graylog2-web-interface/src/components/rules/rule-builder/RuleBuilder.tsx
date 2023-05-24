@@ -24,7 +24,8 @@ import { FormSubmit, ConfirmDialog } from 'components/common';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
-import type { RuleBlock, RuleBuilderRule } from './types';
+import type { BlockType, RuleBlock, RuleBuilderRule } from './types';
+import { getDictForFunction, getDictForParam } from './helpers';
 
 import RuleSimulation from '../RuleSimulation';
 
@@ -47,7 +48,7 @@ const RuleBuilder = () => {
   } = useRuleBuilder();
 
   const [rule, setRule] = useState<RuleBuilderRule>({ description: '', title: '', rule_builder: { conditions: [], actions: [] } });
-  const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: 'condition'|'action' } | null>(null);
+  const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
 
   useEffect(() => {
     if (initialRule) {
@@ -69,7 +70,36 @@ const RuleBuilder = () => {
   //   setRuleBuilder(result.rule_builder);
   // });
 
-  const addBlock = async (type: string, block: RuleBlock) => {
+  // TODO: only for actions
+  // return_type Javalang.void -> no output variable (already in backend validation)
+
+  // TODO: Set primary params and output variables again on delete and reorder
+
+  const setPrimaryParams = (block: RuleBlock): RuleBlock => {
+    const blockDict = getDictForFunction(actionsDict, block.function);
+
+    const isParamSet = (paramName) => (
+      block.params[paramName] && block.params[paramName] !== '' && block.params[paramName] !== null
+    );
+
+    if (!blockDict) return block;
+
+    const newBlock = block;
+
+    Object.keys(block.params).forEach((paramName) => {
+      if (getDictForParam(blockDict, paramName)?.primary && (!isParamSet(paramName))) {
+        const lastBlock = rule.rule_builder.conditions[rule.rule_builder.conditions.length - 1];
+
+        if (!lastBlock?.outputvariable) { return; }
+
+        newBlock.params[paramName] = `$${lastBlock.outputvariable}`;
+      }
+    });
+
+    return newBlock;
+  };
+
+  const addBlock = async (type: BlockType, block: RuleBlock) => {
     // validateRuleBuilder();
     const isValid = true;
 
@@ -81,17 +111,19 @@ const RuleBuilder = () => {
         rule_builder: {
           ...rule.rule_builder,
           conditions: [...rule.rule_builder.conditions,
-            { ...block, outputvariable: `output_conditions_${newConditionBlockOrder + 1}` },
+            { ...block, outputvariable: `$output_conditions_${newConditionBlockOrder + 1}` },
           ],
         },
       });
     } else {
+      const blockToSet = setPrimaryParams(block);
+
       setRule({
         ...rule,
         rule_builder: {
           ...rule.rule_builder,
           actions: [...rule.rule_builder.actions,
-            { ...block, outputvariable: `output_actions_${newActionBlockOrder + 1}` },
+            { ...blockToSet, outputvariable: `output_actions_${newActionBlockOrder + 1}` },
           ],
         },
       });
@@ -106,6 +138,7 @@ const RuleBuilder = () => {
 
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
+
       currentConditions[orderIndex] = block;
 
       setRule({
@@ -115,8 +148,10 @@ const RuleBuilder = () => {
         },
       });
     } else {
+      const blockToSet = setPrimaryParams(block);
+
       const currentActions = [...rule.rule_builder.actions];
-      currentActions[orderIndex] = block;
+      currentActions[orderIndex] = blockToSet;
 
       setRule({
         ...rule,
@@ -127,7 +162,7 @@ const RuleBuilder = () => {
     }
   };
 
-  const deleteBlock = async (orderIndex: number, type: 'condition'|'action') => {
+  const deleteBlock = async (orderIndex: number, type: BlockType) => {
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
       currentConditions.splice(orderIndex, 1);

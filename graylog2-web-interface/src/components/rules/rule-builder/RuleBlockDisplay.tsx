@@ -53,6 +53,8 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
     paramValue && paramValue !== '' && paramValue !== null
   );
 
+  // Todo : remove manual var replacement, use "title" from validation or create/update when available, otherwise use function name
+
   const anyParamsSet = () : boolean => (
     paramNames.some((paramName) => paramValueExists(block.params[paramName]))
   );

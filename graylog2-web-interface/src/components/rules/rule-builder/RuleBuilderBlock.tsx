@@ -105,6 +105,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
                        onCancel={onCancel}
                        onUpdate={onUpdate}
                        onSelect={onSelect}
+                       order={order}
                        options={options}
                        selectedBlockDict={currentBlockDict}
                        type={type} />

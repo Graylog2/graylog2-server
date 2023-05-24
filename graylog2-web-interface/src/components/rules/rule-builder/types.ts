@@ -44,17 +44,29 @@ export type RuleBuilderType = {
   actions: Array<RuleBlock>
 }
 
-export enum RuleBuilderSupportedTypes {
+export enum RuleBuilderTypes {
   Boolean = 'java.lang.Boolean',
   Message = 'org.graylog2.plugin.Message',
   Number = 'java.lang.Long',
   Object = 'java.lang.Object',
   String = 'java.lang.String',
+  Void = 'java.lang.Void',
+  DateTime = 'org.joda.time.DateTime',
+  DateTimeZone = 'org.joda.time.DateTimeZone',
+  DateTimeFormatter = 'org.joda.time.format.DateTimeFormatter'
 }
 
+export const RULE_BUILDER_TYPES_WITH_OUTPUT = [
+  RuleBuilderTypes.Boolean,
+  RuleBuilderTypes.Number,
+  RuleBuilderTypes.String,
+  RuleBuilderTypes.Object,
+  RuleBuilderTypes.Message,
+] as const;
+
 export type BlockFieldDict = {
-  type: RuleBuilderSupportedTypes,
-  transformed_type: RuleBuilderSupportedTypes,
+  type: RuleBuilderTypes,
+  transformed_type: RuleBuilderTypes,
   name: string,
   optional: boolean,
   primary: boolean,
@@ -64,7 +76,7 @@ export type BlockFieldDict = {
 export type BlockDict = {
   name: string,
   pure: boolean,
-  return_type: RuleBuilderSupportedTypes,
+  return_type: RuleBuilderTypes,
   params: Array<BlockFieldDict>,
   description: string | null,
   rule_builder_enabled: boolean,

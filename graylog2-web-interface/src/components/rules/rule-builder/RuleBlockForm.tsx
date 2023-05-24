@@ -14,16 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { FormikFormGroup, Select, FormSubmit } from 'components/common';
+import { FormSubmit, Select } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
+import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 
-import { RuleBuilderSupportedTypes, ruleBlockPropType, blockDictPropType } from './types';
-import type { BlockFieldDict, BlockType, RuleBlock, BlockDict } from './types';
+import { ruleBlockPropType, blockDictPropType } from './types';
+import type { BlockType, RuleBlock, BlockDict } from './types';
 import { replaceVariablesWithParams } from './helpers';
 
 type Props = {
@@ -31,8 +32,9 @@ type Props = {
   onAdd: (values: {[key: string]: any}) => void,
   onCancel: () => void,
   onSelect: (option: string) => void,
-  onUpdate: (values: {[key: string]: any}) => void
+  onUpdate: (values: {[key: string]: any}) => void,
   options: Array<{ label: string, value: any }>,
+  order: number,
   selectedBlockDict?: BlockDict,
   type: BlockType,
 }
@@ -67,75 +69,42 @@ const RuleBlockForm = ({
   onSelect,
   onUpdate,
   options,
+  order,
   selectedBlockDict,
   type,
 }: Props) => {
-  const buildParamField = (param: BlockFieldDict) => {
-    switch (param.type) {
-      case RuleBuilderSupportedTypes.String:
-      case RuleBuilderSupportedTypes.Message:
-        return (
-          <FormikFormGroup type="text"
-                           key={`${selectedBlockDict.name}_${param.name}`}
-                           name={param.name}
-                           label={param.name}
-                           required={!param.optional}
-                           help={param.description} />
-        );
-      case RuleBuilderSupportedTypes.Number:
-        return (
-          <FormikFormGroup type="number"
-                           key={`${selectedBlockDict.name}_${param.name}`}
-                           name={param.name}
-                           label={param.name}
-                           required={!param.optional}
-                           help={param.description} />
-        );
-      case RuleBuilderSupportedTypes.Boolean:
-        return (
-          <FormikFormGroup type="checkbox"
-                           key={`${selectedBlockDict.name}_${param.name}`}
-                           name={param.name}
-                           label={param.name}
-                           required={!param.optional}
-                           help={param.description} />
-        );
-      case RuleBuilderSupportedTypes.Object:
-        return (
-          <FormikFormGroup type="textarea"
-                           name={param.name}
-                           key={`${selectedBlockDict.name}_${param.name}`}
-                           rows={4}
-                           label={param.name}
-                           required={!param.optional}
-                           help={param.description} />
-        );
-      default:
-        return null;
+  const [initialValues, setInitialValues] = useState<{}>({});
+
+  useEffect(() => {
+    const newInitialValues = {};
+
+    if (selectedBlockDict) {
+      selectedBlockDict.params.forEach((param) => {
+        const initialBlockValue = existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
+
+        newInitialValues[param.name] = initialBlockValue;
+      },
+      );
     }
+
+    setInitialValues(newInitialValues);
+  }, [selectedBlockDict, existingBlock]);
+
+  const handleChange = (option: string, resetForm: () => void) => {
+    resetForm();
+    onSelect(option);
   };
 
-  const buildInitialValues = useCallback(() => {
-    const initialValues = {};
-
-    if (!selectedBlockDict) { return initialValues; }
-
-    selectedBlockDict.params.forEach((param) => {
-      const initialBlockValue = existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
-
-      initialValues[param.name] = initialBlockValue;
-    },
-    );
-
-    return initialValues;
-  }, [selectedBlockDict, existingBlock]);
+  const resetField = (fieldName: string, setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void) => {
+    setFieldValue(fieldName, initialValues[fieldName] || undefined);
+  };
 
   return (
     <Row>
       <Col md={12}>
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
-        <Formik onSubmit={existingBlock ? onUpdate : onAdd} initialValues={buildInitialValues()}>
-          {({ resetForm }) => (
+        <Formik enableReinitialize onSubmit={existingBlock ? onUpdate : onAdd} initialValues={initialValues}>
+          {({ resetForm, setFieldValue }) => (
             <Form>
               <Row>
                 <Col md={12}>
@@ -145,7 +114,7 @@ const RuleBlockForm = ({
                           options={options}
                           clearable={false}
                           matchProp="label"
-                          onChange={(option: string) => { resetForm(); onSelect(option); }}
+                          onChange={(option: string) => handleChange(option, resetForm)}
                           value={selectedBlockDict?.name || ''} />
                 </Col>
               </Row>
@@ -161,8 +130,15 @@ const RuleBlockForm = ({
                     </Col>
                   </SelectedBlockInfo>
 
-                  {/* eslint-disable-next-line react/no-array-index-key */}
-                  {selectedBlockDict.params.map((param, key) => <Row key={key}>{buildParamField(param)}</Row>)}
+                  {selectedBlockDict.params.map((param, key) => (
+                    <Row key={key}> {/* eslint-disable-line react/no-array-index-key */}
+                      <RuleBlockFormField param={param}
+                                          functionName={selectedBlockDict.name}
+                                          order={order}
+                                          resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
+                    </Row>
+                  ),
+                  )}
 
                   <FormSubmit bsSize="small"
                               submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
@@ -190,6 +166,7 @@ RuleBlockForm.propTypes = {
       value: PropTypes.any,
     }),
   ).isRequired,
+  order: PropTypes.number.isRequired,
   selectedBlockDict: blockDictPropType,
   type: PropTypes.oneOf(['action', 'condition']).isRequired,
 };
