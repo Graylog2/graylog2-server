@@ -23,7 +23,6 @@ import { IconButton } from 'components/common';
 
 import type { RuleBlock, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType } from './types';
-import { replaceVariablesWithParams } from './helpers';
 
 type Props = {
   block: RuleBlock,
@@ -53,18 +52,24 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
     paramValue && paramValue !== '' && paramValue !== null
   );
 
-  // Todo : remove manual var replacement, use "title" from validation or create/update when available, otherwise use function name
-
   const anyParamsSet = () : boolean => (
     paramNames.some((paramName) => paramValueExists(block.params[paramName]))
   );
+
+  const formatParamValue = (value : string | number | boolean) => {
+    if (typeof value === 'string' && value.startsWith('$')) {
+      return 'Output of the previous step';
+    }
+
+    return (value);
+  };
 
   return (
     <Row>
       <Col xs={9} md={10}>
         <BlockInfo>
           <Col md={12}>
-            <h3>{replaceVariablesWithParams(block.params, blockDict?.rule_builder_title || blockDict?.name)}</h3>
+            <h3>{blockDict?.title || blockDict?.rule_builder_title || blockDict?.name}</h3>
           </Col>
         </BlockInfo>
         {anyParamsSet
@@ -72,7 +77,7 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
         <Row>
           <ParamsCol sm={12} md={6}>
             {paramNames.map((paramName, key) => {
-              const paramValue = block.params[paramName];
+              const paramValue = formatParamValue(block.params[paramName]);
 
               if (paramValueExists(paramValue)) {
                 return (

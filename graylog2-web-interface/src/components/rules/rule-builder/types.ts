@@ -79,6 +79,7 @@ export type BlockDict = {
   return_type: RuleBuilderTypes,
   params: Array<BlockFieldDict>,
   description: string | null,
+  title?: string,
   rule_builder_enabled: boolean,
   rule_builder_title: string | null
 }

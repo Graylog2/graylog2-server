@@ -25,7 +25,6 @@ import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField
 
 import { ruleBlockPropType, blockDictPropType } from './types';
 import type { BlockType, RuleBlock, BlockDict } from './types';
-import { replaceVariablesWithParams } from './helpers';
 
 type Props = {
   existingBlock?: RuleBlock,
@@ -124,7 +123,7 @@ const RuleBlockForm = ({
                   <SelectedBlockInfo>
                     <Col md={12}>
                       <BlockTitle>
-                        {replaceVariablesWithParams(existingBlock?.params, selectedBlockDict.rule_builder_title || selectedBlockDict.name)}
+                        {selectedBlockDict.rule_builder_title || selectedBlockDict.name}
                       </BlockTitle>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>

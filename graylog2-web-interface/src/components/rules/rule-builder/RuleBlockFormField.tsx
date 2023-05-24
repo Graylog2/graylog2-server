@@ -52,6 +52,7 @@ const RuleBlockFormField = ({ param, functionName, order, resetField }: Props) =
   switch (param.type) {
     case RuleBuilderTypes.String:
       return (
+        // TODO: after adding general validation, make sure to not accept string starting with $ for primary params
         <FormikFormGroup type="text"
                          key={`${functionName}_${param.name}`}
                          name={param.name}

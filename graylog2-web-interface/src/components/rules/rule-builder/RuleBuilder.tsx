@@ -88,7 +88,7 @@ const RuleBuilder = () => {
 
     Object.keys(block.params).forEach((paramName) => {
       if (getDictForParam(blockDict, paramName)?.primary && (!isParamSet(paramName))) {
-        const lastBlock = rule.rule_builder.conditions[rule.rule_builder.conditions.length - 1];
+        const lastBlock = rule.rule_builder.actions[rule.rule_builder.actions.length - 1];
 
         if (!lastBlock?.outputvariable) { return; }
 
@@ -111,7 +111,7 @@ const RuleBuilder = () => {
         rule_builder: {
           ...rule.rule_builder,
           conditions: [...rule.rule_builder.conditions,
-            { ...block, outputvariable: `$output_conditions_${newConditionBlockOrder + 1}` },
+            { ...block },
           ],
         },
       });
