@@ -117,6 +117,8 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         return new AutoValue_IndexSetsDefaultConfiguration.Builder();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(INDEX_ANALYZER)
