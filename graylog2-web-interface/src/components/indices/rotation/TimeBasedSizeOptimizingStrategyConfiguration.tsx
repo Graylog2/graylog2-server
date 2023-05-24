@@ -52,6 +52,8 @@ const getInitialMaxRange = (maxRotationPeriod: number, maxLifetime: number) => {
   return maxLifetime > YEAR_IN_DAYS ? maxLifetime + YEAR_IN_DAYS : YEAR_IN_DAYS;
 };
 
+const durationToISOString = (days: number) => moment.duration(days, 'days').toISOString();
+
 const TimeBasedSizeOptimizingStrategyConfiguration = ({
   config: { index_lifetime_max, index_lifetime_min },
   updateConfig,
@@ -86,13 +88,15 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
 
     if (isValidRange(currentRange)) {
       updateConfig({
-        index_lifetime_min: moment.duration(currentRange[0], 'days').toISOString(),
-        index_lifetime_max: moment.duration(currentRange[1], 'days').toISOString(),
+        index_lifetime_min: durationToISOString(currentRange[0]),
+        index_lifetime_max: durationToISOString(currentRange[1]),
       });
     }
   };
 
   const maxRotationPeriodHelpText = maxRotationPeriod ? ` The max rotation period is set to ${durationToRoundedDays(maxRotationPeriod)} days by the Administrator.` : '';
+  const rangeHelpTitle = timeSizeOptimizingFixedLeeway ? 'minimum' : 'minimum / maximum';
+  const fixedLeewayHint = timeSizeOptimizingFixedLeeway && ` The maximum number of days is ${durationToISOString(indexLifetimeRange[1])} because the fixed number of days between min and max is set to ${timeSizeOptimizingFixedLeeway}.`;
 
   return (
     <div>
@@ -101,7 +105,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
                   value={timeSizeOptimizingFixedLeeway ? indexLifetimeRange[0] : indexLifetimeRange}
-                  help={isValidRange(indexLifetimeRange) ? `The minimum / maximum number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText}` : errorMessage}
+                  help={isValidRange(indexLifetimeRange) ? `The ${rangeHelpTitle} number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText} ${fixedLeewayHint}` : errorMessage}
                   min={1}
                   step={1}
                   bsStyle={validationState(indexLifetimeRange)}
