@@ -194,3 +194,10 @@ The following REST API endpoints were changed:
 | `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds.      |
 | `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.                    |
 | `disabled_retention_strategies`             | added   | Allow disabling of `none` `close` `delete` retention strategies. At least one must stay enabled |
+
+## Deprecation and Change in Functionality of GreyNoise Data Adapters
+
+- GreyNoise Community IP Lookup Data Adapters have been marked as deprecated. Existing Data Adapters can no longer be
+  started or lookups performed.
+- GreyNoise Full IP Lookup [Enterprise] Data Adapter can no longer be used with a free GreyNoise Community API tokens.
+- GreyNoise Quick IP Lookup Data Adapter can no longer be used with a free GreyNoise Community API tokens.
