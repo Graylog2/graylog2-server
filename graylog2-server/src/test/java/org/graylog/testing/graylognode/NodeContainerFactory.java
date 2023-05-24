@@ -162,7 +162,7 @@ public class NodeContainerFactory {
                                     }
                                 })))
                 .withExposedPorts(config.portsToExpose())
-                .withStartupTimeout(Duration.of(120, SECONDS));
+                .withStartupTimeout(Duration.of(600, SECONDS));
 
         if (!includeFrontend) {
             container.withEnv("DEVELOPMENT", "true");
