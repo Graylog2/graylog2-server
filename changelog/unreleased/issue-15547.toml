@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Use search query from URL params for dashboard page search input."
+
+issues = ["15536"]
+pulls = ["15540"]
+
