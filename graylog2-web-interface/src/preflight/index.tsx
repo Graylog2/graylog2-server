@@ -26,19 +26,17 @@ import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 import App from './App';
 
 ReactDOM.render((
-  <React.StrictMode>
-    <PreflightThemeProvider>
-      <GlobalThemeStyles />
-      <DefaultQueryClientProvider>
-        <ThemeWrapper>
-          <>
-            <Notifications />
-            <App />
-          </>
-        </ThemeWrapper>
-      </DefaultQueryClientProvider>
-    </PreflightThemeProvider>
-  </React.StrictMode>
+  <PreflightThemeProvider>
+    <GlobalThemeStyles />
+    <DefaultQueryClientProvider>
+      <ThemeWrapper>
+        <>
+          <Notifications />
+          <App />
+        </>
+      </ThemeWrapper>
+    </DefaultQueryClientProvider>
+  </PreflightThemeProvider>
 ),
 document.getElementById('app-root'),
 );
