@@ -126,7 +126,7 @@ const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timeran
 
   const equalTimerange = useMemo(() => config
     ?.quick_access_timerange_presets
-    .find((existingTimerange) => isTimerangeEqual(existingTimerange.timerange, onSubmittingTimerange(timerange, userTimezone))), [config, timerange, userTimezone]);
+    ?.find((existingTimerange) => isTimerangeEqual(existingTimerange.timerange, onSubmittingTimerange(timerange, userTimezone))), [config, timerange, userTimezone]);
 
   return (
     <>
