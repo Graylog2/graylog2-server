@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Title, Space, Tabs, Alert } from 'preflight/components/common';
+import { Title, Space, Tabs } from 'preflight/components/common';
 
 import CACreateForm from './CACreateForm';
 import CAUpload from './CAUpload';
@@ -28,45 +28,28 @@ const StyledTabs = styled(Tabs)(({ theme }) => css`
   }
 `);
 
-const _isSecureConnection = () => {
-  if (window.location.protocol !== 'https:') {
-    return false;
-  }
+const CAConfiguration = () => (
+  <>
+    <Title order={3}>Configure Certificate Authority</Title>
+    <p>
+      In this first step you can either upload or create a new certificate authority.<br />
+      Using it we can provision your data nodes with certificates easily.
+    </p>
+    <Space h="md" />
+    <StyledTabs defaultValue="upload">
+      <Tabs.List>
+        <Tabs.Tab value="upload">Upload CA</Tabs.Tab>
+        <Tabs.Tab value="create">Create new CA</Tabs.Tab>
+      </Tabs.List>
 
-  return window.isSecureContext;
-};
-
-const CAConfiguration = () => {
-  const isSecureConnection = _isSecureConnection();
-
-  return (
-    <>
-      <Title order={3}>Configure Certificate Authority</Title>
-      <p>
-        In this first step you can either upload or create a new certificate authority.<br />
-        Using it we can provision your data nodes with certificates easily.
-      </p>
-      {!isSecureConnection ? (
-        <Alert type="warning">
-          Your connection is not secure. Please be aware the information will be send to the server unencrypted.
-          This includes for example the CA you upload.
-        </Alert>
-      ) : <Space h="md" />}
-      <StyledTabs defaultValue="upload">
-        <Tabs.List>
-          <Tabs.Tab value="upload">Upload CA</Tabs.Tab>
-          <Tabs.Tab value="create">Create new CA</Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="upload" pt="xs">
-          <CAUpload />
-        </Tabs.Panel>
-        <Tabs.Panel value="create" pt="xs">
-          <CACreateForm />
-        </Tabs.Panel>
-      </StyledTabs>
-    </>
-  );
-};
+      <Tabs.Panel value="upload" pt="xs">
+        <CAUpload />
+      </Tabs.Panel>
+      <Tabs.Panel value="create" pt="xs">
+        <CACreateForm />
+      </Tabs.Panel>
+    </StyledTabs>
+  </>
+);
 
 export default CAConfiguration;

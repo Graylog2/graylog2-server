@@ -26,6 +26,7 @@ import UserNotification from 'preflight/util/UserNotification';
 import { Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
+import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 
 type FormValues = {
   files?: Array<File>,
@@ -136,7 +137,7 @@ const CAUpload = () => {
                        name="password"
                        type="password"
                        label="Password" />
-          <Space h="md" />
+          <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
           <Button disabled={isSubmitting || !isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
