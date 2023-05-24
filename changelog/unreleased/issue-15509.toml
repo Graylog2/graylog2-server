@@ -2,4 +2,4 @@ type = "fixed"
 message = "Apply pivot limits correctly when installing saved searches/dashboard from pre-5.1 content packs."
 
 issues = ["15509"]
-pulls = ["15523"]
+pulls = ["15582"]
