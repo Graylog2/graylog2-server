@@ -24,7 +24,7 @@ import java.security.PrivateKey;
 
 public interface PrivateKeyEncryptedStorage {
 
-    void writeEncryptedKey(char[] passwd, PrivateKey privateKey) throws IOException, OperatorCreationException;
+    void writeEncryptedKey(char[] password, PrivateKey privateKey) throws IOException, OperatorCreationException;
 
     PrivateKey readEncryptedKey(char[] password) throws IOException, OperatorCreationException, PKCSException;
 }

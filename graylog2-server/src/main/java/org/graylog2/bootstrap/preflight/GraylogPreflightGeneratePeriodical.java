@@ -17,9 +17,9 @@
 package org.graylog2.bootstrap.preflight;
 
 import org.graylog.security.certutil.cert.storage.CertMongoStorage;
+import org.graylog.security.certutil.cert.storage.CertStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
-import org.graylog.security.certutil.csr.storage.CsrStorage;
 import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -45,8 +46,8 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
     private final NodePreflightConfigService nodePreflightConfigService;
 
-    private final CsrStorage csrStorage;
-    private final CertMongoStorage certMongoStorage;
+    private final CsrMongoStorage csrStorage;
+    private final CertStorage certMongoStorage;
 
     private String caKeystoreFilename = "datanode-ca.p12";
     private Integer DEFAULT_VALIDITY = 90;
@@ -66,6 +67,11 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
         final Path caKeystorePath = Path.of(caKeystoreFilename);
 
+        if(!Files.exists(caKeystorePath)) {
+            LOG.warn("mandatory keystore file does not exist.");
+            return;
+        }
+
         try {
             char[] password = DEFAULT_PASSWORD.toCharArray();
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
@@ -81,9 +87,17 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                     .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
                     .forEach(c -> {
                         try {
-                            var csr = csrStorage.readCsr();
-                            var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
-                            certMongoStorage.writeCert(cert);
+                            var csr = csrStorage.readCsr(c.nodeId());
+                            if (csr.isEmpty()) {
+                                LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
+                                nodePreflightConfigService.save(c.toBuilder()
+                                        .state(NodePreflightConfig.State.ERROR)
+                                        .errorMsg("Node in CSR state, but no CSR present")
+                                        .build());
+                            } else {
+                                var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                                certMongoStorage.writeCert(cert, c.nodeId());
+                            }
                         } catch (Exception e) {
                             LOG.error("Could not sign CSR: " + e.getMessage(), e);
                             nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());

@@ -41,6 +41,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -226,10 +227,11 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     @Override
     public SearchEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        var queries = this.queries().stream()
+                .map(query -> query.toContentPackEntity(entityDescriptorIds))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         final SearchEntity.Builder searchEntityBuilder = SearchEntity.builder()
-                .queries(ImmutableSet.copyOf(this.queries().stream()
-                        .map(query -> query.toContentPackEntity(entityDescriptorIds))
-                        .collect(Collectors.toSet())))
+                .queries(ImmutableSet.copyOf(queries))
                 .parameters(this.parameters())
                 .requires(this.requires())
                 .createdAt(this.createdAt());

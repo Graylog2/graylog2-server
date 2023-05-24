@@ -18,7 +18,7 @@ package org.graylog.security.certutil.csr.storage;
 
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 import java.io.BufferedReader;
@@ -37,7 +37,7 @@ public record CsrFileStorage(String csrFilename) implements CsrStorage {
 
     @Override
     public void writeCsr(PKCS10CertificationRequest csr)
-            throws IOException, OperatorCreationException {
+            throws IOException, OperatorException {
 
         try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(new FileWriter(csrFilename, Charset.defaultCharset()))) {
             jcaPEMWriter.writeObject(csr);
@@ -46,7 +46,7 @@ public record CsrFileStorage(String csrFilename) implements CsrStorage {
 
     @Override
     public PKCS10CertificationRequest readCsr()
-            throws IOException, OperatorCreationException {
+            throws IOException, OperatorException {
 
         Reader pemReader = new BufferedReader(new FileReader(csrFilename, Charset.defaultCharset()));
         PEMParser pemParser = new PEMParser(pemReader);

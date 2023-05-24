@@ -22,7 +22,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.revinate.assertj.json.JsonPathAssert;
+import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import java.util.function.Consumer;

@@ -14,20 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.storage;
+import * as React from 'react';
 
-import org.graylog.security.certutil.ca.exceptions.CAStorageException;
+import { Button, Title, Space } from 'preflight/components/common';
 
-import java.nio.file.Path;
-import java.security.KeyStore;
-
-public interface CAKeystoreStorage {
-
-    void writeCAKeyStore(final Path keystorePath,
-                         final KeyStore caKeyStore,
-                         final char[] password)
-            throws CAStorageException;
-
-    //TODO: we may need a read method as well, for CSR processing
-
+type Props = {
+  onResumeStartup: () => void,
 }
+
+const ConfigurationFinished = ({ onResumeStartup }: Props) => (
+  <div>
+    <Title order={3}>All data nodes are secured and reachable.</Title>
+    <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
+    <Space h="md" />
+    <Button onClick={onResumeStartup} size="xs">
+      Resume startup
+    </Button>
+  </div>
+);
+
+export default ConfigurationFinished;
