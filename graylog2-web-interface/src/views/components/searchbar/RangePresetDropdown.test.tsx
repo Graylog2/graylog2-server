@@ -39,7 +39,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 describe('RangePresetDropdown', () => {
   it('should not call onChange prop when selecting "Configure Ranges" option.', async () => {
     const onSelectOption = jest.fn();
-    render(<RangePresetDropdown onChange={onSelectOption} />);
+    render(<RangePresetDropdown onChange={onSelectOption} availableOptions={[]} />);
 
     const timeRangeButton = screen.getByLabelText('Open time range preset select');
     fireEvent.click(timeRangeButton);
