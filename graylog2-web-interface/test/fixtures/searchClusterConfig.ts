@@ -132,24 +132,6 @@ const searchClusterConfig: SearchesConfig = {
       },
       description: 'all messages',
     },
-    {
-      id: '75eb1eb5-7f49-43d4-8a67-550491fb2a71',
-      timerange: {
-        from: '2023-05-21T09:56:34.000Z',
-        to: '2023-05-22T10:01:34.000Z',
-        type: 'absolute',
-      },
-      description: 'some absolute',
-    },
-    {
-      id: 'b6601ece-cfa8-4d7a-ae80-7ecb365ed824',
-      timerange: {
-        from: '2023-05-22T11:37:22.000Z',
-        to: '2023-05-23T11:42:22.000Z',
-        type: 'absolute',
-      },
-      description: 'abs2',
-    },
   ],
   query_time_range_limit: 'PT0S',
   relative_timerange_options: {
