@@ -18,10 +18,12 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Formik, Form, Field } from 'formik';
+import { Input as MantineInput } from '@mantine/core';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
-import { Icon, Dropzone } from 'preflight/components/common';
+import { Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
@@ -39,7 +41,21 @@ const DropzoneInner = styled.div`
   gap: 10px;
 `;
 
-const submitUpload = (files: Array<File>) => fetch('POST', qualifyUrl('/api/ca/upload'), { files }, false);
+const Files = styled.div`
+  margin-top: 5px;
+  margin-bottom: 5px;
+`;
+
+const File = styled.div`
+  gap: 5px;
+  display: flex;
+  align-items: center;
+`;
+
+const DeleteIcon = styled(Icon)`
+  cursor: pointer;
+`;
+const submitUpload = (formValues: { files?: Array<File>, password?: string }) => fetch('POST', qualifyUrl('/api/ca/upload'), formValues, false);
 
 const CAUpload = () => {
   const queryClient = useQueryClient();
@@ -58,25 +74,59 @@ const CAUpload = () => {
   });
 
   return (
-    <CADropzone onDrop={onProcessUpload}
-                onReject={onRejectUpload}
-                data-testid="upload-dropzone"
-                loading={isLoading}>
-      <DropzoneInner>
-        <Dropzone.Accept>
-          <Icon name="file" type="solid" size="2x" />
-        </Dropzone.Accept>
-        <Dropzone.Reject>
-          <Icon name="triangle-exclamation" size="2x" />
-        </Dropzone.Reject>
-        <Dropzone.Idle>
-          <Icon name="file" type="regular" size="2x" />
-        </Dropzone.Idle>
-        <div>
-          Drag CA here or click to select file
-        </div>
-      </DropzoneInner>
-    </CADropzone>
+    <Formik initialValues={{}} onSubmit={onProcessUpload}>
+      {({ isSubmitting, isValid }) => (
+        <Form>
+          <Field name="files">
+            {({ field: { name, onChange, value } }) => (
+              <>
+                <MantineInput.Label required htmlFor="ca-dropzone">Certificate Authority</MantineInput.Label>
+                <CADropzone onDrop={(files) => onChange({ target: { name, value: files } })}
+                            onReject={onRejectUpload}
+                            data-testid="upload-dropzone"
+                            loading={isLoading}>
+                  <DropzoneInner>
+                    <Dropzone.Accept>
+                      <Icon name="file" type="solid" size="2x" />
+                    </Dropzone.Accept>
+                    <Dropzone.Reject>
+                      <Icon name="triangle-exclamation" size="2x" />
+                    </Dropzone.Reject>
+                    <Dropzone.Idle>
+                      <Icon name="file" type="regular" size="2x" />
+                    </Dropzone.Idle>
+                    <div>
+                      Drag CA here or click to select file
+                    </div>
+                  </DropzoneInner>
+                </CADropzone>
+                <Files>
+                  {value?.map(({ name: fileName }, index) => (
+                    <File>
+                      <Icon name="file" /> {fileName} <DeleteIcon name="xmark"
+                                                                  onClick={() => {
+                                                                    const newValue = [...value];
+                                                                    delete newValue[index];
+                                                                    onChange({ target: { name, value: newValue } });
+                                                                  }} />
+                    </File>
+                  ))}
+                </Files>
+              </>
+            )}
+          </Field>
+
+          <FormikInput placeholder="Password"
+                       name="password"
+                       type="password"
+                       label="Password" />
+          <Space h="md" />
+          <Button disabled={isSubmitting || !isValid} type="submit">
+            {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
+          </Button>
+        </Form>
+      )}
+    </Formik>
   );
 };
 

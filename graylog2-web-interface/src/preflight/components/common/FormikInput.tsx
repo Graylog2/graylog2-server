@@ -22,16 +22,18 @@ import Input from 'preflight/components/common/Input';
 
 type Props = {
   name: string,
-  label: string,
+  label: React.ReactNode,
   placeholder?: string,
+  type?: string
 }
 
-const FormikInput = ({ name, placeholder, label }: Props) => (
+const FormikInput = ({ name, placeholder, label, type }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange, onBlur }, meta: { error: validationError } }) => (
       <Input onBlur={onBlur}
              id={name}
              label={label}
+             type={type}
              placeholder={placeholder}
              value={value}
              error={validationError}
