@@ -169,8 +169,6 @@ public class IndexSetValidatorTest {
                 assertThat(v.message()).contains("effective index retention period of P1W3D")
         );
 
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway()).thenReturn(Period.days(28));
-
         // rotation strategy is not time-based
         final IndexSetConfig modifiedConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
