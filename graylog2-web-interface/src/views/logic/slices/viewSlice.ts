@@ -139,6 +139,7 @@ export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async 
   const view = selectView(getState());
   const { search } = view;
   const newSearch = search.toBuilder()
+    .newId()
     .queries(newQueries)
     .build();
 
