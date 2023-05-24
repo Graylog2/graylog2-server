@@ -91,9 +91,6 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     retentionStrategiesContext: PropTypes.shape({
       max_index_retention_period: PropTypes.string,
     }).isRequired,
-    rotationStrategiesContext: PropTypes.shape({
-      time_size_optimizing_retention_fixed_leeway: PropTypes.string,
-    }).isRequired,
     create: PropTypes.bool,
     onUpdate: PropTypes.func.isRequired,
     cancelLink: PropTypes.string.isRequired,
