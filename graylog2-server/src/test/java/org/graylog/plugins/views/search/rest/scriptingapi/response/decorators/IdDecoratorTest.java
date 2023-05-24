@@ -20,7 +20,6 @@ import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
-import org.graylog2.plugin.Message;
 import org.junit.jupiter.api.Test;
 
 class IdDecoratorTest {

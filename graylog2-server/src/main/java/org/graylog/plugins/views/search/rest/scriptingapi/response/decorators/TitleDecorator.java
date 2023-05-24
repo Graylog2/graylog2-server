@@ -69,7 +69,7 @@ public class TitleDecorator implements FieldDecorator {
 
         final EntitiesTitleResponse response = entityTitleService.getTitles(req, searchUser);
         return extractTitles(ids, response.entities()).stream()
-                .collect(Collectors.collectingAndThen(Collectors.toList(), this::unwrapIfSingleResult));
+                .collect(Collectors.collectingAndThen(Collectors.toList(), titles -> value instanceof Collection<?> ? titles : unwrapIfSingleResult(titles)));
     }
 
     private List<String> extractTitles(List<String> ids, Set<EntityTitleResponse> entities) {

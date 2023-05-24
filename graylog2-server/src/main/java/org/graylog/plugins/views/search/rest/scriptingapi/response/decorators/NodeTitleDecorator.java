@@ -26,7 +26,6 @@ import org.graylog2.shared.utilities.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.function.Function;
 
 
 public class NodeTitleDecorator implements FieldDecorator {
