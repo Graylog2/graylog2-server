@@ -269,6 +269,7 @@ public class ElasticsearchConfiguration {
         return timeSizeOptimizingRotationMaxLifeTime;
     }
 
+    @Nullable
     public Period getTimeSizeOptimizingRotationFixedLeeway() {
         return timeSizeOptimizingRotationFixedLeeway;
     }
