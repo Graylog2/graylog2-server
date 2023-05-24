@@ -17,24 +17,24 @@
 import { notifications } from '@mantine/notifications';
 
 const UserNotification = {
-  error(message, title) {
+  error(message: string, title = 'Error') {
     notifications.show({
       message,
-      title: title || 'Error',
+      title,
       autoClose: 10000,
       color: 'red',
     });
   },
-  warning(message, title) {
+  warning(message: string, title = 'Attention') {
     notifications.show({
       message,
-      title: title || 'Attention',
+      title,
     });
   },
-  success(message, title) {
+  success(message: string, title = 'Success') {
     notifications.show({
       message,
-      title: title || 'Information',
+      title,
       color: 'green',
     });
   },

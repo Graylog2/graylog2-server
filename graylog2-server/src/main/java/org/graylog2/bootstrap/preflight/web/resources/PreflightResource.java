@@ -106,9 +106,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void generate() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        activeDataNodes.values().forEach(node -> {
-            nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(node.getNodeId()).state(NodePreflightConfig.State.CONFIGURED).build());
-        });
+        activeDataNodes.values().forEach(node -> nodePreflightConfigService.changeState(node.getNodeId(), NodePreflightConfig.State.CONFIGURED));
     }
 
     @POST

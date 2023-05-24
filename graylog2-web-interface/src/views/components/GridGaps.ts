@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -16,144 +17,108 @@
  */
 import uniq from 'lodash/uniq';
 
-type Item = {
-  start: { x: number, y: number },
-  end: { x: number, y: number },
-};
-
 const range = (start: number, end: number): Array<number> => [
   ...Array((end + 1) - start).keys(),
 ].map((i) => i + start);
 
-const itemsInRow = (items: Item[], row: number): Item[] => items.filter(({ start, end }) => start.y <= row && end.y > row);
+const normalizeInfinity = ({ width, height, col, row }: Position, maxWidth: number): Position => ({
+  col,
+  row,
+  height,
+  width: Number.isFinite(width) ? width : maxWidth,
+});
 
-function isRightToItem(item: Item, i: Item) {
-  return item.start.x <= i.start.x;
-}
+type Grid<T> = Array<Array<T>>;
 
-const sortByStartXAsc = (item1: Item, item2: Item) => item1.start.x - item2.start.x;
+const placeItemInGrid = <T extends boolean | string | number>(grid: Grid<T>, item: Position, value: T, overlapValue: T = value) => {
+  let overlap = false;
 
-const neighborsToRight = (item: Item, rowItems: { [row: string]: Item[] }) => {
-  const rows = range(item.start.y, item.end.y - 1);
-  const neighbors = rows.flatMap((row) => rowItems[row].filter((i) => i !== item).filter((i) => isRightToItem(item, i)).sort(sortByStartXAsc)[0])
-    .filter((i) => i !== undefined);
+  range(item.col, item.col + item.width - 1).forEach((x) => {
+    range(item.row, item.row + item.height - 1).forEach((y) => {
+      if (grid[y]?.[x] !== undefined) {
+        overlap = true;
+      }
 
-  return uniq(neighbors);
+      // eslint-disable-next-line no-param-reassign
+      (grid[y] ??= [])[x] = (grid[y]?.[x] !== undefined) ? overlapValue : value;
+    });
+  });
+
+  return overlap;
 };
 
-const gapBetween = (item: Item, neighbor: Item): Item => ({
-  start: { x: item.end.x, y: Math.min(item.start.y, neighbor.start.y) },
-  end: { x: neighbor.start.x, y: Math.min(item.end.y, neighbor.end.y) },
-});
-
-const normalizeInfinity = ({ start, end }: Item, maxWidth: number): Item => ({
-  start,
-  end: {
-    x: Number.isFinite(end.x) ? end.x : maxWidth,
-    y: end.y,
-  },
-});
-
-type RowItems = { [row: string]: Item[] };
-
-const findInitialGaps = (rows: Array<number>, rowItems: RowItems, minWidth: number) => rows
-  .filter((row) => rowItems[row].length > 0)
-  .map((row) => [row, Math.min(...rowItems[row].map((item) => item.start.x))])
-  .filter(([, startX]) => startX > minWidth)
-  .reduce((gaps, [row, startX]) => {
-    if (gaps.length === 0) {
-      return [{ start: { x: minWidth, y: row }, end: { x: startX, y: row + 1 } }] as Item[];
-    }
-
-    const [gap, ...rest] = gaps.reverse();
-
-    if (gap.end.x !== startX || gap.end.y < row) {
-      return [...rest, gap, { start: { x: minWidth, y: row }, end: { x: startX, y: row + 1 } }];
-    }
-
-    return [...rest, { start: gap.start, end: { x: startX, y: row + 1 } }];
-  }, [] as Item[]);
-
-const findFinalGaps = (rows: Array<number>, rowItems: RowItems, maxWidth: number) => rows
-  .filter((row) => rowItems[row].length > 0)
-  .map((row) => [row, Math.max(...rowItems[row].map((item) => item.end.x))])
-  .filter(([, endX]) => endX < maxWidth)
-  .reduce((gaps, [row, endX]) => {
-    if (gaps.length === 0) {
-      return [{ start: { x: endX, y: row }, end: { x: maxWidth, y: row + 1 } }] as Item[];
-    }
-
-    const [gap, ...rest] = gaps.reverse();
-
-    if (gap.start.x !== endX || gap.end.y < row) {
-      return [...rest, gap, { start: { x: endX, y: row }, end: { x: maxWidth, y: row + 1 } }];
-    }
-
-    return [...rest, { start: gap.start, end: { x: maxWidth, y: row + 1 } }];
-  }, [] as Item[]);
-
-const itemsOverlap = (items: Item[]) => {
+const itemsOverlap = (items: Position[]) => {
   if (items.length === 0) {
     return false;
   }
 
-  const minY = Math.min(...items.map(({ start: { y } }) => y));
-  const maxY = Math.max(...items.map(({ end: { y } }) => y - 1));
-
-  const spaces = [];
-
-  for (let row = minY; row <= maxY; row += 1) {
-    spaces[row] = [];
-  }
+  const grid = [];
 
   // eslint-disable-next-line no-restricted-syntax
   for (const item of items) {
-    const { start, end } = item;
-
-    for (let { x } = start; x < end.x; x += 1) {
-      for (let { y } = start; y < end.y; y += 1) {
-        if (spaces[y][x] !== undefined) {
-          return true;
-        }
-
-        spaces[y][x] = true;
-      }
+    if (placeItemInGrid(grid, item, true)) {
+      return true;
     }
   }
 
   return false;
 };
 
-const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): Item[] => {
+type Position = {
+  col: number,
+  row: number,
+  height: number,
+  width: number,
+};
+
+const rowIsEmpty = <T extends boolean | string | number>(grid: Grid<T>, row: number) => (grid[row] ?? []).every((cell) => cell === undefined);
+
+const findGaps = (_items: Position[], minWidth: number = 1, maxWidth: number = 13): Position[] => {
   if (_items.length === 0) {
     return [];
   }
 
   const items = _items.map((item) => normalizeInfinity(item, maxWidth));
+  const minY = Math.min(...items.map(({ row }) => row));
+  const maxY = Math.max(...items.map(({ row, height }) => row + height - 1));
 
   if (itemsOverlap(items)) {
     return [];
   }
 
-  const minY = Math.min(...items.map(({ start: { y } }) => y));
-  const maxY = Math.max(...items.map(({ end: { y } }) => y - 1));
+  const grid = [];
 
-  const rows = range(minY, maxY);
+  items.forEach((item) => placeItemInGrid(grid, item, true));
 
-  const rowItems = Object.fromEntries(rows.map((row) => [row, itemsInRow(items, row)]));
+  const gaps = [];
 
-  const initialGaps = findInitialGaps(rows, rowItems, minWidth);
+  for (let x = minWidth; x < maxWidth - 1; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      if (!rowIsEmpty(grid, y) && grid[y]?.[x] === undefined) {
+        const gap = { col: x, row: y, height: 1, width: 1 };
 
-  const finalGaps = findFinalGaps(rows, rowItems, maxWidth);
+        while (gap.col + gap.width < maxWidth && grid[y]?.[gap.col + gap.width] === undefined) {
+          gap.width += 1;
+        }
 
-  const gaps = items.flatMap((item) => {
-    const neighbors = neighborsToRight(item, rowItems);
+        if (gap.width > 1) {
+          while (!rowIsEmpty(grid, gap.row + gap.height) && gap.row + gap.height <= maxY) {
+            if (range(gap.col, gap.col + gap.width - 1).every((k) => !grid[gap.row + gap.height]?.[k])) {
+              gap.height += 1;
+            } else {
+              break;
+            }
+          }
 
-    return neighbors.filter((neighbor) => neighbor.start.x > item.end.x)
-      .map((neighbor) => gapBetween(item, neighbor));
-  });
+          placeItemInGrid(grid, gap, true);
 
-  return uniq([...gaps, ...initialGaps, ...finalGaps]);
+          gaps.push(gap);
+        }
+      }
+    }
+  }
+
+  return uniq(gaps);
 };
 
 export default findGaps;

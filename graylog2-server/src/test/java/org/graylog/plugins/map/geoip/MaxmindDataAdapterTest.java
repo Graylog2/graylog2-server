@@ -141,11 +141,11 @@ public class MaxmindDataAdapterTest {
             assertThat(lookupResult.multiValue())
                     .extracting("city")
                     .extracting("geoNameId")
-                    .containsExactly(5375480);
+                    .isEqualTo(5375480);
             assertThat(lookupResult.multiValue())
                     .extracting("location")
                     .extracting("metroCode")
-                    .containsExactly(807);
+                    .isEqualTo(807);
         }
 
         @Test
@@ -192,7 +192,7 @@ public class MaxmindDataAdapterTest {
             assertThat(lookupResult.multiValue())
                     .extracting("country")
                     .extracting("geoNameId")
-                    .containsExactly(6252001);
+                    .isEqualTo(6252001);
         }
 
         @Test
@@ -228,10 +228,10 @@ public class MaxmindDataAdapterTest {
             assertThat(lookupResult.singleValue()).isEqualTo(15169);
             assertThat(lookupResult.multiValue())
                     .extracting("as_number")
-                    .containsExactly(15169);
+                    .isEqualTo(15169);
             assertThat(lookupResult.multiValue())
                     .extracting("as_organization")
-                    .containsExactly("Google LLC");
+                    .isEqualTo("Google LLC");
         }
 
         @Test

@@ -62,7 +62,7 @@ class DecorateQueryStringsNormalizerTest {
 
         assertThat(normalizedQuery)
                 .extracting(Query::filter)
-                .allMatch(queryFilter -> (queryFilter instanceof QueryStringFilter && ((QueryStringFilter) queryFilter).query().equals("Hey there!")));
+                .matches(queryFilter -> (queryFilter instanceof QueryStringFilter && ((QueryStringFilter) queryFilter).query().equals("Hey there!")));
     }
 
     @Test
@@ -81,7 +81,7 @@ class DecorateQueryStringsNormalizerTest {
                 .hasSize(1)
                 .first()
                 .extracting(searchType -> searchType.query().orElseThrow(IllegalStateException::new))
-                .allMatch(q -> q instanceof BackendQuery && ((BackendQuery) q).queryString().equals("Hey there!"));
+                .matches(q -> q instanceof BackendQuery && ((BackendQuery) q).queryString().equals("Hey there!"));
     }
 
     @Test

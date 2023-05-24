@@ -17,7 +17,7 @@
 package org.graylog2.indexer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revinate.assertj.json.JsonPathAssert;
+import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
