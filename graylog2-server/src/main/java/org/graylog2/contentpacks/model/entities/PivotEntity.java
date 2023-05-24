@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -185,13 +186,15 @@ public abstract class PivotEntity implements SearchTypeEntity {
 
     @Override
     public SearchType toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        var rowGroups = rowLimit().isPresent() ? applyGroupLimit(rowGroups(), rowLimit().getAsInt()) : rowGroups();
+        var columnGroups = columnLimit().isPresent() ? applyGroupLimit(columnGroups(), columnLimit().getAsInt()) : columnGroups();
         return Pivot.builder()
                 .streams(mappedStreams(nativeEntities))
                 .name(name().orElse(null))
                 .sort(sort())
                 .timerange(timerange().orElse(null))
-                .rowGroups(rowGroups())
-                .columnGroups(columnGroups())
+                .rowGroups(rowGroups)
+                .columnGroups(columnGroups)
                 .series(series())
                 .rollup(rollup())
                 .query(query().orElse(null))
@@ -200,5 +203,16 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .type(type())
                 .id(id())
                 .build();
+    }
+
+    private List<BucketSpec> applyGroupLimit(List<BucketSpec> bucketSpecs, int limit) {
+        return bucketSpecs.stream()
+                .map(rowGroup -> {
+                    if (rowGroup instanceof Values values) {
+                        return values.withLimit(limit);
+                    }
+                    return rowGroup;
+                })
+                .toList();
     }
 }
