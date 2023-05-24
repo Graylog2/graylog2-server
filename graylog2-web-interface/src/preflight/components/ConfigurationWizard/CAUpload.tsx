@@ -118,7 +118,7 @@ const CAUpload = () => {
                 </CADropzone>
                 <Files>
                   {value?.map(({ name: fileName }, index) => (
-                    <File>
+                    <File key={fileName}>
                       <Icon name="file" /> {fileName} <DeleteIcon name="xmark"
                                                                   onClick={() => {
                                                                     const newValue = [...value];
