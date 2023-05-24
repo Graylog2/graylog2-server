@@ -27,7 +27,7 @@ import RuleHelper from './RuleHelper';
 
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
-const Rule = ({ create, title }) => {
+const Rule = ({ create, title, isRuleBuilder }) => {
   let pageTitle;
 
   if (create) {
@@ -35,8 +35,6 @@ const Rule = ({ create, title }) => {
   } else {
     pageTitle = <span>Pipeline rule <em>{title}</em></span>;
   }
-
-  const isRuleBuilder = true;
 
   return (
     <div>
@@ -73,11 +71,13 @@ const Rule = ({ create, title }) => {
 Rule.propTypes = {
   title: PropTypes.string,
   create: PropTypes.bool,
+  isRuleBuilder: PropTypes.bool,
 };
 
 Rule.defaultProps = {
   title: '',
   create: false,
+  isRuleBuilder: false,
 };
 
 export default Rule;
