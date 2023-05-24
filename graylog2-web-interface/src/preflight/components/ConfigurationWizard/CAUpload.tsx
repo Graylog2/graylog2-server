@@ -27,6 +27,11 @@ import { Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
+type FormValues = {
+  files?: Array<File>,
+  password?: string,
+}
+
 const CADropzone = styled(Dropzone)`
   height: 120px;
   display: flex;
@@ -55,7 +60,17 @@ const File = styled.div`
 const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
-const submitUpload = (formValues: { files?: Array<File>, password?: string }) => fetch('POST', qualifyUrl('/api/ca/upload'), formValues, false);
+const submitUpload = (formValues: FormValues) => fetch('POST', qualifyUrl('/api/ca/upload'), formValues, false);
+
+const validate = (formValues: FormValues) => {
+  let errors = {};
+
+  if (!formValues.files?.length) {
+    errors = { ...errors, files: 'A CA file is required' };
+  }
+
+  return errors;
+};
 
 const CAUpload = () => {
   const queryClient = useQueryClient();
@@ -74,11 +89,11 @@ const CAUpload = () => {
   });
 
   return (
-    <Formik initialValues={{}} onSubmit={onProcessUpload}>
+    <Formik<FormValues> initialValues={{}} onSubmit={(formValues: FormValues) => onProcessUpload(formValues)} validate={validate}>
       {({ isSubmitting, isValid }) => (
         <Form>
           <Field name="files">
-            {({ field: { name, onChange, value } }) => (
+            {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
                 <MantineInput.Label required htmlFor="ca-dropzone">Certificate Authority</MantineInput.Label>
                 <CADropzone onDrop={(files) => onChange({ target: { name, value: files } })}
@@ -112,6 +127,7 @@ const CAUpload = () => {
                     </File>
                   ))}
                 </Files>
+                {error && <MantineInput.Error>{error}</MantineInput.Error>}
               </>
             )}
           </Field>
