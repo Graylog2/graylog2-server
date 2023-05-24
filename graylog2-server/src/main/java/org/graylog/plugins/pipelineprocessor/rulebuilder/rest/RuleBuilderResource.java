@@ -133,7 +133,10 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @Path("/validate")
     @POST
     public RuleBuilderDto validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
-        return validatorService.validate(ruleBuilderDto);
+        final RuleBuilderDto validated = validatorService.validate(ruleBuilderDto);
+        return validated.toBuilder()
+                .ruleBuilder(ruleBuilderParser.generateTitles(validated.ruleBuilder()))
+                .build();
     }
 
     private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto) {
