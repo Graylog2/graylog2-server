@@ -33,11 +33,9 @@ class TitleDecoratorTest {
     void testPermitted() {
         final FieldDecorator decorator = new TitleDecorator((request, permissions) -> EntitiesTitleResponse.EMPTY_RESPONSE);
         Assertions.assertThat(decorator.accept(RequestedField.parse("streams"))).isTrue();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("streams.name"))).isTrue();
         Assertions.assertThat(decorator.accept(RequestedField.parse("streams.title"))).isTrue();
 
         Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input"))).isTrue();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input.name"))).isTrue();
         Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input.title"))).isTrue();
 
         // For IDs we have a different decorator
@@ -47,7 +45,7 @@ class TitleDecoratorTest {
         Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input.uppercase"))).isFalse();
         // other fields and entities are not supported
         Assertions.assertThat(decorator.accept(RequestedField.parse("http_response_code"))).isFalse();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("http_response_code.name"))).isFalse();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("http_response_code.title"))).isFalse();
     }
 
     @Test
