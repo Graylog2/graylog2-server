@@ -194,7 +194,6 @@ public class IndexSetValidatorTest {
     @Test
     public void timeBasedSizeOptimizingOnlyWithMultipleOfDays() {
         when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway()).thenReturn(Period.days(1));
 
         when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
         final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
