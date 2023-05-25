@@ -57,7 +57,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
       app_section: 'search-widget',
       app_action_value: 'widget-stretch-button',
     });
-  }, [onStretch, position, sendTelemetry, widgetId, widgetType]);
+  }, [onStretch, pathname, position, sendTelemetry, widgetId, widgetType]);
 
   if (!position) {
     return <Spinner />;

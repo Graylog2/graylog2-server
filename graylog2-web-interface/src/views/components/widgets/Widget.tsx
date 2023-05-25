@@ -208,7 +208,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       setWidgetEditing(widget.id);
       setOldWidget(widget);
     }
-  }, [editing, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
+  }, [editing, pathname, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     sendTelemetry('click', {
       app_pathname: getBasePathname(pathname),
