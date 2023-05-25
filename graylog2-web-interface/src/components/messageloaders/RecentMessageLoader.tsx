@@ -48,22 +48,20 @@ type ServerInputSelectProps = {
   isLoading: boolean,
 };
 
-const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: ServerInputSelectProps) => {
-  return (
-    <fieldset>
-      <Description>
-        {selectedInputId
-          ? 'Click on "Load Message" to load the most recent message received by this input within the last hour.'
-          : 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.'}
-      </Description>
-      <InputDropdown inputs={inputs}
-                     preselectedInputId={selectedInputId}
-                     onLoadMessage={onChange}
-                     title={isLoading ? 'Loading message...' : 'Load Message'}
-                     disabled={isLoading} />
-    </fieldset>
-  );
-};
+const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: ServerInputSelectProps) => (
+  <fieldset>
+    <Description>
+      {selectedInputId
+        ? 'Click on "Load Message" to load the most recent message received by this input within the last hour.'
+        : 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.'}
+    </Description>
+    <InputDropdown inputs={inputs}
+                   preselectedInputId={selectedInputId}
+                   onLoadMessage={onChange}
+                   title={isLoading ? 'Loading message...' : 'Load Message'}
+                   disabled={isLoading} />
+  </fieldset>
+);
 
 type ForwaderInputSelectProps = {
   onChange: (inputId: string) => void,

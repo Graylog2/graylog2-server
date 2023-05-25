@@ -73,24 +73,20 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     onStagesChange(newStages, callback);
   };
 
-  const _updateStage = useCallback((prevStage) => {
-    return (stage, callback) => {
-      const newStages = pipeline.stages.filter((s) => s.stage !== prevStage.stage);
+  const _updateStage = useCallback((prevStage) => (stage, callback) => {
+    const newStages = pipeline.stages.filter((s) => s.stage !== prevStage.stage);
 
-      newStages.push(stage);
-      onStagesChange(newStages, callback);
-    };
+    newStages.push(stage);
+    onStagesChange(newStages, callback);
   }, [pipeline, onStagesChange]);
 
-  const _deleteStage = useCallback((stage) => {
-    return () => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
-        const newStages = pipeline.stages.filter((s) => s.stage !== stage.stage);
+  const _deleteStage = useCallback((stage) => () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
+      const newStages = pipeline.stages.filter((s) => s.stage !== stage.stage);
 
-        onStagesChange(newStages);
-      }
-    };
+      onStagesChange(newStages);
+    }
   }, [pipeline, onStagesChange]);
 
   const _formatConnectedStreams = (connectedStreams: Stream[]) => {
@@ -121,9 +117,7 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
       ));
   }, [pipeline, _updateStage, _deleteStage]);
 
-  const stageKey = useMemo(() => {
-    return pipeline.stages.map((s) => s.stage).join('-');
-  }, [pipeline.stages]);
+  const stageKey = useMemo(() => pipeline.stages.map((s) => s.stage).join('-'), [pipeline.stages]);
 
   return (
     <div>

@@ -55,28 +55,26 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
     </ButtonToolbar>
   );
 
-  const _showPipelines = (pipelines: Array<PipelineSummary>) => {
-    return pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => {
-      const tooltip = <Tooltip id={`${id}${pipelineId}`} show>{pipelineTitle}</Tooltip>;
+  const _showPipelines = (pipelines: Array<PipelineSummary>) => pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => {
+    const tooltip = <Tooltip id={`${id}${pipelineId}`} show>{pipelineTitle}</Tooltip>;
 
-      return (
-        <React.Fragment key={pipelineId}>
-          {pipelineTitle.length > STRING_SIZE_LIMIT ? (
-            <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
-              <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-                {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
-              </Link>
-            </OverlayTrigger>
-          ) : (
+    return (
+      <React.Fragment key={pipelineId}>
+        {pipelineTitle.length > STRING_SIZE_LIMIT ? (
+          <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
             <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-              {pipelineTitle}
+              {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
             </Link>
-          )}
-          {index < (pipelinesLength - 1) && ',  '}
-        </React.Fragment>
-      );
-    });
-  };
+          </OverlayTrigger>
+        ) : (
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+            {pipelineTitle}
+          </Link>
+        )}
+        {index < (pipelinesLength - 1) && ',  '}
+      </React.Fragment>
+    );
+  });
 
   return (
     <tr key={title}>

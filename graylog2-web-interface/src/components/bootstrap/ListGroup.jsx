@@ -19,9 +19,7 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
 
-const ListGroup = ({ className, ...props }) => {
-  return <BootstrapListGroup bsClass={className} {...props} />;
-};
+const ListGroup = ({ className, ...props }) => <BootstrapListGroup bsClass={className} {...props} />;
 
 ListGroup.propTypes = {
   className: PropTypes.string,

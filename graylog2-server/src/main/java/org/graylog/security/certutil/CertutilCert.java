@@ -21,10 +21,12 @@ import com.github.rvesse.airline.annotations.Option;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.plugin.Tools;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.security.Key;
 import java.security.KeyStore;
@@ -83,6 +85,11 @@ public class CertutilCert implements CliCommand {
             console.printLine("Generating private key and certificate for this datanode");
 
             final CertRequest req = CertRequest.signed("localhost", intermediateCA)
+                    .withSubjectAlternativeName("localhost")
+                    .withSubjectAlternativeName(Tools.getLocalHostname())
+                    .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
+                    .withSubjectAlternativeName("127.0.0.1")
+                    .withSubjectAlternativeName("ip6-localhost")
                     .validity(Duration.ofDays(10 * 365));
             KeyPair nodePair = CertificateGenerator.generate(req);
 

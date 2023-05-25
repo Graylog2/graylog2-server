@@ -19,9 +19,7 @@ import PropTypes from 'prop-types';
 
 import EmailNotificationForm from './EmailNotificationForm';
 
-const EmailNotificationFormContainer = (props) => {
-  return <EmailNotificationForm {...props} />;
-};
+const EmailNotificationFormContainer = (props) => <EmailNotificationForm {...props} />;
 
 EmailNotificationFormContainer.propTypes = {
   config: PropTypes.object.isRequired,

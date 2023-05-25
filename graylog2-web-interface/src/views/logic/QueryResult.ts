@@ -27,11 +27,9 @@ type Results = {
   searchTypes: SearchTypeResults,
 };
 
-const _findMessages = (results: Results): (MessageResult | undefined) => {
-  return Object.keys(results.searchTypes)
-    .map((id) => results.searchTypes[id])
-    .find((searchType) => searchType.type.toLowerCase() === 'messages') as MessageResult;
-};
+const _findMessages = (results: Results): (MessageResult | undefined) => Object.keys(results.searchTypes)
+  .map((id) => results.searchTypes[id])
+  .find((searchType) => searchType.type.toLowerCase() === 'messages') as MessageResult;
 
 const _searchTypePlugin = (type: string) => {
   const typeDefinition = searchTypeDefinition(type);
@@ -81,10 +79,10 @@ export default class QueryResult {
       duration,
       timestamp,
       effectiveTimerange: effective_timerange,
-      searchTypes: mapValues(queryResult.search_types, (searchType) => {
+      searchTypes: mapValues(queryResult.search_types, (searchType) =>
         // each search type has a custom data structure attached to it, let the plugin convert the value
-        return _searchTypePlugin(searchType.type).convert(searchType);
-      }),
+        _searchTypePlugin(searchType.type).convert(searchType),
+      ),
     };
   }
 

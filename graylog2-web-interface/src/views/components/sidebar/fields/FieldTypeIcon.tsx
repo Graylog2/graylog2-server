@@ -40,6 +40,12 @@ const iconClass = (type: string) => {
       return 'calendar-alt';
     case 'ip':
       return 'network-wired';
+    case 'node':
+      return 'circle-nodes';
+    case 'streams':
+      return 'code-branch';
+    case 'input':
+      return 'tower-broadcast';
     default:
       return 'question-circle';
   }

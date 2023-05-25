@@ -90,31 +90,29 @@ const Sort = React.memo(({ index }: Props) => {
   return (
     <div data-testid={`sort-element-${index}`}>
       <Field name={`sort.${index}.field`}>
-        {({ field: { name, onChange }, meta: { error } }) => {
-          return (
-            <Input id="field-select"
-                   label="Field"
-                   error={error}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
-              <Select options={invalidSort ? [{ label: currentSort.field, value: 0 }] : numberIndexedOptions}
-                      disabled={invalidSort}
-                      allowCreate={invalidSort}
-                      clearable={false}
-                      name={name}
-                      value={invalidSort ? 0 : selectedOption}
-                      placeholder="Specify field/metric to be sorted on"
-                      aria-label="Select field for sorting"
-                      size="small"
-                      menuPortalTarget={document.body}
-                      onChange={(newValue: Option['value']) => {
-                        const option = options[newValue];
-                        setFieldValue(`sort.${index}.type`, option.type);
-                        onChange({ target: { name, value: option.field } });
-                      }} />
-            </Input>
-          );
-        }}
+        {({ field: { name, onChange }, meta: { error } }) => (
+          <Input id="field-select"
+                 label="Field"
+                 error={error}
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9">
+            <Select options={invalidSort ? [{ label: currentSort.field, value: 0 }] : numberIndexedOptions}
+                    disabled={invalidSort}
+                    allowCreate={invalidSort}
+                    clearable={false}
+                    name={name}
+                    value={invalidSort ? 0 : selectedOption}
+                    placeholder="Specify field/metric to be sorted on"
+                    aria-label="Select field for sorting"
+                    size="small"
+                    menuPortalTarget={document.body}
+                    onChange={(newValue: Option['value']) => {
+                      const option = options[newValue];
+                      setFieldValue(`sort.${index}.type`, option.type);
+                      onChange({ target: { name, value: option.field } });
+                    }} />
+          </Input>
+        )}
       </Field>
 
       <Field name={`sort.${index}.direction`}>

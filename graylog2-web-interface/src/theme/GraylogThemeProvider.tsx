@@ -73,14 +73,10 @@ const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLo
       graylogColors: colors[mode],
       mode,
       initialLoad,
-    }).then((currentThemeColors) => {
-      return buildTheme(currentThemeColors, changeMode, mode);
-    });
+    }).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
   }
 
-  return Promise.resolve(colors[mode]).then((currentThemeColors) => {
-    return buildTheme(currentThemeColors, changeMode, mode);
-  });
+  return Promise.resolve(colors[mode]).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
 };
 
 const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
@@ -103,9 +99,7 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
     return ({ regenerateTheme });
   }, [changeMode, generateCustomThemeColors, mode]);
 
-  const themeModeContextValue = useMemo(() => {
-    return mode;
-  }, [mode]);
+  const themeModeContextValue = useMemo(() => mode, [mode]);
 
   return theme ? (
     <RegeneratableThemeContext.Provider value={regeneratableThemeContextValue}>

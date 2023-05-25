@@ -297,11 +297,9 @@ class Wizard extends React.Component<Props, State> {
              activeKey={selectedStep}
              onSelect={this._wizardChanged}
              justified={justified}>
-          {steps.map((navItem) => {
-            return (
-              <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
-            );
-          })}
+          {steps.map((navItem) => (
+            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
+          ))}
         </Nav>
         {!hidePreviousNextButtons && (
           <>
@@ -356,10 +354,8 @@ class Wizard extends React.Component<Props, State> {
                    activeKey={selectedStep}
                    onSelect={this._wizardChanged}
                    justified={justified}>
-          {steps.map((navItem) => {
-            return (
-              <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
-          })}
+          {steps.map((navItem) => (
+            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>))}
         </StyledNav>
       </HorizontalCol>
     );

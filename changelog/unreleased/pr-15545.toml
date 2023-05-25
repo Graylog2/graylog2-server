@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Improve widget placement for specific widget sizes/positions."
+
+pulls = ["15545"]
+issues = ["15308", "15538"]

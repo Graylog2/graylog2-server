@@ -156,40 +156,45 @@ const WidgetActionsMenu = ({
 
   const onDuplicate = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'search-widget',
-      eventElement: 'widget-duplicate-button',
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-duplicate-button',
     });
 
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
   }, [dispatch, widget.id, unsetWidgetFocusing, title, sendTelemetry]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => {
     sendTelemetry('click', {
-      appSection: 'search-widget',
-      eventElement: 'widget-copy-to-dashboard-button',
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-copy-to-dashboard-button',
     });
 
     return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
   }, [history, sendTelemetry, view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
     sendTelemetry('click', {
-      appSection: 'search-widget',
-      eventElement: 'widget-move-button',
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-move-button',
     });
 
     return _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy);
   }, [dispatch, sendTelemetry, view]);
   const onDelete = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'search-widget',
-      eventElement: 'widget-delete-button',
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-delete-button',
     });
 
     return dispatch(_onDelete(widget, view, title));
   }, [dispatch, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
     sendTelemetry('click', {
-      appSection: 'search-widget',
-      eventElement: 'widget-focus-button',
+      app_pathname: 'search',
+      app_section: 'search-widget',
+      app_action_value: 'widget-focus-button',
     });
 
     return setWidgetFocusing(widget.id);

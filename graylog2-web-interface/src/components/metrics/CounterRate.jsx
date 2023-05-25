@@ -52,9 +52,7 @@ class CounterRate extends React.Component {
     });
   }
 
-  _checkPrevMetric = () => {
-    return this.state.prevMetric && this.state.prevMetric.count !== undefined && this.state.prevTs;
-  };
+  _checkPrevMetric = () => this.state.prevMetric && this.state.prevMetric.count !== undefined && this.state.prevTs;
 
   _placeholder = () => {
     if (this.props.hideOnZero) {

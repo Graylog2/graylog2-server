@@ -74,21 +74,19 @@ class EditExtractor extends React.Component {
     this._onFieldChange('target_field')(event);
   };
 
-  _onFieldChange = (key) => {
-    return (event) => {
-      const nextState = {};
-      const { updatedExtractor } = this.state;
+  _onFieldChange = (key) => (event) => {
+    const nextState = {};
+    const { updatedExtractor } = this.state;
 
-      updatedExtractor[key] = FormUtils.getValueFromInput(event.target);
-      nextState.updatedExtractor = updatedExtractor;
+    updatedExtractor[key] = FormUtils.getValueFromInput(event.target);
+    nextState.updatedExtractor = updatedExtractor;
 
-      // Reset result of testing condition after a change in the input
-      if (key === 'condition_value') {
-        nextState.conditionTestResult = undefined;
-      }
+    // Reset result of testing condition after a change in the input
+    if (key === 'condition_value') {
+      nextState.conditionTestResult = undefined;
+    }
 
-      this.setState(nextState);
-    };
+    this.setState(nextState);
   };
 
   _onConfigurationChange = (newConfiguration) => {
@@ -201,18 +199,16 @@ class EditExtractor extends React.Component {
       .then(() => onSave());
   };
 
-  _staticField = (label, text) => {
-    return (
-      <FormGroup>
-        <Col componentClass={ControlLabel} md={2}>
-          {label}
-        </Col>
-        <Col md={10}>
-          <FormControl.Static>{text}</FormControl.Static>
-        </Col>
-      </FormGroup>
-    );
-  };
+  _staticField = (label, text) => (
+    <FormGroup>
+      <Col componentClass={ControlLabel} md={2}>
+        {label}
+      </Col>
+      <Col md={10}>
+        <FormControl.Static>{text}</FormControl.Static>
+      </Col>
+    </FormGroup>
+  );
 
   render() {
     const { updatedExtractor, exampleMessage } = this.state;

@@ -26,20 +26,16 @@ const SizeBasedRotationStrategyConfiguration = ({ config, updateConfig }) => {
   const { max_size } = config;
   const [maxSize, setMaxSize] = useState(max_size);
 
-  const _onInputUpdate = (field) => {
-    return (e) => {
-      const update = {};
-      const value = getValueFromInput(e.target);
-      update[field] = value;
+  const _onInputUpdate = (field) => (e) => {
+    const update = {};
+    const value = getValueFromInput(e.target);
+    update[field] = value;
 
-      setMaxSize(value);
-      updateConfig(update);
-    };
+    setMaxSize(value);
+    updateConfig(update);
   };
 
-  const _formatSize = () => {
-    return NumberUtils.formatBytes(maxSize);
-  };
+  const _formatSize = () => NumberUtils.formatBytes(maxSize);
 
   return (
     <div>

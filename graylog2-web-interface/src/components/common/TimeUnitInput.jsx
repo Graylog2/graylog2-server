@@ -229,15 +229,13 @@ const TimeUnitInput = createReactClass({
     const { unitOptions } = this.state;
     const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox, pullRight } = this.props;
 
-    const options = unitOptions.map((o) => {
-      return (
-        <MenuItem key={o.value}
-                  onSelect={() => this._onUnitSelect(o.value)}
-                  active={unit === o.value}>
-          {o.label}
-        </MenuItem>
-      );
-    });
+    const options = unitOptions.map((o) => (
+      <MenuItem key={o.value}
+                onSelect={() => this._onUnitSelect(o.value)}
+                active={unit === o.value}>
+        {o.label}
+      </MenuItem>
+    ));
 
     const checkbox = (
       <InputGroup.Addon>

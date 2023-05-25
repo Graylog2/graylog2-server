@@ -31,7 +31,8 @@ public abstract class SearchVersion {
 
     public enum Distribution {
         ELASTICSEARCH("Elasticsearch"),
-        OPENSEARCH("OpenSearch");
+        OPENSEARCH("OpenSearch"),
+        DATANODE("Datanode");
 
         private final String printName;
 

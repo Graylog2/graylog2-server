@@ -41,9 +41,7 @@ const InputStateBadge = createReactClass({
   _labelClassForState(sortedStates) {
     const { input } = this.props;
     const { nodes } = this.state;
-    const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => {
-      return numberOfNodes + state.count;
-    }, 0);
+    const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => numberOfNodes + state.count, 0);
 
     if (input.global && nodesWithKnownState !== Object.keys(nodes).length) {
       return 'warning';
@@ -102,16 +100,10 @@ const InputStateBadge = createReactClass({
       });
     }
 
-    const sorted = Object.keys(sortedInputStates).sort(this.comparator.compare.bind(this.comparator)).map((state) => {
-      return { state: state, count: sortedInputStates[state].length };
-    });
+    const sorted = Object.keys(sortedInputStates).sort(this.comparator.compare.bind(this.comparator)).map((state) => ({ state: state, count: sortedInputStates[state].length }));
 
     if (sorted.length > 0) {
-      const popOverText = sorted.map((state) => {
-        return sortedInputStates[state.state].map((node) => {
-          return <small><LinkToNode nodeId={node} />: {state.state}<br /></small>;
-        });
-      });
+      const popOverText = sorted.map((state) => sortedInputStates[state.state].map((node) => <small><LinkToNode nodeId={node} />: {state.state}<br /></small>));
       const popover = (
         <Popover id="inputstate-badge-details"
                  title={`Input States for ${input.title}`}

@@ -42,8 +42,8 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
       return initialQuery;
     }
 
-    return view?.state?.keySeq().get(0);
-  }, [initialQuery, view?.search?.queries, view?.state]);
+    return queries.first()?.id;
+  }, [initialQuery, view?.search?.queries]);
   const initialState = useMemo(() => ({
     view: { view, isDirty: false, isNew, activeQuery },
     searchExecution: {

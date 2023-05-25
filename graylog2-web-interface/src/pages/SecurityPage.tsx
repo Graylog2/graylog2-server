@@ -42,23 +42,21 @@ const SecurityPageStyles = createGlobalStyle`
   ${generateStyles()}
 `;
 
-const SecurityPage = () => {
-  return (
-    <PageLayout>
-      <ThemeModeContext.Consumer>
-        {(theme: ThemeMode) => (<SecurityPageStyles backgroundImage={theme === 'noir' ? SecurityNoLicenseImageDark : SecurityNoLicenseImage} />)}
-      </ThemeModeContext.Consumer>
-      <ThemeModeContext.Consumer>
-        {(theme: ThemeMode) => (
-          <div>
-            <a href="https://www.graylog.org/explore-security/" target="_blank" rel="noreferrer">
-              <img style={{ height: '500px' }} src={theme === 'noir' ? SecurityNoLicenseOverlayDark : SecurityNoLicenseOverlay} alt="security-overlay" />
-            </a>
-          </div>
-        )}
-      </ThemeModeContext.Consumer>
-    </PageLayout>
-  );
-};
+const SecurityPage = () => (
+  <PageLayout>
+    <ThemeModeContext.Consumer>
+      {(theme: ThemeMode) => (<SecurityPageStyles backgroundImage={theme === 'noir' ? SecurityNoLicenseImageDark : SecurityNoLicenseImage} />)}
+    </ThemeModeContext.Consumer>
+    <ThemeModeContext.Consumer>
+      {(theme: ThemeMode) => (
+        <div>
+          <a href="https://www.graylog.org/explore-security/" target="_blank" rel="noreferrer">
+            <img style={{ height: '500px' }} src={theme === 'noir' ? SecurityNoLicenseOverlayDark : SecurityNoLicenseOverlay} alt="security-overlay" />
+          </a>
+        </div>
+      )}
+    </ThemeModeContext.Consumer>
+  </PageLayout>
+);
 
 export default SecurityPage;

@@ -95,19 +95,17 @@ const queryHelpComponent = (
   </OverlayTrigger>
 );
 
-const NoResults = ({ query }: { query: string }) => {
-  return (
-    <tbody>
-      <tr>
-        <td colSpan={5}>
-          {query
-            ? <NoSearchResult>No data adapters found with title &quot;{query}&quot;</NoSearchResult>
-            : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
-        </td>
-      </tr>
-    </tbody>
-  );
-};
+const NoResults = ({ query }: { query: string }) => (
+  <tbody>
+    <tr>
+      <td colSpan={5}>
+        {query
+          ? <NoSearchResult>No data adapters found with title &quot;{query}&quot;</NoSearchResult>
+          : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+      </td>
+    </tr>
+  </tbody>
+);
 
 const DataRow = ({
   dataAdapters,
@@ -117,20 +115,18 @@ const DataRow = ({
   dataAdapters: LookupTableAdapter[],
   query: string,
   errors: { [key: string]: string },
-}) => {
-  return dataAdapters.length > 0
-    ? (
-      <>
-        {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
-          <DataAdapterTableEntry key={dataAdapter.id}
-                                 adapter={dataAdapter}
-                                 error={errors[dataAdapter.name]} />
-        ))}
-      </>
-    ) : (
-      <NoResults query={query} />
-    );
-};
+}) => (dataAdapters.length > 0
+  ? (
+    <>
+      {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
+        <DataAdapterTableEntry key={dataAdapter.id}
+                               adapter={dataAdapter}
+                               error={errors[dataAdapter.name]} />
+      ))}
+    </>
+  ) : (
+    <NoResults query={query} />
+  ));
 
 type Props = {
   dataAdapters: LookupTableAdapter[],

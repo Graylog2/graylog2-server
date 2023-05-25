@@ -26,7 +26,7 @@ import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-def
 import { EventsActions, EventsStore } from 'stores/events/EventsStore';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 
-import Events, { PAGE_SIZES } from './Events';
+import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
 
 import 'components/event-definitions/event-definition-types';
 
@@ -44,9 +44,7 @@ const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
   });
 };
 
-const fetchEventDefinitions = () => {
-  return EventDefinitionsActions.listPaginated({});
-};
+const fetchEventDefinitions = () => EventDefinitionsActions.listPaginated({});
 
 class EventsContainer extends React.Component {
   static propTypes = {
@@ -82,15 +80,17 @@ class EventsContainer extends React.Component {
   }
 
   handlePageChange = (nextPage, nextPageSize) => {
-    const { events } = this.props;
+    if (nextPage * nextPageSize <= EVENTS_MAX_OFFSET_LIMIT) {
+      const { events } = this.props;
 
-    fetchEvents({
-      page: nextPage,
-      pageSize: nextPageSize,
-      query: events.parameters.query,
-      filter: events.parameters.filter,
-      timerange: events.parameters.timerange,
-    });
+      fetchEvents({
+        page: nextPage,
+        pageSize: nextPageSize,
+        query: events.parameters.query,
+        filter: events.parameters.filter,
+        timerange: events.parameters.timerange,
+      });
+    }
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
@@ -109,20 +109,18 @@ class EventsContainer extends React.Component {
     promise.finally(callback);
   };
 
-  handleAlertFilterChange = (nextAlertFilter) => {
-    return () => {
-      const { events } = this.props;
-      const { resetPage, pageSize } = this.props.paginationQueryParameter;
+  handleAlertFilterChange = (nextAlertFilter) => () => {
+    const { events } = this.props;
+    const { resetPage, pageSize } = this.props.paginationQueryParameter;
 
-      resetPage();
+    resetPage();
 
-      fetchEvents({
-        query: events.parameters.query,
-        pageSize: pageSize,
-        filter: { alerts: nextAlertFilter },
-        timerange: events.parameters.timerange,
-      });
-    };
+    fetchEvents({
+      query: events.parameters.query,
+      pageSize: pageSize,
+      filter: { alerts: nextAlertFilter },
+      timerange: events.parameters.timerange,
+    });
   };
 
   handleTimeRangeChange = (timeRangeType, range) => {

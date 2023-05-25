@@ -65,17 +65,15 @@ const StyledSubmenu = styled(Dropdown)(({ left, theme }: { left: boolean, theme:
   }
 `);
 
-const DropdownSubmenu = ({ children, left, title }: Props) => {
-  return (
-    <StyledSubmenu left={left} as="li">
-      {title && <Toggle>{title}</Toggle>}
+const DropdownSubmenu = ({ children, left, title }: Props) => (
+  <StyledSubmenu left={left} as="li">
+    {title && <Toggle>{title}</Toggle>}
 
-      <Dropdown.Menu>
-        {children}
-      </Dropdown.Menu>
-    </StyledSubmenu>
-  );
-};
+    <Dropdown.Menu>
+      {children}
+    </Dropdown.Menu>
+  </StyledSubmenu>
+);
 
 DropdownSubmenu.propTypes = {
   children: PropTypes.node.isRequired,

@@ -24,22 +24,20 @@ import DisableSubmissionStateProvider from '../contexts/DisableSubmissionStatePr
 import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
 describe('WidgetConfigForm', () => {
-  const WidgetConfigFormWithValidationState = ({ validate }: { validate: () => ({ [key: string]: string })}) => {
-    return (
-      <DisableSubmissionStateProvider>
-        <DisableSubmissionStateContext.Consumer>
-          {({ disabled }) => (
-            <>
-              <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate} config={AggregationWidgetConfig.builder().build()}>
-                <span>Hello world!</span>
-              </WidgetConfigForm>
-              <span>{disabled ? 'Form submission is disabled' : 'Form submission is not disabled'}</span>
-            </>
-          )}
-        </DisableSubmissionStateContext.Consumer>
-      </DisableSubmissionStateProvider>
-    );
-  };
+  const WidgetConfigFormWithValidationState = ({ validate }: { validate: () => ({ [key: string]: string })}) => (
+    <DisableSubmissionStateProvider>
+      <DisableSubmissionStateContext.Consumer>
+        {({ disabled }) => (
+          <>
+            <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate} config={AggregationWidgetConfig.builder().build()}>
+              <span>Hello world!</span>
+            </WidgetConfigForm>
+            <span>{disabled ? 'Form submission is disabled' : 'Form submission is not disabled'}</span>
+          </>
+        )}
+      </DisableSubmissionStateContext.Consumer>
+    </DisableSubmissionStateProvider>
+  );
 
   it('propagates validation state to context if submission is disabled', async () => {
     render(<WidgetConfigFormWithValidationState validate={() => ({ visualization: 'Is missing.' })} />);

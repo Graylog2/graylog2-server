@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.mongodb;
 
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -26,18 +27,21 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 public class MongoJackExtension implements ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return isParameterSupported(parameterContext);
+        final Class<?> type = parameterContext.getParameter().getType();
+        return MongoJackObjectMapperProvider.class.equals(type) ||
+                CommonMongoJackObjectMapperProvider.class.equals(type);
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        if (isParameterSupported(parameterContext)) {
-            return new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        }
-        throw new ParameterResolutionException("Unsupported parameter type: " + parameterContext.getParameter().getName());
-    }
+        final Class<?> type = parameterContext.getParameter().getType();
 
-    private boolean isParameterSupported(ParameterContext parameterContext) {
-        return MongoJackObjectMapperProvider.class.equals(parameterContext.getParameter().getType());
+        if (MongoJackObjectMapperProvider.class.equals(type)) {
+            return new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
+        } else if (CommonMongoJackObjectMapperProvider.class.equals(type)) {
+            return new CommonMongoJackObjectMapperProvider(new ObjectMapperProvider());
+        }
+
+        throw new ParameterResolutionException("Unsupported parameter type: " + parameterContext.getParameter().getName());
     }
 }

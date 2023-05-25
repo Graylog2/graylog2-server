@@ -124,4 +124,8 @@ public class MongoDbIndexTools {
                 )
                 .findFirst();
     }
+
+    public void createUniqueIndex(final String field) {
+        this.db.createIndex(new BasicDBObject(field, 1), new BasicDBObject(UNIQUE_KEY, true));
+    }
 }

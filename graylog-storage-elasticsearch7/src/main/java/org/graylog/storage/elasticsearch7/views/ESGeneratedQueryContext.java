@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.util.UniqueNamer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -43,7 +42,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     private final ElasticsearchBackend elasticsearchBackend;
     private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
     private final Map<Object, Object> contextMap = Maps.newHashMap();
-    private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private final Set<SearchError> errors;
     private final SearchSourceBuilder ssb;
 
@@ -93,10 +91,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     public Map<Object, Object> contextMap() {
         return contextMap;
-    }
-
-    public String nextName() {
-        return uniqueNamer.nextName();
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {

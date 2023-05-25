@@ -1,0 +1,6 @@
+type = "added"
+message = "Add system logs to nodes overview page."
+
+issues = [""]
+pulls = ["15381"]
+

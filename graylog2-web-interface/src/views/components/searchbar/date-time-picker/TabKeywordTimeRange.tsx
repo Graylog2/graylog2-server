@@ -102,10 +102,8 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     return undefined;
   }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword, userTimezone]);
 
-  useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
+  useEffect(() => () => {
+    mounted.current = false;
   }, []);
 
   useEffect(() => {

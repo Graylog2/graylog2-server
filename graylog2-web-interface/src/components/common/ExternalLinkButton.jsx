@@ -26,13 +26,11 @@ import ExternalLink from 'components/common/ExternalLink';
  * All props besides `iconClass` and `children` are passed down to the react-bootstrap `<Button />` component.
  */
 
-const ExternalLinkButton = ({ iconClass, children, ...props }) => {
-  return (
-    <Button {...props}>
-      <ExternalLink iconClass={iconClass}>{children}</ExternalLink>
-    </Button>
-  );
-};
+const ExternalLinkButton = ({ iconClass, children, ...props }) => (
+  <Button {...props}>
+    <ExternalLink iconClass={iconClass}>{children}</ExternalLink>
+  </Button>
+);
 
 ExternalLinkButton.propTypes = {
   /** Link to the external location. */

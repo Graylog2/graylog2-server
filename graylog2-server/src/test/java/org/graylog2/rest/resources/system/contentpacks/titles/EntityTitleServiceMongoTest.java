@@ -16,7 +16,8 @@
  */
 package org.graylog2.rest.resources.system.contentpacks.titles;
 
-import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
@@ -33,37 +34,30 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService.TITLE_IF_NOT_PERMITTED;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleServiceImpl.TITLE_IF_NOT_PERMITTED;
 
 
 public class EntityTitleServiceMongoTest {
-
 
     private EntityTitleService toTest;
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    private DbEntitiesCatalog entitiesCatalog;
-    private Subject subject;
-
     @Before
     public void setUp() {
-        entitiesCatalog = new DbEntitiesCatalog(
+        DbEntitiesCatalog entitiesCatalog = new DbEntitiesCatalog(
                 List.of(
                         new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"),
                         new DbEntityCatalogEntry("nodes", "node_id", StreamImpl.class, "nodes:read")
                 )
         );
-        subject = mock(Subject.class);
         mongodb.start();
-        mongodb.importFixture("fixture_for_title_retrieval_testing.json", EntityTitleService.class);
+        mongodb.importFixture("fixture_for_title_retrieval_testing.json", EntityTitleServiceImpl.class);
 
         final MongoConnection connection = mongodb.mongoConnection();
 
-        toTest = new EntityTitleService(connection, entitiesCatalog);
+        toTest = new EntityTitleServiceImpl(connection, entitiesCatalog);
     }
 
     @Test
@@ -79,12 +73,15 @@ public class EntityTitleServiceMongoTest {
                         new EntityIdentifier("01020302e000000000000000", "nodes")  //not existing one
                 )
         );
-        //user has permission for 2 streams and 1 nodes
-        doReturn(true).when(subject).isPermitted("streams:read:01020302e16f9a1d1f6b074a");
-        doReturn(true).when(subject).isPermitted("streams:read:01020302e16f9a1d1f6b074b");
-        doReturn(true).when(subject).isPermitted("nodes:read:01020302e16f9a1d1f6b0741");
 
-        final EntitiesTitleResponse response = toTest.getTitles(subject, request);
+        //user has permission for 2 streams and 1 nodes
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowStream("01020302e16f9a1d1f6b074a")
+                .allowStream("01020302e16f9a1d1f6b074b")
+                .allowNodeRead("01020302e16f9a1d1f6b0741")
+                .build();
+
+        final EntitiesTitleResponse response = toTest.getTitles(request, searchUser);
 
         assertThat(response.entities())
                 .isNotNull()

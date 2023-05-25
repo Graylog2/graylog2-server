@@ -169,6 +169,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
         modules.add(new PreflightWebModule());
         modules.add(new ObjectMapperModule(chainingClassLoader));
+        modules.add(new SchedulerBindings());
 
         final Injector preflightInjector = getPreflightInjector(modules);
         GuiceInjectorHolder.setInjector(preflightInjector);

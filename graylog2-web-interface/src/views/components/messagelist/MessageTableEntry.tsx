@@ -103,7 +103,9 @@ type Props = {
 const isDecoratedField = (field, decorationStats) => decorationStats
   && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
 
-const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoration_stats?: any }, fields) => (isDecoratedField(fieldName, decorationStats)
+const fieldType = (fieldName, { decoration_stats: decorationStats }: {
+  decoration_stats?: any
+}, fields) => (isDecoratedField(fieldName, decorationStats)
   ? FieldType.Decorated
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
@@ -139,9 +141,10 @@ const MessageTableEntry = ({
     const isSelectingText = !!window.getSelection()?.toString();
 
     if (!isSelectingText) {
-      sendTelemetry('toggle_input_button', {
-        appSection: 'search-widget',
-        eventElement: 'widget-message-table-toggle-details',
+      sendTelemetry('input_button_toggle', {
+        app_pathname: 'search',
+        app_section: 'widget',
+        app_action_value: 'widget-message-table-toggle-details',
       });
 
       toggleDetail(`${message.index}-${message.id}`);

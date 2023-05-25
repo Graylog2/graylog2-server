@@ -46,16 +46,12 @@ class LookupTableFieldValueProviderForm extends React.Component {
   ];
 
   formatMessageFields = memoize(
-    (fieldTypes) => {
-      return fieldTypes
-        .sort((ftA, ftB) => naturalSortIgnoreCase(ftA.name, ftB.name))
-        .map((fieldType) => {
-          return {
-            label: `${fieldType.name} – ${fieldType.value.type.type}`,
-            value: fieldType.name,
-          };
-        });
-    },
+    (fieldTypes) => fieldTypes
+      .sort((ftA, ftB) => naturalSortIgnoreCase(ftA.name, ftB.name))
+      .map((fieldType) => ({
+        label: `${fieldType.name} – ${fieldType.value.type.type}`,
+        value: fieldType.name,
+      })),
     (fieldTypes) => fieldTypes.map((ft) => ft.name).join('-'),
   );
 
@@ -75,17 +71,13 @@ class LookupTableFieldValueProviderForm extends React.Component {
     this.propagateChanges(name, value);
   };
 
-  handleSelectChange = (key) => {
-    return (nextLookupTable) => {
-      this.propagateChanges(key, nextLookupTable);
-    };
+  handleSelectChange = (key) => (nextLookupTable) => {
+    this.propagateChanges(key, nextLookupTable);
   };
 
-  formatLookupTables = (lookupTables) => {
-    return lookupTables
-      .sort((lt1, lt2) => naturalSortIgnoreCase(lt1.title, lt2.title))
-      .map((table) => ({ label: table.title, value: table.name }));
-  };
+  formatLookupTables = (lookupTables) => lookupTables
+    .sort((lt1, lt2) => naturalSortIgnoreCase(lt1.title, lt2.title))
+    .map((table) => ({ label: table.title, value: table.name }));
 
   render() {
     const { allFieldTypes, config, lookupTables, validation } = this.props;

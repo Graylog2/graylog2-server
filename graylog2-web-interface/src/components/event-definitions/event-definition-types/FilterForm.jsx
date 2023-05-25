@@ -51,16 +51,14 @@ const LOOKUP_PERMISSIONS = [
   'lookuptables:read',
 ];
 
-const _buildNewParameter = (name) => {
-  return ({
-    name: name,
-    embryonic: true,
-    type: 'lut-parameter-v1',
-    data_type: 'any',
-    title: 'new title',
-    // has no binding, no need to set binding property
-  });
-};
+const _buildNewParameter = (name) => ({
+  name: name,
+  embryonic: true,
+  type: 'lut-parameter-v1',
+  data_type: 'any',
+  title: 'new title',
+  // has no binding, no need to set binding property
+});
 
 class FilterForm extends React.Component {
   formatStreamIds = memoize(
@@ -207,19 +205,17 @@ class FilterForm extends React.Component {
     this.propagateChange('streams', nextValue);
   };
 
-  handleTimeRangeChange = (fieldName) => {
-    return (nextValue, nextUnit) => {
-      const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
+  handleTimeRangeChange = (fieldName) => (nextValue, nextUnit) => {
+    const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
 
-      this.propagateChange(fieldName, durationInMs);
+    this.propagateChange(fieldName, durationInMs);
 
-      const stateFieldName = camelCase(fieldName);
+    const stateFieldName = camelCase(fieldName);
 
-      this.setState({
-        [`${stateFieldName}Duration`]: nextValue,
-        [`${stateFieldName}Unit`]: nextUnit,
-      });
-    };
+    this.setState({
+      [`${stateFieldName}Duration`]: nextValue,
+      [`${stateFieldName}Unit`]: nextUnit,
+    });
   };
 
   renderQueryParameters = () => {
@@ -240,17 +236,15 @@ class FilterForm extends React.Component {
       );
     }
 
-    const parameterButtons = queryParameters.map((queryParam) => {
-      return (
-        <EditQueryParameterModal key={queryParam.name}
-                                 queryParameter={LookupTableParameter.fromJSON(queryParam)}
-                                 embryonic={!!queryParam.embryonic}
-                                 queryParameters={queryParameters}
-                                 lookupTables={lookupTables.tables}
-                                 validation={validation}
-                                 onChange={onChangeQueryParameters} />
-      );
-    });
+    const parameterButtons = queryParameters.map((queryParam) => (
+      <EditQueryParameterModal key={queryParam.name}
+                               queryParameter={LookupTableParameter.fromJSON(queryParam)}
+                               embryonic={!!queryParam.embryonic}
+                               queryParameters={queryParameters}
+                               lookupTables={lookupTables.tables}
+                               validation={validation}
+                               onChange={onChangeQueryParameters} />
+    ));
 
     if (isEmpty(parameterButtons)) {
       return null;

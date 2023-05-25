@@ -18,10 +18,11 @@ package org.graylog.datanode.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.security.certutil.CertutilCert;
+import org.graylog.security.certutil.CertutilHttp;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 
@@ -30,41 +31,50 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.Key;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
+import static org.graylog.datanode.configuration.TlsConfigurationSupplier.TRUSTSTORE_FILENAME;
 
 @Singleton
 public class ConfigurationProvider implements Provider<OpensearchConfiguration> {
 
     private final OpensearchConfiguration configuration;
 
+    public static final String SSL_PREFIX = "plugins.security.ssl.";
+
     @Inject
-    public ConfigurationProvider(Configuration localConfiguration, DataNodeConfig sharedConfiguration, OpensearchDistribution opensearchDistribution) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    public ConfigurationProvider(Configuration localConfiguration,
+                                 DataNodeConfig sharedConfiguration,
+                                 OpensearchDistribution opensearchDistribution,
+                                 TlsConfigurationSupplier tlsConfigurationSupplier,
+                                 TruststoreCreator truststoreCreator,
+                                 RootCertificateFinder rootCertificateFinder
+    ) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+        Map<String, X509Certificate> rootCerts = new HashMap<>();
+        final String truststorePassword = UUID.randomUUID().toString();
         final var cfg = sharedConfiguration.test();
 
-        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
+        final String opensearchConfigLocation = localConfiguration.getOpensearchConfigLocation();
+        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
+        final Path datanodeConfigDir = Path.of(localConfiguration.getConfigLocation());
+        final Path opensearchConfigDir = Path.of(opensearchConfigLocation).resolve("opensearch");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
         config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        if(localConfiguration.isSingleNodeOnly()) {
+        if (localConfiguration.isSingleNodeOnly()) {
             config.put("discovery.type", "single-node");
         } else {
             config.put("cluster.initial_master_nodes", "node1");
@@ -77,16 +87,21 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                 networkHost -> config.put("network.host", networkHost));
 
 
-        final Path transportKeystorePath = Path.of(localConfiguration.getOpensearchConfigLocation())
+        //copy from read-only data node configuration, to read-write configuration directory
+        Path transportKeystorePath = datanodeConfigDir
                 .resolve(localConfiguration.getDatanodeTransportCertificate());
-
-
-        final Path httpKeystorePath = Path.of(localConfiguration.getOpensearchConfigLocation())
+        if (Files.exists(transportKeystorePath)) {
+            transportKeystorePath = Files.copy(transportKeystorePath, opensearchConfigDir.resolve(localConfiguration.getDatanodeTransportCertificate()));
+        }
+        Path httpKeystorePath = datanodeConfigDir
                 .resolve(localConfiguration.getDatanodeHttpCertificate());
+        if (Files.exists(httpKeystorePath)) {
+            httpKeystorePath = Files.copy(httpKeystorePath, opensearchConfigDir.resolve(localConfiguration.getDatanodeHttpCertificate()));
+        }
 
         if (Files.exists(transportKeystorePath) && Files.exists(httpKeystorePath)) {
             config.put("plugins.security.disabled", "false");
-            config.put("plugins.security.ssl.http.enabled", "true");
+            config.put(SSL_PREFIX + "http.enabled", "true");
 
             final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
 
@@ -102,7 +117,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         } else {
             config.put("plugins.security.disabled", "true");
-            config.put("plugins.security.ssl.http.enabled", "false");
+            config.put(SSL_PREFIX + "http.enabled", "false");
         }
 
 
@@ -112,12 +127,14 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                     "transport_certificate_password has to be configured for the keystore " + transportKeystorePath
             );
 
-            KeyStore nodeKeystore = loadKeystore(transportKeystorePath, localConfiguration.getDatanodeTransportCertificatePassword());
-            extractCertificates(opensearchConfigDir, "transport", nodeKeystore, localConfiguration.getDatanodeTransportCertificatePassword());
+            rootCerts.put("transport-chain-CA-root", rootCertificateFinder.findRootCert(transportKeystorePath,
+                    localConfiguration.getDatanodeTransportCertificatePassword(),
+                    CertutilCert.DATANODE_KEY_ALIAS));
 
-            config.put("plugins.security.ssl.transport.pemcert_filepath", "transport.pem");
-            config.put("plugins.security.ssl.transport.pemkey_filepath", "transport-key.pem");
-            config.put("plugins.security.ssl.transport.pemtrustedcas_filepath", "transport-ca.pem");
+            tlsConfigurationSupplier.addTransportTlsConfig(config,
+                    CertutilCert.DATANODE_KEY_ALIAS,
+                    localConfiguration.getDatanodeTransportCertificate(),
+                    localConfiguration.getDatanodeTransportCertificatePassword());
 
             config.put("plugins.security.allow_default_init_securityindex", "true");
             //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
@@ -136,26 +153,31 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             Objects.requireNonNull(localConfiguration.getDatanodeHttpCertificatePassword(),
                     "http_certificate_password has to be configured for the keystore " + httpKeystorePath
             );
+            rootCerts.put("http-chain-CA-root", rootCertificateFinder.findRootCert(httpKeystorePath,
+                    localConfiguration.getDatanodeHttpCertificatePassword(),
+                    CertutilHttp.DATANODE_KEY_ALIAS));
 
-            KeyStore httpKeystore = loadKeystore(httpKeystorePath, localConfiguration.getDatanodeHttpCertificatePassword());
+            tlsConfigurationSupplier.addHttpTlsConfig(config,
+                    CertutilHttp.DATANODE_KEY_ALIAS,
+                    localConfiguration.getDatanodeHttpCertificate(),
+                    localConfiguration.getDatanodeHttpCertificatePassword());
 
-            final String truststorePassword = UUID.randomUUID().toString();
-            final Path trustStorePath = createTruststore(httpKeystore, truststorePassword, opensearchConfigDir);
-            System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
-            System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
-
-            extractCertificates(opensearchConfigDir, "http", httpKeystore, localConfiguration.getDatanodeHttpCertificatePassword());
-
-            config.put("plugins.security.ssl.http.pemcert_filepath", "http.pem");
-            config.put("plugins.security.ssl.http.pemkey_filepath", "http-key.pem");
-            config.put("plugins.security.ssl.http.pemtrustedcas_filepath", "http-ca.pem");
         }
 
-
+        if (!rootCerts.isEmpty()) {
+            final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
+            truststoreCreator.createTruststore(rootCerts,
+                    truststorePassword,
+                    trustStorePath
+            );
+            System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
+            System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
+            tlsConfigurationSupplier.addTrustStoreTlsConfig(config, truststorePassword);
+        }
         configuration = new OpensearchConfiguration(
                 opensearchDistribution.version(),
                 opensearchDistribution.directory(),
-                Path.of(localConfiguration.getOpensearchConfigLocation()),
+                Path.of(opensearchConfigLocation),
                 localConfiguration.getOpensearchHttpPort(),
                 localConfiguration.getOpensearchTransportPort(),
                 localConfiguration.getRestApiUsername(),
@@ -185,57 +207,6 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
         mapper.writeValue(fos, map);
-    }
-
-    private Path createTruststore(KeyStore keystorePath, String password, Path opensearchConfigDir) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
-        KeyStore trustStore = KeyStore.getInstance("PKCS12");
-        trustStore.load(null, null);
-
-
-        final Certificate[] certs = keystorePath.getCertificateChain("datanode");
-
-        for (Certificate cert : certs) {
-            if (cert instanceof final X509Certificate x509Certificate) {
-                final String alias = x509Certificate.getSubjectX500Principal().getName();
-                trustStore.setCertificateEntry(alias, x509Certificate);
-            }
-        }
-
-        final Path truststorePath = opensearchConfigDir.resolve("datanode-truststore.jks");
-        trustStore.store(new FileOutputStream(truststorePath.toFile()), password.toCharArray());
-        return truststorePath;
-    }
-
-    private void extractCertificates(Path opensearchConfigDir, String prefix, KeyStore nodeKeystore, String password) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        final Key datanodePrivateKey = nodeKeystore.getKey("datanode", password.toCharArray());
-        writePem(opensearchConfigDir.resolve(prefix + "-key.pem"), datanodePrivateKey);
-
-        final Certificate datanodeCert = nodeKeystore.getCertificate("datanode");
-        writePem(opensearchConfigDir.resolve(prefix + ".pem"), datanodeCert);
-
-        final Certificate[] certChain = nodeKeystore.getCertificateChain("datanode");
-        final Certificate caCertificate = Arrays.stream(certChain)
-                .filter(c -> ((X509Certificate) c).getSubjectX500Principal().getName().equals("CN=ca"))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Could not extract CA certificate"));
-
-        writePem(opensearchConfigDir.resolve(prefix + "-ca.pem"), caCertificate);
-    }
-
-    private static KeyStore loadKeystore(Path keystorePath, String password) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
-        final FileInputStream is = new FileInputStream(keystorePath.toFile());
-        nodeKeystore.load(is, password.toCharArray());
-        return nodeKeystore;
-    }
-
-
-    private static void writePem(Path path, Object object) throws IOException {
-        FileWriter writer = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
-        JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
-        pemWriter.writeObject(object);
-        pemWriter.flush();
-        pemWriter.close();
     }
 
     @Override
