@@ -65,9 +65,8 @@ public class CACreator {
     }
 
     public KeyStore uploadCA(final char[] password, String ca) throws CACreationException {
-        try {
+        try (var is = new StringInputStream(ca)) {
             var caKeystore = KeyStore.getInstance("PKCS12");
-            var is = new StringInputStream(ca);
             caKeystore.load(is, password);
 
             return caKeystore;

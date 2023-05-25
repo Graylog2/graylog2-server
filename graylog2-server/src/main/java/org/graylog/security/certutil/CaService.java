@@ -98,8 +98,8 @@ public class CaService {
             throw new CACreationException("Could not generate CA: " + ex.getMessage(), ex);
         }
 
-        currentCA = Optional.of(new CA("generated CA", CAType.GENERATED));
-        return currentCA.get();
+        this.currentCA = Optional.of(new CA("generated CA", CAType.GENERATED));
+        return this.currentCA.get();
     }
 
     public CA upload(String password, FormDataBodyPart body) throws CACreationException {

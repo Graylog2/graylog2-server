@@ -43,9 +43,9 @@ public class KeystoreFileStorage implements KeystoreStorage {
     }
 
     public Optional<KeyStore> readKeyStore(final Path keystorePath, char[] password) throws KeyStoreStorageException {
-        try {
+        try(var in = Files.newInputStream(keystorePath)) {
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
-            caKeystore.load(Files.newInputStream(keystorePath), password);
+            caKeystore.load(in, password);
             return Optional.of(caKeystore);
         } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException ex) {
             throw new KeyStoreStorageException("Could not read keystore: " + ex.getMessage(), ex);
