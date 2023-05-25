@@ -74,13 +74,13 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
         <Row>
           <ParamsCol sm={12} md={6}>
             {paramNames.map((paramName, key) => {
-              const paramValue = formatParamValue(block.params[paramName]);
+              const paramValue = block.params[paramName];
 
               if (paramValueExists(paramValue)) {
                 return (
                 // eslint-disable-next-line react/no-array-index-key
                   <Col key={key}>
-                    <Param><strong>{paramName}:</strong> {paramValue}</Param>
+                    <Param><strong>{paramName}:</strong> {formatParamValue(paramValue)}</Param>
                   </Col>
                 );
               }
