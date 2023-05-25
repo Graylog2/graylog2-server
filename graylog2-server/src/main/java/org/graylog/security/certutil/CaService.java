@@ -16,6 +16,12 @@
  */
 package org.graylog.security.certutil;
 
+import io.netty.handler.codec.base64.Base64Decoder;
+import org.apache.commons.net.util.Base64;
+import org.glassfish.jersey.media.multipart.BodyPart;
+import org.glassfish.jersey.media.multipart.ContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Decode;
 import org.graylog.security.certutil.ca.CACreator;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -30,7 +36,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -99,15 +109,32 @@ public class CaService {
         return currentCA.get();
     }
 
-    public CA upload(String password, List<String> caFiles) throws CACreationException {
+    public CA upload(String password, FormDataBodyPart body) throws CACreationException {
         // TODO: if the upload consists of more than one file, handle accordingly
         // or: decide that it's always only one file containing all certificates
         try {
             this.password = Optional.ofNullable(password);
             final var pass = this.password.map(String::toCharArray).orElse(null);
-            KeyStore keyStore = caCreator.uploadCA(pass, caFiles.get(0));
-            keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
-        } catch (KeyStoreStorageException ex) {
+
+            // for(BodyPart part : body.getParent().getBodyParts())
+            BodyPart part = body.getParent().getBodyParts().get(0);
+            InputStream is = part.getEntityAs(InputStream.class);
+            ContentDisposition meta = part.getContentDisposition();
+            String pem = new String(is.readAllBytes());
+            // TODO: combine all parts into one keystore etc.
+            // }
+            String base64 = new String(new Base64().decode(pem));
+            if(base64.contains("-----BEGIN CERTIFICATE-----")) {
+                KeyStore keyStore = caCreator.uploadCA(pass, pem);
+                keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
+            } else {
+                ByteArrayInputStream bais = new ByteArrayInputStream(pem.getBytes(StandardCharsets.UTF_8));
+                KeyStore keyStore = KeyStore.getInstance("PKCS12");
+                keyStore.load(bais, pass);
+                keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
+            }
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyStoreStorageException |
+                 CertificateException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
             throw new CACreationException("Could not write CA: " + ex.getMessage(), ex);
         }

@@ -16,12 +16,14 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
-import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodePreflightConfig;
@@ -38,8 +40,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -83,11 +85,12 @@ public class PreflightResource {
     }
 
     @POST
-    @Path("/ca/upload")
-    @NoAuditEvent("No Audit Event needed")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void uploadCA(@FormParam("password") String password, @FormParam("files") List<String> caFiles) throws CACreationException {
-        caService.upload(password, caFiles);
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/upload")
+    public String uploadCA(@FormParam("password") String password, @FormDataParam("file") FormDataBodyPart body) throws CACreationException {
+        caService.upload(password, body);
+        return "Ok";
     }
 
     @DELETE
