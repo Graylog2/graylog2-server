@@ -22,17 +22,21 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRuleService;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
+import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -64,15 +68,20 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     private final RuleResource ruleResource;
     private final RuleBuilderService ruleBuilderParser;
     private final ValidatorService validatorService;
+    private final RuleSimulator ruleSimulator;
+    private final PipelineRuleService pipelineRuleService;
+
 
     @Inject
     public RuleBuilderResource(RuleBuilderRegistry ruleBuilderRegistry,
                                RuleResource ruleResource,
-                               RuleBuilderService ruleBuilderParser, ValidatorService validatorService) {
+                               RuleBuilderService ruleBuilderParser, ValidatorService validatorService, RuleSimulator ruleSimulator, PipelineRuleService pipelineRuleService) {
         this.ruleBuilderRegistry = ruleBuilderRegistry;
         this.ruleResource = ruleResource;
         this.ruleBuilderParser = ruleBuilderParser;
         this.validatorService = validatorService;
+        this.ruleSimulator = ruleSimulator;
+        this.pipelineRuleService = pipelineRuleService;
     }
 
 
@@ -139,6 +148,18 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return validated.toBuilder()
                 .ruleBuilder(ruleBuilderParser.generateTitles(validated.ruleBuilder()))
                 .build();
+    }
+
+    @ApiOperation("Simulate a single processing rule created by the rule builder")
+    @Path("/simulate")
+    @POST
+    @NoAuditEvent("Only used to simulate a rule builder")
+    public Message simulate(@ApiParam(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
+        RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto());
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
+        Message message = ruleSimulator.createMessage(simulateRuleBuilderRequest.message());
+
+        return ruleSimulator.simulate(rule, message);
     }
 
     private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto) {

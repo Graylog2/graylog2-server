@@ -27,8 +27,10 @@ import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -78,6 +80,9 @@ public class RuleBuilderService {
     }
 
     private List<RuleBuilderStep> generateStepTitles(List<RuleBuilderStep> steps) {
+        if (Objects.isNull(steps)) {
+            return Collections.emptyList();
+        }
         return steps.stream().map(this::generateStepTitle).collect(Collectors.toList());
     }
 
