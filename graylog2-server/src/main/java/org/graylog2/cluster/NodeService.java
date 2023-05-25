@@ -20,6 +20,7 @@ import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 public interface NodeService extends PersistedService {
@@ -30,6 +31,8 @@ public interface NodeService extends PersistedService {
     Node byNodeId(String nodeId) throws NodeNotFoundException;
 
     Node byNodeId(NodeId nodeId) throws NodeNotFoundException;
+
+    Map<String, Node> byNodeIds(Collection<String> nodeIds);
 
     Map<String, Node> allActive(Node.Type type);
 
