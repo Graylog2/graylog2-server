@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.plugin.Message;
 
 import javax.inject.Singleton;
 import java.util.Map;
@@ -80,9 +81,9 @@ public class FieldTypeMapper {
             .build();
 
     private static final Map<String, FieldTypes.Type> FIELD_MAP = Map.of(
-            "streams", STREAMS_TYPE,
-            "gl2_source_input", INPUT_TYPE,
-            "gl2_source_node", NODE_TYPE
+            Message.FIELD_STREAMS, STREAMS_TYPE,
+            Message.FIELD_GL2_SOURCE_INPUT, INPUT_TYPE,
+            Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE
     );
 
     /**
