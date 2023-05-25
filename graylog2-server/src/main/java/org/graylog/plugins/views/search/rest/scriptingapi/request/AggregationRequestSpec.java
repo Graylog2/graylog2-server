@@ -55,7 +55,7 @@ public record AggregationRequestSpec(@JsonProperty("query") String queryString,
     @JsonIgnore
     public List<ResponseSchemaEntry> getSchema() {
         final Stream<ResponseSchemaEntry> groupings = groupings().stream()
-                .map(gr -> ResponseSchemaEntry.groupBy(gr.fieldName()));
+                .map(gr -> ResponseSchemaEntry.groupBy(gr.requestedField().toString()));
 
         final Stream<ResponseSchemaEntry> metrics = metrics().stream()
                 .map(metric -> ResponseSchemaEntry.metric(metric.functionName(), metric.fieldName()));

@@ -45,11 +45,9 @@ const BackgroundText = styled.div`
   height: 100%;
   width: 100%;
   padding: 0 30px;
-`;
-
-const BackgroundImage = styled.img`
-  height: 100%;
-  width: 100%;
+  background-image: url(${bgImage});
+  background-position: center;
+  background-size: cover;
 `;
 
 const NotificationsContainer = styled.div`
@@ -114,7 +112,6 @@ const LoginChrome = ({ children }: Props) => (
           <Claim>Data. Insights. <Highlight>Answers.</Highlight></Claim>
         </TextContainer>
       </BackgroundText>
-      <BackgroundImage alt="background" src={bgImage} />
     </Background>
   </LoginContainer>
 );

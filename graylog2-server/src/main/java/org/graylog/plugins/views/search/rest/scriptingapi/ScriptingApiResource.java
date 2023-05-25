@@ -97,7 +97,6 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     public TabularResponse executeQuery(@ApiParam(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
                                         @Context SearchUser searchUser) {
 
-
         try {
             //Step 1: map simple request to more complex search
             Search search = searchCreator.mapToSearch(messagesRequestSpec, searchUser);
@@ -107,7 +106,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             postAuditEvent(searchJob);
 
             //Step 3: take complex response and try to map it to simpler, tabular form
-            return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser);
+            return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser, getSubject());
 
         } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
@@ -160,7 +159,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             postAuditEvent(searchJob);
 
             //Step 3: take complex response and try to map it to simpler, tabular form
-            return aggregationTabularResponseCreator.mapToResponse(aggregationRequestSpec, searchJob);
+            return aggregationTabularResponseCreator.mapToResponse(aggregationRequestSpec, searchJob, searchUser);
         } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
