@@ -1,0 +1,5 @@
+type = "added"
+message = "Add support for a fixed leeway configuration for the time size based rotation strategy"
+
+issues = ["Graylog2/graylog-plugin-cloud#1149"]
+pulls = ["15556", "Graylog2/graylog-plugin-enterprise#5213"]
