@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -65,6 +66,11 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     public void doRun() {
         LOG.debug("checking if there are configuration steps to take care of");
         final Path caKeystorePath = Path.of(caKeystoreFilename);
+
+        if(!Files.exists(caKeystorePath)) {
+            LOG.warn("mandatory keystore file does not exist.");
+            return;
+        }
 
         try {
             char[] password = DEFAULT_PASSWORD.toCharArray();

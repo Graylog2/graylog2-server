@@ -235,6 +235,6 @@ public class ChunkedQueryResultTest {
                 .element(index)
                 .isNotNull()
                 .extracting(el -> el.getMessage().getField("name"))
-                .containsOnly(expectedValue);
+                .isEqualTo(expectedValue);
     }
 }

@@ -138,10 +138,14 @@ export const updateView = (newView: View, recreateSearch: boolean = false) => as
 export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
   const { search } = view;
+  const newSearch = search.toBuilder()
+    .newId()
+    .queries(newQueries)
+    .build();
+
+  const searchAfterSave = await createSearch(newSearch);
   const newView = view.toBuilder()
-    .search(search.toBuilder()
-      .queries(newQueries)
-      .build())
+    .search(searchAfterSave)
     .build();
 
   return dispatch(updateView(newView));

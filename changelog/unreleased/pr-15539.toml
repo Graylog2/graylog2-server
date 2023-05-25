@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Keep query order when exporting saved searches/dashboards to content packs."
+
+pulls = ["15505"]
+issues = ["15341", "15528"]

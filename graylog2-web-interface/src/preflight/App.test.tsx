@@ -25,7 +25,7 @@ import UserNotification from 'preflight/util/UserNotification';
 
 import App from './App';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: () => 'https://example.org/',
@@ -39,6 +39,13 @@ jest.mock('preflight/hooks/useDataNodes', () => jest.fn(() => ({
   data: [],
   isFetching: false,
   isInitialLoading: false,
+  error: undefined,
+})));
+
+jest.mock('preflight/hooks/useDataNodesCA', () => jest.fn(() => ({
+  data: undefined,
+  isInitialLoading: false,
+  isFetching: false,
   error: undefined,
 })));
 
@@ -59,6 +66,10 @@ describe('App', () => {
       configurable: true,
       value: { reload: jest.fn() },
     });
+  });
+
+  beforeEach(() => {
+    asMock(fetch).mockReturnValue(Promise.resolve());
   });
 
   afterAll(() => {

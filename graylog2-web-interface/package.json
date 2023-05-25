@@ -50,6 +50,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@graylog/sawmill": "^1.0.5",
     "@mantine/core": "^6.0.4",
+    "@mantine/dropzone": "^6.0.10",
     "@mantine/hooks": "^6.0.4",
     "@mantine/notifications": "^6.0.4",
     "@openfonts/dm-sans_latin": "^1.0.2",
