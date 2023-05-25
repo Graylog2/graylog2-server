@@ -17,36 +17,47 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.response;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.apache.commons.lang.StringUtils;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+import org.graylog2.indexer.fieldtypes.FieldTypes;
 
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 
 public enum ResponseEntryDataType {
-    STRING(Set.of("keyword", "text")),
-    NUMERIC(Set.of("long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float")),
-    DATE(Set.of("date")),
-    BOOLEAN(Set.of("boolean")),
-    BINARY(Set.of("binary")),
-    IP(Set.of("ip")),
-    GEO(Set.of("geo_point", "geo_shape")),
-    UNKNOWN(Set.of());
+    STRING(FieldTypeMapper.STRING_TYPE, FieldTypeMapper.STRING_FTS_TYPE),
+    NUMERIC(FieldTypeMapper.LONG_TYPE, FieldTypeMapper.INT_TYPE, FieldTypeMapper.SHORT_TYPE, FieldTypeMapper.BYTE_TYPE, FieldTypeMapper.DOUBLE_TYPE, FieldTypeMapper.FLOAT_TYPE),
+    DATE(FieldTypeMapper.DATE_TYPE),
+    BOOLEAN(FieldTypeMapper.BOOLEAN_TYPE),
+    BINARY(FieldTypeMapper.BINARY_TYPE),
+    IP(FieldTypeMapper.IP_TYPE),
+    GEO(FieldTypeMapper.GEO_POINT_TYPE),
+    STREAM(FieldTypeMapper.STREAMS_TYPE),
+    INPUT(FieldTypeMapper.INPUT_TYPE),
+    NODE(FieldTypeMapper.STREAMS_TYPE),
+    UNKNOWN();
 
-    private final Set<String> correspondingSearchEngineTypes;
+    private final Set<FieldTypes.Type> correspondingFieldTypes;
 
-    ResponseEntryDataType(Set<String> correspondingSearchEngineTypes) {
-        this.correspondingSearchEngineTypes = correspondingSearchEngineTypes;
+    ResponseEntryDataType(FieldTypes.Type... correspondingFieldTypes) {
+        this.correspondingFieldTypes = Set.of(correspondingFieldTypes);
     }
 
-    public static ResponseEntryDataType fromSearchEngineType(final String type) {
-        if (StringUtils.isBlank(type)) {
+    public static ResponseEntryDataType fromFieldType(final FieldTypes.Type type) {
+        if (type == null) {
             return UNKNOWN;
         }
         return Arrays.stream(ResponseEntryDataType.values())
-                .filter(dataType -> dataType.correspondingSearchEngineTypes.contains(type))
+                .filter(dataType -> dataType.correspondingFieldTypes.stream().anyMatch(corresponding -> isMatch(corresponding, type)))
                 .findFirst()
                 .orElse(UNKNOWN);
+    }
+
+    private static boolean isMatch(FieldTypes.Type corresponding, FieldTypes.Type type) {
+        // FieldTypes.Type is not just type, it includes also properties. Properties may differ in the received and corresponding
+        // type, which leads to wrong detection of a match. So we have to use the type itself, which is reliable for now.
+        // TODO: can we solve that in a more elegant way?
+        return corresponding.type().equals(type.type());
     }
 
     @JsonValue

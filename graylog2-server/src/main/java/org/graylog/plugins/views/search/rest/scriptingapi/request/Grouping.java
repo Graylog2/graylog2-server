@@ -40,4 +40,14 @@ public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
         }
     }
 
+    @Deprecated
+    @Override
+    public String fieldName() {
+        return fieldName;
+    }
+
+    public RequestedField requestedField() {
+        return RequestedField.parse(fieldName);
+    }
+
 }
