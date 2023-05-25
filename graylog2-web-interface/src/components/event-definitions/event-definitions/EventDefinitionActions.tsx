@@ -164,7 +164,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     }
   };
 
-  const isEnabled = eventDefinition?.enabled;
+  const isEnabled = eventDefinition?.state === 'ENABLED';
 
   return (
     <>

@@ -18,6 +18,7 @@ package org.graylog2.migrations;
 
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
@@ -31,17 +32,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class V20230523160600_PopulateEventDefinitionEnabled extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20230523160600_PopulateEventDefinitionEnabled.class);
+public class V20230523160600_PopulateEventDefinitionState extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20230523160600_PopulateEventDefinitionState.class);
 
     private final ClusterConfigService clusterConfigService;
     private final DBEventDefinitionService dbEventDefinitionService;
     private final DBJobDefinitionService dbJobDefinitionService;
 
     @Inject
-    public V20230523160600_PopulateEventDefinitionEnabled(ClusterConfigService clusterConfigService,
-                                                          DBEventDefinitionService dbEventDefinitionService,
-                                                          DBJobDefinitionService dbJobDefinitionService) {
+    public V20230523160600_PopulateEventDefinitionState(ClusterConfigService clusterConfigService,
+                                                        DBEventDefinitionService dbEventDefinitionService,
+                                                        DBJobDefinitionService dbJobDefinitionService) {
         this.clusterConfigService = clusterConfigService;
         this.dbEventDefinitionService = dbEventDefinitionService;
         this.dbJobDefinitionService = dbJobDefinitionService;
@@ -54,7 +55,7 @@ public class V20230523160600_PopulateEventDefinitionEnabled extends Migration {
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(V20230523160600_PopulateEventDefinitionEnabled.MigrationCompleted.class) != null) {
+        if (clusterConfigService.get(V20230523160600_PopulateEventDefinitionState.MigrationCompleted.class) != null) {
             LOG.debug("Migration already completed!");
             return;
         }
@@ -69,8 +70,8 @@ public class V20230523160600_PopulateEventDefinitionEnabled extends Migration {
         });
 
         // Mark enabled event definitions as such
-        dbEventDefinitionService.bulkEnableDisable(enabledEventDefinitionIds, true);
-        clusterConfigService.write(new V20230523160600_PopulateEventDefinitionEnabled.MigrationCompleted());
+        dbEventDefinitionService.bulkUpdateState(enabledEventDefinitionIds, EventDefinition.State.ENABLED);
+        clusterConfigService.write(new V20230523160600_PopulateEventDefinitionState.MigrationCompleted());
     }
 
     public record MigrationCompleted() {}

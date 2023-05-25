@@ -30,6 +30,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorEngine;
@@ -344,8 +345,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
                 new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to enable", definitionId)));
         eventDefinitionHandler.schedule(definitionId);
-        dbService.bulkEnableDisable(List.of(definitionId), true);
-        return eventDefinitionDto.toBuilder().enabled(true).build();
+        dbService.bulkUpdateState(List.of(definitionId), EventDefinition.State.ENABLED);
+        return eventDefinitionDto.toBuilder().state(EventDefinition.State.ENABLED).build();
     }
 
     @POST
@@ -366,7 +367,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .filter(id -> !idsFailedToSchedule.contains(id))
                 .toList();
         // Mark each of the successfully scheduled event definitions as enabled in the DB
-        dbService.bulkEnableDisable(successfullyScheduledIds, true);
+        dbService.bulkUpdateState(successfullyScheduledIds, EventDefinition.State.ENABLED);
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
@@ -383,8 +384,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
                 new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to disable", definitionId)));
         eventDefinitionHandler.unschedule(definitionId);
-        dbService.bulkEnableDisable(List.of(definitionId), false);
-        return eventDefinitionDto.toBuilder().enabled(false).build();
+        dbService.bulkUpdateState(List.of(definitionId), EventDefinition.State.DISABLED);
+        return eventDefinitionDto.toBuilder().state(EventDefinition.State.DISABLED).build();
     }
 
     @POST
@@ -405,7 +406,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .filter(id -> !idsFailedToUnschedule.contains(id))
                 .toList();
         // Mark each of the successfully unscheduled event definitions as disabled in the DB
-        dbService.bulkEnableDisable(successfullyUnscheduledIds, false);
+        dbService.bulkUpdateState(successfullyUnscheduledIds, EventDefinition.State.DISABLED);
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();

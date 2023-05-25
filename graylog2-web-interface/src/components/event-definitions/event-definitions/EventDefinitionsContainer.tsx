@@ -50,7 +50,7 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     },
     status: {
       renderCell: (_status: string, eventDefinition) => (
-        <StatusCell status={eventDefinition?.enabled} />
+        <StatusCell status={eventDefinition?.state} />
       ),
       staticWidth: 100,
     },
