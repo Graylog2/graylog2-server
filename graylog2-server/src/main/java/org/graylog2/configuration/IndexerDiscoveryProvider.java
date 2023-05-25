@@ -44,7 +44,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     public static final URI DEFAULT_INDEXER_HOST = URI.create("http://127.0.0.1:9200");
 
     private final List<URI> hosts;
-    private final Supplier<Optional<PreflightConfig>> preflightConfigSupplier;
+    private final PreflightConfigService preflightConfigService;
     private final Supplier<Collection<Node>> activeNodesSupplier;
 
     private final Supplier<List<URI>> resultsCachingSupplier;
@@ -52,14 +52,18 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     @Inject
     public IndexerDiscoveryProvider(
             @Named("elasticsearch_hosts") List<URI> hosts,
-            PreflightConfigService preflightConfigServiceIf,
+            PreflightConfigService preflightConfigService,
             NodeService nodeService) {
-        this(hosts, preflightConfigServiceIf::getPersistedConfig, () -> nodeService.allActive(Node.Type.DATANODE).values());
+        this(hosts, preflightConfigService, serviceToSupplier(nodeService));
     }
 
-    IndexerDiscoveryProvider(List<URI> hosts, Supplier<Optional<PreflightConfig>> preflightConfigSupplier, Supplier<Collection<Node>> activeNodesSupplier) {
+    private static Supplier<Collection<Node>> serviceToSupplier(NodeService nodeService) {
+        return () -> nodeService.allActive(Node.Type.DATANODE).values();
+    }
+
+    IndexerDiscoveryProvider(List<URI> hosts, PreflightConfigService preflightConfigService, Supplier<Collection<Node>> activeNodesSupplier) {
         this.hosts = hosts;
-        this.preflightConfigSupplier = preflightConfigSupplier;
+        this.preflightConfigService = preflightConfigService;
         this.activeNodesSupplier = activeNodesSupplier;
         this.resultsCachingSupplier = Suppliers.memoize(this::doGet);
     }
@@ -76,7 +80,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
             return hosts;
         }
 
-        final PreflightConfigResult preflightResult = preflightConfigSupplier.get()
+        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
                 .map(PreflightConfig::result)
                 .orElse(PreflightConfigResult.UNKNOWN);
 

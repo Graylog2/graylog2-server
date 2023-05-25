@@ -19,7 +19,10 @@ package org.graylog2.configuration;
 import org.assertj.core.api.Assertions;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
+import org.graylog2.plugin.database.ValidationException;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
@@ -101,7 +104,22 @@ class IndexerDiscoveryProviderTest {
                 .collect(Collectors.toList());
     }
 
-    private Supplier<Optional<PreflightConfig>> preflightConfig(@Nullable PreflightConfigResult result) {
-        return () -> Optional.ofNullable(result).map(r -> () -> r);
+    private PreflightConfigService preflightConfig(@Nullable PreflightConfigResult result) {
+        return new PreflightConfigService() {
+            @Override
+            public Optional<PreflightConfig> getPersistedConfig() {
+                return Optional.of(resultToConfig(result));
+            }
+
+            @Override
+            public PreflightConfig saveConfiguration() throws ValidationException {
+                throw new IllegalStateException("Should not be called here!");
+            }
+        };
+    }
+
+    @NotNull
+    private PreflightConfig resultToConfig(PreflightConfigResult result) {
+        return () -> result;
     }
 }
