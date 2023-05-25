@@ -32,7 +32,7 @@ import NumberVisualization from './NumberVisualization';
 
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
 
-jest.mock('views/components/messagelist/CustomHighlighting', () =>
+jest.mock('views/components/highlighting/CustomHighlighting', () =>
   /* eslint-disable-next-line react/prop-types */
   ({ children }) => <div>{children}</div>,
 );

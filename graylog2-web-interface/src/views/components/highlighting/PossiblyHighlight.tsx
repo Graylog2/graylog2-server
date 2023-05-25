@@ -25,8 +25,8 @@ import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
-import formatNumber from './FormatNumber';
-import isNumeric from './IsNumeric';
+import formatNumber from '../messagelist/FormatNumber';
+import isNumeric from '../messagelist/IsNumeric';
 
 export type HighlightRange = {
   start: number,
