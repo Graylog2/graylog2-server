@@ -14,20 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.storage;
+import * as React from 'react';
 
-import org.graylog.security.certutil.ca.exceptions.CAStorageException;
+import { singleton } from 'logic/singleton';
+import type { Input } from 'components/messageloaders/Types';
 
-import java.nio.file.Path;
-import java.security.KeyStore;
+type InputsMap = { [id: string]: Input };
+const InputsContext = React.createContext<InputsMap | undefined>(undefined);
 
-public interface CAKeystoreStorage {
-
-    void writeCAKeyStore(final Path keystorePath,
-                         final KeyStore caKeyStore,
-                         final char[] password)
-            throws CAStorageException;
-
-    //TODO: we may need a read method as well, for CSR processing
-
-}
+export default singleton('contexts.InputsContext', () => InputsContext);

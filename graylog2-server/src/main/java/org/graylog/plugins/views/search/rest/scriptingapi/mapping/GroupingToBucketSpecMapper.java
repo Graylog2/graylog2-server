@@ -27,7 +27,7 @@ public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec
     @Override
     public BucketSpec apply(final Grouping grouping) {
         return Values.builder()
-                .field(grouping.fieldName())
+                .field(grouping.requestedField().name())
                 .type(Values.NAME)
                 .limit(grouping.limit())
                 .build();

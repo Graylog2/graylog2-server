@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -35,18 +36,13 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogIndexResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveRequest;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveResponse;
-import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,26 +54,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CatalogResourceTest {
-    static {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-    }
 
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private EntityFacade<Void> mockEntityFacade;
-
-    @Mock
-    private EntityTitleService entityTitleService;
+    private EntityFacade<Void> mockEntityFacade = Mockito.mock(EntityFacade.class);
 
     private ContentPackService contentPackService;
-    private CatalogResource catalogResource;
 
     @Before
     public void setUp() {
@@ -86,7 +70,6 @@ public class CatalogResourceTest {
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
-        catalogResource = new CatalogResource(contentPackService, entityTitleService);
     }
 
     @Test
@@ -99,7 +82,10 @@ public class CatalogResourceTest {
                         .build()
         );
         when(mockEntityFacade.listEntityExcerpts()).thenReturn(entityExcerpts);
-        final CatalogIndexResponse catalogIndexResponse = catalogResource.showEntityIndex();
+
+        final CatalogResource resource = new CatalogResource(contentPackService, (r, p) -> EntitiesTitleResponse.EMPTY_RESPONSE);
+
+        final CatalogIndexResponse catalogIndexResponse = resource.showEntityIndex();
 
         assertThat(catalogIndexResponse.entities())
                 .hasSize(1)
@@ -125,7 +111,9 @@ public class CatalogResourceTest {
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 
-        final CatalogResolveResponse catalogResolveResponse = catalogResource.resolveEntities(request);
+        final CatalogResource resource = new CatalogResource(contentPackService, (r, p) -> EntitiesTitleResponse.EMPTY_RESPONSE);
+
+        final CatalogResolveResponse catalogResolveResponse = resource.resolveEntities(request);
 
         assertThat(catalogResolveResponse.entities()).containsOnly(entity);
     }
@@ -137,11 +125,10 @@ public class CatalogResourceTest {
                 Set.of(new EntityTitleResponse("id", "x", "Title")),
                 Set.of()
         );
-        doReturn(expectedResponse)
-                .when(entityTitleService)
-                .getTitles(any(), eq(request));
 
-        final EntitiesTitleResponse actualResponse = catalogResource.getTitles(request);
+        final CatalogResource resource = new CatalogResource(contentPackService, (r, p) -> expectedResponse);
+
+        final EntitiesTitleResponse actualResponse = resource.getTitles(request, TestSearchUser.builder().build());
         assertEquals(expectedResponse, actualResponse);
     }
 }

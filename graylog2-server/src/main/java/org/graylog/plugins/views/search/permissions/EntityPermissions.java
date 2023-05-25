@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.exceptions;
+package org.graylog.plugins.views.search.permissions;
 
-public class CAStorageException extends Exception {
+public interface EntityPermissions {
+    boolean canReadTitle(String readPermission, String idAsString);
 
-    public CAStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
