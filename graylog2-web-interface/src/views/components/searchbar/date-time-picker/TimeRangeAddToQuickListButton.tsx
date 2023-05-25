@@ -17,12 +17,11 @@
 import * as React from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Position } from 'react-overlays';
-import styled from 'styled-components';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 
-import { ButtonToolbar, Button, Input, Popover } from 'components/bootstrap';
-import { Icon, Portal } from 'components/common';
+import { Button, Input, Popover } from 'components/bootstrap';
+import { FormSubmit, Icon, Portal } from 'components/common';
 import type { TimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -40,10 +39,6 @@ type Props = {
   target: Button | undefined | null,
   equalTimerange: QuickAccessTimeRange
 };
-
-const StyledButtonToolbar = styled(ButtonToolbar)`
-  margin-top: 5px;
-`;
 
 const isTimerangeEqual = (firstTimerange: TimeRange, secondTimerange: TimeRange) => {
   if (firstTimerange.type !== secondTimerange.type) return false;
@@ -83,19 +78,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
             </span>
           </p>
           )}
-          <StyledButtonToolbar>
-            <Button disabled={!description}
-                    bsStyle="info"
-                    type="submit"
-                    bsSize="sm"
-                    onClick={onAddTimerange}>
-              Add
-            </Button>
-            <Button onClick={toggleModal}
-                    bsSize="sm">
-              Cancel
-            </Button>
-          </StyledButtonToolbar>
+          <FormSubmit disabledSubmit={!description} submitButtonText="Add timerange" onCancel={toggleModal} onSubmit={onAddTimerange} bsSize="small" />
         </Popover>
       </Position>
     </Portal>
@@ -131,7 +114,7 @@ const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timeran
   return (
     <>
       <Button disabled={!isTimerangeValid} title="Add timerange to qiuck access timerange list" ref={formTarget} onClick={toggleModal}>
-        <Icon name="thumbtack" />
+        <Icon name="plus" />
       </Button>
       {showForm && (
         <TimeRangeAddToQuickListForm addTimerange={addTimerange} toggleModal={toggleModal} target={formTarget.current} equalTimerange={equalTimerange} />
