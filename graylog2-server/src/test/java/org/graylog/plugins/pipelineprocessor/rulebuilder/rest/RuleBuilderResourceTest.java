@@ -16,12 +16,14 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRuleService;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
+import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.database.NotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,12 +50,16 @@ public class RuleBuilderResourceTest {
 
     @Mock
     ValidatorService validatorService;
+    @Mock
+    RuleSimulator ruleSimulator;
+    @Mock
+    PipelineRuleService pipelineRuleService;
 
     RuleBuilderResource ruleBuilderResource;
 
     @Before
     public void setUp() {
-        ruleBuilderResource = new RuleBuilderResource(ruleBuilderRegistry, ruleResource, ruleBuilderService, validatorService);
+        ruleBuilderResource = new RuleBuilderResource(ruleBuilderRegistry, ruleResource, ruleBuilderService, validatorService, ruleSimulator, pipelineRuleService);
     }
 
     @Test
@@ -61,9 +67,11 @@ public class RuleBuilderResourceTest {
         when(ruleBuilderService.generateRuleSource(any(), any(RuleBuilder.class), anyBoolean()))
                 .thenReturn("rulesource");
         when(ruleResource.createFromParser(any())).thenReturn(RuleSource.builder().id("new_id").source("rulesource").build());
+        RuleBuilder ruleBuilder = RuleBuilder.builder().build();
+        when(ruleBuilderService.generateTitles(any())).thenReturn(ruleBuilder);
         RuleBuilderDto toSave = RuleBuilderDto.builder()
                 .title("title")
-                .ruleBuilder(RuleBuilder.builder().build())
+                .ruleBuilder(ruleBuilder)
                 .build();
         final RuleBuilderDto saved = ruleBuilderResource.createFromBuilder(toSave);
         assertThat(saved.id()).isEqualTo("new_id");
