@@ -6946,7 +6946,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.1.4"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-694d3132-27d3-4ca8-bf2c-9cfbc61f81d6-1684887315689/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.2.1"
     eslint-plugin-jest-dom "4.0.3"
@@ -8253,13 +8253,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.16"
     "@types/react" "18.2.6"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-c8875da3-34ea-4a8c-baac-3df991f0cf28-1684887315524/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-c8875da3-34ea-4a8c-baac-3df991f0cf28-1684887315524/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.2.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-c8875da3-34ea-4a8c-baac-3df991f0cf28-1684887315524/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.0"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -11678,10 +11678,10 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-plotly.js@2.21.0:
-  version "2.21.0"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.21.0.tgz#2e4736accf7d31fd1c5557809042f0fef81a88bb"
-  integrity sha512-R6lFKpb5ZbwofM0QKbQ7v8JWQksqPwAaF0ORJ4CNcyz6nRwBtLOK/oXTvXRUs77zoTl4lDFPTCYkY3xwf4qFyg==
+plotly.js@2.23.2:
+  version "2.23.2"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.23.2.tgz#08497bb08d7446d7c82a28f4bf09e3f15216db17"
+  integrity sha512-02WIZzXpwyGs7xOw/++bGZIGs4HH3lczmPvXzgyQnXSqPGrnyy/xkgEAyp++/zP72O3QUcfhZKW9iTJduM2gDw==
   dependencies:
     "@plotly/d3" "3.8.1"
     "@plotly/d3-sankey" "0.7.2"
