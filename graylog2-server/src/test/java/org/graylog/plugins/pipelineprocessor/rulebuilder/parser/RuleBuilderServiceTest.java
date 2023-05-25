@@ -17,11 +17,14 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +42,8 @@ public class RuleBuilderServiceTest {
 
     @Before
     public void initialize() {
-        ruleBuilderService = new RuleBuilderService(conditionParser, actionParser);
+        when(actionParser.getActions()).thenReturn(new HashMap<>());
+        ruleBuilderService = new RuleBuilderService(conditionParser, actionParser, new SecureFreemarkerConfigProvider());
     }
 
     @Test

@@ -57,7 +57,7 @@ public class RuleBuilderService {
         this.actionParser = actionParser;
         this.freemarkerConfiguration = secureFreemarkerConfigProvider.get();
         StringTemplateLoader templateLoader = new StringTemplateLoader();
-        actionParser.actions.entrySet().stream().forEach(f -> templateLoader.putTemplate(f.getKey(), f.getValue().descriptor().ruleBuilderTitle()));
+        actionParser.getActions().entrySet().stream().forEach(f -> templateLoader.putTemplate(f.getKey(), f.getValue().descriptor().ruleBuilderTitle()));
         freemarkerConfiguration.setTemplateLoader(templateLoader);
     }
 

@@ -44,6 +44,10 @@ public class ActionParser {
         this.freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, actions);
     }
 
+    public Map<String, RuleFragment> getActions() {
+        return actions;
+    }
+
     public String generate(List<RuleBuilderStep> actions, boolean generateSimulatorFields) {
         return actions.stream().map(s -> generateAction(s, generateSimulatorFields)).collect(Collectors.joining(NL));
     }
