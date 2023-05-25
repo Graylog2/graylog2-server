@@ -84,9 +84,11 @@ public class RuleBuilderResourceTest {
                 .thenReturn("rulesource");
         final String updatedId = "updated_id";
         when(ruleResource.update(eq(updatedId), any(RuleSource.class))).thenReturn(RuleSource.builder().id(updatedId).source("rulesource").build());
+        RuleBuilder ruleBuilder = RuleBuilder.builder().build();
+        when(ruleBuilderService.generateTitles(any())).thenReturn(ruleBuilder);
         RuleBuilderDto toSave = RuleBuilderDto.builder()
                 .title("title")
-                .ruleBuilder(RuleBuilder.builder().build())
+                .ruleBuilder(ruleBuilder)
                 .build();
         final RuleBuilderDto saved = ruleBuilderResource.updateFromBuilder(updatedId, toSave);
         assertThat(saved.id()).isEqualTo(updatedId);
