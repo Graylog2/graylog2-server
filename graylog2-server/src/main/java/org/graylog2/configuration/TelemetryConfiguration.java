@@ -31,7 +31,7 @@ public class TelemetryConfiguration {
     public static final String TELEMETRY_CLUSTER_INFO_TTL = "telemetry_cluster_info_ttl";
 
     @Parameter(value = "telemetry_api_key", required = true)
-    private String telemetryApiKey = "phc_fmJsCXBb0sqPpUCAJ51C0sT933i8LHUT6Zqm4oCGuK7";
+    private String telemetryApiKey = "phc_t3lgBB66QsPW4HEfiGopO14um4XGNtBcefEKYWelWda";
 
     @Parameter(value = "telemetry_host")
     private String telemetryApiHost = "https://telemetry.graylog.cloud";
