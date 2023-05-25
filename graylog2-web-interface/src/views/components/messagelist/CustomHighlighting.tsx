@@ -28,7 +28,7 @@ import type { DateTime } from 'util/DateTime';
 import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 import PossiblyHighlight from './PossiblyHighlight';
-import Highlight from './Highlight';
+import SearchQueryHighlights from './SearchQueryHighlights';
 
 const extractDecorators = ({
   fieldName,
@@ -73,7 +73,7 @@ const extractDecorators = ({
 
   return decorators.length > 0
     ? decorators
-    : [Highlight];
+    : [SearchQueryHighlights];
 };
 
 type Props = {

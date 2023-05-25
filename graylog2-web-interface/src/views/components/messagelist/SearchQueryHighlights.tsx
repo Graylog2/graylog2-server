@@ -27,7 +27,7 @@ type Props = {
   value: any,
 };
 
-const Highlight = ({ field, value }: Props) => (
+const SearchQueryHighlights = ({ field, value }: Props) => (
   <AdditionalContext.Consumer>
     {({ message }) => (
       <PossiblyHighlight field={field}
@@ -38,9 +38,9 @@ const Highlight = ({ field, value }: Props) => (
   </AdditionalContext.Consumer>
 );
 
-Highlight.propTypes = {
+SearchQueryHighlights.propTypes = {
   field: PropTypes.string.isRequired,
   value: PropTypes.any.isRequired,
 };
 
-export default Highlight;
+export default SearchQueryHighlights;
