@@ -43,6 +43,7 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 
 @Singleton
 public class GraylogPreflightGeneratePeriodical extends Periodical {
@@ -74,10 +75,16 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
 
         try {
-            KeyStore caKeystore = caService.loadKeyStore();
+            Optional<KeyStore> optKey = caService.loadKeyStore();
+            if(optKey.isEmpty()) {
+                LOG.warn("No keystore available.");
+                return;
+            }
+
             // TODO: get real password
             char[] password = DEFAULT_PASSWORD.toCharArray();
 
+            KeyStore caKeystore = optKey.get();
             var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
             var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 

@@ -109,7 +109,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                 x509Certificate.get(),
                                 privateKeyEncryptedStorage,
                                 DEFAULT_PASSWORD.toCharArray(),
-                                configuration.getDatanodeHttpCertificatePassword().toCharArray(),
+                                configuration.getDatanodeHttpCertificatePassword() == null ? null : configuration.getDatanodeHttpCertificatePassword().toCharArray(),
                                 DATANODE_KEY_ALIAS
                         );
 

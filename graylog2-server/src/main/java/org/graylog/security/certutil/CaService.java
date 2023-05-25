@@ -16,12 +16,10 @@
  */
 package org.graylog.security.certutil;
 
-import io.netty.handler.codec.base64.Base64Decoder;
 import org.apache.commons.net.util.Base64;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Decode;
 import org.graylog.security.certutil.ca.CACreator;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -39,7 +37,6 @@ import javax.inject.Singleton;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStore;
@@ -47,8 +44,9 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
+
+import static org.graylog.security.certutil.CertConstants.KEYSTORE_TYPE;
 
 @Singleton
 public class CaService {
@@ -89,12 +87,7 @@ public class CaService {
 
     // TODO: write local CA and password / also password for generated/uploaded CA into MongoDB
 
-    public CA create(final String password, final Integer daysValid) throws CACreationException {
-        // a given password overrides an eventually configured password from the config
-        if(password != null) {
-            this.password = Optional.of(password);
-        }
-
+    public CA create(final Integer daysValid) throws CACreationException {
         try {
             final var pass = this.password.map(String::toCharArray).orElse(null);
             final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
@@ -120,16 +113,16 @@ public class CaService {
             BodyPart part = body.getParent().getBodyParts().get(0);
             InputStream is = part.getEntityAs(InputStream.class);
             ContentDisposition meta = part.getContentDisposition();
-            String pem = new String(is.readAllBytes());
+            String pem = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             // TODO: combine all parts into one keystore etc.
             // }
-            String base64 = new String(new Base64().decode(pem));
+            String base64 = new String(new Base64().decode(pem), StandardCharsets.UTF_8);
             if(base64.contains("-----BEGIN CERTIFICATE-----")) {
                 KeyStore keyStore = caCreator.uploadCA(pass, pem);
                 keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
             } else {
                 ByteArrayInputStream bais = new ByteArrayInputStream(pem.getBytes(StandardCharsets.UTF_8));
-                KeyStore keyStore = KeyStore.getInstance("PKCS12");
+                KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
                 keyStore.load(bais, pass);
                 keystoreMongoStorage.writeKeyStore(nodeId, keyStore, pass);
             }
@@ -149,16 +142,15 @@ public class CaService {
         }
     }
 
-    public KeyStore loadKeyStore() throws KeyStoreException, KeyStoreStorageException, CertificateException, IOException, NoSuchAlgorithmException {
+    public Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
         if(currentCA.isPresent()) {
             final var pass = this.password.map(String::toCharArray).orElse(null);
             if(currentCA.get().type().equals(CAType.LOCAL)) {
-                return keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), pass).orElseThrow();
+                return Optional.of(keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), pass).orElseThrow());
             } else {
-                return keystoreMongoStorage.readKeyStore(nodeId, pass).orElseThrow();
+                return Optional.of(keystoreMongoStorage.readKeyStore(nodeId, pass).orElseThrow());
             }
-        } else {
-            throw new KeyStoreException("No KeyStore exists.");
         }
+        return Optional.empty();
     }
 }

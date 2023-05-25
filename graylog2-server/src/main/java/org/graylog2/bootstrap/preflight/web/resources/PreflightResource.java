@@ -76,16 +76,19 @@ public class PreflightResource {
 
     @POST
     @Path("/ca/create")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
     @NoAuditEvent("No Audit Event needed")
-    public void createCA(@FormParam("password") String password) throws CACreationException {
+    public void createCA() throws CACreationException {
         // TODO: get validity from preflight UI
-        caService.create(password, null);
+        caService.create(null);
     }
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/upload")
+    @NoAuditEvent("No Audit Event needed")
     public String uploadCA(@FormParam("password") String password, @FormDataParam("file") FormDataBodyPart body) throws CACreationException {
         caService.upload(password, body);
         return "Ok";

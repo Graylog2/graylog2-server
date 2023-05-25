@@ -19,9 +19,15 @@ package org.graylog2.cluster.certificates;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.security.encryption.EncryptedValue;
 
-public record NodeCertificate(@JsonProperty(FIELD_NODEID) String nodeId,
+public record NodeCertificate(@JsonProperty(FIELD_ID) String id,
+                              @JsonProperty(FIELD_NODEID) String nodeId,
                               @JsonProperty(FIELD_ENCR_CERTIFICATE) EncryptedValue encryptedCertificate) {
 
+    public NodeCertificate(String nodeId, EncryptedValue encryptedCertificate) {
+        this(null, nodeId, encryptedCertificate);
+    }
+
+    public static final String FIELD_ID = "_id";
     public static final String FIELD_NODEID = "node_id";
     public static final String FIELD_ENCR_CERTIFICATE = "encrypted_certificate_keystore";
 

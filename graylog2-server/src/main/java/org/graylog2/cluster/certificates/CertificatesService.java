@@ -17,6 +17,7 @@
 package org.graylog2.cluster.certificates;
 
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.indices.MongoDbIndexTools;
@@ -66,7 +67,9 @@ public class CertificatesService extends PaginatedDbService<NodeCertificate> {
     }
 
     public Optional<String> readCert(final String nodeId) {
-        final NodeCertificate nod = dbCollection.findOneById(nodeId);
+        final NodeCertificate nod = dbCollection.findOne(
+                DBQuery.is(FIELD_NODEID, nodeId)
+        );
         if (nod != null && nod.encryptedCertificate() != null) {
             return Optional.ofNullable(encryptionService.decrypt(nod.encryptedCertificate()));
         } else {

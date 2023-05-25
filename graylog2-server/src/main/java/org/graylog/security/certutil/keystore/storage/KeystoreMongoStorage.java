@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
+import java.util.Base64;
 import java.util.Optional;
 
 public class KeystoreMongoStorage {
@@ -42,7 +43,7 @@ public class KeystoreMongoStorage {
         final String nodeIdValue = nodeId.getNodeId();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             keyStore.store(baos, password);
-            final String keystoreDataAsString = baos.toString(StandardCharsets.UTF_8);
+            final String keystoreDataAsString = Base64.getEncoder().encodeToString(baos.toByteArray());
             certificatesService.writeCert(nodeIdValue, keystoreDataAsString);
         } catch (Exception ex) {
             throw new KeyStoreStorageException("Failed to save keystore to Mongo collection for node " + nodeIdValue, ex);
@@ -54,7 +55,7 @@ public class KeystoreMongoStorage {
         final String nodeIdValue = nodeId.getNodeId();
         final Optional<String> keystoreAsString = certificatesService.readCert(nodeIdValue);
         if (keystoreAsString.isPresent()) {
-            try (ByteArrayInputStream bais = new ByteArrayInputStream(keystoreAsString.get().getBytes(StandardCharsets.UTF_8))) {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(keystoreAsString.get()))) {
                 KeyStore keyStore = KeyStore.getInstance("PKCS12");
                 keyStore.load(bais, password);
                 return Optional.of(keyStore);

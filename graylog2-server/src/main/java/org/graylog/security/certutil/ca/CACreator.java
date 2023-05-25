@@ -22,11 +22,11 @@ import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 
-import java.io.InputStream;
-import java.io.StringReader;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+
+import static org.graylog.security.certutil.CertConstants.KEYSTORE_TYPE;
 
 public class CACreator {
 
@@ -45,7 +45,7 @@ public class CACreator {
                             .validity(certificateValidity)
             );
 
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
+            KeyStore caKeystore = KeyStore.getInstance(KEYSTORE_TYPE);
             caKeystore.load(null, null);
 
             caKeystore.setKeyEntry("root",
