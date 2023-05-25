@@ -31,6 +31,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -132,6 +133,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @ApiOperation("Validate rule builder")
     @Path("/validate")
     @POST
+    @NoAuditEvent("Used to validate rule builder")
     public RuleBuilderDto validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
         final RuleBuilderDto validated = validatorService.validate(ruleBuilderDto);
         return validated.toBuilder()

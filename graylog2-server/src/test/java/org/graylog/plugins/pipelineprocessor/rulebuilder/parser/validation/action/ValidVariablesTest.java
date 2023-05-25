@@ -85,7 +85,7 @@ class ValidVariablesTest {
     @Test
     void failsWhenPassedParamMissing() {
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put("int", "$fromOutput");
+        parameters.put(INT_PARAM, "$fromOutput");
         RuleBuilderStep stepWithValidNegation = RuleBuilderStep.builder().parameters(parameters).function(INTEGER_FUNCTION).build();
         ValidationResult result = classUnderTest.validate(stepWithValidNegation);
 
@@ -109,7 +109,7 @@ class ValidVariablesTest {
     @Test
     void failsWhenPassedWrongTypeParam() {
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put("int", "1");
+        parameters.put(INT_PARAM, "1");
         RuleBuilderStep stepWithValidNegation = RuleBuilderStep.builder()
                 .parameters(parameters)
                 .function(INTEGER_FUNCTION)
