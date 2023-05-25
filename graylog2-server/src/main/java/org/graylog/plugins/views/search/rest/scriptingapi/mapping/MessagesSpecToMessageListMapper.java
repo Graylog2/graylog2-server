@@ -35,7 +35,7 @@ public class MessagesSpecToMessageListMapper implements Function<MessagesRequest
                 .sort(createSort(messagesRequestSpec))
                 .limit(messagesRequestSpec.size())
                 .offset(messagesRequestSpec.from())
-                .fields(messagesRequestSpec.fields());
+                .fields(messagesRequestSpec.fieldNames());
 
         return messageListBuilder
                 .build();
