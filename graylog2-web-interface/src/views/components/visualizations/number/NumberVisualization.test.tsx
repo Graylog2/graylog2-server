@@ -30,17 +30,11 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import NumberVisualization from './NumberVisualization';
 
-jest.mock('./AutoFontSizer', () => ({ children }) => children);
+jest.mock('./AutoFontSizer', () => ({ children }: React.PropsWithChildren<{}>) => children);
 
-jest.mock('views/components/highlighting/CustomHighlighting', () =>
-  /* eslint-disable-next-line react/prop-types */
-  ({ children }) => <div>{children}</div>,
-);
+jest.mock('views/components/highlighting/CustomHighlighting', () => ({ children }: React.PropsWithChildren<{}>) => <div>{children}</div>);
 
-jest.mock('views/components/Value', () =>
-  /* eslint-disable-next-line react/prop-types */
-  ({ value }) => <div>{value}</div>,
-);
+jest.mock('views/components/Value', () => ({ value }: { value: string }) => <div>{value}</div>);
 
 type Data = Record<string, Rows>;
 type SUTProps = {
