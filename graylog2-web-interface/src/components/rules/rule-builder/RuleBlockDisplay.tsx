@@ -23,6 +23,7 @@ import { IconButton } from 'components/common';
 
 import type { RuleBlock, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType } from './types';
+import { paramValueExists } from './helpers';
 
 type Props = {
   block: RuleBlock,
@@ -48,10 +49,6 @@ const Param = styled.p`
 const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
   const paramNames = Object.keys(block.params);
 
-  const paramValueExists = (paramValue: string | number | boolean) : boolean => (
-    paramValue && paramValue !== '' && paramValue !== null
-  );
-
   const anyParamsSet = () : boolean => (
     paramNames.some((paramName) => paramValueExists(block.params[paramName]))
   );
@@ -61,7 +58,7 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
       return 'Output of the previous step';
     }
 
-    return (value);
+    return (value.toString());
   };
 
   return (

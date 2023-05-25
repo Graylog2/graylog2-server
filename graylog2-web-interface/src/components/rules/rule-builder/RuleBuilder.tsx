@@ -25,7 +25,7 @@ import { FormSubmit, ConfirmDialog } from 'components/common';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import type { BlockType, RuleBlock, RuleBuilderRule } from './types';
-import { getDictForFunction, getDictForParam } from './helpers';
+import { getDictForFunction, getDictForParam, getActionOutputVariableName, paramValueExists } from './helpers';
 
 import RuleSimulation from '../RuleSimulation';
 
@@ -75,24 +75,22 @@ const RuleBuilder = () => {
 
   // TODO: Set primary params and output variables again on delete and reorder
 
-  const setPrimaryParams = (block: RuleBlock): RuleBlock => {
+  const setPrimaryParams = (block: RuleBlock, position?: number): RuleBlock => {
     const blockDict = getDictForFunction(actionsDict, block.function);
-
-    const isParamSet = (paramName) => (
-      block.params[paramName] && block.params[paramName] !== '' && block.params[paramName] !== null
-    );
 
     if (!blockDict) return block;
 
     const newBlock = block;
 
     Object.keys(block.params).forEach((paramName) => {
-      if (getDictForParam(blockDict, paramName)?.primary && (!isParamSet(paramName))) {
+      if (getDictForParam(blockDict, paramName)?.primary && (!paramValueExists(block.params[paramName]))) {
         const lastBlock = rule.rule_builder.actions[rule.rule_builder.actions.length - 1];
 
-        if (!lastBlock?.outputvariable) { return; }
+        const previousBlock = !position ? lastBlock : rule.rule_builder.actions[position - 1];
 
-        newBlock.params[paramName] = `$${lastBlock.outputvariable}`;
+        if (!previousBlock?.outputvariable) { return; }
+
+        newBlock.params[paramName] = `$${previousBlock.outputvariable}`;
       }
     });
 
@@ -123,7 +121,7 @@ const RuleBuilder = () => {
         rule_builder: {
           ...rule.rule_builder,
           actions: [...rule.rule_builder.actions,
-            { ...blockToSet, outputvariable: `output_actions_${newActionBlockOrder + 1}` },
+            { ...blockToSet, outputvariable: getActionOutputVariableName(newActionBlockOrder + 1) },
           ],
         },
       });
@@ -148,7 +146,7 @@ const RuleBuilder = () => {
         },
       });
     } else {
-      const blockToSet = setPrimaryParams(block);
+      const blockToSet = setPrimaryParams(block, orderIndex);
 
       const currentActions = [...rule.rule_builder.actions];
       currentActions[orderIndex] = blockToSet;

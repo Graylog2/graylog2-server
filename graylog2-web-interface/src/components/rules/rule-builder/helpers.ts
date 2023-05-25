@@ -24,4 +24,13 @@ const getDictForParam = (dict: BlockDict, paramName: string) : BlockFieldDict | 
   dict.params.find((param) => param.name === paramName)
 );
 
-export { getDictForFunction, getDictForParam };
+const getActionOutputVariableName = (order : number) : string => {
+  if (order === 0) return '';
+
+  return `output_actions_${order}`;
+};
+
+const paramValueExists = (paramValue: string | number | boolean) : boolean => (
+  typeof paramValue !== 'undefined' && paramValue !== null);
+
+export { getActionOutputVariableName, getDictForFunction, getDictForParam, paramValueExists };

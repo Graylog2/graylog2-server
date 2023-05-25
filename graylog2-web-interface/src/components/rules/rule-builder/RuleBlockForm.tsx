@@ -81,7 +81,11 @@ const RuleBlockForm = ({
       selectedBlockDict.params.forEach((param) => {
         const initialBlockValue = existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
 
-        newInitialValues[param.name] = initialBlockValue;
+        if (typeof initialBlockValue === 'string' && initialBlockValue.startsWith('$')) {
+          newInitialValues[param.name] = undefined;
+        } else {
+          newInitialValues[param.name] = initialBlockValue;
+        }
       },
       );
     }
@@ -95,7 +99,7 @@ const RuleBlockForm = ({
   };
 
   const resetField = (fieldName: string, setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void) => {
-    setFieldValue(fieldName, initialValues[fieldName] || undefined);
+    setFieldValue(fieldName, null);
   };
 
   return (

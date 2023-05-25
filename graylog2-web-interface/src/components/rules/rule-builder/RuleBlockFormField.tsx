@@ -21,6 +21,7 @@ import { FormikFormGroup, IconButton } from 'components/common';
 
 import { RuleBuilderTypes } from './types';
 import type { BlockFieldDict } from './types';
+import { paramValueExists } from './helpers';
 
 type Props = {
   param: BlockFieldDict,
@@ -49,10 +50,12 @@ const RuleBlockFormField = ({ param, functionName, order, resetField }: Props) =
     return true;
   };
 
+  const isValueSet = paramValueExists(field.value);
+
   const buttonAfter = () => {
     if (!shouldHandlePrimaryParam()) return null;
 
-    if (showPrimaryInput) {
+    if (showPrimaryInput || isValueSet) {
       return (
         <IconButton name="xmark" onClick={onPrimaryInputCancel} title="Cancel" />
       );
@@ -74,7 +77,7 @@ const RuleBlockFormField = ({ param, functionName, order, resetField }: Props) =
                          name={param.name}
                          label={param.name}
                          required={!param.optional}
-                         disabled={shouldHandlePrimaryParam() && !showPrimaryInput}
+                         disabled={shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet}
                          placeholder={placeholder}
                          buttonAfter={buttonAfter()}
                          help={param.description}
@@ -87,25 +90,26 @@ const RuleBlockFormField = ({ param, functionName, order, resetField }: Props) =
                          name={param.name}
                          label={param.name}
                          required={!param.optional}
-                         disabled={shouldHandlePrimaryParam() && !showPrimaryInput}
+                         disabled={shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet}
                          placeholder={placeholder}
                          buttonAfter={buttonAfter()}
                          help={param.description}
                          {...field} />
 
       );
-    case RuleBuilderTypes.Boolean:
+    case RuleBuilderTypes.Boolean: // TODO: make sure value is set to false not undefined when checkbox is initally saved unchecked
       return (
-        <FormikFormGroup type="checkbox"
-                         key={`${functionName}_${param.name}`}
-                         name={param.name}
-                         label={param.name}
-                         required={!param.optional}
-                         disabled={shouldHandlePrimaryParam() && !showPrimaryInput}
-                         placeholder={placeholder}
-                         buttonAfter={buttonAfter()}
-                         help={param.description}
-                         {...field} />
+        <>
+          {(shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet) ? (placeholder) : (
+            <FormikFormGroup type="checkbox"
+                             key={`${functionName}_${param.name}`}
+                             name={param.name}
+                             label={param.name}
+                             help={param.description}
+                             {...field} />
+          )}
+          {buttonAfter()}
+        </>
 
       );
     default:
