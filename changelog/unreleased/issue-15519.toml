@@ -2,4 +2,4 @@ type = "fixed"
 message = "Make sure that search is reexecuted when 'Add to query'/'Remove from query' on dashboards."
 
 issues = ["15519"]
-pulls = ["15593"]
+pulls = ["15599"]
