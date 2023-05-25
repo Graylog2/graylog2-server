@@ -37,7 +37,7 @@ public class ValidAction implements Validator {
     @Override
     public ValidationResult validate(RuleBuilderStep step) {
         if (!actions.containsKey(step.function())) {
-            new ValidationResult(true, "Function " + step.function() + " not available as action for rule builder.");
+            return new ValidationResult(true, "Function " + step.function() + " not available as action for rule builder.");
         }
 
         return new ValidationResult(false, "");

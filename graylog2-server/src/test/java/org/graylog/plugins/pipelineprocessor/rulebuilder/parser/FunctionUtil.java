@@ -27,9 +27,9 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 
 public class FunctionUtil {
 
-    protected static Function<Boolean> testFunction(String name,
-                                                    ImmutableList<ParameterDescriptor> params,
-                                                    Class returnType) {
+    public static Function<Boolean> testFunction(String name,
+                                                 ImmutableList<ParameterDescriptor> params,
+                                                 Class returnType) {
         return new AbstractFunction<>() {
             @Override
             public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
@@ -48,9 +48,9 @@ public class FunctionUtil {
         };
     }
 
-    protected static RuleFragment testCondition(String name,
-                                                String fragment,
-                                                ImmutableList<ParameterDescriptor> params) {
+    public static RuleFragment testCondition(String name,
+                                             String fragment,
+                                             ImmutableList<ParameterDescriptor> params) {
         return RuleFragment.builder()
                 .isCondition()
                 .fragment(fragment)

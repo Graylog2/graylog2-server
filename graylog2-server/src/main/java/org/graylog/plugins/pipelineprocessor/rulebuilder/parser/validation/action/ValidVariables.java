@@ -57,7 +57,7 @@ public class ValidVariables implements Validator {
             Class<?> variableType = getVariableType(value);
 
             if (!parameterDescriptor.optional() && value == null) {
-                return new ValidationResult(true, f("Function %s missing parameter %s ", parameterName));
+                return new ValidationResult(true, f("Function %s missing parameter %s", functionDescriptor.name(), parameterName));
             }
 
             //$ means it is stored in another variable and we need to fetch and verify that type
@@ -65,7 +65,7 @@ public class ValidVariables implements Validator {
                 String substring = s.substring(1);
                 Class<?> passedVariableType = variables.get(substring);
                 if (Objects.isNull(passedVariableType)) {
-                    return new ValidationResult(true, f("Function %s missing passed variable %s ", functionDescriptor.name(), value));
+                    return new ValidationResult(true, f("Function %s missing passed variable %s", functionDescriptor.name(), value));
                 }
                 variableType = passedVariableType;
             }
@@ -83,15 +83,15 @@ public class ValidVariables implements Validator {
         if (StringUtils.isNotBlank(outputvariable)) {
 
             if (functionDescriptor.returnType() == Void.class) {
-                return new ValidationResult(true, f("Function %s is of return typ void. No out put variable allowed ", functionDescriptor.name()));
+                return new ValidationResult(true, f("Function %s is of return typ void. No out put variable allowed", functionDescriptor.name()));
             }
 
-            storeVariable(ruleFragment, outputvariable, functionDescriptor.returnType());
+            storeVariable(outputvariable, functionDescriptor.returnType());
         }
         return new ValidationResult(false, "");
     }
 
-    private void storeVariable(RuleFragment ruleFragment, String name, Class<?> type) {
+    private void storeVariable(String name, Class<?> type) {
         variables.put(name, type);
     }
 
