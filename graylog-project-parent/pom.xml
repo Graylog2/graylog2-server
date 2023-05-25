@@ -169,11 +169,6 @@
                 <version>${reflections.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
-                <artifactId>json-path</artifactId>
-                <version>${json-path.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
@@ -419,6 +414,13 @@
                 <groupId>com.floreysoft</groupId>
                 <artifactId>jmte</artifactId>
                 <version>${jmte.version}</version>
+                <exclusions>
+                    <!-- Exclude the ancient asm:asm version because it conflicts with the org.ow2.asm:asm version. -->
+                    <exclusion>
+                        <groupId>asm</groupId>
+                        <artifactId>asm</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -665,12 +667,6 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-joda-time</artifactId>
                 <version>${assertj-joda-time.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.revinate</groupId>
-                <artifactId>assertj-json</artifactId>
-                <version>${assertj-json.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

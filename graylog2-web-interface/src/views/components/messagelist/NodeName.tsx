@@ -30,7 +30,7 @@ type Props = {
 };
 
 const BreakWord = styled.span`
-  wordBreak: 'break-word';
+  word-break: 'break-word';
 `;
 
 const NodeName = ({ nodeId }: Props) => {
@@ -41,7 +41,7 @@ const NodeName = ({ nodeId }: Props) => {
 
     return (
       <Link to={nodeURL}>
-        <Icon name="code-branch" />
+        <Icon name="circle-nodes" />
         &nbsp;
         <BreakWord>
           {node.short_node_id}

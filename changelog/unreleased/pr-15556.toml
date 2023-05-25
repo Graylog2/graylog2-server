@@ -1,0 +1,5 @@
+type = "added"
+message = "Restrict time size based rotation strategy duration leeway on cloud"
+
+issues = ["Graylog2/graylog-plugin-cloud#1149"]
+pulls = ["15556", "Graylog2/graylog-plugin-enterprise#5213"]

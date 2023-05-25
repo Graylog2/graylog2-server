@@ -17,7 +17,6 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
@@ -41,7 +40,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -114,10 +112,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void generate() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        activeDataNodes.values().forEach(node -> {
-            // TODO: only set nodes to "CONFIGURED" that really are configured correctly or not already connected
-            nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(node.getNodeId()).state(NodePreflightConfig.State.CONFIGURED).build());
-        });
+        activeDataNodes.values().forEach(node -> nodePreflightConfigService.changeState(node.getNodeId(), NodePreflightConfig.State.CONFIGURED));
     }
 
     @POST
