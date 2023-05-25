@@ -25,7 +25,7 @@ import { LinkContainer } from '../common/router';
 
 const SubTitle = styled.label`
   color: #aaa;
-  margin-top: 10px;
+  margin-top: 5px;
 `;
 
 const StyledInput = styled(Input)`
@@ -73,7 +73,7 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => (
             <Col md={6}>
               <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
               <Select value="set_field" clearable={false} onChange={() => {}} options={[]} />
-              <StyledInput value="transaction_date" type="text" />
+              <StyledInput value="transaction_year" type="text" />
               <StyledInput value={new Date().getFullYear()} type="text" />
             </Col>
           </RuleBuilderRow>
