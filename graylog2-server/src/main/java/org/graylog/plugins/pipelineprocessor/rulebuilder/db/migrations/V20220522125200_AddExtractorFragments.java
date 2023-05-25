@@ -67,10 +67,10 @@ public class V20220522125200_AddExtractorFragments extends Migration {
                                         string("prefix").optional().description("Prefix for created fields").build(),
                                         string("suffix").optional().description("Suffix for created fields").build()
                                 ))
-                                .returnType(String.class)
+                                .returnType(Void.class)
                                 .description("Match grok pattern and set fields")
                                 .ruleBuilderEnabled()
-                                .ruleBuilderTitle("Match grok pattern and set fields")
+                                .ruleBuilderTitle("Match grok pattern on field '${field}' and set fields")
                                 .build())
                         .build()
         );
