@@ -17,10 +17,14 @@
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
+import { defaultUser } from 'defaultMockValues';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser, alice } from 'fixtures/users';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
@@ -29,7 +33,13 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
+jest.mock('hooks/useCurrentUser');
+
 describe('TimeRangeInput', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
   const defaultTimeRange = { type: 'relative', range: 300 };
 
   const SUTTimeRangeInput = (props) => (
@@ -133,5 +143,20 @@ describe('TimeRangeInput', () => {
     await screen.findByText(/5 minutes ago/);
 
     expect(screen.queryByRole('button', { name: /open time range preset select/i })).not.toBeInTheDocument();
+  });
+
+  it('has no button add timerenge to quick access for non admin users', async () => {
+    asMock(useCurrentUser).mockReturnValue(alice);
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    fireEvent.click(await screen.findByText(/5 minutes ago/));
+
+    expect(screen.queryByTitle('Add timerange to quick access timerange list')).not.toBeInTheDocument();
+  });
+
+  it('has button add timerenge to quick access for admin users', async () => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    fireEvent.click(await screen.findByText(/5 minutes ago/));
+    await screen.findByTitle('Add timerange to quick access timerange list');
   });
 });

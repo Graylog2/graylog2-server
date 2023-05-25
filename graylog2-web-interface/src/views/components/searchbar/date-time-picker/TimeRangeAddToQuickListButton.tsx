@@ -113,7 +113,7 @@ const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timeran
 
   return (
     <>
-      <Button disabled={!isTimerangeValid} title="Add timerange to qiuck access timerange list" ref={formTarget} onClick={toggleModal}>
+      <Button disabled={!isTimerangeValid} title="Add timerange to quick access timerange list" ref={formTarget} onClick={toggleModal}>
         <Icon name="plus" />
       </Button>
       {showForm && (
