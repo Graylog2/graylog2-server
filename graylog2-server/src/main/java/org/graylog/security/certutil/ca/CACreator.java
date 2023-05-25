@@ -50,11 +50,11 @@ public class CACreator {
 
             caKeystore.setKeyEntry("root",
                     rootCA.privateKey(),
-                    password,
+                    null,
                     new X509Certificate[]{rootCA.certificate()});
             caKeystore.setKeyEntry("ca",
                     intermediateCA.privateKey(),
-                    password,
+                    null,
                     new X509Certificate[]{intermediateCA.certificate(), rootCA.certificate()});
 
             return caKeystore;
@@ -64,12 +64,11 @@ public class CACreator {
         }
     }
 
-    public KeyStore uploadCA(final char[] password, String ca) throws CACreationException {
-        try (var is = new StringInputStream(ca)) {
-            var caKeystore = KeyStore.getInstance("PKCS12");
-            caKeystore.load(is, password);
+    public KeyStore uploadCA(KeyStore keyStore, final char[] password, String cert) throws CACreationException {
+        try (var is = new StringInputStream(cert)) {
+            keyStore.load(is, password);
 
-            return caKeystore;
+            return keyStore;
         } catch (Exception e) {
             throw new CACreationException("Failed to create a Certificate Authority", e);
         }

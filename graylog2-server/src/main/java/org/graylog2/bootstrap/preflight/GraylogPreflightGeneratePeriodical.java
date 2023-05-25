@@ -16,14 +16,11 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.cert.storage.CertMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
-import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
-import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -32,18 +29,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
+
+import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
 @Singleton
 public class GraylogPreflightGeneratePeriodical extends Periodical {
@@ -54,10 +48,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final CsrMongoStorage csrStorage;
     private final CertStorage certMongoStorage;
     private final CaService caService;
-
-    private String caKeystoreFilename = "datanode-ca.p12";
-    private Integer DEFAULT_VALIDITY = 90;
-    private static final String DEFAULT_PASSWORD = "admin";
 
     @Inject
     public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
@@ -81,11 +71,8 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                 return;
             }
 
-            // TODO: get real password
-            char[] password = DEFAULT_PASSWORD.toCharArray();
-
             KeyStore caKeystore = optKey.get();
-            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
+            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", new char[0]);
             var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
             nodePreflightConfigService.streamAll()

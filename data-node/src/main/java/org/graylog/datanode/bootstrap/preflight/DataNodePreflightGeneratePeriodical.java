@@ -56,9 +56,6 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
     private final Configuration configuration;
 
-    //TODO: decide on password handling
-    private static final String DEFAULT_PASSWORD = "admin";
-
     @Inject
     public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
                                                final NodeService nodeService,
@@ -90,7 +87,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
-                var csr = csrGenerator.generateCSR(DEFAULT_PASSWORD.toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
+                var csr = csrGenerator.generateCSR("TODO:changeStorageToMongoDb".toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
                 csrStorage.writeCsr(csr, nodeId.getNodeId());
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
@@ -108,7 +105,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                         certificateAndPrivateKeyMerger.merge(
                                 x509Certificate.get(),
                                 privateKeyEncryptedStorage,
-                                DEFAULT_PASSWORD.toCharArray(),
+                                "TODO:changeStorageToMongoDb".toCharArray(),
                                 configuration.getDatanodeHttpCertificatePassword() == null ? null : configuration.getDatanodeHttpCertificatePassword().toCharArray(),
                                 DATANODE_KEY_ALIAS
                         );

@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
@@ -89,7 +90,7 @@ public class PreflightResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/upload")
     @NoAuditEvent("No Audit Event needed")
-    public String uploadCA(@FormParam("password") String password, @FormDataParam("file") FormDataBodyPart body) throws CACreationException {
+    public String uploadCA(@FormDataParam("password") String password, FormDataMultiPart body) throws CACreationException {
         caService.upload(password, body);
         return "Ok";
     }
