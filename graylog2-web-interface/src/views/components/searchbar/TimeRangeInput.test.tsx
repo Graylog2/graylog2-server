@@ -150,6 +150,8 @@ describe('TimeRangeInput', () => {
     render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
+    await screen.findByText(/search time range/i);
+
     expect(screen.queryByTitle('Add timerange to quick access timerange list')).not.toBeInTheDocument();
   });
 
@@ -158,9 +160,6 @@ describe('TimeRangeInput', () => {
 
     render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     await fireEvent.click(await screen.findByText(/5 minutes ago/));
-
-    await waitFor(() => {
-      expect(screen.getByTitle('Add timerange to quick access timerange list')).toBeInTheDocument();
-    });
+    await screen.findByTitle('Add timerange to quick access timerange list');
   });
 });

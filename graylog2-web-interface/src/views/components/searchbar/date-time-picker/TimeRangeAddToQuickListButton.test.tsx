@@ -161,12 +161,12 @@ describe('TimeRangeDropdown', () => {
     descriptionInput.focus();
 
     await suppressConsole(async () => {
+      await fireEvent.change(descriptionInput, { target: { value: 'Some description' } });
       await fireEvent.change(descriptionInput, { target: { value: '' } });
-
-      const submitButton = await screen.findByTitle('Add timerange');
-      await fireEvent.click(submitButton);
     });
 
-    await expect(mockUpdate).not.toHaveBeenCalledWith();
+    const submitButton = await screen.findByTitle('Add timerange');
+
+    await expect(submitButton).toHaveAttribute('disabled');
   });
 });
