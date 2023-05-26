@@ -61,8 +61,9 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
                  id="add-to-quick-list-popover"
                  data-app-section="add-to-quick-list-popover_form"
                  data-event-element="Add to quick list"
-                 data-testId="add-to-quick-list-popover">
+                 data-testid="add-to-quick-list-popover">
           <Input type="text"
+                 id="add-to-quick-list-description"
                  placeholder="Add description..."
                  title="Time range description"
                  aria-label="Time range description"
@@ -71,14 +72,12 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
                  formGroupClassName="" />
           {!!equalTimerange && (
           <p>
-            <span><Icon name="exclamation-triangle" />
-              You already have similar time range in
+            <Icon name="exclamation-triangle" />
+            You already have similar time range in
               {' '}
-              <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
-              <p>
-                <i>f.e. ({equalTimerange.description})</i>
-              </p>
-            </span>
+            <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
+            <br />
+            <i>f.e. ({equalTimerange.description})</i>
           </p>
           )}
           <FormSubmit disabledSubmit={!description} submitButtonText="Add timerange" onCancel={toggleModal} onSubmit={onAddTimerange} bsSize="small" />
