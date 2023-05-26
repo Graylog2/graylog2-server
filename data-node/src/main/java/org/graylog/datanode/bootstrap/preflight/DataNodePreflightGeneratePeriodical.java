@@ -106,7 +106,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                 x509Certificate.get(),
                                 privateKeyEncryptedStorage,
                                 "TODO:changeStorageToMongoDb".toCharArray(),
-                                configuration.getDatanodeHttpCertificatePassword() == null ? null : configuration.getDatanodeHttpCertificatePassword().toCharArray(),
+                                null,
                                 DATANODE_KEY_ALIAS
                         );
 
