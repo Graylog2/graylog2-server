@@ -19,11 +19,10 @@ import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
-import { Input as MantineInput } from '@mantine/core';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
-import { Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
+import { Input, Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
@@ -96,7 +95,7 @@ const CAUpload = () => {
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
-                <MantineInput.Label required htmlFor="ca-dropzone">Certificate Authority</MantineInput.Label>
+                <Input.Label required htmlFor="ca-dropzone">Certificate Authority</Input.Label>
                 <CADropzone onDrop={(files) => onChange({ target: { name, value: files } })}
                             onReject={onRejectUpload}
                             data-testid="upload-dropzone"
@@ -128,7 +127,7 @@ const CAUpload = () => {
                     </File>
                   ))}
                 </Files>
-                {error && <MantineInput.Error>{error}</MantineInput.Error>}
+                {error && <Input.Error>{error}</Input.Error>}
               </>
             )}
           </Field>
