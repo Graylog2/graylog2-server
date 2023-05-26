@@ -32,6 +32,7 @@ type Props = {
   onCancel: () => void,
   onSelect: (option: string) => void,
   onUpdate: (values: {[key: string]: any}) => void,
+  previousOutputPresent: boolean,
   options: Array<{ label: string, value: any }>,
   order: number,
   selectedBlockDict?: BlockDict,
@@ -69,6 +70,7 @@ const RuleBlockForm = ({
   onUpdate,
   options,
   order,
+  previousOutputPresent,
   selectedBlockDict,
   type,
 }: Props) => {
@@ -138,6 +140,7 @@ const RuleBlockForm = ({
                       <RuleBlockFormField param={param}
                                           functionName={selectedBlockDict.name}
                                           order={order}
+                                          previousOutputPresent={previousOutputPresent}
                                           resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
                     </Row>
                   ),
@@ -170,6 +173,7 @@ RuleBlockForm.propTypes = {
     }),
   ).isRequired,
   order: PropTypes.number.isRequired,
+  previousOutputPresent: PropTypes.bool.isRequired,
   selectedBlockDict: blockDictPropType,
   type: PropTypes.oneOf(['action', 'condition']).isRequired,
 };

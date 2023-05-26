@@ -35,12 +35,13 @@ type Props = {
   blockDict: Array<BlockDict>,
   block?: RuleBlock,
   order: number,
+  previousOutputPresent?: boolean,
   addBlock: (type: string, block: RuleBlock) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
   deleteBlock: (orderIndex: number, type: string,) => void,
 };
 
-const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock, deleteBlock }: Props) => {
+const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
 
@@ -107,6 +108,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, addBlock, updateBlock
                        onSelect={onSelect}
                        order={order}
                        options={options}
+                       previousOutputPresent={previousOutputPresent}
                        selectedBlockDict={currentBlockDict}
                        type={type} />
       ) : (
@@ -124,6 +126,7 @@ RuleBuilderBlock.propTypes = {
   blockDict: PropTypes.arrayOf(blockDictPropType).isRequired,
   block: ruleBlockPropType,
   order: PropTypes.number.isRequired,
+  previousOutputPresent: PropTypes.bool,
   addBlock: PropTypes.func.isRequired,
   updateBlock: PropTypes.func.isRequired,
   deleteBlock: PropTypes.func.isRequired,
@@ -131,6 +134,7 @@ RuleBuilderBlock.propTypes = {
 
 RuleBuilderBlock.defaultProps = {
   block: undefined,
+  previousOutputPresent: false,
 };
 
 export default RuleBuilderBlock;

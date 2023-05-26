@@ -27,10 +27,11 @@ type Props = {
   param: BlockFieldDict,
   functionName: string,
   order: number,
+  previousOutputPresent: boolean,
   resetField: (fieldName: string) => void;
 }
 
-const RuleBlockFormField = ({ param, functionName, order, resetField }: Props) => {
+const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent, resetField }: Props) => {
   const [showPrimaryInput, setShowPrimaryInput] = useState<boolean>(false);
   const [field] = useField(param.name);
 
@@ -46,6 +47,7 @@ const RuleBlockFormField = ({ param, functionName, order, resetField }: Props) =
   const shouldHandlePrimaryParam = () => {
     if (!param.primary) return false;
     if ((order === 0)) return false;
+    if (!previousOutputPresent) return false;
 
     return true;
   };
@@ -70,6 +72,7 @@ const RuleBlockFormField = ({ param, functionName, order, resetField }: Props) =
 
   switch (param.type) {
     case RuleBuilderTypes.String:
+    case RuleBuilderTypes.Object:
       return (
         // TODO: after adding general validation, make sure to not accept string starting with $ for primary params
         <FormikFormGroup type="text"
