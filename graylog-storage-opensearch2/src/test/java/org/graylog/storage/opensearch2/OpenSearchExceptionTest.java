@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.opensearch2.org.apache.http.Header;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -25,8 +26,8 @@ import org.graylog.shaded.opensearch2.org.apache.http.StatusLine;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.rest.RestStatus;
-import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +47,10 @@ public class OpenSearchExceptionTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     Response response;
 
+    @Mock
+    RestHighLevelClient restHighLevelClient;
+
+    // Verify that an OpenSearchStatusException is translated to a BatchSizeTooLargeException.
     @Test
     public void handle429() throws IOException {
         when(response.getHost()).thenReturn(new HttpHost("myHost"));
@@ -138,9 +143,7 @@ public class OpenSearchExceptionTest {
         RestStatus restStatus = RestStatus.BAD_REQUEST;
         OpenSearchStatusException statusException = new OpenSearchStatusException(
                 "status msg", restStatus, responseException);
-
-        OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
-        final OpenSearchClient openSearchClient = openSearchInstance.openSearchClient();
+        final OpenSearchClient openSearchClient = new OpenSearchClient(restHighLevelClient, true, new ObjectMapper());
 
         Exception exception = assertThrows(BatchSizeTooLargeException.class, () -> {
             openSearchClient.execute((a, b) -> {throw statusException;});
