@@ -55,7 +55,7 @@ public class KeystoreFileStorageTest {
     }
 
     @Test
-    void testKeyStorageThrowsExceptionWhenUsingWrongPasswordDuringRead(@TempDir Path tmpDir) throws Exception {
+    void testKeystoreReadThrowsExceptionWhenUsingWrongPassword(@TempDir Path tmpDir) throws Exception {
         final Path keystoreFile = tmpDir.resolve("keystore_file.p12");
         KeyStore testKeystore = KeyStore.getInstance(CertConstants.PKCS12);
         testKeystore.load(null, null);
