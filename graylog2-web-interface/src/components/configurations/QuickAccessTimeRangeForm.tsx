@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Dispatch } from 'react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import moment from 'moment/moment';
 import styled from 'styled-components';
 import Immutable from 'immutable';
@@ -63,6 +63,7 @@ type ItemProps = {
   description: string,
   onChange: (timerange: QuickAccessTimeRange, idx: number) => void,
   onRemove: (idx: number) => void,
+  limitDuration: number,
 }
 
 const contextSettings = {
@@ -74,7 +75,7 @@ const contextSettings = {
   ignoreLimitDurationInTimeRangeDropdown: true,
 };
 
-const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChange, onRemove }: ItemProps) => {
+const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChange, onRemove, limitDuration }: ItemProps) => {
   const handleOnChangeRange = useCallback((newTimerange: TimeRange) => {
     onChange({ timerange: newTimerange, description, id }, idx);
   }, [description, id, idx, onChange]);
@@ -86,9 +87,6 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
   const handleOnRemove = useCallback(() => {
     onRemove(idx);
   }, [idx, onRemove]);
-
-  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
-  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   const debounceHandleOnChangeDescription = debounce((value: string) => handleOnChangeDescription(value), 300);
 
@@ -121,6 +119,9 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
     onUpdate(newState);
   }, [onUpdate, options]);
 
+  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const limitDuration = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds() ?? 0, [config?.query_time_range_limit]);
+
   const onRemove = useCallback((idx: number) => {
     const newState = options.delete(idx);
     onUpdate(newState);
@@ -144,8 +145,9 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
                                   idx={index}
                                   onChange={onChange}
                                   timerange={timerange}
-                                  description={description} />
-  ), [onChange, onRemove]);
+                                  description={description}
+                                  limitDuration={limitDuration} />
+  ), [limitDuration, onChange, onRemove]);
 
   return (
     <div className="form-group">
