@@ -26,7 +26,7 @@ import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
 import type { BlockType, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
-import { getDictForFunction, getDictForParam, getActionOutputVariableName, paramValueExists } from './helpers';
+import { getDictForFunction, getDictForParam, getActionOutputVariableName, paramValueExists, paramValueIsVariable } from './helpers';
 
 import RuleSimulation from '../RuleSimulation';
 
@@ -64,26 +64,27 @@ const RuleBuilder = () => {
   console.log('initialRule', initialRule);
   console.log('currentRule', rule);
 
-  const newConditionBlockOrder = rule.rule_builder.conditions.length;
-  const newActionBlockOrder = rule.rule_builder.actions.length;
+  const newConditionBlockIndex = rule.rule_builder.conditions.length;
+  const newActionBlockIndex = rule.rule_builder.actions.length;
 
   // const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
   //   setRuleBuilder(result.rule_builder);
   // });
 
-  // TODO: Set primary params and output variables again on delete and reorder
+  // TODO: Add reorder functionality (make sure to setPrimaryParamsAndOutputVariable and validate)
+  // TODO: disable submit button when rule builder not valid
 
-  const previousOutput = (position?: number) : {previousOutputPresent: boolean, outputVariable?: string} => {
+  const previousOutput = (index?: number) : {previousOutputPresent: boolean, outputVariable?: string} => {
     const lastBlock = rule.rule_builder.actions[rule.rule_builder.actions.length - 1];
 
-    const previousBlock = !position ? lastBlock : rule.rule_builder.actions[position - 1];
+    const previousBlock = !index ? lastBlock : rule.rule_builder.actions[index - 1];
 
     if (!previousBlock?.outputvariable) return { previousOutputPresent: false };
 
     return { previousOutputPresent: true, outputVariable: previousBlock.outputvariable };
   };
 
-  const setPrimaryParams = (block: RuleBlock, position?: number): RuleBlock => {
+  const setPrimaryParams = (block: RuleBlock, index?: number): RuleBlock => {
     const blockDict = getDictForFunction(actionsDict, block.function);
 
     if (!blockDict) return block;
@@ -91,8 +92,8 @@ const RuleBuilder = () => {
     const newBlock = block;
 
     Object.keys(block.params).forEach((paramName) => {
-      if (getDictForParam(blockDict, paramName)?.primary && (!paramValueExists(block.params[paramName]))) {
-        const { previousOutputPresent, outputVariable } = previousOutput(position);
+      if (getDictForParam(blockDict, paramName)?.primary && (!paramValueExists(block.params[paramName]) || paramValueIsVariable(block.params[paramName]))) {
+        const { previousOutputPresent, outputVariable } = previousOutput(index);
 
         if (!previousOutputPresent) { return; }
 
@@ -103,23 +104,26 @@ const RuleBuilder = () => {
     return newBlock;
   };
 
-  const setOutputVariable = (block: RuleBlock): RuleBlock => {
+  const setOutputVariable = (block: RuleBlock, index?: number): RuleBlock => {
     const newBlock = block;
     const blockDict = getDictForFunction(actionsDict, block.function);
 
+    const order = typeof index !== 'undefined' ? (index + 1) : (newActionBlockIndex + 1);
+
     if ((RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict.return_type)) {
-      newBlock.outputvariable = getActionOutputVariableName(newActionBlockOrder + 1);
+      newBlock.outputvariable = getActionOutputVariableName(order);
     }
 
     return newBlock;
   };
 
+  const setPrimaryParamsAndOutputVariable = (blocks: RuleBlock[]): RuleBlock[] => (
+    blocks.map((block, index) => (
+      setPrimaryParams(setOutputVariable(block, index), index)
+    ))
+  );
+
   const addBlock = async (type: BlockType, block: RuleBlock) => {
-    // validateRuleBuilder();
-    const isValid = true;
-
-    if (!isValid) return;
-
     if (type === 'condition') {
       setRule({
         ...rule,
@@ -131,7 +135,7 @@ const RuleBuilder = () => {
         },
       });
     } else {
-      const blockToSet = setOutputVariable(setPrimaryParams(block));
+      const blockToSet = setPrimaryParams(setOutputVariable(block));
 
       setRule({
         ...rule,
@@ -143,14 +147,11 @@ const RuleBuilder = () => {
         },
       });
     }
+
+    // validateRuleBuilder();
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
-    // validateRuleBuilder();
-    const isValid = true;
-
-    if (!isValid) return;
-
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
 
@@ -175,6 +176,8 @@ const RuleBuilder = () => {
         },
       });
     }
+
+    // validateRuleBuilder();
   };
 
   // [{ output: 1 }, { primary: 1, output: 2 }, { primary: 2 }];
@@ -185,14 +188,6 @@ const RuleBuilder = () => {
 
   // [{ output: 1 }, { primary: 1, output: 2 }, { primary: 2 }];
   // [{ primary: 1, output: 2 }, { primary: 2 }];
-
-  // previousOutputPresent
-
-  // !previousOutputPresent && value.primary && valueIsVariable
-  // => show error "tag" on view view (maybe even with error count)
-  // => disable submit button
-
-  // even on update validation we can have the case that we have erorrs on blocks in view mode -> how do we display those in general?
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
     if (type === 'condition') {
@@ -212,7 +207,7 @@ const RuleBuilder = () => {
       setRule({
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, actions: currentActions,
+          ...rule.rule_builder, actions: setPrimaryParamsAndOutputVariable(currentActions),
         },
       });
     }
@@ -258,11 +253,11 @@ const RuleBuilder = () => {
           ))}
           <RuleBuilderBlock blockDict={conditionsDict || []}
                             block={null}
-                            order={newConditionBlockOrder}
+                            order={newConditionBlockIndex}
                             type="condition"
                             addBlock={addBlock}
                             updateBlock={updateBlock}
-                            deleteBlock={() => setBlockToDelete({ orderIndex: newConditionBlockOrder, type: 'condition' })} />
+                            deleteBlock={() => setBlockToDelete({ orderIndex: newConditionBlockIndex, type: 'condition' })} />
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
@@ -280,12 +275,12 @@ const RuleBuilder = () => {
           ))}
           <RuleBuilderBlock blockDict={actionsDict || []}
                             block={null}
-                            order={newActionBlockOrder}
+                            order={newActionBlockIndex}
                             type="action"
-                            previousOutputPresent={previousOutput(newActionBlockOrder).previousOutputPresent}
+                            previousOutputPresent={previousOutput(newActionBlockIndex).previousOutputPresent}
                             addBlock={addBlock}
                             updateBlock={updateBlock}
-                            deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockOrder, type: 'action' })} />
+                            deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
         </Col>
         <Col md={12}>
           <RuleSimulation rule={rule} />

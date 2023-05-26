@@ -33,4 +33,7 @@ const getActionOutputVariableName = (order : number) : string => {
 const paramValueExists = (paramValue: string | number | boolean) : boolean => (
   typeof paramValue !== 'undefined' && paramValue !== null);
 
-export { getActionOutputVariableName, getDictForFunction, getDictForParam, paramValueExists };
+const paramValueIsVariable = (paramValue: string | number | boolean) : boolean => (
+  typeof paramValue === 'string' && paramValue.startsWith('$'));
+
+export { getActionOutputVariableName, getDictForFunction, getDictForParam, paramValueExists, paramValueIsVariable };

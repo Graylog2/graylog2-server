@@ -23,7 +23,7 @@ import { IconButton } from 'components/common';
 
 import type { RuleBlock, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType } from './types';
-import { paramValueExists } from './helpers';
+import { paramValueExists, paramValueIsVariable } from './helpers';
 
 type Props = {
   block: RuleBlock,
@@ -54,7 +54,7 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
   );
 
   const formatParamValue = (value : string | number | boolean) => {
-    if (typeof value === 'string' && value.startsWith('$')) {
+    if (paramValueIsVariable(value)) {
       return 'Output of the previous step';
     }
 
