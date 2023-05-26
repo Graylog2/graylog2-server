@@ -155,8 +155,12 @@ describe('TimeRangeInput', () => {
 
   it('has button add timerenge to quick access for admin users', async () => {
     asMock(useCurrentUser).mockReturnValue(adminUser);
+
     render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
-    fireEvent.click(await screen.findByText(/5 minutes ago/));
-    await screen.findByTitle('Add timerange to quick access timerange list');
+    await fireEvent.click(await screen.findByText(/5 minutes ago/));
+
+    await waitFor(() => {
+      expect(screen.getByTitle('Add timerange to quick access timerange list')).toBeInTheDocument();
+    });
   });
 });

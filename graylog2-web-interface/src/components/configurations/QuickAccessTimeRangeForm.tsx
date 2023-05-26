@@ -100,7 +100,7 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
                      id={`quick-access-time-range-description-${id}`}
                      placeholder="Add description..."
                      title="Time range preset description"
-                     ariaLabel="Time range preset description"
+                     aria-label="Time range preset description"
                      defaultValue={description}
                      onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                      formGroupClassName="" />
@@ -162,7 +162,7 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
                         customContentRender={customContentRender} />
         </TimeRangeInputSettingsContext.Provider>
       </div>
-      <Button bsSize="xs" onClick={addTimeRange} title="Add quick access timerange" ariaLabel="Add quick access timerange">
+      <Button bsSize="xs" onClick={addTimeRange} title="Add quick access timerange" aria-label="Add quick access timerange">
         Add option
       </Button>
     </div>
