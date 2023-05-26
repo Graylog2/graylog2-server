@@ -44,6 +44,7 @@ const FormikInput = ({ name, placeholder, label, type }: Props) => (
 
 FormikInput.defaultProps = {
   placeholder: undefined,
+  type: undefined,
 };
 
 export default FormikInput;
