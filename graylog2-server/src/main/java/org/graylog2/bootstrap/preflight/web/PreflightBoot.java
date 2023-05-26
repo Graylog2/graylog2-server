@@ -44,13 +44,13 @@ public class PreflightBoot {
 
     public boolean shouldRunPreflightWeb() {
 
-        if(configuration.enablePreflightWebserver()) {
+        if (configuration.enablePreflightWebserver()) {
             return true;
         }
 
-        if (!isFreshInstallation) {
-            return false;
-        }
+//        if (!isFreshInstallation) {
+//            return false;
+//        }
 
         if (!hosts.isEmpty()) {
             return false;
