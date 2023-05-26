@@ -44,6 +44,7 @@ const RuleBuilderForm = ({ rule, onChange }: Props) => {
              value={rule.title}
              onChange={handleTitleChange}
              autoFocus
+             required
              help="Rule title." />
 
       <Input type="textarea"
