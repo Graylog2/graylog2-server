@@ -152,6 +152,8 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
                             name={name}
                             disabled={disabled}
                             placeholder="Last week"
+                            title="Keyword input"
+                            aria-label="Keyword input"
                             onChange={onChange}
                             required
                             value={value || defaultValue} />

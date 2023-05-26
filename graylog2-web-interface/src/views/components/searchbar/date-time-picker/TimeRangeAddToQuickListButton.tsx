@@ -60,9 +60,12 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
         <Popover title="Add to quick access list"
                  id="add-to-quick-list-popover"
                  data-app-section="add-to-quick-list-popover_form"
-                 data-event-element="Add to quick list">
+                 data-event-element="Add to quick list"
+                 data-testId="add-to-quick-list-popover">
           <Input type="text"
                  placeholder="Add description..."
+                 title="Time range description"
+                 aria-label="Time range description"
                  defaultValue={description}
                  onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                  formGroupClassName="" />

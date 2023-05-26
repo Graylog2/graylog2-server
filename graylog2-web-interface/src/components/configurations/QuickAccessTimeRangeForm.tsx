@@ -93,17 +93,19 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
   const debounceHandleOnChangeDescription = debounce((value: string) => handleOnChangeDescription(value), 300);
 
   return (
-    <ItemWrapper>
+    <ItemWrapper data-testId={`time-range-preset-${id}`}>
       <TimeRangeInput onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} />
       <Description>
         <StyledInput type="text"
                      id={`quick-access-time-range-description-${id}`}
                      placeholder="Add description..."
+                     title="Time range preset description"
+                     ariaLabel="Time range preset description"
                      defaultValue={description}
                      onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                      formGroupClassName="" />
-        <IconWrapper className="input-group-addon">
-          <Icon name="trash-alt" style={{ cursor: 'pointer' }} onClick={handleOnRemove} />
+        <IconWrapper className="input-group-addon" onClick={handleOnRemove} title="Remove preset">
+          <Icon name="trash-alt" style={{ cursor: 'pointer' }} />
         </IconWrapper>
       </Description>
     </ItemWrapper>
@@ -160,7 +162,9 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
                         customContentRender={customContentRender} />
         </TimeRangeInputSettingsContext.Provider>
       </div>
-      <Button bsSize="xs" onClick={addTimeRange}>Add option</Button>
+      <Button bsSize="xs" onClick={addTimeRange} title="Add quick access timerange" ariaLabel="Add quick access timerange">
+        Add option
+      </Button>
     </div>
   );
 };
