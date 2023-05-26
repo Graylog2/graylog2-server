@@ -93,7 +93,7 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
   const debounceHandleOnChangeDescription = debounce((value: string) => handleOnChangeDescription(value), 300);
 
   return (
-    <ItemWrapper data-testId={`time-range-preset-${id}`}>
+    <ItemWrapper data-testid={`time-range-preset-${id}`}>
       <TimeRangeInput onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} />
       <Description>
         <StyledInput type="text"
