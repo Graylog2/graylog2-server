@@ -26,7 +26,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
-import static org.graylog.security.certutil.CertConstants.KEYSTORE_TYPE;
+import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public class CACreator {
 
@@ -45,7 +45,7 @@ public class CACreator {
                             .validity(certificateValidity)
             );
 
-            KeyStore caKeystore = KeyStore.getInstance(KEYSTORE_TYPE);
+            KeyStore caKeystore = KeyStore.getInstance(PKCS12);
             caKeystore.load(null, null);
 
             caKeystore.setKeyEntry("root",

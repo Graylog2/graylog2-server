@@ -48,7 +48,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
-import static org.graylog.security.certutil.CertConstants.KEYSTORE_TYPE;
+import static org.graylog.security.certutil.CertConstants.PKCS12;
+
 
 @Singleton
 public class CaService {
@@ -106,7 +107,7 @@ public class CaService {
         // or: decide that it's always only one file containing all certificates
         try {
             List<FormDataBodyPart> parts = params.getFields("file");
-            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
+            KeyStore keyStore = KeyStore.getInstance(PKCS12);
             for(BodyPart part : parts) {
                 InputStream is = part.getEntityAs(InputStream.class);
                 byte[] bytes = is.readAllBytes();
