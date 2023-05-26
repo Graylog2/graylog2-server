@@ -173,7 +173,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                   data: /var/lib/graylog-sidecar/collectors/auditbeat/data
                                   logs: /var/lib/graylog-sidecar/collectors/auditbeat/log""",
                         beatsPreambel)
-        ).ifPresent(collector -> ensureDefaultConfiguration("default-linux", collector));
+        ).ifPresent(collector -> ensureDefaultConfiguration("auditlogbeat-default", collector));
         ensureCollector(
                 "winlogbeat",
                 "svc",
