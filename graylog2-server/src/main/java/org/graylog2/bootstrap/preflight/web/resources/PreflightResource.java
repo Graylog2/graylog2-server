@@ -37,7 +37,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,9 +106,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void generate() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        activeDataNodes.values().forEach(node -> {
-            nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(node.getNodeId()).state(NodePreflightConfig.State.CONFIGURED).build());
-        });
+        activeDataNodes.values().forEach(node -> nodePreflightConfigService.changeState(node.getNodeId(), NodePreflightConfig.State.CONFIGURED));
     }
 
     @POST

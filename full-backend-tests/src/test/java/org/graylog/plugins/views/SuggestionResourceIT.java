@@ -34,7 +34,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST})
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
 public class SuggestionResourceIT {
     private final GraylogApis api;
 

@@ -55,7 +55,7 @@ describe('StreamSearchPage', () => {
   };
   const streamId = 'stream-id-1';
   const SimpleStreamSearchPage = () => (
-    <StreamsContext.Provider value={[{ id: streamId }]}>
+    <StreamsContext.Provider value={[{ id: streamId, title: 'Teststream' }]}>
       <StreamSearchPage />
     </StreamsContext.Provider>
   );

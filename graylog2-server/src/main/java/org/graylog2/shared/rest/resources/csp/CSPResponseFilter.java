@@ -21,8 +21,11 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 
+import static org.graylog2.shared.rest.resources.csp.CSPDynamicFeature.CSP_NONCE_PROPERTY;
+
 public class CSPResponseFilter implements ContainerResponseFilter {
     public final static String CSP_HEADER = "Content-Security-Policy";
+    private final static String noncePattern = "\\{nonce}";
     private String value;
 
     public CSPResponseFilter(String value) {
@@ -34,7 +37,9 @@ public class CSPResponseFilter implements ContainerResponseFilter {
                        ContainerResponseContext responseContext) {
         final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
         if (!headers.containsKey(CSP_HEADER)) {
-            headers.add(CSP_HEADER, value);
+            final var cspNonce = (String) requestContext.getProperty(CSP_NONCE_PROPERTY);
+            final var valueWithNonce = value.replaceAll(noncePattern, cspNonce);
+            headers.add(CSP_HEADER, valueWithNonce);
         }
     }
 }

@@ -67,7 +67,7 @@ jest.mock('views/logic/Widgets', () => ({
 
 describe('EventDefinitionReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
-    <StreamsContext.Provider value={[{}]}>
+    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'TestStream' }]}>
       <EventDefinitionReplaySearchPage />
     </StreamsContext.Provider>
   );

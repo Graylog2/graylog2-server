@@ -70,13 +70,14 @@ public class ProductionIndexHtmlGenerator implements IndexHtmlGenerator {
     }
 
     @Override
-    public String get(MultivaluedMap<String, String> headers) {
+    public String get(MultivaluedMap<String, String> headers, String nonce) {
         final URI relativePath = RestTools.buildRelativeExternalUri(headers, httpConfiguration.getHttpExternalUri());
         final Map<String, Object> model = ImmutableMap.<String, Object>builder()
                 .put("title", "Graylog Web Interface")
                 .put("cssFiles", cssFiles)
                 .put("jsFiles", sortedJsFiles)
                 .put("appPrefix", relativePath)
+                .put("nonce", nonce)
                 .build();
         return templateEngine.transform(template, model);
     }

@@ -18,14 +18,15 @@ package org.graylog2.configuration.validators;
 
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
-import org.graylog2.plugin.Version;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.zafarkhaja.semver.Version.*;
+import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DetectedSearchVersionValidatorTest {
 
@@ -33,17 +34,19 @@ class DetectedSearchVersionValidatorTest {
 
     @Test
     void validateMajorVersion() {
-        assertDoesNotThrow(() -> validator.validate("OS1", SearchVersion.create(OPENSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(1, 0, 0))));
-        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(7, 0, 0))));
+        assertDoesNotThrow(() -> validator.validate("OS1", SearchVersion.create(OPENSEARCH, forIntegers(1, 0, 0))));
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, forIntegers(7, 0, 0))));
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(DATANODE, forIntegers(5, 2, 0))));
     }
 
     @Test
     void testPatchVersion() {
-        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(7, 10, 2))));
+        assertDoesNotThrow(() -> validator.validate("ES7", SearchVersion.create(ELASTICSEARCH, forIntegers(7, 10, 2))));
     }
 
     @Test
     void testInvalidCombination() {
-        assertThrows(ValidationException.class, () -> validator.validate("ES5", SearchVersion.create(ELASTICSEARCH, com.github.zafarkhaja.semver.Version.forIntegers(5, 0, 0))));
+        assertThrows(ValidationException.class, () -> validator.validate("ES6", SearchVersion.create(ELASTICSEARCH, forIntegers(6, 0, 0))));
+        assertThrows(ValidationException.class, () -> validator.validate("ES5", SearchVersion.create(ELASTICSEARCH, forIntegers(5, 0, 0))));
     }
 }

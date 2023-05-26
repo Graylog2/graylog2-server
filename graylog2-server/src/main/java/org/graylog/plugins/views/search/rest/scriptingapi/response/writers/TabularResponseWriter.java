@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest.scriptingapi.response.writers;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.vandermeer.asciitable.AsciiTable;
+import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.rest.MoreMediaTypes;
@@ -37,6 +38,8 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Provider
@@ -94,8 +97,21 @@ public class TabularResponseWriter implements MessageBodyWriter<TabularResponse>
         at.addRule();
         at.addRow(response.schema().stream().map(ResponseSchemaEntry::name).collect(Collectors.toList()));
         at.addRule();
-        response.datarows().forEach(at::addRow);
+        response.datarows().stream().map(TabularResponseWriter::serialize).forEach(at::addRow);
         at.addRule();
+        at.setTextAlignment(TextAlignment.LEFT);
         return at.render();
+    }
+
+    private static List<String> serialize(List<Object> values) {
+        return values.stream().map(TabularResponseWriter::serialize).collect(Collectors.toList());
+    }
+
+    private static String serialize(Object val) {
+        if (val instanceof Collection<?> collection) {
+            return collection.stream().map(String::valueOf).collect(Collectors.joining(", "));
+        } else {
+            return String.valueOf(val);
+        }
     }
 }

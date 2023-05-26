@@ -41,13 +41,20 @@ public class FullDirSync {
         existingPaths.removeAll(copiedPaths);
 
         for (Path path : existingPaths) {
-            LOG.info("Deleting obsolete file " + path);
             if (Files.isDirectory(path)) {
+                LOG.info("Deleting obsolete directory " + path);
                 FileUtils.deleteDirectory(path.toFile());
             } else {
-                Files.deleteIfExists(path);
+                try {
+                    LOG.info("Deleting obsolete file " + path);
+                    Files.deleteIfExists(path);
+                } catch (IOException e) {
+                    LOG.info("Failed to delete obsolete file " + path);
+                }
             }
+
         }
+
     }
 
     private static List<Path> copyFiles(Path source, Path target) throws IOException {

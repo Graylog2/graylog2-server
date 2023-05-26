@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Properly prefix frontend paths to prevent error when custom app path suffix is used."
+
+issues = ["15536"]
+pulls = ["15540"]
+

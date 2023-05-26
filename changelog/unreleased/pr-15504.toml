@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Extend authentication cookie's max age on every session extension."
+
+issues = ["15502"]
+pulls = ["15504"]
+

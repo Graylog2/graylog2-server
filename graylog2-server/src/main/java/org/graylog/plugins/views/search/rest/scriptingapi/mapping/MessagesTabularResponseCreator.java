@@ -16,23 +16,30 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
+import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.CachingDecorator;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.FieldDecorator;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,16 +47,18 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesTabularResponseCreator.class);
 
-    private final FieldTypesLookup fieldTypesLookup;
+    private final MappedFieldTypesService mappedFieldTypesService;
+    private final Set<FieldDecorator> decorators;
 
     @Inject
-    public MessagesTabularResponseCreator(final FieldTypesLookup fieldTypesLookup) {
-        this.fieldTypesLookup = fieldTypesLookup;
+    public MessagesTabularResponseCreator(final MappedFieldTypesService mappedFieldTypesService, Set<FieldDecorator> decorators) {
+        this.mappedFieldTypesService = mappedFieldTypesService;
+        this.decorators = decorators;
     }
 
     public TabularResponse mapToResponse(final MessagesRequestSpec messagesRequestSpec,
                                          final SearchJob searchJob,
-                                         final SearchUser searchUser) throws QueryFailedException {
+                                         final SearchUser searchUser, Subject subject) throws QueryFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
@@ -68,25 +77,40 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
     private TabularResponse mapToResponse(final MessagesRequestSpec searchRequestSpec,
                                           final MessageList.Result messageListResult,
                                           final SearchUser searchUser) {
-        final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
-        final Map<String, String> fieldTypes = fieldTypesLookup.getTypes(streams, new HashSet<>(searchRequestSpec.fields()));
-
         return new TabularResponse(
-                searchRequestSpec.getSchema(fieldTypes),
-                getDatarows(searchRequestSpec, messageListResult),
+                getSchema(searchRequestSpec, searchUser),
+                getDatarows(searchRequestSpec, messageListResult, searchUser),
                 new Metadata(messageListResult.effectiveTimerange())
         );
     }
 
-    private static List<List<Object>> getDatarows(final MessagesRequestSpec messagesRequestSpec,
-                                                  final MessageList.Result messageListResult) {
+    private List<ResponseSchemaEntry> getSchema(MessagesRequestSpec searchRequestSpec, SearchUser searchUser) {
+        final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
+        final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
+        final MessageFieldTypeMapper fieldsMapper = new MessageFieldTypeMapper(knownFields);
+
+        return searchRequestSpec.requestedFields()
+                .stream()
+                .map(fieldsMapper)
+                .collect(Collectors.toList());
+    }
+
+    private List<List<Object>> getDatarows(final MessagesRequestSpec messagesRequestSpec,
+                                           final MessageList.Result messageListResult, SearchUser searchUser) {
+
+        final Set<FieldDecorator> cachedDecorators = this.decorators.stream().map(CachingDecorator::new).collect(Collectors.toSet());
+
         return messageListResult.messages()
                 .stream()
-                .map(message -> messagesRequestSpec.fields()
+                .map(message -> messagesRequestSpec.requestedFields()
                         .stream()
-                        .map(field -> message.message().get(field))
-                        .map(value -> value == null ? "-" : value)
+                        .map(field -> extractValue(message, field, cachedDecorators, searchUser))
                         .collect(Collectors.toList())).collect(Collectors.toList());
     }
 
+    private Object extractValue(ResultMessageSummary message, RequestedField field, Set<FieldDecorator> decorators, SearchUser searchUser) {
+        return Optional.ofNullable(message.message().get(field.name()))
+                .map(value -> decorate(decorators, field, value, searchUser))
+                .orElse("-");
+    }
 }
