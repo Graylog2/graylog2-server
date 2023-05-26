@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.response;
 
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseEntryDataType.DATE;
@@ -29,22 +30,16 @@ class ResponseEntryDataTypeTest {
 
     @Test
     void unknownTypeOnBlankEsType() {
-        assertEquals(UNKNOWN, ResponseEntryDataType.fromSearchEngineType(null));
-        assertEquals(UNKNOWN, ResponseEntryDataType.fromSearchEngineType(""));
-    }
-
-    @Test
-    void unknownTypeOnWrongEsType() {
-        assertEquals(UNKNOWN, ResponseEntryDataType.fromSearchEngineType("hamburger"));
+        assertEquals(UNKNOWN, ResponseEntryDataType.fromFieldType(null));
     }
 
     @Test
     void properTypeOnProperEsType() {
-        assertEquals(NUMERIC, ResponseEntryDataType.fromSearchEngineType("float"));
-        assertEquals(NUMERIC, ResponseEntryDataType.fromSearchEngineType("long"));
-        assertEquals(STRING, ResponseEntryDataType.fromSearchEngineType("text"));
-        assertEquals(STRING, ResponseEntryDataType.fromSearchEngineType("keyword"));
-        assertEquals(DATE, ResponseEntryDataType.fromSearchEngineType("date"));
+        assertEquals(NUMERIC, ResponseEntryDataType.fromFieldType(FieldTypeMapper.FLOAT_TYPE));
+        assertEquals(NUMERIC, ResponseEntryDataType.fromFieldType(FieldTypeMapper.LONG_TYPE));
+        assertEquals(STRING, ResponseEntryDataType.fromFieldType(FieldTypeMapper.STRING_FTS_TYPE));
+        assertEquals(STRING, ResponseEntryDataType.fromFieldType(FieldTypeMapper.STRING_TYPE));
+        assertEquals(DATE, ResponseEntryDataType.fromFieldType(FieldTypeMapper.DATE_TYPE));
     }
 
     @Test

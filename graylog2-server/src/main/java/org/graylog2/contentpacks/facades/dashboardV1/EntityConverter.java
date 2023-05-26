@@ -65,7 +65,7 @@ public class EntityConverter {
 
         final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = convertWidgets();
         final Map<String, WidgetPositionDTO> widgetPositionMap = DashboardEntity.positionMap(parameters, widgets);
-        final  Titles titles = DashboardEntity.widgetTitles(widgets, parameters);
+        final Titles titles = DashboardEntity.widgetTitles(widgets, parameters);
 
         final Map<String, Set<String>> widgetMapping = new HashMap<>();
         final Set<SearchTypeEntity> searchTypes = new HashSet<>();

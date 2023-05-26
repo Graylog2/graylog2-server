@@ -66,9 +66,11 @@ public class CertificatesService extends PaginatedDbService<NodeCertificate> {
     }
 
     public Optional<String> readCert(final String nodeId) {
-        final NodeCertificate nod = dbCollection.findOneById(nodeId);
-        if (nod != null && nod.encryptedCertificate() != null) {
-            return Optional.ofNullable(encryptionService.decrypt(nod.encryptedCertificate()));
+        final NodeCertificate nodeCertificate = dbCollection.findOne(
+                DBQuery.is(FIELD_NODEID, nodeId)
+        );
+        if (nodeCertificate != null && nodeCertificate.encryptedCertificate() != null) {
+            return Optional.ofNullable(encryptionService.decrypt(nodeCertificate.encryptedCertificate()));
         } else {
             return Optional.empty();
         }
