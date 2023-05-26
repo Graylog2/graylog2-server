@@ -197,7 +197,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                    - name: Security""",
                         beatsPreambel
                 )
-        ).ifPresent(collector -> ensureDefaultConfiguration("default-windows", collector));
+        ).ifPresent(collector -> ensureDefaultConfiguration("winlogbeat-default", collector));
         ensureCollector(
                 "nxlog",
                 "exec",
