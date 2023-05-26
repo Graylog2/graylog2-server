@@ -21,7 +21,7 @@ import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 
 import { Button, Input, Popover } from 'components/bootstrap';
-import { FormSubmit, Icon, Portal } from 'components/common';
+import { Icon, Portal, ModalSubmit } from 'components/common';
 import type { TimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -80,7 +80,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
             <i>f.e. ({equalTimerange.description})</i>
           </p>
           )}
-          <FormSubmit disabledSubmit={!description} submitButtonText="Add timerange" onCancel={toggleModal} onSubmit={onAddTimerange} bsSize="small" />
+          <ModalSubmit disabledSubmit={!description} submitButtonText="Add timerange" onCancel={toggleModal} onSubmit={onAddTimerange} bsSize="small" />
         </Popover>
       </Position>
     </Portal>

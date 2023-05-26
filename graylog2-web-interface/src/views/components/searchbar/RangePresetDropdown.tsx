@@ -82,7 +82,7 @@ const RangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, c
   const [filtratedByLimitOptions, setFiltratedByLimitOptions] = useState([]);
 
   const timeRangeLimit = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds(), [config?.query_time_range_limit]);
-  const title = displayTitle && (availableOptions ? 'Preset Times' : 'Loading Ranges...');
+  const title = displayTitle && (availableOptions ? 'Preset Times' : 'No available presets');
 
   useEffect(() => {
     const filtrateOptions = async () => {
