@@ -56,11 +56,16 @@ const updateRule = async (rule: RuleBuilderRule) => {
   }
 };
 
-const fetchValidateRule = async (rule: RuleBuilderRule): Promise<RuleBuilderRule> => fetch(
-  'POST',
-  qualifyUrl(ApiRoutes.RuleBuilderController.validate().url),
-  rule,
-);
+const fetchValidateRule = async (rule: RuleBuilderRule): Promise<RuleBuilderRule> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { source, ...ruleToValidate }: any = rule;
+
+  return fetch(
+    'POST',
+    qualifyUrl(ApiRoutes.RuleBuilderController.validate().url),
+    ruleToValidate,
+  );
+};
 
 const fetchRule = async (ruleId: string = '') => fetch('GET', qualifyUrl(ApiRoutes.RulesController.get(ruleId).url));
 const fetchConditionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listConditionsDict().url));

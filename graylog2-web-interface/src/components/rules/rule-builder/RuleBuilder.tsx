@@ -45,7 +45,7 @@ const RuleBuilder = () => {
     actionsDict,
     createRule,
     updateRule,
-    // fetchValidateRule,
+    fetchValidateRule,
   } = useRuleBuilder();
 
   const [rule, setRule] = useState<RuleBuilderRule>({ description: '', title: '', rule_builder: { conditions: [], actions: [] } });
@@ -67,9 +67,9 @@ const RuleBuilder = () => {
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
 
-  // const validateRuleBuilder = () => fetchValidateRule({ ...rule, rule_builder: ruleBuilder }).then((result) => {
-  //   setRuleBuilder(result.rule_builder);
-  // });
+  const validateRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
+    setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
+  });
 
   // TODO: Add reorder functionality (make sure to setPrimaryParamsAndOutputVariable and validate)
   // TODO: disable submit button when rule builder not valid
@@ -124,8 +124,10 @@ const RuleBuilder = () => {
   );
 
   const addBlock = async (type: BlockType, block: RuleBlock) => {
+    let ruleToAdd;
+
     if (type === 'condition') {
-      setRule({
+      ruleToAdd = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder,
@@ -133,11 +135,11 @@ const RuleBuilder = () => {
             { ...block },
           ],
         },
-      });
+      };
     } else {
       const blockToSet = setPrimaryParams(setOutputVariable(block));
 
-      setRule({
+      ruleToAdd = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder,
@@ -145,39 +147,43 @@ const RuleBuilder = () => {
             { ...blockToSet },
           ],
         },
-      });
+      };
     }
 
-    // validateRuleBuilder();
+    setRule(ruleToAdd);
+    validateRuleBuilder(ruleToAdd);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
+    let ruleToUpdate;
+
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
 
       currentConditions[orderIndex] = block;
 
-      setRule({
+      ruleToUpdate = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder, conditions: currentConditions,
         },
-      });
+      };
     } else {
       const blockToSet = setPrimaryParams(block, orderIndex);
 
       const currentActions = [...rule.rule_builder.actions];
       currentActions[orderIndex] = blockToSet;
 
-      setRule({
+      ruleToUpdate = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder, actions: currentActions,
         },
-      });
+      };
     }
 
-    // validateRuleBuilder();
+    setRule(ruleToUpdate);
+    validateRuleBuilder(ruleToUpdate);
   };
 
   // [{ output: 1 }, { primary: 1, output: 2 }, { primary: 2 }];
@@ -190,29 +196,32 @@ const RuleBuilder = () => {
   // [{ primary: 1, output: 2 }, { primary: 2 }];
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
+    let ruleToDelete;
+
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
       currentConditions.splice(orderIndex, 1);
 
-      setRule({
+      ruleToDelete = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder, conditions: currentConditions,
         },
-      });
+      };
     } else {
       const currentActions = [...rule.rule_builder.actions];
       currentActions.splice(orderIndex, 1);
 
-      setRule({
+      ruleToDelete = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder, actions: setPrimaryParamsAndOutputVariable(currentActions),
         },
-      });
+      };
     }
 
-    // validateRuleBuilder();
+    setRule(ruleToDelete);
+    validateRuleBuilder(ruleToDelete);
   };
 
   const handleCancel = () => {
@@ -252,7 +261,6 @@ const RuleBuilder = () => {
                               deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
           ))}
           <RuleBuilderBlock blockDict={conditionsDict || []}
-                            block={null}
                             order={newConditionBlockIndex}
                             type="condition"
                             addBlock={addBlock}
@@ -274,7 +282,6 @@ const RuleBuilder = () => {
                               deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
           ))}
           <RuleBuilderBlock blockDict={actionsDict || []}
-                            block={null}
                             order={newActionBlockIndex}
                             type="action"
                             previousOutputPresent={previousOutput(newActionBlockIndex).previousOutputPresent}
