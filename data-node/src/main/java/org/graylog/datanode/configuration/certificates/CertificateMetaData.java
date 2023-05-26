@@ -14,15 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil;
+package org.graylog.datanode.configuration.certificates;
 
-/**
- * Place to store constants that are not a subject of user/client configuration.
- */
-public interface CertConstants {
+import org.graylog.security.certutil.CertConstants;
 
-    String KEY_GENERATION_ALGORITHM = "RSA";
-    String SIGNING_ALGORITHM = "SHA256withRSA";
-    String PKCS12 = "PKCS12";
-    String DATANODE_KEY_ALIAS = "datanode";
+public record CertificateMetaData(String alias,
+                                  String keystoreFilePath,
+                                  char[] keystoreFilePassword) {
+
+    public CertificateMetaData(String keystoreFilePath,
+                               char[] keystoreFilePassword) {
+        this(CertConstants.DATANODE_KEY_ALIAS, keystoreFilePath, keystoreFilePassword);
+    }
+
+    public String passwordAsString() {
+        return new String(keystoreFilePassword());
+    }
+
 }

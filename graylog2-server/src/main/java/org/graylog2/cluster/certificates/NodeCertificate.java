@@ -18,11 +18,18 @@ package org.graylog2.cluster.certificates;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.security.encryption.EncryptedValue;
+import org.mongojack.Id;
 
-public record NodeCertificate(@JsonProperty(FIELD_NODEID) String nodeId,
+public record NodeCertificate(@Id @JsonProperty(FIELD_ID) String id,
+                              @JsonProperty(FIELD_NODEID) String nodeId,
                               @JsonProperty(FIELD_ENCR_CERTIFICATE) EncryptedValue encryptedCertificate) {
 
+    public static final String FIELD_ID = "id";
     public static final String FIELD_NODEID = "node_id";
     public static final String FIELD_ENCR_CERTIFICATE = "encrypted_certificate_keystore";
+
+    public NodeCertificate(String nodeId, EncryptedValue encryptedCertificate) {
+        this(null, nodeId, encryptedCertificate);
+    }
 
 }
