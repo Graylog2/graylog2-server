@@ -24,7 +24,6 @@ import org.graylog.security.certutil.ca.CACreator;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
-import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
