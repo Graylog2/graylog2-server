@@ -50,11 +50,11 @@ public class CACreator {
 
             caKeystore.setKeyEntry("root",
                     rootCA.privateKey(),
-                    null,
+                    password,
                     new X509Certificate[]{rootCA.certificate()});
             caKeystore.setKeyEntry("ca",
                     intermediateCA.privateKey(),
-                    null,
+                    password,
                     new X509Certificate[]{intermediateCA.certificate(), rootCA.certificate()});
 
             return caKeystore;
