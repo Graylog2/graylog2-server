@@ -54,6 +54,8 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
 
+  const disableSimulation = !rawMessageToSimulate || (!ruleSource && !currentRule?.rule_builder?.conditions?.length && !currentRule?.rule_builder?.actions?.length);
+
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
   };
@@ -61,10 +63,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
   const handleRunRuleSimulation = () => {
     simulateRule(
       rawMessageToSimulate,
-      currentRule || {
-        ...rule,
-        source: ruleSource,
-      },
+      currentRule || rule,
       setRuleSimulationResult,
     );
   };
@@ -100,7 +99,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                  rows={5} />
           <Button bsStyle="info"
                   bsSize="xsmall"
-                  disabled={!rawMessageToSimulate || !ruleSource}
+                  disabled={disableSimulation}
                   onClick={handleRunRuleSimulation}>
             Run rule simulation
           </Button>
