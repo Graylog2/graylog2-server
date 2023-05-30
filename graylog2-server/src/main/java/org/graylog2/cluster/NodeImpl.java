@@ -89,6 +89,7 @@ public class NodeImpl extends PersistedImpl implements Node {
         return (String)fields.get("hostname");
     }
 
+    @JsonIgnore
     @Override
     public String getTitle() {
         return StringUtils.f("%s / %s", getShortNodeId(), getHostname());
