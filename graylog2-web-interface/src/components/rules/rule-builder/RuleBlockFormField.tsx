@@ -22,7 +22,7 @@ import { ControlLabel } from 'components/bootstrap';
 
 import { RuleBuilderTypes } from './types';
 import type { BlockFieldDict } from './types';
-import { paramValueExists } from './helpers';
+import { paramValueExists, paramValueIsVariable } from './helpers';
 
 type Props = {
   param: BlockFieldDict,
@@ -55,6 +55,14 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
 
   const isValueSet = paramValueExists(field.value);
 
+  const validateTextField = (value: string) : string | undefined => {
+    if (paramValueExists(value) && paramValueIsVariable(value)) {
+      return 'Fields starting with \'$\' are not allowed.';
+    }
+
+    return null;
+  };
+
   const buttonAfter = () => {
     if (!shouldHandlePrimaryParam()) return null;
 
@@ -75,12 +83,12 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
     case RuleBuilderTypes.String:
     case RuleBuilderTypes.Object:
       return (
-        // TODO: after adding general validation, make sure to not accept string starting with $ for primary params
         <FormikFormGroup type="text"
                          key={`${functionName}_${param.name}`}
                          name={param.name}
                          label={param.name}
                          required={!param.optional}
+                         validate={validateTextField}
                          disabled={shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet}
                          placeholder={placeholder}
                          buttonAfter={buttonAfter()}
