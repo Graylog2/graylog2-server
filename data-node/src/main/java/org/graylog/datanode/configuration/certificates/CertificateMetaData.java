@@ -14,22 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog.datanode.configuration.certificates;
 
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.security.certutil.CertConstants;
 
-import java.io.IOException;
+public record CertificateMetaData(String alias,
+                                  String keystoreFilePath,
+                                  char[] keystoreFilePassword) {
 
-public interface ManagableProcess<T> {
+    public CertificateMetaData(String keystoreFilePath,
+                               char[] keystoreFilePassword) {
+        this(CertConstants.DATANODE_KEY_ALIAS, keystoreFilePath, keystoreFilePassword);
+    }
 
-    void startWithConfig(T configuration);
+    public String passwordAsString() {
+        return new String(keystoreFilePassword());
+    }
 
-    void restart() throws IOException;
-
-    void stop();
-
-    void onEvent(ProcessEvent event);
-
-    boolean isInState(ProcessState state);
 }
