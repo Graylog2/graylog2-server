@@ -24,8 +24,11 @@ import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 import type { RuleBlock, BlockType, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType } from './types';
 
-const BlockContainer = styled.div(({ theme }) => css`
+const BlockContainer = styled.div.attrs(({ hasErrors }: { hasErrors: boolean }) => ({
+  hasErrors,
+}))(({ hasErrors, theme }) => css`
   border-radius: 4px;
+  border-color: ${hasErrors ? theme.colors.variant.lighter.danger : theme.colors.variant.lighter.default};
   padding: ${theme.spacings.md};
   margin-bottom: ${theme.spacings.md};
 `);
@@ -99,7 +102,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   const showForm = !block || editMode;
 
   return (
-    <BlockContainer className="content">
+    <BlockContainer className="content" hasErrors={block?.errors?.length > 0}>
       {showForm ? (
         <RuleBlockForm existingBlock={block}
                        onAdd={onAdd}

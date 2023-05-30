@@ -23,6 +23,7 @@ import { FormSubmit, Select } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 
+import BlockErrors from './BlockErrors';
 import { paramValueIsVariable } from './helpers';
 import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
 import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
@@ -162,6 +163,7 @@ const RuleBlockForm = ({
             </Form>
           )}
         </Formik>
+        <BlockErrors block={existingBlock} />
       </Col>
     </Row>
   );
