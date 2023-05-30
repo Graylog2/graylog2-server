@@ -18,6 +18,10 @@ import PropTypes from 'prop-types';
 
 export type BlockType = 'condition' | 'action'
 
+export interface ObjectWithErrors {
+  errors?: Array<string>,
+}
+
 export type RuleBuilderRule = {
   rule_builder: RuleBuilderType,
   description?: string,
@@ -31,7 +35,7 @@ export type RuleBlockField = {
   [key:string]: string | number | boolean
 }
 
-export type RuleBlock = {
+export interface RuleBlock extends ObjectWithErrors {
   function: string,
   params: RuleBlockField,
   outputvariable?: string,
@@ -39,7 +43,7 @@ export type RuleBlock = {
   errors?: Array<string>
 }
 
-export type RuleBuilderType = {
+export interface RuleBuilderType extends ObjectWithErrors {
   errors?: Array<string>,
   conditions: Array<RuleBlock>,
   actions: Array<RuleBlock>
