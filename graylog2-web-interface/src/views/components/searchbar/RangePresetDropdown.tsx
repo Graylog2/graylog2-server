@@ -119,7 +119,7 @@ const RangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, c
       sendTelemetry('input_value_change', {
         app_pathname: 'search',
         app_section: 'search-bar',
-        app_action_value: 'quick-access-timerange-selector',
+        app_action_value: 'timerange-preset-selector',
         event_details: { timerange },
       });
 

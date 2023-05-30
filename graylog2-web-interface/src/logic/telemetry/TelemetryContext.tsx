@@ -23,7 +23,7 @@ export type TelemetryEvent = {
   app_section?: string,
   app_action_value?: string
   event_details?: {
-    [key: string]: string | boolean | number,
+    [key: string]: any,
   }
 };
 

@@ -32,6 +32,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 import generateId from 'logic/generateId';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   addTimerange: (title: string) => void,
@@ -92,22 +93,37 @@ const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timeran
   const formTarget = useRef();
   const { config, refresh } = useSearchConfiguration();
   const [showForm, setShowForm] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   const toggleModal = useCallback(() => {
     setShowForm((cur) => !cur);
   }, []);
   const addTimerange = useCallback((description) => {
+    const quickAccessTimerangePreset = { description, timerange: onSubmittingTimerange(timerange, userTimezone), id: generateId() };
+
     ConfigurationsActions.update(ConfigurationType.SEARCHES_CLUSTER_CONFIG,
       {
         ...config,
         quick_access_timerange_presets: [
           ...config.quick_access_timerange_presets,
-          { description, timerange: onSubmittingTimerange(timerange, userTimezone), id: generateId() }],
+          quickAccessTimerangePreset],
       }).then(() => {
       refresh();
       toggleModal();
     });
-  }, [config, refresh, timerange, toggleModal, userTimezone]);
+
+    if (quickAccessTimerangePreset) {
+      sendTelemetry('form_submit', {
+        app_pathname: 'search',
+        app_section: 'search-bar',
+        app_action_value: 'add_to_quick_access_timerange_presets',
+        event_details: {
+          timerange: quickAccessTimerangePreset.timerange,
+          id: quickAccessTimerangePreset.id,
+        },
+      });
+    }
+  }, [config, refresh, sendTelemetry, timerange, toggleModal, userTimezone]);
 
   const equalTimerange = useMemo(() => config
     ?.quick_access_timerange_presets
