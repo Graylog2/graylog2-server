@@ -73,17 +73,17 @@ const fetchActionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuild
 
 const useRuleBuilder = () => {
   const { ruleId } = useParams();
+  const enabled = !(ruleId === 'new');
 
   const { data: rule, refetch: refetchRule, isFetching: isLoadingRule } = useQuery<RuleBuilderRule|null>(
     ['rule'],
     () => fetchRule(ruleId),
     {
-      enabled: !(ruleId === 'new'),
+      enabled,
       onError: (errorThrown) => {
         UserNotification.error(`Loading Rule Builder Rule failed with status: ${errorThrown}`,
           'Could not load Rule Builder Rule.');
       },
-      keepPreviousData: true,
     },
   );
   const { data: conditionsDict, refetch: refetchConditionsDict, isFetching: isLoadingConditionsDict } = useQuery<Array<BlockDict>>(
@@ -115,7 +115,7 @@ const useRuleBuilder = () => {
     isLoadingActionsDict,
     conditionsDict,
     actionsDict,
-    rule,
+    rule: enabled ? rule : null,
     refetchRule,
     refetchConditionsDict,
     refetchActionsDict,
