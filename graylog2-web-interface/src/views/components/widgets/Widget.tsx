@@ -19,6 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { getBasePathname } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -40,6 +41,7 @@ import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActio
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -195,10 +197,11 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   const onToggleEdit = useCallback(() => {
     sendTelemetry('input_button_toggle', {
-      app_pathname: 'search',
+      app_pathname: getBasePathname(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-edit-button',
     });
@@ -211,10 +214,10 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       setWidgetEditing(widget.id);
       setOldWidget(widget);
     }
-  }, [editing, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
+  }, [editing, pathname, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     sendTelemetry('click', {
-      app_pathname: 'search',
+      app_pathname: getBasePathname(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-edit-cancel-button',
     });
@@ -224,7 +227,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
     }
 
     onToggleEdit();
-  }, [dispatch, id, oldWidget, onToggleEdit, sendTelemetry]);
+  }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
   const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
   }), [dispatch, id]);
