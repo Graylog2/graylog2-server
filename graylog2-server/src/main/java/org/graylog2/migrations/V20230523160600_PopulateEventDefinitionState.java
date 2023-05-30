@@ -70,7 +70,7 @@ public class V20230523160600_PopulateEventDefinitionState extends Migration {
         });
 
         // Mark enabled event definitions as such
-        dbEventDefinitionService.bulkUpdateState(enabledEventDefinitionIds, EventDefinition.State.ENABLED);
+        enabledEventDefinitionIds.forEach(id -> dbEventDefinitionService.updateState(id, EventDefinition.State.ENABLED));
         clusterConfigService.write(new V20230523160600_PopulateEventDefinitionState.MigrationCompleted());
     }
 

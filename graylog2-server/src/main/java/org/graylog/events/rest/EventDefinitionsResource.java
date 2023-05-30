@@ -345,7 +345,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
                 new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to enable", definitionId)));
         eventDefinitionHandler.schedule(definitionId);
-        dbService.bulkUpdateState(List.of(definitionId), EventDefinition.State.ENABLED);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.ENABLED).build();
     }
 
@@ -366,8 +365,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         List<String> successfullyScheduledIds = bulkOperationRequest.entityIds().stream()
                 .filter(id -> !idsFailedToSchedule.contains(id))
                 .toList();
-        // Mark each of the successfully scheduled event definitions as enabled in the DB
-        dbService.bulkUpdateState(successfullyScheduledIds, EventDefinition.State.ENABLED);
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
@@ -384,7 +381,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
                 new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to disable", definitionId)));
         eventDefinitionHandler.unschedule(definitionId);
-        dbService.bulkUpdateState(List.of(definitionId), EventDefinition.State.DISABLED);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.DISABLED).build();
     }
 
@@ -405,8 +401,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         List<String> successfullyUnscheduledIds = bulkOperationRequest.entityIds().stream()
                 .filter(id -> !idsFailedToUnschedule.contains(id))
                 .toList();
-        // Mark each of the successfully unscheduled event definitions as disabled in the DB
-        dbService.bulkUpdateState(successfullyUnscheduledIds, EventDefinition.State.DISABLED);
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();

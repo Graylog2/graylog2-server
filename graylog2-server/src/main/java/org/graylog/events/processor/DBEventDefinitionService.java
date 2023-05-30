@@ -81,9 +81,9 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
         return super.save(enrichedWithUpdateDate);
     }
 
-    public void bulkUpdateState(List<String> ids, EventDefinition.State state) {
-        // Strictly enabling/disabling event definitions does not require a scope check nor an updated updated_at field
-        ids.forEach(id -> db.updateById(new ObjectId(id), new DBUpdate.Builder().set(EventDefinitionDto.FIELD_STATE, state)));
+    public void updateState(String id, EventDefinition.State state) {
+        // Strictly enabling/disabling event definitions does not require a scope check
+        db.updateById(new ObjectId(id), new DBUpdate.Builder().set(EventDefinitionDto.FIELD_STATE, state));
     }
 
     public int deleteUnregister(String id) {
