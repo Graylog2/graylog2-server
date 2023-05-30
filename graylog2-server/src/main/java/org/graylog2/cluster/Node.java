@@ -52,4 +52,6 @@ public interface Node extends Persisted {
     Node.Type getType();
 
     String getHostname();
+
+    String getTitle();
 }

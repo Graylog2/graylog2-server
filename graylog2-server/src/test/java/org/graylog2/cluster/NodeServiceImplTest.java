@@ -65,7 +65,7 @@ public class NodeServiceImplTest {
     private Configuration configuration;
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
-    private NodeService nodeService;
+    private NodeServiceImpl nodeService;
 
     @Before
     public void setUp() throws Exception {

@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
+import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -86,6 +87,11 @@ public class NodeImpl extends PersistedImpl implements Node {
     @Override
     public String getHostname() {
         return (String)fields.get("hostname");
+    }
+
+    @Override
+    public String getTitle() {
+        return StringUtils.f("%s / %s", getShortNodeId(), getHostname());
     }
 
     @Override
