@@ -23,6 +23,8 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import { IconButton } from 'components/common';
 import { Position } from 'views/components/widgets/WidgetPropTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getBasePathname } from 'util/URLUtils';
 
 type PositionType = {
   col: number,
@@ -40,6 +42,7 @@ type Props = {
 
 const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: Props) => {
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   const onClick = useCallback(() => {
     const { col, row, height, width } = position;
@@ -50,11 +53,11 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     });
 
     sendTelemetry('click', {
-      app_pathname: 'search',
+      app_pathname: getBasePathname(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-stretch-button',
     });
-  }, [onStretch, position, sendTelemetry, widgetId, widgetType]);
+  }, [onStretch, pathname, position, sendTelemetry, widgetId, widgetType]);
 
   if (!position) {
     return <Spinner />;

@@ -22,7 +22,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import java.net.URI;
 import java.util.List;
 
-public interface OpensearchProcess extends ManagableProcess {
+public interface OpensearchProcess extends ManagableProcess<OpensearchDynamicConfiguration> {
 
     ProcessInfo processInfo();
 
