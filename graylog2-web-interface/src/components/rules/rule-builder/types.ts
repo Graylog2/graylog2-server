@@ -35,6 +35,7 @@ export type RuleBlock = {
   function: string,
   params: RuleBlockField,
   outputvariable?: string,
+  title?: string,
   errors?: Array<string>
 }
 
@@ -79,7 +80,6 @@ export type BlockDict = {
   return_type: RuleBuilderTypes,
   params: Array<BlockFieldDict>,
   description: string | null,
-  title?: string,
   rule_builder_enabled: boolean,
   rule_builder_title: string | null
 }

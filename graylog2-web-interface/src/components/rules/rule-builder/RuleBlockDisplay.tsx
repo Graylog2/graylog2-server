@@ -66,7 +66,7 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
       <Col xs={9} md={10}>
         <BlockInfo>
           <Col md={12}>
-            <h3>{blockDict?.title || blockDict?.rule_builder_title || blockDict?.name}</h3>
+            <h3>{block?.title || blockDict?.name}</h3>
           </Col>
         </BlockInfo>
         {anyParamsSet
