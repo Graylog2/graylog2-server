@@ -34,9 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +59,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                                  TlsConfigurationSupplier tlsConfigurationSupplier,
                                  TruststoreCreator truststoreCreator,
                                  RootCertificateFinder rootCertificateFinder
-    ) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+    ) throws IOException, GeneralSecurityException {
         Map<String, X509Certificate> rootCerts = new HashMap<>();
         final String truststorePassword = UUID.randomUUID().toString();
         final var cfg = sharedConfiguration.test();
@@ -128,7 +126,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             );
 
             rootCerts.put("transport-chain-CA-root", rootCertificateFinder.findRootCert(transportKeystorePath,
-                    localConfiguration.getDatanodeTransportCertificatePassword(),
+                    localConfiguration.getDatanodeTransportCertificatePassword().toCharArray(),
                     CertConstants.DATANODE_KEY_ALIAS));
 
             tlsConfigurationSupplier.addTransportTlsConfig(config,
@@ -156,7 +154,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                     "http_certificate_password has to be configured for the keystore " + httpKeystorePath
             );
             rootCerts.put("http-chain-CA-root", rootCertificateFinder.findRootCert(httpKeystorePath,
-                    localConfiguration.getDatanodeHttpCertificatePassword(),
+                    localConfiguration.getDatanodeHttpCertificatePassword().toCharArray(),
                     CertConstants.DATANODE_KEY_ALIAS));
 
             tlsConfigurationSupplier.addHttpTlsConfig(config,
@@ -171,7 +169,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         if (!rootCerts.isEmpty()) {
             final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
             truststoreCreator.createTruststore(rootCerts,
-                    truststorePassword,
+                    truststorePassword.toCharArray(),
                     trustStorePath
             );
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
