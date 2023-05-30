@@ -68,13 +68,13 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => (
             <Col md={6}>
               <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
               <Select value="has_field" clearable={false} onChange={() => {}} options={[]} />
-              <StyledInput value="transaction_date" type="text" />
+              <StyledInput value="transaction_date" type="text" id="transaction_date" onChange={() => {}} />
             </Col>
             <Col md={6}>
               <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
               <Select value="set_field" clearable={false} onChange={() => {}} options={[]} />
-              <StyledInput value="transaction_year" type="text" />
-              <StyledInput value={new Date().getFullYear()} type="text" />
+              <StyledInput value="transaction_year" type="text" id="transaction_year" onChange={() => {}} />
+              <StyledInput value={new Date().getFullYear()} type="text" id="transaction_year_value" onChange={() => {}} />
             </Col>
           </RuleBuilderRow>
           <br />
@@ -90,6 +90,7 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => (
           <label htmlFor="source_code">Source Code</label>
           {/* @ts-ignore */}
           <SourceCodeEditor mode="pipeline"
+                            id="source_code"
                             value={RULE_TEMPLATE}
                             resizable={false}
                             height={120}
