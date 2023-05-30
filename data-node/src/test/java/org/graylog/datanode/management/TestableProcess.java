@@ -33,11 +33,11 @@ public class TestableProcess implements ManagableProcess<String> {
 
     @Override
     public void startWithConfig(String ignored) {
-        start();
+        restart();
     }
 
     @Override
-    public void start() {
+    public void restart() {
         LOG.debug("Starting process");
         this.state = ProcessState.STARTING;
     }

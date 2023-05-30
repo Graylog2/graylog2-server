@@ -76,7 +76,7 @@ public class ProcessWatchdog implements Runnable {
     private void restartProcess() {
         try {
             LOG.info("Detected terminated process, restarting");
-            process.start();
+            process.restart();
         } catch (IOException e) {
             LOG.warn("Failed to start the process.", e);
         } finally {
