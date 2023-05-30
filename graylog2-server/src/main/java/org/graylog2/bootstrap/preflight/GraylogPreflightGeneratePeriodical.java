@@ -65,7 +65,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
 
         try {
-            Optional<KeyStore> optKey = caService.loadKeyStore();
+            Optional<KeyStore> optKey = caService.loadKeyStore(null);
             if(optKey.isEmpty()) {
                 LOG.warn("No keystore available.");
                 return;

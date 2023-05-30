@@ -18,7 +18,6 @@ package org.graylog.security.certutil;
 
 import org.apache.commons.net.util.Base64;
 import org.glassfish.jersey.media.multipart.BodyPart;
-import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.graylog.security.certutil.ca.CACreator;
@@ -29,6 +28,7 @@ import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -54,58 +55,57 @@ import static org.graylog.security.certutil.CertConstants.PKCS12;
 @Singleton
 public class CaService {
     private static final Logger LOG = LoggerFactory.getLogger(CaService.class);
-    // TODO: clarify default value
     public static int DEFAULT_VALIDITY = 10 * 365;
     private final KeystoreFileStorage keystoreFileStorage;
-    private final KeystoreMongoStorage keystoreMongoStorage;
     private final NodeId nodeId;
     private final CACreator caCreator;
     private final CaConfiguration configuration;
-
-    private Optional<CA> currentCA = Optional.empty();
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public CaService(final Configuration configuration,
                      final KeystoreFileStorage keystoreFileStorage,
-                     final KeystoreMongoStorage keystoreMongoStorage,
                      final NodeId nodeId,
-                     final CACreator caCreator) {
+                     final CACreator caCreator,
+                     final ClusterConfigService clusterConfigService) {
         this.keystoreFileStorage = keystoreFileStorage;
-        this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
         this.configuration = configuration;
+        this.clusterConfigService = clusterConfigService;
+    }
 
-        if(configuration.getCaKeystoreFile() != null && Files.exists(configuration.getCaKeystoreFile())) {
-            currentCA = Optional.of(new CA("local CA", CAType.LOCAL));
-        }
+    private boolean configuredCaExists() {
+        return configuration.getCaKeystoreFile() != null && Files.exists(configuration.getCaKeystoreFile());
     }
 
     public CA get() {
-        return currentCA.get();
-    }
-
-    // TODO: write local CA and password / also password for generated/uploaded CA into MongoDB
-
-    public CA create(final Integer daysValid) throws CACreationException {
-        try {
-            final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
-            KeyStore keyStore = caCreator.createCA(null, certificateValidity);
-            keystoreMongoStorage.writeKeyStore(nodeId, keyStore, null);
-        } catch (Exception ex) {
-            LOG.error("Could not generate CA: " + ex.getMessage(), ex);
-            throw new CACreationException("Could not generate CA: " + ex.getMessage(), ex);
+        if(configuredCaExists()) {
+            return new CA("local CA", CAType.LOCAL);
+        } else {
+            var config = clusterConfigService.get(CaClusterConfig.class);
+            return config != null ? new CA(config.id(), config.type()) : null;
         }
-
-        this.currentCA = Optional.of(new CA("generated CA", CAType.GENERATED));
-        return this.currentCA.get();
     }
 
-    public CA upload(String pass, FormDataMultiPart params) throws CACreationException {
+    public void create(final Integer daysValid, char[] password) throws CACreationException {
+        final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
+        KeyStore keyStore = caCreator.createCA(null, certificateValidity);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            keyStore.store(baos, password);
+            final String keystoreDataAsString = java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
+            var config = new CaClusterConfig("generated CA", CAType.GENERATED, keystoreDataAsString);
+            clusterConfigService.write(config);
+        } catch (Exception ex) {
+            throw new CACreationException("Failed to save keystore cluster config", ex);
+        }
+    }
+
+    public void upload(String pass, FormDataMultiPart params) throws CACreationException {
         final var password = pass == null ? null : pass.toCharArray();
         // TODO: if the upload consists of more than one file, handle accordingly
         // or: decide that it's always only one file containing all certificates
-        try {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             List<FormDataBodyPart> parts = params.getFields("file");
             KeyStore keyStore = KeyStore.getInstance(PKCS12);
             for(BodyPart part : parts) {
@@ -114,6 +114,7 @@ public class CaService {
                 String pem = new String(bytes, StandardCharsets.UTF_8);
 
                 String base64 = new String(new Base64().decode(pem), StandardCharsets.UTF_8);
+                // Test, if upload is PEM file
                 if (base64.contains("-----BEGIN CERTIFICATE-----")) {
                     caCreator.uploadCA(keyStore, password, pem);
                 } else {
@@ -121,31 +122,37 @@ public class CaService {
                     keyStore.load(bais, password);
                 }
             }
-            keystoreMongoStorage.writeKeyStore(nodeId, keyStore, null);
-        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyStoreStorageException |
+            keyStore.store(baos, password);
+            final String keystoreDataAsString = java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
+            var config = new CaClusterConfig("generated CA", CAType.GENERATED, keystoreDataAsString);
+            clusterConfigService.write(config);
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException |
                  CertificateException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
             throw new CACreationException("Could not write CA: " + ex.getMessage(), ex);
         }
-        currentCA = Optional.of(new CA("uploaded CA", CAType.UPLOADED));
-        return get();
     }
 
     public void startOver() {
-        if(currentCA.isPresent() && !currentCA.get().type().equals(CAType.LOCAL)) {
-            // TODO: cleanup in MongoDB
-            currentCA = Optional.empty();
-        }
+
     }
 
-    public Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
-        if(currentCA.isPresent()) {
-            if(currentCA.get().type().equals(CAType.LOCAL)) {
-                return Optional.of(keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), null).orElseThrow());
+    public Optional<KeyStore> loadKeyStore(char[] password) throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
+        if(configuredCaExists()) {
+            return Optional.of(keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), null).orElseThrow());
+        } else {
+            var config = clusterConfigService.get(CaClusterConfig.class);
+            if (config != null) {
+                try (ByteArrayInputStream bais = new ByteArrayInputStream(java.util.Base64.getDecoder().decode(config.keystore()))) {
+                    KeyStore keyStore = KeyStore.getInstance(PKCS12);
+                    keyStore.load(bais, password);
+                    return Optional.of(keyStore);
+                } catch (Exception ex) {
+                    throw new KeyStoreStorageException("Failed to load keystore cluster config", ex);
+                }
             } else {
-                return Optional.of(keystoreMongoStorage.readKeyStore(nodeId, null).orElseThrow());
+                return Optional.empty();
             }
         }
-        return Optional.empty();
     }
 }

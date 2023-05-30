@@ -82,7 +82,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void createCA() throws CACreationException {
         // TODO: get validity from preflight UI
-        caService.create(null);
+        caService.create(CaService.DEFAULT_VALIDITY, null);
     }
 
     @POST
