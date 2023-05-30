@@ -19,7 +19,6 @@ package org.graylog.datanode.management;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
-import org.graylog.datanode.ProcessProvidingExecutor;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessInfo;
@@ -36,11 +35,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -159,14 +156,14 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     public void startWithConfig(OpensearchDynamicConfiguration configuration) {
         if(!Objects.equals(dynamicConfiguration, configuration)) {
             this.dynamicConfiguration = configuration;
-            start();
+            restart();
         } else {
             LOG.info("Dynamic configuration not changed, ignoring");
         }
     }
 
     @Override
-    public synchronized void start()  {
+    public synchronized void restart()  {
         if(dynamicConfiguration == null) {
             throw new IllegalArgumentException("Dynamic runtime configuration required but not supplied!");
         }

@@ -39,7 +39,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @Override
     protected void startUp() {
         this.process.startWithConfig(new OpensearchDynamicConfiguration());
-        this.processWatchdog.start();
+       this.processWatchdog.start();
     }
 
 

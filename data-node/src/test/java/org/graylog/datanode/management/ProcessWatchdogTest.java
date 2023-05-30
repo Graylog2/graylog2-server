@@ -36,7 +36,7 @@ class ProcessWatchdogTest {
     void testLifecycle() throws IOException, ExecutionException, RetryException {
         final TestableProcess process = new TestableProcess();
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, 100);
-        process.start();
+        process.restart();
         watchdog.start();
 
         // both process and watchdog are running now. Let's stop the process and see if the watchdog will restart it
