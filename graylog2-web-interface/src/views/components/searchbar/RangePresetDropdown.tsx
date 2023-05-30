@@ -43,7 +43,7 @@ type Props = {
   header: string,
   disabled?: boolean,
   onChange?: (timerange: TimeRange) => void,
-  availableOptions: Array<QuickAccessTimeRange>,
+  availableOptions?: Array<QuickAccessTimeRange>,
 };
 
 const getPassedByLimit = async (quickAccessTimeRange: QuickAccessTimeRange, limit: number) => {
@@ -156,6 +156,7 @@ RangePresetDropdown.propTypes = {
   header: PropTypes.string,
   onChange: PropTypes.func,
   onToggle: PropTypes.func,
+  availableOptions: PropTypes.array,
 };
 
 RangePresetDropdown.defaultProps = {
@@ -166,6 +167,7 @@ RangePresetDropdown.defaultProps = {
   onToggle: undefined,
   header: undefined,
   displayTitle: true,
+  availableOptions: [],
 };
 
 export default RangePresetDropdown;
