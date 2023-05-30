@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import { Col, Row } from 'components/bootstrap';
 import { IconButton } from 'components/common';
 
-import BlockErrors from './BlockErrors';
+import Errors from './Errors';
 import type { RuleBlock, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType } from './types';
 import { paramValueExists, paramValueIsVariable } from './helpers';
@@ -91,7 +91,7 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
           </ParamsCol>
         </Row>
         )}
-        <BlockErrors block={block} />
+        <Errors objectWithErrors={block} />
       </Col>
       <Col xs={3} md={2} className="text-right">
         <IconButton name="edit" onClick={onEdit} title="Edit" />

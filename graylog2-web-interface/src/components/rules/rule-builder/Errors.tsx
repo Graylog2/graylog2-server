@@ -16,19 +16,18 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 
-import type { RuleBlock } from './types';
-import { ruleBlockPropType } from './types';
+import type { ObjectWithErrors } from './types';
 
 type Props = {
-  block: RuleBlock,
+  objectWithErrors: ObjectWithErrors,
 }
 
-const Errors = styled(Row)(({ theme }) => css`
+const ErrorsContainer = styled(Row)(({ theme }) => css`
   margin-top: ${theme.spacings.sm};
-  margin-bottom: ${theme.spacings.xs};
 `);
 
 const Error = styled.p(({ theme }) => css`
@@ -37,15 +36,15 @@ const Error = styled.p(({ theme }) => css`
   margin-bottom: ${theme.spacings.xs};
 `);
 
-const BlockErrors = ({ block } : Props) => {
-  if (!block) { return null; }
-  if (!block.errors) { return null; }
-  if (!(block.errors.length > 0)) { return null; }
+const Errors = ({ objectWithErrors } : Props) => {
+  if (!objectWithErrors) { return null; }
+  if (!objectWithErrors.errors) { return null; }
+  if (!(objectWithErrors.errors.length > 0)) { return null; }
 
   return (
-    <Errors>
+    <ErrorsContainer>
       <Col md={12}>
-        {block?.errors?.map((error) => (
+        {objectWithErrors?.errors?.map((error) => (
           <Row>
             <Col md={12}>
               <Error>{error}</Error>
@@ -53,16 +52,18 @@ const BlockErrors = ({ block } : Props) => {
           </Row>
         ))}
       </Col>
-    </Errors>
+    </ErrorsContainer>
   );
 };
 
-BlockErrors.propTypes = {
-  block: ruleBlockPropType,
+Errors.propTypes = {
+  objectWithErrors: PropTypes.shape({
+    errors: PropTypes.arrayOf(PropTypes.string),
+  }),
 };
 
-BlockErrors.defaultProps = {
-  block: undefined,
+Errors.defaultProps = {
+  objectWithErrors: undefined,
 };
 
-export default BlockErrors;
+export default Errors;

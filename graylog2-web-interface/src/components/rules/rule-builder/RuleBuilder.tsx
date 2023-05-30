@@ -22,6 +22,7 @@ import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import { FormSubmit, ConfirmDialog } from 'components/common';
 
+import Errors from './Errors';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
@@ -239,6 +240,20 @@ const RuleBuilder = () => {
     }
   };
 
+  const hasRuleBuilderErrors = () : boolean => {
+    if (rule.rule_builder.errors?.length > 0) return true;
+
+    if (rule.rule_builder.actions.some(((action) => action.errors?.length > 0))) {
+      return true;
+    }
+
+    if (rule.rule_builder.conditions.some(((condition) => condition.errors?.length > 0))) {
+      return true;
+    }
+
+    return false;
+  };
+
   return (
     <form onSubmit={(e) => handleSave(e, true)}>
       <Row className="content">
@@ -290,12 +305,16 @@ const RuleBuilder = () => {
                             deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
         </Col>
         <Col md={12}>
+          <Errors objectWithErrors={rule.rule_builder} />
+        </Col>
+        <Col md={12}>
           <RuleSimulation rule={rule} />
         </Col>
         <ActionsCol md={12}>
-          <FormSubmit submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
+          <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
+                      submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
                       centerCol={initialRule && (
-                        <Button type="button" bsStyle="info" onClick={handleSave}>
+                        <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
                           Update rule
                         </Button>
                       )}
