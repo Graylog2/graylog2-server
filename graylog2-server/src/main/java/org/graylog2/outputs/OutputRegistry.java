@@ -47,6 +47,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -149,7 +150,9 @@ public class OutputRegistry {
                 return this.runningMessageOutputs.get(id, loadForIdAndStream(id, stream));
             }
         } catch (ExecutionException | UncheckedExecutionException e) {
-            if (!(e.getCause() instanceof NotFoundException)) {
+            if (e.getCause() instanceof NotFoundException || e.getCause() instanceof IllegalArgumentException) {
+                LOG.debug("Unable to fetch output <{}> for stream <{}/{}>: {}", id, stream.getTitle(), stream.getId(), e.getMessage());
+            } else {
                 final int number = faultCount.addAndGet(1);
                 LOG.error("Unable to fetch output " + id + ", fault #" + number, e);
                 if (number >= faultCountThreshold) {
@@ -180,8 +183,17 @@ public class OutputRegistry {
         return new Callable<MessageOutput>() {
             @Override
             public MessageOutput call() throws Exception {
-                final Output output = outputService.load(id);
-                return launchOutput(output, stream);
+                // Check if the output is still assigned to the given stream before loading and starting it.
+                // The stream assignment of the output could have been removed while the message object went
+                // through processing and output buffer processing handling.
+                // Without this check, we would start the output again after it has been stopped by removing it
+                // from a stream.
+                final Stream dbStream = streamService.load(stream.getId());
+                if (dbStream.getOutputs().stream().map(Output::getId).anyMatch(id::equalsIgnoreCase)) {
+                    final Output output = outputService.load(id);
+                    return launchOutput(output, stream);
+                }
+                throw new IllegalArgumentException("Output not assigned to stream");
             }
         };
     }
