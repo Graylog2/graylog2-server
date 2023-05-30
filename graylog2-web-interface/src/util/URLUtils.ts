@@ -110,6 +110,9 @@ const URLUtils = {
 
     return acceptedProtocols.includes(url.protocol);
   },
+  getBasePathname(pathname: string) {
+    return pathname.split('/')[1];
+  },
 };
 
 export default URLUtils;
@@ -118,6 +121,7 @@ export const {
   appPrefixed,
   getParsedHash,
   getParsedSearch,
+  getBasePathname,
   qualifyUrl,
   replaceHashParam,
   concatURLPath,
