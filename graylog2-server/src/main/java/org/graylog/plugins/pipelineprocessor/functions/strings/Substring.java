@@ -36,7 +36,7 @@ public class Substring extends AbstractFunction<String> {
     public Substring() {
         valueParam = ParameterDescriptor.string("value").description("The string to extract from").primary().build();
         startParam = ParameterDescriptor.integer("start").description("The position to start from, negative means count back from the end of the String by this many characters").build();
-        endParam = ParameterDescriptor.integer("end").optional().description("The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string").build();
+        endParam = ParameterDescriptor.integer("indexEnd").optional().description("The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string").build();
     }
 
     @Override

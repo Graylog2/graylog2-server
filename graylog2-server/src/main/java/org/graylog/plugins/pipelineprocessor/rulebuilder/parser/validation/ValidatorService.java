@@ -57,7 +57,7 @@ public class ValidatorService {
 
         try {
             parseRule(ruleBuilderDto, validationBuilder.build());
-        } catch (ParseException exception) {
+        } catch (Exception exception) {
             validationBuilder.errors(List.of(exception.getMessage()));
         }
 
