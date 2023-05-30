@@ -107,7 +107,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Pro
       </Col>
       <Col xs={3} md={2} className="text-right">
         <IconButton name="edit" onClick={onEdit} title="Edit" />
-        <IconButton name="trash" onClick={onDelete} title="Delete" />
+        <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
       </Col>
     </Row>
   );

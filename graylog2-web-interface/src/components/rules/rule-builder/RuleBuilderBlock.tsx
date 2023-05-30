@@ -113,7 +113,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   };
 
   const isBlockNegatable = () : boolean => (
-    getDictForFunction(blockDict, block.function).return_type === RuleBuilderTypes.Boolean
+    getDictForFunction(blockDict, block.function)?.return_type === RuleBuilderTypes.Boolean
   );
 
   const options = blockDict.map(({ name }) => ({ label: name, value: name }));

@@ -45,7 +45,7 @@ const Errors = ({ objectWithErrors } : Props) => {
     <ErrorsContainer>
       <Col md={12}>
         {objectWithErrors?.errors?.map((error) => (
-          <Row>
+          <Row key={error}>
             <Col md={12}>
               <Error>{error}</Error>
             </Col>
