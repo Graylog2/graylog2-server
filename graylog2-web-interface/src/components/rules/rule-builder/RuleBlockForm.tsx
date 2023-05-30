@@ -23,8 +23,9 @@ import { FormSubmit, Select } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 
-import { ruleBlockPropType, blockDictPropType } from './types';
-import type { BlockType, RuleBlock, BlockDict } from './types';
+import { paramValueIsVariable } from './helpers';
+import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
+import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
 
 type Props = {
   existingBlock?: RuleBlock,
@@ -80,10 +81,16 @@ const RuleBlockForm = ({
     const newInitialValues = {};
 
     if (selectedBlockDict) {
-      selectedBlockDict.params.forEach((param) => {
+      selectedBlockDict.params.forEach((param: BlockFieldDict) => {
         const initialBlockValue = existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
 
-        if (typeof initialBlockValue === 'string' && initialBlockValue.startsWith('$')) {
+        if (!initialBlockValue) {
+          if (param.type === RuleBuilderTypes.Boolean && !initialBlockValue) {
+            newInitialValues[param.name] = false;
+          } else {
+            newInitialValues[param.name] = undefined;
+          }
+        } else if (paramValueIsVariable(initialBlockValue)) {
           newInitialValues[param.name] = undefined;
         } else {
           newInitialValues[param.name] = initialBlockValue;

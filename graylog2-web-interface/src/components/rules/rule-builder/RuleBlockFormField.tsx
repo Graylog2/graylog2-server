@@ -109,6 +109,7 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                              name={param.name}
                              label={param.name}
                              help={param.description}
+                             checked={field.value}
                              {...field} />
           )}
           {buttonAfter()}
