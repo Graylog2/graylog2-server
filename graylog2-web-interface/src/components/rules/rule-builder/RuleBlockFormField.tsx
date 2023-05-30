@@ -18,6 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { useField } from 'formik';
 
 import { FormikFormGroup, IconButton } from 'components/common';
+import { ControlLabel } from 'components/bootstrap';
 
 import { RuleBuilderTypes } from './types';
 import type { BlockFieldDict } from './types';
@@ -104,13 +105,16 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
       return (
         <>
           {(shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet) ? (placeholder) : (
-            <FormikFormGroup type="checkbox"
-                             key={`${functionName}_${param.name}`}
-                             name={param.name}
-                             label={param.name}
-                             help={param.description}
-                             checked={field.value}
-                             {...field} />
+            <>
+              <ControlLabel className="col-sm-3">{param.name}</ControlLabel>
+              <FormikFormGroup type="checkbox"
+                               key={`${functionName}_${param.name}`}
+                               name={param.name}
+                               label={field.value ? 'true' : 'false'}
+                               help={param.description}
+                               checked={field.value}
+                               {...field} />
+            </>
           )}
           {buttonAfter()}
         </>
