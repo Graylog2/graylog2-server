@@ -91,7 +91,7 @@ describe('RuleForm', () => {
       </PipelineRulesContext.Provider>,
     );
 
-    const rawMessageInput = getByPlaceholderText('Message string');
+    const rawMessageInput = getByPlaceholderText('JSON');
 
     expect(rawMessageInput).toHaveValue('');
 
