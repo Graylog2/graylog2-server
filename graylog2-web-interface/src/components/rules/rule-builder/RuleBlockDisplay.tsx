@@ -18,19 +18,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Col, Row } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import { IconButton } from 'components/common';
 
 import Errors from './Errors';
-import type { RuleBlock, BlockDict } from './types';
-import { ruleBlockPropType, blockDictPropType } from './types';
+import type { RuleBlock } from './types';
+import { ruleBlockPropType } from './types';
 import { paramValueExists, paramValueIsVariable } from './helpers';
 
 type Props = {
   block: RuleBlock,
-  blockDict: BlockDict,
+  negatable?: boolean,
   onDelete: () => void,
   onEdit: () => void,
+  onNegate: () => void,
 }
 
 const BlockInfo = styled(Row)(({ theme }) => css`
@@ -47,7 +48,14 @@ const Param = styled.p`
   margin-bottom: 0;
 `;
 
-const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
+const NegationButton = styled(Button).attrs(({ negate }: { negate: boolean }) => ({
+  negate,
+}))(({ negate, theme }) => css`
+  opacity: ${negate ? '1' : '0.3'};
+  margin-right: ${theme.spacings.sm};
+`);
+
+const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Props) => {
   const paramNames = Object.keys(block.params);
 
   const anyParamsSet = () : boolean => (
@@ -67,7 +75,11 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
       <Col xs={9} md={10}>
         <BlockInfo>
           <Col md={12}>
-            <h3>{block?.title || blockDict?.name}</h3>
+            <h3>
+              {negatable
+              && <NegationButton bsStyle="primary" negate={block?.negate} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
+              {block?.title}
+            </h3>
           </Col>
         </BlockInfo>
         {anyParamsSet
@@ -103,14 +115,15 @@ const RuleBlockDisplay = ({ block, blockDict, onEdit, onDelete } : Props) => {
 
 RuleBlockDisplay.propTypes = {
   block: ruleBlockPropType,
-  blockDict: blockDictPropType,
   onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
+  negatable: PropTypes.bool,
+  onNegate: PropTypes.func.isRequired,
 };
 
 RuleBlockDisplay.defaultProps = {
   block: undefined,
-  blockDict: undefined,
+  negatable: false,
 };
 
 export default RuleBlockDisplay;

@@ -22,7 +22,8 @@ import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 
 import type { RuleBlock, BlockType, BlockDict } from './types';
-import { ruleBlockPropType, blockDictPropType } from './types';
+import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
+import { getDictForFunction } from './helpers';
 
 const BlockContainer = styled.div.attrs(({ hasErrors }: { hasErrors: boolean }) => ({
   hasErrors,
@@ -53,12 +54,22 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   },
   [block, blockDict]);
 
-  const buildBlockData = (newParams) => {
+  const buildBlockData = (newData : {newParams?: object, toggleNegate?: boolean} = { newParams: {}, toggleNegate: false }) => {
+    const { newParams, toggleNegate } = newData;
+
+    let newBlock;
+
     if (block) {
-      return { ...block, params: { ...block.params, ...newParams } };
+      newBlock = block;
+    } else {
+      newBlock = { function: currentBlockDict.name, params: {} };
     }
 
-    return { function: currentBlockDict.name, params: newParams };
+    if (toggleNegate) {
+      newBlock.negate = !newBlock.negate;
+    }
+
+    return { ...newBlock, params: { ...newBlock.params, ...newParams } };
   };
 
   const resetBlock = () => {
@@ -75,7 +86,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   };
 
   const onAdd = (paramsToAdd) => {
-    addBlock(type, buildBlockData(paramsToAdd));
+    addBlock(type, buildBlockData({ newParams: paramsToAdd }));
 
     onCancel();
   };
@@ -88,14 +99,22 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
     setEditMode(true);
   };
 
+  const onNegate = () => {
+    updateBlock(order, type, buildBlockData({ toggleNegate: true }));
+  };
+
   const onUpdate = (params) => {
-    updateBlock(order, type, buildBlockData(params));
+    updateBlock(order, type, buildBlockData({ newParams: params }));
     setEditMode(false);
   };
 
   const onSelect = (option: string) => {
     setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
   };
+
+  const isBlockNegatable = () : boolean => (
+    getDictForFunction(blockDict, block.function).return_type === RuleBuilderTypes.Boolean
+  );
 
   const options = blockDict.map(({ name }) => ({ label: name, value: name }));
 
@@ -116,9 +135,10 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
                        type={type} />
       ) : (
         <RuleBlockDisplay block={block}
-                          blockDict={currentBlockDict}
                           onDelete={onDelete}
-                          onEdit={onEdit} />
+                          onEdit={onEdit}
+                          onNegate={onNegate}
+                          negatable={isBlockNegatable()} />
       )}
     </BlockContainer>
   );
