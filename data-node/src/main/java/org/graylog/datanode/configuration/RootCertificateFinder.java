@@ -51,8 +51,9 @@ public class RootCertificateFinder {
     private KeyStore loadKeystore(final Path keystorePath,
                                   final char[] password) throws IOException, GeneralSecurityException {
         KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-        final FileInputStream is = new FileInputStream(keystorePath.toFile());
-        nodeKeystore.load(is, password);
+        try (final FileInputStream is = new FileInputStream(keystorePath.toFile())) {
+            nodeKeystore.load(is, password);
+        }
         return nodeKeystore;
     }
 }
