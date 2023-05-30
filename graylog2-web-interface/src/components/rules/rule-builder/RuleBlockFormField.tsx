@@ -101,7 +101,7 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                          {...field} />
 
       );
-    case RuleBuilderTypes.Boolean: // TODO: make sure value is set to false not undefined when checkbox is initally saved unchecked
+    case RuleBuilderTypes.Boolean:
       return (
         <>
           {(shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet) ? (placeholder) : (
