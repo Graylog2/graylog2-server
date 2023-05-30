@@ -109,7 +109,7 @@ const RangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, c
       return option;
     });
   } else {
-    options = (<MenuItem eventKey="300" disabled>Loading...</MenuItem>);
+    options = (<MenuItem eventKey="300" disabled>No available presets</MenuItem>);
   }
 
   const { formatTime } = useUserDateTime();
