@@ -14,29 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog.datanode.configuration.certificates;
 
-import org.graylog.datanode.process.ProcessInfo;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.security.certutil.CertConstants;
 
-import java.net.URI;
-import java.util.List;
+public record CertificateMetaData(String alias,
+                                  String keystoreFilePath,
+                                  char[] keystoreFilePassword) {
 
-public interface OpensearchProcess extends ManagableProcess<OpensearchDynamicConfiguration> {
+    public CertificateMetaData(String keystoreFilePath,
+                               char[] keystoreFilePassword) {
+        this(CertConstants.DATANODE_KEY_ALIAS, keystoreFilePath, keystoreFilePassword);
+    }
 
-    ProcessInfo processInfo();
+    public String passwordAsString() {
+        return new String(keystoreFilePassword());
+    }
 
-    RestHighLevelClient restClient();
-
-    Object nodeName();
-
-    boolean isLeaderNode();
-    void setLeaderNode(boolean isManagerNode);
-
-    String opensearchVersion();
-
-    List<String> stdOutLogs();
-    List<String> stdErrLogs();
-
-    URI getOpensearchBaseUrl();
 }

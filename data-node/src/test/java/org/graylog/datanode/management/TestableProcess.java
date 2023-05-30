@@ -21,18 +21,23 @@ import org.graylog.datanode.process.ProcessState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestableProcess implements ManagableProcess {
+public class TestableProcess implements ManagableProcess<String> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestableProcess.class);
 
     private volatile ProcessState state;
 
     public TestableProcess() {
-        this.state = ProcessState.NEW;
+        this.state = ProcessState.WAITING_FOR_CONFIGURATION;
     }
 
     @Override
-    public void start() {
+    public void startWithConfig(String ignored) {
+        restart();
+    }
+
+    @Override
+    public void restart() {
         LOG.debug("Starting process");
         this.state = ProcessState.STARTING;
     }

@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil.keystore.storage;
 
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.plugin.system.NodeId;
 
@@ -23,10 +24,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.Optional;
 
 public class KeystoreFileStorage implements KeystoreStorage {
@@ -43,11 +42,11 @@ public class KeystoreFileStorage implements KeystoreStorage {
     }
 
     public Optional<KeyStore> readKeyStore(final Path keystorePath, char[] password) throws KeyStoreStorageException {
-        try(var in = Files.newInputStream(keystorePath)) {
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
+        try (var in = Files.newInputStream(keystorePath)) {
+            KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
             caKeystore.load(in, password);
             return Optional.of(caKeystore);
-        } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException ex) {
+        } catch (IOException | GeneralSecurityException ex) {
             throw new KeyStoreStorageException("Could not read keystore: " + ex.getMessage(), ex);
         }
     }
