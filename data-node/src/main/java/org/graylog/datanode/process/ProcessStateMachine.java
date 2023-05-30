@@ -37,10 +37,10 @@ public class ProcessStateMachine {
         StateMachineConfig<ProcessState, ProcessEvent> config = new StateMachineConfig<>();
 
         // Freshly created process, it hasn't started yet and doesn't have any pid.
-        config.configure(ProcessState.NEW)
+        config.configure(ProcessState.WAITING_FOR_CONFIGURATION)
                 .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
-                .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.TERMINATED);
+                .ignore(ProcessEvent.HEALTH_CHECK_FAILED);
 
         // the process has started already, now we have to wait for a running OS and available REST api
         // the startupFailuresCounter keeps track of failed REST status calls and allow failures during the
@@ -58,7 +58,8 @@ public class ProcessStateMachine {
                 .onEntry(rebootCounter::resetFailuresCounter)
                 .permitReentry(ProcessEvent.HEALTH_CHECK_OK)
                 .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
-                .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
+                .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
+                .ignore(ProcessEvent.PROCESS_STARTED);
 
         // if the REST api is not responding, we'll jump to this state and count how many times the failure
         // occurs. If it fails ttoo many times, we'll mark the process as FAILED
@@ -83,6 +84,6 @@ public class ProcessStateMachine {
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
                 .ignore(ProcessEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 
-        return new StateMachine<>(ProcessState.NEW, config);
+        return new StateMachine<>(ProcessState.WAITING_FOR_CONFIGURATION, config);
     }
 }
