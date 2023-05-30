@@ -20,7 +20,7 @@ public enum ProcessState {
     /**
      * Fresh created process, not started yet
      */
-    NEW,
+    WAITING_FOR_CONFIGURATION,
     /**
      * The process is running on the underlying OS and has a process ID. It's not responding to the REST API yet
      */

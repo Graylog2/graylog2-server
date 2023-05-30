@@ -4081,11 +4081,6 @@
   resolved "https://registry.yarnpkg.com/@webpack-cli/info/-/info-2.0.1.tgz#eed745799c910d20081e06e5177c2b2569f166c0"
   integrity sha512-fE1UEWTwsAxRhrJNikE7v4EotYflkEhBL7EbajfkPlf6E37/2QshOy/D48Mw8G5XMFlQtS6YV42vtbG9zBpIQA==
 
-"@webpack-cli/serve@^2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-2.0.3.tgz#c00c48d19340224242842e38b8f7b76c308bbd3f"
-  integrity sha512-Bwxd73pHuYc0cyl7vulPp2I6kAYtmJPkfUivbts7by6wDAVyFdKzGX3AksbvCRyNVFUJu7o2ZTcWXdT90T3qbg==
-
 "@webpack-cli/serve@^2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-2.0.4.tgz#3982ee6f8b42845437fc4d391e93ac5d9da52f0f"
@@ -15131,25 +15126,6 @@ webpack-bundle-analyzer@^4.5.0:
     opener "^1.5.2"
     sirv "^1.0.7"
     ws "^7.3.1"
-
-webpack-cli@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-5.1.0.tgz#abc4b1f44b50250f2632d8b8b536cfe2f6257891"
-  integrity sha512-a7KRJnCxejFoDpYTOwzm5o21ZXMaNqtRlvS183XzGDUPRdVEzJNImcQokqYZ8BNTnk9DkKiuWxw75+DCCoZ26w==
-  dependencies:
-    "@discoveryjs/json-ext" "^0.5.0"
-    "@webpack-cli/configtest" "^2.1.0"
-    "@webpack-cli/info" "^2.0.1"
-    "@webpack-cli/serve" "^2.0.3"
-    colorette "^2.0.14"
-    commander "^10.0.1"
-    cross-spawn "^7.0.3"
-    envinfo "^7.7.3"
-    fastest-levenshtein "^1.0.12"
-    import-local "^3.0.2"
-    interpret "^3.1.1"
-    rechoir "^0.8.0"
-    webpack-merge "^5.7.3"
 
 webpack-cli@5.1.1:
   version "5.1.1"
