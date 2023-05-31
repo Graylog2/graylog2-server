@@ -4,7 +4,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.graylog2/graylog2-server.svg)](http://mvnrepository.com/artifact/org.graylog2/graylog2-server)
 [![Build](https://github.com/Graylog2/graylog2-server/actions/workflows/build.yml/badge.svg)](https://github.com/Graylog2/graylog2-server/actions/workflows/build.yml)
 
-Welcome! _Graylog_ is an open source log management platform.
+Welcome! _Graylog_ is a free and open log management platform.
 
 You can read more about the project on our [website](https://www.graylog.org/) and check out the [documentation](http://docs.graylog.org/) on the documentation site.
 

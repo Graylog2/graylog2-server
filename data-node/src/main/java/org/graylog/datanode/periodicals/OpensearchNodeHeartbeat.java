@@ -44,7 +44,7 @@ public class OpensearchNodeHeartbeat extends Periodical {
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
-        if (!process.isInState(ProcessState.TERMINATED)) {
+        if (!process.isInState(ProcessState.TERMINATED) && !process.isInState(ProcessState.WAITING_FOR_CONFIGURATION)) {
             try {
                 final MainResponse health = process.restClient()
                         .info(RequestOptions.DEFAULT);
