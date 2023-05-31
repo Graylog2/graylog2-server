@@ -28,6 +28,10 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * This is a test double for the NodeService. It holds all the registered nodes in memory.
+ * Use the {@link #registerServer(String, boolean, URI, String)} to initialize nodes in your tests.
+ */
 public class TestNodeService implements NodeService {
 
     private final Node.Type type;
@@ -44,7 +48,7 @@ public class TestNodeService implements NodeService {
 
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
-        return nodes.add(new TestNode(type, nodeId, isLeader, httpPublishUri.toString(), hostname, DateTime.now(DateTimeZone.UTC)));
+        return nodes.add(new NodeRecord(type, nodeId, isLeader, httpPublishUri.toString(), hostname, DateTime.now(DateTimeZone.UTC)));
     }
 
     @Override
@@ -86,5 +90,38 @@ public class TestNodeService implements NodeService {
     @Override
     public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) {
         throw new UnsupportedOperationException("Unsupported operation");
+    }
+
+    record NodeRecord(Type type, String nodeId, boolean isLeader, String transportAddress, String hostname, DateTime lastSeen) implements Node {
+
+        @Override
+        public String getNodeId() {
+            return nodeId;
+        }
+
+        @Override
+        public boolean isLeader() {
+            return isLeader;
+        }
+
+        @Override
+        public String getTransportAddress() {
+            return transportAddress;
+        }
+
+        @Override
+        public DateTime getLastSeen() {
+            return lastSeen;
+        }
+
+        @Override
+        public Type getType() {
+            return type;
+        }
+
+        @Override
+        public String getHostname() {
+            return hostname;
+        }
     }
 }
