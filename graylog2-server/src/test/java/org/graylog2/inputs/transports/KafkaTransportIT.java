@@ -27,6 +27,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.shared.SuppressForbidden;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -58,6 +59,7 @@ class KafkaTransportIT {
     ArgumentCaptor<RawMessage> messageCaptor;
 
     @Test
+    @SuppressForbidden("Executors.newSingleThreadScheduledExecutor is okay in tests")
     void basicConsumer() throws Exception {
         KAFKA.createTopic("test");
 
