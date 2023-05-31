@@ -89,5 +89,12 @@ com.google.common.base.Charsets @ Use java.nio.charset.StandardCharsets
 @defaultMessage Don't use imports from shaded or denied dependencies
 joptsimple.internal.**
 org.testcontainers.shaded.**
+
+@defaultMessage Prefer using javax.inject.
 com.google.inject.Inject
+com.google.inject.Scope
+com.google.inject.Singleton
+com.google.inject.Provider
+com.google.inject.name.Named
+
 edu.emory.mathcs.backport.java.util.**
