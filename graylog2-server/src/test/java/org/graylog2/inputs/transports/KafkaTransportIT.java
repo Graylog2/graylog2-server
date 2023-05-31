@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class KafkaTransportIT {
     @Container
-    private static final KafkaContainer KAFKA = new KafkaContainer();
+    private static final KafkaContainer KAFKA = KafkaContainer.create();
 
     @Captor
     ArgumentCaptor<RawMessage> messageCaptor;
