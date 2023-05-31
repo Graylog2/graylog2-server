@@ -33,7 +33,7 @@ type Props = {
   onAdd: (values: {[key: string]: any}) => void,
   onCancel: () => void,
   onSelect: (option: string) => void,
-  onUpdate: (values: {[key: string]: any}) => void,
+  onUpdate: (values: {[key: string]: any}, functionName: string) => void,
   previousOutputPresent: boolean,
   options: Array<{ label: string, value: any }>,
   order: number,
@@ -112,11 +112,19 @@ const RuleBlockForm = ({
     setFieldValue(fieldName, null);
   };
 
+  const handleSubmit = (values: {[key: string]: any}) => {
+    if (existingBlock) {
+      onUpdate(values, selectedBlockDict?.name);
+    } else {
+      onAdd(values);
+    }
+  };
+
   return (
     <Row>
       <Col md={12}>
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
-        <Formik enableReinitialize onSubmit={existingBlock ? onUpdate : onAdd} initialValues={initialValues}>
+        <Formik enableReinitialize onSubmit={handleSubmit} initialValues={initialValues}>
           {({ resetForm, setFieldValue }) => (
             <Form>
               <Row>

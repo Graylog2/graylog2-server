@@ -54,15 +54,20 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   },
   [block, blockDict]);
 
-  const buildBlockData = (newData : {newParams?: object, toggleNegate?: boolean} = { newParams: {}, toggleNegate: false }) => {
-    const { newParams, toggleNegate } = newData;
+  const buildBlockData = (
+    newData : {newFunctionName?: string, newParams?: object, toggleNegate?: boolean},
+  ) => {
+    const defaultParameters = { newFunctionName: currentBlockDict.name, newParams: {}, toggleNegate: false };
+    const { newFunctionName, newParams, toggleNegate } = { ...defaultParameters, ...newData };
+
+    const defaultBlock = { function: newFunctionName, params: {} };
 
     let newBlock;
 
-    if (block) {
+    if (block && newFunctionName === block.function) {
       newBlock = block;
     } else {
-      newBlock = { function: currentBlockDict.name, params: {} };
+      newBlock = defaultBlock;
     }
 
     if (toggleNegate) {
@@ -103,8 +108,8 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
     updateBlock(order, type, buildBlockData({ toggleNegate: true }));
   };
 
-  const onUpdate = (params) => {
-    updateBlock(order, type, buildBlockData({ newParams: params }));
+  const onUpdate = (params: {[key: string]: any}, functionName: string) => {
+    updateBlock(order, type, buildBlockData({ newFunctionName: functionName, newParams: params }));
     setEditMode(false);
   };
 
