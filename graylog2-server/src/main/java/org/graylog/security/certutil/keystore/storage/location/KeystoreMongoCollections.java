@@ -14,14 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog.security.certutil.keystore.storage.location;
 
-import org.graylog2.plugin.database.ValidationException;
+import java.util.Collection;
+import java.util.List;
 
-import java.util.Optional;
+public interface KeystoreMongoCollections {
 
-public interface PreflightConfigService {
-    Optional<PreflightConfig> getPersistedConfig();
+    KeystoreMongoCollection DATA_NODE_KEYSTORE_COLLECTION = new KeystoreMongoCollection(
+            "data_node_certificates",
+            "node_id",
+            "encrypted_certificate_keystore"
+    );
 
-    PreflightConfig saveConfiguration() throws ValidationException;
+    Collection<KeystoreMongoCollection> ALL_KEYSTORE_COLLECTIONS = List.of(
+            DATA_NODE_KEYSTORE_COLLECTION
+    );
+
 }

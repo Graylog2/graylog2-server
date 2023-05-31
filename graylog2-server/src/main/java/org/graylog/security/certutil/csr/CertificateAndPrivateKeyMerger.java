@@ -20,6 +20,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 import org.graylog2.plugin.system.NodeId;
 
@@ -67,6 +69,8 @@ public class CertificateAndPrivateKeyMerger {
             throw new GeneralSecurityException("Private key from CSR and public key from certificate do not form a valid pair");
         }
 
-        keystoreMongoStorage.writeKeyStore(nodeId, nodeKeystore, certFilePassword);
+        keystoreMongoStorage.writeKeyStore(new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION),
+                nodeKeystore, certFilePassword);
+
     }
 }

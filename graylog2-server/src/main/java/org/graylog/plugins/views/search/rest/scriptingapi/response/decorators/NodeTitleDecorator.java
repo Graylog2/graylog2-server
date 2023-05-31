@@ -22,7 +22,6 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Message;
-import org.graylog2.shared.utilities.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -51,7 +50,7 @@ public class NodeTitleDecorator implements FieldDecorator {
     public Object decorate(RequestedField field, Object value, SearchUser searchUser) {
         try {
             final Node node = nodeService.byNodeId(value.toString());
-            return StringUtils.f("%s / %s", node.getShortNodeId(), node.getHostname());
+            return node.getTitle();
         } catch (NodeNotFoundException e) {
             return value;
         }

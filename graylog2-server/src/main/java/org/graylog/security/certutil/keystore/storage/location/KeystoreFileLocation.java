@@ -14,14 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog.security.certutil.keystore.storage.location;
 
-import org.graylog2.plugin.database.ValidationException;
+import java.nio.file.Path;
 
-import java.util.Optional;
+public record KeystoreFileLocation(Path keystorePath) implements KeystoreLocation {
 
-public interface PreflightConfigService {
-    Optional<PreflightConfig> getPersistedConfig();
-
-    PreflightConfig saveConfiguration() throws ValidationException;
 }
