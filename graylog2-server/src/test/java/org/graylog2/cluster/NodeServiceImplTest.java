@@ -145,7 +145,7 @@ public class NodeServiceImplTest {
     @Test
     public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
         nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
-        final Node node = nodeService.byNodeId(nodeId);
+        final NodeImpl node = (NodeImpl) nodeService.byNodeId(nodeId);
 
         final long lastSeenMs = System.currentTimeMillis() - 2 * STALE_LEADER_TIMEOUT_MS;
         node.getFields().put("last_seen", (int)(lastSeenMs / 1000));

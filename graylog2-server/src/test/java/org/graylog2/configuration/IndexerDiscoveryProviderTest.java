@@ -21,20 +21,19 @@ import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.TestNodeService;
 import org.graylog2.plugin.database.ValidationException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 class IndexerDiscoveryProviderTest {
 
@@ -94,14 +93,12 @@ class IndexerDiscoveryProviderTest {
                 .hasMessageStartingWith("No Datanode available");
     }
 
-    private Supplier<Collection<Node>> nodes(String... transportAddress) {
-        return () -> Arrays.stream(transportAddress)
-                .map(address -> {
-                    final Node node = Mockito.mock(Node.class);
-                    Mockito.when(node.getTransportAddress()).thenReturn(address);
-                    return node;
-                })
-                .collect(Collectors.toList());
+    private NodeService nodes(String... transportAddress) {
+        final NodeService service = new TestNodeService(Node.Type.DATANODE);
+        Arrays.stream(transportAddress)
+                .map(URI::create)
+                .forEach(address -> service.registerServer(UUID.randomUUID().toString(), false, address, "localhost"));
+        return service;
     }
 
     private PreflightConfigService preflightConfig(@Nullable PreflightConfigResult result) {

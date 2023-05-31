@@ -70,10 +70,6 @@ public class NodeImpl extends PersistedImpl implements Node {
         return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }
 
-    @Override
-    public String getShortNodeId() {
-        return getNodeId().split("-")[0];
-    }
 
     @Override
     public Type getType() {
@@ -87,12 +83,6 @@ public class NodeImpl extends PersistedImpl implements Node {
     @Override
     public String getHostname() {
         return (String)fields.get("hostname");
-    }
-
-    @JsonIgnore
-    @Override
-    public String getTitle() {
-        return StringUtils.f("%s / %s", getShortNodeId(), getHostname());
     }
 
     @Override

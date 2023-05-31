@@ -16,22 +16,23 @@
  */
 package org.graylog2.cluster;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.plugin.database.Persisted;
+import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 
-public interface Node extends Persisted {
+public interface Node {
     enum Type {
         SERVER, DATANODE
     }
 
     String getNodeId();
 
-    @Deprecated
     /**
      * @deprecated Use {@link LeaderElectionService#isLeader()} or {@link #isLeader()} instead.
      */
+    @Deprecated
     @JsonProperty("is_master")
     default boolean isMaster() {
         return isLeader();
@@ -47,11 +48,16 @@ public interface Node extends Persisted {
 
     DateTime getLastSeen();
 
-    String getShortNodeId();
-
     Node.Type getType();
 
     String getHostname();
 
-    String getTitle();
+    default String getShortNodeId() {
+        return getNodeId().split("-")[0];
+    }
+
+    @JsonIgnore
+    default String getTitle() {
+        return StringUtils.f("%s / %s", getShortNodeId(), getHostname());
+    }
 }

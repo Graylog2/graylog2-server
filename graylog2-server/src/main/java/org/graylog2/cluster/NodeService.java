@@ -22,7 +22,7 @@ import org.graylog2.plugin.system.NodeId;
 import java.net.URI;
 import java.util.Map;
 
-public interface NodeService extends PersistedService {
+public interface NodeService {
     Node.Type type();
 
     boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname);

@@ -20,34 +20,24 @@ import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.TestNodeService;
 import org.graylog2.plugin.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
+import java.net.URI;
 
 class NodeTitleDecoratorTest {
 
     private FieldDecorator decorator;
 
     @BeforeEach
-    void setUp() throws NodeNotFoundException {
-        decorator = new NodeTitleDecorator(mockNodeService());
-    }
+    void setUp() {
+        final NodeService nodeService = new TestNodeService(Node.Type.SERVER);
+        nodeService.registerServer("5ca1ab1e-0000-4000-a000-000000000000", false, URI.create("http://my-host.example.com"), "my-host.example.com");
 
-    private NodeService mockNodeService() throws NodeNotFoundException {
-        final NodeService nodeService = Mockito.mock(NodeService.class);
-        final Node node = mockNode("5ca1ab1e / my-host.example.com");
-        Mockito.when(nodeService.byNodeId("5ca1ab1e-0000-4000-a000-000000000000")).thenReturn(node);
-        Mockito.when(nodeService.byNodeId("2e7e1436-9ca4-43e3-b857-c75e61dea424")).thenThrow(new NodeNotFoundException("Not found"));
-        return nodeService;
-    }
-
-    private Node mockNode(String title) {
-        final Node node = Mockito.mock(Node.class);
-        Mockito.when(node.getTitle()).thenReturn(title);
-        return node;
+        decorator = new NodeTitleDecorator(nodeService);
     }
 
     @Test

@@ -29,10 +29,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -45,7 +43,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
 
     private final List<URI> hosts;
     private final PreflightConfigService preflightConfigService;
-    private final Supplier<Collection<Node>> activeNodesSupplier;
+    private final NodeService nodeService;
 
     private final Supplier<List<URI>> resultsCachingSupplier;
 
@@ -54,17 +52,9 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
             @Named("elasticsearch_hosts") List<URI> hosts,
             PreflightConfigService preflightConfigService,
             NodeService nodeService) {
-        this(hosts, preflightConfigService, serviceToSupplier(nodeService));
-    }
-
-    private static Supplier<Collection<Node>> serviceToSupplier(NodeService nodeService) {
-        return () -> nodeService.allActive(Node.Type.DATANODE).values();
-    }
-
-    IndexerDiscoveryProvider(List<URI> hosts, PreflightConfigService preflightConfigService, Supplier<Collection<Node>> activeNodesSupplier) {
         this.hosts = hosts;
         this.preflightConfigService = preflightConfigService;
-        this.activeNodesSupplier = activeNodesSupplier;
+        this.nodeService = nodeService;
         this.resultsCachingSupplier = Suppliers.memoize(this::doGet);
     }
 
@@ -103,7 +93,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     }
 
     private List<URI> discover() {
-        return activeNodesSupplier.get().stream()
+        return nodeService.allActive(Node.Type.DATANODE).values().stream()
                 .map(Node::getTransportAddress)
                 .map(URI::create)
                 .collect(Collectors.toList());
