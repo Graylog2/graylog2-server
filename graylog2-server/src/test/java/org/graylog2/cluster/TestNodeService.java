@@ -21,6 +21,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,11 @@ public class TestNodeService implements NodeService {
     @Override
     public Node byNodeId(NodeId nodeId) throws NodeNotFoundException {
         return byNodeId(nodeId.getNodeId());
+    }
+
+    @Override
+    public Map<String, Node> byNodeIds(Collection<String> nodeIds) {
+        return nodes.stream().filter(n -> nodeIds.contains(n.getNodeId())).collect(Collectors.toMap(Node::getNodeId, Function.identity()));
     }
 
     @Override

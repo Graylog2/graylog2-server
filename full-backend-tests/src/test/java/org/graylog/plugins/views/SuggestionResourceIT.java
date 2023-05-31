@@ -31,6 +31,7 @@ import java.util.Set;
 import static io.restassured.RestAssured.given;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -130,6 +131,22 @@ public class SuggestionResourceIT {
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("200"))
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
+    }
+
+    @ContainerMatrixTest
+    void testAugmentedSuggestionTitles() {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(
+                        """
+                        { "field":"streams", "input":""}
+                        """)
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.title", containsInAnyOrder("Default Stream", "Stream #1", "Stream #2"));
     }
 
     @ContainerMatrixTest

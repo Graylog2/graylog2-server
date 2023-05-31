@@ -149,7 +149,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                     .map(s -> SuggestionEntryDTO.create(
                             s.value(),
                             s.occurrence(),
-                            Optional.ofNullable(results.get(s.value())).map(Node::toString)
+                            Optional.ofNullable(results.get(s.value())).map(Node::getTitle)
                     ))
                     .toList();
         }
