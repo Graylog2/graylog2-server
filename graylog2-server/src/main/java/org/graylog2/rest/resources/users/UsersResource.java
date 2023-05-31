@@ -434,6 +434,13 @@ public class UsersResource extends RestResource {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
             if (sessionTimeoutMs != null && sessionTimeoutMs != 0) {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
+                AllUserSessions allUserSessions = AllUserSessions.create(sessionService);
+                Optional<MongoDbSession> optionalUserSession = allUserSessions.forUser(user);
+                if (optionalUserSession.isPresent()) {
+                    MongoDbSession userSession = optionalUserSession.get();
+                    userSession.setTimeout(sessionTimeoutMs);
+                    sessionService.save(userSession);
+                }
             }
         }
 
