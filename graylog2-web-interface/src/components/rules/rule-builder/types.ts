@@ -27,6 +27,7 @@ export type RuleBuilderRule = {
   description?: string,
   created_at?: string,
   id?: string,
+  source?: string,
   title: string,
   modified_at?: string,
 }

@@ -28,11 +28,16 @@ import RuleBuilderForm from './RuleBuilderForm';
 import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
 import type { BlockType, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
 import { getDictForFunction, getDictForParam, getActionOutputVariableName, paramValueExists, paramValueIsVariable } from './helpers';
+import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 
 import RuleSimulation from '../RuleSimulation';
 
 const ActionsCol = styled(Col)`
   margin-top: 50px;
+`;
+
+const ConvertButton = styled(Button)`
+  float: right;
 `;
 
 const SubTitle = styled.label`
@@ -51,6 +56,7 @@ const RuleBuilder = () => {
 
   const [rule, setRule] = useState<RuleBuilderRule>({ description: '', title: '', rule_builder: { conditions: [], actions: [] } });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
+  const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule|null>(null);
 
   useEffect(() => {
     if (initialRule) {
@@ -266,6 +272,9 @@ const RuleBuilder = () => {
           <RuleBuilderForm rule={rule}
                            onChange={setRule} />
           <label htmlFor="rule_builder">Rule Builder</label>
+          <ConvertButton bsStyle="info" bsSize="small" onClick={() => setRuleSourceCodeToShow(rule)} disabled={false}>
+            Convert to Source Code
+          </ConvertButton>
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
@@ -336,6 +345,11 @@ const RuleBuilder = () => {
                        onCancel={() => setBlockToDelete(null)}>
           <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
         </ConfirmDialog>
+      )}
+      {ruleSourceCodeToShow && (
+        <ConvertToSourceCodeModal show
+                                  onHide={() => setRuleSourceCodeToShow(null)}
+                                  rule={ruleSourceCodeToShow} />
       )}
     </form>
   );
