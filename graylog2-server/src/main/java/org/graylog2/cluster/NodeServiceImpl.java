@@ -17,7 +17,6 @@
 package org.graylog2.cluster;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.mongodb.AggregationOptions;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

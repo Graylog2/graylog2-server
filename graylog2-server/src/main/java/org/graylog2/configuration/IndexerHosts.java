@@ -14,14 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog2.configuration;
 
-import org.graylog2.plugin.database.ValidationException;
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.Optional;
-
-public interface PreflightConfigService {
-    Optional<PreflightConfig> getPersistedConfig();
-
-    PreflightConfig saveConfiguration() throws ValidationException;
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.TYPE })
+@Qualifier
+public @interface IndexerHosts {
 }

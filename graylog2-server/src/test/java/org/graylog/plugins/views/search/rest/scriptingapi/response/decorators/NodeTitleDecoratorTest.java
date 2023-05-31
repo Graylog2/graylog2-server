@@ -20,29 +20,24 @@ import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.TestNodeService;
 import org.graylog2.plugin.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
+import java.net.URI;
 
 class NodeTitleDecoratorTest {
 
     private FieldDecorator decorator;
 
     @BeforeEach
-    void setUp() throws NodeNotFoundException {
-        decorator = new NodeTitleDecorator(mockNodeService("5ca1ab1e-0000-4000-a000-000000000000", "5ca1ab1e", "my-host.example.com"));
-    }
+    void setUp() {
+        final NodeService nodeService = new TestNodeService(Node.Type.SERVER);
+        nodeService.registerServer("5ca1ab1e-0000-4000-a000-000000000000", false, URI.create("http://my-host.example.com"), "my-host.example.com");
 
-    private NodeService mockNodeService(String nodeId, String shortId, String hostname) throws NodeNotFoundException {
-        final Node node = Mockito.mock(Node.class);
-        Mockito.when(node.getShortNodeId()).thenReturn(shortId);
-        Mockito.when(node.getHostname()).thenReturn(hostname);
-        final NodeService service = Mockito.mock(NodeService.class);
-        Mockito.when(service.byNodeId(nodeId)).thenReturn(node);
-        return service;
+        decorator = new NodeTitleDecorator(nodeService);
     }
 
     @Test
@@ -58,5 +53,14 @@ class NodeTitleDecoratorTest {
                 TestSearchUser.builder().build());
 
         Assertions.assertThat(decorated).isEqualTo("5ca1ab1e / my-host.example.com");
+    }
+
+    @Test
+    void testUnknownNode() {
+        final Object decorated = decorator.decorate(RequestedField.parse(Message.FIELD_GL2_SOURCE_NODE),
+                "2e7e1436-9ca4-43e3-b857-c75e61dea424",
+                TestSearchUser.builder().build());
+
+        Assertions.assertThat(decorated).isEqualTo("2e7e1436-9ca4-43e3-b857-c75e61dea424");
     }
 }
