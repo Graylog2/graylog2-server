@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
-class KafkaTransportTest {
+class KafkaTransportIT {
     @Container
     private static final KafkaContainer KAFKA = new KafkaContainer();
 
