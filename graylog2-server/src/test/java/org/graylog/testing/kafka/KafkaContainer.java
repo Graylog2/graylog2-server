@@ -37,11 +37,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class KafkaContainer extends GenericContainer<KafkaContainer> {
     public enum Version {
         V34("3.4");
-
 
         private final String version;
         Version(String version) {
@@ -51,7 +51,6 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
         public String getVersion() {
             return version;
         }
-
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaContainer.class);
@@ -65,7 +64,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
     @SuppressWarnings("resource")
     public KafkaContainer(Version version, Network network) {
-        super(DockerImageName.parse("bitnami/kafka:%s".formatted(version.getVersion())));
+        super(DockerImageName.parse(f("bitnami/kafka:%s", version.getVersion())));
 
         withExposedPorts(9092);
         withNetwork(requireNonNull(network, "network cannot be null"));
@@ -107,7 +106,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
         final String hostName = containerInfo.getConfig().getHostName();
         // Advertise the correct host and port to the external client.
-        final String value = "EXTERNAL://%s:%d,INTERNAL://%s:9094".formatted(getHost(), getKafkaPort(), hostName);
+        final String value = f("EXTERNAL://%s:%d,INTERNAL://%s:9094", getHost(), getKafkaPort(), hostName);
 
         copyFileToContainer(
                 Transferable.of(value),

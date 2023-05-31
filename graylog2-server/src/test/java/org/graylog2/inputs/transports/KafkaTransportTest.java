@@ -42,6 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -71,7 +72,7 @@ class KafkaTransportTest {
         final var config = new Configuration(Map.of(
                 KafkaTransport.CK_LEGACY, false,
                 KafkaTransport.CK_THREADS, 1,
-                KafkaTransport.CK_BOOTSTRAP, "localhost:%d".formatted(KAFKA.getKafkaPort()),
+                KafkaTransport.CK_BOOTSTRAP, f("localhost:%d", KAFKA.getKafkaPort()),
                 KafkaTransport.CK_FETCH_MIN_BYTES, 1,
                 KafkaTransport.CK_FETCH_WAIT_MAX, 100,
                 KafkaTransport.CK_TOPIC_FILTER, "test",
