@@ -20,7 +20,7 @@ Help us build the future of log management and be part of a project that is used
 
 Follow the [contributors guide](https://www.graylog.org/community) and read [the contributing instructions](CONTRIBUTING.md) to get started.
 
-Do you want to get paid for developing our open source product? Apply for one of our [jobs](https://www.graylog.org/careers)!
+Do you want to get paid for developing our free and open product? Apply for one of our [jobs](https://www.graylog.org/careers)!
 
 ## Staying in Touch
 
