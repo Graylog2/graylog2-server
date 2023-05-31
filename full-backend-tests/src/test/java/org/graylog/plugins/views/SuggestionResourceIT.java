@@ -29,13 +29,15 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
+import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
 public class SuggestionResourceIT {
     private final GraylogApis api;
 
@@ -146,7 +148,7 @@ public class SuggestionResourceIT {
                 .then()
                 .statusCode(200)
                 .assertThat().log().ifValidationFails()
-                .body("suggestions.title", containsInAnyOrder("Default Stream", "Stream #1", "Stream #2"));
+                .body("suggestions.title", hasItems("Default Stream", "Stream #1", "Stream #2"));
     }
 
     @ContainerMatrixTest
