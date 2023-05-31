@@ -93,9 +93,11 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
         <>
           <Input id="message"
                  type="textarea"
-                 placeholder="JSON"
+                 // eslint-disable-next-line quotes
+                 placeholder={`{\n    "message": "test"\n}`}
                  value={rawMessageToSimulate}
                  onChange={handleRawMessageChange}
+                 help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
                  rows={5} />
           <Button bsStyle="info"
                   bsSize="xsmall"

@@ -33,7 +33,6 @@ const createRule = async (rule: RuleBuilderRule) => {
 
     UserNotification.success(`Rule "${rule.title}" created successfully`);
   } catch (errorThrown) {
-    console.log('createRule', errorThrown, rule);
     UserNotification.error(`Creating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Create the Rule Builder Rule.');
   }
 };
@@ -51,7 +50,6 @@ const updateRule = async (rule: RuleBuilderRule) => {
 
     UserNotification.success(`Rule "${rule.title}" updated successfully`);
   } catch (errorThrown) {
-    console.log('updateRule', errorThrown, ruleToUpdate);
     UserNotification.error(`Updating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Update the Rule Builder Rule.');
   }
 };
