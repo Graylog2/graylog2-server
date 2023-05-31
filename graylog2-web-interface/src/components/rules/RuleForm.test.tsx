@@ -78,7 +78,7 @@ describe('RuleForm', () => {
     const setRawMessageToSimulate = jest.fn();
     const ruleInput = 'new_test';
 
-    const { getByRole, getByPlaceholderText } = renderWithDataRouter(
+    const { getByRole, getByTitle } = renderWithDataRouter(
       <PipelineRulesContext.Provider value={{
         ruleSource: ruleToUpdate.source,
         ruleSourceRef: {},
@@ -91,7 +91,7 @@ describe('RuleForm', () => {
       </PipelineRulesContext.Provider>,
     );
 
-    const rawMessageInput = getByPlaceholderText('JSON');
+    const rawMessageInput = getByTitle('Message string or JSON');
 
     expect(rawMessageInput).toHaveValue('');
 

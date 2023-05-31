@@ -97,6 +97,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                  placeholder={`{\n    "message": "test"\n}`}
                  value={rawMessageToSimulate}
                  onChange={handleRawMessageChange}
+                 title="Message string or JSON"
                  help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
                  rows={5} />
           <Button bsStyle="info"
