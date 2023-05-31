@@ -16,12 +16,12 @@
  */
 package org.graylog.plugins.views.search.engine;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.Period;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 public class SearchConfigProvider implements Provider<SearchConfig> {

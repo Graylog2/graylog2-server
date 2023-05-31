@@ -16,9 +16,10 @@
  */
 package org.graylog2.lookup.adapters;
 
-import com.google.inject.Inject;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+
+import javax.inject.Inject;
 
 /**
  * Context object for configurations which require access to services to perform validation.

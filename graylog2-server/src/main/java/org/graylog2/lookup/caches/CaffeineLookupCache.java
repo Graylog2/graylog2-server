@@ -28,7 +28,6 @@ import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
 import com.google.auto.value.AutoValue;
-import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog.autovalue.WithBeanGetter;
@@ -40,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.Min;
 import java.util.Locale;

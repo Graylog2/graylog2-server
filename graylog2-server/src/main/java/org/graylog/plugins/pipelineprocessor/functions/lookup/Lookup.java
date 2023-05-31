@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.lookup;
 
-import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -26,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 

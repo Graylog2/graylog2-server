@@ -16,10 +16,10 @@
  */
 package org.graylog2.inputs.codecs;
 
-import com.google.inject.Inject;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 public class CodecFactory {

@@ -17,13 +17,14 @@
 package org.graylog2.database.dbcatalog;
 
 import com.google.common.base.Stopwatch;
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.graylog2.database.dbcatalog.impl.ClassGraphDbEntitiesScanningMethod;
 import org.graylog2.database.dbcatalog.impl.DbEntitiesScanningMethod;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
 
