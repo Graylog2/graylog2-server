@@ -163,7 +163,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
     }
 
     /**
-     * Returns a new {@link KafkaProducer<String, byte[]>} instance that is connected to the Kafka container.
+     * Returns a new {@code KafkaProducer<String, byte[]>} instance that is connected to the Kafka container.
      *
      * @return the new producer instance
      */
@@ -185,9 +185,10 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
      * @param topicName the name of the new topic
      * @throws Exception when topic creation fails
      */
+    @SuppressWarnings("resource")
     public void createTopic(String topicName) throws Exception {
         LOG.info("Creating topic: {}", topicName);
-        adminClient.createTopics(Set.of(new NewTopic(topicName, 1, (short) 1)))
+        adminClient().createTopics(Set.of(new NewTopic(topicName, 1, (short) 1)))
                 .all()
                 .get(30, TimeUnit.SECONDS);
     }
@@ -198,8 +199,9 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
      * @return set of topic strings
      * @throws Exception when topic retrieval fails
      */
+    @SuppressWarnings("resource")
     public Set<String> listTopics() throws Exception {
-        return adminClient.listTopics().names().get(30, TimeUnit.SECONDS);
+        return adminClient().listTopics().names().get(30, TimeUnit.SECONDS);
     }
 
     /**
