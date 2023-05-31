@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
-public interface NodeService extends PersistedService {
+public interface NodeService {
     Node.Type type();
 
     boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname);

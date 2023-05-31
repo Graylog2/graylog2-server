@@ -16,12 +16,8 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import org.graylog2.plugin.database.ValidationException;
-
-import java.util.Optional;
-
-public interface PreflightConfigService {
-    Optional<PreflightConfig> getPersistedConfig();
-
-    PreflightConfig saveConfiguration() throws ValidationException;
+public enum PreflightConfigResult {
+    UNKNOWN,
+    SKIPPED,
+    FINISHED
 }

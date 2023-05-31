@@ -20,9 +20,11 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
@@ -47,7 +50,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
     @Inject
     public RestHighLevelClientProvider(
             GracefulShutdownService shutdownService,
-            @Named("elasticsearch_hosts") List<URI> hosts,
+            @IndexerHosts List<URI> hosts,
             @Named("elasticsearch_connect_timeout") Duration connectTimeout,
             @Named("elasticsearch_socket_timeout") Duration socketTimeout,
             @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,
@@ -61,6 +64,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
+
         clientSupplier = Suppliers.memoize(() -> {
             final RestHighLevelClient client = buildClient(hosts,
                     connectTimeout,

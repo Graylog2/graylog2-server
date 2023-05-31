@@ -70,10 +70,6 @@ public class NodeImpl extends PersistedImpl implements Node {
         return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }
 
-    @Override
-    public String getShortNodeId() {
-        return getNodeId().split("-")[0];
-    }
 
     @Override
     public Type getType() {
