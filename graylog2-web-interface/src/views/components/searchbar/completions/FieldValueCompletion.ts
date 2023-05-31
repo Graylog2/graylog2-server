@@ -80,7 +80,7 @@ const formatSuggestion = (value: string, occurrence: number, input: string | num
   meta: title ? `${title}: ${occurrence} hits` : `${occurrence} hits`,
 });
 
-type PreviousSuggestions = Array<{ value: string, occurrence: number }> | undefined;
+type PreviousSuggestions = Array<{ value: string, occurrence: number, title?: string }> | undefined;
 
 class FieldValueCompletion implements Completer {
   private previousSuggestions: undefined | {
