@@ -51,7 +51,6 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
-import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -360,11 +359,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final BulkOperationResponse response = bulkScheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
-        // Get a list of successfully scheduled event definitions
-        List<String> idsFailedToSchedule = response.failures().stream().map(BulkOperationFailure::entityId).toList();
-        List<String> successfullyScheduledIds = bulkOperationRequest.entityIds().stream()
-                .filter(id -> !idsFailedToSchedule.contains(id))
-                .toList();
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
@@ -396,11 +390,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final BulkOperationResponse response = bulkUnscheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
-        // Get a list of successfully unscheduled event definitions
-        List<String> idsFailedToUnschedule = response.failures().stream().map(BulkOperationFailure::entityId).toList();
-        List<String> successfullyUnscheduledIds = bulkOperationRequest.entityIds().stream()
-                .filter(id -> !idsFailedToUnschedule.contains(id))
-                .toList();
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
