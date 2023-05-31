@@ -18,6 +18,7 @@ package org.graylog2.cluster;
 
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.net.URI;
 import java.util.LinkedList;
@@ -43,7 +44,7 @@ public class TestNodeService implements NodeService {
 
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
-        return nodes.add(new TestNode(type, nodeId, isLeader, httpPublishUri.toString(), hostname, new DateTime()));
+        return nodes.add(new TestNode(type, nodeId, isLeader, httpPublishUri.toString(), hostname, DateTime.now(DateTimeZone.UTC)));
     }
 
     @Override
