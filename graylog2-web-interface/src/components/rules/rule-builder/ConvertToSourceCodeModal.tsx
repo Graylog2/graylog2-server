@@ -19,9 +19,11 @@ import styled from 'styled-components';
 
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import { LinkContainer } from 'components/common/router';
-import copyToClipboard from 'util/copyToClipboard';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
+import copyToClipboard from 'util/copyToClipboard';
+import UserNotification from 'util/UserNotification';
+import { saveRuleSourceCode } from 'hooks/useRuleBuilder';
 
 import type { RuleBuilderRule } from './types';
 
@@ -38,33 +40,43 @@ type Props = {
   rule: RuleBuilderRule,
 };
 
-const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => (
-  <BootstrapModalWrapper showModal={show}
-                         onHide={onHide}
-                         bsSize="large">
-    <Modal.Header closeButton>
-      <Modal.Title>{rule.title}</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <pre>
-        <SourceCodeContainer>
-          {rule.source || '<no code>'}
-        </SourceCodeContainer>
-      </pre>
-    </Modal.Body>
-    <Modal.Footer>
-      <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-        <Button type="button" bsStyle="info">Create new Rule from Code</Button>
-      </LinkContainer>
-      <Button type="button"
-              onClick={() => {
-                copyToClipboard(rule.source);
-                onHide();
-              }}>
-        Copy & Close
-      </Button>
-    </Modal.Footer>
-  </BootstrapModalWrapper>
-);
+const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
+  const history = useHistory();
+
+  return (
+    <BootstrapModalWrapper showModal={show}
+                           onHide={onHide}
+                           bsSize="large">
+      <Modal.Header closeButton>
+        <Modal.Title>{rule.title || '<no title>'}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <pre>
+          <SourceCodeContainer>
+            {rule.source || '<no code>'}
+          </SourceCodeContainer>
+        </pre>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button"
+                bsStyle="info"
+                onClick={() => {
+                  saveRuleSourceCode(rule.source || '');
+                  history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                }}>
+          Create new Rule from Code
+        </Button>
+        <Button type="button"
+                onClick={() => {
+                  copyToClipboard(rule.source);
+                  UserNotification.success('Rule source code copied to clipboard!');
+                  onHide();
+                }}>
+          Copy & Close
+        </Button>
+      </Modal.Footer>
+    </BootstrapModalWrapper>
+  );
+};
 
 export default ConvertToSourceCodeModal;

@@ -23,6 +23,16 @@ import ApiRoutes from 'routing/ApiRoutes';
 import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
 import useParams from 'routing/useParams';
 
+export const saveRuleSourceCode = (sourceCode: string) => {
+  sessionStorage.setItem('rule_source_code', sourceCode);
+};
+
+export const getSavedRuleSourceCode = () => sessionStorage.getItem('rule_source_code');
+
+export const removeSavedRuleSourceCode = () => {
+  sessionStorage.removeItem('rule_source_code');
+};
+
 const createRule = async (rule: RuleBuilderRule) => {
   try {
     await fetch(
