@@ -16,20 +16,19 @@
  */
 import * as React from 'react';
 
-import { Button, Title, Space } from 'preflight/components/common';
+import { Title, Space } from 'preflight/components/common';
+import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 
 type Props = {
-  onResumeStartup: () => void,
+  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const ConfigurationFinished = ({ onResumeStartup }: Props) => (
+const ConfigurationFinished = ({ setIsWaitingForStartup }: Props) => (
   <div>
     <Title order={3}>All data nodes are secured and reachable.</Title>
     <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
     <Space h="md" />
-    <Button onClick={onResumeStartup} size="xs">
-      Resume startup
-    </Button>
+    <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup} />
   </div>
 );
 

@@ -59,10 +59,10 @@ const stepIcon = (stepKey, activeStepKey, theme): { name: IconName, color: strin
 };
 
 type Props = {
-  onResumeStartup: () => void,
+  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const ConfigurationWizard = ({ onResumeStartup }: Props) => {
+const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
   const { step: activeStepKey, isLoading: isLoadingConfigurationStep } = useConfigurationStep();
   const theme = useTheme();
 
@@ -91,7 +91,7 @@ const ConfigurationWizard = ({ onResumeStartup }: Props) => {
       <Grid.Col span={12} md={6} orderMd={1}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning />}
-        {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && <ConfigurationFinished onResumeStartup={onResumeStartup} />}
+        {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && <ConfigurationFinished setIsWaitingForStartup={setIsWaitingForStartup} />}
       </Grid.Col>
     </Grid>
   );
