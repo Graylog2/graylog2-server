@@ -25,6 +25,7 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.AfterEach;
@@ -65,6 +66,7 @@ public class BlockingBatchedESOutputTest {
     private BlockingBatchedESOutput output;
 
     @BeforeEach
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         MetricRegistry metricRegistry = new MetricRegistry();
         NoopJournal journal = new NoopJournal();
