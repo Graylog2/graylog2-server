@@ -14,14 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { TextInput as MantineTextInput, Input as MantineInput } from '@mantine/core';
+package org.graylog2.configuration;
 
-const Input = (props: React.ComponentProps<typeof MantineTextInput>) => (
-  <MantineTextInput {...props} />
-);
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-Input.Error = MantineInput.Error;
-Input.Label = MantineInput.Label;
-
-export default Input;
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.TYPE })
+@Qualifier
+public @interface IndexerHosts {
+}

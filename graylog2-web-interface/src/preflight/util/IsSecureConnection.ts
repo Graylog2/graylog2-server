@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { TextInput as MantineTextInput, Input as MantineInput } from '@mantine/core';
 
-const Input = (props: React.ComponentProps<typeof MantineTextInput>) => (
-  <MantineTextInput {...props} />
-);
+const isSecureConnection = () => {
+  if (window.location.protocol !== 'https:') {
+    return 'NO';
+  }
 
-Input.Error = MantineInput.Error;
-Input.Label = MantineInput.Label;
+  if (window.isSecureContext === undefined) {
+    return 'MAYBE';
+  }
 
-export default Input;
+  return window.isSecureContext ? 'YES' : 'NO';
+};
+
+export default isSecureConnection;

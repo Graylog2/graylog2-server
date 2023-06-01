@@ -26,9 +26,7 @@ import javax.inject.Inject;
 import java.security.KeyStore;
 import java.util.Optional;
 
-//TODO: It is only a concept, do not use it yet!
-//The idea is that client code creates proper KeystoreLocation, and does not cate which implementation to choose for the location, it is done automagically
-@Deprecated
+
 public final class SmartKeystoreStorage implements KeystoreStorage<KeystoreLocation> {
 
     private final KeystoreMongoStorage keystoreMongoStorage;

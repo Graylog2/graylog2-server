@@ -16,18 +16,29 @@
  */
 package org.graylog.plugins.views.search.rest.suggestions;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+
+import java.util.Optional;
 
 @AutoValue
 public abstract class SuggestionEntryDTO {
     @JsonProperty
     public abstract String value();
+
     @JsonProperty
     public abstract long occurrence();
 
+    @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public abstract Optional<String> title();
+
     public static SuggestionEntryDTO create(final String value, final long occurrence) {
-        return new AutoValue_SuggestionEntryDTO(value, occurrence);
+        return create(value, occurrence, Optional.empty());
+    }
+
+    public static SuggestionEntryDTO create(final String value, final long occurrence, Optional<String> title) {
+        return new AutoValue_SuggestionEntryDTO(value, occurrence, title);
     }
 }

@@ -51,4 +51,5 @@ const CAConfiguration = () => (
     </StyledTabs>
   </>
 );
+
 export default CAConfiguration;

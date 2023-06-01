@@ -14,14 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { TextInput as MantineTextInput, Input as MantineInput } from '@mantine/core';
+package org.graylog2.bootstrap.preflight;
 
-const Input = (props: React.ComponentProps<typeof MantineTextInput>) => (
-  <MantineTextInput {...props} />
-);
-
-Input.Error = MantineInput.Error;
-Input.Label = MantineInput.Label;
-
-export default Input;
+public enum PreflightConfigResult {
+    UNKNOWN,
+    SKIPPED,
+    FINISHED
+}

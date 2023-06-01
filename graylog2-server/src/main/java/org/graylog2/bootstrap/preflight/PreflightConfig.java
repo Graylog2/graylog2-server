@@ -16,33 +16,6 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
-import org.graylog2.database.PersistedImpl;
-import org.graylog2.plugin.database.validators.Validator;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Map;
-
-@CollectionName("preflight")
-public class PreflightConfig extends PersistedImpl {
-
-    protected PreflightConfig(@Nullable Map<String, Object> fields) {
-        super(fields);
-    }
-
-    protected PreflightConfig(ObjectId id, @Nullable Map<String, Object> fields) {
-        super(id, fields);
-    }
-
-    @Override
-    public Map<String, Validator> getValidations() {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Collections.emptyMap();
-    }
+public interface PreflightConfig {
+    PreflightConfigResult result();
 }

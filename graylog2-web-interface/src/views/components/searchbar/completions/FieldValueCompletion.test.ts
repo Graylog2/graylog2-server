@@ -55,8 +55,8 @@ describe('FieldValueCompletion', () => {
     input: '',
     sum_other_docs_count: 2,
     suggestions: [
-      { value: 'POST', occurrence: 300 },
-      { value: 'PUT', occurrence: 400 },
+      { value: 'POST', occurrence: 300, title: undefined },
+      { value: 'PUT', occurrence: 400, title: undefined },
     ],
     error: undefined,
   };
@@ -239,7 +239,7 @@ describe('FieldValueCompletion', () => {
         input: 'PSOT',
         sum_other_docs_count: 0,
         suggestions: [
-          { value: 'POST', occurrence: 300 },
+          { value: 'POST', occurrence: 300, title: undefined },
         ],
         error: undefined,
       };
@@ -274,7 +274,7 @@ describe('FieldValueCompletion', () => {
         input: '',
         sum_other_docs_count: 0,
         suggestions: [
-          { value: 'C:\\Windows\\System32\\lsass.exe', occurrence: 300 },
+          { value: 'C:\\Windows\\System32\\lsass.exe', occurrence: 300, title: undefined },
         ],
         error: undefined,
       };
@@ -318,8 +318,8 @@ describe('FieldValueCompletion', () => {
         input: 'a',
         sum_other_docs_count: 2,
         suggestions: [
-          { value: 'action1', occurrence: 400 },
-          { value: 'action2', occurrence: 300 },
+          { value: 'action1', occurrence: 400, title: undefined },
+          { value: 'action2', occurrence: 300, title: undefined },
         ],
         error: undefined,
       };
@@ -350,8 +350,8 @@ describe('FieldValueCompletion', () => {
           input: 'ac',
           sum_other_docs_count: 0,
           suggestions: [
-            { value: 'action3', occurrence: 200 },
-            { value: 'action4', occurrence: 100 },
+            { value: 'action3', occurrence: 200, title: undefined },
+            { value: 'action4', occurrence: 100, title: undefined },
           ],
           error: undefined,
         };
@@ -424,7 +424,7 @@ describe('FieldValueCompletion', () => {
       expect(result).toEqual(true);
     });
 
-    it('returns true if current token is a string and consits only of ""', async () => {
+    it('returns true if current token is a string and consists only of ""', async () => {
       const completer = new FieldValueCompletion();
       const result = completer.shouldShowCompletions(1, [[{ type: 'keyword', value: 'http_method:' }, { type: 'string', value: '""', index: 1, start: 12 }, null]]);
 
