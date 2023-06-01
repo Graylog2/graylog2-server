@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Restore mail attribute for AD authentication."
+message = "Fix user login with AD authentication by restoring the mail attribute."
 
 issues = ["15536"]
 pulls = [""]
