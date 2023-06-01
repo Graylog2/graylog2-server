@@ -59,7 +59,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
       </Modal.Body>
       <Modal.Footer>
         <Button type="button"
-                bsStyle="info"
+                bsStyle="success"
                 onClick={() => {
                   saveRuleSourceCode(rule.source || '');
                   history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
@@ -67,6 +67,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
           Create new Rule from Code
         </Button>
         <Button type="button"
+                bsStyle="info"
                 onClick={() => {
                   copyToClipboard(rule.source);
                   UserNotification.success('Rule source code copied to clipboard!');
