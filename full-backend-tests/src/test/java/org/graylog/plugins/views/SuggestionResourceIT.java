@@ -31,11 +31,11 @@ import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
-import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
@@ -67,7 +67,6 @@ public class SuggestionResourceIT {
 
     @BeforeAll
     public void init() {
-
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
         this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
@@ -119,6 +118,8 @@ public class SuggestionResourceIT {
                 "SuggestionResourceIT#4",
                 "SuggestionResourceIT#5"
         );
+
+        api.fieldTypes().waitForFieldTypeDefinitions("gl2_source_node", "gl2_source_input", "streams");
     }
 
     @ContainerMatrixTest
@@ -150,7 +151,7 @@ public class SuggestionResourceIT {
     }
 
     @ContainerMatrixTest
-    void testAugmentedSuggestionTitles() {
+    void testAugmentedSuggestionTitlesForStreams() {
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -160,6 +161,32 @@ public class SuggestionResourceIT {
                 .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.title", hasItems("Default Stream", "Stream #1", "Stream #2"));
+    }
+
+    @ContainerMatrixTest
+    void testAugmentedSuggestionTitlesForNodes() {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(SuggestionsRequest.create("gl2_source_node", ""))
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.title", not(empty()));
+    }
+
+    @ContainerMatrixTest
+    void testAugmentedSuggestionTitlesForInputs() {
+        given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(SuggestionsRequest.create("gl2_source_input", ""))
+                .post("/search/suggest")
+                .then()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.title", hasItems("Integration test GELF input"));
     }
 
     @ContainerMatrixTest
