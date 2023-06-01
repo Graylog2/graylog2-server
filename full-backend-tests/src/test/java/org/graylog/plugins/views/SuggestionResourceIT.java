@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
@@ -25,7 +26,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.jupiter.api.BeforeAll;
 
-import java.util.Map;
+import javax.annotation.Nullable;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
@@ -46,6 +47,22 @@ public class SuggestionResourceIT {
 
     public SuggestionResourceIT(GraylogApis api) {
         this.api = api;
+    }
+
+    record SuggestionsRequest(String field, String input,
+                              @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Set<String> streams,
+                              @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Integer size) {
+        static SuggestionsRequest create(String field, String input) {
+            return new SuggestionsRequest(field, input, null, null);
+        }
+
+        static SuggestionsRequest create(String field, String input, Set<String> streams) {
+            return new SuggestionsRequest(field, input, streams, null);
+        }
+
+        static SuggestionsRequest create(String field, String input, int size) {
+            return new SuggestionsRequest(field, input, null, size);
+        }
     }
 
     @BeforeAll
@@ -109,7 +126,7 @@ public class SuggestionResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .body("{\"field\":\"facility\", \"input\":\"\"}")
+                .body(SuggestionsRequest.create("facility", ""))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
@@ -123,10 +140,7 @@ public class SuggestionResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .body(
-                        """
-                        { "field":"http_response_code", "input":"20"}
-                        """)
+                .body(SuggestionsRequest.create("http_response_code", "20"))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
@@ -140,10 +154,7 @@ public class SuggestionResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .body(
-                        """
-                        { "field":"streams", "input":""}
-                        """)
+                .body(SuggestionsRequest.create("streams", ""))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
@@ -156,11 +167,7 @@ public class SuggestionResourceIT {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
                 .when()
-                .body(Map.of(
-                        "field", "source",
-                        "input", "",
-                        "streams", Set.of(stream1Id)
-                ))
+                .body(SuggestionsRequest.create("source", "", Set.of(stream1Id)))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
@@ -171,11 +178,7 @@ public class SuggestionResourceIT {
         final ValidatableResponse validatableResponse2 = given()
                 .spec(api.requestSpecification())
                 .when()
-                .body(Map.of(
-                        "field", "source",
-                        "input", "",
-                        "streams", Set.of(stream2Id)
-                ))
+                .body(SuggestionsRequest.create("source", "", Set.of(stream2Id)))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
@@ -189,7 +192,7 @@ public class SuggestionResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .body("{\"field\":\"message\", \"input\":\"foo\"}")
+                .body(SuggestionsRequest.create("message", "foo"))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
@@ -203,7 +206,7 @@ public class SuggestionResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .body("{\"field\":\"facility\", \"input\":\"\", \"size\":1}")
+                .body(SuggestionsRequest.create("facility", "", 1))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
@@ -218,7 +221,7 @@ public class SuggestionResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .body("{\"field\":\"facility\", \"input\":\"tets\"}")
+                .body(SuggestionsRequest.create("facility", "tets"))
                 .post("/search/suggest")
                 .then()
                 .statusCode(200)
