@@ -22,6 +22,7 @@ import org.graylog.security.certutil.ca.CACreator;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 import org.graylog2.bootstrap.CliCommand;
 
 import java.nio.file.Path;
@@ -65,7 +66,7 @@ public class CertutilCa implements CliCommand {
 
             final Path keystorePath = Path.of(keystoreFilename);
             //TODO: it is probably a bad idea to use the same password for CA and its storage...
-            caKeystoreStorage.writeKeyStore(keystorePath, caKeystore, password);
+            caKeystoreStorage.writeKeyStore(new KeystoreFileLocation(keystorePath), caKeystore, password);
             console.printLine("Keys and certificates stored in " + keystorePath.toAbsolutePath());
 
         } catch (Exception e) {

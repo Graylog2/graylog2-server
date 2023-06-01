@@ -26,6 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Sniffer;
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 
 import javax.annotation.Nullable;
@@ -47,7 +48,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
     @Inject
     public RestHighLevelClientProvider(
             GracefulShutdownService shutdownService,
-            @Named("elasticsearch_hosts") List<URI> hosts,
+            @IndexerHosts List<URI> hosts,
             @Named("elasticsearch_connect_timeout") Duration connectTimeout,
             @Named("elasticsearch_socket_timeout") Duration socketTimeout,
             @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,

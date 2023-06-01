@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import { useMemo } from 'react';
+
 import { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
 import type { DataNodes, ConfigurationStep, DataNodesCA } from 'preflight/types';
 import useDataNodes from 'preflight/hooks/useDataNodes';
@@ -38,15 +40,18 @@ const configurationStep = (dataNodes: DataNodes, dataNodesCA: DataNodesCA) => {
 const useConfigurationStep = (): { step: ConfigurationStep | undefined, isLoading: boolean } => {
   const { data: dataNodes, isInitialLoading: isLoadingDataNodes } = useDataNodes();
   const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus } = useDataNodesCA();
+  const step = configurationStep(dataNodes, dataNodesCA);
 
-  if (isLoadingDataNodes || isLoadingCAStatus) {
-    return ({ isLoading: true, step: undefined });
-  }
+  return useMemo(() => {
+    if (isLoadingDataNodes || isLoadingCAStatus) {
+      return ({ isLoading: true, step: undefined });
+    }
 
-  return ({
-    isLoading: false,
-    step: configurationStep(dataNodes, dataNodesCA),
-  });
+    return ({
+      isLoading: false,
+      step,
+    });
+  }, [isLoadingCAStatus, isLoadingDataNodes, step]);
 };
 
 export default useConfigurationStep;

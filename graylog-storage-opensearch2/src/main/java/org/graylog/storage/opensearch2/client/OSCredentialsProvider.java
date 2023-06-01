@@ -22,6 +22,7 @@ import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
 import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog2.configuration.IndexerHosts;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -38,7 +39,7 @@ public class OSCredentialsProvider implements Provider<CredentialsProvider> {
     private final boolean discoveryEnabled;
 
     @Inject
-    public OSCredentialsProvider(@Named("elasticsearch_hosts") List<URI> openSearchHosts,
+    public OSCredentialsProvider(@IndexerHosts List<URI> openSearchHosts,
                                  @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
                                  @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
                                  @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {

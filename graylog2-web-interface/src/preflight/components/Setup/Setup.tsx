@@ -22,17 +22,17 @@ import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
-import { Button } from 'preflight/components/common';
+import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 
 const P = styled.p`
   max-width: 700px;
 `;
 
 type Props = {
-  onResumeStartup: () => void,
+  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const Setup = ({ onResumeStartup }: Props) => (
+const Setup = ({ setIsWaitingForStartup }: Props) => (
   <>
     <Section title="Welcome!" titleOrder={1}>
       <P>
@@ -44,12 +44,12 @@ const Setup = ({ onResumeStartup }: Props) => (
         For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the Graylog server. After the restart this page will not show up again.
       </P>
       <P>
-        You can always skip the configuration and <Button variant="light" compact size="xs" onClick={onResumeStartup}>resume startup</Button>.
+        You can always skip the configuration and <ResumeStartupButton variant="light" compact setIsWaitingForStartup={setIsWaitingForStartup}>resume startup</ResumeStartupButton>.
       </P>
     </Section>
     <Section title="Graylog Data Nodes" titleOrder={2}>
       <DataNodesOverview />
-      <ConfigurationWizard onResumeStartup={onResumeStartup} />
+      <ConfigurationWizard setIsWaitingForStartup={setIsWaitingForStartup} />
     </Section>
   </>
 );

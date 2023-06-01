@@ -18,12 +18,16 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import org.bouncycastle.operator.OperatorException;
 import org.graylog.datanode.Configuration;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.cert.storage.CertMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertStorage;
 import org.graylog.security.certutil.csr.CertificateAndPrivateKeyMerger;
 import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
+import org.graylog.security.certutil.keystore.storage.SmartKeystoreStorage;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodePreflightConfig;
@@ -37,10 +41,9 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
-
-import static org.graylog.security.certutil.CertutilHttp.DATANODE_KEY_ALIAS;
 
 @Singleton
 public class DataNodePreflightGeneratePeriodical extends Periodical {
@@ -55,6 +58,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final CertStorage certMongoStorage;
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
     private final Configuration configuration;
+    private final SmartKeystoreStorage keystoreStorage;
 
     @Inject
     public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
@@ -64,7 +68,8 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                                final CsrGenerator csrGenerator,
                                                final CertMongoStorage certMongoStorage,
                                                final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
-                                               final Configuration configuration) {
+                                               final Configuration configuration,
+                                               final SmartKeystoreStorage keystoreStorage) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -73,6 +78,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         this.certMongoStorage = certMongoStorage;
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
         this.configuration = configuration;
+        this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
     }
@@ -102,13 +108,16 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                     final Optional<X509Certificate> x509Certificate = certMongoStorage.readCert(nodeId.getNodeId());
                     if (x509Certificate.isPresent()) {
                         //TODO: done for HTTP cert, we still need to make decision if we want to process HTTP and transport certs separetely
-                        certificateAndPrivateKeyMerger.merge(
+                        KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
                                 x509Certificate.get(),
                                 privateKeyEncryptedStorage,
                                 "TODO:changeStorageToMongoDb".toCharArray(),
                                 null,
-                                DATANODE_KEY_ALIAS
+                                CertConstants.DATANODE_KEY_ALIAS
                         );
+
+                        final KeystoreMongoLocation location = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
+                        keystoreStorage.writeKeyStore(location, nodeKeystore, configuration.getDatanodeHttpCertificatePassword().toCharArray());
 
                         //should be in one transaction, but we miss transactions...
                         nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
