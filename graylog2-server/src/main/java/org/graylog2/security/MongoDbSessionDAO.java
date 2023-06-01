@@ -81,7 +81,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         return getSimpleSession(sessionId, dbSession);
     }
 
-    private SimpleSession getSimpleSession(Serializable sessionId, MongoDbSession dbSession) {
+    public SimpleSession getSimpleSession(Serializable sessionId, MongoDbSession dbSession) {
         final SimpleSession session = new SimpleSession();
         assignSessionId(session, sessionId);
         session.setHost(dbSession.getHost());

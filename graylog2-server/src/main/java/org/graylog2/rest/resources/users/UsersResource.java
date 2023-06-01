@@ -31,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.session.Session;
 import org.graylog.security.UserContext;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
@@ -56,6 +57,7 @@ import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
+import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -102,6 +104,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -130,6 +133,7 @@ public class UsersResource extends RestResource {
     private final AccessTokenService accessTokenService;
     private final RoleService roleService;
     private final MongoDBSessionService sessionService;
+    private final MongoDbSessionDAO mongoDbSessionDAO;
     private final SearchQueryParser searchQueryParser;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -144,12 +148,13 @@ public class UsersResource extends RestResource {
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
-                         MongoDBSessionService sessionService) {
+                         MongoDBSessionService sessionService, MongoDbSessionDAO mongoDbSessionDAO) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
         this.sessionService = sessionService;
         this.paginatedUserService = paginatedUserService;
+        this.mongoDbSessionDAO = mongoDbSessionDAO;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
     }
 
@@ -432,15 +437,9 @@ public class UsersResource extends RestResource {
 
         if (isPermitted("*")) {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
-            if (sessionTimeoutMs != null && sessionTimeoutMs != 0) {
-                user.setSessionTimeoutMs(sessionTimeoutMs);
-                AllUserSessions allUserSessions = AllUserSessions.create(sessionService);
-                Optional<MongoDbSession> optionalUserSession = allUserSessions.forUser(user);
-                if (optionalUserSession.isPresent()) {
-                    MongoDbSession userSession = optionalUserSession.get();
-                    userSession.setTimeout(sessionTimeoutMs);
-                    sessionService.save(userSession);
-                }
+            if (Objects.nonNull(sessionTimeoutMs) && sessionTimeoutMs != 0 && (user.getSessionTimeoutMs() != sessionTimeoutMs)) {
+                    deleteExistingSession(user);
+                    user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
 
@@ -449,6 +448,18 @@ public class UsersResource extends RestResource {
         }
 
         userManagementService.update(user, cr);
+    }
+
+    private void deleteExistingSession(User user) {
+        AllUserSessions allUserSessions = AllUserSessions.create(sessionService);
+        Optional<MongoDbSession> optionalUserSession = allUserSessions.forUser(user);
+        if (optionalUserSession.isPresent()) {
+            MongoDbSession userSession = optionalUserSession.get();
+            Session session = mongoDbSessionDAO.getSimpleSession(userSession.getSessionId(), userSession);
+            if (Objects.nonNull(session)) {
+                mongoDbSessionDAO.delete(session);
+            }
+        }
     }
 
     private boolean rolesContainAdmin(List<String> roles) {

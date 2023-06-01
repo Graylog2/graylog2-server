@@ -29,6 +29,7 @@ import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
+import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.shared.security.Permissions;
@@ -85,6 +86,8 @@ public class UsersResourceTest {
     @Mock
     private MongoDBSessionService sessionService;
     @Mock
+    private MongoDbSessionDAO mongoDbSessionDAO;
+    @Mock
     private Startpage startPage;
     @Mock
     private Subject subject;
@@ -98,7 +101,7 @@ public class UsersResourceTest {
         userImplFactory = new UserImplFactory(new Configuration(),
                                               new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
-                                              roleService, sessionService, new HttpConfiguration(), subject);
+                                              roleService, sessionService, mongoDbSessionDAO, new HttpConfiguration(), subject);
     }
 
     /**
@@ -138,9 +141,9 @@ public class UsersResourceTest {
 
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
                                  AccessTokenService accessTokenService, RoleService roleService,
-                                 MongoDBSessionService sessionService, HttpConfiguration configuration,
+                                 MongoDBSessionService sessionService, MongoDbSessionDAO mongoDbSessionDAO, HttpConfiguration configuration,
                                  Subject subject) {
-            super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService);
+            super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService, mongoDbSessionDAO);
             this.subject = subject;
             super.configuration = configuration;
         }
