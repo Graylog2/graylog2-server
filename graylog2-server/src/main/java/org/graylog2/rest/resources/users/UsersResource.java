@@ -35,13 +35,11 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.graylog.security.UserContext;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -63,7 +61,6 @@ import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
-import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -139,7 +136,6 @@ public class UsersResource extends RestResource {
     private final AccessTokenService accessTokenService;
     private final RoleService roleService;
     private final MongoDBSessionService sessionService;
-    private final MongoDbSessionDAO mongoDbSessionDAO;
     private final SearchQueryParser searchQueryParser;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -154,13 +150,12 @@ public class UsersResource extends RestResource {
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
-                         MongoDBSessionService sessionService, MongoDbSessionDAO mongoDbSessionDAO) {
+                         MongoDBSessionService sessionService) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
         this.sessionService = sessionService;
         this.paginatedUserService = paginatedUserService;
-        this.mongoDbSessionDAO = mongoDbSessionDAO;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
     }
 
@@ -459,10 +454,12 @@ public class UsersResource extends RestResource {
     private void updateExistingSession(User user, long newSessionTimeOut) {
         AllUserSessions allUserSessions = AllUserSessions.create(sessionService);
         Optional<MongoDbSession> optionalUserSession = allUserSessions.forUser(user);
+
         if (optionalUserSession.isPresent()) {
             MongoDbSession userSession = optionalUserSession.get();
             userSession.setTimeout(newSessionTimeOut);
-            Session session = mongoDbSessionDAO.getSimpleSession(userSession.getSessionId(), userSession);
+            Session session = sessionService.daoToSimpleSession(userSession);
+
             DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
             DefaultSessionManager sessionManager = (DefaultSessionManager) securityManager.getSessionManager();
             SessionDAO sessionDAO = sessionManager.getSessionDAO();

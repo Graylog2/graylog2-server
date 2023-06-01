@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.graylog2.plugin.database.PersistedService;
 
 import javax.annotation.Nullable;
@@ -26,4 +27,5 @@ public interface MongoDBSessionService extends PersistedService {
     MongoDbSession load(String sessionId);
 
     Collection<MongoDbSession> loadAll();
+    SimpleSession daoToSimpleSession(MongoDbSession mongoDbSession);
 }
