@@ -28,14 +28,20 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.graylog.security.UserContext;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -438,7 +444,7 @@ public class UsersResource extends RestResource {
         if (isPermitted("*")) {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
             if (Objects.nonNull(sessionTimeoutMs) && sessionTimeoutMs != 0 && (user.getSessionTimeoutMs() != sessionTimeoutMs)) {
-                    deleteExistingSession(user);
+                    updateExistingSession(user, sessionTimeoutMs);
                     user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
@@ -450,15 +456,17 @@ public class UsersResource extends RestResource {
         userManagementService.update(user, cr);
     }
 
-    private void deleteExistingSession(User user) {
+    private void updateExistingSession(User user, long newSessionTimeOut) {
         AllUserSessions allUserSessions = AllUserSessions.create(sessionService);
         Optional<MongoDbSession> optionalUserSession = allUserSessions.forUser(user);
         if (optionalUserSession.isPresent()) {
             MongoDbSession userSession = optionalUserSession.get();
+            userSession.setTimeout(newSessionTimeOut);
             Session session = mongoDbSessionDAO.getSimpleSession(userSession.getSessionId(), userSession);
-            if (Objects.nonNull(session)) {
-                mongoDbSessionDAO.delete(session);
-            }
+            DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
+            DefaultSessionManager sessionManager = (DefaultSessionManager) securityManager.getSessionManager();
+            SessionDAO sessionDAO = sessionManager.getSessionDAO();
+            sessionDAO.update(session);
         }
     }
 

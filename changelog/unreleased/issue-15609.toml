@@ -1,5 +1,5 @@
 type = "fixed"
-message = "When modifying a user's session timeout, the system will automatically log out the user to ensure application of the new timeout settings."
+message = "When modifying a user's session timeout, the system will automatically update existing user sessions to ensure application of the new timeout settings."
 
 issues = ["15609"]
 pulls = ["15657"]
