@@ -99,6 +99,6 @@ public class NodeImpl extends PersistedImpl implements Node {
 
     @Override
     public String toString() {
-        return StringUtils.f("%s / %s", getShortNodeId(), getHostname());
+        return getTitle();
     }
 }
