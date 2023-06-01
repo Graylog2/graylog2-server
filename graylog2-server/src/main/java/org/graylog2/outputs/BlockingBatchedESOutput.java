@@ -189,7 +189,14 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
     @Override
     public void initialize() throws Exception {
-        flushService.scheduleAtFixedRate(this::forceFlushIfTimedout, outputFlushInterval, outputFlushInterval, TimeUnit.SECONDS);
+        flushService.scheduleAtFixedRate(() -> {
+                    try {
+                        forceFlushIfTimedout();
+                    } catch (Exception e) {
+                        log.error("Caught exception while trying to flush output", e);
+                    }
+                },
+                outputFlushInterval, outputFlushInterval, TimeUnit.SECONDS);
     }
 
     public interface Factory extends ElasticSearchOutput.Factory {
