@@ -35,7 +35,7 @@ public abstract class RuleBuilderStep {
     public static final String FIELD_PARAMETERS = "params";
     public static final String FIELD_OUTPUT = "outputvariable";
     public static final String FIELD_NEGATE = "negate";
-    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_TITLE = "step_title";
 
     @JsonProperty(FIELD_ID)
     @Nullable
