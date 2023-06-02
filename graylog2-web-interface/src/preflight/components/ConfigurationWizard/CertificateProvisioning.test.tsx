@@ -69,6 +69,8 @@ describe('CertificateProvisioning', () => {
     ));
 
     expect(UserNotification.success).toHaveBeenCalledWith('CA provisioned successfully');
+
+    await screen.findByRole('button', { name: /provision certificate and continue/i });
   });
 
   it('should show error when CA provisioning failed', async () => {
@@ -90,6 +92,8 @@ describe('CertificateProvisioning', () => {
     ));
 
     expect(UserNotification.error).toHaveBeenCalledWith('CA provisioning failed with error: Error: Error');
+
+    await screen.findByRole('button', { name: /provision certificate and continue/i });
   });
 
   it('should disable provisioning when there are no data nodes', async () => {

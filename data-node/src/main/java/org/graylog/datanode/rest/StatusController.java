@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.rest;
 
+import org.graylog.datanode.management.OpensearchDynamicConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog2.plugin.Version;
 
@@ -24,6 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -44,5 +46,12 @@ public class StatusController {
                 version,
                 new StatusResponse(openSearch.opensearchVersion(), openSearch.processInfo())
         );
+    }
+
+    @GET
+    @Path("/start")
+    public DataNodeStatus start() throws IOException {
+        openSearch.startWithConfig(new OpensearchDynamicConfiguration());
+        return status();
     }
 }

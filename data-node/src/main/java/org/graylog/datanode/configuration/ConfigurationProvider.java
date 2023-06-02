@@ -20,9 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.datanode.configuration.certificates.CertificateMetaData;
 import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.security.certutil.CertutilCert;
-import org.graylog.security.certutil.CertutilHttp;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 
@@ -34,9 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +59,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                                  TlsConfigurationSupplier tlsConfigurationSupplier,
                                  TruststoreCreator truststoreCreator,
                                  RootCertificateFinder rootCertificateFinder
-    ) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+    ) throws IOException, GeneralSecurityException {
         Map<String, X509Certificate> rootCerts = new HashMap<>();
         final String truststorePassword = UUID.randomUUID().toString();
         final var cfg = sharedConfiguration.test();
@@ -128,13 +126,15 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             );
 
             rootCerts.put("transport-chain-CA-root", rootCertificateFinder.findRootCert(transportKeystorePath,
-                    localConfiguration.getDatanodeTransportCertificatePassword(),
-                    CertutilCert.DATANODE_KEY_ALIAS));
+                    localConfiguration.getDatanodeTransportCertificatePassword().toCharArray(),
+                    CertConstants.DATANODE_KEY_ALIAS));
 
             tlsConfigurationSupplier.addTransportTlsConfig(config,
-                    CertutilCert.DATANODE_KEY_ALIAS,
-                    localConfiguration.getDatanodeTransportCertificate(),
-                    localConfiguration.getDatanodeTransportCertificatePassword());
+                    new CertificateMetaData(
+                            localConfiguration.getDatanodeTransportCertificate(),
+                            localConfiguration.getDatanodeTransportCertificatePassword().toCharArray()
+                    )
+            );
 
             config.put("plugins.security.allow_default_init_securityindex", "true");
             //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
@@ -154,20 +154,22 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                     "http_certificate_password has to be configured for the keystore " + httpKeystorePath
             );
             rootCerts.put("http-chain-CA-root", rootCertificateFinder.findRootCert(httpKeystorePath,
-                    localConfiguration.getDatanodeHttpCertificatePassword(),
-                    CertutilHttp.DATANODE_KEY_ALIAS));
+                    localConfiguration.getDatanodeHttpCertificatePassword().toCharArray(),
+                    CertConstants.DATANODE_KEY_ALIAS));
 
             tlsConfigurationSupplier.addHttpTlsConfig(config,
-                    CertutilHttp.DATANODE_KEY_ALIAS,
-                    localConfiguration.getDatanodeHttpCertificate(),
-                    localConfiguration.getDatanodeHttpCertificatePassword());
+                    new CertificateMetaData(
+                            localConfiguration.getDatanodeHttpCertificate(),
+                            localConfiguration.getDatanodeHttpCertificatePassword().toCharArray()
+                    )
+            );
 
         }
 
         if (!rootCerts.isEmpty()) {
             final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
             truststoreCreator.createTruststore(rootCerts,
-                    truststorePassword,
+                    truststorePassword.toCharArray(),
                     trustStorePath
             );
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());

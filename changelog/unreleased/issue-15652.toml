@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Restore mail attribute for AD authentication."
+
+issues = ["15536"]
+pulls = [""]
+

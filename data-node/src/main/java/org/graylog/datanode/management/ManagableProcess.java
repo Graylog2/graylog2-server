@@ -21,9 +21,11 @@ import org.graylog.datanode.process.ProcessState;
 
 import java.io.IOException;
 
-public interface ManagableProcess {
+public interface ManagableProcess<T> {
 
-    void start() throws IOException;
+    void startWithConfig(T configuration);
+
+    void restart() throws IOException;
 
     void stop();
 
