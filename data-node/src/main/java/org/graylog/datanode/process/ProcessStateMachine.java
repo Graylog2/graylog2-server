@@ -40,6 +40,7 @@ public class ProcessStateMachine {
         config.configure(ProcessState.WAITING_FOR_CONFIGURATION)
                 .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
+                .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED);
 
         // the process has started already, now we have to wait for a running OS and available REST api
@@ -50,6 +51,7 @@ public class ProcessStateMachine {
                         () -> startupFailuresCounter.failedTooManyTimes() ? ProcessState.FAILED : ProcessState.STARTING,
                         startupFailuresCounter::increment)
                 .permit(ProcessEvent.HEALTH_CHECK_OK, ProcessState.AVAILABLE)
+                .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         // the process is running and responding to the REST status, it's available for any usage
@@ -58,6 +60,7 @@ public class ProcessStateMachine {
                 .onEntry(rebootCounter::resetFailuresCounter)
                 .permitReentry(ProcessEvent.HEALTH_CHECK_OK)
                 .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
+                .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
                 .ignore(ProcessEvent.PROCESS_STARTED);
 
@@ -69,6 +72,7 @@ public class ProcessStateMachine {
                         restFailureCounter::increment
                 )
                 .permit(ProcessEvent.HEALTH_CHECK_OK, ProcessState.AVAILABLE)
+                .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         // failed and we see the process as not recoverable.
@@ -76,12 +80,14 @@ public class ProcessStateMachine {
         config.configure(ProcessState.FAILED)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
                 .permit(ProcessEvent.HEALTH_CHECK_OK, ProcessState.AVAILABLE)
+                .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         // final state, the process is not alive anymore, terminated on the operating system level
         config.configure(ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING, rebootCounter::increment)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
+                .ignore(ProcessEvent.PROCESS_STOPPED)
                 .ignore(ProcessEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 
         return new StateMachine<>(ProcessState.WAITING_FOR_CONFIGURATION, config);

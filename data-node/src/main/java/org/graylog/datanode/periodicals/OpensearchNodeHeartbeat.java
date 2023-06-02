@@ -26,6 +26,7 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -64,6 +65,7 @@ public class OpensearchNodeHeartbeat extends Periodical {
         LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.processInfo().pid(), e.getMessage());
     }
 
+    @Nonnull
     @Override
     protected Logger getLogger() {
         return LOG;
