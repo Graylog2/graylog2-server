@@ -27,34 +27,20 @@ import { PipelineRulesContext } from '../RuleContext';
 
 jest.mock('hooks/useRuleBuilder');
 
-const _createRule = jest.fn();
-const _updateRule = jest.fn();
-const _fetchValidateRule = jest.fn();
-
 describe('RuleBuilder', () => {
   it('should save Title and Description', () => {
     const createRule = jest.fn();
-    const fetchValidateRule = jest.fn();
     const title = 'title';
     const description = 'description';
+    const rule_builder = { actions: [], conditions: [] };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: null,
       createRule,
-      fetchValidateRule,
     } as any);
 
     const { getByLabelText, getByRole } = renderWithDataRouter((
-      <PipelineRulesContext.Provider value={{
-        description: '',
-        handleDescription: () => {},
-        ruleSource: '',
-        handleSavePipelineRule: () => {},
-        ruleSourceRef: {},
-        usedInPipelines: [],
-        onAceLoaded: () => {},
-        onChangeSource: () => {},
-      }}>
+      <PipelineRulesContext.Provider value={{}}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
@@ -66,10 +52,60 @@ describe('RuleBuilder', () => {
     const createRuleButton = getByRole('button', { name: 'Create rule' });
     userEvent.click(createRuleButton);
 
-    expect(1).toBe(1);
-    // expect(createRule).toHaveBeenCalledWith({
-    //   title,
-    //   description,
-    // });
+    expect(createRule).toHaveBeenCalledWith({
+      title,
+      description,
+      rule_builder,
+    });
+  });
+
+  it('should update Title and Description', () => {
+    const updateRule = jest.fn();
+    const title = 'title';
+    const description = 'description';
+    const rule_builder = { actions: [], conditions: [] };
+
+    asMock(useRuleBuilder).mockReturnValue({
+      rule: { title: '', description: '', rule_builder },
+      updateRule,
+    } as any);
+
+    const { getByLabelText, getByRole } = renderWithDataRouter((
+      <PipelineRulesContext.Provider value={{}}>
+        <RuleBuilder />
+      </PipelineRulesContext.Provider>
+    ));
+    const titleInput = getByLabelText('Title');
+    const descriptionInput = getByLabelText('Description');
+
+    userEvent.paste(titleInput, title);
+    userEvent.paste(descriptionInput, description);
+    const updateRuleButton = getByRole('button', { name: 'Update rule' });
+    userEvent.click(updateRuleButton);
+
+    expect(updateRule).toHaveBeenCalledWith({
+      title,
+      description,
+      rule_builder,
+    });
+  });
+
+  it('should be able to convert Rule Builder to Source Code', () => {
+    asMock(useRuleBuilder).mockReturnValue({} as any);
+
+    const { getByRole } = renderWithDataRouter((
+      <PipelineRulesContext.Provider value={{}}>
+        <RuleBuilder />
+      </PipelineRulesContext.Provider>
+    ));
+
+    const convertButton = getByRole('button', { name: 'Convert to Source Code' });
+    userEvent.click(convertButton);
+
+    const createRuleFromCodeButton = getByRole('button', { name: 'Create new Rule from Code', hidden: true });
+    const copyCloseButton = getByRole('button', { name: 'Copy & Close', hidden: true });
+
+    expect(createRuleFromCodeButton).toBeInTheDocument();
+    expect(copyCloseButton).toBeInTheDocument();
   });
 });

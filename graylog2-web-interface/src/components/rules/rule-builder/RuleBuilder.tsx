@@ -318,7 +318,7 @@ const RuleBuilder = () => {
   };
 
   return (
-    <form onSubmit={(e) => handleSave(e, true)}>
+    <>
       <Row className="content">
         <Col md={12}>
           <RuleBuilderForm rule={rule}
@@ -350,7 +350,7 @@ const RuleBuilder = () => {
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-          <SortableList onMoveItem={(newList) => handleMoveItem('actions', newList)}
+          <SortableList onMoveItem={(newList: any) => handleMoveItem('actions', newList)}
                         items={rule.rule_builder.actions.map((item, index) => ({
                           ...item,
                           title: (<RuleBuilderBlock key={index} // eslint-disable-line react/no-array-index-key
@@ -391,14 +391,16 @@ const RuleBuilder = () => {
           <RuleSimulation rule={rule} />
         </Col>
         <ActionsCol md={12}>
-          <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
-                      submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
-                      centerCol={initialRule && (
-                        <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
-                          Update rule
-                        </Button>
-                      )}
-                      onCancel={handleCancel} />
+          <form onSubmit={(e) => handleSave(e, true)}>
+            <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
+                        submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
+                        centerCol={initialRule && (
+                          <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
+                            Update rule
+                          </Button>
+                        )}
+                        onCancel={handleCancel} />
+          </form>
         </ActionsCol>
       </Row>
       {blockToDelete && (
@@ -417,7 +419,7 @@ const RuleBuilder = () => {
                                   onHide={() => setRuleSourceCodeToShow(null)}
                                   rule={ruleSourceCodeToShow} />
       )}
-    </form>
+    </>
   );
 };
 
