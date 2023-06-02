@@ -80,22 +80,26 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         var previousMigration = Optional.ofNullable(configService.get(V20191219090834_AddSourcesPage.MigrationCompleted.class));
 
         var previousInstallation = previousMigration.flatMap(this::previousInstallation);
+        var notPreviouslyInstalled = previousInstallation.isEmpty();
 
-        try {
-            final ContentPack contentPack = readContentPack();
+        final ContentPack contentPack = readContentPack();
 
-            var contentPackShouldBeUninstalled = previousInstallation
-                    .filter(this::userHasNotModifiedSourcesPage);
+        var contentPackShouldBeUninstalled = previousInstallation
+                .filter(this::userHasNotModifiedSourcesPage);
+        var notLocallyModified = contentPackShouldBeUninstalled.isPresent();
 
-            var pack = insertContentPack(contentPack)
-                    .orElseThrow(() -> {
-                        configService.write(MigrationCompleted.create(contentPack.id().toString()));
-                        return new ContentPackException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!");
-                    });
-            contentPackShouldBeUninstalled.ifPresentOrElse(installation -> {
-                uninstallContentPack(installation);
-                installContentPack(pack);
-            }, () -> notificationService.publishIfFirst(notificationService.buildNow()
+        var pack = insertContentPack(contentPack)
+                .orElseThrow(() -> {
+                    configService.write(MigrationCompleted.create(contentPack.id().toString()));
+                    return new ContentPackException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!");
+                });
+
+        contentPackShouldBeUninstalled.ifPresent(this::uninstallContentPack);
+
+        if (notPreviouslyInstalled || notLocallyModified) {
+            installContentPack(pack);
+        } else {
+            notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addDetail("title", "Updating Sources Dashboard")
@@ -105,12 +109,10 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
                             If you want to use the new version of the dashboard, you can go to "System" -> "Content Packs" -> "Sources Page Dashboard" and install version 2.
                             In addition, you can either keep your current "Sources" dashboard (having two "Sources" dashboards) or uninstall version 1 of the content pack to remove it.
-                            """)));
-
-            configService.write(MigrationCompleted.create(pack.id().toString()));
-        } catch (Exception e) {
-            throw new RuntimeException("Could not install Source Page Content Pack.", e);
+                            """));
         }
+
+        configService.write(MigrationCompleted.create(pack.id().toString()));
     }
 
 
@@ -152,10 +154,13 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                 .ifPresent(contentPack -> contentPackService.uninstallContentPack(contentPack, contentPackInstallation));
     }
 
-    private ContentPack readContentPack() throws IOException {
-        final URL contentPackURL = V20230601104500_AddSourcesPageV2.class.getResource("V20230601104500_AddSourcesPage_V2_Content_Pack.json");
-        return this.objectMapper.readValue(contentPackURL, ContentPack.class);
-
+    private ContentPack readContentPack() {
+        try {
+            final URL contentPackURL = V20230601104500_AddSourcesPageV2.class.getResource("V20230601104500_AddSourcesPage_V2_Content_Pack.json");
+            return this.objectMapper.readValue(contentPackURL, ContentPack.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read content pack source in migration: ", e);
+        }
     }
 
     @JsonAutoDetect
