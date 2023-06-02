@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,11 +30,17 @@ import static org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder.FIEL
 @AutoValue
 public abstract class RuleBuilderStep {
 
+    public static final String FIELD_ID = "id";
     public static final String FIELD_FUNCTION = "function";
     public static final String FIELD_PARAMETERS = "params";
     public static final String FIELD_OUTPUT = "outputvariable";
     public static final String FIELD_NEGATE = "negate";
     public static final String FIELD_TITLE = "title";
+
+    @JsonProperty(FIELD_ID)
+    @Nullable
+    @ObjectId
+    public abstract String id();
 
     @JsonProperty(FIELD_FUNCTION)
     public abstract String function();
@@ -58,13 +65,15 @@ public abstract class RuleBuilderStep {
     public abstract List<String> errors();
 
     @JsonCreator
-    public static RuleBuilderStep create(@JsonProperty(FIELD_FUNCTION) String function,
+    public static RuleBuilderStep create(@JsonProperty(FIELD_ID) @Nullable String id,
+                                         @JsonProperty(FIELD_FUNCTION) String function,
                                          @JsonProperty(FIELD_PARAMETERS) @Nullable Map<String, Object> parameters,
                                          @JsonProperty(FIELD_OUTPUT) @Nullable String outputvariable,
                                          @JsonProperty(FIELD_NEGATE) @Nullable boolean negate,
                                          @JsonProperty(FIELD_TITLE) @Nullable String title,
                                          @JsonProperty(FIELD_ERRORS) @Nullable List<String> errors) {
         return builder()
+                .id(id)
                 .function(function)
                 .parameters(parameters)
                 .outputvariable(outputvariable)
@@ -83,6 +92,8 @@ public abstract class RuleBuilderStep {
 
     @AutoValue.Builder
     public abstract static class Builder {
+
+        public abstract Builder id(String id);
 
         public abstract Builder function(String function);
 
