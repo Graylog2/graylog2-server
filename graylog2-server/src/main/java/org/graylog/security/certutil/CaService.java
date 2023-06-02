@@ -24,6 +24,9 @@ import org.graylog.security.certutil.ca.CACreator;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
+import org.graylog.security.certutil.keystore.storage.SmartKeystoreStorage;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
@@ -56,6 +59,8 @@ public class CaService {
     private static final Logger LOG = LoggerFactory.getLogger(CaService.class);
     public static int DEFAULT_VALIDITY = 10 * 365;
     private final KeystoreFileStorage keystoreFileStorage;
+    private final SmartKeystoreStorage keystoreStorage;
+    private final KeystoreMongoLocation keystoreLocation;
     private final NodeId nodeId;
     private final CACreator caCreator;
     private final CaConfiguration configuration;
@@ -64,47 +69,43 @@ public class CaService {
     @Inject
     public CaService(final Configuration configuration,
                      final KeystoreFileStorage keystoreFileStorage,
+                     final SmartKeystoreStorage keystoreStorage,
                      final NodeId nodeId,
                      final CACreator caCreator,
                      final ClusterConfigService clusterConfigService) {
         this.keystoreFileStorage = keystoreFileStorage;
+        this.keystoreStorage = keystoreStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
         this.configuration = configuration;
         this.clusterConfigService = clusterConfigService;
+        this.keystoreLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
     }
 
     private boolean configuredCaExists() {
         return configuration.getCaKeystoreFile() != null && Files.exists(configuration.getCaKeystoreFile());
     }
 
-    public CA get() {
+    public CA get() throws KeyStoreStorageException {
         if(configuredCaExists()) {
             return new CA("local CA", CAType.LOCAL);
         } else {
-            var config = clusterConfigService.get(CaClusterConfig.class);
-            return config != null ? new CA(config.id(), config.type()) : null;
+            var keystore = keystoreStorage.readKeyStore(keystoreLocation, null);
+            return keystore.map(c -> new CA(nodeId.getNodeId(), CAType.GENERATED)).orElse(null);
         }
     }
 
-    public void create(final Integer daysValid, char[] password) throws CACreationException {
+    public void create(final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {
         final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
         KeyStore keyStore = caCreator.createCA(null, certificateValidity);
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            keyStore.store(baos, password);
-            final String keystoreDataAsString = java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
-            var config = new CaClusterConfig("generated CA", CAType.GENERATED, keystoreDataAsString);
-            clusterConfigService.write(config);
-        } catch (Exception ex) {
-            throw new CACreationException("Failed to save keystore cluster config", ex);
-        }
+        keystoreStorage.writeKeyStore(keystoreLocation, keyStore, null, password);
     }
 
     public void upload(String pass, FormDataMultiPart params) throws CACreationException {
         final var password = pass == null ? null : pass.toCharArray();
         // TODO: if the upload consists of more than one file, handle accordingly
         // or: decide that it's always only one file containing all certificates
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+        try {
             List<FormDataBodyPart> parts = params.getFields("file");
             KeyStore keyStore = KeyStore.getInstance(PKCS12);
             for(BodyPart part : parts) {
@@ -121,12 +122,9 @@ public class CaService {
                     keyStore.load(bais, password);
                 }
             }
-            keyStore.store(baos, password);
-            final String keystoreDataAsString = java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
-            var config = new CaClusterConfig("generated CA", CAType.GENERATED, keystoreDataAsString);
-            clusterConfigService.write(config);
-        } catch (IOException | KeyStoreException | NoSuchAlgorithmException |
-                 CertificateException ex) {
+            keystoreStorage.writeKeyStore(keystoreLocation, keyStore, password, null);
+       } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
+                KeyStoreException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
             throw new CACreationException("Could not write CA: " + ex.getMessage(), ex);
         }
@@ -138,20 +136,9 @@ public class CaService {
 
     public Optional<KeyStore> loadKeyStore(char[] password) throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
         if(configuredCaExists()) {
-            return Optional.of(keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), null).orElseThrow());
+            return Optional.of(keystoreFileStorage.readKeyStore(configuration.getCaKeystoreFile(), password).orElseThrow());
         } else {
-            var config = clusterConfigService.get(CaClusterConfig.class);
-            if (config != null) {
-                try (ByteArrayInputStream bais = new ByteArrayInputStream(java.util.Base64.getDecoder().decode(config.keystore()))) {
-                    KeyStore keyStore = KeyStore.getInstance(PKCS12);
-                    keyStore.load(bais, password);
-                    return Optional.of(keyStore);
-                } catch (Exception ex) {
-                    throw new KeyStoreStorageException("Failed to load keystore cluster config", ex);
-                }
-            } else {
-                return Optional.empty();
-            }
+            return keystoreStorage.readKeyStore(keystoreLocation, null);
         }
     }
 }

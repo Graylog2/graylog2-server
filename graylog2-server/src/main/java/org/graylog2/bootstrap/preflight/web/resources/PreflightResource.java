@@ -21,6 +21,7 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
@@ -71,7 +72,7 @@ public class PreflightResource {
 
     @GET
     @Path("/ca")
-    public CA get() {
+    public CA get() throws KeyStoreStorageException {
         return caService.get();
     }
 
@@ -80,7 +81,7 @@ public class PreflightResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     @NoAuditEvent("No Audit Event needed")
-    public void createCA() throws CACreationException {
+    public void createCA() throws CACreationException, KeyStoreStorageException {
         // TODO: get validity from preflight UI
         caService.create(CaService.DEFAULT_VALIDITY, null);
     }
