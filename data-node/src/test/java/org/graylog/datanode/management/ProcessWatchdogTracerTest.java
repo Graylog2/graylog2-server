@@ -27,7 +27,7 @@ class ProcessWatchdogTracerTest {
     @Test
     void testLifecycle() {
         final TestableProcess process = new TestableProcess();
-        final ProcessWatchdog watchdog = new ProcessWatchdog(process);
+        final ProcessWatchdog watchdog = new ProcessWatchdog(process, 3);
         process.setStateMachineTracer(watchdog);
         process.restart();
 

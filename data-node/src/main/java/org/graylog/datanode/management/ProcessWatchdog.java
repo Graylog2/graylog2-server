@@ -34,11 +34,12 @@ public class ProcessWatchdog implements StateMachineTracer {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessWatchdog.class);
 
     private boolean active;
-    private final FailuresCounter restartCounter = FailuresCounter.zeroBased(3);
+    private final FailuresCounter restartCounter;
     private final ManagableProcess<?> process;
 
-    public ProcessWatchdog(ManagableProcess<?> process) {
+    public ProcessWatchdog(ManagableProcess<?> process, int restartAttemptsCount) {
         this.process = process;
+        this.restartCounter = FailuresCounter.zeroBased(restartAttemptsCount);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class ProcessWatchdog implements StateMachineTracer {
         if (this.active) {
             if (!restartCounter.failedTooManyTimes()) {
                 try {
-                    LOG.info("Detected terminated process, restarting. Attempt #{}", restartCounter.getCounter() + 1);
+                    LOG.info("Detected terminated process, restarting. Attempt #{}", restartCounter.failuresCount() + 1);
                     process.restart();
                 } catch (IOException e) {
                     LOG.warn("Failed to restart process", e);

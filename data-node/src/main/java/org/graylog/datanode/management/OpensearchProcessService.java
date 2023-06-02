@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
+    private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
 
     @Inject
@@ -36,7 +37,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     private OpensearchProcess createOpensearchProcess(OpensearchConfiguration config, int logsSize) {
         final OpensearchProcessImpl process = new OpensearchProcessImpl(config, logsSize);
-        final ProcessWatchdog watchdog = new ProcessWatchdog(process);
+        final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.setStateMachineTracer(watchdog);
         return process;
     }

@@ -48,7 +48,7 @@ public class FailuresCounter {
         this.counter = initialValue;
     }
 
-    public int getCounter() {
+    public int failuresCount() {
         return counter;
     }
 }
