@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
@@ -27,8 +28,12 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Valid
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 
 import java.util.Map;
+import java.util.Objects;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class ValidNewMessageField implements Validator {
+    public static final String ERROR_MSG = "New field name: %s must not contain spaces";
     private final Map<String, RuleFragment> actions;
 
     @Inject
@@ -41,17 +46,37 @@ public class ValidNewMessageField implements Validator {
         final RuleFragment ruleFragment = actions.get(step.function());
         FunctionDescriptor<?> functionDescriptor = ruleFragment.descriptor();
 
-        if (functionDescriptor.name().equals(SetField.NAME)) {
-            Object value = step.parameters().get("field");
-            return validate((String) value);
+        String functionName = functionDescriptor.name();
+        if (functionName.equals(SetField.NAME)) {
+            return validateSetField(step.parameters());
         }
+
+        if (functionName.equals(SetFields.NAME)) {
+            return validateSetFields(step.parameters());
+        }
+
         return new ValidationResult(false, "");
     }
 
     //Todo: GIM conform
-    private ValidationResult validate(String value) {
-        if (StringUtils.containsWhitespace(value)) {
-            return new ValidationResult(true, "New field names must be underscore seperated. Blank spaces are not allowed!");
+    private ValidationResult validateSetField(Map<String, Object> parameters) {
+        String value = (String) parameters.get("field");
+
+        if (Objects.isNull(value) || StringUtils.containsWhitespace(value)) {
+            return new ValidationResult(true, f(ERROR_MSG, value));
+        }
+
+        return new ValidationResult(false, "");
+    }
+
+    private ValidationResult validateSetFields(Map<String, Object> parameters) {
+        Map<String, Object> values = (Map<String, Object>) parameters.get("fields");
+
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            String key = entry.getKey();
+            if (StringUtils.containsWhitespace(key)) {
+               return new ValidationResult(true, f(ERROR_MSG, key));
+            }
         }
 
         return new ValidationResult(false, "");

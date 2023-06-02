@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.acti
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
 class ValidNewMessageFieldTest {
 
     public static final String FIELD_PARAM = "field";
+    public static final String FIELDS_PARAM = "fields";
     public static final String WITH_SPACES = "with spaces";
     @Mock
     RuleBuilderRegistry ruleBuilderRegistry;
@@ -62,6 +64,13 @@ class ValidNewMessageFieldTest {
         ), Boolean.class);
         actions.put(SetField.NAME, RuleFragment.builder()
                 .descriptor(setFieldFunction.descriptor())
+                .build());
+
+        Function<Boolean> setFieldsFunction = FunctionUtil.testFunction(SetFields.NAME, ImmutableList.of(
+                string(FIELDS_PARAM).optional().build()
+        ), Boolean.class);
+        actions.put(SetFields.NAME, RuleFragment.builder()
+                .descriptor(setFieldsFunction.descriptor())
                 .build());
 
         when(ruleBuilderRegistry.actions()).thenReturn(actions);
@@ -108,6 +117,41 @@ class ValidNewMessageFieldTest {
                 .build();
 
         ValidationResult result = classUnderTest.validate(randomOtherFunction);
+
+        assertThat(result.failed()).isFalse();
+    }
+
+    @Test
+    void validateSetFieldsFunctionFailsWithSpaces() {
+        HashMap<String, Object> parameters = new HashMap<>();
+        HashMap<String, Object> fields = new HashMap<>();
+        fields.put("invalid field", "message");
+        parameters.put(FIELDS_PARAM, fields);
+
+        RuleBuilderStep validStep = RuleBuilderStep.builder()
+                .parameters(parameters)
+                .function(SetFields.NAME)
+                .build();
+
+        ValidationResult result = classUnderTest.validate(validStep);
+
+        assertThat(result.failed()).isTrue();
+    }
+    @Test
+    void validateSetFieldsFunction() {
+        HashMap<String, Object> parameters = new HashMap<>();
+        HashMap<String, Object> fields = new HashMap<>();
+        fields.put("valid_field", "message");
+        fields.put("valid-field", "message");
+        fields.put("valid.field", "message");
+        parameters.put(FIELDS_PARAM, fields);
+
+        RuleBuilderStep validStep = RuleBuilderStep.builder()
+                .parameters(parameters)
+                .function(SetFields.NAME)
+                .build();
+
+        ValidationResult result = classUnderTest.validate(validStep);
 
         assertThat(result.failed()).isFalse();
     }
