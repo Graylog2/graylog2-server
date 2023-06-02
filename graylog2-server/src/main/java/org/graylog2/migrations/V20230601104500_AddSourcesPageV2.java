@@ -19,6 +19,8 @@ import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
     private final MongoCollection<Document> views;
     private final MongoCollection<Document> searches;
+    private final NotificationService notificationService;
 
     @Inject
     public V20230601104500_AddSourcesPageV2(ContentPackService contentPackService,
@@ -50,7 +53,8 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                                             ClusterConfigService configService,
                                             ContentPackPersistenceService contentPackPersistenceService,
                                             ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
-                                            MongoConnection mongoConnection) {
+                                            MongoConnection mongoConnection,
+                                            NotificationService notificationService) {
         this.contentPackService = contentPackService;
         this.objectMapper = objectMapper;
         this.configService = configService;
@@ -58,6 +62,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.views = mongoConnection.getMongoDatabase().getCollection("views");
         this.searches = mongoConnection.getMongoDatabase().getCollection("searches");
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -79,17 +84,35 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         try {
             final ContentPack contentPack = readContentPack();
 
-            previousInstallation
-                    .filter(this::userHasNotModifiedSourcesPage)
-                    .ifPresent(this::uninstallContentPack);
+            var contentPackShouldBeUninstalled = previousInstallation
+                    .filter(this::userHasNotModifiedSourcesPage);
 
-            var pack = installContentPack(contentPack);
+            var pack = insertContentPack(contentPack)
+                    .orElseThrow(() -> {
+                        configService.write(MigrationCompleted.create(contentPack.id().toString()));
+                        return new ContentPackException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!");
+                    });
+            contentPackShouldBeUninstalled.ifPresentOrElse(installation -> {
+                uninstallContentPack(installation);
+                installContentPack(pack);
+            }, () -> notificationService.publishIfFirst(notificationService.buildNow()
+                    .addType(Notification.Type.GENERIC)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail("title", "Updating Sources Dashboard")
+                    .addDetail("description", """
+                            While updating the Sources Dashboard, it was detected that the previous version was modified locally. To save these modifications from getting lost,
+                            a new version of the content pack containing the Sources Dashboard was uploaded, but not installed.
+
+                            If you want to use the new version of the dashboard, you can go to "System" -> "Content Packs" -> "Sources Page Dashboard" and install version 2.
+                            In addition, you can either keep your current "Sources" dashboard (having two "Sources" dashboards) or uninstall version 1 of the content pack to remove it.
+                            """)));
 
             configService.write(MigrationCompleted.create(pack.id().toString()));
         } catch (Exception e) {
             throw new RuntimeException("Could not install Source Page Content Pack.", e);
         }
     }
+
 
     private Optional<ContentPackInstallation> previousInstallation(V20191219090834_AddSourcesPage.MigrationCompleted previousMigration) {
         return Optional.ofNullable(previousMigration.contentPackId())
@@ -117,13 +140,11 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
     }
 
     private ContentPackInstallation installContentPack(ContentPack contentPack) {
-        final ContentPack pack = this.contentPackPersistenceService.insert(contentPack)
-                .orElseThrow(() -> {
-                    configService.write(MigrationCompleted.create(contentPack.id().toString()));
-                    return new ContentPackException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!");
-                });
+        return contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Add Sources Page V2", "admin");
+    }
 
-        return contentPackService.installContentPack(pack, Collections.emptyMap(), "Add Sources Page V2", "admin");
+    private Optional<ContentPack> insertContentPack(ContentPack contentPack) {
+        return this.contentPackPersistenceService.insert(contentPack);
     }
 
     private void uninstallContentPack(ContentPackInstallation contentPackInstallation) {
