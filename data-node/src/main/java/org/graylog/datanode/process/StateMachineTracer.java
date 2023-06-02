@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.exceptions;
+package org.graylog.datanode.process;
 
-public class KeyStoreStorageException extends Exception {
+import com.github.oxo42.stateless4j.delegates.Trace;
 
-    public KeyStoreStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public KeyStoreStorageException(String message) {
-        super(message);
-    }
+/**
+ * The tracer allows to observe triggered event (before) and transitions (after) of the {@link ProcessStateMachine}
+ */
+public interface StateMachineTracer extends Trace<ProcessState, ProcessEvent> {
 }

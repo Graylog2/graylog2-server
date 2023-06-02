@@ -117,7 +117,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                         );
 
                         final KeystoreMongoLocation location = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
-                        keystoreStorage.writeKeyStore(location, nodeKeystore, configuration.getDatanodeHttpCertificatePassword().toCharArray());
+                        keystoreStorage.writeKeyStore(location, nodeKeystore, configuration.getDatanodeHttpCertificatePassword().toCharArray(), null);
 
                         //should be in one transaction, but we miss transactions...
                         nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
