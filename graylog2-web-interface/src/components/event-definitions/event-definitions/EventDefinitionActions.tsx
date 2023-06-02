@@ -164,7 +164,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     }
   };
 
-  const isScheduled = eventDefinition?.scheduler?.is_scheduled;
+  const isEnabled = eventDefinition?.state === 'ENABLED';
 
   return (
     <>
@@ -189,8 +189,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             <>
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
               <MenuItem divider />
-              <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-                {isScheduled ? 'Disable' : 'Enable'}
+              <MenuItem onClick={() => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+                {isEnabled ? 'Disable' : 'Enable'}
               </MenuItem>
 
               {showActions() && (
