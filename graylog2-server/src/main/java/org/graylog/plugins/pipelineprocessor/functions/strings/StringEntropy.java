@@ -29,7 +29,7 @@ public class StringEntropy extends AbstractFunction<Double> {
     private final ParameterDescriptor<String, String> valueParam;
 
     public StringEntropy() {
-        valueParam = ParameterDescriptor.string("value").description("The string to compute Shannon Entropy on.").build();
+        valueParam = ParameterDescriptor.string("value").description("The string to compute Shannon Entropy for.").build();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class StringEntropy extends AbstractFunction<Double> {
                 .name(NAME)
                 .returnType(Double.class)
                 .params(of(valueParam))
-                .description("Compute Shannon Entropy on the characters within a string.")
+                .description("Compute Shannon Entropy for the characters within a string.")
                 .build();
     }
 }
