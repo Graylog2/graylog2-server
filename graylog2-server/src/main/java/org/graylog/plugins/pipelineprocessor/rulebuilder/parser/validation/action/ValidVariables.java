@@ -57,7 +57,7 @@ public class ValidVariables implements Validator {
             Class<?> variableType = getVariableType(value);
 
             if (!parameterDescriptor.optional() && value == null) {
-                return new ValidationResult(true, f("Function %s missing parameter %s", functionDescriptor.name(), parameterName));
+                return new ValidationResult(true, f("Missing parameter %s", parameterName));
             }
 
             //$ means it is stored in another variable and we need to fetch and verify that type
@@ -65,7 +65,7 @@ public class ValidVariables implements Validator {
                 String substring = s.substring(1);
                 Class<?> passedVariableType = variables.get(substring);
                 if (Objects.isNull(passedVariableType)) {
-                    return new ValidationResult(true, f("Function %s missing passed variable %s", functionDescriptor.name(), value));
+                    return new ValidationResult(true, f("Could not find passed variable %s", value));
                 }
                 variableType = passedVariableType;
             }
@@ -73,8 +73,8 @@ public class ValidVariables implements Validator {
             //Check if variable type matches function expectation
             Class<?> paramType = parameterDescriptor.type();
             if (value != null && paramType != Object.class && variableType != paramType) {
-                String errorMsg = "Function %s found wrong parameter type %s for parameter %s. Required type %s";
-                return new ValidationResult(true, f(errorMsg, functionDescriptor.name(), variableType, parameterName, paramType));
+                String errorMsg = "Found a wrong parameter type for parameter %s";
+                return new ValidationResult(true, f(errorMsg, parameterName));
             }
         }
 
@@ -83,7 +83,7 @@ public class ValidVariables implements Validator {
         if (StringUtils.isNotBlank(outputvariable)) {
 
             if (functionDescriptor.returnType() == Void.class) {
-                return new ValidationResult(true, f("Function %s is of return typ void. No out put variable allowed", functionDescriptor.name()));
+                return new ValidationResult(true, f("Return typ is void. No out put variable allowed", functionDescriptor.name()));
             }
 
             storeVariable(outputvariable, functionDescriptor.returnType());

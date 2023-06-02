@@ -79,7 +79,7 @@ class ValidVariablesTest {
         ValidationResult result = classUnderTest.validate(stepWithValidNegation);
 
         assertThat(result.failed()).isTrue();
-        assertThat(result.failureReason()).contains("missing parameter");
+        assertThat(result.failureReason()).isEqualTo("Missing parameter " + INT_PARAM);
     }
 
     @Test
@@ -90,7 +90,7 @@ class ValidVariablesTest {
         ValidationResult result = classUnderTest.validate(stepWithValidNegation);
 
         assertThat(result.failed()).isTrue();
-        assertThat(result.failureReason()).contains("missing passed variable");
+        assertThat(result.failureReason()).isEqualTo("Could not find passed variable $fromOutput");
     }
 
     @Test
@@ -103,7 +103,7 @@ class ValidVariablesTest {
         ValidationResult result = classUnderTest.validate(stepWithValidNegation);
 
         assertThat(result.failed()).isTrue();
-        assertThat(result.failureReason()).contains("is of return typ void. No out put variable allowed");
+        assertThat(result.failureReason()).isEqualTo("Return typ is void. No out put variable allowed");
     }
 
     @Test
@@ -117,7 +117,7 @@ class ValidVariablesTest {
         ValidationResult result = classUnderTest.validate(stepWithValidNegation);
 
         assertThat(result.failed()).isTrue();
-        assertThat(result.failureReason()).contains("found wrong parameter type");
+        assertThat(result.failureReason()).isEqualTo("Found a wrong parameter type for parameter " + INT_PARAM);
     }
 
     @Test
@@ -142,7 +142,7 @@ class ValidVariablesTest {
         ValidationResult result = classUnderTest.validate(stepWithWrongTypPassedOutput);
 
         assertThat(result.failed()).isTrue();
-        assertThat(result.failureReason()).contains("found wrong parameter type");
+        assertThat(result.failureReason()).contains("Found a wrong parameter type for parameter " + INT_PARAM);
     }
 
     @Test
