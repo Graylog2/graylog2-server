@@ -18,6 +18,8 @@ package org.graylog.datanode.management;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,25 +29,27 @@ import javax.inject.Singleton;
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
+
     private final OpensearchProcess process;
-    private final ProcessWatchdog processWatchdog;
 
     @Inject
     public OpensearchProcessService(OpensearchConfiguration config, @Named(value = "process_logs_buffer_size") int logsSize) {
-        this.process = new OpensearchProcessImpl(config, logsSize);
-        this.processWatchdog = new ProcessWatchdog(process);
+        final OpensearchProcessImpl opensearchInstance = new OpensearchProcessImpl(config, logsSize);
+        final ProcessWatchdog watchdog = new ProcessWatchdog(opensearchInstance);
+        opensearchInstance.setStateMachineTracer(watchdog);
+
+        this.process = opensearchInstance;
     }
 
     @Override
     protected void startUp() {
         this.process.startWithConfig(new OpensearchDynamicConfiguration());
-       this.processWatchdog.start();
     }
 
 
     @Override
     protected void shutDown() {
-        this.processWatchdog.stop();
         this.process.stop();
     }
 

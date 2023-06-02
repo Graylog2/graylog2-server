@@ -47,4 +47,8 @@ public class FailuresCounter {
     public synchronized void resetFailuresCounter() {
         this.counter = initialValue;
     }
+
+    public int getCounter() {
+        return counter;
+    }
 }

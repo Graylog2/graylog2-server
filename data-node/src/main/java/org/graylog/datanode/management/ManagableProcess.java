@@ -18,6 +18,7 @@ package org.graylog.datanode.management;
 
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.process.StateMachineTracer;
 
 import java.io.IOException;
 
@@ -30,6 +31,8 @@ public interface ManagableProcess<T> {
     void stop();
 
     void onEvent(ProcessEvent event);
+
+    void setStateMachineTracer(StateMachineTracer stateMachineTracer);
 
     boolean isInState(ProcessState state);
 }

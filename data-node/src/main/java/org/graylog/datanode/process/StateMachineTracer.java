@@ -16,10 +16,10 @@
  */
 package org.graylog.datanode.process;
 
-public enum ProcessEvent {
-    PROCESS_STARTED,
-    HEALTH_CHECK_OK,
-    HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED, // user-triggered action
-    PROCESS_TERMINATED // failure from outside, not requested
+import com.github.oxo42.stateless4j.delegates.Trace;
+
+/**
+ * The tracer allows to observe triggered event (before) and transitions (after) of the {@link ProcessStateMachine}
+ */
+public interface StateMachineTracer extends Trace<ProcessState, ProcessEvent> {
 }
