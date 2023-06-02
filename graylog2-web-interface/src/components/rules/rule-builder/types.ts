@@ -38,6 +38,7 @@ export type RuleBlockField = {
 
 export interface RuleBlock extends ObjectWithErrors {
   function: string,
+  id: string,
   params: RuleBlockField,
   outputvariable?: string,
   negate?: boolean,
