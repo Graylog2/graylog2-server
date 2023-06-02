@@ -93,7 +93,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
-                var csr = csrGenerator.generateCSR("TODO:changeStorageToMongoDb".toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
+                var csr = csrGenerator.generateCSR(null, node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
                 csrStorage.writeCsr(csr, nodeId.getNodeId());
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
@@ -111,7 +111,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                         KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
                                 x509Certificate.get(),
                                 privateKeyEncryptedStorage,
-                                "TODO:changeStorageToMongoDb".toCharArray(),
+                                null,
                                 null,
                                 CertConstants.DATANODE_KEY_ALIAS
                         );
