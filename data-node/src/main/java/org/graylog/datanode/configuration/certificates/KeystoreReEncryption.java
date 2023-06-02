@@ -50,7 +50,7 @@ public class KeystoreReEncryption {
                                   final KeystoreLocation targetLocation
     ) throws KeyStoreStorageException {
         final char[] oneTimePassword = RandomStringUtils.randomAlphabetic(256).toCharArray();
-        reEncypt(originalLocation, originalPassword, targetLocation, originalPassword);
+        reEncypt(originalLocation, originalPassword, targetLocation, oneTimePassword);
         return oneTimePassword;
     }
 
