@@ -110,7 +110,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
         var pack = insertContentPack(contentPack)
                 .orElseThrow(() -> {
-                    configService.write(MigrationCompleted.create(contentPack.id().toString()));
+                    configService.write(MigrationCompleted.create(contentPack.id().toString(), false, false));
                     return new ContentPackException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!");
                 });
 
@@ -118,6 +118,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
         if (notPreviouslyInstalled || notLocallyModified) {
             var newInstallation = installContentPack(pack);
+            assert (newInstallation != null);
             previousDashboard.ifPresent(dashboard -> fixupNewDashboardId(dashboard, newInstallation));
         } else {
             notificationService.publishIfFirst(notificationService.buildNow()
@@ -133,7 +134,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                             """));
         }
 
-        configService.write(MigrationCompleted.create(pack.id().toString()));
+        configService.write(MigrationCompleted.create(pack.id().toString(), notPreviouslyInstalled || notLocallyModified, contentPackShouldBeUninstalled.isPresent()));
     }
 
     private void fixupNewDashboardId(Document previousDashboard, ContentPackInstallation newInstallation) {
@@ -206,12 +207,18 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
     @AutoValue
     @WithBeanGetter
     public static abstract class MigrationCompleted {
-        @JsonProperty("content_pack_id")
+        @JsonProperty
         public abstract String contentPackId();
 
+        @JsonProperty
+        public abstract boolean installedContentPack();
+
+        @JsonProperty
+        public abstract boolean uninstalledPreviousRevision();
+
         @JsonCreator
-        public static MigrationCompleted create(@JsonProperty("content_pack_id") final String contentPackId) {
-            return new AutoValue_V20230601104500_AddSourcesPageV2_MigrationCompleted(contentPackId);
+        public static MigrationCompleted create(@JsonProperty("content_pack_id") final String contentPackId, boolean installedContentPack, boolean uninstalledPreviousRevision) {
+            return new AutoValue_V20230601104500_AddSourcesPageV2_MigrationCompleted(contentPackId, installedContentPack, uninstalledPreviousRevision);
         }
     }
 }
