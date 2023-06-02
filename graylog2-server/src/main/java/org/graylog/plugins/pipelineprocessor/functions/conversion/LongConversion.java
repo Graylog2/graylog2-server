@@ -40,7 +40,7 @@ public class LongConversion extends AbstractFunction<Long> {
 
     public LongConversion() {
         valueParam = object(VALUE).description("Value to convert").primary().build();
-        defaultParam = integer(DEFAULT).optional().description("Used when 'value' is null, defaults to 0").build();
+        defaultParam = integer(DEFAULT).optional().allowNegatives(true).description("Used when 'value' is null, defaults to 0").build();
     }
 
     @Override

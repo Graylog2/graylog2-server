@@ -46,6 +46,9 @@ public abstract class ParameterDescriptor<T, R> {
     @JsonProperty
     public abstract boolean primary();
 
+    @JsonProperty
+    public abstract boolean allowNegatives();
+
     @JsonIgnore
     public abstract java.util.function.Function<T, R> transform();
 
@@ -54,7 +57,7 @@ public abstract class ParameterDescriptor<T, R> {
     public abstract String description();
 
     public static <T, R> Builder<T, R> param() {
-        return new AutoValue_ParameterDescriptor.Builder<T, R>().optional(false).primary(false);
+        return new AutoValue_ParameterDescriptor.Builder<T, R>().optional(false).primary(false).allowNegatives(false);
     }
 
     public static Builder<String, String> string(String name) {
@@ -133,6 +136,8 @@ public abstract class ParameterDescriptor<T, R> {
         public abstract Builder<T, R> optional(boolean optional);
 
         public abstract Builder<T, R> primary(boolean primary);
+
+        public abstract Builder<T, R> allowNegatives(boolean allowNegatives);
 
         public Builder<T, R> optional() {
             return optional(true);
