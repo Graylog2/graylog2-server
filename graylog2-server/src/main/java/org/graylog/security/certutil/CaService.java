@@ -64,21 +64,18 @@ public class CaService {
     private final NodeId nodeId;
     private final CACreator caCreator;
     private final CaConfiguration configuration;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public CaService(final Configuration configuration,
                      final KeystoreFileStorage keystoreFileStorage,
                      final SmartKeystoreStorage keystoreStorage,
                      final NodeId nodeId,
-                     final CACreator caCreator,
-                     final ClusterConfigService clusterConfigService) {
+                     final CACreator caCreator) {
         this.keystoreFileStorage = keystoreFileStorage;
         this.keystoreStorage = keystoreStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
         this.configuration = configuration;
-        this.clusterConfigService = clusterConfigService;
         this.keystoreLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
     }
 
