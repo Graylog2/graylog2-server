@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.exceptions;
+package org.graylog.security.certutil.keystore.storage;
 
-public class KeyStoreStorageException extends Exception {
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 
-    public KeyStoreStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface KeystoreContentMover {
 
-    public KeyStoreStorageException(String message) {
-        super(message);
-    }
+    KeyStore moveContents(final KeyStore originalKeyStore,
+                          char[] currentPassword,
+                          final char[] newPassword) throws GeneralSecurityException, IOException;
 }
