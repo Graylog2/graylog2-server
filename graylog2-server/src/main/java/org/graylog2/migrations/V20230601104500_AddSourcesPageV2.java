@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
@@ -45,6 +46,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
     private final MongoCollection<Document> views;
     private final MongoCollection<Document> searches;
+    private final MongoCollection<Document> contentPackInstallations;
     private final NotificationService notificationService;
 
     @Inject
@@ -62,6 +64,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.views = mongoConnection.getMongoDatabase().getCollection("views");
         this.searches = mongoConnection.getMongoDatabase().getCollection("searches");
+        this.contentPackInstallations = mongoConnection.getMongoDatabase().getCollection("content_packs_installations");
         this.notificationService = notificationService;
     }
 
@@ -87,6 +90,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         var contentPackShouldBeUninstalled = previousInstallation
                 .filter(this::userHasNotModifiedSourcesPage);
         var notLocallyModified = contentPackShouldBeUninstalled.isPresent();
+        var previousDashboard = contentPackShouldBeUninstalled.flatMap(this::dashboardFromInstallation);
 
         var pack = insertContentPack(contentPack)
                 .orElseThrow(() -> {
@@ -97,7 +101,8 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         contentPackShouldBeUninstalled.ifPresent(this::uninstallContentPack);
 
         if (notPreviouslyInstalled || notLocallyModified) {
-            installContentPack(pack);
+            var newInstallation = installContentPack(pack);
+            previousDashboard.ifPresent(dashboard -> fixupNewDashboardId(dashboard, newInstallation));
         } else {
             notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(Notification.Type.GENERIC)
@@ -115,6 +120,19 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         configService.write(MigrationCompleted.create(pack.id().toString()));
     }
 
+    private void fixupNewDashboardId(Document previousDashboard, ContentPackInstallation newInstallation) {
+        var newDashboard = dashboardFromInstallation(newInstallation);
+        var previousDashboardId = previousDashboard.getObjectId("_id");
+
+        newDashboard.ifPresent(dashboard -> {
+            var newDashboardId = dashboard.getObjectId("_id");
+            dashboard.append("_id", previousDashboardId);
+            views.deleteOne(Filters.eq("_id", newDashboardId));
+            views.insertOne(dashboard);
+            contentPackInstallations.updateOne(Filters.eq("_id", newInstallation.id()), Updates.set("entities.0.id", previousDashboardId.toHexString()));
+        });
+    }
+
 
     private Optional<ContentPackInstallation> previousInstallation(V20191219090834_AddSourcesPage.MigrationCompleted previousMigration) {
         return Optional.ofNullable(previousMigration.contentPackId())
@@ -126,11 +144,16 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                         .findFirst());
     }
 
-    private boolean userHasNotModifiedSourcesPage(ContentPackInstallation previousInstallation) {
-        var previousDashboard = Optional.ofNullable(previousInstallation.entities())
+    private Optional<Document> dashboardFromInstallation(ContentPackInstallation installation) {
+        return Optional.ofNullable(installation.entities())
                 .flatMap(entities -> entities.stream().findFirst())
                 .map(Identified::id)
-                .flatMap(dashboardId -> Optional.ofNullable(views.find(Filters.eq("_id", new ObjectId(dashboardId.id()))).first()))
+                .map(ModelId::id)
+                .flatMap(dashboardId -> Optional.ofNullable(views.find(Filters.eq("_id", new ObjectId(dashboardId))).first()));
+    }
+
+    private boolean userHasNotModifiedSourcesPage(ContentPackInstallation previousInstallation) {
+        var previousDashboard = dashboardFromInstallation(previousInstallation)
                 .flatMap(dashboard -> Optional.ofNullable(dashboard.getString("search_id")))
                 .flatMap(searchId -> Optional.ofNullable(searches.find(Filters.eq("_id", new ObjectId(searchId))).first()));
 
