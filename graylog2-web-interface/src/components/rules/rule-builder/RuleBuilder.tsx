@@ -17,10 +17,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
+import generateId from 'logic/generateId';
 import useHistory from 'routing/useHistory';
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
-import { FormSubmit, ConfirmDialog } from 'components/common';
+import { ConfirmDialog, FormSubmit, SortableList } from 'components/common';
 
 import Errors from './Errors';
 import RuleBuilderBlock from './RuleBuilderBlock';
@@ -146,6 +147,7 @@ const RuleBuilder = () => {
 
   const addBlock = async (type: BlockType, block: RuleBlock) => {
     let ruleToAdd;
+    const blockId = generateId();
 
     if (type === 'condition') {
       ruleToAdd = {
@@ -153,7 +155,7 @@ const RuleBuilder = () => {
         rule_builder: {
           ...rule.rule_builder,
           conditions: [...rule.rule_builder.conditions,
-            { ...block },
+            { ...block, id: blockId },
           ],
         },
       };
@@ -165,7 +167,7 @@ const RuleBuilder = () => {
         rule_builder: {
           ...rule.rule_builder,
           actions: [...rule.rule_builder.actions,
-            { ...blockToSet },
+            { ...blockToSet, id: blockId },
           ],
         },
       };
@@ -265,6 +267,56 @@ const RuleBuilder = () => {
     return false;
   };
 
+  //   function compareFn(a, b) {
+  // const originalIndex =str.substring(str.indexOf("_") + 1, str.length);
+  //   if (newList.find((item))) {
+  //     return -1;
+  //   }
+  //   if (a is greater than b by the ordering criterion) {
+  //     return 1;
+  //   }
+  //   // a must be equal to b
+  //   return 0;
+  // }
+
+  const ruleWithNewBlocks = (type, newBlocks) : RuleBuilderRule => {
+    let ruleToUpdate = rule;
+
+    if (type === 'condition') {
+      ruleToUpdate = {
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, conditions: newBlocks,
+        },
+      };
+    } else {
+      ruleToUpdate = {
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder, actions: newBlocks,
+        },
+      };
+    }
+
+    return ruleToUpdate;
+  };
+
+  const handleMoveItem = (type, newList: Array<RuleBlock & {title: any}>) => {
+    console.log('===newlist', newList);
+
+    const newListWithoutTitle: RuleBlock[] = newList.map(({ title: _, ...rest }) => rest);
+    console.log('===newListWithoutTitle', newListWithoutTitle);
+
+    const newRule = ruleWithNewBlocks(type, setPrimaryParametersAndOutputVariables(newListWithoutTitle));
+    validateRuleBuilder(newRule);
+
+    //
+    //
+    // newList.map((item) => {
+
+    // });
+  };
+
   return (
     <form onSubmit={(e) => handleSave(e, true)}>
       <Row className="content">
@@ -298,7 +350,21 @@ const RuleBuilder = () => {
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-          {rule.rule_builder.actions.map((action, index) => (
+          <SortableList onMoveItem={(newList) => handleMoveItem('actions', newList)}
+                        items={rule.rule_builder.actions.map((item, index) => ({
+                          ...item,
+                          title: (<RuleBuilderBlock key={index} // eslint-disable-line react/no-array-index-key
+                                                    blockDict={actionsDict || []}
+                                                    block={item}
+                                                    order={index}
+                                                    type="action"
+                                                    previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, index).previousOutputPresent}
+                                                    addBlock={addBlock}
+                                                    updateBlock={updateBlock}
+                                                    deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />),
+                        }))} />
+
+          {/* {rule.rule_builder.actions.map((action, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <RuleBuilderBlock key={index}
                               blockDict={actionsDict || []}
@@ -309,7 +375,7 @@ const RuleBuilder = () => {
                               addBlock={addBlock}
                               updateBlock={updateBlock}
                               deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
-          ))}
+          ))} */}
           <RuleBuilderBlock blockDict={actionsDict || []}
                             order={newActionBlockIndex}
                             type="action"
