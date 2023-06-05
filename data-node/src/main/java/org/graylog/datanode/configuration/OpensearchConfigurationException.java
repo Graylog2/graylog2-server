@@ -16,5 +16,12 @@
  */
 package org.graylog.datanode.configuration;
 
-public record DataNodeConfig(String test) {
+public class OpensearchConfigurationException extends RuntimeException {
+    public OpensearchConfigurationException(String message) {
+        super(message);
+    }
+
+    public OpensearchConfigurationException(Exception cause) {
+        super(cause);
+    }
 }

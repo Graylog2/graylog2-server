@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 public record OpensearchConfiguration(
-        String opensearchVersion,
         Path opensearchDir,
         Path opensearchConfigDir,
         int httpPort,

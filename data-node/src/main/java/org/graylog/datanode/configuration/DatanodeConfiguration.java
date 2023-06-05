@@ -14,26 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog.datanode.configuration;
 
-import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.ProcessInfo;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.datanode.OpensearchDistribution;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-
-public interface OpensearchProcess extends ManagableProcess<OpensearchConfiguration> {
-
-    ProcessInfo processInfo();
-
-    Optional<RestHighLevelClient> restClient();
-
-    boolean isLeaderNode();
-    void setLeaderNode(boolean isManagerNode);
-    List<String> stdOutLogs();
-    List<String> stdErrLogs();
-
-    URI getOpensearchBaseUrl();
+/**
+ * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
+ * config file or from the ENV properties.
+ */
+public record DatanodeConfiguration(
+        OpensearchDistribution opensearchDistribution,
+        String nodeName,
+        int processLogsBufferSize
+) {
 }

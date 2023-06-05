@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.google.common.eventbus.EventBus;
 import org.bouncycastle.operator.OperatorException;
 import org.graylog.datanode.Configuration;
 import org.graylog.security.certutil.CertConstants;
@@ -60,6 +61,8 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final Configuration configuration;
     private final SmartKeystoreStorage keystoreStorage;
 
+    private final EventBus serverEventBus;
+
     //TODO: decide on password handling
     private static final String DEFAULT_PASSWORD = "admin";
 
@@ -72,7 +75,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                                final CertMongoStorage certMongoStorage,
                                                final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
                                                final Configuration configuration,
-                                               final SmartKeystoreStorage keystoreStorage) {
+                                               final SmartKeystoreStorage keystoreStorage, EventBus serverEventBus) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -82,6 +85,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
         this.configuration = configuration;
         this.keystoreStorage = keystoreStorage;
+        this.serverEventBus = serverEventBus;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
     }
@@ -92,7 +96,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         var cfg = nodePreflightConfigService.getPreflightConfigFor(nodeId.getNodeId());
         if (cfg == null) {
             // write default config if none exists for this node
-            nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
+            saveConfig(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED));
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
@@ -101,7 +105,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
                 LOG.error("error generating a CSR: " + ex.getMessage(), ex);
-                nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(ex.getMessage()).build());
+                saveConfig(cfg.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(ex.getMessage()));
             }
         } else if (NodePreflightConfig.State.SIGNED.equals(cfg.state())) {
             if (cfg.certificate() == null) {
@@ -123,7 +127,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                         keystoreStorage.writeKeyStore(location, nodeKeystore, configuration.getDatanodeHttpCertificatePassword().toCharArray(), null);
 
                         //should be in one transaction, but we miss transactions...
-                        nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
+                        changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
                     }
                 } catch (Exception ex) {
                     LOG.error("Config entry in signed state, but no certificate data present in Mongo");
@@ -136,6 +140,18 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
             // set state to State.CONNECTED
             // nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
         }
+    }
+
+    private void changeState(String nodeId, NodePreflightConfig.State state) {
+        nodePreflightConfigService.changeState(nodeId, state);
+        serverEventBus.post(new DatanodePreflightStateChangeEvent(state));
+    }
+
+    private void saveConfig(NodePreflightConfig.Builder state) {
+        Optional.of(nodePreflightConfigService.save(state.build()))
+                .map(NodePreflightConfig::state)
+                .map(DatanodePreflightStateChangeEvent::new)
+                .ifPresent(serverEventBus::post);
     }
 
     @Override

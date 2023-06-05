@@ -14,7 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog.datanode.bindings;
 
-public class OpensearchDynamicConfiguration {
+import com.google.inject.AbstractModule;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
+
+public class DatanodeConfigurationBindings extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(DatanodeConfiguration.class).toProvider(DatanodeConfigurationProvider.class);
+    }
 }

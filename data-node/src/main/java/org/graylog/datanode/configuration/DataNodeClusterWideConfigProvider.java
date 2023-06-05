@@ -25,29 +25,29 @@ import org.slf4j.LoggerFactory;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
-public class DataNodeConfigProvider implements Provider<DataNodeConfig> {
-    private static final Logger LOG = LoggerFactory.getLogger(DataNodeConfigProvider.class);
+public class DataNodeClusterWideConfigProvider implements Provider<DataNodeClusterWideConfig> {
+    private static final Logger LOG = LoggerFactory.getLogger(DataNodeClusterWideConfigProvider.class);
 
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public DataNodeConfigProvider(ClusterConfigService clusterConfigService) {
+    public DataNodeClusterWideConfigProvider(ClusterConfigService clusterConfigService) {
         this.clusterConfigService = clusterConfigService;
     }
 
     @Override
-    public DataNodeConfig get() {
+    public DataNodeClusterWideConfig get() {
         return loadFromDatabase().orElse(getDefaultConfig());
     }
 
-    public DataNodeConfig getDefaultConfig() {
-        return new DataNodeConfig(null);
+    public DataNodeClusterWideConfig getDefaultConfig() {
+        return new DataNodeClusterWideConfig(null);
     }
 
     @NotNull
-    public Optional<DataNodeConfig> loadFromDatabase() {
+    public Optional<DataNodeClusterWideConfig> loadFromDatabase() {
         try {
-            return Optional.ofNullable(clusterConfigService.get(DataNodeConfig.class));
+            return Optional.ofNullable(clusterConfigService.get(DataNodeClusterWideConfig.class));
         } catch (Exception e) {
             LOG.error("Failed to fetch datanode configuration from database", e);
             return Optional.empty();

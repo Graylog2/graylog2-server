@@ -16,8 +16,15 @@
  */
 package org.graylog.datanode.management;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog.datanode.bootstrap.preflight.DatanodePreflightStateChangeEvent;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,26 +34,41 @@ import javax.inject.Singleton;
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
+
     private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
+    private final Provider<OpensearchConfiguration> configurationProvider;
 
     @Inject
-    public OpensearchProcessService(OpensearchConfiguration config, @Named(value = "process_logs_buffer_size") int logsSize) {
-        this.process = createOpensearchProcess(config, logsSize);
+    public OpensearchProcessService(DatanodeConfiguration datanodeConfiguration, Provider<OpensearchConfiguration> configurationProvider, EventBus eventBus) {
+        this.configurationProvider = configurationProvider;
+        this.process = createOpensearchProcess(datanodeConfiguration);
+        eventBus.register(this);
     }
 
-    private OpensearchProcess createOpensearchProcess(OpensearchConfiguration config, int logsSize) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(config, logsSize);
+    private OpensearchProcess createOpensearchProcess(DatanodeConfiguration datanodeConfiguration) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize());
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.setStateMachineTracer(watchdog);
         return process;
     }
 
+    @Subscribe
+    public void handlePreflightConfigEvent(DatanodePreflightStateChangeEvent event) {
+        switch (event.state()) {
+            case STORED -> this.process.startWithConfig(configurationProvider.get());
+        }
+    }
+
     @Override
     protected void startUp() {
-        // todo: this should be moved to a configuration provider that will know the right moment when to start the
-        // opensearch process.
-        this.process.startWithConfig(new OpensearchDynamicConfiguration());
+        try {
+            final OpensearchConfiguration config = configurationProvider.get();
+            this.process.startWithConfig(config);
+        } catch (OpensearchConfigurationException e) {
+            LOG.warn("Failed to obtain opensearch configuration. Adapt your datanode configuration or use the preflight web interface", e);
+        }
     }
 
 

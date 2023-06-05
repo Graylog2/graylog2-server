@@ -14,15 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog.datanode.bootstrap.preflight;
 
-import com.google.inject.AbstractModule;
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog.datanode.OpensearchDistributionProvider;
-
-public class OpensearchDistributionBindings extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(OpensearchDistribution.class).toProvider(OpensearchDistributionProvider.class);
-    }
+public record DatanodePreflightStateChangeEvent(org.graylog2.cluster.NodePreflightConfig.State state) {
 }

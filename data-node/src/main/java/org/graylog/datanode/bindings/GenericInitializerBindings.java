@@ -19,12 +19,14 @@ package org.graylog.datanode.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.datanode.configuration.DataNodeConfigProvider;
-import org.graylog.datanode.configuration.DataNodeConfig;
+import org.graylog.datanode.configuration.DataNodeClusterWideConfigProvider;
+import org.graylog.datanode.configuration.DataNodeClusterWideConfig;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
 import org.graylog.datanode.initializers.JerseyService;
 import org.graylog.datanode.management.OpensearchProcessService;
 import org.graylog.datanode.initializers.PeriodicalsService;
-import org.graylog.datanode.configuration.ConfigurationProvider;
+import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
@@ -34,9 +36,9 @@ public class GenericInitializerBindings extends AbstractModule {
     protected void configure() {
 //        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
 
-
-        bind(OpensearchConfiguration.class).toProvider(ConfigurationProvider.class);
-        bind(DataNodeConfig.class).toProvider(DataNodeConfigProvider.class);
+        bind(DatanodeConfiguration.class).toProvider(DatanodeConfigurationProvider.class);
+        bind(OpensearchConfiguration.class).toProvider(OpensearchConfigurationProvider.class);
+        bind(DataNodeClusterWideConfig.class).toProvider(DataNodeClusterWideConfigProvider.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
 
