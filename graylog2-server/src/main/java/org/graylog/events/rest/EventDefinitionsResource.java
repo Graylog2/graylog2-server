@@ -30,6 +30,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorEngine;
@@ -340,9 +341,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
-        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
+        final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
+                new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to enable", definitionId)));
         eventDefinitionHandler.schedule(definitionId);
-        return eventDefinitionDto.orElse(null);
+        return eventDefinitionDto.toBuilder().state(EventDefinition.State.ENABLED).build();
     }
 
     @POST
@@ -357,7 +359,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final BulkOperationResponse response = bulkScheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
-
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
@@ -371,9 +372,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                          @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
-        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
+        final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
+                new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to disable", definitionId)));
         eventDefinitionHandler.unschedule(definitionId);
-        return eventDefinitionDto.orElse(null);
+        return eventDefinitionDto.toBuilder().state(EventDefinition.State.DISABLED).build();
     }
 
     @POST
@@ -388,7 +390,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final BulkOperationResponse response = bulkUnscheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
-
         return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();

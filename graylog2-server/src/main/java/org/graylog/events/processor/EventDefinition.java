@@ -29,6 +29,11 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 public interface EventDefinition {
+    enum State {
+        ENABLED,
+        DISABLED
+    }
+
     @Nullable
     String id();
 
