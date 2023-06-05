@@ -78,7 +78,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Pro
             <h3>
               {negatable
               && <NegationButton bsStyle="primary" negate={block?.negate} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
-              {block?.title}
+              {block?.step_title}
             </h3>
           </Col>
         </BlockInfo>

@@ -145,7 +145,7 @@ const RuleBlockForm = ({
                   <SelectedBlockInfo>
                     <Col md={12}>
                       <BlockTitle>
-                        {existingBlock?.title || selectedBlockDict.name}
+                        {existingBlock?.step_title || selectedBlockDict.name}
                       </BlockTitle>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>

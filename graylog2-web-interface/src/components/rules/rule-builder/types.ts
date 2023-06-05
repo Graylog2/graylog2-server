@@ -42,7 +42,7 @@ export interface RuleBlock extends ObjectWithErrors {
   params: RuleBlockField,
   outputvariable?: string,
   negate?: boolean,
-  title?: string,
+  step_title?: string,
   errors?: Array<string>
 }
 
