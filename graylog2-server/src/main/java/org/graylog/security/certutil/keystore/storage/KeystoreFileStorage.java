@@ -30,13 +30,25 @@ import java.util.Optional;
 
 public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLocation> {
 
+    private final KeystoreContentMover keystoreContentMover;
+
+    public KeystoreFileStorage(final KeystoreContentMover keystoreContentMover) {
+        this.keystoreContentMover = keystoreContentMover;
+    }
+
     @Override
     public void writeKeyStore(final KeystoreFileLocation location,
                               final KeyStore keyStore,
-                              final char[] password) throws KeyStoreStorageException {
+                              final char[] currentPassword,
+                              final char[] newPassword) throws KeyStoreStorageException {
         final Path keystorePath = location.keystorePath();
         try (FileOutputStream store = new FileOutputStream(keystorePath.toFile())) {
-            keyStore.store(store, password);
+            if (newPassword == null) {
+                keyStore.store(store, currentPassword);
+            } else {
+                KeyStore newKeyStore = keystoreContentMover.moveContents(keyStore, currentPassword, newPassword);
+                newKeyStore.store(store, newPassword);
+            }
         } catch (Exception ex) {
             throw new KeyStoreStorageException("Failed to save keystore to " + keystorePath, ex);
         }
@@ -62,7 +74,7 @@ public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLo
     public void writeKeyStore(final Path keystorePath,
                               final KeyStore keyStore,
                               final char[] password) throws KeyStoreStorageException {
-        writeKeyStore(new KeystoreFileLocation(keystorePath), keyStore, password);
+        writeKeyStore(new KeystoreFileLocation(keystorePath), keyStore, password, null);
     }
 
 }

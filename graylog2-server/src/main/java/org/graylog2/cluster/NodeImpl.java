@@ -96,4 +96,9 @@ public class NodeImpl extends PersistedImpl implements Node {
     public Map<String, Validator> getEmbeddedValidations(String key) {
         return Collections.emptyMap();
     }
+
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }

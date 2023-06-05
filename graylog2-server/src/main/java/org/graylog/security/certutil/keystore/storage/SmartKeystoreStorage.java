@@ -26,28 +26,27 @@ import javax.inject.Inject;
 import java.security.KeyStore;
 import java.util.Optional;
 
-//TODO: It is only a concept, do not use it yet!
-//The idea is that client code creates proper KeystoreLocation, and does not cate which implementation to choose for the location, it is done automagically
-@Deprecated
 public final class SmartKeystoreStorage implements KeystoreStorage<KeystoreLocation> {
 
     private final KeystoreMongoStorage keystoreMongoStorage;
     private final KeystoreFileStorage keystoreFileStorage;
 
     @Inject
-    public SmartKeystoreStorage(final CertificatesService certificatesService) {
-        keystoreMongoStorage = new KeystoreMongoStorage(certificatesService);
-        keystoreFileStorage = new KeystoreFileStorage();
+    public SmartKeystoreStorage(final CertificatesService certificatesService,
+                                final KeystoreContentMover keystoreContentMover) {
+        keystoreMongoStorage = new KeystoreMongoStorage(certificatesService, keystoreContentMover);
+        keystoreFileStorage = new KeystoreFileStorage(keystoreContentMover);
     }
 
     @Override
     public void writeKeyStore(KeystoreLocation location,
                               KeyStore keyStore,
-                              char[] password) throws KeyStoreStorageException {
+                              char[] currentPassword,
+                              final char[] newPassword) throws KeyStoreStorageException {
         if (location instanceof final KeystoreMongoLocation mongoLocation) {
-            keystoreMongoStorage.writeKeyStore(mongoLocation, keyStore, password);
+            keystoreMongoStorage.writeKeyStore(mongoLocation, keyStore, currentPassword, newPassword);
         } else if (location instanceof final KeystoreFileLocation fileLocation) {
-            keystoreFileStorage.writeKeyStore(fileLocation, keyStore, password);
+            keystoreFileStorage.writeKeyStore(fileLocation, keyStore, currentPassword, newPassword);
         }
     }
 

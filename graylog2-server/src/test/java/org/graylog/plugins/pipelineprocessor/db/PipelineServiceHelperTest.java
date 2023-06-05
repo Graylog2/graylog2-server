@@ -24,11 +24,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,16 +69,16 @@ public class PipelineServiceHelperTest {
                 "aaaaa"));
 
         // when + then
-        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of("debug#3"))).satisfies(map -> {
+        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#3"))).satisfies(map -> {
             assertThat(map.get("debug#3")).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
         });
-        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of("debug#2", "debug#3", "debug#4"))).satisfies(map -> {
+        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#2", "debug#3", "debug#4"))).satisfies(map -> {
             assertThat(map.get("debug#2")).satisfies(containsPipelines("Pipeline 1", "Pipeline 3"));
             assertThat(map.get("debug#3")).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
             assertThat(map.get("debug#4")).isEmpty();
         });
-        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of())).isEmpty();
-        assertThat(underTest.groupByRuleName(() -> pipelines, ImmutableSet.of("debug#4"))).satisfies(map -> {
+        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of())).isEmpty();
+        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#4"))).satisfies(map -> {
             assertThat(map.get("debug#4")).isEmpty();
         });
     }

@@ -27,25 +27,31 @@ import javax.inject.Singleton;
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
+    private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
-    private final ProcessWatchdog processWatchdog;
 
     @Inject
     public OpensearchProcessService(OpensearchConfiguration config, @Named(value = "process_logs_buffer_size") int logsSize) {
-        this.process = new OpensearchProcessImpl(config, logsSize);
-        this.processWatchdog = new ProcessWatchdog(process);
+        this.process = createOpensearchProcess(config, logsSize);
+    }
+
+    private OpensearchProcess createOpensearchProcess(OpensearchConfiguration config, int logsSize) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(config, logsSize);
+        final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
+        process.setStateMachineTracer(watchdog);
+        return process;
     }
 
     @Override
     protected void startUp() {
+        // todo: this should be moved to a configuration provider that will know the right moment when to start the
+        // opensearch process.
         this.process.startWithConfig(new OpensearchDynamicConfiguration());
-       this.processWatchdog.start();
     }
 
 
     @Override
     protected void shutDown() {
-        this.processWatchdog.stop();
         this.process.stop();
     }
 

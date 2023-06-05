@@ -22,17 +22,13 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.FieldDecorator;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.org.bouncycastle.cert.ocsp.Req;
 
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class TabularResponseCreatorTest {
 
