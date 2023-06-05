@@ -23,7 +23,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -50,7 +49,7 @@ class ImmutableFeatureFlagsTest {
     private static final String SYSTEM_PROPERTY_VALUE = "system_prop";
     private static final String ENVIRONMENT_VARIABLE_VALUE = "env_var";
 
-    private static final Map<String, String> EMPTY = ImmutableMap.of();
+    private static final Map<String, String> EMPTY = Map.of();
     public static final String FILE = "file";
     private final FeatureFlagsFactory factory = new FeatureFlagsFactory();
 
@@ -61,24 +60,24 @@ class ImmutableFeatureFlagsTest {
 
     @Test
     void testOverrideOrder() throws IOException {
-        Map<String, String> defaultProps = ImmutableMap.of(
+        Map<String, String> defaultProps = Map.of(
                 FEATURE_1, DEFAULT_PROPERTY_VALUE,
                 FEATURE_2, DEFAULT_PROPERTY_VALUE,
                 FEATURE_3, DEFAULT_PROPERTY_VALUE,
                 FEATURE_4, DEFAULT_PROPERTY_VALUE);
-        Map<String, String> customProps = ImmutableMap.of(
+        Map<String, String> customProps = Map.of(
                 FEATURE_2, CUSTOM_PROPERTY_VALUE,
                 FEATURE_3, CUSTOM_PROPERTY_VALUE,
                 FEATURE_4, CUSTOM_PROPERTY_VALUE);
-        Map<String, String> systemProps = ImmutableMap.of(
+        Map<String, String> systemProps = Map.of(
                 PREFIX_SYSTEM_PROPERTY + FEATURE_3, SYSTEM_PROPERTY_VALUE,
                 PREFIX_SYSTEM_PROPERTY + FEATURE_4, SYSTEM_PROPERTY_VALUE);
-        Map<String, String> envVars = ImmutableMap.of(
+        Map<String, String> envVars = Map.of(
                 PREFIX_ENVIRONMENT_VARIABLE + FEATURE_4, ENVIRONMENT_VARIABLE_VALUE);
 
         FeatureFlags flags = create(defaultProps, customProps, systemProps, envVars);
 
-        assertThat(flags.getAll()).isEqualTo(ImmutableMap.of(
+        assertThat(flags.getAll()).isEqualTo(Map.of(
                 FEATURE_1, DEFAULT_PROPERTY_VALUE,
                 FEATURE_2, CUSTOM_PROPERTY_VALUE,
                 FEATURE_3, SYSTEM_PROPERTY_VALUE,
@@ -88,20 +87,20 @@ class ImmutableFeatureFlagsTest {
 
     @Test
     void testSystemPropertyPrefix() throws IOException {
-        FeatureFlags flags = create(EMPTY, EMPTY, ImmutableMap.of(
+        FeatureFlags flags = create(EMPTY, EMPTY, Map.of(
                 "wrong prefix", SYSTEM_PROPERTY_VALUE,
                 PREFIX_SYSTEM_PROPERTY + FEATURE_1, SYSTEM_PROPERTY_VALUE), EMPTY);
 
-        assertThat(flags.getAll()).isEqualTo(ImmutableMap.of(FEATURE_1, SYSTEM_PROPERTY_VALUE));
+        assertThat(flags.getAll()).isEqualTo(Map.of(FEATURE_1, SYSTEM_PROPERTY_VALUE));
     }
 
     @Test
     void testEnvironmentVariablePrefix() throws IOException {
-        FeatureFlags flags = create(EMPTY, EMPTY, EMPTY, ImmutableMap.of(
+        FeatureFlags flags = create(EMPTY, EMPTY, EMPTY, Map.of(
                 "wrong prefix", ENVIRONMENT_VARIABLE_VALUE,
                 PREFIX_ENVIRONMENT_VARIABLE + FEATURE_1, ENVIRONMENT_VARIABLE_VALUE));
 
-        assertThat(flags.getAll()).isEqualTo(ImmutableMap.of(FEATURE_1, ENVIRONMENT_VARIABLE_VALUE));
+        assertThat(flags.getAll()).isEqualTo(Map.of(FEATURE_1, ENVIRONMENT_VARIABLE_VALUE));
     }
 
     @ParameterizedTest
@@ -155,19 +154,19 @@ class ImmutableFeatureFlagsTest {
                 given(featureFlagsResources.environmentVariables()).willReturn(duplicate(PREFIX_ENVIRONMENT_VARIABLE))));
     }
 
-    private ImmutableMap<String, String> duplicate() {
+    private Map<String, String> duplicate() {
         return duplicate("");
     }
 
-    private ImmutableMap<String, String> duplicate(String prefix) {
+    private Map<String, String> duplicate(String prefix) {
         String key = prefix + "feature";
-        return ImmutableMap.of(
+        return Map.of(
                 key.toUpperCase(Locale.ROOT), "on",
                 key.toLowerCase(Locale.ROOT), "on");
     }
 
     private FeatureFlags create(String feature, String value) throws IOException {
-        return create(ImmutableMap.of(feature, value), EMPTY, EMPTY, EMPTY);
+        return create(Map.of(feature, value), EMPTY, EMPTY, EMPTY);
     }
 
     private FeatureFlags empty() throws IOException {

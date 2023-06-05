@@ -30,12 +30,19 @@ import org.graylog.plugins.views.search.rest.suggestions.SuggestionEntryDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsErrorDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsRequestDTO;
-import org.graylog.plugins.views.search.validation.FieldTypeValidationImpl;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -44,6 +51,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -62,11 +70,16 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     private final MappedFieldTypesService mappedFieldTypesService;
 
+    private final EntityTitleService entityTitleService;
+    private final NodeService nodeService;
+
     @Inject
-    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService, MappedFieldTypesService mappedFieldTypesService) {
+    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService, MappedFieldTypesService mappedFieldTypesService, EntityTitleService entityTitleService, NodeService nodeService) {
         this.permittedStreams = permittedStreams;
         this.querySuggestionsService = querySuggestionsService;
         this.mappedFieldTypesService = mappedFieldTypesService;
+        this.entityTitleService = entityTitleService;
+        this.nodeService = nodeService;
     }
 
     @POST
@@ -80,6 +93,12 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         final TimeRange timerange = Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange());
         final String fieldName = suggestionsRequest.field();
 
+        final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
+        var fieldType = fieldTypes.stream().filter(f -> f.name().equals(fieldName))
+                .findFirst()
+                .map(MappedFieldTypeDTO::type)
+                .orElse(FieldTypes.Type.createType("unknown", Collections.emptySet()));
+
         final SuggestionRequest req = SuggestionRequest.builder()
                 .field(fieldName)
                 .fieldType(getFieldType(streams, timerange, fieldName))
@@ -90,7 +109,9 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .build();
 
         SuggestionResponse res = querySuggestionsService.suggest(req);
-        final List<SuggestionEntryDTO> suggestions = res.suggestions().stream().map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence())).collect(Collectors.toList());
+        final List<SuggestionEntryDTO> suggestions = augmentSuggestions(res.suggestions().stream()
+                .map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence()))
+                .toList(), fieldType, searchUser);
         final SuggestionsDTO.Builder suggestionsBuilder = SuggestionsDTO.builder(res.field(), res.input())
                 .suggestions(suggestions)
                 .sumOtherDocsCount(res.sumOtherDocsCount());
@@ -101,6 +122,49 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
         return suggestionsBuilder.build();
     }
+
+    private List<SuggestionEntryDTO> augmentSuggestions(List<SuggestionEntryDTO> suggestions, FieldTypes.Type fieldType, SearchUser searchUser) {
+        if (fieldType.equals(FieldTypeMapper.STREAMS_TYPE) || fieldType.equals(FieldTypeMapper.INPUT_TYPE)) {
+            var entityIds = suggestions.stream()
+                    .map(SuggestionEntryDTO::value)
+                    .distinct()
+                    .map(value -> new EntityIdentifier(value, mapEntityType(fieldType.type())))
+                    .toList();
+            var results = entityTitleService.getTitles(new EntityTitleRequest(entityIds), searchUser).entities()
+                    .stream()
+                    .collect(Collectors.toMap(EntityTitleResponse::id, EntityTitleResponse::title));
+            return suggestions.stream()
+                    .map(s -> SuggestionEntryDTO.create(s.value(), s.occurrence(), Optional.ofNullable(results.get(s.value()))))
+                    .toList();
+        }
+
+        if (fieldType.equals(FieldTypeMapper.NODE_TYPE)) {
+            var nodeIds = suggestions.stream()
+                    .map(SuggestionEntryDTO::value)
+                    .distinct()
+                    .toList();
+
+            var results = nodeService.byNodeIds(nodeIds);
+            return suggestions.stream()
+                    .map(s -> SuggestionEntryDTO.create(
+                            s.value(),
+                            s.occurrence(),
+                            Optional.ofNullable(results.get(s.value())).map(Node::getTitle)
+                    ))
+                    .toList();
+        }
+
+        return suggestions;
+    }
+
+    private String mapEntityType(String type) {
+        return switch (type) {
+            case "streams" -> "streams";
+            case "input" -> "inputs";
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        };
+    }
+
 
     private Set<String> adaptStreams(Set<String> streams, SearchUser searchUser) {
         if (streams == null || streams.isEmpty()) {
