@@ -167,7 +167,7 @@
     "less-loader": "^11.0.0",
     "node-fetch": "^2.6.1",
     "puppeteer": "^20.2.0",
-    "react-bootstrap": "0.33.1",
+    "react-bootstrap": "1.6.7",
     "style-loader": "3.3.3",
     "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
     "trace-unhandled": "^2.0.1",
