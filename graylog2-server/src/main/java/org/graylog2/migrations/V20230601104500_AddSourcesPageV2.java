@@ -207,17 +207,19 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
     @AutoValue
     @WithBeanGetter
     public static abstract class MigrationCompleted {
-        @JsonProperty
+        @JsonProperty("content_pack_id")
         public abstract String contentPackId();
 
-        @JsonProperty
+        @JsonProperty("installed_content_pack")
         public abstract boolean installedContentPack();
 
-        @JsonProperty
+        @JsonProperty("uninstalled_previous_revision")
         public abstract boolean uninstalledPreviousRevision();
 
         @JsonCreator
-        public static MigrationCompleted create(@JsonProperty("content_pack_id") final String contentPackId, boolean installedContentPack, boolean uninstalledPreviousRevision) {
+        public static MigrationCompleted create(@JsonProperty("content_pack_id") final String contentPackId,
+                                                @JsonProperty("installed_content_pack") boolean installedContentPack,
+                                                @JsonProperty("uninstalled_previous_revision") boolean uninstalledPreviousRevision) {
             return new AutoValue_V20230601104500_AddSourcesPageV2_MigrationCompleted(contentPackId, installedContentPack, uninstalledPreviousRevision);
         }
     }
