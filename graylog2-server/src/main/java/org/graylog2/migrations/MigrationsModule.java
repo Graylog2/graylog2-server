@@ -65,6 +65,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20230213160000_EncryptedInputConfigMigration.class);
         addMigration(V20230210102500_UniqueUserMigration.class);
         addMigration(V20230523160600_PopulateEventDefinitionState.class);
+        addMigration(V20230531135500_MigrateRemoveObsoleteItemsFromGrantsCollection.class);
         addMigration(V20230601104500_AddSourcesPageV2.class);
     }
 }
