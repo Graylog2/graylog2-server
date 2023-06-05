@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
-import com.google.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -26,6 +25,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Collection;
 import java.util.Collections;
