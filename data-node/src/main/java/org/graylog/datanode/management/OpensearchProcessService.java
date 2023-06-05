@@ -34,7 +34,7 @@ import javax.inject.Singleton;
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
 
     private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
