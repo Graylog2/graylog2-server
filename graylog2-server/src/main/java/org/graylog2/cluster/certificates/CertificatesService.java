@@ -92,7 +92,13 @@ public class CertificatesService {
                 )
         );
         final Document nodeCertificate = objects.first();
-        return nodeCertificate != null;
+        if (nodeCertificate != null) {
+            final Document encryptedCertificateDocument = nodeCertificate.get(collection.encryptedCertificateField(), Document.class);
+            if (encryptedCertificateDocument != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Optional<String> readCert(final KeystoreMongoLocation keystoreMongoLocation) {
