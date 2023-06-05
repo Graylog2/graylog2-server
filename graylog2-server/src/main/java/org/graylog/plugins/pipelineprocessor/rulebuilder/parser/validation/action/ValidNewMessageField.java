@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.action;
 
-import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -27,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidationResult;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.Objects;
 
