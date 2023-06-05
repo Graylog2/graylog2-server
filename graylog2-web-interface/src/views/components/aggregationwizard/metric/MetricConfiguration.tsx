@@ -49,7 +49,8 @@ const Metric = ({ index }: Props) => {
   const { values: { metrics }, errors: { metrics: metricsError }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentFunction = metrics[index].function;
 
-  const isFieldRequired = currentFunction !== 'count';
+  const hasFieldOption = currentFunction !== 'percentage';
+  const isFieldRequired = !['count', 'percentage'].includes(currentFunction);
 
   const isPercentile = currentFunction === 'percentile';
   const requiresNumericField = !['card', 'count', 'latest'].includes(currentFunction);
@@ -91,6 +92,7 @@ const Metric = ({ index }: Props) => {
           </Input>
         )}
       </Field>
+      {hasFieldOption && (
       <Field name={`metrics.${index}.field`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="metric-field"
@@ -109,6 +111,7 @@ const Metric = ({ index }: Props) => {
           </Input>
         )}
       </Field>
+      )}
       {isPercentile && (
         <Field name={`metrics.${index}.percentile`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
