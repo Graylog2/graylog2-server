@@ -17,6 +17,9 @@
 import * as React from 'react';
 
 import type { IconName } from 'components/common/Icon';
+import type { NavItemProps } from 'views/components/sidebar/NavItem';
+import UndoNavItem from 'views/components/sidebar/undo/UndoNavItem';
+import RedoNavItem from 'views/components/sidebar/redo/RedoNavItem';
 
 import ViewDescription from './description/ViewDescription';
 import AddWidgetButton from './create/AddWidgetButton';
@@ -35,7 +38,8 @@ export type SidebarSection = {
   key: string,
   title: string,
   icon: IconName,
-  content: React.ComponentType<SidebarSectionProps>,
+  content?: React.ComponentType<SidebarSectionProps>,
+  CustomNavComponent?: React.ComponentType<NavItemProps>
 };
 
 const sidebarSections: Array<SidebarSection> = [
@@ -64,6 +68,18 @@ const sidebarSections: Array<SidebarSection> = [
     icon: 'subscript',
     title: 'Fields',
     content: ({ sidebarChildren }: SidebarSectionProps) => sidebarChildren,
+  },
+  {
+    key: 'undoAction',
+    icon: 'undo',
+    title: 'Undo',
+    CustomNavComponent: UndoNavItem,
+  },
+  {
+    key: 'redoAction',
+    icon: 'redo',
+    title: 'Redo',
+    CustomNavComponent: RedoNavItem,
   },
 ];
 
