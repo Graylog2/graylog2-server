@@ -48,9 +48,9 @@ public class PreflightBoot {
             return true;
         }
 
-//        if (!isFreshInstallation) {
-//            return false;
-//        }
+        if (!isFreshInstallation) {
+            return false;
+        }
 
         if (!hosts.isEmpty()) {
             return false;
