@@ -20,7 +20,6 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
-import com.google.inject.name.Named;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;

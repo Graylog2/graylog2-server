@@ -692,7 +692,7 @@ public class MessageTest {
 
     @Test
     public void addProcessingError_appendsWithEachCall() {
-        final Message msg = new Message(new org.testcontainers.shaded.com.google.common.collect.ImmutableMap.Builder<String, Object>()
+        final Message msg = new Message(new ImmutableMap.Builder<String, Object>()
                 .put(Message.FIELD_ID, "msg-id")
                 .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
                 .build());
@@ -715,7 +715,7 @@ public class MessageTest {
 
     @Test
     public void processingErrors_returnImmutableList() {
-        final Message msg = new Message(new org.testcontainers.shaded.com.google.common.collect.ImmutableMap.Builder<String, Object>()
+        final Message msg = new Message(new ImmutableMap.Builder<String, Object>()
                 .put(Message.FIELD_ID, "msg-id")
                 .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
                 .build());
@@ -733,7 +733,7 @@ public class MessageTest {
     @Test
     public void toElasticSearchObject_processingErrorDetailsAreJoinedInOneStringAndReturnedInProcessingErrorField() {
         // given
-        final Message msg = new Message(new org.testcontainers.shaded.com.google.common.collect.ImmutableMap.Builder<String, Object>()
+        final Message msg = new Message(new ImmutableMap.Builder<String, Object>()
                 .put(Message.FIELD_ID, "msg-id")
                 .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
                 .build());

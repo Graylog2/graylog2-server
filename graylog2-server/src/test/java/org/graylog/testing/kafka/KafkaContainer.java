@@ -117,7 +117,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
         withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint("sh"));
         withCommand("-c", "while [ ! -f " + KAFKA_ADVERTISED_LISTENERS_FILE + " ]; do sleep 0.1; done; /entrypoint.sh /run.sh");
 
-        waitingFor(Wait.forLogMessage(".*Kafka Server started.*", 1).withStartupTimeout(Duration.ofSeconds(5)));
+        waitingFor(Wait.forLogMessage(".*Kafka Server started.*", 1).withStartupTimeout(Duration.ofSeconds(60)));
     }
 
     private static String generateKraftClusterId() {
