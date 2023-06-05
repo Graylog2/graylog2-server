@@ -35,8 +35,6 @@ public class GenericInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
 //        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
-
-        bind(DatanodeConfiguration.class).toProvider(DatanodeConfigurationProvider.class);
         bind(OpensearchConfiguration.class).toProvider(OpensearchConfigurationProvider.class);
         bind(DataNodeClusterWideConfig.class).toProvider(DataNodeClusterWideConfigProvider.class);
 
