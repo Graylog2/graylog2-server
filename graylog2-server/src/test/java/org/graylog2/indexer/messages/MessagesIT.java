@@ -17,10 +17,10 @@
 package org.graylog2.indexer.messages;
 
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import joptsimple.internal.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
@@ -288,7 +288,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
         final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
 
-        final String message = Strings.repeat('A', size);
+        final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
             messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", now())));
         }

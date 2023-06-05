@@ -26,12 +26,12 @@ import org.graylog2.cluster.TestNodeService;
 import org.graylog2.plugin.database.ValidationException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,7 +55,7 @@ class IndexerDiscoveryProviderTest {
     @Test
     void testPreconfiguredIndexers() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
-                ImmutableList.of(URI.create("http://my-host:9200")),
+                List.of(URI.create("http://my-host:9200")),
                 preflightConfig(null),
                 nodes()
         );

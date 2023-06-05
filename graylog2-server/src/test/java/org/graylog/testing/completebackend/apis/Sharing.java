@@ -17,8 +17,6 @@
 package org.graylog.testing.completebackend.apis;
 
 import io.restassured.path.json.JsonPath;
-import io.restassured.specification.RequestSpecification;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,7 +50,7 @@ public class Sharing implements GraylogRestApi {
     }
 
     private static Object serialize(SharingRequest req) {
-        return ImmutableMap.of("selected_grantee_capabilities", req.permissions().entrySet().stream().collect(Collectors.toMap(
+        return Map.of("selected_grantee_capabilities", req.permissions().entrySet().stream().collect(Collectors.toMap(
                 it -> it.getKey().serialize(),
                 Map.Entry::getValue
         )));
