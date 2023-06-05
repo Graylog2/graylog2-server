@@ -453,10 +453,7 @@ public class UsersResource extends RestResource {
 
     private void updateExistingSession(User user, long newSessionTimeOut) {
         AllUserSessions allUserSessions = AllUserSessions.create(sessionService);
-        Optional<MongoDbSession> optionalUserSession = allUserSessions.forUser(user);
-
-        if (optionalUserSession.isPresent()) {
-            MongoDbSession userSession = optionalUserSession.get();
+        allUserSessions.forUser(user).ifPresent(userSession -> {
             userSession.setTimeout(newSessionTimeOut);
             Session session = sessionService.daoToSimpleSession(userSession);
 
@@ -464,7 +461,7 @@ public class UsersResource extends RestResource {
             DefaultSessionManager sessionManager = (DefaultSessionManager) securityManager.getSessionManager();
             SessionDAO sessionDAO = sessionManager.getSessionDAO();
             sessionDAO.update(session);
-        }
+        });
     }
 
     private boolean rolesContainAdmin(List<String> roles) {
