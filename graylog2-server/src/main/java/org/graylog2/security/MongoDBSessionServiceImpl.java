@@ -22,6 +22,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
@@ -69,4 +70,18 @@ public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements M
 
         return dbSessions;
     }
+
+    @Override
+    public SimpleSession daoToSimpleSession(MongoDbSession sessionDAO) {
+        final SimpleSession session = new SimpleSession();
+        session.setId(sessionDAO.getSessionId());
+        session.setHost(sessionDAO.getHost());
+        session.setTimeout(sessionDAO.getTimeout());
+        session.setStartTimestamp(sessionDAO.getStartTimestamp());
+        session.setLastAccessTime(sessionDAO.getLastAccessTime());
+        session.setExpired(sessionDAO.isExpired());
+        session.setAttributes(sessionDAO.getAttributes());
+        return session;
+    }
+
 }
