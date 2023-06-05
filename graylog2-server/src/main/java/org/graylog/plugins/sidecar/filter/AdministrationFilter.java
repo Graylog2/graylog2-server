@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.sidecar.filter;
 
-import com.google.inject.name.Named;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 
+import javax.inject.Named;
 import java.util.function.Predicate;
 
 public interface AdministrationFilter extends Predicate<Sidecar> {

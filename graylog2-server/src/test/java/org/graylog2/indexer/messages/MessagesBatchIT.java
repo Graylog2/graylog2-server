@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import joptsimple.internal.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.mockito.Mockito.mock;
 
 public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
@@ -92,7 +91,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
     private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
         final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
 
-        final String message = Strings.repeat('A', size);
+        final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
             messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", now())));
         }
