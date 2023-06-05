@@ -78,6 +78,7 @@ export type BlockFieldDict = {
   name: string,
   optional: boolean,
   primary: boolean,
+  allow_negatives: boolean,
   description: string | null
 }
 
