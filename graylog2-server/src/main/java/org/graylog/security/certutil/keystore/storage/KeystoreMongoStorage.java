@@ -33,16 +33,27 @@ import static org.graylog.security.certutil.CertConstants.PKCS12;
 public final class KeystoreMongoStorage implements KeystoreStorage<KeystoreMongoLocation> {
 
     private final CertificatesService certificatesService;
+    private final KeystoreContentMover keystoreContentMover;
 
     @Inject
-    public KeystoreMongoStorage(final CertificatesService certificatesService) {
+    public KeystoreMongoStorage(final CertificatesService certificatesService,
+                                final KeystoreContentMover keystoreContentMover) {
         this.certificatesService = certificatesService;
+        this.keystoreContentMover = keystoreContentMover;
     }
 
     @Override
-    public void writeKeyStore(KeystoreMongoLocation location, KeyStore keyStore, char[] password) throws KeyStoreStorageException {
+    public void writeKeyStore(KeystoreMongoLocation location,
+                              KeyStore keyStore,
+                              char[] currentPassword,
+                              final char[] newPassword) throws KeyStoreStorageException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            keyStore.store(baos, password);
+            if (newPassword == null) {
+                keyStore.store(baos, currentPassword);
+            } else {
+                KeyStore newKeyStore = keystoreContentMover.moveContents(keyStore, currentPassword, newPassword);
+                newKeyStore.store(baos, newPassword);
+            }
             final String keystoreDataAsString = Base64.getEncoder().encodeToString(baos.toByteArray());
             certificatesService.writeCert(location, keystoreDataAsString);
         } catch (Exception ex) {
