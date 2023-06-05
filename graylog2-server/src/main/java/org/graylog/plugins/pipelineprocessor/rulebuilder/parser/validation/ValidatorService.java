@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
@@ -25,6 +23,8 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
