@@ -103,4 +103,5 @@ export const FieldTypes = {
   BINARY: createType('binary', []),
   GEO_POINT: createType('geo-point', []),
   IP: createType('ip', [Properties.Enumerable]),
+  PERCENTAGE: createType('percentage', []),
 };
