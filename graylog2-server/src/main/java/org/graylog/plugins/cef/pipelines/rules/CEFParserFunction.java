@@ -21,7 +21,6 @@ import com.codahale.metrics.Timer;
 import com.github.jcustenborder.cef.CEFParser;
 import com.github.jcustenborder.cef.CEFParserFactory;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
 import org.graylog.plugins.cef.parser.MappedMessage;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -31,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 

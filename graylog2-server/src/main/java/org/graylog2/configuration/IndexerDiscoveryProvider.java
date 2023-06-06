@@ -17,7 +17,6 @@
 package org.graylog2.configuration;
 
 import com.google.common.base.Suppliers;
-import com.google.inject.Provider;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
@@ -28,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
