@@ -16,8 +16,9 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import org.graylog.security.certutil.cert.storage.CertMongoStorage;
-import org.graylog.security.certutil.cert.storage.CertStorage;
+import org.graylog.security.certutil.cert.CertificateChain;
+import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
+import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
@@ -39,6 +40,7 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 @Singleton
 public class GraylogPreflightGeneratePeriodical extends Periodical {
@@ -47,7 +49,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final NodePreflightConfigService nodePreflightConfigService;
 
     private final CsrMongoStorage csrStorage;
-    private final CertStorage certMongoStorage;
+    private final CertChainStorage certMongoStorage;
 
     private String caKeystoreFilename = "datanode-ca.p12";
     private Integer DEFAULT_VALIDITY = 90;
@@ -56,7 +58,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     @Inject
     public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
                                               final CsrMongoStorage csrStorage,
-                                              final CertMongoStorage certMongoStorage) {
+                                              final CertChainMongoStorage certMongoStorage) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -79,9 +81,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
             var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
             var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
-
-            // TODO: delete?
-//            final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+            var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
             nodePreflightConfigService.streamAll()
                     .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
@@ -96,7 +96,9 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                         .build());
                             } else {
                                 var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
-                                certMongoStorage.writeCert(cert, c.nodeId());
+                                //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
+                                final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
+                                certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
                             }
                         } catch (Exception e) {
                             LOG.error("Could not sign CSR: " + e.getMessage(), e);
