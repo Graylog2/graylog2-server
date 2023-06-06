@@ -78,8 +78,6 @@ public class PreflightResource {
 
     @POST
     @Path("/ca/create")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.TEXT_PLAIN)
     @NoAuditEvent("No Audit Event needed")
     public void createCA() throws CACreationException, KeyStoreStorageException {
         // TODO: get validity from preflight UI
@@ -88,11 +86,10 @@ public class PreflightResource {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("/upload")
+    @Path("/ca/upload")
     @NoAuditEvent("No Audit Event needed")
-    public String uploadCA(@FormDataParam("password") String password, FormDataMultiPart body) throws CACreationException {
-        caService.upload(password, body);
+    public String uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) throws CACreationException {
+        caService.upload(password, bodyParts);
         return "Ok";
     }
 

@@ -96,14 +96,14 @@ public class CaService {
         final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
         KeyStore keyStore = caCreator.createCA(null, certificateValidity);
         keystoreStorage.writeKeyStore(keystoreLocation, keyStore, null, password);
+        LOG.debug("Generated a new CA.");
     }
 
-    public void upload(String pass, FormDataMultiPart params) throws CACreationException {
+    public void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException {
         final var password = pass == null ? null : pass.toCharArray();
         // TODO: if the upload consists of more than one file, handle accordingly
         // or: decide that it's always only one file containing all certificates
         try {
-            List<FormDataBodyPart> parts = params.getFields("file");
             KeyStore keyStore = KeyStore.getInstance(PKCS12);
             for(BodyPart part : parts) {
                 InputStream is = part.getEntityAs(InputStream.class);
