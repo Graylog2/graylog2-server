@@ -22,8 +22,8 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodePreflightConfig;
-import org.graylog2.cluster.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 
 import javax.inject.Inject;

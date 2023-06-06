@@ -19,7 +19,7 @@ package org.graylog.datanode.management;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
-import org.graylog.datanode.bootstrap.preflight.DatanodePreflightStateChangeEvent;
+import org.graylog2.cluster.preflight.NodePreflightStateChangeEvent;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.process.OpensearchConfiguration;
@@ -54,7 +54,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     }
 
     @Subscribe
-    public void handlePreflightConfigEvent(DatanodePreflightStateChangeEvent event) {
+    public void handlePreflightConfigEvent(NodePreflightStateChangeEvent event) {
         switch (event.state()) {
             case STORED -> this.process.startWithConfig(configurationProvider.get());
         }

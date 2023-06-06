@@ -14,7 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.preflight;
+package org.graylog2.cluster.preflight;
 
-public record DatanodePreflightStateChangeEvent(org.graylog2.cluster.NodePreflightConfig.State state) {
+import java.util.Optional;
+import java.util.stream.Stream;
+
+public interface NodePreflightConfigService {
+    NodePreflightConfig getPreflightConfigFor(String nodeId);
+
+    void writeCsr(String nodeId, String csr);
+
+    void writeCert(String nodeId, String cert);
+
+    Optional<String> readCert(String nodeId);
+
+    void changeState(String nodeId, NodePreflightConfig.State state);
+
+    NodePreflightConfig save(NodePreflightConfig config);
+
+    Stream<NodePreflightConfig> streamAll();
+
+    int delete(String id);
+    void deleteAll();
 }
