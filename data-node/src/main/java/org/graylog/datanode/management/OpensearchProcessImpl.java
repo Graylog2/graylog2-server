@@ -75,7 +75,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
-        final HttpHost host = getRestBaseUrl(configuration);
+        final HttpHost host = configuration.getRestBaseUrl();
 
         RestClientBuilder builder = RestClient.builder(host);
         if ("https".equals(host.getSchemeName())) {
@@ -113,19 +113,17 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 process.info().startInstant().orElse(null),
                 process.info().totalCpuDuration().orElse(null),
                 process.info().user().orElse(null),
-                configuration.map(this::getRestBaseUrl).map(HttpHost::toString).orElse(null)
+                configuration.map(OpensearchConfiguration::getRestBaseUrl).map(HttpHost::toString).orElse(null)
 
         )).orElseGet(() -> new ProcessInfo(-1, datanodeConfiguration.nodeName(), processState.getState(), false, null, null, null, null));
     }
 
     @Override
     public URI getOpensearchBaseUrl() {
-        return configuration.map(c -> URI.create(getRestBaseUrl(c).toURI())).orElse(URI.create(""));
-    }
-
-    private HttpHost getRestBaseUrl(OpensearchConfiguration config) {
-        final boolean sslEnabled = Boolean.parseBoolean(config.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        return new HttpHost("localhost", config.httpPort(), sslEnabled ? "https" : "http");
+        final String baseUrl = configuration.map(OpensearchConfiguration::getRestBaseUrl)
+                .map(HttpHost::toURI)
+                .orElse(""); // TODO: will this cause problems in the nodeservice?
+        return URI.create(baseUrl);
     }
 
     private Optional<Process> process() {
