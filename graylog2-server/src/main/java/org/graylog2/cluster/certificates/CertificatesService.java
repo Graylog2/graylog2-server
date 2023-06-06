@@ -26,7 +26,6 @@ import org.bson.Document;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollection;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
-import org.graylog2.cluster.NodePreflightConfig;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
