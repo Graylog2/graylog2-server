@@ -16,6 +16,7 @@
  */
 package org.graylog2.periodical;
 
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -43,7 +44,7 @@ public class ESVersionCheckPeriodical extends Periodical {
     @Inject
     public ESVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
                                     @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
-                                    @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
+                                    @IndexerHosts List<URI> elasticsearchHosts,
                                     VersionProbe versionProbe,
                                     NotificationService notificationService) {
         this.initialElasticsearchVersion = elasticsearchVersion;

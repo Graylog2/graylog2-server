@@ -33,8 +33,6 @@ import java.util.concurrent.TimeoutException;
 
 
 class CommandLineProcess {
-    private static final String JAVA_HOME_ENV = "JAVA_HOME";
-
     private final Path executable;
     private final List<String> arguments;
     private final ProcessListener listener;
@@ -57,7 +55,7 @@ class CommandLineProcess {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandLineProcess.class);
 
-    public void start() throws IOException {
+    public void start() {
 
         LOG.info("Running process from " + executable.toAbsolutePath());
 
@@ -70,13 +68,13 @@ class CommandLineProcess {
         executor.setStreamHandler(new PumpStreamHandler(new LoggingOutputStream(listener::onStdOut), new LoggingOutputStream(listener::onStdErr)));
         executor.setWatchdog(watchDog);
 
-        executor.execute(cmdLine, environment.getEnv(), listener);
         try {
+            executor.execute(cmdLine, environment.getEnv(), listener);
             this.process = executor.getProcess().get(30, TimeUnit.SECONDS);
             listener.onStart();
         } catch (TimeoutException e) {
             throw new RuntimeException("Failed to obtain process", e);
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -86,7 +84,7 @@ class CommandLineProcess {
     }
 
     /**
-     * "Do not rely on the undelying process if not necessary"
+     * "Do not rely on the underlying process if not necessary"
      */
     @Deprecated(forRemoval = true)
     public Optional<Process> getProcess() {

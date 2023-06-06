@@ -16,33 +16,31 @@
  */
 package org.graylog.datanode.configuration;
 
+import org.graylog.datanode.configuration.certificates.CertificateMetaData;
+
 import java.util.Map;
 
-import static org.graylog.datanode.configuration.ConfigurationProvider.SSL_PREFIX;
+import static org.graylog.datanode.configuration.variants.SecureConfiguration.SSL_PREFIX;
 
 public class TlsConfigurationSupplier {
 
     static final String KEYSTORE_FORMAT = "PKCS12";
     static final String TRUSTSTORE_FORMAT = "PKCS12";
 
-    static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
+    public static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
 
     public void addTransportTlsConfig(Map<String, String> config,
-                                      final String alias,
-                                      final String keystoreFile,
-                                      final String keystoreFilePassword
+                                      final CertificateMetaData certificateMetaData
 
     ) {
         final String configSubPart = SSL_PREFIX + "transport";
-        addTlsConfig(config, configSubPart, alias, keystoreFile, keystoreFilePassword);
+        addTlsConfig(config, configSubPart, certificateMetaData);
     }
 
     public void addHttpTlsConfig(Map<String, String> config,
-                                 final String alias,
-                                 final String keystoreFile,
-                                 final String keystoreFilePassword) {
+                                 final CertificateMetaData certificateMetaData) {
         final String configSubPart = SSL_PREFIX + "http";
-        addTlsConfig(config, configSubPart, alias, keystoreFile, keystoreFilePassword);
+        addTlsConfig(config, configSubPart, certificateMetaData);
         config.put(configSubPart + ".enabled", "true");
     }
 
@@ -61,13 +59,11 @@ public class TlsConfigurationSupplier {
 
     private void addTlsConfig(Map<String, String> config,
                               final String configPrefix,
-                              final String alias,
-                              final String keystoreFilePath,
-                              final String keystoreFilePassword
+                              final CertificateMetaData certificateMetaData
     ) {
         config.put(configPrefix + ".keystore_type", KEYSTORE_FORMAT);
-        config.put(configPrefix + ".keystore_filepath", keystoreFilePath);
-        config.put(configPrefix + ".keystore_password", keystoreFilePassword);
-        config.put(configPrefix + ".keystore_alias", alias);
+        config.put(configPrefix + ".keystore_filepath", certificateMetaData.keystoreFilePath());
+        config.put(configPrefix + ".keystore_password", certificateMetaData.passwordAsString());
+        config.put(configPrefix + ".keystore_alias", certificateMetaData.alias());
     }
 }

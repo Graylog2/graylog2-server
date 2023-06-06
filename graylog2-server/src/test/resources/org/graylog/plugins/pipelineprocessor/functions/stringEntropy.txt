@@ -1,0 +1,8 @@
+rule "string_entropy"
+when
+    true
+then
+    set_field("zero_entropy", string_entropy("1111"));
+    set_field("one_entropy", string_entropy("1111155555"));
+    trigger_test();
+end

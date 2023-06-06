@@ -19,12 +19,13 @@ package org.graylog.datanode.management;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
-import org.graylog.datanode.ProcessProvidingExecutor;
+import org.apache.commons.io.IOUtils;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessInfo;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
+import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
 import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
@@ -40,9 +41,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 
@@ -50,9 +51,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
     private final OpensearchConfiguration configuration;
+    private OpensearchDynamicConfiguration dynamicConfiguration;
     private final RestHighLevelClient restClient;
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
+
     private boolean isLeaderNode;
     private CommandLineProcess commandLineProcess;
 
@@ -132,7 +135,13 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public void onEvent(ProcessEvent event) {
+        LOG.debug("Process event: " + event);
         this.processState.fire(event);
+    }
+
+    @Override
+    public void setStateMachineTracer(StateMachineTracer stateMachineTracer) {
+        this.processState.setTrace(stateMachineTracer);
     }
 
     public void setLeaderNode(boolean isLeaderNode) {
@@ -153,7 +162,23 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
-    public synchronized void start() throws IOException {
+    public void startWithConfig(OpensearchDynamicConfiguration configuration) {
+        if(!Objects.equals(dynamicConfiguration, configuration)) {
+            this.dynamicConfiguration = configuration;
+            restart();
+        } else {
+            LOG.info("Dynamic configuration not changed, ignoring");
+        }
+    }
+
+    @Override
+    public synchronized void restart()  {
+        if (dynamicConfiguration == null) {
+            throw new IllegalArgumentException("Dynamic runtime configuration required but not supplied!");
+        }
+
+        stopProcess();
+
         final Path executable = configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
         final List<String> arguments = configuration.asMap().entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
@@ -163,7 +188,23 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public synchronized void stop() {
-        commandLineProcess.stop();
+        onEvent(ProcessEvent.PROCESS_STOPPED);
+        stopProcess();
+        stopRestClient();
+    }
+
+    private void stopRestClient() {
+        try {
+            restClient().close();
+        } catch (IOException e) {
+            LOG.warn("Failed to close rest client", e);
+        }
+    }
+
+    private void stopProcess() {
+        if (this.commandLineProcess != null) {
+            commandLineProcess.stop();
+        }
     }
 
     @Override
