@@ -119,6 +119,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.StringEntropy;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
@@ -203,6 +204,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Replace.NAME, Replace.class);
         addMessageProcessorFunction(Length.NAME, Length.class);
         addMessageProcessorFunction(FirstNonNull.NAME, FirstNonNull.class);
+        addMessageProcessorFunction(StringEntropy.NAME, StringEntropy.class);
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);

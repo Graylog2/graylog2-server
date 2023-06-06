@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bindings;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.datanode.Configuration;
@@ -34,6 +35,7 @@ import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
 import javax.ws.rs.container.DynamicFeature;
@@ -65,6 +67,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindProviders() {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
+        bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
     }

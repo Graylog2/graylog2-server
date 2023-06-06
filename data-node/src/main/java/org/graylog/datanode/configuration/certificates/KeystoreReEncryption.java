@@ -64,7 +64,6 @@ public class KeystoreReEncryption {
         if (keyStore.isPresent()) {
             final KeyStore originalKeystore = keyStore.get();
             keystoreStorage.writeKeyStore(targetLocation, originalKeystore, originalPassword, newPassword);
-
         } else {
             throw new KeyStoreStorageException("No keystore present in : " + originalLocation);
         }
