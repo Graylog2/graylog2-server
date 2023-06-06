@@ -28,9 +28,14 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.graylog.security.UserContext;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
@@ -102,6 +107,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -432,8 +438,9 @@ public class UsersResource extends RestResource {
 
         if (isPermitted("*")) {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
-            if (sessionTimeoutMs != null && sessionTimeoutMs != 0) {
-                user.setSessionTimeoutMs(sessionTimeoutMs);
+            if (Objects.nonNull(sessionTimeoutMs) && sessionTimeoutMs != 0 && (user.getSessionTimeoutMs() != sessionTimeoutMs)) {
+                    updateExistingSession(user, sessionTimeoutMs);
+                    user.setSessionTimeoutMs(sessionTimeoutMs);
             }
         }
 
@@ -442,6 +449,19 @@ public class UsersResource extends RestResource {
         }
 
         userManagementService.update(user, cr);
+    }
+
+    private void updateExistingSession(User user, long newSessionTimeOut) {
+        AllUserSessions allUserSessions = AllUserSessions.create(sessionService);
+        allUserSessions.forUser(user).ifPresent(userSession -> {
+            userSession.setTimeout(newSessionTimeOut);
+            Session session = sessionService.daoToSimpleSession(userSession);
+
+            DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
+            DefaultSessionManager sessionManager = (DefaultSessionManager) securityManager.getSessionManager();
+            SessionDAO sessionDAO = sessionManager.getSessionDAO();
+            sessionDAO.update(session);
+        });
     }
 
     private boolean rolesContainAdmin(List<String> roles) {
