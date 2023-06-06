@@ -90,4 +90,11 @@ describe('RuleBuilderBlock', () => {
 
     expect(mockNegate).toHaveBeenCalled();
   });
+
+  it('displays errors when existing', async () => {
+    render(<RuleBlockDisplay block={{ ...block, errors: ['wrong 1', 'not right 2'] }} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+
+    expect(screen.getByText('wrong 1')).toBeInTheDocument();
+    expect(screen.getByText('not right 2')).toBeInTheDocument();
+  });
 });
