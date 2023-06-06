@@ -25,6 +25,7 @@ import type View from 'views/logic/views/View';
 import type { QueryId } from 'views/logic/queries/Query';
 import type { QuerySet } from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { BufferItem } from 'views/logic/slices/undoRedoSlice';
 
 type Props = {
   initialQuery: QueryId,
@@ -44,16 +45,34 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
 
     return queries.first()?.id;
   }, [initialQuery, view?.search?.queries]);
-  const initialState = useMemo(() => ({
-    view: { view, isDirty: false, isNew, activeQuery },
-    searchExecution: {
-      widgetsToSearch: undefined,
-      executionState,
-      isLoading: false,
-      result: undefined,
-    },
+  const initialState = useMemo(() => {
+    const viewStore = {
+      view,
+      isDirty:
+    false,
+      isNew,
+      activeQuery,
+    };
+
+    const initialBuffer: Array<BufferItem> = [{ state: viewStore, type: 'view' }];
+
+    return ({
+      view: viewStore,
+      searchExecution: {
+        widgetsToSearch: undefined,
+        executionState,
+        isLoading:
+        false,
+        result:
+        undefined,
+      },
+      undoRedo: {
+        buffer: initialBuffer,
+        currentRevision: 0,
+      },
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [executionState, isNew, view]);
+  }, [executionState, isNew, view]);
   const store = useMemo(() => createStore(reducers, initialState), [initialState, reducers]);
 
   return (

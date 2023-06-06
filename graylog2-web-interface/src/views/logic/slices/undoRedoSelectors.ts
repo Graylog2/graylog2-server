@@ -22,6 +22,6 @@ export const selectRootUndoRedo = (state: RootState) => state.undoRedo;
 export const selectBuffer = createSelector(selectRootUndoRedo, (state) => state.buffer);
 
 export const selectUndoRedoAvailability = createSelector(selectRootUndoRedo, ({ currentRevision, buffer }) => ({
-  isUndoAvailable: currentRevision >= 0 && currentRevision !== null,
-  isRedoAvailable: currentRevision < (buffer.length - 1) && currentRevision !== null,
+  isUndoAvailable: currentRevision > 0,
+  isRedoAvailable: currentRevision < (buffer.length - 1),
 }));

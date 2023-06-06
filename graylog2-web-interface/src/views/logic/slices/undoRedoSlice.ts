@@ -26,7 +26,7 @@ const BUFFER_MAX_SIZE = 10;
 
 type BufferItemType = 'view';
 
-type BufferItem = { type: BufferItemType, state: any }
+export type BufferItem = { type: BufferItemType, state: any }
 
 export type UndoRedoState = {
   buffer: Array<BufferItem>,
@@ -75,7 +75,7 @@ export const undo = () => async (dispatch: AppDispatch, getState: () => RootStat
 
   if (isUndoAvailable) {
     const newRevision = currentRevision - 1;
-    const { type, state } = buffer[currentRevision];
+    const { type, state } = buffer[newRevision];
     const bufferHandler = handlers[type];
 
     dispatch(bufferHandler(state)).then(() => dispatch(setCurrentRevision(newRevision)));
@@ -89,6 +89,7 @@ export const redo = () => async (dispatch: AppDispatch, getState: () => RootStat
 
   if (isRedoAvailable) {
     const newRevision = currentRevision + 1;
+
     const { type, state } = buffer[newRevision];
     const bufferHandler = handlers[type];
     dispatch(bufferHandler(state)).then(() => dispatch(setCurrentRevision(newRevision)));
