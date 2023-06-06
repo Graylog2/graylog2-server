@@ -82,6 +82,25 @@ public class CertificatesService {
         return result.getModifiedCount() > 0 || result.getUpsertedId() != null;
     }
 
+    public boolean hasCert(final KeystoreMongoLocation keystoreMongoLocation) {
+        final KeystoreMongoCollection collection = keystoreMongoLocation.collection();
+        MongoCollection<Document> dbCollection = mongoDatabase.getCollection(collection.collectionName());
+        final FindIterable<Document> objects = dbCollection.find(
+                eq(
+                        collection.identifierField(),
+                        keystoreMongoLocation.nodeId()
+                )
+        );
+        final Document nodeCertificate = objects.first();
+        if (nodeCertificate != null) {
+            final Document encryptedCertificateDocument = nodeCertificate.get(collection.encryptedCertificateField(), Document.class);
+            if (encryptedCertificateDocument != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Optional<String> readCert(final KeystoreMongoLocation keystoreMongoLocation) {
         final KeystoreMongoCollection collection = keystoreMongoLocation.collection();
         MongoCollection<Document> dbCollection = mongoDatabase.getCollection(collection.collectionName());

@@ -16,6 +16,8 @@
  */
 package org.graylog2.cluster.certificates;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.MongoConnection;
@@ -28,6 +30,7 @@ import java.util.Optional;
 
 import static org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CertificatesServiceTest {
@@ -37,10 +40,12 @@ public class CertificatesServiceTest {
 
     private CertificatesService certificatesService;
     private EncryptedValueService encryptedValueService;
+    private MongoConnection mongoConnection;
+
 
     @Before
     public void setUp() {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+        mongoConnection = mongodb.mongoConnection();
         encryptedValueService = new EncryptedValueService("abracadabra! abracadabra!");
         certificatesService = new CertificatesService(mongoConnection, encryptedValueService);
     }
@@ -74,6 +79,31 @@ public class CertificatesServiceTest {
         final Optional<String> readResult = certificatesService.readCert("node_id_1");
         assertTrue(readResult.isPresent());
         assertEquals("Certificate string representation", readResult.get());
+    }
+
+    @Test
+    public void testHasCertReturnsFalseWhenNoMongoEntry() {
+        assertFalse(certificatesService.hasCert(
+                new KeystoreMongoLocation("there is no node with this id", DATA_NODE_KEYSTORE_COLLECTION)
+        ));
+    }
+
+    @Test
+    public void testHasCertReturnsFalseWhenMongoEntryWithMissingCert() {
+        //adding document without encrypted certificate
+        final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(DATA_NODE_KEYSTORE_COLLECTION.collectionName());
+        collection.insertOne(new Document(DATA_NODE_KEYSTORE_COLLECTION.identifierField(), "node_id_1"));
+        assertFalse(certificatesService.hasCert(
+                new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION)
+        ));
+    }
+
+    @Test
+    public void testHasCertReturnsTrueWhenProperMongoEntry() {
+        certificatesService.writeCert(new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION), "Certificate string representation");
+        assertTrue(certificatesService.hasCert(
+                new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION)
+        ));
     }
 
 
