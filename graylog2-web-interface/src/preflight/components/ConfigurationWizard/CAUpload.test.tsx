@@ -19,7 +19,7 @@ import React from 'react';
 import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
-import fetch from 'logic/rest/FetchProvider';
+import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
 import UserNotification from 'preflight/util/UserNotification';
 
@@ -42,7 +42,7 @@ const logger = {
 
 describe('CAUpload', () => {
   beforeEach(() => {
-    asMock(fetch).mockReturnValue(Promise.resolve());
+    asMock(fetchMultiPartFormData).mockReturnValue(Promise.resolve());
   });
 
   const files = [
@@ -63,7 +63,7 @@ describe('CAUpload', () => {
     userEvent.upload(dropzone, files);
     userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining('/api/ca/upload'),
       { files },
@@ -74,7 +74,7 @@ describe('CAUpload', () => {
   });
 
   it('should show error when CA upload fails', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(fetchMultiPartFormData).mockImplementation(() => Promise.reject(new Error('Error')));
 
     renderPreflight(
       <DefaultQueryClientProvider options={{ logger }}>
