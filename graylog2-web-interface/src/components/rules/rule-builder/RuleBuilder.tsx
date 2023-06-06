@@ -70,9 +70,9 @@ const RuleBuilder = () => {
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
 
-  const validateRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
+  const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
-  });
+  }).catch(() => setRule(ruleToValidate));
 
   // TODO: Add reorder functionality (make sure to setPrimaryParamsAndOutputVariable and validate)
 
@@ -173,8 +173,7 @@ const RuleBuilder = () => {
       };
     }
 
-    setRule(ruleToAdd);
-    validateRuleBuilder(ruleToAdd);
+    validateAndSaveRuleBuilder(ruleToAdd);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
@@ -205,8 +204,7 @@ const RuleBuilder = () => {
       };
     }
 
-    setRule(ruleToUpdate);
-    validateRuleBuilder(ruleToUpdate);
+    validateAndSaveRuleBuilder(ruleToUpdate);
   };
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
@@ -234,8 +232,7 @@ const RuleBuilder = () => {
       };
     }
 
-    setRule(ruleToDelete);
-    validateRuleBuilder(ruleToDelete);
+    validateAndSaveRuleBuilder(ruleToDelete);
   };
 
   const handleCancel = () => {
