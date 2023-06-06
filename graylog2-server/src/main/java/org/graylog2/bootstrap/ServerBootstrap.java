@@ -41,6 +41,7 @@ import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
+import org.graylog2.cluster.preflight.PreflightConfigBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -167,6 +168,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
+        modules.add(new PreflightConfigBindings());
         modules.add(new PreflightWebModule());
         modules.add(new ObjectMapperModule(chainingClassLoader));
         modules.add(new SchedulerBindings());
