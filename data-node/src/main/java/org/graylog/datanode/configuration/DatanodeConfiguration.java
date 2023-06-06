@@ -14,7 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog.datanode.configuration;
 
-public class OpensearchDynamicConfiguration {
+import org.graylog.datanode.OpensearchDistribution;
+
+/**
+ * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
+ * config file or from the ENV properties.
+ */
+public record DatanodeConfiguration(
+        OpensearchDistribution opensearchDistribution,
+        String nodeName,
+        int processLogsBufferSize
+) {
 }

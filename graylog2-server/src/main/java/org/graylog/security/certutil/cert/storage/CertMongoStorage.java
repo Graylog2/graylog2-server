@@ -21,7 +21,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.graylog2.cluster.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.NodePreflightConfigService;
 
 import javax.inject.Inject;
 import java.io.BufferedReader;

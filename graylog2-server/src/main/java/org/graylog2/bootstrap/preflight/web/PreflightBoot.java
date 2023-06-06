@@ -44,7 +44,7 @@ public class PreflightBoot {
 
     public boolean shouldRunPreflightWeb() {
 
-        if(configuration.enablePreflightWebserver()) {
+        if (configuration.enablePreflightWebserver()) {
             return true;
         }
 

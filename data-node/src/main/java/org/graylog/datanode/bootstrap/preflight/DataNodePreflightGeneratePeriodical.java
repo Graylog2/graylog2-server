@@ -30,8 +30,8 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoColl
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodePreflightConfig;
-import org.graylog2.cluster.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;

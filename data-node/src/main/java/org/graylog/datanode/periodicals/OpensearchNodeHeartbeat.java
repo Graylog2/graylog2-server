@@ -21,6 +21,7 @@ import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.core.MainResponse;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Optional;
 
 @Singleton
 public class OpensearchNodeHeartbeat extends Periodical {
@@ -46,12 +48,16 @@ public class OpensearchNodeHeartbeat extends Periodical {
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
         if (!process.isInState(ProcessState.TERMINATED) && !process.isInState(ProcessState.WAITING_FOR_CONFIGURATION)) {
-            try {
-                final MainResponse health = process.restClient()
-                        .info(RequestOptions.DEFAULT);
-                onNodeResponse(process, health);
-            } catch (IOException | OpenSearchStatusException e) {
-                onRestError(process, e);
+
+            final Optional<RestHighLevelClient> restClient = process.restClient();
+            if(restClient.isPresent()) {
+                try {
+                    final MainResponse health = restClient.get()
+                            .info(RequestOptions.DEFAULT);
+                    onNodeResponse(process, health);
+                } catch (IOException | OpenSearchStatusException e) {
+                    onRestError(process, e);
+                }
             }
         }
     }

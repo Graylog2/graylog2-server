@@ -14,26 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog2.cluster.preflight;
 
-import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.ProcessInfo;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-
-import java.net.URI;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public interface OpensearchProcess extends ManagableProcess<OpensearchConfiguration> {
+public interface NodePreflightConfigService {
+    NodePreflightConfig getPreflightConfigFor(String nodeId);
 
-    ProcessInfo processInfo();
+    void writeCsr(String nodeId, String csr);
 
-    Optional<RestHighLevelClient> restClient();
+    void writeCert(String nodeId, String cert);
 
-    boolean isLeaderNode();
-    void setLeaderNode(boolean isManagerNode);
-    List<String> stdOutLogs();
-    List<String> stdErrLogs();
+    Optional<String> readCert(String nodeId);
 
-    URI getOpensearchBaseUrl();
+    void changeState(String nodeId, NodePreflightConfig.State state);
+
+    NodePreflightConfig save(NodePreflightConfig config);
+
+    Stream<NodePreflightConfig> streamAll();
+
+    int delete(String id);
+    void deleteAll();
 }
