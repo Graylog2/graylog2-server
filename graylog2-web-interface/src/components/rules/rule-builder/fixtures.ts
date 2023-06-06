@@ -425,7 +425,7 @@ const actionsBlockDict: BlockDict[] = [
 ];
 
 const buildRuleBlock = (attrs: {
-  function?: string,
+  functionName?: string,
   id?: string,
   params?: {[key:string]: string | number | boolean},
   outputvariable?: string,
@@ -456,6 +456,4 @@ const buildRuleBlock = (attrs: {
   return block;
 };
 
-const negatableBlockName = 'has_field';
-
-export { actionsBlockDict, conditionsBlockDict, buildRuleBlock, negatableBlockName };
+export { actionsBlockDict, conditionsBlockDict, buildRuleBlock };
