@@ -66,15 +66,22 @@ class DocsHelper {
 
   DOCS_URL = 'https://docs.graylog.org/docs';
 
+  NEW_DOCS_URL = 'https://go2docs.graylog.org';
+
   DOCS_URL_BY_VERSION = {
-    '5.0': 'https://go2docs.graylog.org/5-0',
-    // eslint-disable-next-line quote-props
-    '5.1': 'https://go2docs.graylog.org/5-1',
+    '3\\..': 'https://archivedocs.graylog.org/en/3.3',
+    '4\\..': `${this.NEW_DOCS_URL}/4-x`,
+    '5\\.0': `${this.NEW_DOCS_URL}/5-0`,
+    '5\\.1': `${this.NEW_DOCS_URL}/5-1`,
   };
 
   toString(path, inVersion = null) {
     const currentDocsVersion = Object.keys(this.DOCS_URL_BY_VERSION)[Object.keys(this.DOCS_URL_BY_VERSION).length - 1];
-    const version = Object.keys(this.DOCS_URL_BY_VERSION).includes(inVersion) ? inVersion : currentDocsVersion;
+    const version = Object.keys(this.DOCS_URL_BY_VERSION).find((verRex) => {
+      const rex = new RegExp(`^${verRex}$`);
+
+      return rex.test(inVersion);
+    }) || currentDocsVersion;
 
     const baseUrl = inVersion ? this.DOCS_URL_BY_VERSION[version] : this.DOCS_URL;
 
