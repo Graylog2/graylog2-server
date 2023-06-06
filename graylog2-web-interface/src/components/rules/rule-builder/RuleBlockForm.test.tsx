@@ -40,24 +40,22 @@ const mockSelect = jest.fn();
 const mockUpdate = jest.fn();
 
 const comp = ({
-  order = 1,
   existingBlock = undefined,
   selectedBlockDict = undefined,
-  previousOutputPresent = false,
 } = {}) => (
   <RuleBlockForm onAdd={mockAdd}
                  onCancel={mockCancel}
                  onSelect={mockSelect}
                  onUpdate={mockUpdate}
-                 previousOutputPresent={previousOutputPresent}
+                 previousOutputPresent={false}
                  options={options}
                  selectedBlockDict={selectedBlockDict}
                  existingBlock={existingBlock}
-                 order={order}
+                 order={1}
                  type="action" />
 );
 
-describe('RuleBuilderBlock', () => {
+describe('RuleBlockForm', () => {
   afterEach(() => {
     jest.resetAllMocks();
   });

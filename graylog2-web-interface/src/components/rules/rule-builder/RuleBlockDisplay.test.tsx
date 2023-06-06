@@ -34,7 +34,7 @@ const mockDelete = jest.fn();
 const mockEdit = jest.fn();
 const mockNegate = jest.fn();
 
-describe('RuleBuilderBlock', () => {
+describe('RuleBlockDisplay', () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
