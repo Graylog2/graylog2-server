@@ -38,6 +38,11 @@ const Wrapper = styled.div``;
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
 const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
+const percentageStrategyOptions = [
+  { label: 'Document Count', value: 'COUNT' },
+  { label: 'Field Sum', value: 'SUM' },
+];
+const percentageRequiredFieldOptions = [Properties.Numeric];
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
@@ -53,6 +58,7 @@ const Metric = ({ index }: Props) => {
   const isFieldRequired = !['count', 'percentage'].includes(currentFunction);
 
   const isPercentile = currentFunction === 'percentile';
+  const isPercentage = currentFunction === 'percentage';
   const requiresNumericField = !['card', 'count', 'latest'].includes(currentFunction);
   const requiredProperties = requiresNumericField
     ? [Properties.Numeric]
@@ -131,6 +137,46 @@ const Metric = ({ index }: Props) => {
             </Input>
           )}
         </Field>
+      )}
+      {isPercentage && (
+        <>
+          <Field name={`metrics.${index}.strategy`}>
+            {({ field: { name, value, onChange }, meta: { error } }) => (
+              <Input id="metric-percentage-strategy-select"
+                     label="Strategy"
+                     error={error}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <Select options={percentageStrategyOptions}
+                        clearable={false}
+                        name={name}
+                        value={value}
+                        aria-label="Select strategy"
+                        size="small"
+                        menuPortalTarget={document.body}
+                        onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+              </Input>
+            )}
+          </Field>
+          <Field name={`metrics.${index}.field`}>
+            {({ field: { name, value, onChange }, meta: { error } }) => (
+              <Input id="metric-field"
+                     label="Field"
+                     error={error}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <FieldSelect id="metric-field-select"
+                             selectRef={metricFieldSelectRef}
+                             onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                             clearable={!isFieldRequired}
+                             properties={percentageRequiredFieldOptions}
+                             name={name}
+                             value={value}
+                             ariaLabel="Select a field" />
+              </Input>
+            )}
+          </Field>
+        </>
       )}
       <FormikInput id="name"
                    label={<>Name <Opt /></>}
