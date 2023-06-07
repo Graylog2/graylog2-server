@@ -40,7 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MongoDBPreflightCheck {
+public class MongoDBPreflightCheck implements PreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBPreflightCheck.class);
     private static final String CLUSTER_CONFIG_COLLECTION_NAME = "cluster_config";
 
