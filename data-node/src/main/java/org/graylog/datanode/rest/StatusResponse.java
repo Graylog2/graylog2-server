@@ -18,4 +18,4 @@ package org.graylog.datanode.rest;
 
 import org.graylog.datanode.process.OpensearchInfo;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo info) {}
+public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}

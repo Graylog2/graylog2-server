@@ -16,5 +16,5 @@
  */
 package org.graylog.datanode.process;
 
-public record OpensearchInfo(String nodeName, ProcessState status, boolean isLeaderNode, String restBaseUrl, ProcessInformation processInformation) {
+public record OpensearchInfo(String nodeName, ProcessState state, boolean isLeaderNode, String restBaseUrl, ProcessInformation process) {
 }

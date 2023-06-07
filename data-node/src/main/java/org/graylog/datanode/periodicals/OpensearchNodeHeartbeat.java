@@ -68,7 +68,7 @@ public class OpensearchNodeHeartbeat extends Periodical {
 
     private void onRestError(OpensearchProcess process, Exception e) {
         process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
-        LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.processInfo().processInformation().pid(), e.getMessage());
+        LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.processInfo().process().pid(), e.getMessage());
     }
 
     @Nonnull
