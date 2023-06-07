@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.process;
 
-import org.graylog.datanode.process.OpensearchInfo;
-
-public record StatusResponse(String opensearchVersion, OpensearchInfo info) {}
+public record OpensearchInfo(String nodeName, ProcessState status, boolean isLeaderNode, String restBaseUrl, ProcessInformation processInformation) {
+}

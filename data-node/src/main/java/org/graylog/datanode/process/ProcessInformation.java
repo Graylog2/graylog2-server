@@ -16,6 +16,11 @@
  */
 package org.graylog.datanode.process;
 
-public record ProcessInfo(long pid, String nodeName, ProcessState status, boolean isLeaderNode, java.time.Instant started, java.time.Duration totalCpuDuration, String user,
-                          String restBaseUrl) {
+import java.time.Instant;
+
+public record ProcessInformation(long pid, boolean alive, Instant started) {
+
+    public static ProcessInformation empty() {
+        return new ProcessInformation(-1, false, null);
+    }
 }

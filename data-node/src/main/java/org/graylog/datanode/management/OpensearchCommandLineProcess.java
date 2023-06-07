@@ -17,13 +17,14 @@
 package org.graylog.datanode.management;
 
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.process.ProcessInformation;
 
+import javax.validation.constraints.NotNull;
 import java.io.Closeable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 public class OpensearchCommandLineProcess implements Closeable {
 
@@ -45,7 +46,8 @@ public class OpensearchCommandLineProcess implements Closeable {
         commandLineProcess.stop();
     }
 
-    public Optional<Process> process() {
-        return commandLineProcess.getProcess();
+    @NotNull
+    public ProcessInformation processInfo() {
+        return commandLineProcess.processInfo();
     }
 }
