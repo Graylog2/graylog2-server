@@ -23,27 +23,37 @@ import java.util.Enumeration;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
-//TODO: temporary and limited implementation...
-//Supporting all the possibilities would be a nightmare
-//The goal is to introduce a new class for KeyStore, which supports only one type of password across all entries, one entry type...
-public class PrivateKeyEntryOnlyKeystoreContentMover implements KeystoreContentMover {
+//Assumption: there is one common password, shared between the keystore and its entries
+public class SinglePasswordKeystoreContentMover implements KeystoreContentMover {
 
     @Override
     public KeyStore moveContents(KeyStore originalKeyStore,
                                  char[] currentPassword,
                                  final char[] newPassword) throws GeneralSecurityException, IOException {
+        if (newPassword == null) {
+            throw new IllegalArgumentException("new password cannot be null");
+        }
         KeyStore newKeyStore = KeyStore.getInstance(PKCS12);
         newKeyStore.load(null, newPassword);
 
         final Enumeration<String> aliases = originalKeyStore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
-            newKeyStore.setKeyEntry(
-                    alias,
-                    originalKeyStore.getKey(alias, currentPassword),
-                    newPassword,
-                    originalKeyStore.getCertificateChain(alias)
-            );
+            if (originalKeyStore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
+                newKeyStore.setKeyEntry(
+                        alias,
+                        originalKeyStore.getKey(alias, currentPassword),
+                        newPassword,
+                        originalKeyStore.getCertificateChain(alias)
+                );
+            } else if (originalKeyStore.entryInstanceOf(alias, KeyStore.TrustedCertificateEntry.class)) {
+                newKeyStore.setCertificateEntry(alias, originalKeyStore.getCertificate(alias));
+            } else if (originalKeyStore.entryInstanceOf(alias, KeyStore.SecretKeyEntry.class)) {
+                newKeyStore.setEntry(alias,
+                        originalKeyStore.getEntry(alias, new KeyStore.PasswordProtection(currentPassword)),
+                        new KeyStore.PasswordProtection(newPassword)
+                );
+            }
         }
         return newKeyStore;
     }

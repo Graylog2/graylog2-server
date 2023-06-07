@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.configuration.variants;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.RootCertificateFinder;
 import org.graylog.datanode.configuration.TlsConfigurationSupplier;
@@ -94,8 +95,9 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
     }
 
     @Override
-    public Map<String, String> configure(Configuration localConfiguration) throws KeyStoreStorageException, IOException, GeneralSecurityException {
-        Map<String, String> config = commonSecureConfig(localConfiguration);
+    public ImmutableMap<String, String> configure(Configuration localConfiguration) throws KeyStoreStorageException, IOException, GeneralSecurityException {
+        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        builder.putAll(commonSecureConfig(localConfiguration));
         Map<String, X509Certificate> rootCerts = new HashMap<>();
         final String truststorePassword = UUID.randomUUID().toString();
         keystoreReEncryption.reEncyptWithSecret(
@@ -113,18 +115,16 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
                 finalTransportKeystoreLocation.keystorePath(),
                 secret,
                 CertConstants.DATANODE_KEY_ALIAS));
-        tlsConfigurationSupplier.addTransportTlsConfig(config,
-                new CertificateMetaData(
+        builder.putAll(tlsConfigurationSupplier.getTransportTlsConfig(new CertificateMetaData(
                         localConfiguration.getDatanodeTransportCertificate(),
                         secret
                 )
-        );
-        tlsConfigurationSupplier.addHttpTlsConfig(config,
-                new CertificateMetaData(
+        ));
+        builder.putAll(tlsConfigurationSupplier.getHttpTlsConfig(new CertificateMetaData(
                         localConfiguration.getDatanodeHttpCertificate(),
                         secret
                 )
-        );
+        ));
 
         if (!rootCerts.isEmpty()) {
             final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
@@ -134,9 +134,9 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
             );
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
-            tlsConfigurationSupplier.addTrustStoreTlsConfig(config, truststorePassword);
+            builder.putAll(tlsConfigurationSupplier.getTrustStoreTlsConfig(truststorePassword));
         }
 
-        return config;
+        return builder.build();
     }
 }
