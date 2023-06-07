@@ -14,26 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode;
+package org.graylog2.cluster.preflight;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.nio.file.Path;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
-@Singleton
-public class OpensearchDistributionProvider implements Provider<OpensearchDistribution> {
-
-    private final OpensearchDistribution opensearchDistribution;
-
-    @Inject
-    public OpensearchDistributionProvider(Configuration configuration) throws IOException {
-        this.opensearchDistribution = OpensearchDistribution.detectInDirectory(Path.of(configuration.getOpensearchDistributionRoot()));
-    }
+public class PreflightConfigBindings extends AbstractModule {
 
     @Override
-    public OpensearchDistribution get() {
-        return opensearchDistribution;
+    protected void configure() {
+        // this wires the NodePreflightConfigServiceImpl delegate into the NodePreflightConfigBusEvents from above
+        bind(NodePreflightConfigService.class).annotatedWith(Names.named(NodePreflightConfigBusEvents.DELEGATE_NAME)).to(NodePreflightConfigServiceImpl.class);
+
+        // this is the generic dependency used by callers
+        bind(NodePreflightConfigService.class).to(NodePreflightConfigBusEvents.class);
     }
 }

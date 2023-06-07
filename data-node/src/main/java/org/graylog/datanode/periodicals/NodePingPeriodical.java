@@ -35,19 +35,19 @@ public class NodePingPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(NodePingPeriodical.class);
     private final NodeService nodeService;
     private final NodeId nodeId;
-    private final URI opensearchBaseUri;
+    private final Supplier<URI> opensearchBaseUri;
     private final Supplier<Boolean> isLeader;
 
 
     @Inject
     public NodePingPeriodical(NodeService nodeService, NodeId nodeId, OpensearchProcess managedOpenSearch) {
-        this(nodeService, nodeId, managedOpenSearch.getOpensearchBaseUrl(), managedOpenSearch::isLeaderNode);
+        this(nodeService, nodeId, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::isLeaderNode);
     }
 
     NodePingPeriodical(
             NodeService nodeService,
             NodeId nodeId,
-            URI opensearchBaseUri,
+            Supplier<URI> opensearchBaseUri,
             Supplier<Boolean> isLeader
     ) {
         this.nodeService = nodeService;
@@ -100,7 +100,7 @@ public class NodePingPeriodical extends Periodical {
     @Override
     public void doRun() {
         try {
-            nodeService.markAsAlive(nodeId, isLeader.get(), opensearchBaseUri);
+            nodeService.markAsAlive(nodeId, isLeader.get(), opensearchBaseUri.get());
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             registerServer();
@@ -110,7 +110,7 @@ public class NodePingPeriodical extends Periodical {
     private void registerServer() {
         final boolean registrationSucceeded = nodeService.registerServer(nodeId.getNodeId(),
                 isLeader.get(),
-                opensearchBaseUri,
+                opensearchBaseUri.get(),
                 Tools.getLocalCanonicalHostname());
 
         if (!registrationSucceeded) {

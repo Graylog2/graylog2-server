@@ -21,7 +21,8 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.graylog2.cluster.NodePreflightConfigService;
+import org.graylog.security.certutil.cert.CertificateChain;
+import org.graylog2.cluster.preflight.NodePreflightConfigService;
 
 import javax.inject.Inject;
 import java.io.BufferedReader;
@@ -30,47 +31,66 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
-public class CertMongoStorage implements CertStorage {
+public class CertChainMongoStorage implements CertChainStorage {
 
     private NodePreflightConfigService mongoService;
 
     @Inject
-    public CertMongoStorage(final NodePreflightConfigService mongoService) {
+    public CertChainMongoStorage(final NodePreflightConfigService mongoService) {
         this.mongoService = mongoService;
     }
 
     @Override
-    public void writeCert(final X509Certificate cert,
-                          final String nodeId) throws IOException, OperatorCreationException {
+    public void writeCertChain(final CertificateChain certChain,
+                               final String nodeId) throws IOException, OperatorCreationException {
         var writer = new StringWriter();
         try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
-            jcaPEMWriter.writeObject(cert);
+            for (Certificate cert : certChain.toCertificateChainArray()) {
+                jcaPEMWriter.writeObject(cert);
+            }
+
         }
         mongoService.writeCert(nodeId, writer.toString());
     }
 
     @Override
-    public Optional<X509Certificate> readCert(final String nodeId) throws IOException, GeneralSecurityException {
+    public Optional<CertificateChain> readCertChain(final String nodeId) throws IOException, GeneralSecurityException {
         final Optional<String> certAsString = mongoService.readCert(nodeId);
 
         if (certAsString.isPresent()) {
             Reader pemReader = new BufferedReader(new StringReader(certAsString.get()));
             PEMParser pemParser = new PEMParser(pemReader);
-            var parsedObj = pemParser.readObject();
-            if (parsedObj instanceof X509Certificate) {
-                return Optional.of((X509Certificate) parsedObj);
-            } else if (parsedObj instanceof X509CertificateHolder) {
-                return Optional.of(
-                        new JcaX509CertificateConverter().getCertificate(
-                                (X509CertificateHolder) parsedObj
-                        )
-                );
+            List<X509Certificate> caCerts = new LinkedList<>();
+            X509Certificate signedCert = readSingleCert(pemParser);
+
+            if (signedCert != null) {
+                X509Certificate caCert = readSingleCert(pemParser);
+                while (caCert != null) {
+                    caCerts.add(caCert);
+                    caCert = readSingleCert(pemParser);
+                }
+                return Optional.of(new CertificateChain(signedCert, caCerts));
             }
         }
-
         return Optional.empty();
+    }
+
+    private X509Certificate readSingleCert(PEMParser pemParser) throws IOException, CertificateException {
+        var parsedObj = pemParser.readObject();
+        if (parsedObj instanceof X509Certificate) {
+            return (X509Certificate) parsedObj;
+        } else if (parsedObj instanceof X509CertificateHolder) {
+            return new JcaX509CertificateConverter().getCertificate(
+                    (X509CertificateHolder) parsedObj
+            );
+        }
+        return null;
     }
 }

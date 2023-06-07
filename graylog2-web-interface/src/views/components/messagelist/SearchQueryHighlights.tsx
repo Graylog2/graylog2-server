@@ -16,32 +16,31 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import get from 'lodash/get';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 
-import PossiblyHighlight from './PossiblyHighlight';
+import PossiblyHighlight from '../highlighting/PossiblyHighlight';
 
 type Props = {
   field: string,
   value: any,
 };
 
-const Highlight = ({ field, value }: Props) => (
+const SearchQueryHighlights = ({ field, value }: Props) => (
   <AdditionalContext.Consumer>
     {({ message }) => (
       <PossiblyHighlight field={field}
                          color={DEFAULT_HIGHLIGHT_COLOR}
                          value={value}
-                         highlightRanges={get(message, 'highlight_ranges')} />
+                         highlightRanges={message?.highlight_ranges} />
     )}
   </AdditionalContext.Consumer>
 );
 
-Highlight.propTypes = {
+SearchQueryHighlights.propTypes = {
   field: PropTypes.string.isRequired,
   value: PropTypes.any.isRequired,
 };
 
-export default Highlight;
+export default SearchQueryHighlights;

@@ -39,7 +39,7 @@ public class RootCertificateFinder {
         return Arrays.stream(certs)
                 .filter(cert -> cert instanceof X509Certificate)
                 .map(cert -> (X509Certificate) cert)
-                .filter(this::isRootCaCertificate)
+                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)//TODO: certs.length == 1 may be temporary, our merged does not create a proper cert chain, it seems
                 .findFirst()
                 .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
     }
