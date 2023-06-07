@@ -74,7 +74,7 @@ public class CaService {
         this.nodeId = nodeId;
         this.caCreator = caCreator;
         this.configuration = configuration;
-        this.passwordSecret = passwordSecret;
+        this.passwordSecret = configuration.getCaPassword() != null ? configuration.getCaPassword() : passwordSecret;
         this.keystoreMongoLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
         this.keystoreFileLocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
     }

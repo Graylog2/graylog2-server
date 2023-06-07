@@ -16,12 +16,14 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
+import org.graylog2.Configuration;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
 import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -48,6 +50,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
     private final NodePreflightConfigService nodePreflightConfigService;
 
+    private final CaConfiguration configuration;
     private final CsrMongoStorage csrStorage;
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
@@ -58,12 +61,14 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                               final CsrMongoStorage csrStorage,
                                               final CertChainMongoStorage certMongoStorage,
                                               final CaService caService,
+                                              final Configuration configuration,
                                               final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
         this.caService = caService;
         this.passwordSecret = passwordSecret;
+        this.configuration = configuration;
     }
 
     @Override
@@ -71,14 +76,15 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
 
         try {
-            Optional<KeyStore> optKey = caService.loadKeyStore(passwordSecret.toCharArray());
+            final var password = configuration.getCaPassword() != null ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
+            Optional<KeyStore> optKey = caService.loadKeyStore(password);
             if(optKey.isEmpty()) {
                 LOG.warn("No keystore available.");
                 return;
             }
 
             KeyStore caKeystore = optKey.get();
-            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", passwordSecret.toCharArray());
+            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
             var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
             var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
