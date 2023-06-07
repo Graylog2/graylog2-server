@@ -20,6 +20,9 @@ import styled, { css } from 'styled-components';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
+import useLocation from 'routing/useLocation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { getBasePathname } from 'util/URLUtils';
 
 import type { RuleBlock, BlockType, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
@@ -48,6 +51,9 @@ type Props = {
 const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent, addBlock, updateBlock, deleteBlock }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
+
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     if (block) { setCurrentBlockDict(blockDict.find(((b) => b.name === block.function))); }
@@ -97,14 +103,32 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   };
 
   const onDelete = () => {
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `delete-${type}-button`,
+    });
+
     deleteBlock(order, type);
   };
 
   const onEdit = () => {
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `edit-${type}-button`,
+    });
+
     setEditMode(true);
   };
 
   const onNegate = () => {
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `negate-${type}-button`,
+    });
+
     updateBlock(order, type, buildBlockData({ toggleNegate: true }));
   };
 

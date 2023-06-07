@@ -20,8 +20,10 @@ import styled from 'styled-components';
 import { Button, BootstrapModalWrapper, Modal, Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { Select, SourceCodeEditor } from 'components/common';
-
-import { LinkContainer } from '../common/router';
+import useLocation from 'routing/useLocation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useHistory from 'routing/useHistory';
+import { getBasePathname } from 'util/URLUtils';
 
 const SubTitle = styled.label`
   color: #aaa;
@@ -53,60 +55,84 @@ type Props = {
   onClose: () => void,
 };
 
-const CreateRuleModal = ({ showModal, onClose }: Props) => (
-  <BootstrapModalWrapper showModal={showModal}
-                         onHide={onClose}
-                         bsSize="large">
-    <Modal.Header closeButton>
-      <Modal.Title>Create Rule</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <Row>
-        <StyledCol md={6}>
-          <label htmlFor="rule_builder">Rule Builder</label>
-          <RuleBuilderRow>
-            <Col md={6}>
-              <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
-              <Select value="has_field" clearable={false} onChange={() => {}} options={[]} />
-              <StyledInput value="transaction_date" type="text" id="transaction_date" onChange={() => {}} />
-            </Col>
-            <Col md={6}>
-              <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-              <Select value="set_field" clearable={false} onChange={() => {}} options={[]} />
-              <StyledInput value="transaction_year" type="text" id="transaction_year" onChange={() => {}} />
-              <StyledInput value={new Date().getFullYear()} type="text" id="transaction_year_value" onChange={() => {}} />
-            </Col>
-          </RuleBuilderRow>
-          <br />
-          <div>
-            It can be converted into <i>Source Code</i> at any moment.
-          </div>
-          <br />
-          <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`}>
-            <Button bsStyle="success">Use Rule Builder</Button>
-          </LinkContainer>
-        </StyledCol>
-        <Col md={6}>
-          <label htmlFor="source_code">Source Code</label>
-          {/* @ts-ignore */}
-          <SourceCodeEditor mode="pipeline"
-                            id="source_code"
-                            value={RULE_TEMPLATE}
-                            resizable={false}
-                            height={120}
-                            readOnly />
-          <br />
-          <div>
-            It can <b>not</b> be converted into <i>Rule Builder</i>.
-          </div>
-          <br />
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-            <Button bsStyle="success">Use Source Code</Button>
-          </LinkContainer>
-        </Col>
-      </Row>
-    </Modal.Body>
-  </BootstrapModalWrapper>
-);
+const CreateRuleModal = ({ showModal, onClose }: Props) => {
+  const history = useHistory();
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
+  return (
+    <BootstrapModalWrapper showModal={showModal}
+                           onHide={onClose}
+                           bsSize="large">
+      <Modal.Header closeButton>
+        <Modal.Title>Create Rule</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Row>
+          <StyledCol md={6}>
+            <label htmlFor="rule_builder">Rule Builder</label>
+            <RuleBuilderRow>
+              <Col md={6}>
+                <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
+                <Select value="has_field" clearable={false} onChange={() => {}} options={[]} />
+                <StyledInput value="transaction_date" type="text" id="transaction_date" onChange={() => {}} />
+              </Col>
+              <Col md={6}>
+                <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
+                <Select value="set_field" clearable={false} onChange={() => {}} options={[]} />
+                <StyledInput value="transaction_year" type="text" id="transaction_year" onChange={() => {}} />
+                <StyledInput value={new Date().getFullYear()} type="text" id="transaction_year_value" onChange={() => {}} />
+              </Col>
+            </RuleBuilderRow>
+            <br />
+            <div>
+              It can be converted into <i>Source Code</i> at any moment.
+            </div>
+            <br />
+            <Button bsStyle="success"
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        app_pathname: getBasePathname(pathname),
+                        app_section: 'pipeline-rules',
+                        app_action_value: 'create-rule-using-rule-builder-button',
+                      });
+
+                      history.replace(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
+                    }}>
+              Use Rule Builder
+            </Button>
+          </StyledCol>
+          <Col md={6}>
+            <label htmlFor="source_code">Source Code</label>
+            {/* @ts-ignore */}
+            <SourceCodeEditor mode="pipeline"
+                              id="source_code"
+                              value={RULE_TEMPLATE}
+                              resizable={false}
+                              height={120}
+                              readOnly />
+            <br />
+            <div>
+              It can <b>not</b> be converted into <i>Rule Builder</i>.
+            </div>
+            <br />
+            <Button bsStyle="success"
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        app_pathname: getBasePathname(pathname),
+                        app_section: 'pipeline-rules',
+                        app_action_value: 'create-rule-using-source-code-button',
+                      });
+
+                      history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                    }}>
+              Use Source Code
+            </Button>
+          </Col>
+        </Row>
+      </Modal.Body>
+    </BootstrapModalWrapper>
+  );
+};
 
 export default CreateRuleModal;

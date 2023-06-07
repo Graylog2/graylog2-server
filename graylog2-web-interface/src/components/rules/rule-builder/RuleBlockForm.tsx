@@ -22,6 +22,9 @@ import styled, { css } from 'styled-components';
 import { FormSubmit, Select } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
+import { getBasePathname } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import Errors from './Errors';
 import { paramValueIsVariable } from './helpers';
@@ -78,6 +81,9 @@ const RuleBlockForm = ({
 }: Props) => {
   const [initialValues, setInitialValues] = useState<{}>({});
 
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   useEffect(() => {
     const newInitialValues = {};
 
@@ -104,6 +110,13 @@ const RuleBlockForm = ({
   }, [selectedBlockDict, existingBlock]);
 
   const handleChange = (option: string, resetForm: () => void) => {
+    sendTelemetry('select', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `select-${type}`,
+      event_details: { option },
+    });
+
     resetForm();
     onSelect(option);
   };
@@ -114,8 +127,20 @@ const RuleBlockForm = ({
 
   const handleSubmit = (values: {[key: string]: any}) => {
     if (existingBlock) {
+      sendTelemetry('click', {
+        app_pathname: getBasePathname(pathname),
+        app_section: 'pipeline-rule-builder',
+        app_action_value: `update-${type}-button`,
+      });
+
       onUpdate(values, selectedBlockDict?.name);
     } else {
+      sendTelemetry('click', {
+        app_pathname: getBasePathname(pathname),
+        app_section: 'pipeline-rule-builder',
+        app_action_value: `add-${type}-button`,
+      });
+
       onAdd(values);
     }
   };

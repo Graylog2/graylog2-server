@@ -23,6 +23,9 @@ import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import { ConfirmDialog, FormSubmit } from 'components/common';
+import { getBasePathname } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import Errors from './Errors';
 import RuleBuilderBlock from './RuleBuilderBlock';
@@ -67,6 +70,8 @@ const RuleBuilder = () => {
   }, [initialRule]);
 
   const history = useHistory();
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
 
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
@@ -273,7 +278,17 @@ const RuleBuilder = () => {
           <RuleBuilderForm rule={rule}
                            onChange={setRule} />
           <label htmlFor="rule_builder">Rule Builder</label>
-          <ConvertButton bsStyle="info" bsSize="small" onClick={() => setRuleSourceCodeToShow(rule)} disabled={false}>
+          <ConvertButton bsStyle="info"
+                         bsSize="small"
+                         onClick={() => {
+                           sendTelemetry('click', {
+                             app_pathname: getBasePathname(pathname),
+                             app_section: 'pipeline-rules',
+                             app_action_value: 'convert-rule-builder-to-source-code-button',
+                           });
+
+                           setRuleSourceCodeToShow(rule);
+                         }}>
             Convert to Source Code
           </ConvertButton>
         </Col>

@@ -21,6 +21,9 @@ import PropTypes from 'prop-types';
 import { Button, ControlLabel, FormGroup, Input } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import type { RuleType } from 'stores/rules/RulesStore';
+import { getBasePathname } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import { PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
@@ -54,13 +57,24 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
 
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   const disableSimulation = !rawMessageToSimulate || (!ruleSource && !currentRule?.rule_builder?.conditions?.length && !currentRule?.rule_builder?.actions?.length);
+  const is_rule_builder = Boolean(currentRule?.rule_builder);
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
   };
 
   const handleRunRuleSimulation = () => {
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-simulation',
+      app_action_value: 'run-rule-simulation-button',
+      event_details: { is_rule_builder },
+    });
+
     simulateRule(
       rawMessageToSimulate,
       currentRule || rule,
@@ -69,12 +83,26 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
   };
 
   const handleResetRuleSimulation = () => {
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-simulation',
+      app_action_value: 'reset-rule-simulation-button',
+      event_details: { is_rule_builder },
+    });
+
     setRawMessageToSimulate('');
     setRuleSimulationResult(null);
     setStartRuleSimulation(false);
   };
 
   const handleStartRuleSimulation = () => {
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-simulation',
+      app_action_value: 'start-rule-simulation-button',
+      event_details: { is_rule_builder },
+    });
+
     setStartRuleSimulation(true);
   };
 
