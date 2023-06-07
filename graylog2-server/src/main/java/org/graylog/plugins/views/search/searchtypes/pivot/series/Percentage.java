@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
@@ -32,18 +33,30 @@ import java.util.Optional;
 public abstract class Percentage implements SeriesSpec {
     public static final String NAME = "percentage";
 
+    public enum Strategy {
+        COUNT,
+        SUM
+    }
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
+    @JsonProperty
+    public abstract Optional<Strategy> strategy();
+
+    @JsonProperty
+    public abstract Optional<String> field();
+
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder extends SeriesSpecBuilder<Percentage, Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_Percentage.Builder();
+            return new AutoValue_Percentage.Builder()
+                    .strategy(Strategy.COUNT);
         }
 
         @Override
@@ -52,12 +65,26 @@ public abstract class Percentage implements SeriesSpec {
 
         abstract Optional<String> id();
 
+        @JsonProperty
+        public abstract Builder field(@Nullable String field);
+
+        abstract Optional<String> field();
+
+        @JsonProperty
+        public abstract Builder strategy(@Nullable Strategy strategy);
+
+        abstract Optional<Strategy> strategy();
+
         abstract Percentage autoBuild();
 
         @Override
         public Percentage build() {
             if (id().isEmpty()) {
                 id(NAME + "()");
+            }
+
+            if (strategy().filter(Strategy.SUM::equals).isPresent() && field().isEmpty()) {
+                throw new IllegalArgumentException("When strategy is sum, a field must be specified.");
             }
             return autoBuild();
         }
