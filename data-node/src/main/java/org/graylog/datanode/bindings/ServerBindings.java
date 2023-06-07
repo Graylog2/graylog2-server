@@ -23,7 +23,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.cluster.DataNodeServiceImpl;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
-import org.graylog.security.certutil.keystore.storage.PrivateKeyEntryOnlyKeystoreContentMover;
+import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.NodeService;
@@ -78,7 +78,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindSingletons() {
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
-        bind(KeystoreContentMover.class).to(PrivateKeyEntryOnlyKeystoreContentMover.class).asEagerSingleton();
+        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
     }
 
     private void bindInterfaces() {
