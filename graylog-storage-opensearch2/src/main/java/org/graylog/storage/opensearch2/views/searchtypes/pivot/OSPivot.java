@@ -48,7 +48,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSPivot implements OSSearchTypeHandler<Pivot> {
@@ -80,6 +79,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         // add global rollup series if those were requested
         if (pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty())) {
             seriesStream(pivot, queryContext, "global rollup")
+                    .filter(result -> Placement.PIVOT.equals(result.placement()))
+                    .map(SeriesAggregationBuilder::aggregationBuilder)
                     .forEach(searchSourceBuilder::aggregation);
         }
 
@@ -88,13 +89,21 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
         final List<AggregationBuilder> metricsAggregations = createdAggregations.metrics();
         seriesStream(pivot, queryContext, "metrics")
-                .forEach(aggregation -> metricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(aggregation)));
+                .forEach(result -> {
+                    switch (result.placement()) {
+                        case PIVOT ->
+                                metricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(result.aggregationBuilder()));
+                        case ROOT -> rootAggregation.subAggregation(result.aggregationBuilder());
+                    }
+                });
 
         if (!pivot.columnGroups().isEmpty()) {
             final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdColumnsAggregations = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
             final AggregationBuilder columnsRootAggregation = createdColumnsAggregations.root();
             final List<AggregationBuilder> columnMetricsAggregations = createdColumnsAggregations.metrics();
             seriesStream(pivot, queryContext, "metrics")
+                    .filter(result -> Placement.PIVOT.equals(result.placement()))
+                    .map(SeriesAggregationBuilder::aggregationBuilder)
                     .forEach(aggregation -> columnMetricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(aggregation)));
             if (leafAggregation != null) {
                 leafAggregation.subAggregation(columnsRootAggregation);
@@ -168,21 +177,19 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         return BucketSpecHandler.CreatedAggregations.create(root, leaf, metrics);
     }
 
-    private Stream<AggregationBuilder> seriesStream(Pivot pivot, OSGeneratedQueryContext queryContext, String reason) {
+    private Stream<SeriesAggregationBuilder> seriesStream(Pivot pivot, OSGeneratedQueryContext queryContext, String reason) {
         return pivot.series()
                 .stream()
                 .distinct()
-                .map((seriesSpec) -> {
+                .flatMap((seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
                     final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
                     if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
-                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
-                })
-                .filter(Optional::isPresent)
-                .map(Optional::get);
+                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext).stream();
+                });
     }
 
     @WithSpan

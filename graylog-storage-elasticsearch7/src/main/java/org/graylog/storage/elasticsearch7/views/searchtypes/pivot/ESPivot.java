@@ -48,7 +48,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
@@ -80,6 +79,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // add global rollup series if those were requested
         if (pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty())) {
             seriesStream(pivot, queryContext, "global rollup")
+                    .filter(result -> Placement.PIVOT.equals(result.placement()))
+                    .map(SeriesAggregationBuilder::aggregationBuilder)
                     .forEach(searchSourceBuilder::aggregation);
         }
 
@@ -88,13 +89,20 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
         final List<AggregationBuilder> metrics = createdAggregations.metrics();
         seriesStream(pivot, queryContext, "metrics")
-                .forEach(aggregation -> metrics.forEach(metric -> metric.subAggregation(aggregation)));
+                .forEach(result -> {
+                    switch (result.placement()) {
+                        case PIVOT -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
+                        case ROOT -> rootAggregation.subAggregation(result.aggregationBuilder());
+                    }
+                });
 
         if (!pivot.columnGroups().isEmpty()) {
             final BucketSpecHandler.CreatedAggregations<AggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
             final AggregationBuilder columnsRootAggregation = columnsAggregation.root();
             final List<AggregationBuilder> columnMetrics = columnsAggregation.metrics();
             seriesStream(pivot, queryContext, "metrics")
+                    .filter(result -> Placement.PIVOT.equals(result.placement()))
+                    .map(SeriesAggregationBuilder::aggregationBuilder)
                     .forEach(aggregation -> columnMetrics.forEach(metric -> metric.subAggregation(aggregation)));
             if (leafAggregation != null) {
                 leafAggregation.subAggregation(columnsRootAggregation);
@@ -169,21 +177,19 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
 
-    private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
+    private Stream<SeriesAggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
         return pivot.series()
                 .stream()
                 .distinct()
-                .map((seriesSpec) -> {
+                .flatMap((seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
                     final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
                     if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
-                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
-                })
-                .filter(Optional::isPresent)
-                .map(Optional::get);
+                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext).stream();
+                });
     }
 
     @WithSpan
