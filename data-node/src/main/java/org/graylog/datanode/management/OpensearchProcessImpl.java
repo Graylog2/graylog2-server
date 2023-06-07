@@ -27,22 +27,13 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
-import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Queue;
 
@@ -60,7 +51,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final DatanodeConfiguration datanodeConfiguration;
 
     private boolean isLeaderNode;
-    private CommandLineProcess commandLineProcess;
+    private OpensearchCommandLineProcess commandLineProcess;
 
     private final Queue<String> stdout;
     private final Queue<String> stderr;
@@ -73,18 +64,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-
-        final HttpHost host = configuration.getRestBaseUrl();
-
-        RestClientBuilder builder = RestClient.builder(host);
-        if ("https".equals(host.getSchemeName())) {
-            if (configuration.authUsername() != null && configuration.authPassword() != null) {
-                credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(configuration.authUsername(), configuration.authPassword()));
-            }
-            builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
-        }
-        return new RestHighLevelClient(builder);
+        return OpensearchRestClient.build(configuration);
     }
 
     @Override
@@ -101,12 +81,8 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         return restClient;
     }
 
-    public ProcessState getStatus() {
-        return processState.getState();
-    }
-
     public ProcessInfo processInfo() {
-        return process().map(process -> new ProcessInfo(
+        return commandLineProcess.process().map(process -> new ProcessInfo(
                 process.pid(),
                 datanodeConfiguration.nodeName(), processState.getState(),
                 isLeaderNode,
@@ -124,10 +100,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 .map(HttpHost::toURI)
                 .orElse(""); // TODO: will this cause problems in the nodeservice?
         return URI.create(baseUrl);
-    }
-
-    private Optional<Process> process() {
-        return Optional.ofNullable(commandLineProcess).flatMap(CommandLineProcess::getProcess);
     }
 
     public void onEvent(ProcessEvent event) {
@@ -150,7 +122,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public boolean isInState(ProcessState expectedState) {
-        return this.getStatus().equals(expectedState);
+        return this.processState.getState().equals(expectedState);
     }
 
     @Override
@@ -165,10 +137,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         configuration.ifPresentOrElse(
                 (config -> {
                     stopProcess();
-                    final Path executable = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
-                    final List<String> arguments = config.asMap().entrySet().stream()
-                            .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
-                    commandLineProcess = new CommandLineProcess(executable, arguments, this, config.getEnv());
+                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
                     commandLineProcess.start();
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
@@ -194,7 +163,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private void stopProcess() {
         if (this.commandLineProcess != null) {
-            commandLineProcess.stop();
+            commandLineProcess.close();
         }
     }
 
@@ -227,4 +196,3 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         onEvent(ProcessEvent.PROCESS_TERMINATED);
     }
 }
-

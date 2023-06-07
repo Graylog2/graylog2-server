@@ -20,6 +20,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 
 import javax.inject.Inject;
@@ -27,8 +28,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 
 /**
  * Merges signed certificate, received after CSR was processed, with private key, that was awaiting in a safe file.
@@ -43,7 +42,7 @@ public class CertificateAndPrivateKeyMerger {
         this.keyPairChecker = keyPairChecker;
     }
 
-    public KeyStore merge(final X509Certificate signedCertificate,
+    public KeyStore merge(final CertificateChain certificateChain,
                           final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
                           final char[] privateKeyStoragePassword,
                           final char[] certFilePassword,
@@ -54,10 +53,10 @@ public class CertificateAndPrivateKeyMerger {
         nodeKeystore.load(null, null);
 
         final PrivateKey privateKey = privateKeyEncryptedStorage.readEncryptedKey(privateKeyStoragePassword);
-        if (!keyPairChecker.matchingKeys(privateKey, signedCertificate.getPublicKey())) {
+        if (!keyPairChecker.matchingKeys(privateKey, certificateChain.signedCertificate().getPublicKey())) {
             throw new GeneralSecurityException("Private key from CSR and public key from certificate do not form a valid pair");
         }
-        nodeKeystore.setKeyEntry(alias, privateKey, certFilePassword, new Certificate[]{signedCertificate});
+        nodeKeystore.setKeyEntry(alias, privateKey, certFilePassword, certificateChain.toCertificateChainArray());
 
         return nodeKeystore;
     }

@@ -19,8 +19,9 @@ package org.graylog.datanode.bootstrap.preflight;
 import org.bouncycastle.operator.OperatorException;
 import org.graylog.datanode.Configuration;
 import org.graylog.security.certutil.CertConstants;
-import org.graylog.security.certutil.cert.storage.CertMongoStorage;
-import org.graylog.security.certutil.cert.storage.CertStorage;
+import org.graylog.security.certutil.cert.CertificateChain;
+import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
+import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CertificateAndPrivateKeyMerger;
 import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
@@ -42,7 +43,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.KeyStore;
-import java.security.cert.X509Certificate;
 import java.util.Optional;
 
 @Singleton
@@ -55,7 +55,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final PrivateKeyEncryptedFileStorage privateKeyEncryptedStorage;
     private final CsrMongoStorage csrStorage;
     private final CsrGenerator csrGenerator;
-    private final CertStorage certMongoStorage;
+    private final CertChainStorage certMongoStorage;
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
     private final Configuration configuration;
     private final SmartKeystoreStorage keystoreStorage;
@@ -66,7 +66,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                                final NodeId nodeId,
                                                final CsrMongoStorage csrStorage,
                                                final CsrGenerator csrGenerator,
-                                               final CertMongoStorage certMongoStorage,
+                                               final CertChainMongoStorage certMongoStorage,
                                                final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
                                                final Configuration configuration,
                                                final SmartKeystoreStorage keystoreStorage) {
@@ -105,11 +105,10 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                 LOG.error("Config entry in signed state, but no certificate data present in Mongo");
             } else {
                 try {
-                    final Optional<X509Certificate> x509Certificate = certMongoStorage.readCert(nodeId.getNodeId());
-                    if (x509Certificate.isPresent()) {
-                        //TODO: done for HTTP cert, we still need to make decision if we want to process HTTP and transport certs separetely
+                    final Optional<CertificateChain> certificateChain = certMongoStorage.readCertChain(nodeId.getNodeId());
+                    if (certificateChain.isPresent()) {
                         KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
-                                x509Certificate.get(),
+                                certificateChain.get(),
                                 privateKeyEncryptedStorage,
                                 null,
                                 null,

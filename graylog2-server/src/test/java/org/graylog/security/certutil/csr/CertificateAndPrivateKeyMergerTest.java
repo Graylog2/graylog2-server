@@ -19,6 +19,7 @@ package org.graylog.security.certutil.csr;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
+import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Enumeration;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -63,7 +65,7 @@ public class CertificateAndPrivateKeyMergerTest {
         doReturn(publicKey).when(signedCertificate).getPublicKey();
         doReturn(false).when(keyPairChecker).matchingKeys(privateKey, publicKey);
         doReturn(privateKey).when(privateKeyEncryptedStorage).readEncryptedKey("privPass".toCharArray());
-        assertThrows(GeneralSecurityException.class, () -> toTest.merge(signedCertificate,
+        assertThrows(GeneralSecurityException.class, () -> toTest.merge(new CertificateChain(signedCertificate, List.of()),
                 privateKeyEncryptedStorage,
                 "privPass".toCharArray(),
                 "certPass".toCharArray(),
@@ -80,12 +82,12 @@ public class CertificateAndPrivateKeyMergerTest {
         final char[] privPass = "privPass".toCharArray();
         final char[] certPass = "certPass".toCharArray();
         final String alias = "data-node";
-        
+
 
         doReturn(keyPair.privateKey()).when(privateKeyEncryptedStorage).readEncryptedKey(privPass);
         doReturn(true).when(keyPairChecker).matchingKeys(keyPair.privateKey(), keyPair.publicKey());
 
-        final KeyStore merged = toTest.merge(keyPair.certificate(),
+        final KeyStore merged = toTest.merge(new CertificateChain(keyPair.certificate(), List.of()),
                 privateKeyEncryptedStorage,
                 privPass,
                 certPass,
