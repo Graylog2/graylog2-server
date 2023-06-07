@@ -1,0 +1,5 @@
+type = "added"
+message = "Add plugin for displaying asset information in log messages."
+
+issues = [""]
+pulls = ["15716"]
