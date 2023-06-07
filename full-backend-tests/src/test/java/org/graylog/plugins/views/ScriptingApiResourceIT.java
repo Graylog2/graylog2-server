@@ -38,7 +38,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvParser;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
@@ -85,7 +84,7 @@ public class ScriptingApiResourceIT {
 
         api.sharing().setSharing(new SharingRequest(
                 new SharingRequest.Entity(Sharing.ENTITY_STREAM, stream2Id),
-                ImmutableMap.of(
+                Map.of(
                         new SharingRequest.Entity(Sharing.ENTITY_USER, userId), Sharing.PERMISSION_VIEW
                 )));
 
@@ -112,7 +111,7 @@ public class ScriptingApiResourceIT {
                          {
                            "group_by": [
                              {
-                               "field": "streams"
+                               "field": "streams.id"
                              }
                            ],
                            "metrics": [
@@ -129,6 +128,32 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, DEFAULT_STREAM, 3);
         validateRow(validatableResponse, stream2Id, 2);
         validateRow(validatableResponse, stream1Id, 1);
+    }
+
+    @ContainerMatrixTest
+    void testAggregationByStreamTitle() {
+        final ValidatableResponse validatableResponse =
+                api.post("/search/aggregate","""
+                         {
+                           "group_by": [
+                             {
+                               "field": "streams.title"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                         """, 200);
+
+        validatableResponse.log().ifValidationFails()
+                .assertThat().body("datarows", Matchers.hasSize(3));
+
+        validateRow(validatableResponse, "Default Stream", 3);
+        validateRow(validatableResponse, "Stream #2", 2);
+        validateRow(validatableResponse, "Stream #1", 1);
     }
 
     @ContainerMatrixTest

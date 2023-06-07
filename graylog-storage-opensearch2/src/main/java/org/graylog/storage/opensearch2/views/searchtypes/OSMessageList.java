@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch2.views.searchtypes;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.name.Named;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
@@ -44,6 +44,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -158,6 +159,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
         return QueryBuilders.queryStringQuery(queryString);
     }
 
+    @WithSpan
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final List<ResultMessageSummary> messages = StreamSupport.stream(result.getHits().spliterator(), false)

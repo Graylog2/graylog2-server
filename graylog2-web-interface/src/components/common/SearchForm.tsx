@@ -16,7 +16,6 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import Promise from 'bluebird';
 import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
 import debounce from 'lodash/debounce';
@@ -144,16 +143,14 @@ const SearchForm = ({
    * before setting it to "true" has happened and thus not resetting the state after a search request.
    * @private
    */
-  const setLoadingState = () => {
-    return new Promise((resolve) => {
-      if (useLoadingState) {
-        setIsLoading(true);
-        resolve();
-      } else {
-        resolve();
-      }
-    });
-  };
+  const setLoadingState = () => new Promise<void>((resolve) => {
+    if (useLoadingState) {
+      setIsLoading(true);
+      resolve();
+    } else {
+      resolve();
+    }
+  });
 
   const resetLoadingState = () => {
     if (useLoadingState) {

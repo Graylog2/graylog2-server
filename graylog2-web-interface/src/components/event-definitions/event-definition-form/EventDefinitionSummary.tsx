@@ -28,10 +28,6 @@ import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 
-// Import built-in plugins
-import 'components/event-definitions/event-definition-types';
-import 'components/event-notifications/event-notification-types';
-
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
 
@@ -39,12 +35,16 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
+// Import built-in plugins
+import 'components/event-definitions/event-definition-types';
+import 'components/event-notifications/event-notification-types';
+
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<any>,
   validation: {
     errors: {
-      title: string,
+      title?: string,
     }
   },
   currentUser: User,
@@ -63,21 +63,19 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     flipShowValidation();
   }, [showValidation, setShowValidation]);
 
-  const renderDetails = () => {
-    return (
-      <>
-        <h3 className={commonStyles.title}>Details</h3>
-        <dl>
-          <dt>Title</dt>
-          <dd>{eventDefinition.title || 'No title given'}</dd>
-          <dt>Description</dt>
-          <dd>{eventDefinition.description || 'No description given'}</dd>
-          <dt>Priority</dt>
-          <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
-        </dl>
-      </>
-    );
-  };
+  const renderDetails = () => (
+    <>
+      <h3 className={commonStyles.title}>Details</h3>
+      <dl>
+        <dt>Title</dt>
+        <dd>{eventDefinition.title || 'No title given'}</dd>
+        <dt>Description</dt>
+        <dd>{eventDefinition.description || 'No description given'}</dd>
+        <dt>Priority</dt>
+        <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+      </dl>
+    </>
+  );
 
   const getPlugin = (name, type) => {
     if (type === undefined) {
@@ -125,17 +123,15 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     );
   };
 
-  const renderFieldList = (fieldNames, fields, keys) => {
-    return (
-      <>
-        <dl>
-          <dt>Keys</dt>
-          <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
-        </dl>
-        {fieldNames.sort(naturalSort).map((fieldName) => renderField(fieldName, fields[fieldName], keys))}
-      </>
-    );
-  };
+  const renderFieldList = (fieldNames, fields, keys) => (
+    <>
+      <dl>
+        <dt>Keys</dt>
+        <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
+      </dl>
+      {fieldNames.sort(naturalSort).map((fieldName) => renderField(fieldName, fields[fieldName], keys))}
+    </>
+  );
 
   const renderFields = (fields, keys) => {
     const fieldNames = Object.keys(fields);

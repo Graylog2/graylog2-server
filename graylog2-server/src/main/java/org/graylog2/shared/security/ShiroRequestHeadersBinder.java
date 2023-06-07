@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.security;
 
-import joptsimple.internal.Strings;
+import com.google.common.base.Strings;
 import org.apache.shiro.util.ThreadContext;
 
 import javax.annotation.Priority;

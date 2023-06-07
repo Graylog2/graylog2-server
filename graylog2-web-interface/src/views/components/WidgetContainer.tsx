@@ -63,7 +63,7 @@ WidgetContainer.defaultProps = {
 };
 
 WidgetContainer.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.element.isRequired,
   className: PropTypes.string,
   isFocused: PropTypes.bool.isRequired,
   style: PropTypes.object,

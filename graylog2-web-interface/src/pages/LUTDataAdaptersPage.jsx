@@ -36,9 +36,7 @@ const _saved = (history) => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 };
 
-const _isCreating = ({ action }) => {
-  return action === 'create';
-};
+const _isCreating = ({ action }) => action === 'create';
 
 const _validateAdapter = (adapter) => {
   LookupTableDataAdaptersActions.validate(adapter);
@@ -150,7 +148,7 @@ class LUTDataAdaptersPage extends React.Component {
       } else {
         content = (
           <DataAdapterCreate types={types}
-                             saved={_saved}
+                             saved={() => _saved(history)}
                              validate={_validateAdapter}
                              validationErrors={validationErrors} />
         );
@@ -206,8 +204,11 @@ LUTDataAdaptersPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withHistory(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage))), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
-  ...otherProps,
-  ...dataAdaptersStore,
-  errorStates: lookupTableStore.errorStates,
-})));
+export default connect(
+  withHistory(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage)))),
+  { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+  ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...dataAdaptersStore,
+    errorStates: lookupTableStore.errorStates,
+  }));

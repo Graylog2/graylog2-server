@@ -40,10 +40,10 @@ type Props = {
   eventDefinition: EventDefinition,
   validation: {
     errors: {
-      title: string,
+      title?: string,
     }
   },
-  onChange: (name: string, value: any) => void,
+  onChange: (name: string, value: unknown) => void,
 }
 
 const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Props) => {
@@ -127,9 +127,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
                 <h4>Fields with errors</h4>
                 <p>Please correct the following errors before saving this Event Definition:</p>
                 <ul>
-                  {errors.map((error) => {
-                    return <li key={error}>{error}</li>;
-                  })}
+                  {errors.map((error) => <li key={error}>{error}</li>)}
                 </ul>
               </Alert>
             )}

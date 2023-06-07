@@ -87,7 +87,9 @@ import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
@@ -120,6 +122,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.StringEntropy;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
@@ -274,6 +277,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Replace.NAME, new Replace());
         functions.put(Length.NAME, new Length());
         functions.put(FirstNonNull.NAME, new FirstNonNull());
+        functions.put(StringEntropy.NAME, new StringEntropy());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -373,6 +377,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupSetStringList.NAME, new LookupSetStringList(lookupTableService));
         functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
+        functions.put(LookupHasValue.NAME, new LookupHasValue(lookupTableService));
+	functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1196,6 +1202,19 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void lookupSetValueWithTtl() {
+        doReturn(LookupResult.single(123)).when(lookupTable).setValueWithTtl(any(), any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).setValueWithTtl("key", 123L, 456L);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(123);
+    }
+
+    @Test
     public void lookupClearKey() {
         // Stub method call to avoid having verifyNoMoreInteractions() fail
         doNothing().when(lookupTable).clearKey(any());
@@ -1217,6 +1236,21 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule);
 
         verify(lookupTable).setStringList("key", testList);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(testList);
+    }
+
+    @Test
+    public void lookupSetStringListWithTtl() {
+        final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
+
+        doReturn(LookupResult.withoutTTL().stringListValue(testList).build()).when(lookupTable).setStringListWithTtl(any(), any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).setStringListWithTtl("key", testList, 123L);
         verifyNoMoreInteractions(lookupTable);
 
         assertThat(message.getField("new_value")).isEqualTo(testList);
@@ -1252,6 +1286,36 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void lookupHasValue() {
+        doReturn(null).when(lookupTable).lookup(any());
+        doReturn(LookupResult.withoutTTL().single("present").build()).when(lookupTable).lookup("present");
+        doReturn(LookupResult.withoutTTL().build()).when(lookupTable).lookup("empty");
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable, times(3)).lookup(any());
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("check_present")).isEqualTo(true);
+        assertThat(message.getField("check_absent")).isEqualTo(false);
+        assertThat(message.getField("check_empty")).isEqualTo(false);
+    }
+
+    @Test
+    public void lookupAssignTtl() {
+        doReturn(LookupResult.single(123L)).when(lookupTable).assignTtl(any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).assignTtl("key", 123L);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(123L);
+    }
+
+    @Test
     public void firstNonNull() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule);
@@ -1266,6 +1330,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void stringEntropy() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("zero_entropy")).isEqualTo(0.0D);
+        assertThat(message.getField("one_entropy")).isEqualTo(1.0D);
+    }
+
+    @   Test
     public void notExpressionTypeCheck() {
         try {
             Rule rule = parser.parseRule(ruleForTest(), true);

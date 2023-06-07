@@ -18,6 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ModalSubmit from 'components/common/ModalSubmit';
+import StringUtils from 'util/StringUtils';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
@@ -46,30 +47,31 @@ const BootstrapModalConfirm = ({
   confirmButtonText,
   onCancel,
   onConfirm,
-}: Props) => {
-  return (
-    <BootstrapModalWrapper showModal={showModal}
-                           onHide={onCancel}
-                           role="alertdialog">
-      <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
+  ...restProps
+}: Props) => (
+  <BootstrapModalWrapper showModal={showModal}
+                         onHide={onCancel}
+                         role="alertdialog"
+                         data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
+                         {...restProps}>
+    <Modal.Header closeButton>
+      <Modal.Title>{title}</Modal.Title>
+    </Modal.Header>
 
-      <Modal.Body>
-        {children}
-      </Modal.Body>
+    <Modal.Body>
+      {children}
+    </Modal.Body>
 
-      <Modal.Footer>
-        <ModalSubmit disabledCancel={cancelButtonDisabled}
-                     disabledSubmit={confirmButtonDisabled}
-                     onCancel={onCancel}
-                     onSubmit={onConfirm}
-                     submitButtonText={confirmButtonText}
-                     submitButtonType="button" />
-      </Modal.Footer>
-    </BootstrapModalWrapper>
-  );
-};
+    <Modal.Footer>
+      <ModalSubmit disabledCancel={cancelButtonDisabled}
+                   disabledSubmit={confirmButtonDisabled}
+                   onCancel={onCancel}
+                   onSubmit={onConfirm}
+                   submitButtonText={confirmButtonText}
+                   submitButtonType="button" />
+    </Modal.Footer>
+  </BootstrapModalWrapper>
+);
 
 BootstrapModalConfirm.propTypes = {
   /** Control whether the modal is shown or not. Prop updates should trigger opening (if show changes from false to true), respectively closing the modal (if show changes from false to true). */

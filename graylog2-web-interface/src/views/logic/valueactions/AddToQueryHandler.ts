@@ -21,7 +21,7 @@ import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
-import { selectCurrentQueryString } from 'views/logic/slices/viewSelectors';
+import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
 
@@ -50,7 +50,7 @@ type Arguments = {
 };
 
 const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const oldQuery = selectCurrentQueryString(queryId)(getState());
+  const oldQuery = selectQueryString(queryId)(getState());
   const newQuery = formatNewQuery(oldQuery, field, value, type);
 
   return dispatch(updateQueryString(queryId, newQuery));

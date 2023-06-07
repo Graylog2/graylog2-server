@@ -48,10 +48,13 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type SearchResult from 'views/logic/SearchResult';
 import type { WidgetMapping } from 'views/logic/views/types';
+import type { Event } from 'components/events/events/types';
+import type Parameter from 'views/logic/parameters/Parameter';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -216,6 +219,8 @@ export interface ActionContexts {
   message: Message,
   valuePath: ValuePath,
   isLocalNode: boolean,
+  parameters?: Immutable.Set<Parameter>,
+  parameterBindings?: ParameterBindings,
 }
 
 export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
@@ -243,6 +248,36 @@ type MessageAugmentation = {
 
 type MessageDetailContextProviderProps = {
   message: Message,
+}
+
+type DashboardActionComponentProps = {
+  dashboard: View,
+  modalRef: () => unknown,
+}
+
+type DashboardActionModalProps = {
+  dashboard: View,
+  ref: React.Ref<unknown>,
+}
+
+type DashboardAction = {
+  key: string,
+  component: React.ComponentType<DashboardActionComponentProps>,
+  modal?: React.ComponentType<DashboardActionModalProps>,
+}
+
+type EventActionComponentProps = {
+  event: Event,
+}
+
+type MessageActionComponentProps = {
+  index: string,
+  id: string,
+}
+
+type SearchActionComponentProps = {
+  loaded: boolean,
+  view: View,
 }
 
 export type CopyParamsToView = (sourceView: View, targetView: View) => View;
@@ -361,10 +396,23 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
+    'views.components.dashboardActions'?: Array<DashboardAction>;
+    'views.components.eventActions'?: Array<{
+      component: React.ComponentType<EventActionComponentProps>,
+      key: string,
+    }>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
-    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<MessageDetailContextProviderProps>>;
-    'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType>;
+    'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;
+    'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
+    'views.components.widgets.messageTable.messageActions'?: Array<{
+      component: React.ComponentType<MessageActionComponentProps>,
+      key: string,
+    }>;
+    'views.components.searchActions'?: Array<{
+      component: React.ComponentType<SearchActionComponentProps>,
+      key: string,
+    }>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;

@@ -85,11 +85,19 @@ public class IndexSetDefaultsResource extends RestResource {
         if (violation != null) {
             throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
         }
+
+        violation = indexSetValidator.validateRotation(config.rotationStrategyConfig());
+
+        if (violation != null) {
+            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.ROTATION_STRATEGY_CONFIG, violation.message()));
+        }
+
         violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
                 config.retentionStrategyConfig());
         if (violation != null) {
             throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.RETENTION_STRATEGY_CONFIG, violation.message()));
         }
+
 
         clusterConfigService.write(config);
         return Response.ok(config).build();

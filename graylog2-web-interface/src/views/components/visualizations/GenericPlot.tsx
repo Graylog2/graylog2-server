@@ -50,8 +50,10 @@ type ChartMarker = {
 export type ChartConfig = {
   name: string,
   labels: Array<string>,
+  originalLabels?: Array<string>,
   line?: ChartMarker,
   marker?: ChartMarker,
+  originalName?: string,
 };
 
 export type ColorMap = {
@@ -259,7 +261,8 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
                                    target={legendConfig.target}>
                             <Popover id="legend-config"
                                      title={`Configuration for ${legendConfig.name}`}
-                                     className={styles.locals.customPopover}>
+                                     className={styles.locals.customPopover}
+                                     data-event-element="Generic Plot">
                               <ColorPicker color={legendConfig.color}
                                            colors={defaultColors}
                                            onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />

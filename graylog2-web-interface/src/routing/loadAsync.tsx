@@ -37,7 +37,7 @@ type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TP
 const emptyPlaceholder = <></>;
 
 const loadAsync = <TProps, >(factory: ComponentSupplier<TProps>): React.ComponentType<TProps> => {
-  const Component = React.lazy(factory);
+  const Component = React.lazy(factory) as React.ComponentType<TProps>;
 
   return (props: TProps) => (
     <ErrorBoundary FallbackComponent={ErrorComponent}>

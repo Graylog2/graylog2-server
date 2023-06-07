@@ -15,21 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
 import type { UserConfigType } from 'src/stores/configurations/ConfigurationsStore';
 
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { getConfig } from 'components/configurations/helpers';
+import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted, ISODurationInput } from 'components/common';
-
-type Props = {
-  config: UserConfigType,
-  updateConfig: (config: UserConfigType) => Promise<void>,
-};
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const StyledDefList = styled.dl.attrs({
   className: 'deflist',
@@ -47,35 +48,56 @@ const LabelSpan = styled.span(({ theme }: { theme: DefaultTheme }) => css`
   font-weight: bold;
 `);
 
-const UserConfig = ({ config, updateConfig }: Props) => {
+const UserConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [viewConfig, setViewConfig] = useState<UserConfigType | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<UserConfigType | undefined>(undefined);
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
-  const _saveConfig = (values) => {
-    updateConfig(values).then(() => {
+  const sendTelemetry = useSendTelemetry();
+
+  useEffect(() => {
+    ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.USER_CONFIG, configuration);
+
+      setViewConfig(config);
+      setFormConfig(config);
+    });
+  }, [configuration]);
+
+  const saveConfig = (values) => {
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'user',
+      app_action_value: 'configuration-save',
+    });
+
+    ConfigurationsActions.update(ConfigurationType.USER_CONFIG, values).then(() => {
       setShowModal(false);
     });
   };
 
-  const _resetConfig = () => {
+  const resetConfig = () => {
     setShowModal(false);
+    setFormConfig(viewConfig);
   };
 
-  const _timeoutIntervalValidator = (milliseconds: number) => {
-    return milliseconds >= 1000;
-  };
+  const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
+
+  const modalTitle = 'Update User Configuration';
 
   return (
     <div>
-      <h2>User Configuration</h2>
+      <h2>Users Configuration</h2>
       <p>These settings can be used to set a global session timeout value.</p>
 
-      {!config ? <Spinner /> : (
+      {!viewConfig ? <Spinner /> : (
         <>
           <StyledDefList>
             <dt>Global session timeout:</dt>
-            <dd>{config.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
             <dt>Timeout interval:</dt>
-            <dd>{config.enable_global_session_timeout ? config.global_session_timeout_interval : '-'}</dd>
+            <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -91,56 +113,57 @@ const UserConfig = ({ config, updateConfig }: Props) => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal} onHide={_resetConfig} aria-modal="true" aria-labelledby="dialog_label">
-            <Formik onSubmit={_saveConfig} initialValues={config}>
+          <Modal show={showModal && formConfig}
+                 onHide={resetConfig}
+                 aria-modal="true"
+                 aria-labelledby="dialog_label"
+                 data-app-section="configurations_user"
+                 data-event-element={modalTitle}>
+            <Formik onSubmit={saveConfig} initialValues={formConfig}>
+              {({ isSubmitting, values, setFieldValue }) => (
+                <Form>
+                  <Modal.Header closeButton>
+                    <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                  </Modal.Header>
 
-              {({ isSubmitting, values, setFieldValue }) => {
-                return (
-                  <Form>
-                    <Modal.Header closeButton>
-                      <Modal.Title id="dialog_label">Update User Configuration</Modal.Title>
-                    </Modal.Header>
-
-                    <Modal.Body>
-                      <div>
-                        <Row>
-                          <Col sm={12}>
-                            <FormikInput type="checkbox"
-                                         name="enable_global_session_timeout"
-                                         id="enable_global_session_timeout"
-                                         label={(
-                                           <LabelSpan>Enable global session timeout</LabelSpan>
+                  <Modal.Body>
+                    <div>
+                      <Row>
+                        <Col sm={12}>
+                          <FormikInput type="checkbox"
+                                       name="enable_global_session_timeout"
+                                       id="enable_global_session_timeout"
+                                       label={(
+                                         <LabelSpan>Enable global session timeout</LabelSpan>
                                          )} />
-                            <InputDescription help="If enabled, it will be set for all the users." />
-                          </Col>
-                          <Col sm={12}>
-                            <fieldset>
-                              <ISODurationInput id="global_session_timeout_interval"
-                                                duration={values.global_session_timeout_interval}
-                                                update={(value) => setFieldValue('global_session_timeout_interval', value)}
-                                                label="Global session timeout interval (as ISO8601 Duration)"
-                                                help="Session automatically end after this amount of time, unless they are actively used."
-                                                validator={_timeoutIntervalValidator}
-                                                errorText="invalid (min: 1 second)"
-                                                disabled={!values.enable_global_session_timeout}
-                                                required />
-                            </fieldset>
-                          </Col>
-                        </Row>
-                      </div>
-                    </Modal.Body>
+                          <InputDescription help="If enabled, it will be set for all the users." />
+                        </Col>
+                        <Col sm={12}>
+                          <fieldset>
+                            <ISODurationInput id="global_session_timeout_interval"
+                                              duration={values.global_session_timeout_interval}
+                                              update={(value) => setFieldValue('global_session_timeout_interval', value)}
+                                              label="Global session timeout interval (as ISO8601 Duration)"
+                                              help="Session automatically end after this amount of time, unless they are actively used."
+                                              validator={timeoutIntervalValidator}
+                                              errorText="invalid (min: 1 second)"
+                                              disabled={!values.enable_global_session_timeout}
+                                              required />
+                          </fieldset>
+                        </Col>
+                      </Row>
+                    </div>
+                  </Modal.Body>
 
-                    <Modal.Footer>
-                      <ModalSubmit onCancel={_resetConfig}
-                                   isSubmitting={isSubmitting}
-                                   isAsyncSubmit
-                                   submitLoadingText="Update configuration"
-                                   submitButtonText="Update configuration" />
-                    </Modal.Footer>
-                  </Form>
-                );
-              }}
-
+                  <Modal.Footer>
+                    <ModalSubmit onCancel={resetConfig}
+                                 isSubmitting={isSubmitting}
+                                 isAsyncSubmit
+                                 submitLoadingText="Update configuration"
+                                 submitButtonText="Update configuration" />
+                  </Modal.Footer>
+                </Form>
+              )}
             </Formik>
           </Modal>
         </>

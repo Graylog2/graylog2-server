@@ -60,15 +60,13 @@ InteractiveValue.defaultProps = {
   render: defaultRenderer,
 };
 
-const Value = ({ children, field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
-  return (
-    <InteractiveContext.Consumer>
-      {(interactive) => ((interactive)
-        ? <InteractiveValue field={field} value={value} render={render} type={type}>{children}</InteractiveValue>
-        : <span><TypeSpecificValue field={field} value={value} type={type} /></span>)}
-    </InteractiveContext.Consumer>
-  );
-};
+const Value = ({ children, field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
+  <InteractiveContext.Consumer>
+    {(interactive) => ((interactive)
+      ? <InteractiveValue field={field} value={value} render={render} type={type}>{children}</InteractiveValue>
+      : <span><TypeSpecificValue field={field} value={value} type={type} /></span>)}
+  </InteractiveContext.Consumer>
+);
 
 Value.defaultProps = {
   render: defaultRenderer,

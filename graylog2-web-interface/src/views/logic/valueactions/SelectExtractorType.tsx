@@ -21,6 +21,7 @@ import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Select from 'components/common/Select';
 import { BootstrapModalForm } from 'components/bootstrap';
+import type { ActionContexts } from 'views/types';
 
 import type { ActionComponentProps } from '../../components/actions/ActionHandler';
 
@@ -30,11 +31,7 @@ type State = {
 
 const _renderOption = ({ label }: { label: string }) => <strong>{label}</strong>;
 
-const _getExtractorTypes = () => {
-  return ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => {
-    return { label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType };
-  });
-};
+const _getExtractorTypes = () => ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => ({ label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType }));
 
 class SelectExtractorType extends React.Component<ActionComponentProps, State> {
   static propTypes = {
@@ -42,6 +39,8 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
   };
 
   static contextType = ActionContext;
+
+  readonly context: ActionContexts;
 
   extractorRoutes = {};
 

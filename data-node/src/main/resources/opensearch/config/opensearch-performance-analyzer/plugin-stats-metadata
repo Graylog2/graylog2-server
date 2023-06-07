@@ -1,0 +1,2 @@
+# All the meta data to be emitted in the plugin stats; an example below
+Program=PerformanceAnalyzerPlugin

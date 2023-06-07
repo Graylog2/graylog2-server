@@ -144,11 +144,16 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("cluster.info.update.interval", "10s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
+                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
     }
 
     @Override
     public Adapters adapters() {
         return this.adapters;
+    }
+
+    @Override
+    public String getLogs() {
+        return this.container.getLogs();
     }
 }

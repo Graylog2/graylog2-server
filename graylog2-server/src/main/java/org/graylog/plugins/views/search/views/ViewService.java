@@ -16,16 +16,15 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
@@ -58,24 +57,22 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
     private final ViewRequirements.Factory viewRequirementsFactory;
     private final EntityOwnershipService entityOwnerShipService;
     private final ViewSummaryService viewSummaryService;
-    private final MongoCollection<Document> collection;
-    private final ObjectMapper mapper;
+    private final MongoCollection<ViewDTO> collection;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                          ObjectMapper mapper,
                           ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityOwnershipService entityOwnerShipService,
-                          ViewSummaryService viewSummaryService) {
+                          ViewSummaryService viewSummaryService,
+                          MongoCollections mongoCollections) {
         super(mongoConnection, mongoJackObjectMapperProvider, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
         this.viewSummaryService = viewSummaryService;
-        this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
-        this.mapper = mapper;
+        this.collection = mongoCollections.get(COLLECTION_NAME, ViewDTO.class);
 
         new MongoDbIndexTools(db).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
@@ -100,7 +97,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
 
     public Optional<ViewDTO> get(final SearchUser searchUser, final String id) {
         return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), getSortBuilder("asc", "_id"))
-                .findFirst().map(this::deserialize);
+                .findFirst();
     }
 
     protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
@@ -113,7 +110,6 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
         var grandTotal = db.getCount(grandTotalQuery);
 
         var views = findViews(searchUser, dbQuery.toBson(), sort)
-                .map(this::deserialize)
                 .filter(filter)
                 .toList();
 
@@ -261,17 +257,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
     }
 
     @Override
-    public ObjectMapper mapper() {
-        return mapper;
-    }
-
-    @Override
-    public MongoCollection<Document> collection() {
+    public MongoCollection<ViewDTO> collection() {
         return collection;
-    }
-
-    @Override
-    public Class<ViewDTO> type() {
-        return ViewDTO.class;
     }
 }

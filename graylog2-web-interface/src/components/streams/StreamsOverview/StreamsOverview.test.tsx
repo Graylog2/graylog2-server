@@ -17,6 +17,8 @@
 import React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { QueryParamProvider } from 'use-query-params';
 
 import { indexSets } from 'fixtures/indexSets';
 import { asMock, MockStore } from 'helpers/mocking';
@@ -73,10 +75,16 @@ const paginatedStreams = (exampleStream = stream) => ({
 });
 
 describe('StreamsOverview', () => {
+  const renderSut = () => render(
+    <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <StreamsOverview indexSets={indexSets} />
+    </QueryParamProvider>,
+  );
+
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { ...layoutPreferences, displayedAttributes: ['title', 'description', 'rules'] },
-      isLoading: false,
+      isInitialLoading: false,
     });
 
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
@@ -99,7 +107,7 @@ describe('StreamsOverview', () => {
     });
     asMock(useStreams).mockReturnValue(emptyPaginatedStreams);
 
-    render(<StreamsOverview indexSets={indexSets} />);
+    renderSut();
 
     await screen.findByText('No streams have been found');
   });
@@ -107,7 +115,7 @@ describe('StreamsOverview', () => {
   it('should render list', async () => {
     asMock(useStreams).mockReturnValue(paginatedStreams());
 
-    render(<StreamsOverview indexSets={indexSets} />);
+    renderSut();
 
     await screen.findByText(stream.title);
     await screen.findByText(stream.description);
@@ -139,7 +147,7 @@ describe('StreamsOverview', () => {
     };
     asMock(useStreams).mockReturnValue(paginatedStreams(streamWithRules));
 
-    render(<StreamsOverview indexSets={indexSets} />);
+    renderSut();
 
     const tableRow = await screen.findByTestId(`table-row-${streamWithRules.id}`);
 

@@ -66,6 +66,7 @@ const OverlayDropdownButton = ({
                          <Button bsSize={bsSize}
                                  className="dropdown-toggle"
                                  ref={toggleTarget}
+                                 aria-label={buttonTitle}
                                  title={buttonTitle}
                                  disabled={disabled}
                                  onClick={onToggle}>
@@ -83,7 +84,7 @@ const OverlayDropdownButton = ({
 OverlayDropdownButton.defaultProps = {
   bsSize: undefined,
   buttonTitle: undefined,
-  closeOnSelect: false,
+  closeOnSelect: true,
   disabled: false,
   dropdownMinWidth: undefined,
   dropdownZIndex: undefined,

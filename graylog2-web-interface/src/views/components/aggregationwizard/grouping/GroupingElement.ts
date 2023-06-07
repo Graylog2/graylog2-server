@@ -174,9 +174,7 @@ const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
   return groupByError;
 };
 
-const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
-  return errors.filter((error) => Object.keys(error).length > 0).length > 0;
-};
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
 
 const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
   if ('interval' in grouping) {

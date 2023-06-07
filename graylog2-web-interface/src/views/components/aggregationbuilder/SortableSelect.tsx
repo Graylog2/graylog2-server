@@ -25,7 +25,7 @@ import Select from 'components/common/Select';
 
 import styles from './SortableSelect.css';
 
-const SortableSelectContainer = SortableContainer(Select);
+const SortableSelectContainer = SortableContainer<React.ComponentProps<typeof Select>>(Select);
 
 const _arrayMove = (array: Array<{ field: string }> | undefined, from: number, to: number) => {
   const result = array?.slice() ?? [];

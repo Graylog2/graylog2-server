@@ -32,6 +32,7 @@ public class VendorFields {
     public static final String VENDOR_PUBLIC_IP = "vendor_public_ip";
     public static final String VENDOR_PUBLIC_IPV6 = "vendor_public_ipv6";
     public static final String VENDOR_SIGNIN_PROTOCOL = "vendor_signin_protocol";
+    public static final String VENDOR_SUBTYPE = "vendor_subtype";
     public static final String VENDOR_THREAT_SUSPECTED = "vendor_threat_suspected";
     public static final String VENDOR_TRANSACTION_ID = "vendor_transaction_id";
     public static final String VENDOR_TRANSACTION_TYPE = "vendor_transaction_type";

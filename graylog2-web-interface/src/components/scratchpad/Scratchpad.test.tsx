@@ -25,17 +25,15 @@ import Scratchpad from './Scratchpad';
 
 const setScratchpadVisibility = jest.fn();
 
-const renderSUT = () => {
-  return (
-    <ScratchpadContext.Provider value={{
-      isScratchpadVisible: true,
-      localStorageItem: 'gl-scratchpad-jest',
-      setScratchpadVisibility,
-    }}>
-      <Scratchpad />
-    </ScratchpadContext.Provider>
-  );
-};
+const renderSUT = () => (
+  <ScratchpadContext.Provider value={{
+    isScratchpadVisible: true,
+    localStorageItem: 'gl-scratchpad-jest',
+    setScratchpadVisibility,
+  }}>
+    <Scratchpad />
+  </ScratchpadContext.Provider>
+);
 
 jest.mock('clipboard');
 

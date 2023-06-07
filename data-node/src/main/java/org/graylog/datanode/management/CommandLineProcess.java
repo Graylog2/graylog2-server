@@ -33,24 +33,29 @@ import java.util.concurrent.TimeoutException;
 
 
 class CommandLineProcess {
-
     private final Path executable;
     private final List<String> arguments;
     private final ProcessListener listener;
+    private final Environment environment;
     private final ExecuteWatchdog watchDog;
 
     private Process process;
 
-    public CommandLineProcess(Path executable, List<String> arguments, ProcessListener listener) {
+
+    CommandLineProcess(Path executable,
+                       List<String> arguments,
+                       ProcessListener listener,
+                       Environment environment) {
         this.executable = executable;
         this.arguments = arguments;
         this.listener = listener;
+        this.environment = environment;
         this.watchDog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandLineProcess.class);
 
-    public void start() throws IOException {
+    public void start() {
 
         LOG.info("Running process from " + executable.toAbsolutePath());
 
@@ -60,16 +65,16 @@ class CommandLineProcess {
 
         ProcessProvidingExecutor executor = new ProcessProvidingExecutor();
 
-        //executor.setStreamHandler(logs);
         executor.setStreamHandler(new PumpStreamHandler(new LoggingOutputStream(listener::onStdOut), new LoggingOutputStream(listener::onStdErr)));
         executor.setWatchdog(watchDog);
-        executor.execute(cmdLine, listener);
+
         try {
+            executor.execute(cmdLine, environment.getEnv(), listener);
             this.process = executor.getProcess().get(30, TimeUnit.SECONDS);
             listener.onStart();
         } catch (TimeoutException e) {
             throw new RuntimeException("Failed to obtain process", e);
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -77,8 +82,9 @@ class CommandLineProcess {
     public void stop() {
         this.watchDog.destroyProcess();
     }
+
     /**
-     * "Do not rely on the undelying process if not necessary"
+     * "Do not rely on the underlying process if not necessary"
      */
     @Deprecated(forRemoval = true)
     public Optional<Process> getProcess() {

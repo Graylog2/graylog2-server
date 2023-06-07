@@ -14,161 +14,136 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import moment from 'moment';
 
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { getConfig } from 'components/configurations/helpers';
+import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
-import ObjectUtils from 'util/ObjectUtils';
-import type { SearchesConfig as SearchesConfigType } from 'components/search/SearchConfig';
+import Spinner from 'components/common/Spinner';
+import type { SearchConfig } from 'components/search';
 import Select from 'components/common/Select/Select';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import 'moment-duration-format';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
-function _queryTimeRangeLimitValidator(milliseconds: number) {
-  return milliseconds >= 1;
-}
+const queryTimeRangeLimitValidator = (milliseconds: number) => milliseconds >= 1;
 
-function _relativeTimeRangeValidator(milliseconds: number, duration: string) {
-  return milliseconds >= 1 || duration === 'PT0S';
-}
+const relativeTimeRangeValidator = (milliseconds: number, duration: string) => milliseconds >= 1 || duration === 'PT0S';
 
-function _surroundingTimeRangeValidator(milliseconds: number) {
-  return milliseconds >= 1;
-}
+const surroundingTimeRangeValidator = (milliseconds: number) => milliseconds >= 1;
 
-function _autoRefreshTimeRangeValidator(milliseconds: number) {
+function autoRefreshTimeRangeValidator(milliseconds: number) {
   return milliseconds >= 1000;
 }
 
-function _splitStringList(stringList: string) {
-  return stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
-}
+const splitStringList = (stringList: string) => stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
 
-const _buildTimeRangeOptions = (options: { [x: string]: string; }) => {
-  return Object.keys(options).map((key) => {
-    return { period: key, description: options[key] };
-  });
-};
+const buildTimeRangeOptions = (options: { [x: string]: string; }) => Object.keys(options).map((key) => ({ period: key, description: options[key] }));
 
 type Option = { period: string, description: string };
 
-type Props = {
-  config: SearchesConfigType,
-  updateConfig: (newConfig: SearchesConfigType) => Promise<unknown>,
-};
-type State = {
-  config: SearchesConfigType,
-  showConfigModal: boolean,
-  limitEnabled: boolean,
-  relativeTimeRangeOptionsUpdate: Array<Option>,
-  surroundingTimeRangeOptionsUpdate: Array<Option>,
-  autoRefreshTimeRangeOptionsUpdate: Array<Option>,
-  surroundingFilterFields?: string,
-  analysisDisabledFields?: string,
-  defaultAutoRefreshOptionUpdate?: string,
-};
+const SearchesConfig = () => {
+  const isLimitEnabled = (config) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
+  const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
+  const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<SearchConfig | undefined>(undefined);
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(undefined);
+  const [surroundingTimeRangeOptionsUpdate, setSurroundingTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(undefined);
+  const [autoRefreshTimeRangeOptionsUpdate, setAutoRefreshTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(undefined);
+  const [surroundingFilterFieldsUpdate, setSurroundingFilterFieldsUpdate] = useState<string | undefined>(undefined);
+  const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState<string | undefined>(undefined);
+  const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
 
-class SearchesConfig extends React.Component<Props, State> {
-  private readonly defaultState: State;
+  const sendTelemetry = useSendTelemetry();
 
-  static propTypes = {
-    config: PropTypes.shape({
-      query_time_range_limit: PropTypes.string,
-      relative_timerange_options: PropTypes.objectOf(PropTypes.string),
-      surrounding_timerange_options: PropTypes.objectOf(PropTypes.string),
-      surrounding_filter_fields: PropTypes.arrayOf(PropTypes.string),
-      analysis_disabled_fields: PropTypes.arrayOf(PropTypes.string),
-    }).isRequired,
-    updateConfig: PropTypes.func.isRequired,
+  useEffect(() => {
+    ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration);
+
+      setViewConfig(config);
+      setFormConfig(config);
+    });
+  }, [configuration]);
+
+  const onUpdate = (field: keyof SearchConfig) => (newOptions) => {
+    setFormConfig({ ...formConfig, [field]: newOptions });
   };
 
-  constructor(props: Props) {
-    super(props);
-
-    const { config } = props;
-
-    const queryTimeRangeLimit = config?.query_time_range_limit;
-
-    this.state = {
-      showConfigModal: false,
-      config: { ...config },
-      limitEnabled: moment.duration(queryTimeRangeLimit).asMilliseconds() > 0,
-      relativeTimeRangeOptionsUpdate: undefined,
-      surroundingTimeRangeOptionsUpdate: undefined,
-      autoRefreshTimeRangeOptionsUpdate: undefined,
-      defaultAutoRefreshOptionUpdate: undefined,
-    };
-
-    this.defaultState = { ...this.state };
-  }
-
-  _onUpdate = (field: keyof SearchesConfigType) => {
-    return (newOptions) => {
-      const { config } = this.state;
-      const update = ObjectUtils.clone(config);
-
-      update[field] = newOptions;
-
-      this.setState({ config: update });
-    };
+  const onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {
+    setRelativeTimeRangeOptionsUpdate(data);
   };
 
-  _onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {
-    this.setState({ relativeTimeRangeOptionsUpdate: data });
+  const onSurroundingTimeRangeOptionsUpdate = (data: Array<Option>) => {
+    setSurroundingTimeRangeOptionsUpdate(data);
   };
 
-  _onSurroundingTimeRangeOptionsUpdate = (data: Array<Option>) => {
-    this.setState({ surroundingTimeRangeOptionsUpdate: data });
+  const onAutoRefreshTimeRangeOptionsUpdate = (data: Array<Option>) => {
+    setAutoRefreshTimeRangeOptionsUpdate(data);
   };
 
-  _onAutoRefreshTimeRangeOptionsUpdate = (data: Array<Option>) => {
-    this.setState({ autoRefreshTimeRangeOptionsUpdate: data });
+  const onFilterFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSurroundingFilterFieldsUpdate(e.target.value);
   };
 
-  _onFilterFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ surroundingFilterFields: e.target.value });
+  const onAnalysisDisabledFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAnalysisDisabledFieldsUpdate(e.target.value);
   };
 
-  _onAnalysisDisabledFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ analysisDisabledFields: e.target.value });
+  const onAutoRefreshDefaultOptionsUpdate = (data: string) => {
+    setDefaultAutoRefreshOptionUpdate(data);
   };
 
-  _onAutoRefreshDefaultOptionsUpdate = (data: string) => {
-    this.setState({ defaultAutoRefreshOptionUpdate: data });
-  };
+  const onChecked = () => {
+    let queryTimeRangeLimit;
 
-  _onChecked = () => {
-    const { config: origConfig, limitEnabled } = this.state;
-    const config = ObjectUtils.clone(origConfig);
-
-    if (limitEnabled) {
+    if (isLimitEnabled(formConfig)) {
       // If currently enabled, disable by setting the limit to 0 seconds.
-      config.query_time_range_limit = 'PT0S';
+      queryTimeRangeLimit = 'PT0S';
     } else {
       // If currently not enabled, set a default of 30 days.
-      config.query_time_range_limit = 'P30D';
+      queryTimeRangeLimit = 'P30D';
     }
 
-    this.setState({ config: config, limitEnabled: !limitEnabled });
+    setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
   };
 
-  _saveConfig = () => {
-    const { updateConfig } = this.props;
-    const {
-      analysisDisabledFields,
-      config,
-      relativeTimeRangeOptionsUpdate,
-      surroundingTimeRangeOptionsUpdate,
-      surroundingFilterFields,
-      autoRefreshTimeRangeOptionsUpdate,
-      defaultAutoRefreshOptionUpdate,
-    } = this.state;
-    const update = ObjectUtils.clone(config);
+  const openModal = () => {
+    setShowConfigModal(true);
+  };
+
+  const resetFormUpdates = () => {
+    setRelativeTimeRangeOptionsUpdate(undefined);
+    setSurroundingTimeRangeOptionsUpdate(undefined);
+    setSurroundingFilterFieldsUpdate(undefined);
+    setAnalysisDisabledFieldsUpdate(undefined);
+    setAutoRefreshTimeRangeOptionsUpdate(undefined);
+    setDefaultAutoRefreshOptionUpdate(undefined);
+  };
+
+  const handleModalCancel = () => {
+    setShowConfigModal(false);
+    setFormConfig(viewConfig);
+    resetFormUpdates();
+  };
+
+  const saveConfig = () => {
+    const update = { ...formConfig };
+
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'search',
+      app_action_value: 'configuration-save',
+    });
 
     if (relativeTimeRangeOptionsUpdate) {
       update.relative_timerange_options = {};
@@ -177,7 +152,7 @@ class SearchesConfig extends React.Component<Props, State> {
         update.relative_timerange_options[entry.period] = entry.description;
       });
 
-      this.setState({ relativeTimeRangeOptionsUpdate: undefined });
+      setRelativeTimeRangeOptionsUpdate(undefined);
     }
 
     if (surroundingTimeRangeOptionsUpdate) {
@@ -187,23 +162,22 @@ class SearchesConfig extends React.Component<Props, State> {
         update.surrounding_timerange_options[entry.period] = entry.description;
       });
 
-      this.setState({ surroundingTimeRangeOptionsUpdate: undefined });
+      setSurroundingTimeRangeOptionsUpdate(undefined);
     }
 
-    // Make sure to update filter fields
-    if (surroundingFilterFields) {
-      update.surrounding_filter_fields = _splitStringList(surroundingFilterFields);
-      this.setState({ surroundingFilterFields: undefined });
+    if (surroundingFilterFieldsUpdate) {
+      update.surrounding_filter_fields = splitStringList(surroundingFilterFieldsUpdate);
+      setSurroundingFilterFieldsUpdate(undefined);
     }
 
-    if (analysisDisabledFields) {
-      update.analysis_disabled_fields = _splitStringList(analysisDisabledFields);
-      this.setState({ analysisDisabledFields: undefined });
+    if (analysisDisabledFieldsUpdate) {
+      update.analysis_disabled_fields = splitStringList(analysisDisabledFieldsUpdate);
+      setAnalysisDisabledFieldsUpdate(undefined);
     }
 
     if (autoRefreshTimeRangeOptionsUpdate) {
       update.auto_refresh_timerange_options = Object.fromEntries(autoRefreshTimeRangeOptionsUpdate.map((entry) => [entry.period, entry.description]));
-      this.setState({ autoRefreshTimeRangeOptionsUpdate: undefined });
+      setAutoRefreshTimeRangeOptionsUpdate(undefined);
     }
 
     const defaultAutoRefreshOption = defaultAutoRefreshOptionUpdate
@@ -212,107 +186,90 @@ class SearchesConfig extends React.Component<Props, State> {
 
     if (update.default_auto_refresh_option !== defaultAutoRefreshOption) {
       update.default_auto_refresh_option = defaultAutoRefreshOptionUpdate;
-      this.setState({ defaultAutoRefreshOptionUpdate: undefined });
+      setDefaultAutoRefreshOptionUpdate(undefined);
     }
 
-    updateConfig(update).then(() => {
-      this._closeModal();
+    const newFormConfig = { ...formConfig, ...update };
+
+    ConfigurationsActions.update(ConfigurationType.SEARCHES_CLUSTER_CONFIG, newFormConfig).then(() => {
+      setShowConfigModal(false);
+      resetFormUpdates();
     });
   };
 
-  _openModal = () => {
-    this.setState({ showConfigModal: true });
-  };
+  if (!viewConfig) {
+    return <Spinner />;
+  }
 
-  _closeModal = () => {
-    // Reset to initial state when the modal is closed without saving.
-    this.setState(this.defaultState);
-  };
+  const duration = (config) => moment.duration(config.query_time_range_limit);
+  const limit = (config) => (isLimitEnabled(config) ? `${config.query_time_range_limit} (${duration(config).humanize()})` : 'disabled');
+  const autoRefreshOptions = (config) => autoRefreshTimeRangeOptionsUpdate ?? buildTimeRangeOptions(config.auto_refresh_timerange_options);
+  const formDefaultAutoRefreshOptionUpdate = (config) => defaultAutoRefreshOptionUpdate ?? config.default_auto_refresh_option;
+  const defaultAutoRefreshOption = (config) => (autoRefreshOptions(config).find((option) => option.period === formDefaultAutoRefreshOptionUpdate(config))
+    ? formDefaultAutoRefreshOptionUpdate(config)
+    : autoRefreshOptions[0]?.period);
 
-  render() {
-    const {
-      showConfigModal,
-      config,
-      limitEnabled,
-      surroundingTimeRangeOptionsUpdate,
-      surroundingFilterFields,
-      relativeTimeRangeOptionsUpdate,
-      analysisDisabledFields,
-      autoRefreshTimeRangeOptionsUpdate,
-    } = this.state;
-    const duration = moment.duration(config.query_time_range_limit);
-    const limit = limitEnabled ? `${config.query_time_range_limit} (${duration.humanize()})` : 'disabled';
+  return (
+    <div>
+      <h2>Search Configuration</h2>
 
-    let filterFields;
-    let filterFieldsString;
+      <dl className="deflist">
+        <dt>Query time range limit</dt>
+        <dd>{limit(viewConfig)}</dd>
+        <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries
+          which
+          span a lot of data and would need a long time and many resources to complete (if at all).
+        </dd>
+      </dl>
 
-    if (config.surrounding_filter_fields) {
-      filterFields = config.surrounding_filter_fields.map((f) => <li key={f}>{f}</li>);
-      filterFieldsString = config.surrounding_filter_fields.join(', ');
-    }
+      <Row>
+        <Col md={4}>
+          <strong>Relative time range options</strong>
+          <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
+          <strong>Surrounding time range options</strong>
+          <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
+        </Col>
+        <Col md={4}>
+          <Row style={{ marginBottom: 20 }}>
+            <Col>
+              <strong>Surrounding search filter fields</strong>
+              <ul>
+                {viewConfig.surrounding_filter_fields && viewConfig.surrounding_filter_fields.map((f: string) => (
+                  <li key={f}>{f}
+                  </li>
+                ))}
+              </ul>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <strong>UI analysis disabled for fields</strong>
+              <ul>
+                {viewConfig.analysis_disabled_fields && (viewConfig.analysis_disabled_fields.map((f: string) => (
+                  <li key={f}>{f}
+                  </li>
+                )))}
+              </ul>
+            </Col>
+          </Row>
+        </Col>
+        <Col md={4}>
+          <strong>Auto-refresh interval options</strong>
+          <TimeRangeOptionsSummary options={viewConfig.auto_refresh_timerange_options} />
 
-    let analysisDisabledFieldsListItems;
-    let analysisDisabledFieldsString;
+          <strong>Default auto-refresh interval</strong>
+          <TimeRangeOptionsSummary options={{ [viewConfig.default_auto_refresh_option]: viewConfig.auto_refresh_timerange_options[viewConfig.default_auto_refresh_option] }} />
+        </Col>
+      </Row>
+      <IfPermitted permissions="clusterconfigentry:edit">
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
+      </IfPermitted>
 
-    if (config.analysis_disabled_fields) {
-      analysisDisabledFieldsListItems = config.analysis_disabled_fields.map((f) => <li key={f}>{f}</li>);
-      analysisDisabledFieldsString = config.analysis_disabled_fields.join(', ');
-    }
-
-    const autoRefreshOptions = autoRefreshTimeRangeOptionsUpdate ?? _buildTimeRangeOptions(config.auto_refresh_timerange_options);
-    const defaultAutoRefreshOptionUpdate = this.state.defaultAutoRefreshOptionUpdate ?? config.default_auto_refresh_option;
-    const defaultAutoRefreshOption = autoRefreshOptions.find((option) => option.period === defaultAutoRefreshOptionUpdate)
-      ? defaultAutoRefreshOptionUpdate
-      : autoRefreshOptions[0]?.period;
-
-    return (
-      <div>
-        <h2>Search Configuration</h2>
-
-        <dl className="deflist">
-          <dt>Query time range limit</dt>
-          <dd>{limit}</dd>
-          <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries which
-            span a lot of data and would need a long time and many resources to complete (if at all).
-          </dd>
-        </dl>
-
-        <Row>
-          <Col md={6}>
-            <strong>Relative time range options</strong>
-            <TimeRangeOptionsSummary options={config.relative_timerange_options} />
-            <strong>Surrounding time range options</strong>
-            <TimeRangeOptionsSummary options={config.surrounding_timerange_options} />
-          </Col>
-          <Col md={6} />
-          <Col md={6}>
-            <strong>Auto-refresh interval options</strong>
-            <TimeRangeOptionsSummary options={config.auto_refresh_timerange_options} />
-
-            <strong>Default auto-refresh interval</strong>
-            <TimeRangeOptionsSummary options={{ [config.default_auto_refresh_option]: config.auto_refresh_timerange_options[config.default_auto_refresh_option] }} />
-
-            <strong>Surrounding search filter fields</strong>
-            <ul>
-              {filterFields}
-            </ul>
-
-            <strong>UI analysis disabled for fields</strong>
-            <ul>
-              {analysisDisabledFieldsListItems}
-            </ul>
-
-          </Col>
-
-        </Row>
-        <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
-        </IfPermitted>
-
-        <BootstrapModalForm show={showConfigModal}
+      {showConfigModal && formConfig && (
+        <BootstrapModalForm show
                             title="Update Search Configuration"
-                            onSubmitForm={this._saveConfig}
-                            onCancel={this._closeModal}
+                            onSubmitForm={saveConfig}
+                            onCancel={handleModalCancel}
                             submitButtonText="Update configuration">
           <fieldset>
             <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
@@ -320,47 +277,50 @@ class SearchesConfig extends React.Component<Props, State> {
                    type="checkbox"
                    label="Enable query limit"
                    name="enabled"
-                   checked={limitEnabled}
-                   onChange={this._onChecked} />
-            {limitEnabled && (
+                   checked={isLimitEnabled(formConfig)}
+                   onChange={onChecked} />
+            {isLimitEnabled(formConfig) && (
               <ISODurationInput id="query-timerange-limit-field"
-                                duration={config.query_time_range_limit}
-                                update={this._onUpdate('query_time_range_limit')}
+                                duration={formConfig.query_time_range_limit}
+                                update={onUpdate('query_time_range_limit')}
                                 label="Query time range limit (ISO8601 Duration)"
                                 help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
-                                validator={_queryTimeRangeLimitValidator}
+                                validator={queryTimeRangeLimitValidator}
                                 required />
             )}
-            <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || _buildTimeRangeOptions(config.relative_timerange_options)}
-                                  update={this._onRelativeTimeRangeOptionsUpdate}
-                                  validator={_relativeTimeRangeValidator}
+            <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.relative_timerange_options)}
+                                  update={onRelativeTimeRangeOptionsUpdate}
+                                  validator={relativeTimeRangeValidator}
                                   title="Relative Timerange Options"
-                                  help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
-            <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || _buildTimeRangeOptions(config.surrounding_timerange_options)}
-                                  update={this._onSurroundingTimeRangeOptionsUpdate}
-                                  validator={_surroundingTimeRangeValidator}
+                                  help={
+                                    <span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>
+              } />
+            <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
+                                  update={onSurroundingTimeRangeOptionsUpdate}
+                                  validator={surroundingTimeRangeValidator}
                                   title="Surrounding Timerange Options"
-                                  help={<span>Configure the available options for the <strong>surrounding</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
+                                  help={
+                                    <span>Configure the available options for the <strong>surrounding</strong> time range selector as <strong>ISO8601 duration</strong></span>
+              } />
 
             <Input id="filter-fields-input"
                    type="text"
                    label="Surrounding search filter fields"
-                   onChange={this._onFilterFieldsUpdate}
-                   value={surroundingFilterFields || filterFieldsString}
+                   onChange={onFilterFieldsUpdate}
+                   value={surroundingFilterFieldsUpdate || (formConfig.surrounding_filter_fields && formConfig.surrounding_filter_fields.join(', '))}
                    help="A ',' separated list of message fields that will be used as filter for the surrounding messages query."
                    required />
 
             <Input id="disabled-fields-input"
                    type="text"
                    label="Disabled analysis fields"
-                   onChange={this._onAnalysisDisabledFieldsUpdate}
-                   value={analysisDisabledFields || analysisDisabledFieldsString}
+                   onChange={onAnalysisDisabledFieldsUpdate}
+                   value={analysisDisabledFieldsUpdate || (formConfig.analysis_disabled_fields && formConfig.analysis_disabled_fields.join(', '))}
                    help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
                    required />
-
-            <TimeRangeOptionsForm options={autoRefreshOptions}
-                                  update={this._onAutoRefreshTimeRangeOptionsUpdate}
-                                  validator={_autoRefreshTimeRangeValidator}
+            <TimeRangeOptionsForm options={autoRefreshOptions(formConfig)}
+                                  update={onAutoRefreshTimeRangeOptionsUpdate}
+                                  validator={autoRefreshTimeRangeValidator}
                                   title="Auto-Refresh Interval Options"
                                   help={<span>Configure the available options for the <strong>auto-refresh</strong> interval selector as <strong>ISO8601 duration</strong></span>} />
             <Input label="Default Auto-Refresh Option"
@@ -369,18 +329,18 @@ class SearchesConfig extends React.Component<Props, State> {
                    help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
               <Select placeholder="Select the default interval"
                       clearable={false}
-                      options={autoRefreshOptions}
+                      options={autoRefreshOptions(formConfig)}
                       displayKey="description"
                       valueKey="period"
                       matchProp="label"
-                      onChange={this._onAutoRefreshDefaultOptionsUpdate}
-                      value={defaultAutoRefreshOption} />
+                      onChange={onAutoRefreshDefaultOptionsUpdate}
+                      value={defaultAutoRefreshOption(formConfig)} />
             </Input>
           </fieldset>
         </BootstrapModalForm>
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
 
 export default SearchesConfig;

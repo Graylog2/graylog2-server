@@ -23,6 +23,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.apache.commons.exec.ExecuteException;
 import org.assertj.core.api.Assertions;
+import org.graylog.datanode.process.ProcessEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +60,7 @@ class CommandLineProcessTest {
     }
 
     @Test
-    void testManualStop() throws IOException, ExecutionException, RetryException, URISyntaxException {
+    void testManualStop() throws IOException, ExecutionException, RetryException {
         List<String> stdout = new LinkedList<>();
         List<String> stdErr = new LinkedList<>();
 
@@ -89,7 +91,12 @@ class CommandLineProcessTest {
                 LOG.info("On process failed:", e);
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(binPath, Collections.emptyList(), listener);
+        final CommandLineProcess process = new CommandLineProcess(
+                binPath,
+                Collections.emptyList(),
+                listener,
+                new Environment(Map.of("USER", "test", "JAVA_HOME", "/path/to/jre"))
+        );
         process.start();
 
         waitTillLogsAreAvailable(stdout, 3);
@@ -148,7 +155,7 @@ class CommandLineProcessTest {
                 exitCodeFuture.complete(e.getExitValue());
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener);
+        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener, new Environment(System.getenv()));
         process.start();
 
         final Integer exitCode = exitCodeFuture.get(10, TimeUnit.SECONDS);

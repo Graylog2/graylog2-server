@@ -47,6 +47,7 @@ describe('Chart helper functions', () => {
         type: 'dummy',
         x: ['index', 'show', 'login', 'edit'],
         y: [27142, 7826, 6626, 1246],
+        originalName: 'count()',
       }];
 
       expect(result).toHaveLength(1);
@@ -61,6 +62,7 @@ describe('Chart helper functions', () => {
         type: 'bar',
         x: ['index', 'show', 'login', 'edit'],
         y: [27142, 7826, 6626, 1246],
+        originalName: 'count()',
       }];
 
       expect(result).toHaveLength(1);
@@ -81,6 +83,7 @@ describe('Chart helper functions', () => {
           '2018-05-28T11:53:00.000Z',
         ],
         y: [7813, 8657, 8645, 8630, 702],
+        originalName: 'count()',
       }, {
         name: 'sum(took_ms)',
         type: 'bar',
@@ -92,6 +95,7 @@ describe('Chart helper functions', () => {
           '2018-05-28T11:53:00.000Z',
         ],
         y: [587008, 646728, 792102, 579708, 62596],
+        originalName: 'sum(took_ms)',
       }];
 
       expect(result).toHaveLength(2);
@@ -112,6 +116,7 @@ describe('Chart helper functions', () => {
           '2018-05-28T11:53:00.000Z',
         ],
         y: [7813, 0, 0, 0, 702],
+        originalName: 'count()',
       }];
 
       expect(result).toHaveLength(1);
@@ -129,6 +134,7 @@ describe('Chart helper functions', () => {
           '2018-05-28T11:53:00.000Z',
         ],
         y: [7813, 702],
+        originalName: 'count()',
       }];
 
       expect(result).toHaveLength(1);
@@ -155,13 +161,13 @@ describe('Chart helper functions', () => {
 
     it('should allow passing a format series function to modify the series structure', () => {
       const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
-      const generatorFunction: Generator = (type, name, x, y, z) => ({ type, name, x, y, z });
+      const generatorFunction: Generator = ({ type, name, labels: x, values: y, data: z }) => ({ type, name, x, y, z, originalName: name });
 
       const formatSeriesCustom = ({
         valuesBySeries,
         xLabels,
       }: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
-        // In this example we want to create only one series, with an z value, which contains all series data
+        // In this example we want to create only one series, with a z value, which contains all series data
         const z: Array<any> = Object.values(valuesBySeries).map((series) => {
           const newSeries = fill(Array(xLabels.length), null);
 
@@ -209,24 +215,25 @@ describe('Chart helper functions', () => {
   describe('generateChart', () => {
     it('should allow passing a generator function modelling the chart config', () => {
       const input = readFixture('ChartData.test.simple.json');
-      const generatorFunction: Generator = (type, name, labels, values) => ({
+      const generatorFunction: Generator = ({ type, name, labels, values }) => ({
         type: 'md5',
         name: md5(JSON.stringify({ type, name, labels, values })),
+        originalName: name,
       });
       const pipeline = flow([
         transformKeys(config.rowPivots, config.columnPivots, formatTime),
         extractSeries(),
         formatSeries,
-        generateChart('scatter', generatorFunction),
+        generateChart('scatter', generatorFunction, config),
       ]);
       const result = pipeline(input);
       const expectedResult = [
-        { type: 'md5', name: '99fff4aaa8e33abf060756997b07172c' },
-        { type: 'md5', name: '07493899371a4a8b67c14a305774f9d9' },
-        { type: 'md5', name: '1846191e09cf20e5f2090abeb01877a7' },
-        { type: 'md5', name: '8e560cc5648d21674230dfbb5e99f4d7' },
-        { type: 'md5', name: '57469e98b570e77672233b258c7d91a0' },
-        { type: 'md5', name: '88648c9ca14f65ef199856a4fda8836e' },
+        { type: 'md5', name: 'a04d4e18974d37355624a90d66638504', originalName: 'index-count()' },
+        { type: 'md5', name: 'b607b20cd74affda22167cebc610c7be', originalName: 'index-sum(took_ms)' },
+        { type: 'md5', name: '6931556ff24852ee09b350fa8c3fa217', originalName: 'edit-count()' },
+        { type: 'md5', name: 'a2411d23695865bf1e9b1bc2ac502f6c', originalName: 'edit-sum(took_ms)' },
+        { type: 'md5', name: 'ea6fc3a2d21d0e68bf078a5efae6b04a', originalName: 'count()' },
+        { type: 'md5', name: '0c341c5b895a4dc1ebab86bbf728e20b', originalName: 'sum(took_ms)' },
       ];
 
       expect(result).toHaveLength(6);

@@ -35,9 +35,7 @@ type DirectionStrategy = {
   tooltip: (fieldName: string) => string,
 };
 
-const _tooltip = (fieldName: string, newDirection: Direction) => {
-  return `Sort ${fieldName} ${newDirection.direction}`;
-};
+const _tooltip = (fieldName: string, newDirection: Direction) => `Sort ${fieldName} ${newDirection.direction}`;
 
 const _changeSort = (nextDirection: Direction, _config: MessagesWidgetConfig, fieldName: string, onSortChange: (newSortConfig: SortConfig[]) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
   const newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
@@ -49,9 +47,7 @@ const _changeSort = (nextDirection: Direction, _config: MessagesWidgetConfig, fi
   });
 };
 
-const _isFieldSortActive = (config: MessagesWidgetConfig, fieldName: string) => {
-  return config.sort && config.sort.length > 0 && config.sort[0].field === fieldName;
-};
+const _isFieldSortActive = (config: MessagesWidgetConfig, fieldName: string) => config.sort && config.sort.length > 0 && config.sort[0].field === fieldName;
 
 const DirectionStrategyAsc: DirectionStrategy = {
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Descending),

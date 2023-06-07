@@ -65,9 +65,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
     } = {},
   } = sidecar;
 
-  const getCollectorInformation = (collectorId: string) => {
-    return collectors.find((collector) => collector.id === collectorId);
-  };
+  const getCollectorInformation = (collectorId: string) => collectors.find((collector) => collector.id === collectorId);
 
   return (
 

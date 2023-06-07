@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { useQueryParam, QueryParamProvider } from 'use-query-params';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -39,6 +41,11 @@ jest.mock('views/stores/ViewManagementStore', () => ({
       },
     },
   },
+}));
+
+jest.mock('use-query-params', () => ({
+  ...jest.requireActual('use-query-params'),
+  useQueryParam: jest.fn(),
 }));
 
 const loadDashboardsResponse = (count = 1) => {
@@ -90,14 +97,22 @@ const loadDashboardsResponse = (count = 1) => {
 };
 
 describe('DashboardsOverview', () => {
+  const SUT = () => (
+    <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <DashboardsOverview />
+    </QueryParamProvider>
+  );
+
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
+    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
+    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
   });
 
   it('should render empty', async () => {
     asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
 
-    render(<DashboardsOverview />);
+    render(<SUT />);
 
     await screen.findByText('No dashboards have been created yet.');
   });
@@ -105,10 +120,24 @@ describe('DashboardsOverview', () => {
   it('should render list', async () => {
     asMock(useDashboards).mockReturnValue(loadDashboardsResponse(3));
 
-    render(<DashboardsOverview />);
+    render(<SUT />);
 
     await screen.findByText('search-title-0');
     await screen.findByText('search-title-1');
     await screen.findByText('search-title-2');
+  });
+
+  it('should use search query from URL params', async () => {
+    asMock(useQueryParam).mockImplementation((field: string) => {
+      const value = field === 'query' ? 'example query' : undefined;
+
+      return [value, () => {}];
+    });
+
+    render(<SUT />);
+
+    const searchInput = await screen.findByPlaceholderText('Enter search query...');
+
+    expect(searchInput).toHaveValue('example query');
   });
 });

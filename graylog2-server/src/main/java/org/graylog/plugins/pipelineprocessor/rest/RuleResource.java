@@ -36,17 +36,19 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -65,7 +67,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -91,29 +92,34 @@ public class RuleResource extends RestResource implements PluginRestResource {
             .build();
 
     private final RuleService ruleService;
+    private final RuleSimulator ruleSimulator;
     private final PipelineService pipelineService;
     private final RuleMetricsConfigService ruleMetricsConfigService;
-    private final PipelineRuleParser pipelineRuleParser;
+    private final PipelineRuleService pipelineRuleService;
     private final FunctionRegistry functionRegistry;
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
+    private final StreamService streamService;
 
     @Inject
     public RuleResource(RuleService ruleService,
-                        PipelineService pipelineService,
+                        RuleSimulator ruleSimulator, PipelineService pipelineService,
                         RuleMetricsConfigService ruleMetricsConfigService,
-                        PipelineRuleParser pipelineRuleParser,
+                        PipelineRuleService pipelineRuleService,
                         PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry,
-                        PipelineServiceHelper pipelineServiceHelper) {
+                        PipelineServiceHelper pipelineServiceHelper,
+                        StreamService streamService) {
         this.ruleService = ruleService;
+        this.ruleSimulator = ruleSimulator;
         this.pipelineService = pipelineService;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
-        this.pipelineRuleParser = pipelineRuleParser;
+        this.pipelineRuleService = pipelineRuleService;
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
+        this.streamService = streamService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -124,12 +130,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule;
-        try {
-            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), false);
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), false);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
@@ -148,7 +149,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         }
 
         log.debug("Created new rule {}", save);
-        return RuleSource.fromDao(pipelineRuleParser, save);
+        return pipelineRuleService.createRuleSourceFromRuleDao(save);
     }
 
     @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
@@ -156,13 +157,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/parse")
     @NoAuditEvent("only used to parse a rule, no changes made in the system")
     public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule;
-        try {
-            // be silent about parse errors here, many requests will result in invalid syntax
-            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), true);
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         return RuleSource.builder()
                 .title(rule.name())
@@ -173,14 +168,27 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .build();
     }
 
+    @ApiOperation(value = "Simulate a single processing rule")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/simulate")
+    @NoAuditEvent("only used to test a rule, no changes made in the system")
+    public Message simulate(
+            @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
+    ) throws NotFoundException {
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(request.ruleSource().id(), request.ruleSource().source(), true);
+        Message message = ruleSimulator.createMessage(request.message());
+        return ruleSimulator.simulate(rule, message);
+    }
+
     @ApiOperation(value = "Get all processing rules")
     @GET
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
     public Collection<RuleSource> getAll() {
         final Collection<RuleDao> ruleDaos = ruleService.loadAll();
         return ruleDaos.stream()
-                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
-                .collect(Collectors.toList());
+                .map(pipelineRuleService::createRuleSourceFromRuleDao)
+                .toList();
     }
 
     @GET
@@ -208,8 +216,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final PaginatedList<RuleDao> result = paginatedRuleService
                 .findPaginated(searchQuery, page, perPage, sort, order);
         final List<RuleSource> ruleSourceList = result.stream()
-                .map(dao -> RuleSource.fromDao(pipelineRuleParser, dao))
-                .collect(Collectors.toList());
+                .map(pipelineRuleService::createRuleSourceFromRuleDao)
+                .toList();
         final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
         return PaginatedResponse.create("rules", rules,
@@ -236,11 +244,11 @@ public class RuleResource extends RestResource implements PluginRestResource {
                                             .id(dao.id())
                                             .title(dao.title())
                                             .build())
-                                    .collect(Collectors.toList())
+                                    .toList()
                     );
                 });
 
-        return ImmutableMap.of("used_in_pipelines", result);
+        return Map.of("used_in_pipelines", result);
     }
 
 
@@ -250,7 +258,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @GET
     public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
-        return RuleSource.fromDao(pipelineRuleParser, ruleService.load(id));
+        return pipelineRuleService.createRuleSourceFromRuleDao(ruleService.load(id));
     }
 
     @ApiOperation("Retrieve the named processing rules in bulk")
@@ -261,9 +269,9 @@ public class RuleResource extends RestResource implements PluginRestResource {
         Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
 
         return ruleDaos.stream()
-                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
+                .map(pipelineRuleService::createRuleSourceFromRuleDao)
                 .filter(rule -> isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, rule.id()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @ApiOperation(value = "Modify a processing rule", notes = "It can take up to a second until the change is applied")
@@ -275,12 +283,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
 
         final RuleDao ruleDao = ruleService.load(id);
-        final Rule rule;
-        try {
-            rule = pipelineRuleParser.parseRule(id, update.source(), false);
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(id, update.source(), false);
         final RuleDao toSave = ruleDao.toBuilder()
                 .title(rule.name())
                 .description(update.description())
@@ -296,7 +299,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
             throw new BadRequestException(e.getMessage());
         }
 
-        return RuleSource.fromDao(pipelineRuleParser, savedRule);
+        return pipelineRuleService.createRuleSourceFromRuleDao(savedRule);
     }
 
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")

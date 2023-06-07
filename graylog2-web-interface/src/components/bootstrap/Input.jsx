@@ -92,9 +92,7 @@ class Input extends React.Component {
     children: null,
   };
 
-  getInputDOMNode = () => {
-    return this.input;
-  };
+  getInputDOMNode = () => this.input;
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   getValue = () => {
@@ -114,17 +112,13 @@ class Input extends React.Component {
   };
 
   // eslint-disable-next-line react/no-unused-class-component-methods
-  getChecked = () => {
-    return this.getInputDOMNode().checked;
-  };
+  getChecked = () => this.getInputDOMNode().checked;
 
-  _renderFormControl = (componentClass, controlProps, children) => {
-    return (
-      <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...controlProps}>
-        {children}
-      </FormControl>
-    );
-  };
+  _renderFormControl = (componentClass, controlProps, children) => (
+    <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...controlProps}>
+      {children}
+    </FormControl>
+  );
 
   _renderFormGroup = (children) => {
     const {

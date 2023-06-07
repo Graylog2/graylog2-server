@@ -33,13 +33,14 @@ class MessageDetail extends React.Component {
     inputs: PropTypes.object,
     nodes: PropTypes.object,
     message: PropTypes.object.isRequired,
-    streams: PropTypes.object.isRequired,
+    streams: PropTypes.object,
     customFieldActions: PropTypes.node,
   };
 
   static defaultProps = {
     inputs: undefined,
     nodes: undefined,
+    streams: undefined,
     customFieldActions: undefined,
   };
 
@@ -95,11 +96,15 @@ class MessageDetail extends React.Component {
     );
   };
 
-  render() {
-    const { renderForDisplay, nodes, message, customFieldActions } = this.props;
-    const streamIds = Immutable.Set(message.stream_ids);
-    const streams = streamIds.map((id) => {
-      const stream = this.props.streams.get(id);
+  _getStreamLinks = (streamIds) => {
+    const { streams, message } = this.props;
+
+    if (message.streams) {
+      return message.streams.map((stream) => (<li key={stream.id}><StreamLink stream={stream} /></li>));
+    }
+
+    const _streams = streamIds.map((id) => {
+      const stream = streams.get(id);
 
       if (stream !== undefined) {
         return <li key={stream.id}><StreamLink stream={stream} /></li>;
@@ -107,6 +112,14 @@ class MessageDetail extends React.Component {
 
       return null;
     });
+
+    return _streams;
+  };
+
+  render() {
+    const { renderForDisplay, nodes, message, customFieldActions } = this.props;
+    const streamIds = Immutable.Set(message.stream_ids);
+    const streamLinks = this._getStreamLinks(streamIds);
 
     // Legacy
     const viaRadio = message.source_radio_id
@@ -172,7 +185,7 @@ class MessageDetail extends React.Component {
             && (
             <dd className="stream-list">
               <ul>
-                {streams}
+                {streamLinks}
               </ul>
             </dd>
             )}

@@ -18,10 +18,12 @@ package org.graylog2.cluster;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bson.types.BSONTimestamp;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
+import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -29,7 +31,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
-@CollectionName("nodes")
+@DbEntity(collection = "nodes", titleField = "node_id")
 public class NodeImpl extends PersistedImpl implements Node {
 
     public NodeImpl(Map<String, Object> fields) {
@@ -58,13 +60,16 @@ public class NodeImpl extends PersistedImpl implements Node {
 
     @Override
     public DateTime getLastSeen() {
-        return new DateTime(((Integer) fields.getOrDefault("last_seen", 0)) * 1000L, DateTimeZone.UTC);
+        final Object rawLastSeen = fields.get("last_seen");
+        if (rawLastSeen == null) {
+            throw new IllegalStateException("Last seen timestamp of node is unexpectedly null!");
+        }
+        if (rawLastSeen instanceof BSONTimestamp) {
+            return new DateTime(((BSONTimestamp) rawLastSeen).getTime() * 1000L, DateTimeZone.UTC);
+        }
+        return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }
 
-    @Override
-    public String getShortNodeId() {
-        return getNodeId().split("-")[0];
-    }
 
     @Override
     public Type getType() {
@@ -90,5 +95,10 @@ public class NodeImpl extends PersistedImpl implements Node {
     @JsonIgnore
     public Map<String, Validator> getEmbeddedValidations(String key) {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }

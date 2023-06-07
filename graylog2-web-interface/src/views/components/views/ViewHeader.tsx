@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -29,19 +29,51 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
+import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
 import { createGRN } from 'logic/permissions/GRN';
 
 const links = {
-  [View.Type.Dashboard]: {
+  [View.Type.Dashboard]: ({ id, title }) => [{
     link: Routes.DASHBOARDS,
     label: 'Dashboards',
   },
-  [View.Type.Search]: {
+  {
+    label: title || id,
+    dataTestId: 'view-title',
+  },
+  ],
+  [View.Type.Search]: ({ id, title }) => [{
     link: Routes.SEARCH,
     label: 'Search',
   },
+  {
+    label: title || id,
+    dataTestId: 'view-title',
+  },
+  ],
+  alert: ({ id }) => [
+    {
+      link: Routes.ALERTS.LIST,
+      label: 'Alerts & Events',
+    },
+    {
+      label: id,
+      dataTestId: 'alert-id-title',
+    },
+  ],
+  eventDefinition: ({ id, title }) => [
+    {
+      link: Routes.ALERTS.DEFINITIONS.LIST,
+      label: 'Event definitions',
+    },
+    {
+      link: Routes.ALERTS.DEFINITIONS.show(id),
+      label: title || id,
+      dataTestId: 'event-definition-title',
+    },
+  ],
 };
 
 const Content = styled.div(({ theme }) => css`
@@ -76,12 +108,22 @@ const StyledIcon = styled(Icon)`
 font-size: 0.5rem;
 `;
 
+const CrumbLink = ({ label, link, dataTestId }: { label: string, link: string | undefined, dataTestId?: string}) => (
+  link ? <Link target="_blank" to={link} data-testid={dataTestId}>{label}</Link> : <span data-testid={dataTestId}>{label}</span>
+);
+
+CrumbLink.defaultProps = {
+  dataTestId: undefined,
+};
+
 const ViewHeader = () => {
   const view = useView();
   const isNew = useIsNew();
   const isSavedView = view?.id && view?.title && !isNew;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
+
+  const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } = useAlertAndEventDefinitionData();
   const dispatch = useAppDispatch();
   const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
 
@@ -89,27 +131,39 @@ const ViewHeader = () => {
   const title = useViewTitle();
   const onChangeFavorite = useCallback((newValue) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
 
+  const breadCrumbs = useMemo(() => {
+    if (isAlert || isEvent) return links.alert({ id: alertId });
+    if (isEventDefinition) return links.eventDefinition({ id: definitionId, title: definitionTitle });
+
+    return links[view.type]({ id: view.id, title });
+  }, [alertId, definitionId, definitionTitle, isAlert, isEvent, isEventDefinition, view, title]);
+
   return (
     <Row>
       <Content>
-        <Link to={links[view.type].link}>
-          {links[view.type].label}
-        </Link>
-        <StyledIcon name="chevron-right" />
-        <TitleWrapper>
-          <span data-testid="view-title">{title}</span>
-          {isSavedView && (
-            <>
-              <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />
-              <EditButton onClick={toggleMetadataEdit}
-                          role="button"
-                          title={`Edit ${typeText} ${view.title} metadata`}
-                          tabIndex={0}>
-                <Icon name="pen-to-square" />
-              </EditButton>
-            </>
-          )}
-        </TitleWrapper>
+        {
+          breadCrumbs.map(({ label, link, dataTestId }, index) => {
+            const theLast = index === breadCrumbs.length - 1;
+
+            return (
+              <TitleWrapper key={`${label}_${link}`}>
+                <CrumbLink link={link} label={label} dataTestId={dataTestId} />
+                {!theLast && <StyledIcon name="chevron-right" />}
+                {isSavedView && theLast && (
+                  <>
+                    <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />
+                    <EditButton onClick={toggleMetadataEdit}
+                                role="button"
+                                title={`Edit ${typeText} ${view.title} metadata`}
+                                tabIndex={0}>
+                      <Icon name="pen-to-square" />
+                    </EditButton>
+                  </>
+                )}
+              </TitleWrapper>
+            );
+          })
+        }
         {showMetadataEdit && (
         <ViewPropertiesModal show
                              view={view}

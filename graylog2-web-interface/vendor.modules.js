@@ -34,4 +34,5 @@ module.exports = [
   'styled-components',
   'redux',
   'react-redux',
+  'use-query-params',
 ];

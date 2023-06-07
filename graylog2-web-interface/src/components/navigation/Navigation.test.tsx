@@ -256,7 +256,7 @@ describe('Navigation', () => {
     // eslint-disable-next-line jest/expect-expect
     it.each`
     permissions                    | count | links
-    ${[]}                          | ${5}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
+    ${[]}                          | ${6}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
 
     it('should not show `Enterprise` item if user is lacking permissions', () => {

@@ -24,11 +24,11 @@ import com.github.rholder.retry.WaitStrategies;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.NoHttpResponseException;
-import org.graylog.datanode.bootstrap.commands.certutil.CertutilCa;
-import org.graylog.datanode.bootstrap.commands.certutil.CertutilCert;
-import org.graylog.datanode.bootstrap.commands.certutil.CertutilHttp;
-import org.graylog.datanode.bootstrap.commands.certutil.TestableConsole;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
+import org.graylog.security.certutil.CertutilCa;
+import org.graylog.security.certutil.CertutilCert;
+import org.graylog.security.certutil.CertutilHttp;
+import org.graylog.security.certutil.console.TestableConsole;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +70,8 @@ public class DatanodeSecuritySetupIT {
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
-            datanodeContainer.withFileSystemBind(nodeCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-transport-certificates.p12");
-            datanodeContainer.withFileSystemBind(httpCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-https-certificates.p12");
+            datanodeContainer.withFileSystemBind(nodeCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/bin/config/datanode-transport-certificates.p12");
+            datanodeContainer.withFileSystemBind(httpCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/bin/config/datanode-https-certificates.p12");
 
             // configure transport security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");

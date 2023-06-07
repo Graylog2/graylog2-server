@@ -17,7 +17,7 @@
 import React from 'react';
 
 type Props = {
-  fields: Object[],
+  fields: Object[] | {[key: string]: string},
 };
 
 const EventFields = ({ fields }: Props) => {
@@ -25,11 +25,9 @@ const EventFields = ({ fields }: Props) => {
 
   return (
     <ul>
-      {fieldNames.map((fieldName) => {
-        return (
-          <li key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</li>
-        );
-      })}
+      {fieldNames.map((fieldName) => (
+        <li key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</li>
+      ))}
     </ul>
   );
 };

@@ -47,11 +47,12 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule.source);
   const [description, setDescription] = useState(rule.description);
+  const [startRuleSimulation, setStartRuleSimulation] = useState(false);
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
+  const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
-    const nextErrorAnnotations = nextErrors.map((e) => {
-      return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
-    });
+    const nextErrorAnnotations = nextErrors.map((e) => ({ row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' }));
 
     ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
   }, []);
@@ -64,6 +65,16 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     };
 
     RulesActions.parse(nextRule, callback);
+  }, [rule, description]);
+
+  const simulateRule = useCallback((messageString: string, callback: () => void) => {
+    const nextRule = {
+      ...rule,
+      source: ruleSourceRef.current.editor.getSession().getValue(),
+      description,
+    };
+
+    RulesActions.simulate(messageString, nextRule, callback);
   }, [rule, description]);
 
   useEffect(() => {
@@ -113,6 +124,13 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       onAceLoaded: () => setAceLoaded(true),
       ruleSource,
       onChangeSource,
+      simulateRule,
+      rawMessageToSimulate,
+      setRawMessageToSimulate,
+      ruleSimulationResult,
+      setRuleSimulationResult,
+      startRuleSimulation,
+      setStartRuleSimulation,
     });
   }, [
     description,
@@ -121,6 +139,10 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     ruleSource,
     usedInPipelines,
     validateNewRule,
+    simulateRule,
+    rawMessageToSimulate,
+    ruleSimulationResult,
+    startRuleSimulation,
   ]);
 
   return (

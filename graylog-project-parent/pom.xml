@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -79,11 +79,6 @@
                 <version>${guava-retrying.version}</version>
             </dependency>
             <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>${joda-time.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.zafarkhaja</groupId>
                 <artifactId>java-semver</artifactId>
                 <version>${java-semver.version}</version>
@@ -119,6 +114,11 @@
                 <groupId>org.graylog.repackaged.mongojack</groupId>
                 <artifactId>mongojack</artifactId>
                 <version>${mongojack.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog.shaded</groupId>
+                <artifactId>mongojack4</artifactId>
+                <version>${mongojack4.version}</version>
             </dependency>
 
             <dependency>
@@ -167,11 +167,6 @@
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>${reflections.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
-                <artifactId>json-path</artifactId>
-                <version>${json-path.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
@@ -419,6 +414,13 @@
                 <groupId>com.floreysoft</groupId>
                 <artifactId>jmte</artifactId>
                 <version>${jmte.version}</version>
+                <exclusions>
+                    <!-- Exclude the ancient asm:asm version because it conflicts with the org.ow2.asm:asm version. -->
+                    <exclusion>
+                        <groupId>asm</groupId>
+                        <artifactId>asm</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -571,6 +573,71 @@
                 <version>${unboundid-ldap.version}</version>
             </dependency>
 
+            <!-- Tracing dependencies -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+                <version>${opentelemetry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>${opentelemetry-semconv.version}</version>
+            </dependency>
+
+            <!-- AWS plugin -->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>${aws-java-sdk-1.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-sqs</artifactId>
+                <version>${aws-java-sdk-1.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-ec2</artifactId>
+                <version>${aws-java-sdk-1.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-sts</artifactId>
+                <version>${aws-java-sdk-1.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <!-- Test dependencies -->
             <dependency>
                 <groupId>junit</groupId>
@@ -600,12 +667,6 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-joda-time</artifactId>
                 <version>${assertj-joda-time.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.revinate</groupId>
-                <artifactId>assertj-json</artifactId>
-                <version>${assertj-json.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

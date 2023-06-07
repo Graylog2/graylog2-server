@@ -40,6 +40,7 @@ import createSearch from 'views/logic/slices/createSearch';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -137,10 +138,14 @@ export const updateView = (newView: View, recreateSearch: boolean = false) => as
 export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
   const { search } = view;
+  const newSearch = search.toBuilder()
+    .newId()
+    .queries(newQueries)
+    .build();
+
+  const searchAfterSave = await createSearch(newSearch);
   const newView = view.toBuilder()
-    .search(search.toBuilder()
-      .queries(newQueries)
-      .build())
+    .search(searchAfterSave)
     .build();
 
   return dispatch(updateView(newView));
@@ -250,7 +255,7 @@ export const mergeQueryTitles = (newQueryTitles: { queryId: QueryId, titlesMap: 
 export const setQueryString = (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
   const query = selectQueryById(queryId)(getState());
   const newQuery = query.toBuilder()
-    .query({ type: 'elasticsearch', query_string: newQueryString })
+    .query(createElasticsearchQueryString(newQueryString))
     .build();
 
   return dispatch(updateQuery(queryId, newQuery));
@@ -272,7 +277,7 @@ export const updateQueryString = (queryId: string, newQueryString: string) => (d
     return dispatch(setQueryString(queryId, newQueryString));
   }
 
-  return dispatch(setGlobalOverrideQuery(newQueryString));
+  return dispatch(setGlobalOverrideQuery(newQueryString)).then(() => dispatch(execute()));
 };
 
 export const updateViewState = (id: QueryId, newViewState: ViewStateType) => (dispatch: AppDispatch, getState: () => RootState) => {

@@ -19,6 +19,7 @@ import type * as React from 'react';
 export type ValueRendererProps = {
   field: string,
   value: any,
+  children?: React.ReactNode,
 };
 
 export type ValueRenderer = React.ComponentType<ValueRendererProps>;

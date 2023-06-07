@@ -32,9 +32,10 @@ export type Event = {
   timerange_end: string,
   key: string,
   fields: Object[],
-  group_by_fields: Object[],
+  group_by_fields: {[key: string]: string},
   source_streams: string[],
   replay_info: EventReplayInfo | undefined,
+  alert: boolean | undefined,
 };
 
 export type EventDefinitionContext = {

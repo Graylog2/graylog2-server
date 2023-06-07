@@ -8,8 +8,12 @@
     <script defer src="/<%= vendorModule().files.js[vendorChunk] %>"></script>
     <% } %>
     <%= htmlWebpackPlugin.tags.headTags %>
+    <% for (var idx in pluginNames()) { %>
+    <script defer src="/<%= pluginNames()[idx] %>.js"></script>
+    <% } %>
   </head>
   <body>
     <%= htmlWebpackPlugin.tags.bodyTags %>
+    <div id="app-root" />
   </body>
 </html>

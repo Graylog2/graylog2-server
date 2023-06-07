@@ -38,6 +38,7 @@ import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTimeFormats, DateTime } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
@@ -45,7 +46,11 @@ import TabKeywordTimeRange from './TabKeywordTimeRange';
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
-import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
+import {
+  classifyRelativeTimeRange,
+  normalizeIfClassifiedRelativeTimeRange,
+  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+} from './RelativeTimeRangeClassifiedHelper';
 
 export type TimeRangeDropDownFormValues = {
   nextTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
@@ -55,7 +60,7 @@ export type TimeRangeDropdownProps = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
   limitDuration: number,
   noOverride?: boolean,
-  position: 'bottom'|'right',
+  position: 'bottom' | 'right',
   setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
   validTypes?: Array<TimeRangeType>,
@@ -127,7 +132,7 @@ const PopoverTitle = styled.span`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   > span {
     font-weight: 600;
   }
@@ -138,14 +143,19 @@ const LimitLabel = styled.span(({ theme }) => css`
     margin-right: 3px;
     color: ${theme.colors.variant.dark.warning};
   }
-  
+
   > span {
     font-size: ${theme.fonts.size.small};
     color: ${theme.colors.variant.darkest.warning};
   }
 `);
 
-const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
+const timeRangeTypeTabs = ({
+  activeTab,
+  limitDuration,
+  setValidatingKeyword,
+  tabs,
+}: TimeRangeTabsArguments) => availableTimeRangeTypes
   .filter(({ type }) => tabs.includes(type))
   .map(({ type, name }) => {
     const TimeRangeTypeTab = timeRangeTypes[type];
@@ -188,13 +198,29 @@ type TimeRangeTabsProps = {
   setValidatingKeyword: (validating: boolean) => void,
 };
 
-const TimeRangeTabs = ({ handleActiveTab, currentTimeRange, limitDuration, validTypes, setValidatingKeyword }: TimeRangeTabsProps) => {
+const TimeRangeTabs = ({
+  handleActiveTab,
+  currentTimeRange,
+  limitDuration,
+  validTypes,
+  setValidatingKeyword,
+}: TimeRangeTabsProps) => {
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
+  const sendTelemetry = useSendTelemetry();
 
   const onSelect = useCallback((nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
     handleActiveTab(nextTab);
     setActiveTab(nextTab);
-  }, [handleActiveTab]);
+
+    sendTelemetry('click', {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-time-range',
+      event_details: {
+        tab: nextTab,
+      },
+    });
+  }, [handleActiveTab, sendTelemetry]);
 
   const tabs = useMemo(() => timeRangeTypeTabs({
     activeTab,
@@ -226,6 +252,7 @@ const TimeRangeDropdown = ({
 }: TimeRangeDropdownProps) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   const positionIsBottom = position === 'bottom';
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
@@ -237,13 +264,27 @@ const TimeRangeDropdown = ({
 
   const handleCancel = useCallback(() => {
     toggleDropdownShow();
-  }, [toggleDropdownShow]);
 
-  const handleSubmit = useCallback(({ nextTimeRange }: { nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange'] }) => {
+    sendTelemetry('click', {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-time-range-cancel-button',
+    });
+  }, [sendTelemetry, toggleDropdownShow]);
+
+  const handleSubmit = useCallback(({ nextTimeRange }: {
+    nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']
+  }) => {
     setCurrentTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(nextTimeRange)));
 
     toggleDropdownShow();
-  }, [setCurrentTimeRange, toggleDropdownShow]);
+
+    sendTelemetry('click', {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-time-range-confirm-button',
+    });
+  }, [sendTelemetry, setCurrentTimeRange, toggleDropdownShow]);
 
   const title = (
     <PopoverTitle>

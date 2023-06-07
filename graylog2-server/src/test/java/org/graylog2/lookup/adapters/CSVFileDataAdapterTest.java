@@ -50,6 +50,7 @@ public class CSVFileDataAdapterTest {
     public MockitoRule rule = MockitoJUnit.rule();
 
     private final Path csvFile;
+    private final Path cidrLookupFile;
     private CSVFileDataAdapter csvFileDataAdapter;
 
     @Mock
@@ -65,6 +66,10 @@ public class CSVFileDataAdapterTest {
         final URL resource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterTest.csv");
         final Path csvFilePath = Paths.get(resource.toURI());
         this.csvFile = csvFilePath;
+
+        final URL cidrResource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterCIDRLookupTest.csv");
+        final Path cidrLookupFilePath = Paths.get(cidrResource.toURI());
+        this.cidrLookupFile = cidrLookupFilePath;
     }
 
     @Test
@@ -186,33 +191,70 @@ public class CSVFileDataAdapterTest {
     @Test
     public void testConfigValidationFileNotInPermittedLocation() {
         final Config config = Config.builder()
-                                    .type(NAME)
-                                    .path("fake-path")
-                                    .separator(",")
-                                    .quotechar("\"")
-                                    .keyColumn("key")
-                                    .valueColumn("value")
-                                    .checkInterval(60)
-                                    .caseInsensitiveLookup(false)
-                                    .build();
+                .type(NAME)
+                .path("fake-path")
+                .separator(",")
+                .quotechar("\"")
+                .keyColumn("key")
+                .valueColumn("value")
+                .checkInterval(60)
+                .caseInsensitiveLookup(false)
+                .build();
         when(validationContext.getPathChecker()).thenReturn(pathChecker);
         when(pathChecker.fileIsInAllowedPath(any(Path.class))).thenReturn(false);
         final Optional<Multimap<String, String>> result = config.validate(validationContext);
         assertTrue(result.isPresent());
         assertEquals(CSVFileDataAdapter.ALLOWED_PATH_ERROR,
-                     String.join("", result.get().asMap().get("path")));
+                String.join("", result.get().asMap().get("path")));
+    }
+
+    @Test
+    public void testCIDRLookups() throws Exception {
+        final Config config = cidrLookupConfig();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath((isA(Path.class)))).thenReturn(true);
+        csvFileDataAdapter.doStart();
+
+        assertThat(csvFileDataAdapter.doGet("10.10.64.128")).isEqualTo(LookupResult.single("Corporate"));
+        assertThat(csvFileDataAdapter.doGet("192.168.100.112")).isEqualTo(LookupResult.single("Finance"));
+        assertThat(csvFileDataAdapter.doGet("192.168.101.66")).isEqualTo(LookupResult.single("IT"));
+        assertThat(csvFileDataAdapter.doGet("192.168.102.205")).isEqualTo(LookupResult.single("HR"));
+        assertThat(csvFileDataAdapter.doGet("192.168.102.8")).isEqualTo(LookupResult.single("HR Subnet 1"));
+        assertThat(csvFileDataAdapter.doGet("192.168.102.20")).isEqualTo(LookupResult.single("HR Subnet 2"));
+        assertThat(csvFileDataAdapter.doGet("192.168.102.33")).isEqualTo(LookupResult.single("HR Subnet 3"));
+        assertThat(csvFileDataAdapter.doGet("192.168.102.48")).isEqualTo(LookupResult.single("HR Subnet 4"));
+        assertThat(csvFileDataAdapter.doGet("192.168.102.79")).isEqualTo(LookupResult.single("HR Subnet 5"));
+        assertThat(csvFileDataAdapter.doGet("8.8.8.8")).isEqualTo(LookupResult.single("Google DNS"));
+        assertThat(csvFileDataAdapter.doGet("2001:db7::")).isEqualTo(LookupResult.single("Single IPv6"));
+        assertThat(csvFileDataAdapter.doGet("2002:0000:0000:1234:abcd:1234:4321:dcba")).isEqualTo(LookupResult.single("IPv6 Range"));
+        assertThat(csvFileDataAdapter.doGet("192.168.103.16")).isEqualTo(LookupResult.empty());
+        assertThat(csvFileDataAdapter.doGet("not.an.ip.address")).isEqualTo(LookupResult.withError());
     }
 
     private Config baseConfig() {
         return Config.builder()
-                     .type(NAME)
-                     .path(csvFile.toString())
-                     .separator(",")
-                     .quotechar("\"")
-                     .keyColumn("key")
-                     .valueColumn("value")
-                     .checkInterval(60)
-                     .caseInsensitiveLookup(false)
-                     .build();
+                .type(NAME)
+                .path(csvFile.toString())
+                .separator(",")
+                .quotechar("\"")
+                .keyColumn("key")
+                .valueColumn("value")
+                .checkInterval(60)
+                .caseInsensitiveLookup(false)
+                .build();
+    }
+
+    private Config cidrLookupConfig() {
+        return Config.builder()
+                .type(NAME)
+                .path(cidrLookupFile.toString())
+                .separator(",")
+                .quotechar("\"")
+                .keyColumn("key")
+                .valueColumn("value")
+                .checkInterval(60)
+                .caseInsensitiveLookup(false)
+                .cidrLookup(true)
+                .build();
     }
 }

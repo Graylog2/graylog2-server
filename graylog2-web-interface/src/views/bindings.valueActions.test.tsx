@@ -44,7 +44,7 @@ describe('Views bindings value actions', () => {
     },
     type: FieldType.Unknown,
   };
-  const findAction = (type): ActionDefinition<{}> => valueActions.find((binding) => binding.type === type);
+  const findAction = (type: string): ActionDefinition<{}> => valueActions.find((binding) => binding.type === type);
   const view = createSearch({ queryId: 'query1' });
   const rootState = { view: { view } } as RootState;
   const getState = jest.fn(() => rootState);
@@ -82,21 +82,55 @@ describe('Views bindings value actions', () => {
     });
 
     it('should be enabled for compound fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Compound]),
-      }, getState))
-        .toEqual(true);
+      expect(
+        isEnabled({
+          ...defaultArguments,
+          field: 'something',
+          type: FieldType.create('string', [Properties.Compound]),
+        }, getState),
+      ).toEqual(true);
     });
 
     it('should be disabled for decorated fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Decorated]),
-      }, getState))
+      expect(
+        isEnabled({
+          ...defaultArguments,
+          field: 'something',
+          type: FieldType.create('string', [Properties.Decorated]),
+        }, getState),
+      ).toBe(false);
+    });
+  });
+
+  describe('Add to query', () => {
+    const action = findAction('add-to-query');
+
+    it('is present', () => {
+      expect(action).toBeDefined();
+    });
+
+    it('has `isEnabled` condition', () => {
+      expect(action.isEnabled).toBeDefined();
+    });
+
+    it('should be disabled for decorated fields', () => {
+      expect(
+        action.isEnabled({
+          ...defaultArguments,
+          field: 'something',
+          type: FieldType.create('string', [Properties.Decorated]),
+        }, getState),
+      ).toEqual(false);
+    });
+
+    it('should be disabled for functions', () => {
+      expect(action.isEnabled({ ...defaultArguments, field: 'count(something)', type: FieldTypes.STRING() }, getState))
         .toEqual(false);
+    });
+
+    it('should be enabled for fields with type string', () => {
+      expect(action.isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
+        .toEqual(true);
     });
   });
 });

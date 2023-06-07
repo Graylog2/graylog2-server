@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
+import type { SelectInstance, GroupBase } from 'react-select';
 
 import type { FieldTypeCategory } from 'views/logic/aggregationbuilder/Pivot';
 import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
@@ -52,7 +53,7 @@ type Props = {
   placeholder?: string,
   properties?: Array<Property>,
   qualifiedTypeCategory?: FieldTypeCategory,
-  selectRef?: React.Ref<React.ComponentType>,
+  selectRef?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
   size?: 'normal' | 'small',
   value: string | undefined,
 }

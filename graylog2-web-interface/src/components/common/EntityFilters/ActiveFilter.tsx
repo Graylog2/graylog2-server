@@ -26,10 +26,6 @@ import FilterConfiguration from 'components/common/EntityFilters/FilterConfigura
 
 const Container = styled.div`
   display: flex;
-
-  :not(:last-child) {
-    margin-right: 3px;
-  }
 `;
 
 const CenteredButton = styled(Button)`
@@ -42,18 +38,19 @@ type FilterValueDropdownProps = {
   allActiveFilters: Filters | undefined,
   filter: Filter,
   filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onChangeFilter: (attributeId: string, newFilter: Filter) => void,
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
 }
 
-const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filterValueRenderer, filter: { id, value, title } }: FilterValueDropdownProps) => {
+const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filterValueRenderer, filter }: FilterValueDropdownProps) => {
   const [show, setShowDropdown] = useState(false);
+  const { value, title } = filter;
 
   const _onToggle = () => {
     setShowDropdown((cur) => !cur);
   };
 
-  const onSubmit = (newFilter: Filter) => {
-    onChangeFilter(attribute.id, { id, value: newFilter.value, title: newFilter.title });
+  const onSubmit = (newFilter: { title: string, value: string }) => {
+    onChangeFilter(attribute.id, value, { value: newFilter.value, title: newFilter.title });
     _onToggle();
   };
 
@@ -70,8 +67,8 @@ const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filt
       <FilterConfiguration attribute={attribute}
                            filterValueRenderer={filterValueRenderer}
                            onSubmit={onSubmit}
-                           allActiveFilters={allActiveFilters}
-                           scenario="edit" />
+                           filter={filter}
+                           allActiveFilters={allActiveFilters} />
     </OverlayDropdown>
   );
 };
@@ -80,8 +77,8 @@ type Props = {
   attribute: Attribute,
   filter: Filter,
   allActiveFilters: Filters | undefined
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onChangeFilter: (attributeId: string, newFilter: Filter) => void,
+  filterValueRenderer: (value: string, title: string) => React.ReactNode | undefined,
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
   onDeleteFilter: (attributeId: string, filterId: string) => void,
 }
 
@@ -93,17 +90,17 @@ const ActiveFilter = ({
   onDeleteFilter,
   onChangeFilter,
 }: Props) => {
-  const { value, title, id } = filter;
+  const { value, title } = filter;
 
   const onChangeBooleanValue = () => {
     if (attribute.type === 'BOOLEAN') {
       const oppositeFilterOption = attribute.filter_options.find(({ value: optionVal }) => optionVal !== value);
-      onChangeFilter(attribute.id, { id, value: oppositeFilterOption.value, title: oppositeFilterOption.title });
+      onChangeFilter(attribute.id, value, { value: oppositeFilterOption.value, title: oppositeFilterOption.title });
     }
   };
 
   return (
-    <Container className="btn-group" data-testid={`filter-${id}`}>
+    <Container className="btn-group" data-testid={`${attribute.id}-filter-${value}`}>
       {attribute.type === 'BOOLEAN' && (
         <CenteredButton bsSize="xsmall" onClick={onChangeBooleanValue} title="Change filter value">
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
@@ -116,7 +113,7 @@ const ActiveFilter = ({
                              allActiveFilters={allActiveFilters}
                              filterValueRenderer={filterValueRenderer} />
       )}
-      <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, id)} title="Delete filter">
+      <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, value)} title="Delete filter">
         <Icon name="times" />
       </CenteredButton>
     </Container>

@@ -68,6 +68,20 @@ public class LookupTableServiceTest {
     }
 
     @Test
+    public void functionSetValueWithTtl() {
+        function.setValueWithTtl("key", "value", 500L);
+
+        assertThatThrownBy(() -> function.setValueWithTtl("key", null, 500L)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> function.setValueWithTtl(null, "value2", 500L)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> function.setValueWithTtl(null, null, 500L)).isInstanceOf(NullPointerException.class);
+
+        verify(table, times(1)).setValueWithTtl("key", "value", 500L);
+        verify(table, never()).setValueWithTtl("key", null, 500L);
+        verify(table, never()).setValueWithTtl(null, "value2", 500L);
+        verify(table, never()).setValueWithTtl(null, null, 500L);
+    }
+
+    @Test
     public void functionSetStringList() {
         function.setStringList("key", ImmutableList.of("hello", "world"));
         function.setStringList("key", Arrays.asList("with", "empty", "", "and", null));
@@ -83,6 +97,24 @@ public class LookupTableServiceTest {
         verify(table, never()).setStringList(null, ImmutableList.of("none"));
         verify(table, never()).setStringList(null, null);
         verify(table, never()).setStringList("key", Arrays.asList("with", "empty", "", "and", null));
+    }
+
+    @Test
+    public void functionSetStringListWithTtl() {
+        function.setStringListWithTtl("key", ImmutableList.of("hello", "world"), 500L);
+        function.setStringListWithTtl("key", Arrays.asList("with", "empty", "", "and", null), 500L);
+
+        assertThatThrownBy(() -> function.setStringListWithTtl("key", null, 500L)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> function.setStringListWithTtl(null, ImmutableList.of("none"), 500L)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> function.setStringListWithTtl(null, null, 500L)).isInstanceOf(NullPointerException.class);
+
+        verify(table, times(1)).setStringListWithTtl("key", ImmutableList.of("hello", "world"), 500L);
+        verify(table, times(1)).setStringListWithTtl("key", ImmutableList.of("with", "empty", "and"), 500L);
+
+        verify(table, never()).setStringListWithTtl("key", null, 500L);
+        verify(table, never()).setStringListWithTtl(null, ImmutableList.of("none"), 500L);
+        verify(table, never()).setStringListWithTtl(null, null, 500L);
+        verify(table, never()).setStringListWithTtl("key", Arrays.asList("with", "empty", "", "and", null), 500L);
     }
 
     @Test
@@ -128,6 +160,16 @@ public class LookupTableServiceTest {
         assertThatThrownBy(() -> function.clearKey(null)).isInstanceOf(NullPointerException.class);
 
         verify(table, times(1)).clearKey("key");
+        verify(table, never()).clearKey(null);
+    }
+
+    @Test
+    public void functionAssignTtl() {
+        function.assignTtl("key", 500L);
+
+        assertThatThrownBy(() -> function.assignTtl(null, 500L)).isInstanceOf(NullPointerException.class);
+
+        verify(table, times(1)).assignTtl("key", 500L);
         verify(table, never()).clearKey(null);
     }
 }

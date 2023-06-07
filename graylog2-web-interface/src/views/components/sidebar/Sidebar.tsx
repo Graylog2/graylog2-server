@@ -24,6 +24,7 @@ import type QueryResult from 'views/logic/QueryResult';
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePreferencesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -76,12 +77,23 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
 };
 
 const Sidebar = ({ searchPageLayout, results, children, sections }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const queryId = useActiveQueryId();
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(sidebarIsPinned ? initialSectionKey : null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
-  const toggleSidebar = () => _toggleSidebar(initialSectionKey, activeSectionKey, setActiveSectionKey);
+
+  const toggleSidebar = () => {
+    sendTelemetry('input_button_toggle', {
+      app_pathname: 'search',
+      app_action_value: 'search_sidebar',
+      event_details: { initialSectionKey, activeSectionKey },
+    });
+
+    _toggleSidebar(initialSectionKey, activeSectionKey, setActiveSectionKey);
+  };
+
   const selectSidebarSection = (sectionKey: string) => _selectSidebarSection(sectionKey, activeSectionKey, setActiveSectionKey, toggleSidebar);
   const SectionContent = activeSection?.content;
 

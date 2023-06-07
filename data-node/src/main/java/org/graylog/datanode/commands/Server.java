@@ -34,12 +34,10 @@ import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.preflight.PreflightConfigBindings;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.system.activities.Activity;
@@ -87,6 +85,7 @@ public class Server extends ServerBootstrap {
                 new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new RestBindings(),
+                new PreflightConfigBindings(),
                 new PeriodicalBindings(),
 //               new InitializerBindings(),
                 new ObjectMapperModule(chainingClassLoader),
@@ -103,21 +102,6 @@ public class Server extends ServerBootstrap {
      ///           versionCheckConfiguration,
       //          nettyTransportConfiguration,
                 tlsConfiguration);
-    }
-
-    @Override
-    protected void startNodeRegistration(Injector injector) {
-        // Register this node.
-        final NodeService nodeService = injector.getInstance(NodeService.class);
-        final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
-        final var nodeId = injector.getInstance(NodeId.class);
-
-        nodeService.registerServer(nodeId.toString(),
-                // TODO: not necessary in DataNode context
-                true,
-                configuration.getHttpPublishUri(),
-                Tools.getLocalCanonicalHostname());
-//        serverStatus.setLocalMode(isLocal());
     }
 
     private static class ShutdownHook implements Runnable {
@@ -148,6 +132,11 @@ public class Server extends ServerBootstrap {
 
 //            leaderElectionService.stopAsync().awaitTerminated();
         }
+    }
+
+    @Override
+    protected void startNodeRegistration(Injector injector) {
+        // not needed, the datanode registers itself via the NodePingPeriodical task.
     }
 
     @Override

@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.Maps;
-import com.google.inject.name.Named;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -201,6 +202,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
+    @WithSpan
     public QueryResult doRun(SearchJob job, Query query, OSGeneratedQueryContext queryContext) {
         if (query.searchTypes().isEmpty()) {
             return QueryResult.builder()

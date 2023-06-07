@@ -1,0 +1,5 @@
+type = "added"
+message = "Updating Sources Dashboard with better widgets to gain insights into log volume distribution."
+
+pulls = ["15677"]
+

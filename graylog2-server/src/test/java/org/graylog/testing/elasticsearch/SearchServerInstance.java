@@ -48,4 +48,6 @@ public interface SearchServerInstance extends Closeable {
     void close();
 
     Adapters adapters();
+
+    String getLogs();
 }

@@ -26,16 +26,14 @@ import type { NumberField as NumberFieldType } from './types';
 type Props = {
   autoFocus?: boolean,
   field: NumberFieldType,
-  onChange: (title: string, value: number) => void,
+  onChange: (title: string, value: number, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value: number,
 };
 
 const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
-  const _getDefaultValidationSpecs = () => {
-    return { min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER };
-  };
+  const _getDefaultValidationSpecs = () => ({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER });
 
   const _mapValidationAttribute = (attribute) => {
     const { min, max } = _getDefaultValidationSpecs();

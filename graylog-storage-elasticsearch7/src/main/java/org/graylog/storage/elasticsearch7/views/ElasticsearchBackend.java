@@ -17,7 +17,7 @@
 package org.graylog.storage.elasticsearch7.views;
 
 import com.google.common.collect.Maps;
-import com.google.inject.name.Named;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -28,7 +28,6 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -55,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,6 +100,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
     }
 
+    @WithSpan
     @Override
     public ESGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
         final BackendQuery backendQuery = query.query();
@@ -201,6 +202,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         return Optional.empty();
     }
 
+    @WithSpan
     @Override
     public QueryResult doRun(SearchJob job, Query query, ESGeneratedQueryContext queryContext) {
         if (query.searchTypes().isEmpty()) {

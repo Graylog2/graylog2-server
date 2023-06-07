@@ -19,25 +19,16 @@ package org.graylog.events.conditions;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
-import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import com.revinate.assertj.json.JsonPathAssert;
+import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,29 +36,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BooleanNumberConditionsVisitorTest {
     private static ObjectMapper objectMapper = new ObjectMapperProvider().get();
-
-    @BeforeClass
-    public static void classSetUp() {
-        Configuration.setDefaults(new Configuration.Defaults() {
-            private final JsonProvider jsonProvider = new JacksonJsonProvider(objectMapper);
-            private final MappingProvider mappingProvider = new JacksonMappingProvider(objectMapper);
-
-            @Override
-            public JsonProvider jsonProvider() {
-                return jsonProvider;
-            }
-
-            @Override
-            public Set<Option> options() {
-                return EnumSet.noneOf(Option.class);
-            }
-
-            @Override
-            public MappingProvider mappingProvider() {
-                return mappingProvider;
-            }
-        });
-    }
 
     @Test
     public void testTrue() throws Exception {

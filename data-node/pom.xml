@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -44,8 +44,18 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.4.1</opensearch.version>
+        <opensearch.version>2.5.0</opensearch.version>
         <opensearch.rest.client.version>2.2.0-1</opensearch.rest.client.version>
+
+        <!--
+           We don't need to sign anything in this module. This fixes a release build error related to setting
+           the <outputDirectory> to a different path: https://issues.apache.org/jira/browse/MGPG-44
+        -->
+        <gpg.skip>true</gpg.skip>
+        <maven.source.skip>true</maven.source.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
@@ -413,6 +423,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>io.rest-assured</groupId>
@@ -456,6 +472,11 @@
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -466,8 +487,8 @@
                 <version>${download-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>download-opensearch-tar</id>
-                        <phase>process-resources</phase>
+                        <id>download-opensearch-tar-linux-x64</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
@@ -475,14 +496,14 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
-                            <outputFileName>opensearch-${opensearch.version}.tar.gz</outputFileName>
-                            <outputDirectory>${project.basedir}/bin/download</outputDirectory>
+                            <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
+                            <outputDirectory>${project.build.directory}/downloads</outputDirectory>
                             <unpack>false</unpack>
                         </configuration>
                     </execution>
                     <execution>
-                        <phase>process-resources</phase>
-                        <id>unpack-opensearch-tar</id>
+                        <id>unpack-opensearch-tar-linux-x64</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
@@ -490,9 +511,76 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
-                            <outputFileName>opensearch-${opensearch.version}.tar.gz</outputFileName>
-                            <outputDirectory>${project.basedir}/bin</outputDirectory>
+                            <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
+                            <fileMappers>
+                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    <pattern>^(opensearch-\d+\.\d+\.\d+)/</pattern>
+                                    <replacement>$1-linux-x64/</replacement>
+                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                            </fileMappers>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-opensearch-tar-linux-aarch64</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
+                            </url>
+                            <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
+                            <outputDirectory>${project.build.directory}/downloads</outputDirectory>
+                            <unpack>false</unpack>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-opensearch-tar-linux-aarch64</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
+                            </url>
+                            <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
+                            <unpack>true</unpack>
+                            <fileMappers>
+                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    <pattern>^(opensearch-\d+\.\d+\.\d+)/</pattern>
+                                    <replacement>$1-linux-aarch64/</replacement>
+                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                            </fileMappers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>fix-opensearch-config-permissions</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- Some config files in opensearch-*/config/ use 660 permissions. That's a problem
+                                     when running OpenSearch under a different user account than the owner of the
+                                     OpenSearch config files. (OS packages or container image)
+                                -->
+                                <chmod dir="${project.build.directory}/opensearch"
+                                       includes="opensearch-*/config/**"
+                                       perm="ugo+r" />
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -522,7 +610,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <finalName>datanode-${project.version}</finalName>
+                    <finalName>graylog-datanode-${project.version}</finalName>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
@@ -530,6 +618,30 @@
                             <mainClass>${mainClass}</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-data-node-artifact</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <attach>true</attach>
+                    <appendAssemblyId>true</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/datanode.xml</descriptor>
+                    </descriptors>
+                    <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
+                    <outputDirectory>${project.basedir}/../target/assembly</outputDirectory>
+                    <finalName>datanode-${project.version}-${maven.build.timestamp}</finalName>
                 </configuration>
             </plugin>
 

@@ -32,7 +32,7 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-import CustomHighlighting from '../messagelist/CustomHighlighting';
+import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
 const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`
@@ -106,8 +106,12 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   ));
   const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
     const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
-    const [k, v]: Array<string> = translatedPath;
-    const parentValuePath = [...valuePath, { [k]: v }];
+    const parentValuePath = [...valuePath];
+
+    for (let i = 0; i < translatedPath.length; i += 2) {
+      const [k, v]: Array<string> = translatedPath.slice(i, i + 2);
+      parentValuePath.push({ [k]: v });
+    }
 
     return series.map(({ effectiveName, function: fn }) => {
       const fullPath = [].concat(translatedPath, [effectiveName]);

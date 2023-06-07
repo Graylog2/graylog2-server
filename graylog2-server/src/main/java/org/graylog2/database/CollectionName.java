@@ -23,9 +23,11 @@ import java.lang.annotation.Target;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
+ * @deprecated Use {@link DbEntity} instead
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Deprecated(forRemoval = true)
 public @interface CollectionName {
     String value();
 }

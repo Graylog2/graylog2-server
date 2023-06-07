@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -31,15 +32,21 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogIndexResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveRequest;
 import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
@@ -47,12 +54,15 @@ import java.util.Set;
 @Api(value = "System/Catalog", description = "Entity Catalog")
 @Path("/system/catalog")
 @Produces(MediaType.APPLICATION_JSON)
-public class CatalogResource {
+public class CatalogResource extends RestResource {
     private final ContentPackService contentPackService;
+    private final EntityTitleService entityTitleService;
 
     @Inject
-    public CatalogResource(ContentPackService contentPackService) {
+    public CatalogResource(final ContentPackService contentPackService,
+                           final EntityTitleService entityTitleService) {
         this.contentPackService = contentPackService;
+        this.entityTitleService = entityTitleService;
     }
 
     @GET
@@ -77,5 +87,15 @@ public class CatalogResource {
         final ImmutableSet<Entity> entities = contentPackService.collectEntities(resolvedEntities);
 
         return CatalogResolveResponse.create(entities);
+    }
+
+    @POST
+    @Timed
+    @ApiOperation(value = "Get titles of provided entities")
+    @NoAuditEvent("This endpoint does not change any data")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/entities/titles")
+    public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request, @Context SearchUser searchUser) {
+        return entityTitleService.getTitles(request, searchUser);
     }
 }

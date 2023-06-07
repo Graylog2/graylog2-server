@@ -21,6 +21,7 @@ import styled from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
@@ -34,7 +35,7 @@ type Props = {
   limitDuration: number,
   noOverride?: boolean,
   onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
-  position?: 'bottom'|'right',
+  position?: 'bottom' | 'right',
   showPresetDropdown?: boolean,
   validTypes?: Array<TimeRangeType>,
   value: TimeRange | NoTimeRangeOverride,
@@ -61,13 +62,26 @@ const TimeRangeInput = ({
   showPresetDropdown = true,
   limitDuration,
 }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const [show, setShow] = useState(false);
 
   if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
     throw new Error(`Value is of type ${value.type}, but only these types are valid: ${validTypes}`);
   }
 
-  const toggleShow = () => setShow(!show);
+  const toggleShow = () => {
+    setShow(!show);
+
+    sendTelemetry('input_button_toggle', {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'time-range-dropdown',
+      event_details: {
+        showing: !show,
+      },
+    });
+  };
+
   const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (

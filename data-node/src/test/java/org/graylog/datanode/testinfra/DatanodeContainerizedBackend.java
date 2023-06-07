@@ -46,8 +46,7 @@ public class DatanodeContainerizedBackend {
         this.datanodeContainer = createDatanodeContainer(
                 "node1",
                 hooks, createDockerImageFile(getOpensearchVersion()),
-                getDatanodeVersion(),
-                getOpensearchVersion());
+                getDatanodeVersion());
     }
 
     public DatanodeContainerizedBackend(Network network, GenericContainer<?> mongodbContainer, String nodeName, DatanodeDockerHooks hooks) {
@@ -57,19 +56,19 @@ public class DatanodeContainerizedBackend {
                 nodeName,
                 hooks,
                 createDockerImageFile(getOpensearchVersion()),
-                getDatanodeVersion(),
-                getOpensearchVersion());
+                getDatanodeVersion());
     }
 
-    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion, String opensearchVersion) {
+    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion) {
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
 
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR + "/opensearch-" + opensearchVersion)
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
+                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/bin/config")
 
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
@@ -79,12 +78,6 @@ public class DatanodeContainerizedBackend {
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "node1:9300")
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
-
-                //datanode_transport_certificate=datanode-transport-certificates.p12
-                //datanode_transport_certificate_password=password
-
-                //datanode_http_certificate=datanode-http-certificates.p12
-                //datanode_http_certificate_password=password
 
                 .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
                 .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
@@ -97,22 +90,25 @@ public class DatanodeContainerizedBackend {
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
-        container.withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/datanode.jar")
+        container.withFileSystemBind("target/graylog-datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
         customizer.onContainer(container);
         return container;
     }
 
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
-        final String opensearchTarArchive = "opensearch-" + opensearchVersion + ".tar.gz";
+        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
-                .withFileFromPath(opensearchTarArchive, Path.of("bin", "download", opensearchTarArchive))
+                .withFileFromPath(opensearchTarArchive, Path.of("target", "downloads", opensearchTarArchive))
                 .withDockerfileFromBuilder(builder ->
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
                                 .run("mkdir -p config")
+                                .run("mkdir -p config/opensearch")
+                                .run("mkdir -p bin")
+                                .run("mkdir -p bin/config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
                                 .add(opensearchTarArchive, ".") // this will automatically extract the tar
@@ -121,7 +117,7 @@ public class DatanodeContainerizedBackend {
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
-                                .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
+                                .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
                                 .build());
     }
 

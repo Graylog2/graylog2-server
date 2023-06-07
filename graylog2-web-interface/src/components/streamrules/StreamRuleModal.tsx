@@ -107,7 +107,9 @@ const StreamRuleModal = ({
   return (
     <Modal title={title}
            onHide={onClose}
-           show>
+           show
+           data-app-section="manage_stream_rules"
+           data-event-element={title}>
       <Formik<FormValues> initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
         {({ values, setFieldValue, isSubmitting, isValidating }) => (
           <Form>
@@ -162,23 +164,21 @@ const StreamRuleModal = ({
                       values.type === STREAM_RULE_TYPES.MATCH_INPUT
                         ? (
                           <Field name="value">
-                            {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => {
-                              return (
-                                <Input id="value"
-                                       label="Input"
-                                       error={(error && touched) ? error : undefined}>
-                                  <Select onBlur={onBlur}
-                                          onChange={(newValue: string) => {
-                                            onChange({ target: { value: newValue, name } });
-                                          }}
-                                          options={inputOptions}
-                                          inputId={name}
-                                          placeholder="Select an input"
-                                          inputProps={{ 'aria-label': 'Select an input' }}
-                                          value={value} />
-                                </Input>
-                              );
-                            }}
+                            {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
+                              <Input id="value"
+                                     label="Input"
+                                     error={(error && touched) ? error : undefined}>
+                                <Select onBlur={onBlur}
+                                        onChange={(newValue: string) => {
+                                          onChange({ target: { value: newValue, name } });
+                                        }}
+                                        options={inputOptions}
+                                        inputId={name}
+                                        placeholder="Select an input"
+                                        inputProps={{ 'aria-label': 'Select an input' }}
+                                        value={value} />
+                              </Input>
+                            )}
                           </Field>
                         )
                         : <FormikInput id="value" label="Value" name="value" />

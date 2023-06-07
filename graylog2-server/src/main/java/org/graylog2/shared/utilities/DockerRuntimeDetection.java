@@ -18,16 +18,28 @@ package org.graylog2.shared.utilities;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 public class DockerRuntimeDetection {
 
     public static Boolean isRunningInsideDocker() {
-        try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
-            return stream.anyMatch(line -> line.contains("/docker"));
-        } catch (IOException e) {
-            return false;
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/self/cgroup"))) {
+            // only works with cgroup v1
+            if (stream.anyMatch(line -> line.contains("/docker"))) {
+                return true;
+            }
+        } catch (IOException ignored) {
         }
+        // this should work on cgroup v2
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/self/mountinfo"))) {
+            if (stream.anyMatch(line -> line.contains("/docker/containers"))) {
+                return true;
+            }
+        } catch (IOException ignored) {
+        }
+        // Last attempt to detect docker
+        return Files.exists(Path.of("/.dockerenv"));
     }
 }

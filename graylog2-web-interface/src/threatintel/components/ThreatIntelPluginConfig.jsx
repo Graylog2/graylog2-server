@@ -16,18 +16,23 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const ThreatIntelPluginConfig = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'ThreatIntelPluginConfig',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -49,7 +54,7 @@ const ThreatIntelPluginConfig = createReactClass({
     };
   },
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.setState({ config: ObjectUtils.clone(newProps.config) });
   },
 
@@ -66,12 +71,14 @@ const ThreatIntelPluginConfig = createReactClass({
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   _onSelect(field) {
     return (selection) => {
       this._updateConfigField(field, selection);
     };
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   _onUpdate(field) {
     return (e) => {
       this._updateConfigField(field, e.target.value);
@@ -92,7 +99,15 @@ const ThreatIntelPluginConfig = createReactClass({
   },
 
   _saveConfig() {
-    this.props.updateConfig(this.state.config).then(() => {
+    const { updateConfig, sendTelemetry } = this.props;
+
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'threat-intel',
+      app_action_value: 'configuration-save',
+    });
+
+    updateConfig(this.state.config).then(() => {
       this._closeModal();
     });
   },
@@ -126,7 +141,10 @@ const ThreatIntelPluginConfig = createReactClass({
           <fieldset>
             <Input type="checkbox"
                    id="tor-checkbox"
-                   ref={(elem) => { this.torEnabled = elem; }}
+                   ref={(elem) => {
+                     // eslint-disable-next-line react/no-unused-class-component-methods
+                     this.torEnabled = elem;
+                   }}
                    label="Allow Tor exit node lookups?"
                    help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
                    name="tor_enabled"
@@ -135,7 +153,10 @@ const ThreatIntelPluginConfig = createReactClass({
 
             <Input type="checkbox"
                    id="spamhaus-checkbox"
-                   ref={(elem) => { this.spamhausEnabled = elem; }}
+                   ref={(elem) => {
+                     // eslint-disable-next-line react/no-unused-class-component-methods
+                     this.spamhausEnabled = elem;
+                   }}
                    label="Allow Spamhaus DROP/EDROP lookups?"
                    help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
                    name="tor_enabled"
@@ -148,4 +169,4 @@ const ThreatIntelPluginConfig = createReactClass({
   },
 });
 
-export default ThreatIntelPluginConfig;
+export default withTelemetry(ThreatIntelPluginConfig);

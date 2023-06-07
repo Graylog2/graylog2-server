@@ -1,0 +1,7 @@
+type = "c"
+message = "Update Kafka client library from 2.7.0 to 3.4.0."
+
+issues = [""]
+pulls = ["15488"]
+
+contributors = [""]

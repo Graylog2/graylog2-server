@@ -7,7 +7,7 @@
     </Appenders>
     <Loggers>
         <!-- Application Loggers -->
-        <Logger name="org.graylog2.datanode" level="info"/>
+        <Logger name="org.graylog.datanode" level="info"/>
 
         <Root level="info">
             <AppenderRef ref="STDOUT"/>

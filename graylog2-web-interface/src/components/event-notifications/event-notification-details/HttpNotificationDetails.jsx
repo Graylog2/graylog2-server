@@ -19,16 +19,14 @@ import PropTypes from 'prop-types';
 
 import { ReadOnlyFormGroup } from 'components/common';
 
-const HttpNotificationDetails = ({ notification }) => {
-  return (
-    <>
-      <ReadOnlyFormGroup label="URL" value={notification.config.url} />
-      <ReadOnlyFormGroup label="Basic Authentication" value={notification.config.basic_auth?.is_set ? '******' : null} />
-      <ReadOnlyFormGroup label="API Key" value={notification.config.api_key} />
-      <ReadOnlyFormGroup label="API Secret" value={notification.config.api_secret?.is_set ? '******' : null} />
-    </>
-  );
-};
+const HttpNotificationDetails = ({ notification }) => (
+  <>
+    <ReadOnlyFormGroup label="URL" value={notification.config.url} />
+    <ReadOnlyFormGroup label="Basic Authentication" value={notification.config.basic_auth?.is_set ? '******' : null} />
+    <ReadOnlyFormGroup label="API Key" value={notification.config.api_key} />
+    <ReadOnlyFormGroup label="API Secret" value={notification.config.api_secret?.is_set ? '******' : null} />
+  </>
+);
 
 HttpNotificationDetails.propTypes = {
   notification: PropTypes.object.isRequired,

@@ -84,7 +84,8 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
       }
 
       #scratchpad-toggle,
-      .dropdown-toggle {
+      .dropdown-toggle,
+      #welcome-nav-link {
         font-size: ${theme.fonts.size.body};
         font-family: ${theme.fonts.family.body};
 

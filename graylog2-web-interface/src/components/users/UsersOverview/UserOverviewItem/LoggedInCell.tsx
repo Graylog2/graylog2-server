@@ -36,28 +36,29 @@ const Td = styled.td`
   position: relative;
 `;
 
-const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => {
-  return (
-    <Td>
-      <OverlayTrigger trigger={['hover', 'focus']}
-                      placement="right"
-                      overlay={(
-                        <Popover id="session-badge-details" title={sessionActive ? 'Logged in' : ''}>
-                          {sessionActive ? (
-                            <>
-                              <div>Last activity: {lastActivity
-                                ? <RelativeTime dateTime={lastActivity} /> : '-'}
-                              </div>
-                              <div>Client address: {clientAddress ?? '-'}</div>
-                            </>
-                          ) : 'Not logged in'}
-                        </Popover>
+const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => (
+  <Td>
+    <OverlayTrigger trigger={['hover', 'focus']}
+                    placement="right"
+                    overlay={(
+                      <Popover id="session-badge-details"
+                               title={sessionActive ? 'Logged in' : ''}
+                               data-app-section="users_overview_item"
+                               data-event-element="Logged In">
+                        {sessionActive ? (
+                          <>
+                            <div>Last activity: {lastActivity
+                              ? <RelativeTime dateTime={lastActivity} /> : '-'}
+                            </div>
+                            <div>Client address: {clientAddress ?? '-'}</div>
+                          </>
+                        ) : 'Not logged in'}
+                      </Popover>
                       )}
-                      rootClose>
-        <LoggedInIcon active={sessionActive} />
-      </OverlayTrigger>
-    </Td>
-  );
-};
+                    rootClose>
+      <LoggedInIcon active={sessionActive} />
+    </OverlayTrigger>
+  </Td>
+);
 
 export default LoggedInCell;

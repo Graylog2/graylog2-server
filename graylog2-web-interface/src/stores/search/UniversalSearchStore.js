@@ -43,13 +43,11 @@ export const UniversalSearchStore = singletonStore(
       return fetch('GET', url).then((response) => {
         const result = jQuery.extend({}, response);
 
-        result.fields = response.fields.map((field) => {
-          return {
-            hash: md5(field),
-            name: field,
-            standard_selected: (field === MESSAGE_FIELD || field === SOURCE_FIELD),
-          };
-        });
+        result.fields = response.fields.map((field) => ({
+          hash: md5(field),
+          name: field,
+          standard_selected: (field === MESSAGE_FIELD || field === SOURCE_FIELD),
+        }));
 
         result.messages = result.messages.map((message) => MessageFormatter.formatMessageSummary(message));
 

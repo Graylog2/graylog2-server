@@ -27,9 +27,17 @@ import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/com
 import { ConfigurationWell } from 'components/configurationforms';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
+import {
+  InputForm,
+  InputStateBadge,
+  InputStateControl,
+  InputStaticFields,
+  InputThroughput,
+  StaticFieldForm,
+} from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const InputListItem = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -40,11 +48,17 @@ const InputListItem = createReactClass({
     input: PropTypes.object.isRequired,
     currentNode: PropTypes.object.isRequired,
     permissions: PropTypes.array.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
 
   _deleteInput() {
+    this.props.sendTelemetry('click', {
+      app_pathname: 'inputs',
+      app_action_value: 'input-delete',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete(this.props.input);
@@ -61,6 +75,11 @@ const InputListItem = createReactClass({
 
   _updateInput(data) {
     InputsActions.update(this.props.input.id, data);
+
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'inputs',
+      app_action_value: 'input-edit',
+    });
   },
 
   render() {
@@ -68,7 +87,7 @@ const InputListItem = createReactClass({
       return <Spinner />;
     }
 
-    const { input } = this.props;
+    const { input, sendTelemetry } = this.props;
     const definition = this.state.inputDescriptions[input.type];
 
     const titleSuffix = (
@@ -82,12 +101,20 @@ const InputListItem = createReactClass({
     );
 
     const actions = [];
+    const queryField = (input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
 
     if (this.isPermitted(this.props.permissions, ['searches:relative'])) {
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
-                       to={Routes.search(`gl2_source_input:${this.props.input.id}`, { relative: 0 })}>
-          <Button>Show received messages</Button>
+                       to={Routes.search(`${queryField}:${this.props.input.id}`, { relative: 0 })}>
+          <Button onClick={() => {
+            sendTelemetry('click', {
+              app_pathname: 'inputs',
+              app_action_value: 'show-received-messages',
+            });
+          }}>
+            Show received messages
+          </Button>
         </LinkContainer>,
       );
     }
@@ -104,7 +131,14 @@ const InputListItem = createReactClass({
 
         actions.push(
           <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
-            <Button>Manage extractors</Button>
+            <Button onClick={() => {
+              sendTelemetry('click', {
+                app_pathname: 'inputs',
+                app_action_value: 'manage-extractors',
+              });
+            }}>
+              Manage extractors
+            </Button>
           </LinkContainer>,
         );
       }
@@ -117,7 +151,15 @@ const InputListItem = createReactClass({
     if (!this.props.input.global) {
       showMetricsMenuItem = (
         <LinkContainer to={Routes.filtered_metrics(this.props.input.node, this.props.input.id)}>
-          <MenuItem key={`show-metrics-${this.props.input.id}`}>Show metrics</MenuItem>
+          <MenuItem key={`show-metrics-${this.props.input.id}`}
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        app_pathname: 'inputs',
+                        app_action_value: 'show-metrics',
+                      });
+                    }}>
+            Show metrics
+          </MenuItem>
         </LinkContainer>
       );
     }
@@ -138,7 +180,9 @@ const InputListItem = createReactClass({
         {showMetricsMenuItem}
 
         <IfPermitted permissions={`inputs:edit:${this.props.input.id}`}>
-          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static field</MenuItem>
+          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static
+            field
+          </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions="inputs:terminate">
@@ -162,7 +206,9 @@ const InputListItem = createReactClass({
 
     const inputForm = definition
       ? (
-        <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+        <InputForm ref={(configurationForm) => {
+          this.configurationForm = configurationForm;
+        }}
                    key={`edit-form-input-${input.id}`}
                    globalValue={input.global}
                    nodeValue={input.node}
@@ -183,7 +229,10 @@ const InputListItem = createReactClass({
                              id={input.id}
                              configuration={input.attributes}
                              typeDefinition={definition || {}} />
-          <StaticFieldForm ref={(staticFieldForm) => { this.staticFieldForm = staticFieldForm; }} input={this.props.input} />
+          <StaticFieldForm ref={(staticFieldForm) => {
+            this.staticFieldForm = staticFieldForm;
+          }}
+                           input={this.props.input} />
           <InputStaticFields input={this.props.input} />
         </Col>
         <Col md={4}>
@@ -205,4 +254,4 @@ const InputListItem = createReactClass({
   },
 });
 
-export default InputListItem;
+export default withTelemetry(InputListItem);

@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Bluebird from 'bluebird';
-
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchJobType } from 'views/stores/SearchJobs';
@@ -24,17 +22,19 @@ import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 
-const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => {
-  return new Bluebird((resolve) => {
-    if (job?.execution?.done) {
-      return resolve(job);
-    }
+const delay = (ms: number) => new Promise((resolve) => {
+  setTimeout(resolve, ms);
+});
 
-    return resolve(Bluebird.delay(250)
+const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promise((resolve) => {
+  if (job?.execution?.done) {
+    resolve(job);
+  } else {
+    resolve(delay(250)
       .then(() => searchJobStatus(job.id))
       .then((jobStatus) => trackJobStatus(jobStatus)));
-  });
-};
+  }
+});
 
 const executeSearch = (
   view: View,

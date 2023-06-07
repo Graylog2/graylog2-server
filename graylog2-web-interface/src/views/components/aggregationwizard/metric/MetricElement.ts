@@ -30,9 +30,7 @@ type MetricError = {
   percentile?: string,
 };
 
-const hasErrors = <T extends {}> (errors: Array<T>): boolean => {
-  return errors.filter((error) => Object.keys(error).length > 0).length > 0;
-};
+const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
 
 const validateMetrics = (values: WidgetConfigFormValues) => {
   const errors = {};
@@ -70,7 +68,7 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
     .build());
 
-const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
+export const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
   const { type: func, field, percentile } = parseSeries(s.function) ?? {};
 
   const metric = {

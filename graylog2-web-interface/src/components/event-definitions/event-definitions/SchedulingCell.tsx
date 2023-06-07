@@ -126,20 +126,18 @@ const SchedulingCell = ({ definition } : Props) => {
     return <>Not Scheduled.</>;
   }
 
-  const clearNotifications = (eventDefinition: EventDefinition) => {
-    return () => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Are you sure you want to clear queued notifications for "${eventDefinition.title}"?`)) {
-        EventDefinitionsActions.clearNotificationQueue(eventDefinition);
-      }
-    };
+  const clearNotifications = (eventDefinition: EventDefinition) => () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Are you sure you want to clear queued notifications for "${eventDefinition.title}"?`)) {
+      EventDefinitionsActions.clearNotificationQueue(eventDefinition);
+    }
   };
 
   const {
     title,
     config: {
-      search_within_ms: executeEveryMs,
-      execute_every_ms: searchWithinMs,
+      search_within_ms: searchWithinMs,
+      execute_every_ms: executeEveryMs,
     },
     scheduler,
   } = definition;

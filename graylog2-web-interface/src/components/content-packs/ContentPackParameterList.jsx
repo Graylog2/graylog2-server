@@ -120,9 +120,7 @@ class ContentPackParameterList extends React.Component {
     }
 
     const regexp = RegExp(filter, 'i');
-    const filteredParameters = parameters.filter((parameter) => {
-      return regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name);
-    });
+    const filteredParameters = parameters.filter((parameter) => regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name));
 
     this.setState({ filteredParameters: filteredParameters, filter: filter });
   };
@@ -152,7 +150,9 @@ class ContentPackParameterList extends React.Component {
     const modal = (
       <BootstrapModalWrapper showModal={showModal}
                              onHide={closeModal}
-                             bsSize="large">
+                             bsSize="large"
+                             data-app-section="content_pack_parameter_list"
+                             data-event-element="Parameter">
         <Modal.Header closeButton>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>

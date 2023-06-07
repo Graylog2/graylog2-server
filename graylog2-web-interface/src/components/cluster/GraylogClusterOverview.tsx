@@ -33,6 +33,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { formatTrafficData } from 'util/TrafficUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import TrafficGraph from './TrafficGraph';
 
@@ -100,12 +101,20 @@ const GraylogClusterTrafficGraph = () => {
   const containerRef = useRef(null);
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
+  const sendTelemetry = useSendTelemetry();
 
   const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
     event.preventDefault();
     const newDays = Number(event.target.value);
 
     setGraphDays(newDays);
+
+    sendTelemetry('input_value_change', {
+      app_pathname: 'system-overview',
+      app_section: 'outgoing-traffic',
+      app_action_value: 'trafficgraph-days-button',
+      event_details: { value: newDays },
+    });
   };
 
   useEffect(() => {

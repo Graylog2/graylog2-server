@@ -22,6 +22,7 @@ import Reflux from 'reflux';
 
 import { Button } from 'components/bootstrap';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 function inputStateFilter(state) {
   return state.inputStates ? state.inputStates[this.props.input.id] : undefined;
@@ -34,6 +35,7 @@ const InputStateControl = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     input: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connectFilter(InputStatesStore, 'inputState', inputStateFilter)],
@@ -65,15 +67,29 @@ const InputStateControl = createReactClass({
   _startInput() {
     this.setState({ loading: true });
 
+    this.props.sendTelemetry('click', {
+      app_pathname: 'inputs',
+      app_action_value: 'start-input',
+    });
+
     InputStatesStore.start(this.props.input)
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => {
+        this.setState({ loading: false });
+      });
   },
 
   _stopInput() {
     this.setState({ loading: true });
 
+    this.props.sendTelemetry('click', {
+      app_pathname: 'inputs',
+      app_action_value: 'stop-input',
+    });
+
     InputStatesStore.stop(this.props.input)
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => {
+        this.setState({ loading: false });
+      });
   },
 
   render() {
@@ -93,4 +109,4 @@ const InputStateControl = createReactClass({
   },
 });
 
-export default InputStateControl;
+export default withTelemetry(InputStateControl);

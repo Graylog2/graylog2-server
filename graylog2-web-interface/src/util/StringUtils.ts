@@ -39,9 +39,7 @@ const StringUtils = {
     return text.replace(/\s/g, newCharacter);
   },
   toTitleCase(str: string, splitCharacter: string = ' ') {
-    return str.toLowerCase().split(splitCharacter).map((word) => {
-      return (`${word.charAt(0).toUpperCase()}${word.slice(1)}`);
-    }).join(' ');
+    return str.toLowerCase().split(splitCharacter).map((word) => (`${word.charAt(0).toUpperCase()}${word.slice(1)}`)).join(' ');
   },
   truncateWithEllipses(text = '', maxLength = 10, end = '...') {
     if (text.length > maxLength) {
@@ -49,6 +47,34 @@ const StringUtils = {
     }
 
     return text;
+  },
+  getRecursiveChildText(reactNode: string|React.ReactNode) {
+    if (typeof reactNode === 'string') {
+      return reactNode;
+    }
+
+    const { children } = (reactNode as any)?.props || {};
+
+    if (Array.isArray(reactNode)) {
+      const joinedNodes = [];
+
+      reactNode.forEach((node) => {
+        if (typeof node === 'object') joinedNodes.push(StringUtils.getRecursiveChildText(node));
+        else if (typeof node === 'string') joinedNodes.push(node);
+      });
+
+      return joinedNodes.join(' ');
+    }
+
+    if (typeof children === 'object') {
+      return StringUtils.getRecursiveChildText(children);
+    }
+
+    if (typeof children === 'string') {
+      return children;
+    }
+
+    return '';
   },
 };
 

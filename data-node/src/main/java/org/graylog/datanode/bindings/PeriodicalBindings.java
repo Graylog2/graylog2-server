@@ -18,12 +18,12 @@ package org.graylog.datanode.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.bootstrap.preflight.DataNodePreflightGeneratePeriodical;
 import org.graylog.datanode.periodicals.ClusterManagerDiscovery;
+import org.graylog.datanode.periodicals.NodePingPeriodical;
 import org.graylog.datanode.periodicals.OpensearchNodeHeartbeat;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
-import org.graylog2.periodical.NodePingThread;
-import org.graylog2.periodical.UserSessionTerminationPeriodical;
 import org.graylog2.plugin.periodical.Periodical;
 
 public class PeriodicalBindings extends AbstractModule {
@@ -35,6 +35,7 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(OpensearchNodeHeartbeat.class);
         periodicalBinder.addBinding().to(ClusterManagerDiscovery.class);
 //        periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
-//        periodicalBinder.addBinding().to(NodePingThread.class);
+        periodicalBinder.addBinding().to(NodePingPeriodical.class);
+        periodicalBinder.addBinding().to(DataNodePreflightGeneratePeriodical.class);
     }
 }

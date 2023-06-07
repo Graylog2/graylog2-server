@@ -160,6 +160,18 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
     }
 
     /**
+     * Update a value for the given key in a DataAdapter and assign a TTL.
+     * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
+     * @param key       The key that should be updated.
+     * @param value     The new value.
+     * @param ttlSec    The time to live in seconds to assigned to this entry.
+     * @return A LookupResult containing the updated value or an error
+     */
+    public LookupResult setValueWithTtl(Object key, Object value, Long ttlSec) {
+        return resultWithError;
+    }
+
+    /**
      * Update all list entries for the given key in a DataAdapter.
      * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
      * @param key           The key that should be updated.
@@ -167,6 +179,18 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
      * @return A LookupResult containing the updated list or an error
      */
     public LookupResult setStringList(Object key, List<String> listValue) {
+        return resultWithError;
+    }
+
+    /**
+     * Update all list entries for the given key in a DataAdapter and assign a TTL.
+     * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
+     * @param key           The key that should be updated.
+     * @param listValue     The new list values.
+     * @param ttlSec        The time to live in seconds to assigned to this entry.
+     * @return A LookupResult containing the updated list or an error
+     */
+    public LookupResult setStringListWithTtl(Object key, List<String> listValue, Long ttlSec) {
         return resultWithError;
     }
 
@@ -200,6 +224,17 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
      */
     public void clearKey(Object key) {
         // This cannot be abstract due to backwards compatibility with version < 3.2.0
+    }
+
+    /**
+     * Update / add a time to live for the given key in a DataAdapter.
+     * This is a method stub that can be implemented in DataAdapters that support TTLs.
+     * @param key             The key that should be updated.
+     * @param ttlSec          The time to live in seconds that should be assigned.
+     * @return A LookupResult containing the updated value or an error
+     */
+    public LookupResult assignTtl(Object key, Long ttlSec) {
+        return resultWithError;
     }
 
     public LookupDataAdapterConfiguration getConfig() {

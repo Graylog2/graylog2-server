@@ -22,6 +22,7 @@ import styled, { css } from 'styled-components';
 import { Icon, IfPermitted } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   onToggle?: (open: boolean) => void,
@@ -43,6 +44,7 @@ const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
 
 const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
   const { config } = useSearchConfiguration();
+  const sendTelemetry = useSendTelemetry();
   const availableOptions = config?.relative_timerange_options;
   const timeRangeLimit = moment.duration(config?.query_time_range_limit);
   const title = displayTitle && (availableOptions ? 'Preset Times' : 'Loading Ranges...');
@@ -59,7 +61,8 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
       }
 
       const optionLabel = availableOptions[key].replace(/Search\sin(\sthe\slast)?\s/, '');
-      const option = (<MenuItem eventKey={seconds} key={`relative-option-${key}`} disabled={disabled}>{optionLabel}</MenuItem>);
+      const option = (
+        <MenuItem eventKey={seconds} key={`relative-option-${key}`} disabled={disabled}>{optionLabel}</MenuItem>);
 
       // The "search in all messages" option should be the last one.
       if (key === 'PT0S') {
@@ -80,6 +83,13 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
 
   const _onChange = (range) => {
     if (range !== null && range !== undefined) {
+      sendTelemetry('input_value_change', {
+        app_pathname: 'search',
+        app_section: 'search-bar',
+        app_action_value: 'relative-timerange-selector',
+        event_details: { range },
+      });
+
       onChange(parseInt(range, 10));
     }
   };
@@ -98,7 +108,8 @@ const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayT
       {options}
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
-        <AdminMenuItem href="/system/configurations" target="_blank">Configure Ranges <ExternalIcon name="external-link-alt" /></AdminMenuItem>
+        <AdminMenuItem href="/system/configurations" target="_blank">Configure Ranges <ExternalIcon name="external-link-alt" />
+        </AdminMenuItem>
       </IfPermitted>
     </DropdownButton>
   );

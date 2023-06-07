@@ -19,8 +19,10 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.shaded.opensearch2.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
@@ -105,6 +107,7 @@ public class OpenSearchClient {
         return execute(fn, "An error occurred: ");
     }
 
+    @WithSpan
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {
         try {
             return fn.apply(client, requestOptions());
@@ -113,6 +116,7 @@ public class OpenSearchClient {
         }
     }
 
+    @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {
             return fn.apply(client, requestOptions());
@@ -179,6 +183,12 @@ public class OpenSearchClient {
     }
 
     private boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
+        if (openSearchException instanceof OpenSearchStatusException statusException) {
+            if (statusException.getCause() instanceof ResponseException responseException) {
+                return (responseException.getResponse().getStatusLine().getStatusCode() == 429);
+            }
+        }
+
         try {
             final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
             if (parsedException.type().equals("search_phase_execution_exception")) {

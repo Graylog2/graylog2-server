@@ -19,8 +19,10 @@ package org.graylog.storage.elasticsearch7;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchStatusException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
@@ -105,6 +107,7 @@ public class ElasticsearchClient {
         return execute(fn, "An error occurred: ");
     }
 
+    @WithSpan
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {
         try {
             return fn.apply(client, requestOptions());
@@ -113,6 +116,7 @@ public class ElasticsearchClient {
         }
     }
 
+    @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {
             return fn.apply(client, requestOptions());
@@ -179,6 +183,12 @@ public class ElasticsearchClient {
     }
 
     private boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
+        if (elasticsearchException instanceof ElasticsearchStatusException statusException) {
+            if (statusException.getCause() instanceof ResponseException responseException) {
+                return (responseException.getResponse().getStatusLine().getStatusCode() == 429);
+            }
+        }
+
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             if (parsedException.type().equals("search_phase_execution_exception")) {

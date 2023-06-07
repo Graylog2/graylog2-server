@@ -28,27 +28,27 @@ const VerboseMessage = styled.div`
   max-height: 500px;
 `;
 
-const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }) => {
-  return (
-    <BootstrapModalWrapper showModal={showModal}
-                           onHide={onHide}
-                           bsSize="large">
-      <Modal.Header closeButton>
-        <Modal.Title><span>Error Details for <em>{collectorName}</em></span></Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <pre>
-          <VerboseMessage>
-            {collectorVerbose || '<no messages>'}
-          </VerboseMessage>
-        </pre>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button type="button" onClick={onHide}>Close</Button>
-      </Modal.Footer>
-    </BootstrapModalWrapper>
-  );
-};
+const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }) => (
+  <BootstrapModalWrapper showModal={showModal}
+                         onHide={onHide}
+                         bsSize="large"
+                         data-app-section="sidecar_verbose_message"
+                         data-event-element={`Error Details for ${collectorName}`}>
+    <Modal.Header closeButton>
+      <Modal.Title><span>Error Details for <em>{collectorName}</em></span></Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <pre>
+        <VerboseMessage>
+          {collectorVerbose || '<no messages>'}
+        </VerboseMessage>
+      </pre>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button type="button" onClick={onHide}>Close</Button>
+    </Modal.Footer>
+  </BootstrapModalWrapper>
+);
 
 VerboseMessageModal.propTypes = {
   showModal: PropTypes.bool.isRequired,

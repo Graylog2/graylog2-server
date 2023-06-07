@@ -25,7 +25,7 @@ import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 type Props = {
   autoFocus?: boolean,
   field: DropdownFieldType,
-  onChange: (title: string, value: string) => void,
+  onChange: (title: string, value: string, dirty?: boolean) => void,
   title: string,
   typeName: string,
   value: string,
@@ -33,11 +33,9 @@ type Props = {
 };
 
 const DropdownField = ({ autoFocus, field, onChange, title, typeName, value, addPlaceholder }: Props) => {
-  const formatOption = (key, displayValue, disabled = false) => {
-    return (
-      <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>{displayValue}</option>
-    );
-  };
+  const formatOption = (key, displayValue, disabled = false) => (
+    <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>{displayValue}</option>
+  );
 
   const handleChange = (event) => {
     onChange(title, event.target.value);

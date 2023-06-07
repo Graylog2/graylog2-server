@@ -77,13 +77,9 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
     }
   };
 
-  const _formatRuleOption = ({ title }) => {
-    return { value: title, label: title };
-  };
+  const _formatRuleOption = ({ title }) => ({ value: title, label: title });
 
-  const _filterChosenRules = (rule, chosenRules) => {
-    return !chosenRules.includes(rule.title);
-  };
+  const _filterChosenRules = (rule, chosenRules) => !chosenRules.includes(rule.title);
 
   const _getFormattedOptions = useCallback(() => {
     const chosenRules = nextStage.rules;
@@ -107,6 +103,7 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
       </Button>
       <BootstrapModalForm show={showModal}
                           title={`${create ? 'Add new' : 'Edit'} stage ${nextStage.stage}`}
+                          data-telemetry-title={`${create ? 'Add new' : 'Edit'} stage`}
                           onSubmitForm={_handleSave}
                           onCancel={_closeModal}
                           submitButtonText={create ? 'Add stage' : 'Update stage'}>
