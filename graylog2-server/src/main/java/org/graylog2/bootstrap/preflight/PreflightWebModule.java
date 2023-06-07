@@ -22,7 +22,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
-import org.graylog.security.certutil.keystore.storage.PrivateKeyEntryOnlyKeystoreContentMover;
+import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightAssetsResource;
@@ -46,7 +46,7 @@ public class PreflightWebModule extends Graylog2Module {
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
-        bind(KeystoreContentMover.class).to(PrivateKeyEntryOnlyKeystoreContentMover.class).asEagerSingleton();
+        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
 
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
