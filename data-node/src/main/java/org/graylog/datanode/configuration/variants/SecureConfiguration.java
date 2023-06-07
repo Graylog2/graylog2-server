@@ -18,6 +18,7 @@ package org.graylog.datanode.configuration.variants;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
@@ -41,8 +42,10 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
         this.datanodeConfigDir = Path.of(localConfiguration.getConfigLocation());
     }
 
-    protected Map<String, String> commonSecureConfig(final Configuration localConfiguration) {
-        Map<String, String> config = commonConfig(localConfiguration);
+    protected ImmutableMap<String, String> commonSecureConfig(final Configuration localConfiguration) {
+        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+        config.putAll(commonConfig(localConfiguration));
+
         config.put("plugins.security.disabled", "false");
         config.put(SSL_PREFIX + "http.enabled", "true");
         config.put("plugins.security.allow_default_init_securityindex", "true");
@@ -56,7 +59,7 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
         config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store");
         config.put("node.max_local_storage_nodes", "3");
 
-        return config;
+        return config.build();
     }
 
     protected void configureInitialAdmin(final Configuration localConfiguration,
