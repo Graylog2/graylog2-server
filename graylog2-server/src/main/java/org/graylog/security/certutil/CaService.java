@@ -109,10 +109,8 @@ public class CaService {
                 InputStream is = part.getEntityAs(InputStream.class);
                 byte[] bytes = is.readAllBytes();
                 String pem = new String(bytes, StandardCharsets.UTF_8);
-
-                String base64 = new String(new Base64().decode(pem), StandardCharsets.UTF_8);
                 // Test, if upload is PEM file
-                if (base64.contains("-----BEGIN CERTIFICATE-----")) {
+                if (pem.startsWith("-----BEGIN CERTIFICATE-----")) {
                     caCreator.uploadCA(keyStore, password, pem);
                 } else {
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
