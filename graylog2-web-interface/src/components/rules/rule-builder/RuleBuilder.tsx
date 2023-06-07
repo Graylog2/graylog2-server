@@ -242,6 +242,12 @@ const RuleBuilder = () => {
   };
 
   const handleCancel = () => {
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rules',
+      app_action_value: 'cancel-button',
+    });
+
     history.goBack();
   };
 
@@ -249,9 +255,21 @@ const RuleBuilder = () => {
     event?.preventDefault();
 
     if (initialRule) {
+      sendTelemetry('click', {
+        app_pathname: getBasePathname(pathname),
+        app_section: 'pipeline-rules',
+        app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
+      });
+
       await updateRule(rule);
       if (closeAfter) handleCancel();
     } else {
+      sendTelemetry('click', {
+        app_pathname: getBasePathname(pathname),
+        app_section: 'pipeline-rules',
+        app_action_value: 'add-rule-button',
+      });
+
       const result = await createRule(rule);
       if (result?.id) history.replace(`${Routes.SYSTEM.PIPELINES.RULE(result?.id)}?rule_builder=true`);
     }
