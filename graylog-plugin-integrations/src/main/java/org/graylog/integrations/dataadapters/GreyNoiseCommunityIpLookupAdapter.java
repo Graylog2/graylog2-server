@@ -32,6 +32,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import org.graylog.plugins.threatintel.tools.AdapterDisabledException;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -53,6 +54,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * The GreyNoiseCommunityIpLookupAdapter class is deprecated as of <a href="https://github.com/Graylog2/graylog-plugin-integrations/pull/1340</a>.
+ *
  * A {@link LookupDataAdapter} that uses the <a href="https://docs.greynoise.io/reference/get_v3-community-ip">GreyNoise Community API</a>
  * to perform IP lookups.
  *
@@ -60,6 +63,7 @@ import java.util.stream.Collectors;
  * The API response is a subset of the IP context returned by the full IP Lookup API.
  * </p>
  */
+@Deprecated
 public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
 
     public static final String ADAPTER_NAME = "GreyNoise Community IP Lookup";
@@ -92,8 +96,8 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
     }
 
     @Override
-    protected void doStart(){
-        //Not needed
+    protected void doStart() throws Exception {
+        throw new AdapterDisabledException("The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should be deleted.");
     }
 
     @Override
@@ -118,6 +122,11 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
 
     @Override
     protected LookupResult doGet(Object ipAddress) {
+        return LookupResult.withError("GreyNoise Community IP Lookup Data Adapter is deprecated and lookups can no longer be performed.");
+    }
+
+    // This is the old doGet() method, left in case this functionality needs to be restored in the future.
+    protected LookupResult doDoGet(Object ipAddress) {
 
 
         Optional<Request> request = createRequest(ipAddress);

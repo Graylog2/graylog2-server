@@ -36,6 +36,7 @@ import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
 import org.graylog.integrations.migrations.V20220622071600_MigratePagerDutyV1;
+import org.graylog.integrations.migrations.V20230522201200_NotificationForDeprecatedGreyNoiseCommunityDataAdapters;
 import org.graylog.integrations.notifications.types.SlackEventNotification;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfig;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfigEntity;
@@ -142,6 +143,9 @@ public class IntegrationsModule extends PluginModule {
 
             // PagerDuty notification type fix
             addMigration(V20220622071600_MigratePagerDutyV1.class);
+
+            // Remove Community GreyNoise IP Lookup Adapters
+            addMigration(V20230522201200_NotificationForDeprecatedGreyNoiseCommunityDataAdapters.class);
         }
     }
 

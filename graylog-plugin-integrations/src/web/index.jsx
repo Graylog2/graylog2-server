@@ -87,7 +87,7 @@ const manifest = new PluginManifest(packageJson, {
     },
     {
       type: 'GreyNoise Community IP Lookup',
-      displayName: 'GreyNoise Community IP Lookup',
+      displayName: '[Deprecated] GreyNoise Community IP Lookup',
       formComponent: GreyNoiseAdapterFieldSet,
       summaryComponent: GreyNoiseAdapterSummary,
       documentationComponent: GreyNoiseCommunityIpLookupAdapterDocumentation,
