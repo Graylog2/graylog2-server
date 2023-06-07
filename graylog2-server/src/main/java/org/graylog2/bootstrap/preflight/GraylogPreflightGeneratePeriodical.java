@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -50,16 +51,19 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final CsrMongoStorage csrStorage;
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
+    private final String passwordSecret;
 
     @Inject
     public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
                                               final CsrMongoStorage csrStorage,
                                               final CertChainMongoStorage certMongoStorage,
-                                              final CaService caService) {
+                                              final CaService caService,
+                                              final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
         this.caService = caService;
+        this.passwordSecret = passwordSecret;
     }
 
     @Override
@@ -67,7 +71,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
 
         try {
-            Optional<KeyStore> optKey = caService.loadKeyStore(null);
+            Optional<KeyStore> optKey = caService.loadKeyStore(passwordSecret.toCharArray());
             if(optKey.isEmpty()) {
                 LOG.warn("No keystore available.");
                 return;

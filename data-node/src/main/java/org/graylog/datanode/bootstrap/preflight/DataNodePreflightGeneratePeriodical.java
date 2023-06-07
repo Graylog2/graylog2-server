@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -59,6 +60,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
     private final Configuration configuration;
     private final SmartKeystoreStorage keystoreStorage;
+    private final String passwordSecret;
 
     @Inject
     public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
@@ -69,7 +71,8 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                                final CertChainMongoStorage certMongoStorage,
                                                final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
                                                final Configuration configuration,
-                                               final SmartKeystoreStorage keystoreStorage) {
+                                               final SmartKeystoreStorage keystoreStorage,
+                                               final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -81,6 +84,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
+        this.passwordSecret = passwordSecret;
     }
 
     @Override
@@ -93,7 +97,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
-                var csr = csrGenerator.generateCSR(null, node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
+                var csr = csrGenerator.generateCSR(passwordSecret.toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
                 csrStorage.writeCsr(csr, nodeId.getNodeId());
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
@@ -110,13 +114,13 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                         KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
                                 certificateChain.get(),
                                 privateKeyEncryptedStorage,
-                                null,
-                                null,
+                                passwordSecret.toCharArray(),
+                                passwordSecret.toCharArray(),
                                 CertConstants.DATANODE_KEY_ALIAS
                         );
 
                         final KeystoreMongoLocation location = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
-                        keystoreStorage.writeKeyStore(location, nodeKeystore, configuration.getDatanodeHttpCertificatePassword().toCharArray(), null);
+                        keystoreStorage.writeKeyStore(location, nodeKeystore, configuration.getDatanodeHttpCertificatePassword().toCharArray(), passwordSecret.toCharArray());
 
                         //should be in one transaction, but we miss transactions...
                         nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);

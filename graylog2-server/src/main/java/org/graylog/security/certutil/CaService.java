@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -61,16 +62,19 @@ public class CaService {
     private final NodeId nodeId;
     private final CACreator caCreator;
     private final CaConfiguration configuration;
+    private final String passwordSecret;
 
     @Inject
     public CaService(final Configuration configuration,
                      final SmartKeystoreStorage keystoreStorage,
                      final NodeId nodeId,
-                     final CACreator caCreator) {
+                     final CACreator caCreator,
+                     final @Named("password_secret") String passwordSecret) {
         this.keystoreStorage = keystoreStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
         this.configuration = configuration;
+        this.passwordSecret = passwordSecret;
         this.keystoreMongoLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
         this.keystoreFileLocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
     }
@@ -83,15 +87,15 @@ public class CaService {
         if(configuredCaExists()) {
             return new CA("local CA", CAType.LOCAL);
         } else {
-            var keystore = keystoreStorage.readKeyStore(keystoreMongoLocation, null);
+            var keystore = keystoreStorage.readKeyStore(keystoreMongoLocation, passwordSecret.toCharArray());
             return keystore.map(c -> new CA(nodeId.getNodeId(), CAType.GENERATED)).orElse(null);
         }
     }
 
     public void create(final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {
         final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
-        KeyStore keyStore = caCreator.createCA(null, certificateValidity);
-        keystoreStorage.writeKeyStore(keystoreMongoLocation, keyStore, null, password);
+        KeyStore keyStore = caCreator.createCA(passwordSecret.toCharArray(), certificateValidity);
+        keystoreStorage.writeKeyStore(keystoreMongoLocation, keyStore, passwordSecret.toCharArray(), password);
         LOG.debug("Generated a new CA.");
     }
 
@@ -115,7 +119,7 @@ public class CaService {
                     keyStore.load(bais, password);
                 }
             }
-            keystoreStorage.writeKeyStore(keystoreMongoLocation, keyStore, password, null);
+            keystoreStorage.writeKeyStore(keystoreMongoLocation, keyStore, password, passwordSecret.toCharArray());
        } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
                 KeyStoreException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
