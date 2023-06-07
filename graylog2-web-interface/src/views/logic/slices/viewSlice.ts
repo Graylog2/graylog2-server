@@ -41,7 +41,6 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import type { BufferItem } from 'views/logic/slices/undoRedoSlice';
 import { pushIntoBuffer } from 'views/logic/slices/undoRedoSlice';
 
 const viewSlice = createSlice({
@@ -123,13 +122,19 @@ export const loadView = (newView: View, recreateSearch: boolean = false) => asyn
   return dispatch(setView(newView));
 };
 
-export const updateViewNoBufferPush = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const updateView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const view = selectView(state);
 
+  await dispatch(pushIntoBuffer({
+    type: 'view',
+    state: {
+      ...state.view,
+    },
+  }));
+
   if (recreateSearch || !isViewEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
-
     await dispatch(setView(updatedViewWithSearch, true));
 
     return dispatch(execute());
@@ -138,30 +143,26 @@ export const updateViewNoBufferPush = (newView: View, recreateSearch: boolean = 
   return dispatch(setView(newView, true));
 };
 
-const getBufferItem = ({ state, newView }: { state: RootState, newView: View}): BufferItem => ({
-  type: 'view',
-  state: {
-    ...state.view,
-    view: newView,
-    isDirty: true,
-  },
-});
-
-export const updateView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const updateViewNoBufferPush = ({ newView, recreateSearch = false, hasToPushRevision = false }: { newView: View, recreateSearch: boolean, hasToPushRevision: boolean }) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const view = selectView(state);
 
+  if (hasToPushRevision) {
+    await dispatch(pushIntoBuffer({
+      type: 'view',
+      state: {
+        ...state.view,
+      },
+    }, false));
+  }
+
   if (recreateSearch || !isViewEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
-
-    await dispatch(pushIntoBuffer(getBufferItem({ state, newView: updatedViewWithSearch })));
 
     await dispatch(setView(updatedViewWithSearch, true));
 
     return dispatch(execute());
   }
-
-  await dispatch(pushIntoBuffer(getBufferItem({ state, newView })));
 
   return dispatch(setView(newView, true));
 };
