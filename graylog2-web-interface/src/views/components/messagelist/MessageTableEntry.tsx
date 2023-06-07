@@ -32,12 +32,12 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import { InputsStore } from 'stores/inputs/InputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-import CustomHighlighting from './CustomHighlighting';
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
 import MessagePreview from './MessagePreview';
 import type { Message } from './Types';
 
+import CustomHighlighting from '../highlighting/CustomHighlighting';
 import TypeSpecificValue from '../TypeSpecificValue';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 

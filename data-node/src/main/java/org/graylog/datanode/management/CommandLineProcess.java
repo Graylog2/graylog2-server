@@ -84,7 +84,7 @@ class CommandLineProcess {
     }
 
     /**
-     * "Do not rely on the undelying process if not necessary"
+     * "Do not rely on the underlying process if not necessary"
      */
     @Deprecated(forRemoval = true)
     public Optional<Process> getProcess() {

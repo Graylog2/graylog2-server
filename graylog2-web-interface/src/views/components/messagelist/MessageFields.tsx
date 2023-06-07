@@ -25,7 +25,8 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import type { Message } from './Types';
-import CustomHighlighting from './CustomHighlighting';
+
+import CustomHighlighting from '../highlighting/CustomHighlighting';
 
 type Props = {
   message: Message,

@@ -16,8 +16,11 @@
  */
 package org.graylog.datanode.management;
 
+import com.github.oxo42.stateless4j.StateMachine;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.process.ProcessStateMachine;
+import org.graylog.datanode.process.StateMachineTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +28,10 @@ public class TestableProcess implements ManagableProcess<String> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestableProcess.class);
 
-    private volatile ProcessState state;
+    private final StateMachine<ProcessState, ProcessEvent> stateMachine;
 
     public TestableProcess() {
-        this.state = ProcessState.WAITING_FOR_CONFIGURATION;
+        this.stateMachine = ProcessStateMachine.createNew();
     }
 
     @Override
@@ -39,22 +42,27 @@ public class TestableProcess implements ManagableProcess<String> {
     @Override
     public void restart() {
         LOG.debug("Starting process");
-        this.state = ProcessState.STARTING;
+        onEvent(ProcessEvent.PROCESS_STARTED);
     }
 
     @Override
     public void stop() {
         LOG.debug("Stopping process process");
-        this.state = ProcessState.TERMINATED;
+        onEvent(ProcessEvent.PROCESS_STOPPED);
     }
 
     @Override
     public void onEvent(ProcessEvent event) {
-        // ignored
+        stateMachine.fire(event);
+    }
+
+    @Override
+    public void setStateMachineTracer(StateMachineTracer stateMachineTracer) {
+        stateMachine.setTrace(stateMachineTracer);
     }
 
     @Override
     public boolean isInState(ProcessState state) {
-        return this.state == state;
+        return this.stateMachine.isInState(state);
     }
 }

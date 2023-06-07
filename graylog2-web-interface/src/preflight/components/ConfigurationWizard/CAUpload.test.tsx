@@ -61,6 +61,7 @@ describe('CAUpload', () => {
 
     const dropzone = await findDropZone();
     userEvent.upload(dropzone, files);
+    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
@@ -83,6 +84,8 @@ describe('CAUpload', () => {
 
     const dropzone = await findDropZone();
     userEvent.upload(dropzone, files);
+
+    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',

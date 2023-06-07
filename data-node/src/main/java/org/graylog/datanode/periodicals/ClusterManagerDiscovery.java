@@ -17,27 +17,32 @@
 package org.graylog.datanode.periodicals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
 import java.util.Optional;
 
 @Singleton
 public class ClusterManagerDiscovery extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterManagerDiscovery.class);
+    private final DatanodeConfiguration datanodeConfiguration;
     private final OpensearchProcess managedOpenSearch;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public ClusterManagerDiscovery(OpensearchProcess managedOpenSearch, ObjectMapper objectMapper) {
+    public ClusterManagerDiscovery(DatanodeConfiguration datanodeConfiguration, OpensearchProcess managedOpenSearch, ObjectMapper objectMapper) {
+        this.datanodeConfiguration = datanodeConfiguration;
         this.managedOpenSearch = managedOpenSearch;
         this.objectMapper = objectMapper;
     }
@@ -48,7 +53,7 @@ public class ClusterManagerDiscovery extends Periodical {
         if (managedOpenSearch.isInState(ProcessState.AVAILABLE)) {
             final Boolean isManagerNode = getClusterStateResponse(managedOpenSearch)
                     .map(r -> r.nodes().get(r.clusterManagerNode()))
-                    .map(managerNode -> managedOpenSearch.nodeName().equals(managerNode.name()))
+                    .map(managerNode -> datanodeConfiguration.nodeName().equals(managerNode.name()))
                     .orElse(false);
             managedOpenSearch.setLeaderNode(isManagerNode);
         }
@@ -56,14 +61,15 @@ public class ClusterManagerDiscovery extends Periodical {
 
 
     private Optional<ClusterStateResponse> getClusterStateResponse(OpensearchProcess process) {
-        try {
-            final Response response = process.restClient()
-                    .getLowLevelClient()
-                    .performRequest(new Request("GET", "_cluster/state/"));
+        return process.restClient().flatMap(this::requestClusterState);
+    }
 
-            final ClusterStateResponse clusterState = objectMapper.readValue(response.getEntity().getContent(), ClusterStateResponse.class);
-            return Optional.of(clusterState);
-        } catch (Exception e) {
+    private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {
+        try {
+            final Response response = client.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/"));
+            final ClusterStateResponse state = objectMapper.readValue(response.getEntity().getContent(), ClusterStateResponse.class);
+            return Optional.of(state);
+        } catch (IOException e) {
             LOG.warn("Failed to obtain cluster state response", e);
             return Optional.empty();
         }

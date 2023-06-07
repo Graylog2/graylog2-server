@@ -23,6 +23,7 @@ import { Button, FormikInput, Space } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
+import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 
 type FormValues = {
 
@@ -60,6 +61,7 @@ const CACreateForm = () => (
           <FormikInput placeholder="Input 2 placeholder"
                        name="input-2"
                        label="Input 2" />
+          <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
           <Button disabled={isSubmitting || !isValid} type="submit">
             {isSubmitting ? 'Creating CA...' : 'Create CA'}
           </Button>

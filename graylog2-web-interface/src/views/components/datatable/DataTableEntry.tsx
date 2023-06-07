@@ -32,7 +32,7 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-import CustomHighlighting from '../messagelist/CustomHighlighting';
+import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
 const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`

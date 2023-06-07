@@ -16,40 +16,19 @@
  */
 import * as React from 'react';
 import { AppShell } from '@mantine/core';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import Navigation from 'preflight/navigation/Navigation';
 import Setup from 'preflight/components/Setup';
-import useDataNodes from 'preflight/hooks/useDataNodes';
-import UserNotification from 'preflight/util/UserNotification';
 import WaitingForStartup from 'preflight/components/WaitingForStartup';
 
 const App = () => {
-  const { data: dataNodes } = useDataNodes();
-  const [waitingForStartup, setWaitingForStartup] = useState(false);
-
-  const onResumeStartup = useCallback(() => {
-    // eslint-disable-next-line no-alert
-    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
-      fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
-        .then(() => {
-          setWaitingForStartup(true);
-        })
-        .catch((error) => {
-          setWaitingForStartup(false);
-
-          UserNotification.error(`Resuming startup failed with error: ${error}`,
-            'Could not resume startup');
-        });
-    }
-  }, [dataNodes?.length]);
+  const [isWaitingForStartup, setIsWaitingForStartup] = useState(false);
 
   return (
     <AppShell padding="md" header={<Navigation />}>
-      {!waitingForStartup && <Setup onResumeStartup={onResumeStartup} />}
-      {waitingForStartup && <WaitingForStartup />}
+      {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
+      {isWaitingForStartup && <WaitingForStartup />}
     </AppShell>
   );
 };

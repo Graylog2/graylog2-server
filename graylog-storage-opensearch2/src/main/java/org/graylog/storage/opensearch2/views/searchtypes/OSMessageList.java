@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch2.views.searchtypes;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.name.Named;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
@@ -45,6 +44,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
