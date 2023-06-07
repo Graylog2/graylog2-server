@@ -98,6 +98,7 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
 import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
+import ShowAssetInformation from 'views/logic/valueactions/ShowAssetInformation';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -125,6 +126,12 @@ Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
 const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
+
+const assetInfoFields = [
+  'ip_addresses',
+  'mac_addresses',
+  'hostnames',
+];
 
 const exports: PluginExports = {
   pages: {
@@ -341,6 +348,13 @@ const exports: PluginExports = {
       isEnabled: () => true,
       resetFocus: false,
       component: CreateEventDefinition,
+    },
+    {
+      type: 'show-asset-information',
+      title: 'Show asset information',
+      isHidden: ({ field }: ActionHandlerArguments) => (assetInfoFields.indexOf(field) === -1),
+      resetFocus: false,
+      component: ShowAssetInformation,
     },
   ], ['create-extractor']),
   visualizationTypes: visualizationBindings,

@@ -145,6 +145,15 @@ describe('DashboardActionsMenu', () => {
     await findByText(/Editing dashboard/);
   });
 
+  it('should open select investigation modal', async () => {
+    const { getByText, findByText } = render(<SUT />);
+    const editMenuItem = getByText(/Edit metadata/i);
+
+    userEvent.click(editMenuItem);
+
+    await findByText(/Investigations - Add dashboard as evidence/);
+  });
+
   it('should open dashboard share modal', () => {
     const { getByRole, getByText } = render(<SUT />);
     const openShareButton = getByText(/Share/i);
