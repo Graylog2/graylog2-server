@@ -18,7 +18,9 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
@@ -36,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +46,40 @@ import java.util.stream.Stream;
 
 public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, ValueCount> {
     private static final Logger LOG = LoggerFactory.getLogger(ESCountHandler.class);
+    private final ESCountHandler esCountHandler;
+    private final ESSumHandler esSumHandler;
+
+    @Inject
+    public ESPercentageHandler(ESCountHandler esCountHandler, ESSumHandler esSumHandler) {
+        this.esCountHandler = esCountHandler;
+        this.esSumHandler = esSumHandler;
+    }
 
     @Nonnull
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentage percentage, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        return List.of();
+        return Stream.concat(
+                seriesHandler(name, pivot, percentage, searchTypeHandler, queryContext).stream(),
+                seriesHandler(name + "-root", pivot, percentage, searchTypeHandler, queryContext).stream()
+                        .map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
+        ).toList();
+    }
+
+    private List<SeriesAggregationBuilder> seriesHandler(String name, Pivot pivot, Percentage percentage, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+        return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
+            case SUM -> {
+                var seriesSpecBuilder = Sum.builder().id(percentage.id());
+                var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+
+                yield esSumHandler.doCreateAggregation(name, pivot, seriesSpec, searchTypeHandler, queryContext);
+            }
+            case COUNT -> {
+                var seriesSpecBuilder = Count.builder().id(percentage.id());
+                var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+
+                yield esCountHandler.doCreateAggregation(name, pivot, seriesSpec, searchTypeHandler, queryContext);
+            }
+        };
     }
 
     @Override

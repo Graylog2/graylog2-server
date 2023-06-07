@@ -48,6 +48,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
@@ -92,7 +93,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .forEach(result -> {
                     switch (result.placement()) {
                         case PIVOT -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
-                        case ROOT -> rootAggregation.subAggregation(result.aggregationBuilder());
+                        case ROOT ->
+                                Optional.ofNullable(rootAggregation).ifPresent(root -> root.subAggregation(result.aggregationBuilder()));
                     }
                 });
 
