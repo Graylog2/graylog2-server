@@ -20,12 +20,12 @@ import { render } from 'wrappedTestingLibrary';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import type { Message } from 'views/components/messagelist/Types';
 
-import Highlight from './Highlight';
+import SearchQueryHighlights from './SearchQueryHighlights';
 
-const messageFor = (ranges) => ({ highlight_ranges: ranges } as Message);
+const messageFor = (ranges: { [p: string]: any }) => ({ highlight_ranges: ranges } as Message);
 
-const hasBrokenUpText = (text) => (_content, node) => {
-  const hasText = (currentNode) => currentNode.textContent === text;
+const hasBrokenUpText = (text: string) => (_content, node: Element) => {
+  const hasText = (currentNode: Element) => currentNode.textContent === text;
   const nodeHasText = hasText(node);
   const childrenDontHaveText = Array.from(node.children).every(
     (child) => !hasText(child),
@@ -34,15 +34,15 @@ const hasBrokenUpText = (text) => (_content, node) => {
   return nodeHasText && childrenDontHaveText;
 };
 
-describe('Highlight', () => {
+describe('SearchQueryHighlights', () => {
   it('works for empty field & value', async () => {
-    const { container } = render(<Highlight field="" value="" />);
+    const { container } = render(<SearchQueryHighlights field="" value="" />);
 
     expect(container).toMatchSnapshot();
   });
 
   it('returns unmodified string without ranges', async () => {
-    const { findByText } = render(<Highlight field="foo" value="bar" />);
+    const { findByText } = render(<SearchQueryHighlights field="foo" value="bar" />);
 
     const elem = await findByText('bar');
 
@@ -55,7 +55,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="foobar" />
+        <SearchQueryHighlights field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
 
@@ -70,7 +70,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="foobar" />
+        <SearchQueryHighlights field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
 
@@ -85,7 +85,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="foobar" />
+        <SearchQueryHighlights field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
 
@@ -100,7 +100,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="foobar" />
+        <SearchQueryHighlights field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
 
@@ -115,7 +115,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="foobar" />
+        <SearchQueryHighlights field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
 
@@ -133,7 +133,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="the brown fox jumps over the lazy dog" />
+        <SearchQueryHighlights field="foo" value="the brown fox jumps over the lazy dog" />
       </AdditionalContext.Provider>,
     );
 
@@ -151,7 +151,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="the brown fox jumps over the lazy dog" />
+        <SearchQueryHighlights field="foo" value="the brown fox jumps over the lazy dog" />
       </AdditionalContext.Provider>,
     );
 
@@ -169,7 +169,7 @@ describe('Highlight', () => {
     });
     const { findByText } = render(
       <AdditionalContext.Provider value={{ message }}>
-        <Highlight field="foo" value="the brown fox jumps over the lazy dog" />
+        <SearchQueryHighlights field="foo" value="the brown fox jumps over the lazy dog" />
       </AdditionalContext.Provider>,
     );
 
