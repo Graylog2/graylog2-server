@@ -119,14 +119,15 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                 CertConstants.DATANODE_KEY_ALIAS
                         );
 
+                        final var password = configuration.getDatanodeHttpCertificatePassword() != null ? configuration.getDatanodeHttpCertificatePassword().toCharArray() : passwordSecret.toCharArray();
                         final KeystoreMongoLocation location = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
-                        keystoreStorage.writeKeyStore(location, nodeKeystore, configuration.getDatanodeHttpCertificatePassword().toCharArray(), passwordSecret.toCharArray());
+                        keystoreStorage.writeKeyStore(location, nodeKeystore, password, passwordSecret.toCharArray());
 
                         //should be in one transaction, but we miss transactions...
                         nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
                     }
                 } catch (Exception ex) {
-                    LOG.error("Config entry in signed state, but no certificate data present in Mongo");
+                    LOG.error("Config entry in signed state, but wrong certificate data present in Mongo");
                 }
             }
 

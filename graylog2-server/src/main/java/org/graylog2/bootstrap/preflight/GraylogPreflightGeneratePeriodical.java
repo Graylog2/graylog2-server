@@ -78,7 +78,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             }
 
             KeyStore caKeystore = optKey.get();
-            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", new char[0]);
+            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", passwordSecret.toCharArray());
             var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
             var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");

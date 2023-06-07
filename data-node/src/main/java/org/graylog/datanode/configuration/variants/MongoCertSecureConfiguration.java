@@ -56,7 +56,7 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
     private final char[] secret;
     private final KeystoreMongoLocation mongoLocation;
 
-    private final String mongoKeystorePassword;
+    private final char[] mongoKeystorePassword;
 
     @Inject
     public MongoCertSecureConfiguration(final Configuration localConfiguration,
@@ -86,7 +86,7 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
         this.secret = passwordSecret.toCharArray();
 
         //TODO: matches line 123 of DataNodePreflightGeneratePeriodical, but both need to be changed
-        this.mongoKeystorePassword = localConfiguration.getDatanodeHttpCertificatePassword();
+        this.mongoKeystorePassword = localConfiguration.getDatanodeHttpCertificatePassword() != null ? localConfiguration.getDatanodeHttpCertificatePassword().toCharArray() : secret;
     }
 
     @Override
@@ -102,11 +102,11 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
         final String truststorePassword = UUID.randomUUID().toString();
         keystoreReEncryption.reEncyptWithSecret(
                 mongoLocation,
-                mongoKeystorePassword.toCharArray(),
+                mongoKeystorePassword,
                 finalTransportKeystoreLocation);
         keystoreReEncryption.reEncyptWithSecret(
                 mongoLocation,
-                mongoKeystorePassword.toCharArray(),
+                mongoKeystorePassword,
                 finalHttpKeystoreLocation);
 
         configureInitialAdmin(localConfiguration, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
