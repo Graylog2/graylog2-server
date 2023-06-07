@@ -19,6 +19,7 @@ import styled from 'styled-components';
 
 import generateId from 'logic/generateId';
 import useHistory from 'routing/useHistory';
+import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import { ConfirmDialog, FormSubmit } from 'components/common';
@@ -246,7 +247,8 @@ const RuleBuilder = () => {
       await updateRule(rule);
       if (closeAfter) handleCancel();
     } else {
-      await createRule(rule);
+      const result = await createRule(rule);
+      if (result?.id) history.replace(`${Routes.SYSTEM.PIPELINES.RULE(result?.id)}?rule_builder=true`);
     }
   };
 

@@ -35,15 +35,19 @@ export const removeSavedRuleSourceCode = () => {
 
 const createRule = async (rule: RuleBuilderRule) => {
   try {
-    await fetch(
+    const result = await fetch(
       'POST',
       qualifyUrl(ApiRoutes.RuleBuilderController.create().url),
       rule,
     );
 
     UserNotification.success(`Rule "${rule.title}" created successfully`);
+
+    return result;
   } catch (errorThrown) {
     UserNotification.error(`Creating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Create the Rule Builder Rule.');
+
+    return null;
   }
 };
 
