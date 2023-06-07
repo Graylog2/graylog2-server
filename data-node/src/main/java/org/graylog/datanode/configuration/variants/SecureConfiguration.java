@@ -47,7 +47,7 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
         config.putAll(commonConfig(localConfiguration));
 
         config.put("plugins.security.disabled", "false");
-        config.put(SSL_PREFIX + "http.enabled", "true");
+        //config.put(SSL_PREFIX + "http.enabled", "true");
         config.put("plugins.security.allow_default_init_securityindex", "true");
         //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
 
