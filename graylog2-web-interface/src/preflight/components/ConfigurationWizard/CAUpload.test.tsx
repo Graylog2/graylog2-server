@@ -25,7 +25,7 @@ import UserNotification from 'preflight/util/UserNotification';
 
 import CAUpload from './CAUpload';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
 
 jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
@@ -49,6 +49,13 @@ describe('CAUpload', () => {
     new File(['fileBits'], 'fileName', { type: 'application/x-pem-file' }),
   ];
 
+  const formData = () => {
+    const f = new FormData();
+    files.forEach((file) => f.append('files', file));
+
+    return f;
+  };
+
   const findDropZone = async () => {
     const dropzoneContainer = await screen.findByTestId('upload-dropzone');
 
@@ -64,9 +71,8 @@ describe('CAUpload', () => {
     userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
-      'POST',
       expect.stringContaining('/api/ca/upload'),
-      { files },
+      formData(),
       false,
     ));
 
@@ -87,10 +93,9 @@ describe('CAUpload', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
+    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
       expect.stringContaining('/api/ca/upload'),
-      { files },
+      formData(),
       false,
     ));
 
