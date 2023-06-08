@@ -45,6 +45,8 @@ import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Path(PreflightConstants.API_PREFIX)
 @Produces(MediaType.APPLICATION_JSON)
@@ -63,11 +65,18 @@ public class PreflightResource {
         this.caService = caService;
     }
 
+    record DataNode(String nodeId, Node.Type type, String transportAddress, NodePreflightConfig.State status, String hostname, String shortNodeId) {}
+
     @GET
     @Path("/data_nodes")
-    public List<Node> listDataNodes() {
+    public List<DataNode> listDataNodes() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        return new ArrayList<>(activeDataNodes.values());
+        final var preflightDataNodes = nodePreflightConfigService.streamAll().collect(Collectors.toMap(NodePreflightConfig::nodeId, Function.identity()));
+
+        return activeDataNodes.values().stream().map(n -> {
+            final var preflight = preflightDataNodes.get(n.getNodeId());
+            return new DataNode(n.getNodeId(), n.getType(), n.getTransportAddress(), preflight != null ? preflight.state() : null, n.getHostname(), n.getShortNodeId());
+        }).collect(Collectors.toList());
     }
 
     @GET
