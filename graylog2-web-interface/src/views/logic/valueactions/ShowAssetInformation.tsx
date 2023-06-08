@@ -14,27 +14,43 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 
 import { Button } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const ShowAssetInformation = (identifier) => {
-  const [show, setShow] = useState(true);
+type Props = {
+  onClose: () => void,
+  value: string,
+}
+
+function usePrevious(value) {
+  const ref = useRef();
+
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref.current;
+}
+
+const ShowAssetInformation = ({ value, onClose }: Props) => {
   const pluggableAssetInformation = usePluginEntities('views.components.assetValueActions');
 
   const assetInformation = useMemo(() => pluggableAssetInformation.map(({ component: PluggableAssetInformation, key }) => (
-    <PluggableAssetInformation key={`value-action-${key}`} identifier={identifier} />
-  )), [pluggableAssetInformation, identifier]);
+    <PluggableAssetInformation key={`value-action-${key}`} identifier={value} />
+  )), [pluggableAssetInformation, value]);
+
+  if (value === usePrevious(value)) return null;
 
   const toggleShow = () => {
-    setShow(!show);
+    onClose();
   };
 
   return (
     <div>
-      <Button bsSize="xsmall" onClick={() => toggleShow()}>Show/Hide info</Button>
-      {show && assetInformation}
+      <Button bsSize="xsmall" onClick={() => toggleShow()}>Close info</Button>
+      {assetInformation}
     </div>
   );
 };
