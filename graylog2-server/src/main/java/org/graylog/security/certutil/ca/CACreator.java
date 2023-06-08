@@ -16,9 +16,11 @@
  */
 package org.graylog.security.certutil.ca;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -30,15 +32,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,17 +96,12 @@ public class CACreator {
     }
 
     private Optional<RSAPrivateKey> readPrivateKey(final String key) {
-        String privateKeyPEM = key
-                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
-                .replaceAll(System.lineSeparator(), "")
-                .replace("-----END RSA PRIVATE KEY-----", "");
-
-        byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
-
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-            return Optional.of((RSAPrivateKey) keyFactory.generatePrivate(keySpec));
+            Reader pemReader = new BufferedReader(new StringReader(key));
+            PEMParser pemParser = new PEMParser(pemReader);
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+            PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(pemParser.readObject());
+            return Optional.of((RSAPrivateKey) converter.getPrivateKey(privateKeyInfo));
         } catch (Exception ex) {
             LOG.error("Could not decode private key from prem: " + ex.getMessage(), ex);
             return Optional.empty();
