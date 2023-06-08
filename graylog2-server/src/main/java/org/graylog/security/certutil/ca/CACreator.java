@@ -23,6 +23,8 @@ import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,11 +37,15 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public class CACreator {
+    private static final Logger LOG = LoggerFactory.getLogger(CACreator.class);
 
     public KeyStore createCA(final char[] password,
                              final Duration certificateValidity) throws CACreationException {
@@ -90,33 +96,71 @@ public class CACreator {
         return null;
     }
 
-    private RSAPrivateKey readPrivateKey(final String key) throws Exception {
+    private Optional<RSAPrivateKey> readPrivateKey(final String key) {
         String privateKeyPEM = key
-                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
                 .replaceAll(System.lineSeparator(), "")
-                .replace("-----END PRIVATE KEY-----", "");
+                .replace("-----END RSA PRIVATE KEY-----", "");
 
         byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
 
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+            return Optional.of((RSAPrivateKey) keyFactory.generatePrivate(keySpec));
+        } catch (Exception ex) {
+            LOG.error("Could not decode private key from prem: " + ex.getMessage(), ex);
+            return Optional.empty();
+        }
+    }
+
+    private List<String> splitPem(String pem) {
+        var parts = new ArrayList<String>();
+        // if pem contains another section, split it
+        while(pem.contains("----BEGIN") && pem.contains("-----END")) {
+            var start = pem.indexOf("-----BEGIN");
+            var end = pem.indexOf("-----", pem.indexOf("-----END") + 8) + 5;
+            parts.add(pem.substring(start, end));
+            pem = pem.substring(end);
+        }
+        return parts;
+    }
+
+    private Optional<String> findCert(final List<String> certs, final String type) {
+        return certs.stream().filter(c -> c.startsWith(type)).findFirst();
+    }
+
+    private void addCert(KeyStore keyStore, final char[] password, RSAPrivateKey pk, String cert, String name) {
+        try {
+            var certificate = readCert(cert);
+            keyStore.setKeyEntry(name,
+                    pk,
+                    password,
+                    new X509Certificate[]{certificate});
+        } catch (Exception e) {
+            LOG.error("Could not find certificate: " + e.getMessage(), e);
+        }
     }
 
     // TODO: secure against errors, tests
     public KeyStore uploadCA(KeyStore keyStore, final char[] password, String pem) throws CACreationException {
         try {
-            var endKey = "-----END RSA PRIVATE KEY-----";
-            var key = pem.substring(pem.indexOf("-----BEGIN RSA PRIVATE KEY"), pem.indexOf(endKey) + endKey.length() + 1);
-            var endCert = "-----END CERTIFICATE-----";
-            var cert = pem.substring(pem.indexOf("-----BEGIN CERTIFICATE"), pem.indexOf(endCert) + endKey.length() + 1);
+            var certs = splitPem(pem);
 
-            var pk = readPrivateKey(key);
-            var certificate = readCert(cert);
-            keyStore.setKeyEntry("root",
-                    pk,
-                    password,
-                    new X509Certificate[]{certificate});
+            var pk = findCert(certs, "-----BEGIN RSA PRIVATE KEY").flatMap(this::readPrivateKey).orElseThrow();
+            certs.remove(findCert(certs, "-----BEGIN RSA PRIVATE KEY").orElse(null));
+
+            var root = findCert(certs, "-----BEGIN CERTIFICATE");
+            root.ifPresent(cert -> {
+                addCert(keyStore, password, pk, cert, "root");
+                certs.remove(cert);
+            });
+
+            var ca = findCert(certs, "-----BEGIN CERTIFICATE");
+            ca.ifPresent(cert -> {
+                addCert(keyStore, password, pk, cert, "ca");
+                certs.remove(cert);
+            });
 
             return keyStore;
         } catch (Exception e) {
