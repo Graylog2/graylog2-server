@@ -49,7 +49,7 @@ const CACreateForm = () => {
 
   const { mutate: onSubmit } = useMutation(createCA, {
     onSuccess: () => {
-      UserNotification.success('CA creation successfully');
+      UserNotification.success('CA created successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
     },
     onError: (error) => {
