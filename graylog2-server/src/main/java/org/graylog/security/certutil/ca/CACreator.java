@@ -19,8 +19,13 @@ package org.graylog.security.certutil.ca;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -32,10 +37,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +88,8 @@ public class CACreator {
         }
     }
 
-    private X509Certificate readCert(final String cert) throws IOException, CertificateException {
-        Reader pemReader = new BufferedReader(new StringReader(cert));
+    X509Certificate readCert(final String cert) throws IOException, CertificateException {
+        Reader pemReader = new StringReader(cert);
         PEMParser pemParser = new PEMParser(pemReader);
         var parsedObj = pemParser.readObject();
         if (parsedObj instanceof X509Certificate) {
@@ -95,36 +102,46 @@ public class CACreator {
         return null;
     }
 
-    private Optional<RSAPrivateKey> readPrivateKey(final String key) {
+    Optional<RSAPrivateKey> readPrivateKey(final String key, final char[] password) {
         try {
-            Reader pemReader = new BufferedReader(new StringReader(key));
-            PEMParser pemParser = new PEMParser(pemReader);
+            Reader reader = new StringReader(key);
+            PEMParser pemParser = new PEMParser(reader);
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-            PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(pemParser.readObject());
-            return Optional.of((RSAPrivateKey) converter.getPrivateKey(privateKeyInfo));
+            var object = pemParser.readObject();
+
+            if (object instanceof PEMEncryptedKeyPair) {
+                PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().build(password);
+                return Optional.of((RSAPrivateKey)converter.getKeyPair(((PEMEncryptedKeyPair)object).decryptKeyPair(decProv)).getPrivate());
+            } else {
+                return Optional.of((RSAPrivateKey)converter.getKeyPair((PEMKeyPair)object).getPrivate());
+            }
         } catch (Exception ex) {
-            LOG.error("Could not decode private key from prem: " + ex.getMessage(), ex);
+            LOG.error("Could not decode private key from pem: " + ex.getMessage(), ex);
             return Optional.empty();
         }
     }
 
-    private List<String> splitPem(String pem) {
+    final static String PADDING = "-----";
+    final static String BEGIN = PADDING + "BEGIN";
+    final static String END = PADDING + "END";
+
+    List<String> splitPem(String pem) {
         var parts = new ArrayList<String>();
         // if pem contains another section, split it
-        while(pem.contains("----BEGIN") && pem.contains("-----END")) {
-            var start = pem.indexOf("-----BEGIN");
-            var end = pem.indexOf("-----", pem.indexOf("-----END") + 8) + 5;
+        while(pem.contains(BEGIN) && pem.contains(END)) {
+            var start = pem.indexOf(BEGIN);
+            var end = pem.indexOf(PADDING, pem.indexOf(END) + END.length()) + PADDING.length();
             parts.add(pem.substring(start, end));
             pem = pem.substring(end);
         }
         return parts;
     }
 
-    private Optional<String> findCert(final List<String> certs, final String type) {
+    Optional<String> findCert(final List<String> certs, final String type) {
         return certs.stream().filter(c -> c.startsWith(type)).findFirst();
     }
 
-    private void addCert(KeyStore keyStore, final char[] password, RSAPrivateKey pk, String cert, String name) {
+    void addCert(KeyStore keyStore, final char[] password, RSAPrivateKey pk, String cert, String name) {
         try {
             var certificate = readCert(cert);
             keyStore.setKeyEntry(name,
@@ -141,7 +158,7 @@ public class CACreator {
         try {
             var certs = splitPem(pem);
 
-            var pk = findCert(certs, "-----BEGIN RSA PRIVATE KEY").flatMap(this::readPrivateKey).orElseThrow();
+            var pk = findCert(certs, "-----BEGIN RSA PRIVATE KEY").flatMap(c -> this.readPrivateKey(c, password)).orElseThrow();
             certs.remove(findCert(certs, "-----BEGIN RSA PRIVATE KEY").orElse(null));
 
             var root = findCert(certs, "-----BEGIN CERTIFICATE");
