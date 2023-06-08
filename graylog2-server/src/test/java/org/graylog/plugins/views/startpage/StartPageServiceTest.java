@@ -119,8 +119,7 @@ public class StartPageServiceTest {
 
         var eventbus = new EventBus();
         var dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
-        var entityOwnerShipService = new EntityOwnershipService(dbGrantService, grnRegistry);
-        var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, entityOwnerShipService);
+        var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus);
         var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
         startPageService = new StartPageService(new TestCatalog(), grnRegistry, lastOpenedService, recentActivityService, eventbus);
     }

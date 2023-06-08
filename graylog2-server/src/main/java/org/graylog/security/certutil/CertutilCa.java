@@ -22,7 +22,7 @@ import org.graylog.security.certutil.ca.CACreator;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
-import org.graylog.security.certutil.keystore.storage.PrivateKeyEntryOnlyKeystoreContentMover;
+import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 import org.graylog2.bootstrap.CliCommand;
 
@@ -42,14 +42,14 @@ public class CertutilCa implements CliCommand {
     public CertutilCa() {
         this.console = new SystemConsole();
         this.caCreator = new CACreator();
-        this.caKeystoreStorage = new KeystoreFileStorage(new PrivateKeyEntryOnlyKeystoreContentMover());
+        this.caKeystoreStorage = new KeystoreFileStorage(new SinglePasswordKeystoreContentMover());
     }
 
     public CertutilCa(String keystoreFilename, CommandLineConsole console) {
         this.keystoreFilename = keystoreFilename;
         this.console = console;
         this.caCreator = new CACreator();
-        this.caKeystoreStorage = new KeystoreFileStorage(new PrivateKeyEntryOnlyKeystoreContentMover());
+        this.caKeystoreStorage = new KeystoreFileStorage(new SinglePasswordKeystoreContentMover());
     }
 
     @Override

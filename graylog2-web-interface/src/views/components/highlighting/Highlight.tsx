@@ -15,11 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
-import type { ValueRenderer } from './ValueRenderer';
+type BackgroundColorProps = {
+  theme: DefaultTheme,
+  $color: string,
+};
 
-import SearchQueryHighlights from '../SearchQueryHighlights';
+const BackgroundColor = styled.div(({ theme, $color }: BackgroundColorProps) => css`
+  background-color: ${$color};
+  color: ${theme.utils.contrastingColor($color)};
+  width: fit-content;
+`);
 
-type DecoratorList = Array<ValueRenderer>;
-const DecoratorContext = React.createContext<DecoratorList>([SearchQueryHighlights]);
-export default DecoratorContext;
+type Props = {
+  color: string,
+};
+
+const Highlight = ({ children, color }: React.PropsWithChildren<Props>) => <BackgroundColor $color={color}>{children}</BackgroundColor>;
+
+export default Highlight;

@@ -18,16 +18,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
-import type { DefaultTheme } from 'styled-components';
-import { withTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
-import formatNumber from './FormatNumber';
-import isNumeric from './IsNumeric';
+import formatNumber from '../messagelist/FormatNumber';
+import isNumeric from '../messagelist/IsNumeric';
 
 export type HighlightRange = {
   start: number,
@@ -43,7 +42,6 @@ type Props = {
   field: string,
   value?: any,
   highlightRanges: Ranges,
-  theme: DefaultTheme,
 };
 
 function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
@@ -57,9 +55,11 @@ function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
   return start === 0 && length === stringifiedValue.length;
 }
 
-const shouldBeFormatted = (field, value) => isFunction(field) && isNumeric(value);
+const shouldBeFormatted = (field: string, value: any) => isFunction(field) && isNumeric(value);
 
-const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {}, theme }: Props) => {
+const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {} }: Props) => {
+  const theme = useTheme();
+
   if (value === undefined || value === null) {
     return '';
   }
@@ -90,8 +90,8 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   const origValue = StringUtils.stringify(value);
 
   const ranges = sortBy(highlightRanges[field], (r) => r.start);
-  const subst = (s, l) => origValue.substring(s, s + l);
-  const rest = (pos) => origValue.substring(pos, origValue.length);
+  const subst = (s: number, l: number) => origValue.substring(s, s + l);
+  const rest = (pos: number) => origValue.substring(pos, origValue.length);
 
   const highlights = ranges
     .filter(({ start }) => (start >= 0))
@@ -124,4 +124,4 @@ PossiblyHighlight.defaultProps = {
   value: undefined,
 };
 
-export default withTheme(PossiblyHighlight);
+export default PossiblyHighlight;
