@@ -55,12 +55,11 @@ public class DatanodeStartupIT {
                     .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                     .retryIfException(input -> input instanceof NoHttpResponseException)
                     .retryIfException(input -> input instanceof SocketException)
-                    .retryIfResult(input -> !input.extract().body().path("opensearch.node.status").equals("AVAILABLE"))
+                    .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                     .build();
 
-             final Integer datanodeRestApiPort = backend.getDatanodeRestPort();
-
-                    retryer.call(() -> this.getStatus(datanodeRestApiPort))
+            final Integer datanodeRestApiPort = backend.getDatanodeRestPort();
+            retryer.call(() -> this.getStatus(datanodeRestApiPort))
                     .assertThat()
                     .body("opensearch.node.node_name", Matchers.equalTo("node1"))
                     .body("opensearch.node.process.pid", Matchers.notNullValue());
