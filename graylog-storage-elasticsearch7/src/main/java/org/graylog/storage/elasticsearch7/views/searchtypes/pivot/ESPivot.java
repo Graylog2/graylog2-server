@@ -39,7 +39,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,33 +128,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
-    }
-
-    private List<Tuple2<String, List<BucketSpec>>> groupByConsecutiveType(List<BucketSpec> pivots) {
-        final List<Tuple2<String, List<BucketSpec>>> groups = new ArrayList<>();
-
-        List<BucketSpec> currentBuckets = new ArrayList<>();
-        String currentType = null;
-
-        for (BucketSpec bucketSpec : pivots) {
-            if (bucketSpec.type().equals(currentType)) {
-                currentBuckets.add(bucketSpec);
-            } else {
-                if (!currentBuckets.isEmpty()) {
-                    groups.add(new Tuple2<>(currentType, currentBuckets));
-                }
-
-                currentBuckets = new ArrayList<>();
-                currentBuckets.add(bucketSpec);
-                currentType = bucketSpec.type();
-            }
-        }
-
-        if (!currentBuckets.isEmpty()) {
-            groups.add(new Tuple2<>(currentType, currentBuckets));
-        }
-
-        return groups;
     }
 
     private BucketSpecHandler.CreatedAggregations<AggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, ESGeneratedQueryContext queryContext) {

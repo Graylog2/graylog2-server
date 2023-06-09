@@ -18,7 +18,6 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
@@ -63,19 +62,6 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
                 aggregation.stream(),
                 aggregation.stream().map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
         ).toList();
-    }
-
-    private SeriesSpec nestedSeriesSpec(Percentage percentage) {
-        return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
-            case SUM -> {
-                var seriesSpecBuilder = Sum.builder().id(percentage.id());
-                yield percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
-            }
-            case COUNT -> {
-                var seriesSpecBuilder = Count.builder().id(percentage.id());
-                yield percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
-            }
-        };
     }
 
     private List<SeriesAggregationBuilder> createNestedSeriesAggregation(String name, Pivot pivot, Percentage percentage, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
