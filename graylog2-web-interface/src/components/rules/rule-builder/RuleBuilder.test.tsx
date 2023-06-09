@@ -91,7 +91,13 @@ describe('RuleBuilder', () => {
   });
 
   it('should be able to convert Rule Builder to Source Code', () => {
-    asMock(useRuleBuilder).mockReturnValue({} as any);
+    const title = 'title';
+    const description = 'description';
+    const rule_builder = { actions: [], conditions: [] };
+
+    asMock(useRuleBuilder).mockReturnValue({
+      rule: { title, description, rule_builder },
+    } as any);
 
     const { getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{}}>
@@ -99,7 +105,7 @@ describe('RuleBuilder', () => {
       </PipelineRulesContext.Provider>
     ));
 
-    const convertButton = getByRole('button', { name: 'Convert to Source Code' });
+    const convertButton = getByRole('button', { name: 'Convert Rule Builder to Source Code', hidden: true });
     userEvent.click(convertButton);
 
     const createRuleFromCodeButton = getByRole('button', { name: 'Create new Rule from Code', hidden: true });
