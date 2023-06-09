@@ -65,7 +65,7 @@ public class PreflightResource {
         this.caService = caService;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, NodePreflightConfig.State status, String hostname, String shortNodeId) {}
+    record DataNode(String nodeId, Node.Type type, String transportAddress, NodePreflightConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
 
     @GET
     @Path("/data_nodes")
@@ -75,7 +75,7 @@ public class PreflightResource {
 
         return activeDataNodes.values().stream().map(n -> {
             final var preflight = preflightDataNodes.get(n.getNodeId());
-            return new DataNode(n.getNodeId(), n.getType(), n.getTransportAddress(), preflight != null ? preflight.state() : null, n.getHostname(), n.getShortNodeId());
+            return new DataNode(n.getNodeId(), n.getType(), n.getTransportAddress(), preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null, n.getHostname(), n.getShortNodeId());
         }).collect(Collectors.toList());
     }
 
