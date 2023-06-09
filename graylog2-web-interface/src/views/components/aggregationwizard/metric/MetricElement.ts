@@ -70,8 +70,10 @@ const parameterForMetric = (metric: MetricFormValues) => {
   }
 };
 
+const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
+
 const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
-  .map((metric) => Series.create(metric.function, metric.field, parameterForMetric(metric))
+  .map((metric) => Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
     .toBuilder()
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
     .build());
