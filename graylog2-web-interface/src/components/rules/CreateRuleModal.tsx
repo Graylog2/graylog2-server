@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, BootstrapModalWrapper, Modal, Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -25,10 +25,10 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useHistory from 'routing/useHistory';
 import { getBasePathname } from 'util/URLUtils';
 
-const SubTitle = styled.label`
-  color: #aaa;
+const SubTitle = styled.label(({ theme }) => css`
+  color: ${theme.colors.variant.default};
   margin-top: 5px;
-`;
+`);
 
 const CreateRuleContainer = styled(Row)`
   margin-top: 25px;
