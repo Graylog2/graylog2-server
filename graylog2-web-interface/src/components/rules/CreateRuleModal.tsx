@@ -30,6 +30,14 @@ const SubTitle = styled.label`
   margin-top: 5px;
 `;
 
+const CreateRuleContainer = styled(Row)`
+  margin-top: 25px;
+  
+  .source-code-editor {
+    pointer-events: none;
+  }
+`;
+
 const StyledInput = styled(Input)`
   margin-top: 5px;
   background-color: white;
@@ -41,6 +49,7 @@ const StyledCol = styled(Col)`
 
 const RuleBuilderRow = styled(Row)`
   height: 155px;
+  pointer-events: none;
 `;
 
 const RULE_TEMPLATE = `rule "function howto"
@@ -68,7 +77,10 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => {
         <Modal.Title>Create Rule</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Row>
+        <div>
+          Please select how you want to create the Pipeline Rule:
+        </div>
+        <CreateRuleContainer>
           <StyledCol md={6}>
             <label htmlFor="rule_builder">Rule Builder</label>
             <RuleBuilderRow>
@@ -129,7 +141,7 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => {
               Use Source Code
             </Button>
           </Col>
-        </Row>
+        </CreateRuleContainer>
       </Modal.Body>
     </BootstrapModalWrapper>
   );
