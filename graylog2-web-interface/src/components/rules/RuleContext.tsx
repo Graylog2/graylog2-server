@@ -118,11 +118,11 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     };
 
     return ({
-      rule: rule?.id ? {
+      rule: {
         ...rule,
         description,
         source: ruleSource,
-      } : null,
+      },
       description,
       handleDescription: setDescription,
       handleSavePipelineRule,
