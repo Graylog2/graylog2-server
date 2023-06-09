@@ -16,8 +16,8 @@
  */
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import ObjectID from 'bson-objectid';
 
-import generateId from 'logic/generateId';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
@@ -32,7 +32,13 @@ import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
 import type { BlockType, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
-import { getDictForFunction, getDictForParam, getActionOutputVariableName, paramValueExists, paramValueIsVariable } from './helpers';
+import {
+  getDictForFunction,
+  getDictForParam,
+  getActionOutputVariableName,
+  paramValueExists,
+  paramValueIsVariable,
+} from './helpers';
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 
 import RuleSimulation from '../RuleSimulation';
@@ -59,9 +65,13 @@ const RuleBuilder = () => {
     fetchValidateRule,
   } = useRuleBuilder();
 
-  const [rule, setRule] = useState<RuleBuilderRule>({ description: '', title: '', rule_builder: { conditions: [], actions: [] } });
+  const [rule, setRule] = useState<RuleBuilderRule>({
+    description: '',
+    title: '',
+    rule_builder: { conditions: [], actions: [] },
+  });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
-  const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule|null>(null);
+  const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
 
   useEffect(() => {
     if (initialRule) {
@@ -82,7 +92,7 @@ const RuleBuilder = () => {
 
   // TODO: Add reorder functionality (make sure to setPrimaryParamsAndOutputVariable and validate)
 
-  const getPreviousBlock = (blocks: RuleBlock[], index?: number) : RuleBlock | undefined => {
+  const getPreviousBlock = (blocks: RuleBlock[], index?: number): RuleBlock | undefined => {
     if (index === 0) return undefined;
 
     if (!index) return (blocks[blocks.length - 1]);
@@ -90,7 +100,10 @@ const RuleBuilder = () => {
     return (blocks[index - 1]);
   };
 
-  const getPreviousOutput = (blocks: RuleBlock[], index?: number) : {previousOutputPresent: boolean, outputVariable?: string} => {
+  const getPreviousOutput = (blocks: RuleBlock[], index?: number): {
+    previousOutputPresent: boolean,
+    outputVariable?: string
+  } => {
     const previousBlock = getPreviousBlock(blocks, index);
 
     if (!previousBlock?.outputvariable) return { previousOutputPresent: false };
@@ -120,7 +133,9 @@ const RuleBuilder = () => {
 
     Object.keys(block.params).forEach((paramName) => {
       if (getDictForParam(blockDict, paramName)?.primary) {
-        if (paramValueExists(block.params[paramName]) && !paramValueIsVariable(block.params[paramName])) { return; }
+        if (paramValueExists(block.params[paramName]) && !paramValueIsVariable(block.params[paramName])) {
+          return;
+        }
 
         const { previousOutputPresent, outputVariable } = getPreviousOutput(blocks, index);
 
@@ -130,7 +145,9 @@ const RuleBuilder = () => {
           }
         }
 
-        if (!previousOutputPresent) { return; }
+        if (!previousOutputPresent) {
+          return;
+        }
 
         newBlock.params[paramName] = `$${outputVariable}`;
       }
@@ -153,7 +170,7 @@ const RuleBuilder = () => {
 
   const addBlock = async (type: BlockType, block: RuleBlock) => {
     let ruleToAdd;
-    const blockId = generateId();
+    const blockId = new ObjectID().toString();
 
     if (type === 'condition') {
       ruleToAdd = {
@@ -275,7 +292,7 @@ const RuleBuilder = () => {
     }
   };
 
-  const hasRuleBuilderErrors = () : boolean => {
+  const hasRuleBuilderErrors = (): boolean => {
     if (rule.rule_builder.errors?.length > 0) return true;
 
     if (rule.rule_builder.actions.some(((action) => action.errors?.length > 0))) {
@@ -328,7 +345,10 @@ const RuleBuilder = () => {
                             type="condition"
                             addBlock={addBlock}
                             updateBlock={updateBlock}
-                            deleteBlock={() => setBlockToDelete({ orderIndex: newConditionBlockIndex, type: 'condition' })} />
+                            deleteBlock={() => setBlockToDelete({
+                              orderIndex: newConditionBlockIndex,
+                              type: 'condition',
+                            })} />
         </Col>
         <Col md={6}>
           <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
