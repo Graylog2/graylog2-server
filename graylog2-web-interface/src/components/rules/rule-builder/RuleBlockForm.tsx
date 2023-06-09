@@ -126,21 +126,15 @@ const RuleBlockForm = ({
   };
 
   const handleSubmit = (values: {[key: string]: any}) => {
-    if (existingBlock) {
-      sendTelemetry('click', {
-        app_pathname: getBasePathname(pathname),
-        app_section: 'pipeline-rule-builder',
-        app_action_value: `update-${type}-button`,
-      });
+    sendTelemetry('click', {
+      app_pathname: getBasePathname(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `${existingBlock ? 'update' : 'add'}-${type}-button`,
+    });
 
+    if (existingBlock) {
       onUpdate(values, selectedBlockDict?.name);
     } else {
-      sendTelemetry('click', {
-        app_pathname: getBasePathname(pathname),
-        app_section: 'pipeline-rule-builder',
-        app_action_value: `add-${type}-button`,
-      });
-
       onAdd(values);
     }
   };
