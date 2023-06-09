@@ -16,13 +16,13 @@
  */
 package org.graylog.datanode.configuration.variants;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,8 +32,8 @@ public interface SecurityConfigurationVariant {
 
     Map<String, String> configure(final Configuration localConfiguration) throws KeyStoreStorageException, IOException, GeneralSecurityException;
 
-    default Map<String, String> commonConfig(final Configuration localConfiguration) {
-        final LinkedHashMap<String, String> config = new LinkedHashMap<>();
+    default ImmutableMap<String, String> commonConfig(final Configuration localConfiguration) {
+        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
@@ -48,6 +48,6 @@ public interface SecurityConfigurationVariant {
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");
 
-        return config;
+        return config.build();
     }
 }

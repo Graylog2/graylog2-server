@@ -75,6 +75,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         try {
             final Map<String, String> config = chosenSecurityConfigurationVariant.configure(localConfiguration);
+
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistribution().directory(),
                     Path.of(opensearchConfigLocation),
