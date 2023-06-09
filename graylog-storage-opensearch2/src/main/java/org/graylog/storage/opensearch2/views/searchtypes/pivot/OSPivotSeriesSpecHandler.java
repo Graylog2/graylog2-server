@@ -41,7 +41,7 @@ public abstract class OSPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
         aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
     }
 
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
         return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
     }
 

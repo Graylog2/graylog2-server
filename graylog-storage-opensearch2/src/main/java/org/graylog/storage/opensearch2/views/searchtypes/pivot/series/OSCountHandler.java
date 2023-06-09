@@ -83,7 +83,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
     }
 
     @Override
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
         final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
         if (objects == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
