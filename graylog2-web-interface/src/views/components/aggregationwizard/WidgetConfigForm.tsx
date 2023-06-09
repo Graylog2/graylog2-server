@@ -41,7 +41,7 @@ export type MetricFormValues = {
   field: string | undefined,
   name?: string | undefined,
   percentile?: number | undefined,
-  strategy?: 'SUM' | 'COUNT',
+  strategy?: string,
 };
 
 export type GroupingDirection = 'row' | 'column';
