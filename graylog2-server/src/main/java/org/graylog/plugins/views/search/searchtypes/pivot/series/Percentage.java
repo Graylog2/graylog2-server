@@ -51,6 +51,10 @@ public abstract class Percentage implements SeriesSpec {
     @JsonProperty
     public abstract Optional<String> field();
 
+    public static Builder builder() {
+        return new AutoValue_Percentage.Builder().type(Percentage.NAME);
+    }
+
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder extends SeriesSpecBuilder<Percentage, Builder> {
