@@ -32,13 +32,13 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.InitialBucket;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -122,7 +122,7 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var rootResult = extractNestedSeriesAggregation(pivot, percentage, createMultiBucket(searchResult), esGeneratedQueryContext);
+        var rootResult = extractNestedSeriesAggregation(pivot, percentage, InitialBucket.create(searchResult), esGeneratedQueryContext);
         var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, searchTypeHandler, esGeneratedQueryContext);
 
         return nestedSeriesResult.map(result -> {
@@ -130,35 +130,6 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
                     return value / totalResult.doubleValue();
                 })
                 .map(bucketPercentage -> Value.create(percentage.id(), Percentage.NAME, bucketPercentage));
-    }
-
-    private MultiBucketsAggregation.Bucket createMultiBucket(SearchResponse searchResult) {
-        return new MultiBucketsAggregation.Bucket() {
-            @Override
-            public Object getKey() {
-                return null;
-            }
-
-            @Override
-            public String getKeyAsString() {
-                return null;
-            }
-
-            @Override
-            public long getDocCount() {
-                return searchResult.getHits().getTotalHits().value;
-            }
-
-            @Override
-            public Aggregations getAggregations() {
-                return searchResult.getAggregations();
-            }
-
-            @Override
-            public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
-                return null;
-            }
-        };
     }
 
     private Aggregation extractNestedSeriesAggregation(Pivot pivot, Percentage percentage, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
