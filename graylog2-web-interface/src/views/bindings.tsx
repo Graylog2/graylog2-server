@@ -127,10 +127,24 @@ Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
 const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
 
-const assetInfoFields = [
-  'ip_addresses',
-  'mac_addresses',
-  'hostnames',
+const GIMSchemaAssetLookupFields = [
+  'source_hostname',
+  'source_ip',
+  'source_ipv6',
+  'source_nat_ip',
+  'destination_hostname',
+  'destination_ip',
+  'destination_nat_ip',
+  'host_hostname',
+  'host_ip',
+  'host_ipv6',
+  'host_mac',
+  'vendor_private_ip',
+  'vendor_private_ipv6',
+  'vendor_public_ip',
+  'vendor_public_ipv6',
+  'event_observer_ip',
+  'event_source',
 ];
 
 const exports: PluginExports = {
@@ -352,7 +366,7 @@ const exports: PluginExports = {
     {
       type: 'show-asset-information',
       title: 'Show asset information',
-      isHidden: ({ field }: ActionHandlerArguments) => (assetInfoFields.indexOf(field) === -1),
+      isHidden: ({ field }: ActionHandlerArguments) => (GIMSchemaAssetLookupFields.indexOf(field) === -1),
       resetFocus: false,
       component: ShowAssetInformation,
     },
