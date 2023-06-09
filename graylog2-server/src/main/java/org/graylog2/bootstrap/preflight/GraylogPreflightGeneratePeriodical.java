@@ -196,8 +196,9 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         final var node = nodeService.byNodeId(nodeId);
         Request request = new Request.Builder().url(node.getTransportAddress()).build();
         Call call = tmpClient.newCall(request);
-        Response response = call.execute();
-        return response.isSuccessful();
+        try(Response response = call.execute()) {
+            return response.isSuccessful();
+        }
     }
 
     @Override
