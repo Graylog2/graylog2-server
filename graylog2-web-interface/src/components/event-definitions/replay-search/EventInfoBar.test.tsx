@@ -34,6 +34,7 @@ import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import ViewsBindings from 'views/bindings';
+import { undoRedoSliceReducer } from 'views/logic/slices/undoRedoSlice';
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
@@ -93,6 +94,7 @@ describe('<EventInfoBar />', () => {
       'views.reducers': [
         { key: 'view', reducer: viewSliceReducer },
         { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+        { key: 'undoRedo', reducer: undoRedoSliceReducer },
       ],
     }));
 
