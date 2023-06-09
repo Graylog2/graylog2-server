@@ -48,7 +48,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
@@ -77,8 +76,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
+        var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
+
         // add global rollup series if those were requested
-        if (pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty())) {
+        if (generateRollups) {
             seriesStream(pivot, queryContext, "global rollup")
                     .filter(result -> Placement.PIVOT.equals(result.placement()))
                     .map(SeriesAggregationBuilder::aggregationBuilder)
@@ -93,8 +94,11 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .forEach(result -> {
                     switch (result.placement()) {
                         case PIVOT -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
-                        case ROOT ->
-                                Optional.ofNullable(rootAggregation).ifPresent(root -> root.subAggregation(result.aggregationBuilder()));
+                        case ROOT -> {
+                            if (!generateRollups) {
+                                searchSourceBuilder.aggregation(result.aggregationBuilder());
+                            }
+                        }
                     }
                 });
 

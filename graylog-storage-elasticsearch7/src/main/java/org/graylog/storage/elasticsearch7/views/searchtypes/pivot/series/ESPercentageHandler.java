@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
@@ -27,13 +28,12 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.missing.Missing;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,26 +58,61 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
     @Nonnull
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentage percentage, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+        var aggregation = createNestedSeriesAggregation(name, pivot, percentage, searchTypeHandler, queryContext);
         return Stream.concat(
-                seriesHandler(name, pivot, percentage, searchTypeHandler, queryContext).stream(),
-                seriesHandler(name + "-root", pivot, percentage, searchTypeHandler, queryContext).stream()
-                        .map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
+                aggregation.stream(),
+                aggregation.stream().map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
         ).toList();
     }
 
-    private List<SeriesAggregationBuilder> seriesHandler(String name, Pivot pivot, Percentage percentage, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    private SeriesSpec nestedSeriesSpec(Percentage percentage) {
+        return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
+            case SUM -> {
+                var seriesSpecBuilder = Sum.builder().id(percentage.id());
+                yield percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+            }
+            case COUNT -> {
+                var seriesSpecBuilder = Count.builder().id(percentage.id());
+                yield percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+            }
+        };
+    }
+
+    private List<SeriesAggregationBuilder> createNestedSeriesAggregation(String name, Pivot pivot, Percentage percentage, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {
                 var seriesSpecBuilder = Sum.builder().id(percentage.id());
                 var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
 
-                yield esSumHandler.doCreateAggregation(name, pivot, seriesSpec, searchTypeHandler, queryContext);
+                yield esSumHandler.createAggregation(name, pivot, seriesSpec, searchTypeHandler, queryContext);
             }
             case COUNT -> {
                 var seriesSpecBuilder = Count.builder().id(percentage.id());
                 var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
 
-                yield esCountHandler.doCreateAggregation(name, pivot, seriesSpec, searchTypeHandler, queryContext);
+                yield esCountHandler.createAggregation(name, pivot, seriesSpec, searchTypeHandler, queryContext);
+            }
+        };
+    }
+
+    private Stream<Value> handleNestedSeriesResults(Pivot pivot,
+                                                    Percentage percentage,
+                                                    SearchResponse searchResult,
+                                                    Object seriesResult,
+                                                    ESSearchTypeHandler<Pivot> searchTypeHandler,
+                                                    ESGeneratedQueryContext esGeneratedQueryContext) {
+        return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
+            case SUM -> {
+                var seriesSpecBuilder = Sum.builder().id(percentage.id());
+                var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+
+                yield esSumHandler.handleResult(pivot, seriesSpec, searchResult, seriesResult, searchTypeHandler, esGeneratedQueryContext);
+            }
+            case COUNT -> {
+                var seriesSpecBuilder = Count.builder().id(percentage.id());
+                var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+
+                yield esCountHandler.handleResult(pivot, seriesSpec, searchResult, seriesResult, searchTypeHandler, esGeneratedQueryContext);
             }
         };
     }
@@ -101,44 +136,90 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var totalCount = searchResult.getHits().getTotalHits().value;
-        var bucketPercentage = (double) value / totalCount;
-        return Stream.of(Value.create(percentage.id(), Percentage.NAME, bucketPercentage));
+        var rootResult = extractNestedSeriesAggregation(pivot, percentage, createMultiBucket(searchResult), esGeneratedQueryContext);
+        var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, searchTypeHandler, esGeneratedQueryContext);
+
+        return nestedSeriesResult.map(result -> {
+                    var totalResult = (Number) result.value();
+                    return value / totalResult.doubleValue();
+                })
+                .map(bucketPercentage -> Value.create(percentage.id(), Percentage.NAME, bucketPercentage));
+    }
+
+    private MultiBucketsAggregation.Bucket createMultiBucket(SearchResponse searchResult) {
+        return new MultiBucketsAggregation.Bucket() {
+            @Override
+            public Object getKey() {
+                return null;
+            }
+
+            @Override
+            public String getKeyAsString() {
+                return null;
+            }
+
+            @Override
+            public long getDocCount() {
+                return searchResult.getHits().getTotalHits().value;
+            }
+
+            @Override
+            public Aggregations getAggregations() {
+                return searchResult.getAggregations();
+            }
+
+            @Override
+            public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
+                return null;
+            }
+        };
+    }
+
+    private Aggregation extractNestedSeriesAggregation(Pivot pivot, Percentage percentage, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
+        return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
+            case SUM -> {
+                var seriesSpecBuilder = Sum.builder().id(percentage.id());
+                var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+
+                yield esSumHandler.extractAggregationFromResult(pivot, seriesSpec, aggregations, queryContext);
+            }
+            case COUNT -> {
+                var seriesSpecBuilder = Count.builder().id(percentage.id());
+                var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
+
+                yield esCountHandler.extractAggregationFromResult(pivot, seriesSpec, aggregations, queryContext);
+            }
+        };
     }
 
     @Override
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
-        final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
-        if (objects == null) {
-            if (aggregations instanceof MultiBucketsAggregation.Bucket) {
-                return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
-            } else if (aggregations instanceof Missing) {
-                return createValueCount(((Missing) aggregations).getDocCount());
-            }
-        } else {
-            // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
-            // value_count aggregation. we'll handle that special case in doHandleResult above
-            return aggregations.getAggregations().get(objects.v1);
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
+        var result = extractNestedSeriesAggregation(pivot, (Percentage) spec, aggregations, queryContext);
+        if (result instanceof ValueCount) {
+            return result;
+        }
+        if (result instanceof ParsedSum sum) {
+            return createValueCount(sum.getValue());
         }
 
-        return null;
+        throw new IllegalStateException("Unable to parse result: " + result);
     }
 
-    private Aggregation createValueCount(final Long docCount) {
+    private Aggregation createValueCount(final Double value) {
         return new ValueCount() {
             @Override
             public long getValue() {
-                return docCount;
+                return value.longValue();
             }
 
             @Override
             public double value() {
-                return docCount;
+                return value;
             }
 
             @Override
             public String getValueAsString() {
-                return docCount.toString();
+                return value.toString();
             }
 
             @Override
@@ -157,7 +238,7 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
             }
 
             @Override
-            public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) throws IOException {
+            public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) {
                 return null;
             }
         };
