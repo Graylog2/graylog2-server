@@ -170,8 +170,8 @@ const RuleBlockForm = ({
                     </Col>
                   </SelectedBlockInfo>
 
-                  {selectedBlockDict.params.map((param, key) => (
-                    <Row key={key}> {/* eslint-disable-line react/no-array-index-key */}
+                  {selectedBlockDict.params.map((param) => (
+                    <Row key={`${order}_${param}`}>
                       <RuleBlockFormField param={param}
                                           functionName={selectedBlockDict.name}
                                           order={order}
