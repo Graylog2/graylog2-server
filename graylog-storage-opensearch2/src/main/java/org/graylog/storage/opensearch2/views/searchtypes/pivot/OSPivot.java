@@ -75,8 +75,10 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
+        var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
+
         // add global rollup series if those were requested
-        if (pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty())) {
+        if (generateRollups) {
             seriesStream(pivot, queryContext, "global rollup")
                     .filter(result -> Placement.PIVOT.equals(result.placement()))
                     .map(SeriesAggregationBuilder::aggregationBuilder)
@@ -86,13 +88,17 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
         final AggregationBuilder rootAggregation = createdAggregations.root();
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
-        final List<AggregationBuilder> metricsAggregations = createdAggregations.metrics();
+        final List<AggregationBuilder> metrics = createdAggregations.metrics();
         seriesStream(pivot, queryContext, "metrics")
                 .forEach(result -> {
                     switch (result.placement()) {
                         case PIVOT ->
-                                metricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(result.aggregationBuilder()));
-                        case ROOT -> rootAggregation.subAggregation(result.aggregationBuilder());
+                                metrics.forEach(metricsAggregation -> metricsAggregation.subAggregation(result.aggregationBuilder()));
+                        case ROOT -> {
+                            if (!generateRollups) {
+                                rootAggregation.subAggregation(result.aggregationBuilder());
+                            }
+                        }
                     }
                 });
 
