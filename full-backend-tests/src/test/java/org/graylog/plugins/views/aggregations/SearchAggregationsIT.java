@@ -747,10 +747,10 @@ public class SearchAggregationsIT {
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
                 .rootPath(searchTypeResult)
-                .body(pathToMetricResult("GET", "percentage(,COUNT)"), equalTo(0.86))
-                .body(pathToMetricResult("DELETE", "percentage(,COUNT)"), equalTo(0.052))
-                .body(pathToMetricResult("POST", "percentage(,COUNT)"), equalTo(0.045))
-                .body(pathToMetricResult("PUT", "percentage(,COUNT)"), equalTo(0.043));
+                .body(pathToMetricResult("GET", "percentage(,COUNT)"), equalTo(0.86f))
+                .body(pathToMetricResult("DELETE", "percentage(,COUNT)"), equalTo(0.052f))
+                .body(pathToMetricResult("POST", "percentage(,COUNT)"), equalTo(0.045f))
+                .body(pathToMetricResult("PUT", "percentage(,COUNT)"), equalTo(0.043f));
     }
 
     @ContainerMatrixTest
@@ -764,15 +764,15 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("rows", hasSize(4));
+                .body("rows", hasSize(5));
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
                 .rootPath(searchTypeResult)
-                .body(pathToMetricResult("GET", "percentage(http_method,COUNT)"), equalTo(0.86))
-                .body(pathToMetricResult("DELETE", "percentage(http_method,COUNT)"), equalTo(0.052))
-                .body(pathToMetricResult("POST", "percentage(http_method,COUNT)"), equalTo(0.045))
-                .body(pathToMetricResult("PUT", "percentage(http_method,COUNT)"), equalTo(0.043));
+                .body(pathToMetricResult("GET", "percentage(http_method,COUNT)"), equalTo(0.86f))
+                .body(pathToMetricResult("DELETE", "percentage(http_method,COUNT)"), equalTo(0.052f))
+                .body(pathToMetricResult("POST", "percentage(http_method,COUNT)"), equalTo(0.045f))
+                .body(pathToMetricResult("PUT", "percentage(http_method,COUNT)"), equalTo(0.043f));
     }
 
     @ContainerMatrixTest
@@ -786,15 +786,15 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("rows", hasSize(4));
+                .body("rows", hasSize(5));
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
                 .rootPath(searchTypeResult)
-                .body(pathToMetricResult("GET", "percentage(took_ms,SUM)"), equalTo(0.86))
-                .body(pathToMetricResult("DELETE", "percentage(took_ms,SUM)"), equalTo(0.052))
-                .body(pathToMetricResult("POST", "percentage(took_ms,SUM)"), equalTo(0.045))
-                .body(pathToMetricResult("PUT", "percentage(took_ms,SUM)"), equalTo(0.043));
+                .body(pathToMetricResult("GET", "percentage(took_ms,SUM)"), equalTo(0.689713f))
+                .body(pathToMetricResult("DELETE", "percentage(took_ms,SUM)"), equalTo(0.04857759715519431f))
+                .body(pathToMetricResult("POST", "percentage(took_ms,SUM)"), equalTo(0.148501397002794f))
+                .body(pathToMetricResult("PUT", "percentage(took_ms,SUM)"), equalTo(0.11320802641605283f));
     }
 
     private String listToGroovy(Collection<String> strings) {

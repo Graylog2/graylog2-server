@@ -51,6 +51,11 @@ public abstract class Percentage implements SeriesSpec {
     @JsonProperty
     public abstract Optional<String> field();
 
+    @Override
+    public String literal() {
+        return type() + "(" + field().map(Strings::nullToEmpty).orElse("") + "," + strategy().orElse(Strategy.COUNT) + ")";
+    }
+
     public static Builder builder() {
         return new AutoValue_Percentage.Builder().type(Percentage.NAME);
     }
@@ -89,7 +94,7 @@ public abstract class Percentage implements SeriesSpec {
         @Override
         public Percentage build() {
             if (id().isEmpty()) {
-                id(NAME + "()");
+                id(NAME + "(" + field().map(Strings::nullToEmpty).orElse("") + "," + strategy().orElse(Strategy.COUNT) + ")");
             }
 
             if (strategy().filter(Strategy.SUM::equals).isPresent() && field().isEmpty()) {
