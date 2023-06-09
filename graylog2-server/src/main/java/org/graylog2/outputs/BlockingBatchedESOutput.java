@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,13 +60,14 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private final Meter bufferFlushesRequested;
     private final Cluster cluster;
     private final int shutdownTimeoutMs;
-    private final ScheduledExecutorService flushService;
+    private final ScheduledExecutorService daemonScheduler;
 
     private volatile List<Map.Entry<IndexSet, Message>> buffer;
 
     private static final AtomicInteger activeFlushThreads = new AtomicInteger(0);
     private final AtomicLong lastFlushTime = new AtomicLong();
     private final int outputFlushInterval;
+    private ScheduledFuture<?> flushTask;
 
     @Inject
     public BlockingBatchedESOutput(MetricRegistry metricRegistry,
@@ -74,7 +76,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
                                    Journal journal,
                                    MessageQueueAcknowledger acknowledger,
                                    Cluster cluster,
-                                   @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+                                   @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
         super(metricRegistry, messages, journal, acknowledger);
         this.maxBufferSize = serverConfiguration.getOutputBatchSize();
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
@@ -85,7 +87,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
         this.cluster = cluster;
         this.shutdownTimeoutMs = serverConfiguration.getShutdownTimeout();
-        this.flushService = scheduler;
+        this.daemonScheduler = daemonScheduler;
 
         buffer = new ArrayList<>(maxBufferSize);
     }
@@ -166,7 +168,9 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
     @Override
     public void stop() {
-        flushService.shutdown();
+        if (flushTask != null) {
+            flushTask.cancel(false);
+        }
 
         if (cluster.isConnected() && cluster.isDeflectorHealthy()) {
             // Try to flush current batch. Time-limited to avoid blocking shutdown too long.
@@ -189,7 +193,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
     @Override
     public void initialize() throws Exception {
-        flushService.scheduleAtFixedRate(() -> {
+        this.flushTask = daemonScheduler.scheduleAtFixedRate(() -> {
                     try {
                         forceFlushIfTimedout();
                     } catch (Exception e) {
