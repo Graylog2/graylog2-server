@@ -315,6 +315,8 @@ const RuleBuilder = () => {
           <label htmlFor="rule_builder">Rule Builder</label>
           <ConvertButton bsStyle="info"
                          bsSize="small"
+                         title={initialRule ? 'Convert Rule Builder to Source Code' : 'Please Create the Rule first'}
+                         disabled={!initialRule}
                          onClick={() => {
                            sendTelemetry('click', {
                              app_pathname: getBasePathname(pathname),
