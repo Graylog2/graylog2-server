@@ -41,10 +41,10 @@ public class StringConversion extends AbstractFunction<String> {
     private final ParameterDescriptor<String, String> defaultParam;
 
     public StringConversion() {
-        declaringClassCache = new ThreadLocal<LinkedHashMap<Class<?>, Class<?>>>() {
+        declaringClassCache = new ThreadLocal<>() {
             @Override
             protected LinkedHashMap<Class<?>, Class<?>> initialValue() {
-                return new LinkedHashMap<Class<?>, Class<?>>() {
+                return new LinkedHashMap<>() {
                     @Override
                     protected boolean removeEldestEntry(Map.Entry<Class<?>, Class<?>> eldest) {
                         return size() > 1024;
@@ -52,7 +52,7 @@ public class StringConversion extends AbstractFunction<String> {
                 };
             }
         };
-        valueParam = object("value").description("Value to convert").build();
+        valueParam = object("value").description("Value to convert").primary().build();
         defaultParam = string("default").optional().description("Used when 'value' is null, defaults to \"\"").build();
     }
 
@@ -103,6 +103,8 @@ public class StringConversion extends AbstractFunction<String> {
                         defaultParam
                 ))
                 .description("Converts a value to its string representation")
+                .ruleBuilderEnabled()
+                .ruleBuilderTitle("Convert value to string")
                 .build();
     }
 }
