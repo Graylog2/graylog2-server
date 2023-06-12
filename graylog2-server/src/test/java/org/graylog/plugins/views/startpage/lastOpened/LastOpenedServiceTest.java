@@ -95,8 +95,7 @@ public class LastOpenedServiceTest {
         this.grnRegistry = grnRegistry;
         this.lastOpenedService = new LastOpenedService(mongodb.mongoConnection(),
                 mongoJackObjectMapperProvider,
-                new EventBus(),
-                null);
+                new EventBus());
     }
 
     @Test
