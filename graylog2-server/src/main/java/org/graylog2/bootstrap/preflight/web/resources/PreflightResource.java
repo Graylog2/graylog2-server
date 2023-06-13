@@ -22,8 +22,8 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodePreflightConfig;
-import org.graylog2.cluster.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 
 import javax.inject.Inject;
@@ -39,6 +39,8 @@ import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Path(PreflightConstants.API_PREFIX)
 @Produces(MediaType.APPLICATION_JSON)
@@ -56,11 +58,18 @@ public class PreflightResource {
         this.nodePreflightConfigService = nodePreflightConfigService;
     }
 
+    record DataNode(String nodeId, Node.Type type, String transportAddress, NodePreflightConfig.State status, String hostname, String shortNodeId) {}
+
     @GET
     @Path("/data_nodes")
-    public List<Node> listDataNodes() {
+    public List<DataNode> listDataNodes() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        return new ArrayList<>(activeDataNodes.values());
+        final var preflightDataNodes = nodePreflightConfigService.streamAll().collect(Collectors.toMap(NodePreflightConfig::nodeId, Function.identity()));
+
+        return activeDataNodes.values().stream().map(n -> {
+            final var preflight = preflightDataNodes.get(n.getNodeId());
+            return new DataNode(n.getNodeId(), n.getType(), n.getTransportAddress(), preflight != null ? preflight.state() : null, n.getHostname(), n.getShortNodeId());
+        }).collect(Collectors.toList());
     }
 
     @GET

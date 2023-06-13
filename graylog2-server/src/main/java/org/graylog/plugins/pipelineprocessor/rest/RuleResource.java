@@ -138,6 +138,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .source(ruleSource.source())
                 .createdAt(now)
                 .modifiedAt(now)
+                .ruleBuilder(ruleSource.ruleBuilder())
                 .build();
 
         final RuleDao save;
@@ -289,6 +290,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
+                .ruleBuilder(update.ruleBuilder())
                 .build();
 
         final RuleDao savedRule;
@@ -312,12 +314,31 @@ public class RuleResource extends RestResource implements PluginRestResource {
         ruleService.delete(id);
     }
 
-
     @ApiOperation("Get function descriptors")
     @Path("/functions")
     @GET
     public Collection<Object> functionDescriptors() {
         return functionRegistry.all().stream()
+                .map(Function::descriptor)
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("Get function descriptors for rule builder")
+    @Path("/rulebuilder/functions")
+    @GET
+    public Collection<Object> rulebuilderFunctions() {
+        return functionRegistry.all().stream()
+                .filter(f -> f.descriptor().ruleBuilderEnabled())
+                .map(Function::descriptor)
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("Get condition descriptors for ruleBuilder")
+    @Path("/rulebuilder/conditions")
+    @GET
+    public Collection<Object> rulebuilderConditions() {
+        return functionRegistry.all().stream()
+                .filter(f -> f.descriptor().ruleBuilderEnabled() && f.descriptor().returnType().equals(Boolean.class))
                 .map(Function::descriptor)
                 .collect(Collectors.toList());
     }

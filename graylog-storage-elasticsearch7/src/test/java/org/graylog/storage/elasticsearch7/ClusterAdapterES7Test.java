@@ -31,7 +31,6 @@ import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
 import java.util.List;
@@ -115,7 +114,7 @@ class ClusterAdapterES7Test {
 
     @Test
     void testFileDescriptorStats() {
-        doReturn(ImmutableList.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
+        doReturn(List.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
         final Set<NodeFileDescriptorStats> nodeFileDescriptorStats = clusterAdapter.fileDescriptorStats();
 
         assertThat(nodeFileDescriptorStats)
@@ -136,7 +135,7 @@ class ClusterAdapterES7Test {
 
     @Test
     void testDiskUsageStats() {
-        doReturn(ImmutableList.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
+        doReturn(List.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
         final Set<NodeDiskUsageStats> diskUsageStats = clusterAdapter.diskUsageStats();
 
         assertThat(diskUsageStats)

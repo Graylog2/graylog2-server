@@ -21,9 +21,9 @@ import type { Message } from 'views/components/messagelist/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
-import CustomHighlighting from './CustomHighlighting';
 import DecoratedValue from './decoration/DecoratedValue';
 
+import CustomHighlighting from '../highlighting/CustomHighlighting';
 import TypeSpecificValue from '../TypeSpecificValue';
 
 export const MessageWrapper = styled.div`

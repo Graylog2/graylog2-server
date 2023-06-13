@@ -21,8 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { Button, Title, Space, Alert } from 'preflight/components/common';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
-import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
-import useDataNodes from 'preflight/hooks/useDataNodes';
+import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
 
 const onProvisionCertificates = () => fetch(
   'POST',
@@ -37,11 +36,12 @@ const CertificateProvisioning = () => {
 
   const { mutate: provisionCertificates, isLoading } = useMutation(onProvisionCertificates, {
     onSuccess: () => {
-      UserNotification.success('CA provisioned successfully');
-      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+      UserNotification.success('Certificate provisioning successful');
+      queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
     },
     onError: (error) => {
-      UserNotification.error(`CA provisioning failed with error: ${error}`);
+      UserNotification.error(`Certificate provisioning failed with error: ${error}`);
+      queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
     },
   });
 

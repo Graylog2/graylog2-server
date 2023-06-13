@@ -22,10 +22,10 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightAssetsResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
-import org.graylog2.cluster.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoConnection;
@@ -44,9 +44,9 @@ public class PreflightWebModule extends Graylog2Module {
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
-        bind(NodePreflightConfigService.class).asEagerSingleton();
 
-        bind(PreflightConfigService.class);
+        bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
+        bind(PreflightBoot.class).asEagerSingleton();
 
         addPreflightRestResource(PreflightResource.class);
         addPreflightRestResource(PreflightStatusResource.class);
