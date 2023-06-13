@@ -86,7 +86,7 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
         this.secret = passwordSecret.toCharArray();
 
         //TODO: matches line 123 of DataNodePreflightGeneratePeriodical, but both need to be changed
-        this.mongoKeystorePassword = localConfiguration.getDatanodeHttpCertificatePassword() != null ? localConfiguration.getDatanodeHttpCertificatePassword().toCharArray() : secret;
+        this.mongoKeystorePassword = secret;
     }
 
     @Override

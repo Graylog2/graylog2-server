@@ -31,9 +31,9 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoColl
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
 import org.graylog2.cluster.preflight.NodePreflightConfigService;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -111,17 +111,17 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                 try {
                     final Optional<CertificateChain> certificateChain = certMongoStorage.readCertChain(nodeId.getNodeId());
                     if (certificateChain.isPresent()) {
+                        final char[] secret = passwordSecret.toCharArray();
                         KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
                                 certificateChain.get(),
                                 privateKeyEncryptedStorage,
-                                passwordSecret.toCharArray(),
-                                passwordSecret.toCharArray(),
+                                secret,
+                                secret,
                                 CertConstants.DATANODE_KEY_ALIAS
                         );
 
-                        final var password = configuration.getDatanodeHttpCertificatePassword() != null ? configuration.getDatanodeHttpCertificatePassword().toCharArray() : passwordSecret.toCharArray();
                         final KeystoreMongoLocation location = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
-                        keystoreStorage.writeKeyStore(location, nodeKeystore, password, passwordSecret.toCharArray());
+                        keystoreStorage.writeKeyStore(location, nodeKeystore, secret, secret);
 
                         //should be in one transaction, but we miss transactions...
                         nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
