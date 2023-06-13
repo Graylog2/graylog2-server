@@ -188,7 +188,7 @@ class FieldValueCompletion implements Completer {
         suggestions,
       };
 
-      return suggestions.map(({ value, occurrence, title }) => formatSuggestion(value, occurrence, input, isQuoted, title));
+      return suggestions.map(({ value, occurrence, title }: any) => formatSuggestion(value, occurrence, input, isQuoted, title));
     });
   };
 
