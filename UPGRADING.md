@@ -26,3 +26,7 @@ The following REST API changes have been made.
 | Endpoint                                              | Description                               |
 |-------------------------------------------------------|-------------------------------------------|
 | `PUT /example/placeholder`                            | TODO placeholder comment                  |
+
+### Change in base route of Anomaly Detection REST API endpoints
+The base route to anomaly detection REST API endpoints has been changed from
+`/plugins/org.graylog.plugins.securityapp/ad/detectors` to `/plugins/org.graylog.plugins.securityapp.anomaly/detectors`.
