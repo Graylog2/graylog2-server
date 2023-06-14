@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
+import type { DebouncedFunc } from 'lodash';
 import { fireEvent, render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
 import Immutable from 'immutable';
@@ -55,8 +57,7 @@ describe('QuickAccessTimeRangeForm', () => {
       refresh: jest.fn(),
     });
 
-    // @ts-ignore
-    asMock(debounce).mockImplementation((fn) => fn);
+    asMock(debounce as DebouncedFunc<(...args: any) => any>).mockImplementation((fn) => fn);
   });
 
   it('render all items', async () => {

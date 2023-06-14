@@ -59,7 +59,7 @@ const getPassedByLimit = async (quickAccessTimeRange: QuickAccessTimeRange, limi
         return ToolsStore.testNaturalDate((timerange as KeywordTimeRange).keyword, (timerange as KeywordTimeRange).timezone)
           .then((response) => moment().diff(response.from, 'seconds') <= limit);
       default:
-        throw Error('Timerange type doesn\'t not exist');
+        throw Error('Time range type doesn\'t not exist');
     }
   };
 

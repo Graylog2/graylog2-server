@@ -57,7 +57,7 @@ describe('TimeRangeDropdown', () => {
     asMock(debounce).mockImplementation((fn) => fn);
   });
 
-  const getOpenButton = () => screen.findByTitle('Add timerange to quick access timerange list');
+  const getOpenButton = () => screen.findByTitle('Add time range to quick access time range list');
 
   it('shows popover on click', async () => {
     render(
@@ -74,7 +74,7 @@ describe('TimeRangeDropdown', () => {
     await screen.findByText('Add to quick access list');
   });
 
-  it('dont shows alert about duplication when there is no similar timerange', async () => {
+  it('dont shows alert about duplication when there is no similar time range', async () => {
     render(
       <TimeRangeAddToQuickListButton timerange={{
         type: 'relative',
@@ -89,7 +89,7 @@ describe('TimeRangeDropdown', () => {
     await expect(screen.queryByText('You already have similar time range in')).not.toBeInTheDocument();
   });
 
-  it('shows alert about duplication when there is similar timerange', async () => {
+  it('shows alert about duplication when there is similar time range', async () => {
     render(
       <TimeRangeAddToQuickListButton timerange={{
         type: 'relative',
@@ -120,9 +120,9 @@ describe('TimeRangeDropdown', () => {
     descriptionInput.focus();
 
     await suppressConsole(async () => {
-      await fireEvent.change(descriptionInput, { target: { value: 'My new timerange' } });
+      await fireEvent.change(descriptionInput, { target: { value: 'My new time range' } });
 
-      const submitButton = await screen.findByTitle('Add timerange');
+      const submitButton = await screen.findByTitle('Add time range');
       await fireEvent.click(submitButton);
     });
 
@@ -134,7 +134,7 @@ describe('TimeRangeDropdown', () => {
             ...mockSearchClusterConfig.quick_access_timerange_presets,
             {
               id: 'timerange-id',
-              description: 'My new timerange',
+              description: 'My new time range',
               timerange: {
                 type: 'relative',
                 from: 500,
@@ -165,7 +165,7 @@ describe('TimeRangeDropdown', () => {
       await fireEvent.change(descriptionInput, { target: { value: '' } });
     });
 
-    const submitButton = await screen.findByTitle('Add timerange');
+    const submitButton = await screen.findByTitle('Add time range');
 
     await expect(submitButton).toHaveAttribute('disabled');
   });

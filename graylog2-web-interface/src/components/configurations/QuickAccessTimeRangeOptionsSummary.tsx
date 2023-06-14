@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
+import assertUnreachable from 'logic/assertUnreachable';
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 import type {
   KeywordTimeRange,
@@ -54,7 +55,7 @@ export const getTimeRangeValueSummary = (timerange: TimeRange) => {
     case 'keyword':
       return (timerange as KeywordTimeRange).keyword;
     default:
-      throw Error('Timerange type doesn\'t not exist');
+      return assertUnreachable(timerange, 'Timerange type doesn\'t not exist');
   }
 };
 

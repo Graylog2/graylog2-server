@@ -145,21 +145,21 @@ describe('TimeRangeInput', () => {
     expect(screen.queryByRole('button', { name: /open time range preset select/i })).not.toBeInTheDocument();
   });
 
-  it('has no button add timerenge to quick access for non admin users', async () => {
+  it('has no button add time renge to quick access for non admin users', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByText(/search time range/i);
 
-    expect(screen.queryByTitle('Add timerange to quick access timerange list')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Add time range to quick access time range list')).not.toBeInTheDocument();
   });
 
-  it('has button add timerenge to quick access for admin users', async () => {
+  it('has button add time renge to quick access for admin users', async () => {
     asMock(useCurrentUser).mockReturnValue(adminUser);
 
     render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     await fireEvent.click(await screen.findByText(/5 minutes ago/));
-    await screen.findByTitle('Add timerange to quick access timerange list');
+    await screen.findByTitle('Add time range to quick access time range list');
   });
 });

@@ -296,7 +296,7 @@ const SearchesConfig = () => {
                             onCancel={handleModalCancel}
                             submitButtonText="Update configuration">
           <fieldset>
-            <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
+            <label htmlFor="query-limit-checkbox">Query Time Range Limit</label>
             <Input id="query-limit-checkbox"
                    type="checkbox"
                    label="Enable query limit"

@@ -19,6 +19,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Position } from 'react-overlays';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
+import styled from 'styled-components';
 
 import { Button, Input, Popover } from 'components/bootstrap';
 import { Icon, Portal, ModalSubmit } from 'components/common';
@@ -33,6 +34,10 @@ import Routes from 'routing/Routes';
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+
+const StyledModalSubmit = styled(ModalSubmit)`
+margin-top: 15px;
+`;
 
 type Props = {
   addTimerange: (title: string) => void,
@@ -81,7 +86,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
             <i>f.e. ({equalTimerange.description})</i>
           </p>
           )}
-          <ModalSubmit disabledSubmit={!description} submitButtonText="Add timerange" onCancel={toggleModal} onSubmit={onAddTimerange} bsSize="small" />
+          <StyledModalSubmit disabledSubmit={!description} submitButtonText="Add time range" onCancel={toggleModal} onSubmit={onAddTimerange} bsSize="small" />
         </Popover>
       </Position>
     </Portal>
@@ -131,8 +136,8 @@ const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timeran
 
   return (
     <>
-      <Button disabled={!isTimerangeValid} title="Add timerange to quick access timerange list" ref={formTarget} onClick={toggleModal}>
-        <Icon name="plus" />
+      <Button disabled={!isTimerangeValid} title="Add time range to quick access time range list" ref={formTarget} onClick={toggleModal}>
+        <Icon name="floppy-disk" type="regular" />
       </Button>
       {showForm && (
         <TimeRangeAddToQuickListForm addTimerange={addTimerange} toggleModal={toggleModal} target={formTarget.current} equalTimerange={equalTimerange} />

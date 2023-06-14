@@ -151,7 +151,7 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
 
   return (
     <div className="form-group">
-      <strong>Quick Access Timerange Options</strong>
+      <strong>Quick Access Time Range Options</strong>
       <span className="help-block">
         <span>Configure the available options for the <strong>quick access</strong> time range selector</span>
       </span>
