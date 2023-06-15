@@ -124,22 +124,22 @@ const IndexSetsComponent = () => {
   const Toolbar = styled(Row)(({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[90]};
     padding-bottom: 15px;
-  `);
+`);
 
   const GlobalStatsCol = styled(Col)`
     display: flex;
     align-items: center;
     gap: 10px;
-  `;
+`;
 
   const GlobalStats = styled.p`
     margin-bottom: 0;
-  `;
+`;
 
   const StatsInfoText = styled.span(({ theme }: { theme: DefaultTheme }) => css`
     color: ${theme.colors.textAlt};
     font-style: italic;
-  `);
+`);
 
   const statsDisabledText = 'Stats are disabled by default';
 
