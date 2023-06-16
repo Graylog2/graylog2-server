@@ -142,7 +142,7 @@ public class RuleResourceTest {
                 when true
                 then
                    debug("OK");
-                end""", title), null, null);
+                end""", title), null, null, null);
     }
 
     private PipelineDao pipelineDao(String id, String title) {

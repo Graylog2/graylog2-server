@@ -39,7 +39,7 @@ public class DoubleConversion extends AbstractFunction<Double> {
 
     public DoubleConversion() {
         valueParam = object(VALUE).description("Value to convert").build();
-        defaultParam = floating(DEFAULT).optional().description("Used when 'value' is null, defaults to 0").build();
+        defaultParam = floating(DEFAULT).optional().allowNegatives(true).description("Used when 'value' is null, defaults to 0").build();
     }
 
     @Override
