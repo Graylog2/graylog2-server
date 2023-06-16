@@ -43,6 +43,6 @@ public class WatchdogWithProcessInfo extends ExecuteWatchdog {
     }
 
     private static ProcessInformation processInfo(Process p) {
-        return new ProcessInformation(p.pid(), p.isAlive(), p.info().startInstant().orElse(null));
+        return ProcessInformation.create(p);
     }
 }

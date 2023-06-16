@@ -23,4 +23,8 @@ public record ProcessInformation(long pid, boolean alive, Instant started) {
     public static ProcessInformation empty() {
         return new ProcessInformation(-1, false, null);
     }
+
+    public static ProcessInformation create(Process p) {
+        return new ProcessInformation(p.pid(), p.isAlive(), p.info().startInstant().orElse(null));
+    }
 }
