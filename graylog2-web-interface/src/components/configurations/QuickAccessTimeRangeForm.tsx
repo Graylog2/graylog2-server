@@ -99,6 +99,7 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
                      placeholder="Add description..."
                      title="Time range preset description"
                      aria-label="Time range preset description"
+                     required
                      defaultValue={description}
                      onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                      formGroupClassName="" />
