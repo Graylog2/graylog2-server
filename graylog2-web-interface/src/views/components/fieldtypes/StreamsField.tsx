@@ -26,7 +26,7 @@ type Props = {
 
 const StreamsList = styled.span`
   span:not(:last-child)::after {
-    content: ", ";
+    content: ', ';
   }
 `;
 
