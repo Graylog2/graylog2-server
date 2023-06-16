@@ -36,7 +36,7 @@ public class ESSumHandler extends ESPivotSeriesSpecHandler<Sum, org.graylog.shad
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
         record(queryContext, pivot, sumSpec, name, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Sum.class);
-        return List.of(SeriesAggregationBuilder.pivot(sum));
+        return List.of(SeriesAggregationBuilder.metric(sum));
     }
 
     @Override

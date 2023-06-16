@@ -36,7 +36,7 @@ public class ESMinHandler extends ESPivotSeriesSpecHandler<Min, org.graylog.shad
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
         record(queryContext, pivot, minSpec, name, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min.class);
-        return List.of(SeriesAggregationBuilder.pivot(min));
+        return List.of(SeriesAggregationBuilder.metric(min));
     }
 
     @Override

@@ -37,7 +37,7 @@ public class ESAverageHandler extends ESPivotSeriesSpecHandler<Average, Avg> {
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Average avgSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final AvgAggregationBuilder avg = AggregationBuilders.avg(name).field(avgSpec.field());
         record(queryContext, pivot, avgSpec, name, Avg.class);
-        return List.of(SeriesAggregationBuilder.pivot(avg));
+        return List.of(SeriesAggregationBuilder.metric(avg));
     }
 
     @Override

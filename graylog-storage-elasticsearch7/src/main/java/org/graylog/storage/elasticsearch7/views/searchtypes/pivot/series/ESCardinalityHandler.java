@@ -36,7 +36,7 @@ public class ESCardinalityHandler extends ESPivotSeriesSpecHandler<Cardinality, 
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Cardinality cardinalitySpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final CardinalityAggregationBuilder card = AggregationBuilders.cardinality(name).field(cardinalitySpec.field());
         record(queryContext, pivot, cardinalitySpec, name, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Cardinality.class);
-        return List.of(SeriesAggregationBuilder.pivot(card));
+        return List.of(SeriesAggregationBuilder.metric(card));
     }
 
     @Override

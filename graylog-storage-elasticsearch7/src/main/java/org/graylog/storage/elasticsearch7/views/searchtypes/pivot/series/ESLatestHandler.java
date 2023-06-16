@@ -50,7 +50,7 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, ParsedFilt
                         .fetchSource(latestSpec.field(), null)
                         .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
         record(queryContext, pivot, latestSpec, name, ParsedFilter.class);
-        return List.of(SeriesAggregationBuilder.pivot(latest));
+        return List.of(SeriesAggregationBuilder.metric(latest));
     }
 
     @Override

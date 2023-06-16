@@ -37,7 +37,7 @@ public class ESVarianceHandler extends ESPivotSeriesSpecHandler<Variance, Extend
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder variance = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
         record(queryContext, pivot, varianceSpec, name, ExtendedStats.class);
-        return List.of(SeriesAggregationBuilder.pivot(variance));
+        return List.of(SeriesAggregationBuilder.metric(variance));
     }
 
     @Override

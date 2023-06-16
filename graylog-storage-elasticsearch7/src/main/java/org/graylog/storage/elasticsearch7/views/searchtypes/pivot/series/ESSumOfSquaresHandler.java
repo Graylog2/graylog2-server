@@ -37,7 +37,7 @@ public class ESSumOfSquaresHandler extends ESPivotSeriesSpecHandler<SumOfSquares
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, SumOfSquares sumOfSquaresSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder sumOfSquares = AggregationBuilders.extendedStats(name).field(sumOfSquaresSpec.field());
         record(queryContext, pivot, sumOfSquaresSpec, name, ExtendedStats.class);
-        return List.of(SeriesAggregationBuilder.pivot(sumOfSquares));
+        return List.of(SeriesAggregationBuilder.metric(sumOfSquares));
     }
 
     @Override

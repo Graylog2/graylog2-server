@@ -80,7 +80,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // add global rollup series if those were requested
         if (generateRollups) {
             seriesStream(pivot, queryContext, "global rollup")
-                    .filter(result -> Placement.PIVOT.equals(result.placement()))
+                    .filter(result -> Placement.METRIC.equals(result.placement()))
                     .map(SeriesAggregationBuilder::aggregationBuilder)
                     .forEach(searchSourceBuilder::aggregation);
         }
@@ -92,7 +92,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         seriesStream(pivot, queryContext, "metrics")
                 .forEach(result -> {
                     switch (result.placement()) {
-                        case PIVOT -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
+                        case METRIC -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
+                        case ROW -> leafAggregation.subAggregation(result.aggregationBuilder());
                         case ROOT -> {
                             if (!generateRollups) {
                                 searchSourceBuilder.aggregation(result.aggregationBuilder());
@@ -106,9 +107,13 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             final AggregationBuilder columnsRootAggregation = columnsAggregation.root();
             final List<AggregationBuilder> columnMetrics = columnsAggregation.metrics();
             seriesStream(pivot, queryContext, "metrics")
-                    .filter(result -> Placement.PIVOT.equals(result.placement()))
-                    .map(SeriesAggregationBuilder::aggregationBuilder)
-                    .forEach(aggregation -> columnMetrics.forEach(metric -> metric.subAggregation(aggregation)));
+                    .forEach(result -> {
+                        var aggregationBuilder = result.aggregationBuilder();
+                        switch (result.placement()) {
+                            case COLUMN -> columnsRootAggregation.subAggregation(aggregationBuilder);
+                            case METRIC -> columnMetrics.forEach(metric -> metric.subAggregation(aggregationBuilder));
+                        }
+                    });
             if (leafAggregation != null) {
                 leafAggregation.subAggregation(columnsRootAggregation);
             } else {

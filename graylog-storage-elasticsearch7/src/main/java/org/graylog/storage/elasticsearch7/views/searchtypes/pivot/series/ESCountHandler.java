@@ -57,7 +57,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
             // the request was for a field count, we have to add a value_count sub aggregation
             final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
             record(queryContext, pivot, count, name, ValueCount.class);
-            return List.of(SeriesAggregationBuilder.pivot(value));
+            return List.of(SeriesAggregationBuilder.metric(value));
         }
     }
 
