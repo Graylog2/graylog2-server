@@ -64,9 +64,7 @@ const SystemLogsPage = () => {
     history.push(Routes.SYSTEM.NODES.LIST);
   };
 
-  const _isLoading = () => {
-    return !node;
-  };
+  const _isLoading = () => !node;
 
   if (_isLoading()) {
     return <Spinner />;
