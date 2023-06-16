@@ -38,11 +38,8 @@ public class WatchdogWithProcessInfo extends ExecuteWatchdog {
     @NotNull
     public ProcessInformation processInfo() {
         return Optional.ofNullable(process)
-                .map(WatchdogWithProcessInfo::processInfo)
+                .map(ProcessInformation::create)
                 .orElse(ProcessInformation.empty());
     }
 
-    private static ProcessInformation processInfo(Process p) {
-        return ProcessInformation.create(p);
-    }
 }
