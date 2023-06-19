@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.process;
 
-public record DataNodeClusterWideConfig(String test) {
+public record OpensearchInfo(String nodeName, ProcessState state, boolean isLeaderNode, String restBaseUrl, ProcessInformation process) {
 }

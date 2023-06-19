@@ -17,19 +17,18 @@
 package org.graylog.datanode.management;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.graylog.datanode.ProcessProvidingExecutor;
+import org.graylog.datanode.process.ProcessInformation;
+import org.graylog.datanode.process.WatchdogWithProcessInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 
 class CommandLineProcess {
@@ -37,10 +36,7 @@ class CommandLineProcess {
     private final List<String> arguments;
     private final ProcessListener listener;
     private final Environment environment;
-    private final ExecuteWatchdog watchDog;
-
-    private Process process;
-
+    private final WatchdogWithProcessInfo watchDog;
 
     CommandLineProcess(Path executable,
                        List<String> arguments,
@@ -50,44 +46,38 @@ class CommandLineProcess {
         this.arguments = arguments;
         this.listener = listener;
         this.environment = environment;
-        this.watchDog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
+        this.watchDog = new WatchdogWithProcessInfo(ExecuteWatchdog.INFINITE_TIMEOUT);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandLineProcess.class);
 
     public void start() {
-
         LOG.info("Running process from " + executable.toAbsolutePath());
 
         CommandLine cmdLine = new CommandLine(executable.toAbsolutePath().toString());
-
         arguments.forEach(it -> cmdLine.addArgument(it, true));
 
-        ProcessProvidingExecutor executor = new ProcessProvidingExecutor();
-
-        executor.setStreamHandler(new PumpStreamHandler(new LoggingOutputStream(listener::onStdOut), new LoggingOutputStream(listener::onStdErr)));
-        executor.setWatchdog(watchDog);
-
         try {
-            executor.execute(cmdLine, environment.getEnv(), listener);
-            this.process = executor.getProcess().get(30, TimeUnit.SECONDS);
+            createExecutor().execute(cmdLine, environment.getEnv(), listener);
             listener.onStart();
-        } catch (TimeoutException e) {
-            throw new RuntimeException("Failed to obtain process", e);
-        } catch (ExecutionException | InterruptedException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private DefaultExecutor createExecutor() {
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setStreamHandler(new PumpStreamHandler(new LoggingOutputStream(listener::onStdOut), new LoggingOutputStream(listener::onStdErr)));
+        executor.setWatchdog(watchDog);
+        return executor;
     }
 
     public void stop() {
         this.watchDog.destroyProcess();
     }
 
-    /**
-     * "Do not rely on the underlying process if not necessary"
-     */
-    @Deprecated(forRemoval = true)
-    public Optional<Process> getProcess() {
-        return Optional.ofNullable(process);
+    @NotNull
+    public ProcessInformation processInfo() {
+        return watchDog.processInfo();
     }
 }

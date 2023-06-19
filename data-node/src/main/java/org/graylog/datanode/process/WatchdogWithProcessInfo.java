@@ -16,6 +16,30 @@
  */
 package org.graylog.datanode.process;
 
-public record ProcessInfo(long pid, String nodeName, ProcessState status, boolean isLeaderNode, java.time.Instant started, java.time.Duration totalCpuDuration, String user,
-                          String restBaseUrl) {
+import org.apache.commons.exec.ExecuteWatchdog;
+
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
+
+public class WatchdogWithProcessInfo extends ExecuteWatchdog {
+
+    private Process process;
+
+    public WatchdogWithProcessInfo(long timeout) {
+        super(timeout);
+    }
+
+    @Override
+    public synchronized void start(Process processToMonitor) {
+        super.start(processToMonitor);
+        this.process = processToMonitor;
+    }
+
+    @NotNull
+    public ProcessInformation processInfo() {
+        return Optional.ofNullable(process)
+                .map(ProcessInformation::create)
+                .orElse(ProcessInformation.empty());
+    }
+
 }

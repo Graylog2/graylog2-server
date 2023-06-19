@@ -37,7 +37,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
-import static org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION;
 
 
 public class CertificatesService {
@@ -128,14 +127,4 @@ public class CertificatesService {
         return Optional.empty();
     }
 
-    @Deprecated
-    public boolean writeCert(final String nodeId,
-                             final String cert) {
-        return writeCert(new KeystoreMongoLocation(nodeId, DATA_NODE_KEYSTORE_COLLECTION), cert);
-    }
-
-    @Deprecated
-    public Optional<String> readCert(final String nodeId) {
-        return readCert(new KeystoreMongoLocation(nodeId, DATA_NODE_KEYSTORE_COLLECTION));
-    }
 }
