@@ -46,24 +46,30 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
 
     return queries.first()?.id;
   }, [initialQuery, view?.search?.queries]);
-  const initialState = useMemo(() => ({
-    view: {
-      view,
-      isDirty:
-          false,
-      isNew,
-      activeQuery,
-    },
-    searchExecution: {
-      widgetsToSearch: undefined,
-      executionState,
-      isLoading:
-        false,
-      result:
-        undefined,
-    },
-    undoRedo: undoRedoState,
-  }),
+  const initialState = useMemo(() => {
+    const undoRedo = undoRedoState ? {
+      undoRedo: undoRedoState,
+    } : {};
+
+    return ({
+      view: {
+        view,
+        isDirty:
+            false,
+        isNew,
+        activeQuery,
+      },
+      searchExecution: {
+        widgetsToSearch: undefined,
+        executionState,
+        isLoading:
+            false,
+        result:
+          undefined,
+      },
+      ...undoRedo,
+    });
+  },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [executionState, isNew, view]);
   const store = useMemo(() => createStore(reducers, initialState), [initialState, reducers]);
@@ -76,10 +82,7 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
 };
 
 PluggableStoreProvider.defaultProps = {
-  undoRedoState: {
-    buffer: [],
-    currentRevision: 0,
-  },
+  undoRedoState: undefined,
 };
 
 export default PluggableStoreProvider;
