@@ -14,26 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog.datanode.process;
 
-import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.OpensearchInfo;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.apache.commons.exec.ExecuteWatchdog;
 
-import java.net.URI;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
-public interface OpensearchProcess extends ManagableProcess<OpensearchConfiguration> {
+public class WatchdogWithProcessInfo extends ExecuteWatchdog {
 
-    OpensearchInfo processInfo();
+    private Process process;
 
-    Optional<RestHighLevelClient> restClient();
+    public WatchdogWithProcessInfo(long timeout) {
+        super(timeout);
+    }
 
-    boolean isLeaderNode();
-    void setLeaderNode(boolean isManagerNode);
-    List<String> stdOutLogs();
-    List<String> stdErrLogs();
+    @Override
+    public synchronized void start(Process processToMonitor) {
+        super.start(processToMonitor);
+        this.process = processToMonitor;
+    }
 
-    URI getOpensearchBaseUrl();
+    @NotNull
+    public ProcessInformation processInfo() {
+        return Optional.ofNullable(process)
+                .map(ProcessInformation::create)
+                .orElse(ProcessInformation.empty());
+    }
+
 }

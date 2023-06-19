@@ -108,7 +108,7 @@ public class DatanodeSecuritySetupIT {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
-                .retryIfResult(input -> !input.extract().body().path("process.info.status").equals("AVAILABLE"))
+                .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
         retryer.call(() -> RestAssured.given()
