@@ -20,7 +20,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 
 enum Placement {
     ROOT,
-    PIVOT
+    ROW,
+    COLUMN,
+    METRIC
 }
 
 public record SeriesAggregationBuilder(AggregationBuilder aggregationBuilder, Placement placement) {
@@ -28,7 +30,15 @@ public record SeriesAggregationBuilder(AggregationBuilder aggregationBuilder, Pl
         return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROOT);
     }
 
-    public static SeriesAggregationBuilder pivot(AggregationBuilder aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationBuilder, Placement.PIVOT);
+    public static SeriesAggregationBuilder metric(AggregationBuilder aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationBuilder, Placement.METRIC);
+    }
+
+    public static SeriesAggregationBuilder row(AggregationBuilder aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROW);
+    }
+
+    public static SeriesAggregationBuilder column(AggregationBuilder aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationBuilder, Placement.COLUMN);
     }
 }

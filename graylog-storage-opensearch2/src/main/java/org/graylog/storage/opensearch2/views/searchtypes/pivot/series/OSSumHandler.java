@@ -36,7 +36,7 @@ public class OSSumHandler extends OSPivotSeriesSpecHandler<Sum, org.graylog.shad
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
         record(queryContext, pivot, sumSpec, name, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum.class);
-        return List.of(SeriesAggregationBuilder.pivot(sum));
+        return List.of(SeriesAggregationBuilder.metric(sum));
     }
 
     @Override

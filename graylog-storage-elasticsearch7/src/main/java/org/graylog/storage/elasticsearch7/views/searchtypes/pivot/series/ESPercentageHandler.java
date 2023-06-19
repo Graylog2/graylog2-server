@@ -61,7 +61,6 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
         return Stream.concat(
                 aggregation.stream(),
                 aggregation.stream().map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
-                //aggregation.stream().map(r -> SeriesAggregationBuilder.row(r.aggregationBuilder()))
         ).toList();
     }
 

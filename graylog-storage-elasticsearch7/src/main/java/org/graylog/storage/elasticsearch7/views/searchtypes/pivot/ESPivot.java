@@ -160,7 +160,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return BucketSpecHandler.CreatedAggregations.create(root, leaf, metrics);
     }
 
-
     private Stream<SeriesAggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
         return pivot.series()
                 .stream()
@@ -228,7 +227,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         for (BucketSpec bucketSpec : pivots) {
             result = result.flatMap((tuple) -> {
                 final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
-
                 return bucketHandler.extractBuckets(pivot, bucketSpec, tuple);
             });
         }

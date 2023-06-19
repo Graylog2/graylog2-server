@@ -80,7 +80,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         // add global rollup series if those were requested
         if (generateRollups) {
             seriesStream(pivot, queryContext, "global rollup")
-                    .filter(result -> Placement.PIVOT.equals(result.placement()))
+                    .filter(result -> Placement.METRIC.equals(result.placement()))
                     .map(SeriesAggregationBuilder::aggregationBuilder)
                     .forEach(searchSourceBuilder::aggregation);
         }
@@ -92,8 +92,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         seriesStream(pivot, queryContext, "metrics")
                 .forEach(result -> {
                     switch (result.placement()) {
-                        case PIVOT ->
-                                metrics.forEach(metricsAggregation -> metricsAggregation.subAggregation(result.aggregationBuilder()));
+                        case METRIC -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
+                        case ROW -> rootAggregation.subAggregation(result.aggregationBuilder());
                         case ROOT -> {
                             if (!generateRollups) {
                                 rootAggregation.subAggregation(result.aggregationBuilder());
@@ -103,13 +103,18 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                 });
 
         if (!pivot.columnGroups().isEmpty()) {
-            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdColumnsAggregations = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
-            final AggregationBuilder columnsRootAggregation = createdColumnsAggregations.root();
-            final List<AggregationBuilder> columnMetricsAggregations = createdColumnsAggregations.metrics();
+            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
+            final AggregationBuilder columnsRootAggregation = columnsAggregation.root();
+            final AggregationBuilder columnsLeafAggregation = columnsAggregation.leaf();
+            final List<AggregationBuilder> columnMetrics = columnsAggregation.metrics();
             seriesStream(pivot, queryContext, "metrics")
-                    .filter(result -> Placement.PIVOT.equals(result.placement()))
-                    .map(SeriesAggregationBuilder::aggregationBuilder)
-                    .forEach(aggregation -> columnMetricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(aggregation)));
+                    .forEach(result -> {
+                        var aggregationBuilder = result.aggregationBuilder();
+                        switch (result.placement()) {
+                            case COLUMN -> columnsLeafAggregation.subAggregation(aggregationBuilder);
+                            case METRIC -> columnMetrics.forEach(metric -> metric.subAggregation(aggregationBuilder));
+                        }
+                    });
             if (leafAggregation != null) {
                 leafAggregation.subAggregation(columnsRootAggregation);
             } else {
@@ -186,21 +191,22 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         retrieveBuckets(pivot, pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
-                    final ImmutableList<String> keys = tuple.keys();
-                    final MultiBucketsAggregation.Bucket bucket = tuple.bucket();
+                    final ImmutableList<String> rowKeys = tuple.keys();
+                    final MultiBucketsAggregation.Bucket rowBucket = tuple.bucket();
                     final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
-                            .key(keys)
+                            .key(rowKeys)
                             .source("leaf");
                     if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
-                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
                     }
-                    if (!pivot.columnGroups().isEmpty()){
-                        retrieveBuckets(pivot, pivot.columnGroups(), bucket)
+                    if (!pivot.columnGroups().isEmpty()) {
+                        var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
+                        retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
-                                    processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                 });
                     }
                     resultBuilder.addRow(rowBuilder.build());

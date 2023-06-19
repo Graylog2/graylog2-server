@@ -36,7 +36,7 @@ public class OSMaxHandler extends OSPivotSeriesSpecHandler<Max, org.graylog.shad
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
         record(queryContext, pivot, maxSpec, name, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max.class);
-        return List.of(SeriesAggregationBuilder.pivot(max));
+        return List.of(SeriesAggregationBuilder.metric(max));
     }
 
     @Override

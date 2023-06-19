@@ -109,7 +109,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
                                         OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext esGeneratedQueryContext) {
+                                        OSGeneratedQueryContext osGeneratedQueryContext) {
         final long value;
         if (valueCount == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
@@ -122,8 +122,9 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var rootResult = extractNestedSeriesAggregation(pivot, percentage, InitialBucket.create(searchResult), esGeneratedQueryContext);
-        var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, searchTypeHandler, esGeneratedQueryContext);
+        var initialBucket = osGeneratedQueryContext.rowBucket().orElseGet(() -> InitialBucket.create(searchResult));
+        var rootResult = extractNestedSeriesAggregation(pivot, percentage, initialBucket, osGeneratedQueryContext);
+        var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, searchTypeHandler, osGeneratedQueryContext);
 
         return nestedSeriesResult.map(result -> {
                     var totalResult = (Number) result.value();

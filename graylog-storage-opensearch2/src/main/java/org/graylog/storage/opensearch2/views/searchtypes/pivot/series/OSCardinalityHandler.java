@@ -36,7 +36,7 @@ public class OSCardinalityHandler extends OSPivotSeriesSpecHandler<Cardinality, 
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Cardinality cardinalitySpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final CardinalityAggregationBuilder card = AggregationBuilders.cardinality(name).field(cardinalitySpec.field());
         record(queryContext, pivot, cardinalitySpec, name, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Cardinality.class);
-        return List.of(SeriesAggregationBuilder.pivot(card));
+        return List.of(SeriesAggregationBuilder.metric(card));
     }
 
     @Override
