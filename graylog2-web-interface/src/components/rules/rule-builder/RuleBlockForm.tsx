@@ -171,7 +171,7 @@ const RuleBlockForm = ({
                   </SelectedBlockInfo>
 
                   {selectedBlockDict.params.map((param) => (
-                    <Row key={`${order}_${param}`}>
+                    <Row key={`${order}_${param.name}`}>
                       <RuleBlockFormField param={param}
                                           functionName={selectedBlockDict.name}
                                           order={order}
