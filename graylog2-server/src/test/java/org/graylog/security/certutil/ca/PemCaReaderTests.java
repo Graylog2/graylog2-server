@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CACreatorTests {
+public class PemCaReaderTests {
     static final String rsaKey1 = """
             -----BEGIN RSA PRIVATE KEY-----
             MIICXAIBAAKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0FPqri0cb2JZfXJ/DgYSF6vUp
@@ -51,15 +51,15 @@ public class CACreatorTests {
 
     @Test
     public void decodeRsaPk1() {
-        var caCreator = new CACreator();
-        var pk = caCreator.readPrivateKey(rsaKey1, null);
+        var pemCaReader = new PemCaReader();
+        var pk = pemCaReader.readPrivateKey(rsaKey1, null);
         assertThat(pk).isNotEmpty();
     }
 
     @Test
     public void decodeRsaPk2() {
-        var caCreator = new CACreator();
-        var pk = caCreator.readPrivateKey(rsaKey2, null);
+        var pemCaReader = new PemCaReader();
+        var pk = pemCaReader.readPrivateKey(rsaKey2, null);
         assertThat(pk).isNotEmpty();
     }
 }
