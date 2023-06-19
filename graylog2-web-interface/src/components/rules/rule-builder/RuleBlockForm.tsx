@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Formik } from 'formik';
+import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Select } from 'components/common';
@@ -144,8 +144,8 @@ const RuleBlockForm = ({
       <Col md={12}>
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
         <Formik enableReinitialize onSubmit={handleSubmit} initialValues={initialValues}>
-          {({ resetForm, setFieldValue }) => (
-            <Form>
+          {({ resetForm, setFieldValue, values }) => (
+            <div>
               <Row>
                 <Col md={12}>
                   <Select id="existingBlock-select"
@@ -183,11 +183,13 @@ const RuleBlockForm = ({
 
                   <FormSubmit bsSize="small"
                               submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
+                              submitButtonType="button"
+                              onSubmit={() => handleSubmit(values)}
                               onCancel={() => { resetForm(); onCancel(); }} />
 
                 </SelectedBlock>
               )}
-            </Form>
+            </div>
           )}
         </Formik>
         <Errors objectWithErrors={existingBlock} />
