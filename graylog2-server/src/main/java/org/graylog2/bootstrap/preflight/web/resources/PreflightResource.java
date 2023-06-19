@@ -32,6 +32,7 @@ import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -55,14 +56,17 @@ public class PreflightResource {
     private final NodeService nodeService;
     private final NodePreflightConfigService nodePreflightConfigService;
     private final CaService caService;
+    private final String passwordSecret;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final NodePreflightConfigService nodePreflightConfigService,
-                             final CaService caService) {
+                             final CaService caService,
+                             final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.caService = caService;
+        this.passwordSecret = passwordSecret;
     }
 
     record DataNode(String nodeId, Node.Type type, String transportAddress, NodePreflightConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
@@ -90,7 +94,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void createCA() throws CACreationException, KeyStoreStorageException {
         // TODO: get validity from preflight UI
-        caService.create(CaService.DEFAULT_VALIDITY, null);
+        caService.create(CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
     }
 
     @POST
