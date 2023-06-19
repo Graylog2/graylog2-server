@@ -96,7 +96,6 @@ public class FavoriteServiceTest {
                 new EventBus(),
                 mongoJackObjectMapperProvider,
                 null,
-                null,
                 grnRegistry);
     }
 
