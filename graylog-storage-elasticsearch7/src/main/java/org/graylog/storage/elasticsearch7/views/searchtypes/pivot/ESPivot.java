@@ -93,7 +93,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .forEach(result -> {
                     switch (result.placement()) {
                         case METRIC -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
-                        case ROW -> leafAggregation.subAggregation(result.aggregationBuilder());
+                        case ROW -> rootAggregation.subAggregation(result.aggregationBuilder());
                         case ROOT -> {
                             if (!generateRollups) {
                                 searchSourceBuilder.aggregation(result.aggregationBuilder());
@@ -105,12 +105,13 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         if (!pivot.columnGroups().isEmpty()) {
             final BucketSpecHandler.CreatedAggregations<AggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
             final AggregationBuilder columnsRootAggregation = columnsAggregation.root();
+            final AggregationBuilder columnsLeafAggregation = columnsAggregation.leaf();
             final List<AggregationBuilder> columnMetrics = columnsAggregation.metrics();
             seriesStream(pivot, queryContext, "metrics")
                     .forEach(result -> {
                         var aggregationBuilder = result.aggregationBuilder();
                         switch (result.placement()) {
-                            case COLUMN -> columnsRootAggregation.subAggregation(aggregationBuilder);
+                            case COLUMN -> columnsLeafAggregation.subAggregation(aggregationBuilder);
                             case METRIC -> columnMetrics.forEach(metric -> metric.subAggregation(aggregationBuilder));
                         }
                     });
@@ -191,21 +192,22 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         retrieveBuckets(pivot, pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
-                    final ImmutableList<String> keys = tuple.keys();
-                    final MultiBucketsAggregation.Bucket bucket = tuple.bucket();
+                    final ImmutableList<String> rowKeys = tuple.keys();
+                    final MultiBucketsAggregation.Bucket rowBucket = tuple.bucket();
                     final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
-                            .key(keys)
+                            .key(rowKeys)
                             .source("leaf");
                     if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
-                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
                     }
-                    if (!pivot.columnGroups().isEmpty()){
-                        retrieveBuckets(pivot, pivot.columnGroups(), bucket)
+                    if (!pivot.columnGroups().isEmpty()) {
+                        var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
+                        retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
-                                    processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                 });
                     }
                     resultBuilder.addRow(rowBuilder.build());

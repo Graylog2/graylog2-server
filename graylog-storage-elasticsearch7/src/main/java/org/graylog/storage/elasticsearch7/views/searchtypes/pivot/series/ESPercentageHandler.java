@@ -59,9 +59,9 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentage percentage, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         var aggregation = createNestedSeriesAggregation(name, pivot, percentage, searchTypeHandler, queryContext);
         return Stream.concat(
-                Stream.concat(aggregation.stream(),
-                        aggregation.stream().map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))),
-                aggregation.stream().map(r -> SeriesAggregationBuilder.column(r.aggregationBuilder()))
+                aggregation.stream(),
+                aggregation.stream().map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
+                //aggregation.stream().map(r -> SeriesAggregationBuilder.row(r.aggregationBuilder()))
         ).toList();
     }
 
@@ -123,7 +123,8 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var rootResult = extractNestedSeriesAggregation(pivot, percentage, InitialBucket.create(searchResult), esGeneratedQueryContext);
+        var initialBucket = esGeneratedQueryContext.rowBucket().orElseGet(() -> InitialBucket.create(searchResult));
+        var rootResult = extractNestedSeriesAggregation(pivot, percentage, initialBucket, esGeneratedQueryContext);
         var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, searchTypeHandler, esGeneratedQueryContext);
 
         return nestedSeriesResult.map(result -> {
