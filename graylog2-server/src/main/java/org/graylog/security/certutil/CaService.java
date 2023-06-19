@@ -57,8 +57,8 @@ public class CaService {
     private static final Logger LOG = LoggerFactory.getLogger(CaService.class);
     public static int DEFAULT_VALIDITY = 10 * 365;
     private final SmartKeystoreStorage keystoreStorage;
-    private final KeystoreMongoLocation keystoreMongoLocation;
-    private final KeystoreFileLocation keystoreFileLocation;
+    private final KeystoreMongoLocation mongoDbCaLocation;
+    private final KeystoreFileLocation manuallyProvidedCALocation;
     private final NodeId nodeId;
     private final CACreator caCreator;
     private final CaConfiguration configuration;
@@ -75,19 +75,24 @@ public class CaService {
         this.caCreator = caCreator;
         this.configuration = configuration;
         this.passwordSecret = configuration.getCaPassword() != null ? configuration.getCaPassword() : passwordSecret;
-        this.keystoreMongoLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
-        this.keystoreFileLocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
+        this.mongoDbCaLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
+        this.manuallyProvidedCALocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
     }
 
-    private boolean configuredCaExists() {
+    /**
+     * If the config options in the config file are filled, it exists (if it doesn't exist, it's an error)
+     *
+     * @return if a CA has been configured in graylog.conf
+     */
+    private boolean configuredCaInConfExists() {
         return configuration.getCaKeystoreFile() != null && Files.exists(configuration.getCaKeystoreFile());
     }
 
     public CA get() throws KeyStoreStorageException {
-        if(configuredCaExists()) {
+        if(configuredCaInConfExists()) {
             return new CA("local CA", CAType.LOCAL);
         } else {
-            var keystore = keystoreStorage.readKeyStore(keystoreMongoLocation, passwordSecret.toCharArray());
+            var keystore = keystoreStorage.readKeyStore(mongoDbCaLocation, passwordSecret.toCharArray());
             return keystore.map(c -> new CA(nodeId.getNodeId(), CAType.GENERATED)).orElse(null);
         }
     }
@@ -95,7 +100,7 @@ public class CaService {
     public void create(final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {
         final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
         KeyStore keyStore = caCreator.createCA(passwordSecret.toCharArray(), certificateValidity);
-        keystoreStorage.writeKeyStore(keystoreMongoLocation, keyStore, passwordSecret.toCharArray(), password);
+        keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, passwordSecret.toCharArray(), password);
         LOG.debug("Generated a new CA.");
     }
 
@@ -117,7 +122,7 @@ public class CaService {
                     keyStore.load(bais, password);
                 }
             }
-            keystoreStorage.writeKeyStore(keystoreMongoLocation, keyStore, password, passwordSecret.toCharArray());
+            keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, password, passwordSecret.toCharArray());
        } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
                 KeyStoreException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
@@ -130,6 +135,6 @@ public class CaService {
     }
 
     public Optional<KeyStore> loadKeyStore(char[] password) throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
-        return keystoreStorage.readKeyStore(configuredCaExists() ? keystoreFileLocation : keystoreMongoLocation, password);
+        return keystoreStorage.readKeyStore(configuredCaInConfExists() ? manuallyProvidedCALocation : mongoDbCaLocation, password);
      }
 }
