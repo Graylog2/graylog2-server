@@ -18,13 +18,14 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 import connect from 'stores/connect';
+import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsActions, StreamsStore } from 'views/stores/StreamsStore';
 
 import StreamsContext from './StreamsContext';
 
 type Props = {
   children: React.ReactElement,
-  streams: Array<any> | undefined | null,
+  streams: Array<Stream> | undefined | null,
 };
 
 const StreamsProvider = ({ children, streams }: Props) => {

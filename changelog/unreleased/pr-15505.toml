@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Do not extend session when fetching indexer cluster health."
+
+pulls = ["15505"]
+

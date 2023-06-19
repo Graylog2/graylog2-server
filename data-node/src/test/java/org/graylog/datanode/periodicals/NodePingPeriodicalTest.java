@@ -36,7 +36,7 @@ class NodePingPeriodicalTest {
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
-                uri,
+                () -> uri,
                 () -> true
         );
 
@@ -62,7 +62,7 @@ class NodePingPeriodicalTest {
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
-                uri,
+                () -> uri,
                 () -> true
         );
 

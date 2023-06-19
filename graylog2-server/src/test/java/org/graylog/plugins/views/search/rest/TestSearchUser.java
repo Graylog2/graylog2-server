@@ -29,7 +29,6 @@ import java.util.function.Consumer;
 
 import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
-import static org.mockito.Mockito.when;
 
 public class TestSearchUser {
 
@@ -49,6 +48,11 @@ public class TestSearchUser {
     public TestSearchUser allowStream(String streamId) {
         this.permissions.put(STREAMS_READ + ":" + streamId, true);
         this.knownStreams.add(streamId);
+        return this;
+    }
+
+    public TestSearchUser allowNodeRead(String nodeId) {
+        this.permissions.put("nodes:read:" + nodeId, true);
         return this;
     }
 

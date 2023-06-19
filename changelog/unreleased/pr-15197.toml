@@ -1,0 +1,5 @@
+type = "a"
+message = "Datanode autodiscovery, indexer hosts refactoring, preflight startup logic implemented"
+
+pulls = ["15197", "graylog-plugin-enterprise#5101"]
+

@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.Test;
@@ -147,6 +148,15 @@ public class SearchTest {
                 .hasSize(5)
                 .contains("a", "b", "x", "y", "z");
 
+    }
+
+    @Test
+    void exportingToContentPackEntityKeepsOrderOfQueries() {
+        var search = Search.builder().queries(queriesWithSearchTypes("one", "two", "three", "for", "five", "six", "seven")).build();
+        var queryIdsBefore = search.queries().stream().map(Query::id).toList();
+        var contentPackSearch = search.toContentPackEntity(null);
+        var queryIdsAfter = contentPackSearch.queries().stream().map(QueryEntity::id).toList();
+        assertThat(queryIdsAfter).isEqualTo(queryIdsBefore);
     }
 
     private Set<String> searchTypeIdsFrom(Search search) {

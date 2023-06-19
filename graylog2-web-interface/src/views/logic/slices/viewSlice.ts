@@ -138,10 +138,14 @@ export const updateView = (newView: View, recreateSearch: boolean = false) => as
 export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
   const { search } = view;
+  const newSearch = search.toBuilder()
+    .newId()
+    .queries(newQueries)
+    .build();
+
+  const searchAfterSave = await createSearch(newSearch);
   const newView = view.toBuilder()
-    .search(search.toBuilder()
-      .queries(newQueries)
-      .build())
+    .search(searchAfterSave)
     .build();
 
   return dispatch(updateView(newView));
@@ -273,7 +277,7 @@ export const updateQueryString = (queryId: string, newQueryString: string) => (d
     return dispatch(setQueryString(queryId, newQueryString));
   }
 
-  return dispatch(setGlobalOverrideQuery(newQueryString));
+  return dispatch(setGlobalOverrideQuery(newQueryString)).then(() => dispatch(execute()));
 };
 
 export const updateViewState = (id: QueryId, newViewState: ViewStateType) => (dispatch: AppDispatch, getState: () => RootState) => {

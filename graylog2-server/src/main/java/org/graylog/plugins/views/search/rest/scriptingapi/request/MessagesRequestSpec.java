@@ -16,17 +16,13 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseEntryDataType;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,14 +70,17 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
 
     }
 
-    @JsonIgnore
-    public List<ResponseSchemaEntry> getSchema(final Map<String, String> fieldTypes) {
-        return fields()
-                .stream()
-                .map(field -> {
-                    final String type = fieldTypes.getOrDefault(field, null);
-                    return ResponseSchemaEntry.field(field, ResponseEntryDataType.fromSearchEngineType(type));
-                })
-                .collect(Collectors.toList());
+    @Deprecated
+    @Override
+    public List<String> fields() {
+        return fieldNames();
+    }
+
+    public List<RequestedField> requestedFields() {
+        return fields.stream().map(RequestedField::parse).collect(Collectors.toList());
+    }
+
+    public List<String> fieldNames() {
+        return requestedFields().stream().map(RequestedField::name).collect(Collectors.toList());
     }
 }

@@ -34,9 +34,9 @@ public class Substring extends AbstractFunction<String> {
     private final ParameterDescriptor<Long, Long> endParam;
 
     public Substring() {
-        valueParam = ParameterDescriptor.string("value").description("The string to extract from").build();
-        startParam = ParameterDescriptor.integer("start").description("The position to start from, negative means count back from the end of the String by this many characters").build();
-        endParam = ParameterDescriptor.integer("end").optional().description("The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string").build();
+        valueParam = ParameterDescriptor.string("value").description("The string to extract from").primary().build();
+        startParam = ParameterDescriptor.integer("start").allowNegatives(true).description("The position to start from, negative means count back from the end of the String by this many characters").build();
+        endParam = ParameterDescriptor.integer("indexEnd").optional().allowNegatives(true).description("The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string").build();
     }
 
     @Override
@@ -63,6 +63,8 @@ public class Substring extends AbstractFunction<String> {
                         endParam
                 ))
                 .description("Extract a substring from a string")
+                .ruleBuilderEnabled()
+                .ruleBuilderTitle("Get substring from '${start}' to '${end!\"end\"}' of value")
                 .build();
     }
 }

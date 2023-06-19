@@ -51,7 +51,7 @@ describe('NewSearchPage', () => {
     relative: '300',
   };
   const SimpleNewSearchPage = () => (
-    <StreamsContext.Provider value={[{}]}>
+    <StreamsContext.Provider value={[{ id: 'stream1', title: 'Stream 1' }]}>
       <NewSearchPage />
     </StreamsContext.Provider>
   );

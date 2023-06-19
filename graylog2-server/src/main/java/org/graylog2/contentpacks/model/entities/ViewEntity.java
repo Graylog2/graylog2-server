@@ -178,9 +178,7 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
                 .properties(this.properties())
                 .createdAt(this.createdAt())
                 .requires(this.requires());
-        if (this.owner().isPresent()) {
-            viewBuilder.owner(this.owner().get());
-        }
+        this.owner().ifPresent(viewBuilder::owner);
         return viewBuilder;
     }
 }

@@ -18,6 +18,7 @@ package org.graylog.failure;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.graylog2.Configuration;
@@ -26,11 +27,10 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -67,7 +67,7 @@ public class FailureHandlingServiceTest {
         final FailureHandler fallbackIndexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackIndexingFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
+                Set.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
 
         underTest.startAsync();
         underTest.awaitRunning();
@@ -273,7 +273,7 @@ public class FailureHandlingServiceTest {
     }
 
     private FailureBatch indexingFailureBatch(IndexingFailure indexingFailure) {
-        return FailureBatch.indexingFailureBatch(ImmutableList.of(indexingFailure));
+        return FailureBatch.indexingFailureBatch(List.of(indexingFailure));
     }
 
     private FailureBatch processingFailureBatch(ProcessingFailure... processingFailure) {

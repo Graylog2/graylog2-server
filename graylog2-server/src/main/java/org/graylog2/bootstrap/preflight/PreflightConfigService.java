@@ -16,34 +16,12 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.google.common.collect.ImmutableMap;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.ValidationException;
 
-import javax.inject.Inject;
 import java.util.Optional;
 
-public class PreflightConfigService extends PersistedServiceImpl {
+public interface PreflightConfigService {
+    Optional<PreflightConfig> getPersistedConfig();
 
-    @Inject
-    public PreflightConfigService(MongoConnection connection) {
-        super(connection);
-    }
-
-    public Optional<PreflightConfig> getPersistedConfig() {
-        final DBObject doc = findOne(PreflightConfig.class, new BasicDBObject());
-        return Optional.ofNullable(doc)
-                .map(o -> new PreflightConfig((ObjectId) o.get("_id"), o.toMap()));
-    }
-
-    public PreflightConfig saveConfiguration() throws ValidationException {
-        final ImmutableMap<String, Object> fields = ImmutableMap.of("finished", true);
-        final PreflightConfig config = new PreflightConfig(fields);
-        final String id = save(config);
-        return getPersistedConfig().orElseThrow(() -> new IllegalStateException("Failed to obtain configuration that was just stored"));
-    }
+    PreflightConfig saveConfiguration() throws ValidationException;
 }

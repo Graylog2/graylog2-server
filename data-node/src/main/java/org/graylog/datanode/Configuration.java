@@ -83,8 +83,11 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_config_location")
     private String opensearchConfigLocation = "config";
 
+    @Parameter(value = "config_location")
+    private String configLocation;
+
     @Parameter(value = "process_logs_buffer_size")
-    private Integer logs = 500;
+    private Integer opensearchProcessLogsBufferSize = 500;
 
 
     @Parameter(value = "node_name")
@@ -107,13 +110,13 @@ public class Configuration extends BaseConfiguration {
     private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
 
     @Parameter(value = "transport_certificate_password")
-    private String datanodeTransportCertificatePassword = null;
+    private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = "datanode-http-certificates.p12";
 
     @Parameter(value = "http_certificate_password")
-    private String datanodeHttpCertificatePassword = null;
+    private String datanodeHttpCertificatePassword;
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
@@ -156,6 +159,10 @@ public class Configuration extends BaseConfiguration {
         return opensearchConfigLocation;
     }
 
+    public String getConfigLocation() {
+        return configLocation;
+    }
+
     public String getOpensearchDataLocation() {
         return opensearchDataLocation;
     }
@@ -165,7 +172,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public Integer getProcessLogsBufferSize() {
-        return logs;
+        return opensearchProcessLogsBufferSize;
     }
 
     @Parameter(value = "rest_api_username")

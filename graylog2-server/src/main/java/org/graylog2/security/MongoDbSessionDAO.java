@@ -78,19 +78,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
             // expired session or it was never there to begin with
             return null;
         }
-        return getSimpleSession(sessionId, dbSession);
-    }
-
-    private SimpleSession getSimpleSession(Serializable sessionId, MongoDbSession dbSession) {
-        final SimpleSession session = new SimpleSession();
-        assignSessionId(session, sessionId);
-        session.setHost(dbSession.getHost());
-        session.setTimeout(dbSession.getTimeout());
-        session.setStartTimestamp(dbSession.getStartTimestamp());
-        session.setLastAccessTime(dbSession.getLastAccessTime());
-        session.setExpired(dbSession.isExpired());
-        session.setAttributes(dbSession.getAttributes());
-        return session;
+        return mongoDBSessionService.daoToSimpleSession(dbSession);
     }
 
     @Override
@@ -153,7 +141,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         Collection<MongoDbSession> dbSessions = mongoDBSessionService.loadAll();
         List<Session> sessions = Lists.newArrayList();
         for (MongoDbSession dbSession : dbSessions) {
-            sessions.add(getSimpleSession(dbSession.getSessionId(), dbSession));
+            sessions.add(mongoDBSessionService.daoToSimpleSession(dbSession));
         }
 
         return sessions;

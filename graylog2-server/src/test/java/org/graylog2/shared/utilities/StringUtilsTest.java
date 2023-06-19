@@ -18,10 +18,9 @@ package org.graylog2.shared.utilities;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,17 +47,17 @@ public class StringUtilsTest {
                 .isInstanceOf(Set.class)
                 .isEmpty();
 
-        Assertions.assertThat(StringUtils.splitByComma(ImmutableList.of("one", "two,three,", "", " ")))
+        Assertions.assertThat(StringUtils.splitByComma(List.of("one", "two,three,", "", " ")))
                 .hasSize(3)
                 .containsExactlyInAnyOrder("one", "two", "three");
 
 
-        Assertions.assertThat(StringUtils.splitByComma(ImmutableList.of("one", "two,three")))
+        Assertions.assertThat(StringUtils.splitByComma(List.of("one", "two,three")))
                 .hasSize(3)
                 .containsExactlyInAnyOrder("one", "two", "three");
 
 
-        Assertions.assertThat(StringUtils.splitByComma(ImmutableSet.of("one", "two,three")))
+        Assertions.assertThat(StringUtils.splitByComma(List.of("one", "two,three")))
                 .hasSize(3)
                 .containsExactlyInAnyOrder("one", "two", "three");
 

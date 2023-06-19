@@ -26,7 +26,7 @@ const ExpandedSectionsProvider = ({ children }: { children: React.ReactNode }): 
   const toggleSection = useCallback((entityId: string, sectionName: string) => setExpandedSections((cur) => {
     const newCur = { ...cur ?? {} };
 
-    if (newCur[entityId]?.includes('rules')) {
+    if (newCur[entityId]?.includes(sectionName)) {
       const newSections = newCur[entityId].filter((section) => section !== sectionName);
 
       if (newSections.length === 0) {

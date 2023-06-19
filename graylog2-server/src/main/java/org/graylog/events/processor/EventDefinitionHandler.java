@@ -192,6 +192,7 @@ public class EventDefinitionHandler {
 
         getJobDefinition(eventDefinition)
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
+        eventDefinitionService.updateState(eventDefinitionId, EventDefinition.State.DISABLED);
     }
 
     /**
@@ -267,6 +268,7 @@ public class EventDefinitionHandler {
     private void createJobDefinitionAndTriggerIfScheduledType(EventDefinitionDto eventDefinition) {
         getJobSchedulerConfig(eventDefinition)
                 .ifPresent(schedulerConfig -> createJobDefinitionAndTrigger(eventDefinition, schedulerConfig));
+        eventDefinitionService.updateState(eventDefinition.id(), EventDefinition.State.ENABLED);
     }
 
     private Optional<JobDefinitionDto> getJobDefinition(EventDefinitionDto eventDefinition) {

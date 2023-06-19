@@ -16,7 +16,7 @@
  */
 package org.graylog.security.certutil.csr.storage;
 
-import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 import java.io.IOException;
@@ -24,8 +24,8 @@ import java.io.IOException;
 public interface CsrStorage {
 
     void writeCsr(PKCS10CertificationRequest csr)
-            throws IOException, OperatorCreationException;
+            throws IOException, OperatorException;
 
     PKCS10CertificationRequest readCsr()
-            throws IOException, OperatorCreationException;
+            throws IOException, OperatorException;
 }

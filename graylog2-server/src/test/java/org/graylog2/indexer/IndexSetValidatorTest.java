@@ -216,6 +216,37 @@ public class IndexSetValidatorTest {
     }
 
     @Test
+    public void timeBasedSizeOptimizingHonorsFixedLeeWay() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway()).thenReturn(Period.days(10));
+
+        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
+        final IndexSetConfig failingConfig = testIndexSetConfig().toBuilder()
+                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
+                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                        .indexLifetimeMin(Period.days(10))
+                        .indexLifetimeMax(Period.days(19))
+                        .build()
+                )
+                .build();
+
+        assertThat(validator.validate(failingConfig)).hasValueSatisfying(v -> assertThat(v.message())
+                .contains("The duration between index_lifetime_max and index_lifetime_min <P9D> " +
+                        "cannot be shorter than time_size_optimizing_retention_fixed_leeway <P10D>"));
+
+        final IndexSetConfig successfullConfig = testIndexSetConfig().toBuilder()
+                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
+                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                        .indexLifetimeMin(Period.days(10))
+                        .indexLifetimeMax(Period.days(20))
+                        .build()
+                )
+                .build();
+
+        assertThat(validator.validate(successfullConfig)).isEmpty();
+    }
+
+    @Test
     public void validateIndexAction() {
         final String prefix = "graylog_index";
         final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);

@@ -106,7 +106,7 @@ describe('Create a new dashboard', () => {
     <DefaultProviders>
       <DefaultQueryClientProvider>
         <CurrentUserProvider>
-          <StreamsContext.Provider value={[{ id: 'stream-1' }]}>
+          <StreamsContext.Provider value={[{ id: 'stream-1', title: 'Stream 1' }]}>
             <AppRouter />
           </StreamsContext.Provider>
         </CurrentUserProvider>

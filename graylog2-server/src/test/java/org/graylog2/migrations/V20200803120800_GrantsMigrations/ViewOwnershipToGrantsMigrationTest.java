@@ -16,7 +16,6 @@
  */
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
@@ -32,7 +31,9 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
+import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -65,7 +66,6 @@ class ViewOwnershipToGrantsMigrationTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider objectMapperProvider,
-               ObjectMapper mapper,
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
@@ -75,7 +75,8 @@ class ViewOwnershipToGrantsMigrationTest {
         this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
-        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, mapper, clusterConfigService, entityOwnershipService, viewSummaryService);
+        final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongodb.mongoConnection());
+        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService, viewSummaryService, mongoCollections);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -136,11 +137,11 @@ class ViewOwnershipToGrantsMigrationTest {
     public static class TestViewService extends ViewService {
         public TestViewService(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                               ObjectMapper mapper,
                                ClusterConfigService clusterConfigService,
                                EntityOwnershipService entityOwnerShipService,
-                               ViewSummaryService viewSummaryService) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService);
+                               ViewSummaryService viewSummaryService,
+                               MongoCollections mongoCollections) {
+            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService, mongoCollections);
         }
     }
 }

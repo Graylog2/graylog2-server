@@ -7,6 +7,7 @@ exports[`EventHandler convert should convert events to chart data and shapes 1`]
     "mode": "markers",
     "name": "Alerts",
     "opacity": 0.5,
+    "originalName": "Alerts",
     "text": [
       "This is a emergency. Please stay calm.",
     ],

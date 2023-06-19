@@ -20,6 +20,7 @@ import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { isValidDate } from 'util/DateTime';
 
 type TimeFormatter = (time: DateTime, format?: DateTimeFormats) => string;
+export type KeyMapper = (key: Key, field: string) => Key;
 
 const transformKey = (key: Key, indices: Array<number>, formatTimestamp: TimeFormatter) => {
   if (indices.length === 0) {

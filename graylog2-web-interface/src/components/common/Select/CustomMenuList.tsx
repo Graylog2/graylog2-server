@@ -16,7 +16,7 @@
  */
 import React, { useRef, useCallback, useEffect } from 'react';
 import { components as Components } from 'react-select';
-import type { Props } from 'react-select/creatable';
+import type { MenuListProps } from 'react-select';
 import { VariableSizeList as List } from 'react-window';
 import styled from 'styled-components';
 
@@ -51,7 +51,13 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
   );
 };
 
-export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { listRef?: any}) => {
+type WindowListProps = Partial<MenuListProps> & {
+  listRef?: any,
+  children: Array<React.ReactNode>,
+  onItemsRendered?: () => void
+}
+
+export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
   const containerRef = useRef(null);
   const vListRef = useRef(null);
   const sizeMap = useRef({});
@@ -97,14 +103,16 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { li
 
 WindowList.defaultProps = {
   listRef: undefined,
+  onItemsRendered: undefined,
 };
 
-const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
+const CustomMenuList = ({ children, innerProps, ...rest }: Partial<MenuListProps> & { children: Array<React.ReactNode> }) => {
   if (!children?.length || (children.length < REACT_SELECT_MAX_OPTIONS_LENGTH)) {
     return (
       <Components.MenuList {...rest}
                            innerProps={{
                              ...innerProps,
+                             // @ts-ignore
                              'data-testid': 'react-select-list',
                            }}>
         {children}
@@ -113,10 +121,6 @@ const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
   }
 
   return <WindowList>{children}</WindowList>;
-};
-
-CustomMenuList.defaultProps = {
-  innerProps: {},
 };
 
 export default CustomMenuList;

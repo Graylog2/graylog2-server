@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-import com.revinate.assertj.json.JsonPathAssert;
+import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;

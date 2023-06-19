@@ -2,6 +2,7 @@
     {
        "type":"heatmap",
        "name":"XYZ Chart",
+       "originalName":"XYZ Chart",
        "x":[
           "00",
           "01",
@@ -10,21 +11,21 @@
           "04"
        ],
        "y":[
-          "100-count()",
-          "304-count()",
-          "203-count()",
-          "204-count()",
+          "100⸱count()",
+          "304⸱count()",
+          "203⸱count()",
+          "204⸱count()",
           "count()",
-          "405-count()",
-          "201-count()",
-          "500-count()",
-          "406-count()",
-          "416-count()",
-          "503-count()",
-          "400-count()",
-          "205-count()",
-          "401-count()",
-          "200-count()"
+          "405⸱count()",
+          "201⸱count()",
+          "500⸱count()",
+          "406⸱count()",
+          "416⸱count()",
+          "503⸱count()",
+          "400⸱count()",
+          "205⸱count()",
+          "401⸱count()",
+          "200⸱count()"
        ],
        "z":[
           [
