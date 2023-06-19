@@ -158,7 +158,7 @@ public class ClusterConfigResource extends RestResource {
         try {
             object = objectMapper.readValue(body, cls);
         } catch (Exception e) {
-            final String msg = "Couldn't parse cluster configuration \"" + configClass + "\".";
+            final String msg = "Couldn't parse cluster configuration \"" + configClass + "\". The problem was : " + e.getMessage();
             LOG.error(msg, e);
             throw new BadRequestException(msg);
         }

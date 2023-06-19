@@ -14,20 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+package org.graylog2.indexer.searches.timerangepresets.conversion;
 
-import { useStore } from 'stores/connect';
-import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
-import type { SearchesConfig } from 'components/search/SearchConfig';
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.joda.time.Period;
 
-const useSearchConfiguration = (): { config: SearchesConfig, refresh: () => void} => {
-  const { searchesClusterConfig } = useStore(SearchConfigStore);
+import java.util.function.Function;
 
-  useEffect(() => {
-    SearchConfigActions.refresh();
-  }, []);
+public class PeriodToRelativeRangeConverter implements Function<Period, RelativeRange> {
 
-  return { config: searchesClusterConfig, refresh: SearchConfigActions.refresh };
-};
-
-export default useSearchConfiguration;
+    @Override
+    public RelativeRange apply(final Period period) {
+        if (period != null) {
+            return RelativeRange.Builder.builder()
+                    .from(period.toStandardSeconds().getSeconds())
+                    .build();
+        } else {
+            return null;
+        }
+    }
+}
