@@ -84,6 +84,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 1,
                 1,
                 false,
+                false,
                 null,
                 Duration.seconds(60),
                 "http",
