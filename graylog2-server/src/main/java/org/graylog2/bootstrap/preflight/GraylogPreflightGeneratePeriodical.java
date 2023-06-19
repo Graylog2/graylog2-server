@@ -180,8 +180,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                 nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
                             }
                         } catch (Exception e) {
-                            LOG.error("Exception trying to connect to node "  + c.nodeId() + ": " + e.getMessage(), e);
-                            nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                            LOG.warn("Exception trying to connect to node "  + c.nodeId() + ": " + e.getMessage() + ", retrying", e);
                         }
                     });
 
