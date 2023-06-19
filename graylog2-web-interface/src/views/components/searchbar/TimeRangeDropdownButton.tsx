@@ -15,25 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
-import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
-import type { TimeRange, NoTimeRangeOverride, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import RangePresetDropdown from './RangePresetDropdown';
 import TimeRangeButton from './TimeRangeButton';
 
 type Props = {
-  children: React.ReactNode,
   disabled?: boolean,
   hasErrorOnMount?: boolean,
   onPresetSelectOpen: () => void,
   setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
-  show?: boolean,
   toggleShow: () => void,
   showPresetDropdown?: boolean,
 };
@@ -42,38 +39,30 @@ const StyledRangePresetDropdown = styled(RangePresetDropdown)`
   padding: 6px;
 `;
 
-const RelativePosition = styled.div`
-  position: relative;
-`;
-
 const StyledButtonGroup = styled(ButtonGroup)`
   display: flex;
+  align-items: start;
 `;
 
 const TimeRangeDropdownButton = ({
-  children,
   disabled,
   hasErrorOnMount,
   onPresetSelectOpen,
   setCurrentTimeRange,
-  show,
   showPresetDropdown = true,
   toggleShow,
 }: Props) => {
   const { submitForm, isValid } = useFormikContext();
-  const containerRef = useRef();
+  const { config } = useSearchConfiguration();
+  const availableOptions = config?.quick_access_timerange_presets;
 
   const _onClick = (e) => {
     e.currentTarget.blur();
     toggleShow();
   };
 
-  const selectRelativeTimeRangePreset = (from) => {
-    const nextTimeRange: RelativeTimeRangeWithEnd = {
-      type: 'relative',
-      from,
-    };
-    setCurrentTimeRange(normalizeIfAllMessagesRange(nextTimeRange));
+  const selectRelativeTimeRangePreset = (timerange) => {
+    setCurrentTimeRange(normalizeIfAllMessagesRange(timerange));
 
     if (isValid) {
       submitForm();
@@ -86,40 +75,28 @@ const TimeRangeDropdownButton = ({
     }
   };
 
-  const dropdown = showPresetDropdown
-    ? (
-      <StyledRangePresetDropdown disabled={disabled}
-                                 displayTitle={false}
-                                 onChange={selectRelativeTimeRangePreset}
-                                 onToggle={_onPresetSelectToggle}
-                                 header="From (Until Now)"
-                                 bsSize={null} />
-    )
-    : null;
-
   return (
-    <RelativePosition ref={containerRef}>
-      <StyledButtonGroup>
-        <TimeRangeButton hasError={hasErrorOnMount}
-                         disabled={disabled}
-                         onClick={_onClick} />
-        {dropdown}
-      </StyledButtonGroup>
-      <Overlay show={show}
-               trigger="click"
-               placement="bottom"
-               onHide={toggleShow}
-               container={containerRef.current}>
-        {children}
-      </Overlay>
-    </RelativePosition>
+    <StyledButtonGroup>
+      <TimeRangeButton hasError={hasErrorOnMount}
+                       disabled={disabled}
+                       onClick={_onClick} />
+      {showPresetDropdown
+        && (
+          <StyledRangePresetDropdown disabled={disabled}
+                                     displayTitle={false}
+                                     onChange={selectRelativeTimeRangePreset}
+                                     onToggle={_onPresetSelectToggle}
+                                     header="Select time range"
+                                     bsSize={null}
+                                     availableOptions={availableOptions} />
+        )}
+    </StyledButtonGroup>
   );
 };
 
 TimeRangeDropdownButton.defaultProps = {
   hasErrorOnMount: false,
   disabled: false,
-  show: false,
   showPresetDropdown: true,
 };
 

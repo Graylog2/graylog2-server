@@ -17,29 +17,23 @@
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import asMock from 'helpers/mocking/AsMock';
 
 import RangePresetDropdown from './RangePresetDropdown';
 
-jest.mock('stores/configurations/ConfigurationsStore', () => ({
-  ConfigurationsStore: MockStore(),
-}));
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-  SearchConfigStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({ searchesClusterConfig: mockSearchClusterConfig }),
-  },
-}));
+jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
 describe('RangePresetDropdown', () => {
   it('should not call onChange prop when selecting "Configure Ranges" option.', async () => {
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchClusterConfig,
+      refresh: jest.fn(),
+    });
+
     const onSelectOption = jest.fn();
-    render(<RangePresetDropdown onChange={onSelectOption} />);
+    render(<RangePresetDropdown onChange={onSelectOption} availableOptions={[]} />);
 
     const timeRangeButton = screen.getByLabelText('Open time range preset select');
     fireEvent.click(timeRangeButton);
@@ -47,5 +41,46 @@ describe('RangePresetDropdown', () => {
     fireEvent.click(rangePresetOption);
 
     expect(onSelectOption).not.toHaveBeenCalled();
+  });
+
+  it('filtrate options by limit', async () => {
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: {
+        ...mockSearchClusterConfig,
+        query_time_range_limit: 'PT6M',
+      },
+      refresh: jest.fn(),
+    });
+
+    const onSelectOption = jest.fn();
+
+    render(<RangePresetDropdown onChange={onSelectOption}
+                                availableOptions={[
+                                  {
+                                    id: '639843f5-049a-4532-8a54-102da850b7f1',
+                                    timerange: {
+                                      from: 300,
+                                      type: 'relative',
+                                    },
+                                    description: '5 minutes',
+                                  },
+                                  {
+                                    id: '8dda08e9-cd23-44ff-b4eb-edeb7a704cf4',
+                                    timerange: {
+                                      keyword: 'Last ten minutes',
+                                      timezone: 'Europe/Berlin',
+                                      type: 'keyword',
+                                    },
+                                    description: 'Keyword ten min',
+                                  },
+                                ]} />);
+
+    const timeRangeButton = screen.getByLabelText('Open time range preset select');
+    fireEvent.click(timeRangeButton);
+
+    const tenMinTR = screen.queryByText('Keyword ten min');
+    await screen.findByText('5 minutes');
+
+    expect(tenMinTR).not.toBeInTheDocument();
   });
 });

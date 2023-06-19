@@ -16,6 +16,5 @@
  */
 package org.graylog.datanode.process;
 
-public record ProcessInfo(long pid, String nodeName, ProcessState status, boolean isLeaderNode, java.time.Instant started, java.time.Duration totalCpuDuration, String user,
-                          String restBaseUrl) {
+public record OpensearchInfo(String nodeName, ProcessState state, boolean isLeaderNode, String restBaseUrl, ProcessInformation process) {
 }

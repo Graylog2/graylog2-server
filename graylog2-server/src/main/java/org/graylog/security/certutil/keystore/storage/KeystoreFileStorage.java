@@ -67,16 +67,4 @@ public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLo
         }
     }
 
-    @Deprecated
-    public Optional<KeyStore> readKeyStore(final Path keystorePath, char[] password) throws KeyStoreStorageException {
-        return readKeyStore(new KeystoreFileLocation(keystorePath), password);
-    }
-
-    @Deprecated
-    public void writeKeyStore(final Path keystorePath,
-                              final KeyStore keyStore,
-                              final char[] password) throws KeyStoreStorageException {
-        writeKeyStore(new KeystoreFileLocation(keystorePath), keyStore, password, null);
-    }
-
 }
