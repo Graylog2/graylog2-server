@@ -421,12 +421,12 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         defaultTemplate
                 )));
             } catch (Exception e) {
-                LOG.error("Can't save collector '{}', please restart Graylog to fix this.", collectorName, e);
+                LOG.error("Can't save collector '{}'!", collectorName, e);
             }
         }
 
         if (collector == null) {
-            LOG.error("Unable to access fixed '{}' collector, please restart Graylog to fix this.", collectorName);
+            LOG.error("Unable to access fixed '{}' collector!", collectorName);
             return Optional.empty();
         }
 
@@ -446,12 +446,12 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             try {
                 variable = configurationVariableService.save(ConfigurationVariable.create(name, description, content));
             } catch (Exception e) {
-                LOG.error("Can't save sidecar configuration variable '{}', please restart Graylog to fix this.", name, e);
+                LOG.error("Can't save sidecar configuration variable '{}'!", name, e);
             }
         }
 
         if (variable == null) {
-            LOG.error("Unable to access '{}' sidecar configuration variable, please restart Graylog to fix this.", name);
+            LOG.error("Unable to access '{}' sidecar configuration variable!", name);
         }
     }
 
@@ -473,12 +473,12 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         collector.defaultTemplate(),
                         Set.of("default")));
             } catch (Exception e) {
-                LOG.error("Can't save sidecar default configuration '{}', please restart Graylog to fix this.", name, e);
+                LOG.error("Can't save sidecar default configuration '{}'!", name, e);
             }
         }
 
         if (config == null) {
-            LOG.error("Unable to access '{}' sidecar default configuration, please restart Graylog to fix this.", name);
+            LOG.error("Unable to access '{}' sidecar default configuration!", name);
         }
     }
 
