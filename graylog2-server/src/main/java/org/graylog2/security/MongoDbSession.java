@@ -64,19 +64,20 @@ public class MongoDbSession extends PersistedImpl {
 
     @SuppressForbidden("Deliberate use of ObjectInputStream")
     public Map<Object, Object> getAttributes() {
-        final Object attributes = fields.get("attributes");
-        if (attributes == null) {
-            return null;
-        }
-        final ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) attributes);
         try {
+            final Object attributes = fields.get("attributes");
+            if (attributes == null) {
+                return null;
+            }
+            final ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) attributes);
+
             // FIXME: This could break backward compatibility if different Java versions are being used.
             final ObjectInputStream ois = new ObjectInputStream(bis);
             final Object o = ois.readObject();
             return (Map<Object, Object>) o;
         } catch (IOException e) {
             LOG.error("little io. wow.", e);
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | ClassCastException e) {
             LOG.error("wrong thingy in db", e);
         }
         return null;
