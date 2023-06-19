@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { appPrefixed } from 'util/URLUtils';
 
 import NavigationLink from './NavigationLink';
+import {asMock} from 'helpers/mocking';
 
 jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path), qualifyUrl: jest.fn((path) => path) }));
 
@@ -31,7 +32,7 @@ describe('NavigationLink', () => {
   });
 
   it('does not prefix URL with app prefix', () => {
-    appPrefixed.mockImplementation((path) => `/someprefix${path}`);
+    asMock(appPrefixed).mockImplementation((path) => `/someprefix${path}`);
     render(<NavigationLink description="Hello there!" path="/hello" />);
 
     expect(screen.getByText('Hello there!')).toHaveAttribute('href', '/hello');
