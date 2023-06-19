@@ -95,10 +95,11 @@ const NodeLoggers = createReactClass({
                         onClick={() => {
                           this.setState({ showDetails: !showDetails });
 
-                          sendTelemetry('toggle_input_button', {
-                            appSection: 'logging',
-                            eventElement: 'show-log-level-metrics',
-                            eventInfo: { showing: !showDetails },
+                          sendTelemetry('input_button_toggle', {
+                            app_pathname: 'logging',
+                            app_section: 'log-level',
+                            app_action_value: 'show-metrics',
+                            event_details: { showing: !showDetails },
                           });
                         }}>
                   <Icon name="tachometer-alt" />{' '}
@@ -107,7 +108,9 @@ const NodeLoggers = createReactClass({
               </div>
               <h2>
                 <LinkToNode nodeId={nodeId} />
-                <small> Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong></small>
+                <small>
+                  Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong>
+                </small>
               </h2>
             </div>
             <div className="subsystems">

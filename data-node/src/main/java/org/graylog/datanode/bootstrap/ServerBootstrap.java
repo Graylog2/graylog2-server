@@ -27,9 +27,9 @@ import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
+import org.graylog.datanode.bindings.DatanodeConfigurationBindings;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
-import org.graylog.datanode.bindings.OpensearchDistributionBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
@@ -157,7 +157,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
-                new OpensearchDistributionBindings()
+                new DatanodeConfigurationBindings()
 
         );
     }
@@ -168,7 +168,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(),
-                new OpensearchDistributionBindings(),
+                new DatanodeConfigurationBindings(),
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
@@ -281,7 +281,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 //        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
-        result.add(new OpensearchDistributionBindings());
+        result.add(new DatanodeConfigurationBindings());
 //        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;

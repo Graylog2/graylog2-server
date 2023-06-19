@@ -95,7 +95,7 @@ public class IndexFieldTypesServiceTest {
                 .as("check that get by index_name works")
                 .isNotNull()
                 .extracting("indexName")
-                .containsOnly("graylog_1");
+                .isEqualTo("graylog_1");
 
         assertThat(dbService.findAll().size())
                 .as("check that all entries are returned as a stream")

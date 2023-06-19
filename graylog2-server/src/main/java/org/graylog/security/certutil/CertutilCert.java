@@ -21,10 +21,12 @@ import com.github.rvesse.airline.annotations.Option;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.plugin.Tools;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.security.Key;
 import java.security.KeyStore;
@@ -39,6 +41,7 @@ import java.time.Duration;
 @Command(name = "cert", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilCert implements CliCommand {
 
+    @Deprecated //no need to have separate alias for both certificates types
     public static final String DATANODE_KEY_ALIAS = "datanode";
     @Option(name = "--ca", description = "Filename for the CA keystore")
     protected String caKeystoreFilename = "datanode-ca.p12";
@@ -83,6 +86,11 @@ public class CertutilCert implements CliCommand {
             console.printLine("Generating private key and certificate for this datanode");
 
             final CertRequest req = CertRequest.signed("localhost", intermediateCA)
+                    .withSubjectAlternativeName("localhost")
+                    .withSubjectAlternativeName(Tools.getLocalHostname())
+                    .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
+                    .withSubjectAlternativeName("127.0.0.1")
+                    .withSubjectAlternativeName("ip6-localhost")
                     .validity(Duration.ofDays(10 * 365));
             KeyPair nodePair = CertificateGenerator.generate(req);
 

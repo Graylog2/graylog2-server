@@ -36,7 +36,7 @@ const GraylogHeader = styled(Header)(({ theme }) => css`
 `);
 const NavigationContainer = styled.div`
   display: flex;
-  justify-content : space-between;
+  justify-content: space-between;
   align-items: center;
 `;
 const StyledText = styled(Text)<React.PropsWithChildren<StyledMantineTextProps>>(({ theme }: StyledMantineTextProps) => css`

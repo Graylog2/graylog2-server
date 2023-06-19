@@ -59,7 +59,7 @@ public class NodeInstance implements Closeable {
     }
 
     public String uri() {
-        return String.format(Locale.US, "http://%s", container.getContainerIpAddress());
+        return String.format(Locale.US, "http://%s", container.getHost());
     }
 
     public int apiPort() {

@@ -109,3 +109,6 @@ export const availableTimeRangeTypes = [
 ];
 
 export const VISUALIZATION_TABLE_HEADER_HEIGHT = 28;
+
+export const keySeparator = '\u2E31';
+export const humanSeparator = '-';

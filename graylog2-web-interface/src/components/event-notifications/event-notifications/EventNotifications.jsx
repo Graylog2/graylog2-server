@@ -40,25 +40,23 @@ import styles from './EventNotifications.css';
 
 export const PAGE_SIZES = [10, 25, 50];
 
-const renderEmptyContent = () => {
-  return (
-    <Row>
-      <Col md={4} mdOffset={4}>
-        <EmptyEntity>
-          <p>
-            Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications
-            to integrate Graylog Alerts with an external alerting system you use.
-          </p>
-          <IfPermitted permissions="eventnotifications:create">
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-              <Button bsStyle="success">Get Started!</Button>
-            </LinkContainer>
-          </IfPermitted>
-        </EmptyEntity>
-      </Col>
-    </Row>
-  );
-};
+const renderEmptyContent = () => (
+  <Row>
+    <Col md={4} mdOffset={4}>
+      <EmptyEntity>
+        <p>
+          Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications
+          to integrate Graylog Alerts with an external alerting system you use.
+        </p>
+        <IfPermitted permissions="eventnotifications:create">
+          <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+            <Button bsStyle="success">Get Started!</Button>
+          </LinkContainer>
+        </IfPermitted>
+      </EmptyEntity>
+    </Col>
+  </Row>
+);
 
 const getNotificationPlugin = (type) => {
   if (type === undefined) {

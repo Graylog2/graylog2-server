@@ -16,13 +16,12 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
@@ -36,16 +35,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> implements ViewUtils<ViewSummaryDTO> {
     private static final String COLLECTION_NAME = "views";
-    private final MongoCollection<Document> collection;
-    private final ObjectMapper mapper;
+    private final MongoCollection<ViewSummaryDTO> collection;
 
     @Inject
     protected ViewSummaryService(MongoConnection mongoConnection,
                                  MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                 ObjectMapper mapper) {
+                                 MongoCollections mongoCollections) {
         super(mongoConnection, mongoJackObjectMapperProvider, ViewSummaryDTO.class, COLLECTION_NAME);
-        this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
-        this.mapper = mapper;
+        this.collection = mongoCollections.get(COLLECTION_NAME, ViewSummaryDTO.class);
     }
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(SearchUser searchUser,
@@ -69,7 +66,6 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> imple
         );
 
         final List<ViewSummaryDTO> views = findViews(searchUser, query, sort)
-                .map(this::deserialize)
                 .filter(predicate)
                 .toList();
 
@@ -86,17 +82,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> imple
     }
 
     @Override
-    public ObjectMapper mapper() {
-        return mapper;
-    }
-
-    @Override
-    public MongoCollection<Document> collection() {
+    public MongoCollection<ViewSummaryDTO> collection() {
         return collection;
-    }
-
-    @Override
-    public Class<ViewSummaryDTO> type() {
-        return ViewSummaryDTO.class;
     }
 }

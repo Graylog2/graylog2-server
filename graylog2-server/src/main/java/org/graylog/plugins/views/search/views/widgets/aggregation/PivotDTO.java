@@ -25,7 +25,6 @@ import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.OptionalInt;
 
 @AutoValue
 @JsonDeserialize(builder = PivotDTO.Builder.class)
@@ -44,6 +43,12 @@ public abstract class PivotDTO {
 
     @JsonProperty(FIELD_CONFIG)
     public abstract PivotConfigDTO config();
+
+    abstract Builder toBuilder();
+
+    public PivotDTO withConfig(PivotConfigDTO config) {
+        return toBuilder().config(config).build();
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {

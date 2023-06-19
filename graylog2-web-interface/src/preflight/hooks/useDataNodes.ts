@@ -22,6 +22,8 @@ import fetch from 'logic/rest/FetchProvider';
 import type { DataNodes } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
 
+const DEFAULT_DATA = [];
+export const DATA_NODES_OVERVIEW_QUERY_KEY = ['data-nodes', 'overview'];
 const fetchDataNodes = () => (
   fetch('GET', qualifyUrl('/api/data_nodes'), undefined, false)
 );
@@ -38,14 +40,14 @@ const useDataNodes = (): {
     error,
     isInitialLoading,
   } = useQuery<DataNodes, FetchError>(
-    ['data-nodes', 'overview'],
+    DATA_NODES_OVERVIEW_QUERY_KEY,
     fetchDataNodes,
     {
-      initialData: [],
       refetchInterval: 3000,
+      keepPreviousData: true,
     });
 
-  return { data, isFetching, isInitialLoading, error };
+  return { data: data ?? DEFAULT_DATA, isFetching, isInitialLoading, error };
 };
 
 export default useDataNodes;

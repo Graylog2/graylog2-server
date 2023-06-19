@@ -25,13 +25,11 @@ import { ConfigurationVariableActions } from 'stores/sidecars/ConfigurationVaria
 import EditConfigurationVariableModal from './EditConfigurationVariableModal';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
-const _renderConfigList = (configurations) => {
-  return (
-    <ul className={ConfigurationHelperStyle.ulStyle}>
-      {configurations.map((conf) => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
-    </ul>
-  );
-};
+const _renderConfigList = (configurations) => (
+  <ul className={ConfigurationHelperStyle.ulStyle}>
+    {configurations.map((conf) => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
+  </ul>
+);
 
 class ConfigurationVariablesHelper extends React.Component {
   static propTypes = {
@@ -80,21 +78,19 @@ class ConfigurationVariablesHelper extends React.Component {
       .then(() => this._onSuccessfulUpdate(() => this._closeErrorModal()));
   };
 
-  _handleDeleteCheck = (configVar) => {
-    return () => {
-      this.setState({ variableToDelete: configVar });
+  _handleDeleteCheck = (configVar) => () => {
+    this.setState({ variableToDelete: configVar });
 
-      ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
-        // Variable still in use: Report error
-        if (response.length > 0) {
-          this.setState({ errorModalContent: _renderConfigList(response) });
-          this._openErrorModal();
-          // Not in use, ask for confirmation
-        } else {
-          this._openErrorConfirmModal();
-        }
-      });
-    };
+    ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
+      // Variable still in use: Report error
+      if (response.length > 0) {
+        this.setState({ errorModalContent: _renderConfigList(response) });
+        this._openErrorModal();
+        // Not in use, ask for confirmation
+      } else {
+        this._openErrorConfirmModal();
+      }
+    });
   };
 
   _configurationVariableListBuilder = () => {

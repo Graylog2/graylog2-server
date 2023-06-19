@@ -62,7 +62,10 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Inject
     public OSValuesHandler(@DetectedSearchVersion SearchVersion version) {
-        this.supportsMultiTerms = version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0");
+        this.supportsMultiTerms =
+                version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0") ||
+                version.satisfies(SearchVersion.Distribution.DATANODE, ">=5.2.0");
+
     }
 
     @Nonnull

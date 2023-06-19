@@ -54,9 +54,7 @@ const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (st
   return `${localizer(from)} - ${localizer(to)}`;
 };
 
-const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => {
-  return timerange.keyword;
-};
+const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => timerange.keyword;
 
 const TimeRangeToString = (timerange?: TimeRange, localizer?: (string) => string): string => {
   const { type } = timerange || {};

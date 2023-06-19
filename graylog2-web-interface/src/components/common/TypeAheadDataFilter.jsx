@@ -198,9 +198,7 @@ class TypeAheadDataFilter extends React.Component {
       return filterData(data);
     }
 
-    const filteredData = data.filter((datum) => {
-      return this._matchFilters(datum) && this._matchStringSearch(datum);
-    }, this);
+    const filteredData = data.filter((datum) => this._matchFilters(datum) && this._matchStringSearch(datum), this);
 
     onDataFiltered(filteredData, filterText);
 
@@ -210,16 +208,14 @@ class TypeAheadDataFilter extends React.Component {
   render() {
     const { filters, filterText } = this.state;
     const { id, label, displayKey, filterBy, filterSuggestionAccessor, filterSuggestions } = this.props;
-    const filtersContent = filters.map((filter) => {
-      return (
-        <li key={`li-${filter}`}>
-          <span className="pill label label-default">
-            {filterBy}: {filter}
-            <button type="button" className="tag-remove" data-target={filter} onClick={this._onFilterRemoved} aria-label={`Remove filter ${filter}`} />
-          </span>
-        </li>
-      );
-    });
+    const filtersContent = filters.map((filter) => (
+      <li key={`li-${filter}`}>
+        <span className="pill label label-default">
+          {filterBy}: {filter}
+          <button type="button" className="tag-remove" data-target={filter} onClick={this._onFilterRemoved} aria-label={`Remove filter ${filter}`} />
+        </span>
+      </li>
+    ));
 
     let suggestions;
 

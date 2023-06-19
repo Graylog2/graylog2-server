@@ -38,11 +38,9 @@ describe('HasOwnership', () => {
   const otherGrn = createGRN(otherType, otherId);
   const otherGrnPermission = `entity:own:${otherGrn}`;
 
-  const DisabledComponent = ({ disabled }: { disabled: boolean}) => {
-    return disabled
-      ? <span>disabled</span>
-      : <span>enabled</span>;
-  };
+  const DisabledComponent = ({ disabled }: { disabled: boolean}) => (disabled
+    ? <span>disabled</span>
+    : <span>enabled</span>);
 
   type Props = {
     id: string,

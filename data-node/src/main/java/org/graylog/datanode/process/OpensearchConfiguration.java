@@ -16,14 +16,17 @@
  */
 package org.graylog.datanode.process;
 
+import org.graylog.datanode.management.Environment;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public record OpensearchConfiguration(
-        String opensearchVersion,
         Path opensearchDir,
+        Path opensearchConfigDir,
         int httpPort,
         int transportPort,
         String authUsername,
@@ -54,5 +57,16 @@ public record OpensearchConfiguration(
 
     private String toValuesList(List<String> values) {
         return String.join(",", values);
+    }
+
+    public Environment getEnv() {
+        final Environment env = new Environment(System.getenv());
+        env.put("OPENSEARCH_PATH_CONF", opensearchConfigDir.resolve("opensearch").toAbsolutePath().toString());
+        return env;
+    }
+
+    public HttpHost getRestBaseUrl() {
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        return new HttpHost("localhost", httpPort(), sslEnabled ? "https" : "http");
     }
 }

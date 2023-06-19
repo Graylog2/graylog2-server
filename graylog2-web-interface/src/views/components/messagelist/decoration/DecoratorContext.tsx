@@ -18,8 +18,8 @@ import * as React from 'react';
 
 import type { ValueRenderer } from './ValueRenderer';
 
-import Highlight from '../Highlight';
+import SearchQueryHighlights from '../SearchQueryHighlights';
 
 type DecoratorList = Array<ValueRenderer>;
-const DecoratorContext = React.createContext<DecoratorList>([Highlight]);
+const DecoratorContext = React.createContext<DecoratorList>([SearchQueryHighlights]);
 export default DecoratorContext;

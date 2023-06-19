@@ -251,7 +251,7 @@ class SourceCodeEditor extends React.Component {
     const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
 
     return (
-      <div>
+      <div className="source-code-editor">
         {toolbar
           && (
           <Toolbar style={{ width: validCssWidth }}>

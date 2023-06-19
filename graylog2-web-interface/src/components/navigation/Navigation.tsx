@@ -42,9 +42,7 @@ import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
-const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(appPrefixed(prefix)) === 0;
-};
+const _isActive = (requestPath, prefix) => requestPath.indexOf(appPrefixed(prefix)) === 0;
 
 /**
  * Checks if a plugin and its corresponding route is registered to the PluginStore
@@ -84,10 +82,12 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
     if (isEmpty) return null;
     const { BadgeComponent } = pluginRoute;
 
+    const renderBadge = pluginRoute.children.some((child) => isPermitted(currentUserPermissions, child.permissions) && child?.BadgeComponent);
+
     return (
       <NavDropdown key={title}
                    title={title}
-                   badge={BadgeComponent}
+                   badge={renderBadge ? BadgeComponent : null}
                    id="enterprise-dropdown"
                    inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}

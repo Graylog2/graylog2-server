@@ -260,10 +260,19 @@ type DashboardActionModalProps = {
   ref: React.Ref<unknown>,
 }
 
+type AssetActionComponentProps = {
+  identifier: unknown,
+}
+
 type DashboardAction = {
   key: string,
   component: React.ComponentType<DashboardActionComponentProps>,
   modal?: React.ComponentType<DashboardActionModalProps>,
+}
+
+type AssetAction = {
+  key: string,
+  component: React.ComponentType<AssetActionComponentProps>,
 }
 
 type EventActionComponentProps = {
@@ -396,14 +405,24 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
+    'views.components.assetValueActions'?: Array<AssetAction>;
     'views.components.dashboardActions'?: Array<DashboardAction>;
-    'views.components.eventActions'?: Array<React.ComponentType<EventActionComponentProps>>;
+    'views.components.eventActions'?: Array<{
+      component: React.ComponentType<EventActionComponentProps>,
+      key: string,
+    }>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
-    'views.components.widgets.messageTable.messageActions'?: Array<React.ComponentType<MessageActionComponentProps>>;
-    'views.components.searchActions'?: Array<React.ComponentType<SearchActionComponentProps>>;
+    'views.components.widgets.messageTable.messageActions'?: Array<{
+      component: React.ComponentType<MessageActionComponentProps>,
+      key: string,
+    }>;
+    'views.components.searchActions'?: Array<{
+      component: React.ComponentType<SearchActionComponentProps>,
+      key: string,
+    }>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;

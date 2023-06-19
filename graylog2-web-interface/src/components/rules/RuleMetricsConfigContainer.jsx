@@ -22,9 +22,7 @@ import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 import RuleMetricsConfig from './RuleMetricsConfig';
 
-const handleChange = (nextConfig) => {
-  return RulesActions.updateMetricsConfig(nextConfig);
-};
+const handleChange = (nextConfig) => RulesActions.updateMetricsConfig(nextConfig);
 
 class RuleMetricsConfigContainer extends React.Component {
   static propTypes = {
@@ -56,6 +54,4 @@ class RuleMetricsConfigContainer extends React.Component {
   }
 }
 
-export default connect(RuleMetricsConfigContainer, { rules: RulesStore }, ({ rules }) => {
-  return { metricsConfig: rules ? rules.metricsConfig : rules };
-});
+export default connect(RuleMetricsConfigContainer, { rules: RulesStore }, ({ rules }) => ({ metricsConfig: rules ? rules.metricsConfig : rules }));

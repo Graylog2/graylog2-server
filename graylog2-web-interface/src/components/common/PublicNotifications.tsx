@@ -95,9 +95,7 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
       return null;
     }
 
-    const _dismiss = () => {
-      return onDismissPublicNotification(notificationId);
-    };
+    const _dismiss = () => onDismissPublicNotification(notificationId);
 
     return (
       <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title}>

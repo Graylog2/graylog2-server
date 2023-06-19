@@ -22,7 +22,6 @@ import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
-import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.ESVersionCheckPeriodical;
@@ -37,12 +36,12 @@ import org.graylog2.periodical.TrafficCounterCalculator;
 import org.graylog2.periodical.UserSessionTerminationPeriodical;
 import org.graylog2.periodical.VersionCheckThread;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.telemetry.cluster.TelemetryClusterInfoPeriodical;
 
 public class PeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
-        periodicalBinder.addBinding().to(BatchedElasticSearchOutputFlushThread.class);
         periodicalBinder.addBinding().to(ClusterHealthCheckThread.class);
         periodicalBinder.addBinding().to(ContentPackLoaderPeriodical.class);
         periodicalBinder.addBinding().to(IndexerClusterCheckerThread.class);
@@ -60,5 +59,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
         periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
+        periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
     }
 }

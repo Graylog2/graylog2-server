@@ -28,30 +28,28 @@ type Props = {
   indexSet: IndexSet,
 };
 
-const IndexSetDetails = ({ indexSet }: Props) => {
-  return (
-    <StyledIndexSetDetailsRow>
-      <Col lg={3}>
-        <dl>
-          <dt>Index prefix:</dt>
-          <dd>{indexSet.index_prefix}</dd>
-          <HideOnCloud>
-            <dt>Shards:</dt>
-            <dd>{indexSet.shards}</dd>
-            <dt>Replicas:</dt>
-            <dd>{indexSet.replicas}</dd>
-          </HideOnCloud>
-          <dt>Field type refresh interval:</dt>
-          <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
-        </dl>
-      </Col>
+const IndexSetDetails = ({ indexSet }: Props) => (
+  <StyledIndexSetDetailsRow>
+    <Col lg={3}>
+      <dl>
+        <dt>Index prefix:</dt>
+        <dd>{indexSet.index_prefix}</dd>
+        <HideOnCloud>
+          <dt>Shards:</dt>
+          <dd>{indexSet.shards}</dd>
+          <dt>Replicas:</dt>
+          <dd>{indexSet.replicas}</dd>
+        </HideOnCloud>
+        <dt>Field type refresh interval:</dt>
+        <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
+      </dl>
+    </Col>
 
-      <Col lg={6}>
-        <IndicesConfiguration indexSet={indexSet} />
-      </Col>
-    </StyledIndexSetDetailsRow>
-  );
-};
+    <Col lg={6}>
+      <IndicesConfiguration indexSet={indexSet} />
+    </Col>
+  </StyledIndexSetDetailsRow>
+);
 
 IndexSetDetails.propTypes = { indexSet: PropTypes.object.isRequired };
 export default IndexSetDetails;

@@ -25,15 +25,13 @@ const DeletionRetentionStrategyConfiguration = ({ config, updateConfig }) => {
   const { max_number_of_indices } = config;
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useState(max_number_of_indices);
 
-  const _onInputUpdate = (field) => {
-    return (e) => {
-      const update = {};
-      const value = getValueFromInput(e.target);
-      update[field] = value;
+  const _onInputUpdate = (field) => (e) => {
+    const update = {};
+    const value = getValueFromInput(e.target);
+    update[field] = value;
 
-      setMaxNumberOfIndices(value);
-      updateConfig(update);
-    };
+    setMaxNumberOfIndices(value);
+    updateConfig(update);
   };
 
   return (

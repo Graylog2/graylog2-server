@@ -101,7 +101,7 @@ const EditContentPackPage = createReactClass({
 
     const selectedEntities = contentPack.entities.reduce((result, entity) => {
       if (entityCatalog[entity.type.name]
-        && entityCatalog[entity.type.name].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
+        && entityCatalog[entity.type.name].findIndex((fetchedEntity) => fetchedEntity.id === entity.id) >= 0) {
         const newResult = result;
 
         newResult[entity.type.name] = result[entity.type.name] || [];
@@ -123,11 +123,7 @@ const EditContentPackPage = createReactClass({
       const entityData = new ValueReferenceData(entity.data);
       const configPaths = entityData.getPaths();
 
-      const paramMap = Object.keys(configPaths).filter((path) => {
-        return configPaths[path].isValueParameter();
-      }).map((path) => {
-        return { configKey: path, paramName: configPaths[path].getValue(), readOnly: true };
-      });
+      const paramMap = Object.keys(configPaths).filter((path) => configPaths[path].isValueParameter()).map((path) => ({ configKey: path, paramName: configPaths[path].getValue(), readOnly: true }));
       const newResult = result;
 
       if (paramMap.length > 0) {
@@ -180,9 +176,7 @@ const EditContentPackPage = createReactClass({
 
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
       const contentPackEntities = Object.keys(selectedEntities)
-        .reduce((acc, entityType) => {
-          return acc.concat(selectedEntities[entityType]);
-        }, []).filter((e) => e instanceof Entity);
+        .reduce((acc, entityType) => acc.concat(selectedEntities[entityType]), []).filter((e) => e instanceof Entity);
       /* Mark entities from server */
       const entities = contentPackEntities.concat(result.entities.map((e) => Entity.fromJSON(e, true)));
       const builtContentPack = contentPack.toBuilder()

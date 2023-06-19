@@ -26,17 +26,15 @@ const delay = (ms: number) => new Promise((resolve) => {
   setTimeout(resolve, ms);
 });
 
-const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => {
-  return new Promise((resolve) => {
-    if (job?.execution?.done) {
-      resolve(job);
-    } else {
-      resolve(delay(250)
-        .then(() => searchJobStatus(job.id))
-        .then((jobStatus) => trackJobStatus(jobStatus)));
-    }
-  });
-};
+const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promise((resolve) => {
+  if (job?.execution?.done) {
+    resolve(job);
+  } else {
+    resolve(delay(250)
+      .then(() => searchJobStatus(job.id))
+      .then((jobStatus) => trackJobStatus(jobStatus)));
+  }
+});
 
 const executeSearch = (
   view: View,

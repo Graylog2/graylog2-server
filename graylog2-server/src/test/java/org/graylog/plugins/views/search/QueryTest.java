@@ -120,13 +120,13 @@ public class QueryTest {
         final Query mergedQuery = query.applyExecutionState(executionState.build());
         assertThat(mergedQuery)
                 .isNotEqualTo(query)
-                .extracting(Query::timerange).extracting("range").containsExactly(60);
+                .extracting(Query::timerange).extracting("range").isEqualTo(60);
 
         final Optional<SearchType> messageList = mergedQuery.searchTypes().stream().filter(searchType -> messageListId.equals(searchType.id())).findFirst();
         assertThat(messageList).isPresent();
         final MessageList msgList = (MessageList) messageList.get();
-        assertThat(msgList).extracting(MessageList::offset).containsExactly(150);
-        assertThat(msgList).extracting(MessageList::limit).containsExactly(300);
+        assertThat(msgList).extracting(MessageList::offset).isEqualTo(150);
+        assertThat(msgList).extracting(MessageList::limit).isEqualTo(300);
     }
 
     @Test

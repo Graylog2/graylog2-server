@@ -39,8 +39,10 @@ const formatValue = (value: string, type: string) => {
 };
 
 const completionCaption = (fieldValue: string, input: string | number, isQuoted: boolean) => {
-  if ((isQuoted ? fieldValue : escape(fieldValue)).startsWith(String(input))) {
-    return isQuoted ? fieldValue : escape(fieldValue);
+  const quotedValue = isQuoted ? fieldValue : escape(fieldValue);
+
+  if (quotedValue.startsWith(String(input))) {
+    return quotedValue;
   }
 
   return `${fieldValue} ⭢ ${input}`;
@@ -68,19 +70,17 @@ const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken:
   return {};
 };
 
-const isEnumerableField = (field: FieldTypeMapping | undefined) => {
-  return field?.type.isEnumerable() ?? false;
-};
+const isEnumerableField = (field: FieldTypeMapping | undefined) => field?.type.isEnumerable() ?? false;
 
-const formatSuggestion = (value: string, occurrence: number, input: string | number, isQuoted: boolean): CompletionResult => ({
+const formatSuggestion = (value: string, occurrence: number, input: string | number, isQuoted: boolean, title: string | undefined): CompletionResult => ({
   name: value,
   value: isQuoted ? value : escape(value),
   score: occurrence,
   caption: completionCaption(value, input, isQuoted),
-  meta: `${occurrence} hits`,
+  meta: title ? `${title}: ${occurrence} hits` : `${occurrence} hits`,
 });
 
-type PreviousSuggestions = Array<{ value: string, occurrence: number }> | undefined;
+type PreviousSuggestions = Array<{ value: string, occurrence: number, title?: string }> | undefined;
 
 class FieldValueCompletion implements Completer {
   private previousSuggestions: undefined | {
@@ -138,7 +138,7 @@ class FieldValueCompletion implements Completer {
     if (this.previousSuggestions) {
       return this.previousSuggestions.suggestions
         .filter(({ value }) => (isQuoted ? value : escape(value)).startsWith(String(input)))
-        .map(({ value, occurrence }) => formatSuggestion(value, occurrence, input, isQuoted));
+        .map(({ value, occurrence, title }) => formatSuggestion(value, occurrence, input, isQuoted, title));
     }
 
     return [];
@@ -188,7 +188,7 @@ class FieldValueCompletion implements Completer {
         suggestions,
       };
 
-      return suggestions.map(({ value, occurrence }) => formatSuggestion(value, occurrence, input, isQuoted));
+      return suggestions.map(({ value, occurrence, title }: any) => formatSuggestion(value, occurrence, input, isQuoted, title));
     });
   };
 

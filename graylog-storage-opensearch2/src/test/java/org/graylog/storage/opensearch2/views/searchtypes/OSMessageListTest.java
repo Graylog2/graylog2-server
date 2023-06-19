@@ -18,7 +18,6 @@ package org.graylog.storage.opensearch2.views.searchtypes;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
@@ -28,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;

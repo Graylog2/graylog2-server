@@ -43,7 +43,7 @@ jest.mock('routing/useParams');
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateViewForEventDefinition');
 jest.mock('views/logic/views/UseProcessHooksForView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 
 jest.mock('hooks/useEventDefinition');
 jest.mock('hooks/useAlertAndEventDefinitionData');
@@ -67,7 +67,7 @@ jest.mock('views/logic/Widgets', () => ({
 
 describe('EventDefinitionReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
-    <StreamsContext.Provider value={[{}]}>
+    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'TestStream' }]}>
       <EventDefinitionReplaySearchPage />
     </StreamsContext.Provider>
   );

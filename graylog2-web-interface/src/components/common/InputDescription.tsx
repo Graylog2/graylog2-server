@@ -30,7 +30,7 @@ const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => 
 
 type Props = {
   className?: string,
-  error?: React.ReactElement,
+  error?: React.ReactNode,
   help?: React.ReactNode,
 };
 
@@ -44,7 +44,7 @@ const InputDescription = ({ className, error, help }: Props) => {
   }
 
   return (
-    <HelpBlock className={`${className} no-bm`}>
+    <HelpBlock className={`${className ?? ''} input-description`}>
       {error && (
         <ErrorMessage>
           {error}

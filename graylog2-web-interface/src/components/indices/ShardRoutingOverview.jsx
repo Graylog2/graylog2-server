@@ -61,26 +61,24 @@ const ShardRoutingWrap = styled.div(({ theme }) => css`
   }
 `);
 
-const ShardRoutingOverview = ({ indexName, routing }) => {
-  return (
-    <ShardRoutingWrap>
-      <h3>Shard routing</h3>
+const ShardRoutingOverview = ({ indexName, routing }) => (
+  <ShardRoutingWrap>
+    <h3>Shard routing</h3>
 
-      <ul className="shards">
-        {routing
-          .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
-          .map((route) => <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />)}
-      </ul>
-      <br style={{ clear: 'both' }} />
+    <ul className="shards">
+      {routing
+        .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
+        .map((route) => <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />)}
+    </ul>
+    <br style={{ clear: 'both' }} />
 
-      <div className="description">
-        Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
-        when primaries leave the cluster. Size and document counts only reflect primary shards and no
-        possible replica duplication.
-      </div>
-    </ShardRoutingWrap>
-  );
-};
+    <div className="description">
+      Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
+      when primaries leave the cluster. Size and document counts only reflect primary shards and no
+      possible replica duplication.
+    </div>
+  </ShardRoutingWrap>
+);
 
 ShardRoutingOverview.propTypes = {
   routing: PropTypes.array.isRequired,

@@ -88,6 +88,7 @@ const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
+const SystemLogsPage = loadAsync(() => import('./SystemLogsPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
 const ProcessBufferDumpPage = loadAsync(() => import('./ProcessBufferDumpPage'));
 const UserCreatePage = loadAsync(() => import('./UserCreatePage'));
@@ -171,6 +172,7 @@ export {
   StreamsPage,
   SystemOutputsPage,
   SystemOverviewPage,
+  SystemLogsPage,
   ThreadDumpPage,
   UsersOverviewPage,
   UserCreatePage,

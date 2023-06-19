@@ -25,15 +25,13 @@ type Props = {
   text: string,
 };
 
-const LoadingPage = ({ text }: Props) => {
-  return (
-    <DocumentTitle title="Loading...">
-      <LoginChrome>
-        <Spinner text={text} delay={0} />
-      </LoginChrome>
-    </DocumentTitle>
-  );
-};
+const LoadingPage = ({ text }: Props) => (
+  <DocumentTitle title="Loading...">
+    <LoginChrome>
+      <Spinner text={text} delay={0} />
+    </LoginChrome>
+  </DocumentTitle>
+);
 
 LoadingPage.propTypes = {
   text: PropTypes.string,
