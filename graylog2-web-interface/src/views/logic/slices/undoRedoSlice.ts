@@ -30,7 +30,7 @@ export type BufferItem = { type: BufferItemType, state: any }
 
 export type UndoRedoState = {
   buffer: Array<BufferItem>,
-  currentRevision: null | number
+  currentRevision: number
 }
 
 const handlers: { [name in BufferItemType]: any} = {

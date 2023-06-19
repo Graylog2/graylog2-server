@@ -16,19 +16,18 @@
  */
 import React, { useCallback } from 'react';
 
-import type { NavItemProps } from 'views/components/sidebar/NavItem';
 import NavItem from 'views/components/sidebar/NavItem';
 import useAppDispatch from 'stores/useAppDispatch';
 import { undo } from 'views/logic/slices/undoRedoSlice';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 
-const UndoNavItem = ({ icon, title, sidebarIsPinned }: NavItemProps) => {
+const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(undo()), [dispatch]);
 
-  return <NavItem disabled={!isUndoAvailable} onClick={onClick} icon={icon} title={title} sidebarIsPinned={sidebarIsPinned} />;
+  return <NavItem disabled={!isUndoAvailable} onClick={onClick} icon="undo" title="Undo" sidebarIsPinned={sidebarIsPinned} />;
 };
 
 export default UndoNavItem;

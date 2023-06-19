@@ -36,8 +36,8 @@ export type SidebarSectionProps = {
 
 export type SidebarSection = {
   key: string,
-  title: string,
-  icon: IconName,
+  title?: string,
+  icon?: IconName,
   content?: React.ComponentType<SidebarSectionProps>,
   CustomNavComponent?: React.ComponentType<NavItemProps>
 };
@@ -71,14 +71,10 @@ const sidebarSections: Array<SidebarSection> = [
   },
   {
     key: 'undoAction',
-    icon: 'undo',
-    title: 'Undo',
     CustomNavComponent: UndoNavItem,
   },
   {
     key: 'redoAction',
-    icon: 'redo',
-    title: 'Redo',
     CustomNavComponent: RedoNavItem,
   },
 ];
