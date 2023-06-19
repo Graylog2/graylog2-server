@@ -16,10 +16,10 @@
  */
 package org.graylog.security.certutil;
 
-import org.apache.commons.net.util.Base64;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.graylog.security.certutil.ca.CACreator;
+import org.graylog.security.certutil.ca.PemCaReader;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.SmartKeystoreStorage;
@@ -61,6 +61,7 @@ public class CaService {
     private final KeystoreFileLocation manuallyProvidedCALocation;
     private final NodeId nodeId;
     private final CACreator caCreator;
+    private final PemCaReader pemCaReader;
     private final CaConfiguration configuration;
     private final String passwordSecret;
 
@@ -69,10 +70,12 @@ public class CaService {
                      final SmartKeystoreStorage keystoreStorage,
                      final NodeId nodeId,
                      final CACreator caCreator,
+                     final PemCaReader pemCaReader,
                      final @Named("password_secret") String passwordSecret) {
         this.keystoreStorage = keystoreStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
+        this.pemCaReader = pemCaReader;
         this.configuration = configuration;
         this.passwordSecret = configuration.getCaPassword() != null ? configuration.getCaPassword() : passwordSecret;
         this.mongoDbCaLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
@@ -116,7 +119,7 @@ public class CaService {
                 String pem = new String(bytes, StandardCharsets.UTF_8);
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
-                    caCreator.uploadCA(keyStore, password, pem);
+                    pemCaReader.readCA(keyStore, password, pem);
                 } else {
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
                     keyStore.load(bais, password);

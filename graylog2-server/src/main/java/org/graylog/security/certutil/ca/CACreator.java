@@ -46,8 +46,6 @@ import java.util.Optional;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public class CACreator {
-    private static final Logger LOG = LoggerFactory.getLogger(CACreator.class);
-
     public KeyStore createCA(final char[] password,
                              final Duration certificateValidity) throws CACreationException {
 
@@ -78,97 +76,6 @@ public class CACreator {
 
             return caKeystore;
 
-        } catch (Exception e) {
-            throw new CACreationException("Failed to create a Certificate Authority", e);
-        }
-    }
-
-    X509Certificate readCert(final String cert) throws IOException, CertificateException {
-        Reader pemReader = new StringReader(cert);
-        PEMParser pemParser = new PEMParser(pemReader);
-        var parsedObj = pemParser.readObject();
-        if (parsedObj instanceof X509Certificate) {
-            return (X509Certificate) parsedObj;
-        } else if (parsedObj instanceof X509CertificateHolder) {
-            return new JcaX509CertificateConverter().getCertificate(
-                    (X509CertificateHolder) parsedObj
-            );
-        }
-        return null;
-    }
-
-    Optional<RSAPrivateKey> readPrivateKey(final String key, final char[] password) {
-        try {
-            Reader reader = new StringReader(key);
-            PEMParser pemParser = new PEMParser(reader);
-            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-            var object = pemParser.readObject();
-
-            if (object instanceof PEMEncryptedKeyPair) {
-                PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().build(password);
-                return Optional.of((RSAPrivateKey)converter.getKeyPair(((PEMEncryptedKeyPair)object).decryptKeyPair(decProv)).getPrivate());
-            } else {
-                return Optional.of((RSAPrivateKey)converter.getKeyPair((PEMKeyPair)object).getPrivate());
-            }
-        } catch (Exception ex) {
-            LOG.error("Could not decode private key from pem: " + ex.getMessage(), ex);
-            return Optional.empty();
-        }
-    }
-
-    final static String PADDING = "-----";
-    final static String BEGIN = PADDING + "BEGIN";
-    final static String END = PADDING + "END";
-
-    List<String> splitPem(String pem) {
-        var parts = new ArrayList<String>();
-        // if pem contains another section, split it
-        while(pem.contains(BEGIN) && pem.contains(END)) {
-            var start = pem.indexOf(BEGIN);
-            var end = pem.indexOf(PADDING, pem.indexOf(END) + END.length()) + PADDING.length();
-            parts.add(pem.substring(start, end));
-            pem = pem.substring(end);
-        }
-        return parts;
-    }
-
-    Optional<String> findCert(final List<String> certs, final String type) {
-        return certs.stream().filter(c -> c.startsWith(type)).findFirst();
-    }
-
-    void addCert(KeyStore keyStore, final char[] password, RSAPrivateKey pk, String cert, String name) {
-        try {
-            var certificate = readCert(cert);
-            keyStore.setKeyEntry(name,
-                    pk,
-                    password,
-                    new X509Certificate[]{certificate});
-        } catch (Exception e) {
-            LOG.error("Could not find certificate: " + e.getMessage(), e);
-        }
-    }
-
-    // TODO: secure against errors, tests
-    public KeyStore uploadCA(KeyStore keyStore, final char[] password, String pem) throws CACreationException {
-        try {
-            var certs = splitPem(pem);
-
-            var pk = findCert(certs, "-----BEGIN RSA PRIVATE KEY").flatMap(c -> this.readPrivateKey(c, password)).orElseThrow();
-            certs.remove(findCert(certs, "-----BEGIN RSA PRIVATE KEY").orElse(null));
-
-            var root = findCert(certs, "-----BEGIN CERTIFICATE");
-            root.ifPresent(cert -> {
-                addCert(keyStore, password, pk, cert, "root");
-                certs.remove(cert);
-            });
-
-            var ca = findCert(certs, "-----BEGIN CERTIFICATE");
-            ca.ifPresent(cert -> {
-                addCert(keyStore, password, pk, cert, "ca");
-                certs.remove(cert);
-            });
-
-            return keyStore;
         } catch (Exception e) {
             throw new CACreationException("Failed to create a Certificate Authority", e);
         }
