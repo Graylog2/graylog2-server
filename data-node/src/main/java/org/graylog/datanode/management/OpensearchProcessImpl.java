@@ -22,7 +22,8 @@ import org.apache.commons.exec.ExecuteException;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessInfo;
+import org.graylog.datanode.process.OpensearchInfo;
+import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
@@ -81,17 +82,8 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         return restClient;
     }
 
-    public ProcessInfo processInfo() {
-        return commandLineProcess.process().map(process -> new ProcessInfo(
-                process.pid(),
-                datanodeConfiguration.nodeName(), processState.getState(),
-                isLeaderNode,
-                process.info().startInstant().orElse(null),
-                process.info().totalCpuDuration().orElse(null),
-                process.info().user().orElse(null),
-                configuration.map(OpensearchConfiguration::getRestBaseUrl).map(HttpHost::toString).orElse(null)
-
-        )).orElseGet(() -> new ProcessInfo(-1, datanodeConfiguration.nodeName(), processState.getState(), false, null, null, null, null));
+    public OpensearchInfo processInfo() {
+        return new OpensearchInfo(datanodeConfiguration.nodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess.processInfo());
     }
 
     @Override

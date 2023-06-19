@@ -92,6 +92,7 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.GetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
@@ -160,6 +161,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);
+        addMessageProcessorFunction(GetField.NAME, GetField.class);
         addMessageProcessorFunction(SetField.NAME, SetField.class);
         addMessageProcessorFunction(SetFields.NAME, SetFields.class);
         addMessageProcessorFunction(RenameField.NAME, RenameField.class);

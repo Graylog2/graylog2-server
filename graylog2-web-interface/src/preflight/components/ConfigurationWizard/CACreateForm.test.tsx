@@ -17,6 +17,7 @@
 import React from 'react';
 import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
@@ -30,6 +31,14 @@ jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
+
+const logger = {
+  // eslint-disable-next-line no-console
+  log: console.log,
+  // eslint-disable-next-line no-console
+  warn: console.warn,
+  error: () => {},
+};
 
 describe('CACreateForm', () => {
   beforeEach(() => {
@@ -66,7 +75,12 @@ describe('CACreateForm', () => {
 
   it('should show error when CA creation fails', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
-    renderPreflight(<CACreateForm />);
+
+    renderPreflight((
+      <DefaultQueryClientProvider options={{ logger }}>
+        <CACreateForm />
+      </DefaultQueryClientProvider>
+    ));
 
     await fillOutForm();
     await submitForm();

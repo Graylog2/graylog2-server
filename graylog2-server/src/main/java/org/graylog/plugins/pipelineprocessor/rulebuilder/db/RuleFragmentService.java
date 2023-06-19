@@ -14,7 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.plugins.pipelineprocessor.rulebuilder.db;
 
-public record DataNodeClusterWideConfig(String test) {
+import java.util.Collection;
+import java.util.Optional;
+
+public interface RuleFragmentService {
+    RuleFragment save(RuleFragment ruleFragment);
+
+    void delete(String name);
+
+    Optional<RuleFragment> get(String name);
+
+    Collection<RuleFragment> all();
 }

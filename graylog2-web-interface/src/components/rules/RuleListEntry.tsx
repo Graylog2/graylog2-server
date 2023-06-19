@@ -44,9 +44,10 @@ const LimitedTd = styled.td(({ theme }: {theme: DefaultTheme}) => css`
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { id, title, description, created_at, modified_at } = rule;
   const pipelinesLength = usingPipelines.length;
+  const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
   const actions = (
     <ButtonToolbar>
-      <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE(id)}>
+      <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
         <Button bsSize="xsmall">Edit</Button>
       </LinkContainer>
       <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
@@ -79,7 +80,7 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   return (
     <tr key={title}>
       <td>
-        <Link to={Routes.SYSTEM.PIPELINES.RULE(id)}>
+        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
           {title}
         </Link>
       </td>

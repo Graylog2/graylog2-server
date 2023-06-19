@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
@@ -23,9 +23,11 @@ import { useFormikContext } from 'formik';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-import { Icon } from 'components/common';
-import type { SearchBarFormValues } from 'views/Constants';
+import { Icon, IfPermitted } from 'components/common';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
+import TimeRangeAddToQuickListButton from 'views/components/searchbar/date-time-picker/TimeRangeAddToQuickListButton';
+import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/date-time-picker/TimeRangeDropdown';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -39,6 +41,7 @@ const PreviewWrapper = styled.div`
   justify-content: flex-end;
   float: right;
   transform: translateY(-3px);
+  gap: 5px
 `;
 
 const FromWrapper = styled.span`
@@ -66,10 +69,10 @@ const Date = styled.span(({ theme }) => css`
 const MiddleIcon = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
   color: ${theme.colors.variant.default};
-  padding: 0 15px;
+  padding: 0 5px;
 `);
 
-const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
+export const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -101,8 +104,9 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
-  const { isValid } = useFormikContext<SearchBarFormValues>();
+  const { isValid, errors } = useFormikContext<TimeRangeDropDownFormValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
+  const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
 
   useEffect(() => {
     let output = EMPTY_OUTPUT;
@@ -113,6 +117,8 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
 
     setTimeOutput(output);
   }, [isValid, timerange]);
+
+  const isTimerangeValid = !errors.nextTimeRange;
 
   return (
     <PreviewWrapper data-testid="time-range-live-preview">
@@ -129,16 +135,17 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
         <Title>Until</Title>
         <Date title={`Dates Formatted as [${DATE_TIME_FORMATS.complete}]`}>{until}</Date>
       </UntilWrapper>
+      {showAddToQuickListButton && !!(timerange as TimeRange).type && (
+      <IfPermitted permissions="clusterconfigentry:edit">
+        <TimeRangeAddToQuickListButton timerange={timerange as TimeRange} isTimerangeValid={isTimerangeValid} />
+      </IfPermitted>
+      )}
     </PreviewWrapper>
   );
 };
 
 TimeRangeLivePreview.propTypes = {
-  timerange: PropTypes.shape({
-    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    from: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    to: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }),
+  timerange: PropTypes.object,
 };
 
 TimeRangeLivePreview.defaultProps = {

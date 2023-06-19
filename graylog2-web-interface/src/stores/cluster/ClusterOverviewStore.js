@@ -79,9 +79,7 @@ export const ClusterOverviewStore = singletonStore(
     systemLogs(nodeId, limit) {
       const promise = fetchStreamingPlainText('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/system/loggers/messages/recent/${nodeId}?limit=${limit}`))
         .then(
-          (response) => {
-            return response;
-          },
+          (response) => response,
           (error) => UserNotification.error(`Getting system log messages for node '${nodeId}' failed: ${error}`, 'Could not get system log messages'),
         );
 

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-unused-vars, no-unused-vars
 
 import AppConfig from 'util/AppConfig';
 

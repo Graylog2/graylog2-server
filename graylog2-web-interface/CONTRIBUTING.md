@@ -88,6 +88,14 @@ Newer code (views) is testing a different approach: Instead of importing stores 
 - (Re-)Moving a store that is still in use will fail at compile time, not at runtime
 - Type information of the stores/actions is kept
 
+### Important to know
+
+#### Session timeouts
+To ensure a user session does not time out when a user interacts with the frontend, the session will be extended
+with every API request which implements `fetch` from the `FetchProvider`.
+It is important that periodical request do not extend the user session. For periodically request we use `fetchPeriodically` instead.
+
+
 ### Good to know / gotchas
 
 #### Default Values

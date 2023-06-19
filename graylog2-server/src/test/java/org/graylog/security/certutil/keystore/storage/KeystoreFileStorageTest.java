@@ -60,7 +60,7 @@ public class KeystoreFileStorageTest {
 
     @Test
     void testKeyStoreSaveAndRetrieveWithPasswordChange(@TempDir Path tmpDir) throws Exception {
-        toTest = new KeystoreFileStorage(new PrivateKeyEntryOnlyKeystoreContentMover());
+        toTest = new KeystoreFileStorage(new SinglePasswordKeystoreContentMover());
         final Path keystoreFile = tmpDir.resolve("keystore_file.p12");
         KeyStore testKeystore = KeyStore.getInstance(CertConstants.PKCS12);
         testKeystore.load(new FileInputStream("src/test/resources/org/graylog/security/certutil/keystore/storage/sample_certificate_keystore.p12"), "password".toCharArray());
@@ -87,8 +87,9 @@ public class KeystoreFileStorageTest {
         testKeystore.load(null, null);
         char[] passwd = "password".toCharArray();
 
-        toTest.writeKeyStore(keystoreFile, testKeystore, passwd);
-        assertThrows(KeyStoreStorageException.class, () -> toTest.readKeyStore(keystoreFile, "wrong password".toCharArray()));
+        final KeystoreFileLocation fileLocation = new KeystoreFileLocation(keystoreFile);
+        toTest.writeKeyStore(fileLocation, testKeystore, passwd, null);
+        assertThrows(KeyStoreStorageException.class, () -> toTest.readKeyStore(fileLocation, "wrong password".toCharArray()));
         verifyNoInteractions(keystoreContentMover);
     }
 
