@@ -137,7 +137,11 @@ public class CaService {
 
     }
 
-    public Optional<KeyStore> loadKeyStore(char[] password) throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
-        return keystoreStorage.readKeyStore(configuredCaInConfExists() ? manuallyProvidedCALocation : mongoDbCaLocation, password);
+    public Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
+        if(configuredCaInConfExists()) {
+            return keystoreStorage.readKeyStore(manuallyProvidedCALocation, configuration.getCaPassword().toCharArray());
+        } else {
+            return keystoreStorage.readKeyStore(mongoDbCaLocation, passwordSecret.toCharArray());
+        }
      }
 }
