@@ -31,7 +31,7 @@ import NavigationLink from './NavigationLink';
 const TITLE_PREFIX = 'System';
 const PATH_PREFIX = '/system';
 
-const _isActive = (requestPath, prefix) => requestPath.indexOf(appPrefixed(prefix)) === 0;
+const _isActive = (requestPath: string, prefix: string) => requestPath.indexOf(appPrefixed(prefix)) === 0;
 
 const titleMap = {
   '/overview': 'Overview',
@@ -52,7 +52,7 @@ const titleMap = {
   '/roles': 'Roles',
 };
 
-const _systemTitle = (pathname) => {
+const _systemTitle = (pathname: string) => {
   const pageSpecificTitle = Object.entries(titleMap).find(([route]) => _isActive(pathname, `${PATH_PREFIX}${route}`))?.[1];
 
   if (pageSpecificTitle) {
