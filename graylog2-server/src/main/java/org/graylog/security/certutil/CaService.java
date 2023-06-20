@@ -82,17 +82,8 @@ public class CaService {
         this.manuallyProvidedCALocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
     }
 
-    /**
-     * If the config options in the config file are filled, it exists (if it doesn't exist, it's an error)
-     *
-     * @return if a CA has been configured in graylog.conf
-     */
-    private boolean configuredCaInConfExists() {
-        return configuration.getCaKeystoreFile() != null && Files.exists(configuration.getCaKeystoreFile());
-    }
-
     public CA get() throws KeyStoreStorageException {
-        if(configuredCaInConfExists()) {
+        if(configuration.configuredCaExists()) {
             return new CA("local CA", CAType.LOCAL);
         } else {
             var keystore = keystoreStorage.readKeyStore(mongoDbCaLocation, passwordSecret.toCharArray());
@@ -138,7 +129,7 @@ public class CaService {
     }
 
     public Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
-        if(configuredCaInConfExists()) {
+        if(configuration.configuredCaExists()) {
             return keystoreStorage.readKeyStore(manuallyProvidedCALocation, configuration.getCaPassword().toCharArray());
         } else {
             return keystoreStorage.readKeyStore(mongoDbCaLocation, passwordSecret.toCharArray());

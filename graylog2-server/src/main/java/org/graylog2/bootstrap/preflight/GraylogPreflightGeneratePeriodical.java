@@ -136,7 +136,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
 
         try {
-            final var password = configuration.getCaPassword() != null ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
+            final var password = configuration.configuredCaExists() ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
             Optional<KeyStore> optKey = caService.loadKeyStore();
             if(optKey.isEmpty()) {
                 LOG.warn("No keystore available.");

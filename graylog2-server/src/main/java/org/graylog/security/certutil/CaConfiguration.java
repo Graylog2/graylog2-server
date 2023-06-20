@@ -35,4 +35,8 @@ public class CaConfiguration extends BaseConfiguration {
     public String getCaPassword() {
         return caPassword;
     }
+
+    public boolean configuredCaExists() {
+        return getCaKeystoreFile() != null;
+    }
 }
