@@ -17,10 +17,14 @@
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
+import { defaultUser } from 'defaultMockValues';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import { asMock } from 'helpers/mocking';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser, alice } from 'fixtures/users';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
@@ -29,7 +33,13 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
+jest.mock('hooks/useCurrentUser');
+
 describe('TimeRangeInput', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
   const defaultTimeRange = { type: 'relative', range: 300 };
 
   const SUTTimeRangeInput = (props) => (
@@ -124,7 +134,7 @@ describe('TimeRangeInput', () => {
 
     fireEvent.click(dropdown);
 
-    await screen.findByRole('heading', { name: 'From (Until Now)' });
+    await screen.findByRole('heading', { name: 'Select time range' });
   });
 
   it('allows hiding the dropdown button for quick-selecting presets', async () => {
@@ -133,5 +143,23 @@ describe('TimeRangeInput', () => {
     await screen.findByText(/5 minutes ago/);
 
     expect(screen.queryByRole('button', { name: /open time range preset select/i })).not.toBeInTheDocument();
+  });
+
+  it('has no button add time renge to quick access for non admin users', async () => {
+    asMock(useCurrentUser).mockReturnValue(alice);
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    fireEvent.click(await screen.findByText(/5 minutes ago/));
+
+    await screen.findByText(/search time range/i);
+
+    expect(screen.queryByTitle('Add time range to quick access time range list')).not.toBeInTheDocument();
+  });
+
+  it('has button add time renge to quick access for admin users', async () => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+
+    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    await fireEvent.click(await screen.findByText(/5 minutes ago/));
+    await screen.findByTitle('Add time range to quick access time range list');
   });
 });

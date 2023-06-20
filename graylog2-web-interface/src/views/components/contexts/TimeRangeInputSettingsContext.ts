@@ -18,36 +18,24 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-export type TelemetryEvent = {
-  app_pathname?: string,
-  app_section?: string,
-  app_action_value?: string
-  event_details?: {
-    [key: string]: unknown,
-  }
+type TimeRangeInputSettings = {
+  showDropdownButton: boolean,
+  showRelativePresetsButton: boolean,
+  showAbsolutePresetsButton: boolean,
+  showKeywordPresetsButton: boolean,
+  showAddToQuickListButton: boolean,
+  ignoreLimitDurationInTimeRangeDropdown: boolean
+}
+
+const defaultValue = {
+  showDropdownButton: true,
+  showRelativePresetsButton: true,
+  showAbsolutePresetsButton: true,
+  showKeywordPresetsButton: true,
+  showAddToQuickListButton: true,
+  ignoreLimitDurationInTimeRangeDropdown: false,
 };
 
-export type TelemetryEventType =
-  '$pageview'
-  | 'view'
-  | 'click'
-  | 'form_submit'
-  | 'popover_open'
-  | 'popover_close'
-  | 'input_button_toggle'
-  | 'input_value_change'
-  | 'modal_close'
-  | 'modal_open'
-  | 'select'
-  | 'visit'
-  | 'navigate';
+const TimeRangeInputSettingsContext = React.createContext<TimeRangeInputSettings>(defaultValue);
 
-type ContextType = {
-  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
-}
-const TelemetryContext = React.createContext<ContextType>({
-  sendTelemetry: () => {
-  },
-});
-
-export default singleton('contexts.TelemetryContext', () => TelemetryContext);
+export default singleton('views.components.contexts.TimeRangeInputSettingsContext', () => TimeRangeInputSettingsContext);
