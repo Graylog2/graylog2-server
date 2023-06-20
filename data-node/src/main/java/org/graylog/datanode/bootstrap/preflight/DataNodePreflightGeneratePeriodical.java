@@ -60,7 +60,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
     private final Configuration configuration;
     private final SmartKeystoreStorage keystoreStorage;
-    private final String passwordSecret;
+    private final char[] passwordSecret;
 
     @Inject
     public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
@@ -84,7 +84,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
-        this.passwordSecret = passwordSecret;
+        this.passwordSecret = passwordSecret.toCharArray();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
-                var csr = csrGenerator.generateCSR(passwordSecret.toCharArray(), node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
+                var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
                 csrStorage.writeCsr(csr, nodeId.getNodeId());
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
@@ -111,7 +111,7 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                 try {
                     final Optional<CertificateChain> certificateChain = certMongoStorage.readCertChain(nodeId.getNodeId());
                     if (certificateChain.isPresent()) {
-                        final char[] secret = passwordSecret.toCharArray();
+                        final char[] secret = passwordSecret;
                         KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
                                 certificateChain.get(),
                                 privateKeyEncryptedStorage,
