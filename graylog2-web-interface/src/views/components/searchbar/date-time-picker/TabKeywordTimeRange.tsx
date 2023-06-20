@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
-import { Field, useField } from 'formik';
+import { Field, useField, useFormikContext } from 'formik';
 
 import { Col, FormControl, FormGroup, Panel, Row } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import ToolsStore from 'stores/tools/ToolsStore';
-import type { KeywordTimeRange } from 'views/logic/queries/Query';
+import type { KeywordTimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/date-time-picker/TimeRangeDropdown';
+import TabPresetDropdown from 'views/components/searchbar/date-time-picker/TabPresetDropdown';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -61,6 +65,7 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
+  const { setFieldValue } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const { formatTime, userTimezone } = useUserDateTime();
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
@@ -125,6 +130,13 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     }
   }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
 
+  const { config } = useSearchConfiguration();
+  const { showKeywordPresetsButton } = useContext(TimeRangeInputSettingsContext);
+  const keywordOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'keyword'), [config?.quick_access_timerange_presets]);
+  const onSetPreset = useCallback((range) => {
+    setFieldValue('nextTimeRange', range);
+  }, [setFieldValue]);
+
   return (
     <Row className="no-bm">
       <Col sm={5}>
@@ -140,6 +152,8 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
                             name={name}
                             disabled={disabled}
                             placeholder="Last week"
+                            title="Keyword input"
+                            aria-label="Keyword input"
                             onChange={onChange}
                             required
                             value={value || defaultValue} />
@@ -148,6 +162,8 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
             </FormGroup>
           )}
         </Field>
+        {showKeywordPresetsButton
+          && (<TabPresetDropdown disabled={disabled} onSetPreset={onSetPreset} availableOptions={keywordOptions} />)}
       </Col>
 
       <Col sm={7}>

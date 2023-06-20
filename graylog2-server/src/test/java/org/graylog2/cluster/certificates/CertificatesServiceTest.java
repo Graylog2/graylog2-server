@@ -67,21 +67,6 @@ public class CertificatesServiceTest {
     }
 
     @Test
-    public void testReadUnExistingDeprecatedMethod() {
-        final Optional<String> result = certificatesService.readCert("there is no node with this id");
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    public void testReadAndWriteDeprecatedMethod() {
-        boolean writeResult = certificatesService.writeCert("node_id_1", "Certificate string representation");
-        assertTrue(writeResult);
-        final Optional<String> readResult = certificatesService.readCert("node_id_1");
-        assertTrue(readResult.isPresent());
-        assertEquals("Certificate string representation", readResult.get());
-    }
-
-    @Test
     public void testHasCertReturnsFalseWhenNoMongoEntry() {
         assertFalse(certificatesService.hasCert(
                 new KeystoreMongoLocation("there is no node with this id", DATA_NODE_KEYSTORE_COLLECTION)

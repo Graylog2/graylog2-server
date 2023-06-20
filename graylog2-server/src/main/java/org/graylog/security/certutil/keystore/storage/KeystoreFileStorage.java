@@ -20,6 +20,7 @@ import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 
+import javax.inject.Inject;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,6 +33,7 @@ public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLo
 
     private final KeystoreContentMover keystoreContentMover;
 
+    @Inject
     public KeystoreFileStorage(final KeystoreContentMover keystoreContentMover) {
         this.keystoreContentMover = keystoreContentMover;
     }
@@ -63,18 +65,6 @@ public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLo
         } catch (IOException | GeneralSecurityException ex) {
             throw new KeyStoreStorageException("Could not read keystore: " + ex.getMessage(), ex);
         }
-    }
-
-    @Deprecated
-    public Optional<KeyStore> readKeyStore(final Path keystorePath, char[] password) throws KeyStoreStorageException {
-        return readKeyStore(new KeystoreFileLocation(keystorePath), password);
-    }
-
-    @Deprecated
-    public void writeKeyStore(final Path keystorePath,
-                              final KeyStore keyStore,
-                              final char[] password) throws KeyStoreStorageException {
-        writeKeyStore(new KeystoreFileLocation(keystorePath), keyStore, password, null);
     }
 
 }

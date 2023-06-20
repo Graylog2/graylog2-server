@@ -87,8 +87,9 @@ public class KeystoreFileStorageTest {
         testKeystore.load(null, null);
         char[] passwd = "password".toCharArray();
 
-        toTest.writeKeyStore(keystoreFile, testKeystore, passwd);
-        assertThrows(KeyStoreStorageException.class, () -> toTest.readKeyStore(keystoreFile, "wrong password".toCharArray()));
+        final KeystoreFileLocation fileLocation = new KeystoreFileLocation(keystoreFile);
+        toTest.writeKeyStore(fileLocation, testKeystore, passwd, null);
+        assertThrows(KeyStoreStorageException.class, () -> toTest.readKeyStore(fileLocation, "wrong password".toCharArray()));
         verifyNoInteractions(keystoreContentMover);
     }
 
