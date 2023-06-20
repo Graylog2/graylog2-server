@@ -68,8 +68,9 @@ public class StartPageService {
                 .items()
                 .stream()
                 .skip((long) (page - 1) * perPage)
-                .limit(perPage)
                 .map(i -> new LastOpened(i.grn(), catalog.getTitle(i.grn()), i.timestamp()))
+                .filter(lo -> !lo.title().startsWith(Catalog.UNKNOWN_ENTITY_TEXT))
+                .limit(perPage)
                 .toList();
 
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(items, items.size(), page, perPage));

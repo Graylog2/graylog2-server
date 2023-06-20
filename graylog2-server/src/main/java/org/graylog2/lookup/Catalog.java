@@ -30,6 +30,9 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class Catalog {
+
+    public static final String UNKNOWN_ENTITY_TEXT = "Unknown entity: ";
+
     protected record Entry(String type, String title) {}
 
     private final ContentPackService contentPackService;
@@ -56,7 +59,7 @@ public class Catalog {
                         if (excerpt != null) {
                             return new Entry(excerpt.type().name(), excerpt.title());
                         } else {
-                            return new Entry("Unknown entity: " + id, "Unknown entity: " + id);
+                            return new Entry(UNKNOWN_ENTITY_TEXT + id, UNKNOWN_ENTITY_TEXT + id);
                         }
                     }
                 });
@@ -68,10 +71,10 @@ public class Catalog {
             if(item.title() != null) {
                 return item.title();
             } else {
-                return "Unknown entity: " + grn;
+                return UNKNOWN_ENTITY_TEXT + grn;
             }
         } catch (ExecutionException cex) {
-            return "Unknown entity: " + grn;
+            return UNKNOWN_ENTITY_TEXT + grn;
         }
     }
 
@@ -81,10 +84,10 @@ public class Catalog {
             if(item.type() != null) {
                 return item.type().toLowerCase(Locale.ROOT);
             } else {
-                return "Unknown entity: " + grn;
+                return UNKNOWN_ENTITY_TEXT + grn;
             }
         } catch (ExecutionException cex) {
-            return "Unknown entity: " + grn;
+            return UNKNOWN_ENTITY_TEXT + grn;
         }
     }
 }
