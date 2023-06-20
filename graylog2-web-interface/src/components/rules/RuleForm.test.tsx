@@ -49,6 +49,9 @@ describe('RuleForm', () => {
         usedInPipelines: [],
         onAceLoaded: () => {},
         onChangeSource: () => {},
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
       }}>
         <RuleForm create={false} />
       </PipelineRulesContext.Provider>
@@ -86,6 +89,8 @@ describe('RuleForm', () => {
         rawMessageToSimulate: '',
         startRuleSimulation: true,
         setRawMessageToSimulate,
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
       }}>
         <RuleForm create={false} />
       </PipelineRulesContext.Provider>,
