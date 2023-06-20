@@ -46,7 +46,7 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
       metricError.function = 'Function is required.';
     }
 
-    const isFieldRequired = metric.function && !['count', 'percentage'].includes(metric.function);
+    const isFieldRequired = metric.function !== 'count' && (metric.function !== 'percentage' || metric.strategy !== 'COUNT');
 
     if (isFieldRequired && !metric.field) {
       metricError.field = `Field is required for function ${metric.function}.`;
