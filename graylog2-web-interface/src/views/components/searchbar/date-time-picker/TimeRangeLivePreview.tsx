@@ -41,7 +41,7 @@ const PreviewWrapper = styled.div`
   justify-content: flex-end;
   float: right;
   transform: translateY(-3px);
-  gap: 5px
+  gap: 5px;
 `;
 
 const FromWrapper = styled.span`
