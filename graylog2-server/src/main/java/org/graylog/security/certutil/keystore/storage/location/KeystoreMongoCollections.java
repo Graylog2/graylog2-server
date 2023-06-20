@@ -27,8 +27,15 @@ public interface KeystoreMongoCollections {
             "encrypted_certificate_keystore"
     );
 
+    KeystoreMongoCollection GRAYLOG_CA_KEYSTORE_COLLECTION = new KeystoreMongoCollection(
+            "graylog_ca_certificates",
+            "node_id",
+            "encrypted_certificate_keystore"
+    );
+
     Collection<KeystoreMongoCollection> ALL_KEYSTORE_COLLECTIONS = List.of(
-            DATA_NODE_KEYSTORE_COLLECTION
+            DATA_NODE_KEYSTORE_COLLECTION,
+            GRAYLOG_CA_KEYSTORE_COLLECTION
     );
 
 }
