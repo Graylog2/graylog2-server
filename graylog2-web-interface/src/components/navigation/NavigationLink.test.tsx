@@ -18,9 +18,9 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import { appPrefixed } from 'util/URLUtils';
+import { asMock } from 'helpers/mocking';
 
 import NavigationLink from './NavigationLink';
-import {asMock} from 'helpers/mocking';
 
 jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path), qualifyUrl: jest.fn((path) => path) }));
 
