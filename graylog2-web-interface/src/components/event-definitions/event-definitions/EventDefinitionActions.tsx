@@ -76,17 +76,11 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
-  const showActions = (): boolean => {
-    return scopePermissions?.is_mutable;
-  };
+  const showActions = (): boolean => scopePermissions?.is_mutable;
 
-  const isSystemEventDefinition = (): boolean => {
-    return eventDefinition?.config?.type === 'system-notifications-v1';
-  };
+  const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
-  const isAggregationEventDefinition = (): boolean => {
-    return eventDefinition?.config?.type === 'aggregation-v1';
-  };
+  const isAggregationEventDefinition = (): boolean => eventDefinition?.config?.type === 'aggregation-v1';
 
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
@@ -97,8 +91,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
 
   const handleAction = (action, definition) => {
     sendTelemetry('click', {
-      appSection: 'event-definition',
-      eventElement: `event-definition-action-${action}`,
+      app_pathname: 'event-definition',
+      app_action_value: `event-definition-action-${action}`,
     });
 
     switch (action) {
@@ -170,7 +164,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     }
   };
 
-  const isScheduled = eventDefinition?.scheduler?.is_scheduled;
+  const isEnabled = eventDefinition?.state === 'ENABLED';
 
   return (
     <>
@@ -195,8 +189,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             <>
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
               <MenuItem divider />
-              <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-                {isScheduled ? 'Disable' : 'Enable'}
+              <MenuItem onClick={() => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+                {isEnabled ? 'Disable' : 'Enable'}
               </MenuItem>
 
               {showActions() && (

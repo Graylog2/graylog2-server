@@ -51,12 +51,10 @@ class OTXAdapterFieldSet extends React.Component {
     validationMessage: PropTypes.func.isRequired,
   };
 
-  handleSelect = (fieldName) => {
-    return (selectedIndicator) => {
-      const config = lodash.cloneDeep(this.props.config);
-      config[fieldName] = selectedIndicator;
-      this.props.updateConfig(config);
-    };
+  handleSelect = (fieldName) => (selectedIndicator) => {
+    const config = lodash.cloneDeep(this.props.config);
+    config[fieldName] = selectedIndicator;
+    this.props.updateConfig(config);
   };
 
   render() {

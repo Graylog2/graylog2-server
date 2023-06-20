@@ -25,6 +25,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
 import type FetchError from 'logic/errors/FetchError';
+import type { RuleBuilderType } from 'components/rules/rule-builder/types';
 
 export type RuleType = {
   id?: string,
@@ -33,6 +34,7 @@ export type RuleType = {
   description: string,
   created_at: string,
   modified_at: string,
+  rule_builder: RuleBuilderType,
   errors?: [],
 };
 export type MetricsConfigType = {
@@ -288,16 +290,30 @@ export const RulesStore = singletonStore(
         },
       );
     },
-    simulate(message, ruleSource, callback) {
-      const url = qualifyUrl(ApiRoutes.RulesController.simulate().url);
+    simulate(message, ruleToSimulate, callback) {
+      const url = qualifyUrl(ruleToSimulate?.rule_builder ? ApiRoutes.RuleBuilderController.simulate().url : ApiRoutes.RulesController.simulate().url);
       const rule = {
-        rule_source: {
-          title: ruleSource.title,
-          description: ruleSource.description,
-          source: ruleSource.source,
-        },
         message,
+        rule_source: undefined,
+        rule_builder_dto: undefined,
       };
+
+      if (ruleToSimulate?.rule_builder) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { source, ...ruleBuilderRuleToSimulate } = ruleToSimulate;
+
+        rule.rule_builder_dto = {
+          title: ruleBuilderRuleToSimulate.title,
+          description: ruleBuilderRuleToSimulate.description,
+          rule_builder: ruleBuilderRuleToSimulate.rule_builder,
+        };
+      } else {
+        rule.rule_source = {
+          title: ruleToSimulate.title,
+          description: ruleToSimulate.description,
+          source: ruleToSimulate.source,
+        };
+      }
 
       return fetch('POST', url, rule).then(callback,
         (error) => {

@@ -25,24 +25,20 @@ class PluginsDataTable extends React.Component {
     plugins: PropTypes.array,
   };
 
-  _headerCellFormatter = (header) => {
-    return <th>{header}</th>;
-  };
+  _headerCellFormatter = (header) => <th>{header}</th>;
 
-  _pluginInfoFormatter = (plugin) => {
-    return (
-      <tr key={plugin.name}>
-        <td className="limited">{plugin.name}</td>
-        <td className="limited">{plugin.version}</td>
-        <td className="limited">{plugin.author}</td>
-        <td className="limited" style={{ width: '50%' }}>
-          {plugin.description}
+  _pluginInfoFormatter = (plugin) => (
+    <tr key={plugin.name}>
+      <td className="limited">{plugin.name}</td>
+      <td className="limited">{plugin.version}</td>
+      <td className="limited">{plugin.author}</td>
+      <td className="limited" style={{ width: '50%' }}>
+        {plugin.description}
           &nbsp;&nbsp;
-          <ExternalLink href={plugin.url} style={{ marginLeft: 10 }}>Website</ExternalLink>
-        </td>
-      </tr>
-    );
-  };
+        <ExternalLink href={plugin.url} style={{ marginLeft: 10 }}>Website</ExternalLink>
+      </td>
+    </tr>
+  );
 
   render() {
     if (!this.props.plugins) {

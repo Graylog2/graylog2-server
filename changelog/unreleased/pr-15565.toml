@@ -1,0 +1,5 @@
+type = "fixed"
+message = "NodeService#allActive returns only nodes of correct type based on current server type"
+
+pulls = ["15505"]
+

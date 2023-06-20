@@ -15,19 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, within } from 'wrappedTestingLibrary';
 
 import Pagination from './Pagination';
 
 describe('<Pagination />', () => {
-  it('should display Pagination', () => {
+  it('should display Pagination', async () => {
     const currentPage = 1;
     const totalPages = 5;
-    const { getByTestId } = render(<Pagination currentPage={currentPage}
-                                               totalPages={totalPages} />);
 
-    expect(getByTestId('graylog-pagination')).not.toBeNull();
-    expect(getByTestId('graylog-pagination')).toMatchSnapshot();
+    render(<Pagination currentPage={currentPage}
+                       totalPages={totalPages} />);
+
+    const activePage = await screen.findByTitle('Active page');
+
+    await screen.findByTestId('graylog-pagination');
+    await screen.findByRole('button', { name: /open page 5/i });
+
+    expect(within(activePage).getByText(1)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open page 6/i })).not.toBeInTheDocument();
   });
 
   it('should not render Pagination if only 1 page', () => {
@@ -43,11 +49,12 @@ describe('<Pagination />', () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
-    const { getByLabelText } = render(<Pagination currentPage={currentPage}
-                                                  totalPages={totalPages}
-                                                  onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('Next'));
+    render(<Pagination currentPage={currentPage}
+                       totalPages={totalPages}
+                       onChange={onChangeSpy} />);
+
+    fireEvent.click(screen.getByLabelText('Open next page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage + 1);
   });
@@ -56,11 +63,12 @@ describe('<Pagination />', () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
-    const { getByLabelText } = render(<Pagination currentPage={currentPage}
-                                                  totalPages={totalPages}
-                                                  onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('Prev'));
+    render(<Pagination currentPage={currentPage}
+                       totalPages={totalPages}
+                       onChange={onChangeSpy} />);
+
+    fireEvent.click(screen.getByLabelText('Open previous page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage - 1);
   });
@@ -69,11 +77,12 @@ describe('<Pagination />', () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
-    const { getByLabelText } = render(<Pagination currentPage={currentPage}
-                                                  totalPages={totalPages}
-                                                  onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('Last'));
+    render(<Pagination currentPage={currentPage}
+                       totalPages={totalPages}
+                       onChange={onChangeSpy} />);
+
+    fireEvent.click(screen.getByLabelText('Open last page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(totalPages);
   });
@@ -82,11 +91,12 @@ describe('<Pagination />', () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
-    const { getByLabelText } = render(<Pagination currentPage={currentPage}
-                                                  totalPages={totalPages}
-                                                  onChange={onChangeSpy} />);
 
-    fireEvent.click(getByLabelText('First'));
+    render(<Pagination currentPage={currentPage}
+                       totalPages={totalPages}
+                       onChange={onChangeSpy} />);
+
+    fireEvent.click(screen.getByLabelText('Open first page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(1);
   });

@@ -17,7 +17,6 @@
 package org.graylog2.cluster;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.mongodb.AggregationOptions;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -32,11 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -109,6 +110,14 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         return byNodeId(nodeId.getNodeId());
     }
 
+    @Override
+    public Map<String, Node> byNodeIds(Collection<String> nodeIds) {
+        return query(NodeImpl.class, new BasicDBObject("node_id", new BasicDBObject("$in", nodeIds)))
+                .stream()
+                .map(o -> new NodeImpl((ObjectId) o.get("_id"), o.toMap()))
+                .collect(Collectors.toMap(NodeImpl::getNodeId, Function.identity()));
+    }
+
     private Stream<DBObject> aggregate(List<? extends DBObject> pipeline) {
         return cursorToStream(this.collection(NodeImpl.class).aggregate(pipeline, AggregationOptions.builder().build()));
     }
@@ -122,13 +131,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Deprecated
     @Override
     public Map<String, Node> allActive() {
-        Map<String, Node> nodes = Maps.newHashMap();
-
-        for (Node.Type type : Node.Type.values()) {
-            nodes.putAll(allActive(type));
-        }
-
-        return nodes;
+        return allActive(type());
     }
 
     private List<? extends DBObject> recentHeartbeat(List<? extends Map<String, Object>> additionalMatches) {

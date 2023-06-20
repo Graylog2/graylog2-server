@@ -110,8 +110,12 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_ROW_PIVOTS)
         public abstract Builder rowPivots(List<PivotDTO> rowPivots);
 
+        abstract List<PivotDTO> rowPivots();
+
         @JsonProperty(FIELD_COLUMN_PIVOTS)
         public abstract Builder columnPivots(List<PivotDTO> columnPivots);
+
+        abstract List<PivotDTO> columnPivots();
 
         @JsonProperty(FIELD_SERIES)
         public abstract Builder series(List<SeriesDTO> series);
@@ -142,10 +146,35 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_ROW_LIMIT)
         public abstract Builder optionalRowLimit(@Nullable Integer limit);
 
+        abstract Optional<Integer> optionalRowLimit();
+
         @JsonProperty(FIELD_COLUMN_LIMIT)
         public abstract Builder optionalColumnLimit(@Nullable Integer limit);
 
-        public abstract AggregationConfigDTO build();
+        abstract Optional<Integer> optionalColumnLimit();
+
+        abstract AggregationConfigDTO autoBuild();
+
+        public AggregationConfigDTO build() {
+            var rowPivots = optionalRowLimit().map(limit -> applyLimit(rowPivots(), limit)).orElse(rowPivots());
+            var columnPivots = optionalColumnLimit().map(limit -> applyLimit(columnPivots(), limit)).orElse(columnPivots());
+            return this.rowPivots(rowPivots)
+                    .columnPivots(columnPivots)
+                    .optionalRowLimit(null)
+                    .optionalColumnLimit(null)
+                    .autoBuild();
+        }
+
+        private List<PivotDTO> applyLimit(List<PivotDTO> pivots, int limit) {
+            return pivots.stream()
+                    .map(pivot -> {
+                        if (pivot.config() != null && pivot.config() instanceof ValueConfigDTO config) {
+                            return pivot.withConfig(config.withLimit(limit));
+                        }
+                        return pivot;
+                    })
+                    .toList();
+        }
 
         @JsonCreator
         public static Builder builder() {

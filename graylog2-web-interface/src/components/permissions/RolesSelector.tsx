@@ -67,9 +67,7 @@ const _assignRole = (selectedRoleNames, roles, onSubmit, setselectedRoleNames, s
 
   const selectedRoleNameList = selectedRoleNames.split(',');
 
-  const selectedRoles = Immutable.Set(compact(selectedRoleNameList.map((selection) => {
-    return roles.find((r) => r.name === selection);
-  })));
+  const selectedRoles = Immutable.Set(compact(selectedRoleNameList.map((selection) => roles.find((r) => r.name === selection))));
 
   if (selectedRoles.size <= 0) {
     setError(`Role assignment failed, because the roles ${selectedRoleNames ?? '(undefined)'} does not exist`);

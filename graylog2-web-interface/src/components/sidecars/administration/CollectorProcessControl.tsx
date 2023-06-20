@@ -67,43 +67,37 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     setIsConfigurationWarningHidden(true);
   };
 
-  const renderSummaryContent = (selectedSidecars: string[]) => {
-    return (
-      <>
-        <p>
-          You are going to <strong>{selectedAction}</strong> log collectors in&nbsp;
-          <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecars.length} />:
-        </p>
-        <p>{selectedSidecars.join(', ')}</p>
-        <p>Are you sure you want to proceed with this action?</p>
-      </>
-    );
-  };
+  const renderSummaryContent = (selectedSidecars: string[]) => (
+    <>
+      <p>
+        You are going to <strong>{selectedAction}</strong> log collectors in&nbsp;
+        <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecars.length} />:
+      </p>
+      <p>{selectedSidecars.join(', ')}</p>
+      <p>Are you sure you want to proceed with this action?</p>
+    </>
+  );
 
-  const renderConfigurationWarning = () => {
-    return (
-      <Panel bsStyle="info" header="Collectors without Configuration">
-        <p>
-          At least one selected Collector is not configured yet. To start a new Collector, assign a
-          Configuration to it and the Sidecar will start the process for you.
-        </p>
-        <p>
-          {capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
-        </p>
-        <Button bsSize="xsmall" bsStyle="primary" onClick={hideConfigurationWarning}>Understood, continue
-          anyway
-        </Button>
-      </Panel>
-    );
-  };
+  const renderConfigurationWarning = () => (
+    <Panel bsStyle="info" header="Collectors without Configuration">
+      <p>
+        At least one selected Collector is not configured yet. To start a new Collector, assign a
+        Configuration to it and the Sidecar will start the process for you.
+      </p>
+      <p>
+        {capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
+      </p>
+      <Button bsSize="xsmall" bsStyle="primary" onClick={hideConfigurationWarning}>Understood, continue
+        anyway
+      </Button>
+    </Panel>
+  );
 
   const renderProcessActionSummary = () => {
     const selectedSidecars = uniq<string>(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
 
     // Check if all selected collectors have assigned configurations
-    const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => {
-      return sidecar.assignments.some(({ collector_id }) => collector_id === collector.id);
-    });
+    const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => sidecar.assignments.some(({ collector_id }) => collector_id === collector.id));
 
     const shouldShowConfigurationWarning = !isConfigurationWarningHidden && !allHaveConfigurationsAssigned;
 

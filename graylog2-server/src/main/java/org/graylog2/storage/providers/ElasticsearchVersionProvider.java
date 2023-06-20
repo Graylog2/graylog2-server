@@ -16,6 +16,7 @@
  */
 package org.graylog2.storage.providers;
 
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
@@ -45,7 +46,7 @@ public class ElasticsearchVersionProvider implements Provider<SearchVersion> {
 
     @Inject
     public ElasticsearchVersionProvider(@Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
-                                        @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
+                                        @IndexerHosts List<URI> elasticsearchHosts,
                                         VersionProbe versionProbe,
                                         AtomicCache<Optional<SearchVersion>> cachedVersion) {
 

@@ -64,76 +64,70 @@ class TimeRangeOptionsForm extends React.Component<Props> {
     }
   };
 
-  _onRemove = (removedIdx: number) => {
-    return () => {
-      const options = ObjectUtils.clone(this.props.options);
+  _onRemove = (removedIdx: number) => () => {
+    const options = ObjectUtils.clone(this.props.options);
 
-      // Remove element at index
-      options.splice(removedIdx, 1);
+    // Remove element at index
+    options.splice(removedIdx, 1);
 
-      this._update(options);
-    };
+    this._update(options);
   };
 
-  _onChange = (changedIdx: number, field: string) => {
-    return (e) => {
-      const options = ObjectUtils.clone(this.props.options);
+  _onChange = (changedIdx: number, field: string) => (e) => {
+    const options = ObjectUtils.clone(this.props.options);
 
-      options.forEach((_o, idx) => {
-        if (idx === changedIdx) {
-          let { value } = e.target;
+    options.forEach((_o, idx) => {
+      if (idx === changedIdx) {
+        let { value } = e.target;
 
-          if (field === 'period') {
-            value = value.toUpperCase();
+        if (field === 'period') {
+          value = value.toUpperCase();
 
-            if (!value.startsWith('P')) {
-              value = `P${value}`;
-            }
+          if (!value.startsWith('P')) {
+            value = `P${value}`;
           }
-
-          options[idx][field] = value;
         }
-      });
 
-      this._update(options);
-    };
-  };
-
-  _buildTimeRangeOptions = () => {
-    return this.props.options.map((option, idx) => {
-      const { period } = option;
-      const { description } = option;
-      const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'has-error');
-
-      return (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={`timerange-option-${idx}`}>
-          <Row>
-            <Col xs={4}>
-              <div className={`input-group ${errorStyle}`}>
-                <input type="text" className="form-control" value={period} onChange={this._onChange(idx, 'period')} />
-                <span className="input-group-addon">
-                  {ISODurationUtils.formatDuration(period, this.props.validator)}
-                </span>
-              </div>
-            </Col>
-            <Col xs={8}>
-              <div className="input-group">
-                <input type="text"
-                       className="form-control"
-                       placeholder="Add description..."
-                       value={description}
-                       onChange={this._onChange(idx, 'description')} />
-                <span className="input-group-addon">
-                  <Icon name="trash-alt" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
-                </span>
-              </div>
-            </Col>
-          </Row>
-        </div>
-      );
+        options[idx][field] = value;
+      }
     });
+
+    this._update(options);
   };
+
+  _buildTimeRangeOptions = () => this.props.options.map((option, idx) => {
+    const { period } = option;
+    const { description } = option;
+    const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'has-error');
+
+    return (
+    // eslint-disable-next-line react/no-array-index-key
+      <div key={`timerange-option-${idx}`}>
+        <Row>
+          <Col xs={4}>
+            <div className={`input-group ${errorStyle}`}>
+              <input type="text" className="form-control" value={period} onChange={this._onChange(idx, 'period')} />
+              <span className="input-group-addon">
+                {ISODurationUtils.formatDuration(period, this.props.validator)}
+              </span>
+            </div>
+          </Col>
+          <Col xs={8}>
+            <div className="input-group">
+              <input type="text"
+                     className="form-control"
+                     placeholder="Add description..."
+                     value={description}
+                     onChange={this._onChange(idx, 'description')} />
+              <span className="input-group-addon">
+                <Icon name="trash-alt" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
+              </span>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    );
+  });
 
   render() {
     return (

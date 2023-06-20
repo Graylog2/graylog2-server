@@ -44,23 +44,21 @@ const RolesOverviewItem = ({
     readOnly,
   },
   users,
-}: Props) => {
-  return (
-    <tr key={id}>
-      <td className="limited">
-        <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>
-          {name}
-        </Link>
-      </td>
-      <DescriptionCell>
-        <TextOverflowEllipsis>
-          {description}
-        </TextOverflowEllipsis>
-      </DescriptionCell>
-      <UsersCell users={Immutable.Set(users)} />
-      <ActionsCell roleId={id} roleName={name} readOnly={readOnly} />
-    </tr>
-  );
-};
+}: Props) => (
+  <tr key={id}>
+    <td className="limited">
+      <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>
+        {name}
+      </Link>
+    </td>
+    <DescriptionCell>
+      <TextOverflowEllipsis>
+        {description}
+      </TextOverflowEllipsis>
+    </DescriptionCell>
+    <UsersCell users={Immutable.Set(users)} />
+    <ActionsCell roleId={id} roleName={name} readOnly={readOnly} />
+  </tr>
+);
 
 export default RolesOverviewItem;

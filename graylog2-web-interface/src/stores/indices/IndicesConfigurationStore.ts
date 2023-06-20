@@ -45,6 +45,7 @@ export const IndicesConfigurationStore = singletonStore(
     rotationStrategies: undefined,
     retentionStrategies: undefined,
     retentionStrategiesContext: undefined,
+    rotationStrategiesContext: undefined,
 
     getInitialState() {
       return {
@@ -62,6 +63,7 @@ export const IndicesConfigurationStore = singletonStore(
         activeRetentionConfig: this.activeRetentionConfig,
         retentionStrategies: this.retentionStrategies,
         retentionStrategiesContext: this.retentionStrategiesContext,
+        rotationStrategiesContext: this.rotationStrategiesContext,
       };
     },
     _url(path) {
@@ -74,6 +76,8 @@ export const IndicesConfigurationStore = singletonStore(
       promise.then(
         (response: RotationStrategyResponse) => {
           this.rotationStrategies = response.strategies;
+
+          this.rotationStrategiesContext = response.context;
           this.trigger(this.getState());
         },
         (error) => {

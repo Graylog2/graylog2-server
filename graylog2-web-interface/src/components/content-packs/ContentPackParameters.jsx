@@ -88,7 +88,7 @@ class ContentPackParameters extends React.Component {
   _onParameterClear = (id, configKey) => {
     const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
 
-    remove(newAppliedParameter[id], (paramMap) => { return paramMap.configKey === configKey; });
+    remove(newAppliedParameter[id], (paramMap) => paramMap.configKey === configKey);
     this.props.onStateChange({ appliedParameter: newAppliedParameter });
   };
 
@@ -98,7 +98,7 @@ class ContentPackParameters extends React.Component {
 
     /* If we delete a parameter we need to remove the reference from appliedParameter */
     Object.keys(newAppliedParameter).forEach((id) => {
-      remove(newAppliedParameter[id], (paramMap) => { return paramMap.paramName === parameter.name; });
+      remove(newAppliedParameter[id], (paramMap) => paramMap.paramName === parameter.name);
 
       if (newAppliedParameter[id].length <= 0) {
         delete newAppliedParameter[id];
@@ -111,16 +111,14 @@ class ContentPackParameters extends React.Component {
     this._closeConfirmModal();
   };
 
-  _confirmationModal = () => {
-    return (
-      <BootstrapModalConfirm showModal={this.state.showParameterModal}
-                             title="Confirm deletion"
-                             onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
-                             onCancel={this._closeConfirmModal}>
-        {`Are you sure you want to do delete this parameter: ${(this.state.parameterToDelete || {}).title}?`}
-      </BootstrapModalConfirm>
-    );
-  };
+  _confirmationModal = () => (
+    <BootstrapModalConfirm showModal={this.state.showParameterModal}
+                           title="Confirm deletion"
+                           onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
+                           onCancel={this._closeConfirmModal}>
+      {`Are you sure you want to do delete this parameter: ${(this.state.parameterToDelete || {}).title}?`}
+    </BootstrapModalConfirm>
+  );
 
   _openConfirmModal = (parameter) => {
     this.setState({ showParameterModal: true, parameterToDelete: parameter });

@@ -33,11 +33,9 @@ type Props = {
 };
 
 const DropdownField = ({ autoFocus, field, onChange, title, typeName, value, addPlaceholder }: Props) => {
-  const formatOption = (key, displayValue, disabled = false) => {
-    return (
-      <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>{displayValue}</option>
-    );
-  };
+  const formatOption = (key, displayValue, disabled = false) => (
+    <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>{displayValue}</option>
+  );
 
   const handleChange = (event) => {
     onChange(title, event.target.value);

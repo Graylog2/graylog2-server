@@ -71,9 +71,7 @@ const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorV
 `;
 });
 
-const Alert = ({ bsStyle, ...rest }: Props) => {
-  return <StyledAlert bsStyle={bsStyle} {...rest} />;
-};
+const Alert = ({ bsStyle, ...rest }: Props) => <StyledAlert bsStyle={bsStyle} {...rest} />;
 
 Alert.defaultProps = {
   onDismiss: undefined,

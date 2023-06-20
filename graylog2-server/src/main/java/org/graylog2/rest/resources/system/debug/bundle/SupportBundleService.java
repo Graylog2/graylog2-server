@@ -28,6 +28,7 @@ import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -129,7 +130,7 @@ public class SupportBundleService {
                                 ObjectMapperProvider objectMapperProvider,
                                 ClusterStatsService clusterStatsService,
                                 VersionProbe searchDbProbe,
-                                @Named("elasticsearch_hosts") List<URI> searchDbHosts,
+                                @IndexerHosts List<URI> searchDbHosts,
                                 ClusterAdapter searchDbClusterAdapter) {
         this.executor = executor;
         this.nodeService = nodeService;

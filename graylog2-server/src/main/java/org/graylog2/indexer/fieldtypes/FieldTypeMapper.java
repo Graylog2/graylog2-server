@@ -18,8 +18,10 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.plugin.Message;
 
 import javax.inject.Singleton;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableSet.of;
@@ -51,6 +53,12 @@ public class FieldTypeMapper {
     public static final FieldTypes.Type GEO_POINT_TYPE = createType("geo-point", of());
     public static final FieldTypes.Type IP_TYPE = createType("ip", of(PROP_ENUMERABLE));
 
+    /* Content-specific field types */
+    public static final FieldTypes.Type STREAMS_TYPE = createType("streams", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type INPUT_TYPE = createType("input", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type NODE_TYPE = createType("node", of(PROP_ENUMERABLE));
+
+
     /**
      * A map from Elasticsearch types to Graylog logical types.
      */
@@ -72,6 +80,12 @@ public class FieldTypeMapper {
             .put("ip", IP_TYPE)
             .build();
 
+    private static final Map<String, FieldTypes.Type> FIELD_MAP = Map.of(
+            Message.FIELD_STREAMS, STREAMS_TYPE,
+            Message.FIELD_GL2_SOURCE_INPUT, INPUT_TYPE,
+            Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE
+    );
+
     /**
      * Map the given Elasticsearch field type to a Graylog type.
      *
@@ -79,7 +93,8 @@ public class FieldTypeMapper {
      * @return the Graylog type object
      */
     public Optional<FieldTypes.Type> mapType(FieldTypeDTO type) {
-        return Optional.ofNullable(TYPE_MAP.get(type.physicalType()))
+        return Optional.ofNullable(FIELD_MAP.get(type.fieldName()))
+                .or(() -> Optional.ofNullable(TYPE_MAP.get(type.physicalType())))
                 .map(mappedType -> type.properties().contains(FieldTypeDTO.Properties.FIELDDATA)
                         ? mappedType.toBuilder().properties(new ImmutableSet.Builder<String>().addAll(mappedType.properties()).add(PROP_ENUMERABLE).build()).build()
                         : mappedType);

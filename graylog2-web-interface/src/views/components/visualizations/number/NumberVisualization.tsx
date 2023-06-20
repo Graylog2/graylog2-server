@@ -21,7 +21,7 @@ import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import Value from 'views/components/Value';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
-import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
+import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';

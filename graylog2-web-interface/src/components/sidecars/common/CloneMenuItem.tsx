@@ -19,31 +19,29 @@ import PropTypes from 'prop-types';
 
 import { MenuItem, BootstrapModalForm, Input } from 'components/bootstrap';
 
-const CloneMenuItem = ({ error, id, showModal, onClose, name, onChange, onSave, onSelect }) => {
-  return (
-    <>
-      <MenuItem onSelect={onSelect}>Clone</MenuItem>
-      <BootstrapModalForm show={showModal}
-                          title="Clone"
-                          onSubmitForm={onSave}
-                          onCancel={onClose}
-                          submitButtonDisabled={Boolean(error)}
-                          submitButtonText="Done">
-        <fieldset>
-          <Input type="text"
-                 id={id}
-                 label="Name"
-                 defaultValue={name}
-                 onChange={onChange}
-                 bsStyle={error ? 'error' : null}
-                 help={error || 'Type a name for the new collector'}
-                 autoFocus
-                 required />
-        </fieldset>
-      </BootstrapModalForm>
-    </>
-  );
-};
+const CloneMenuItem = ({ error, id, showModal, onClose, name, onChange, onSave, onSelect }) => (
+  <>
+    <MenuItem onSelect={onSelect}>Clone</MenuItem>
+    <BootstrapModalForm show={showModal}
+                        title="Clone"
+                        onSubmitForm={onSave}
+                        onCancel={onClose}
+                        submitButtonDisabled={Boolean(error)}
+                        submitButtonText="Done">
+      <fieldset>
+        <Input type="text"
+               id={id}
+               label="Name"
+               defaultValue={name}
+               onChange={onChange}
+               bsStyle={error ? 'error' : null}
+               help={error || 'Type a name for the new collector'}
+               autoFocus
+               required />
+      </fieldset>
+    </BootstrapModalForm>
+  </>
+);
 
 CloneMenuItem.propTypes = {
   error: PropTypes.string,

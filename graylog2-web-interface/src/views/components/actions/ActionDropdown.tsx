@@ -38,13 +38,11 @@ const StyledListItem = styled.li`
   list-style: none;
 `;
 
-const filterVisibleActions = (dispatch: AppDispatch, handlerArgs: Props['handlerArgs'], actions: Array<ActionDefinition> | undefined = []) => {
-  return actions.filter((action: ActionDefinition) => {
-    const { isHidden = () => false } = action;
+const filterVisibleActions = (dispatch: AppDispatch, handlerArgs: Props['handlerArgs'], actions: Array<ActionDefinition> | undefined = []) => actions.filter((action: ActionDefinition) => {
+  const { isHidden = () => false } = action;
 
-    return dispatch((_dispatch, getState) => !isHidden(handlerArgs, getState));
-  });
-};
+  return dispatch((_dispatch, getState) => !isHidden(handlerArgs, getState));
+});
 
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const valueActions = usePluginEntities('valueActions');

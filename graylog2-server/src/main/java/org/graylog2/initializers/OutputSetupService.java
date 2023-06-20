@@ -20,6 +20,7 @@ import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.system.shutdown.GracefulShutdownHook;
@@ -39,12 +40,15 @@ public class OutputSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(OutputSetupService.class);
 
     private final OutputRegistry outputRegistry;
+    private final MessageOutput defaultMessageOutput;
 
     @Inject
     public OutputSetupService(final OutputRegistry outputRegistry,
                               final BufferSynchronizerService bufferSynchronizerService,
-                              final MetricRegistry metricRegistry) {
+                              final MetricRegistry metricRegistry,
+                              @DefaultMessageOutput MessageOutput defaultMessageOutput) {
         this.outputRegistry = outputRegistry;
+        this.defaultMessageOutput = defaultMessageOutput;
 
         // Shutdown after the BufferSynchronizerService has stopped to avoid shutting down outputs too early.
         bufferSynchronizerService.addListener(new Listener() {
@@ -83,7 +87,8 @@ public class OutputSetupService extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        // Outputs are started lazily in the OutputRegistry.
+        defaultMessageOutput.initialize();
+        // Other outputs are started lazily in the OutputRegistry.
     }
 
     @Override

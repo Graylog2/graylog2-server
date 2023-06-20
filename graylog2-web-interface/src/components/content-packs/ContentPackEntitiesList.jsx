@@ -82,9 +82,7 @@ class ContentPackEntitiesList extends React.Component {
     }
 
     const regexp = RegExp(filter, 'i');
-    const filteredEntities = entities.filter((entity) => {
-      return regexp.test(entity.title) || regexp.test(entity.description);
-    });
+    const filteredEntities = entities.filter((entity) => regexp.test(entity.title) || regexp.test(entity.description));
 
     this.setState({ filteredEntities: filteredEntities, filter: filter });
   };

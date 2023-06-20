@@ -38,13 +38,13 @@ const IndexSetsComponent = () => {
   const DEFAULT_PAGE_SIZE = 10;
   const SEARCH_MIN_TERM_LENGTH = 3;
   const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } = useStore<IndexSetsStoreState>(IndexSetsStore);
-  const { page, resetPage } : PaginationQueryParameterResult = usePaginationQueryParameter();
+  const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();
   const sendTelemetry = useSendTelemetry();
 
   const [statsEnabled, setStatsEnabled] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>(undefined);
 
-  const formsRef = useRef<{[key: string]: { open:() => void }}>();
+  const formsRef = useRef<{ [key: string]: { open:() => void } }>();
 
   const loadData = useCallback((pageNumber: number = DEFAULT_PAGE_NUMBER, limit: number = DEFAULT_PAGE_SIZE) => {
     if (searchTerm) {
@@ -75,32 +75,33 @@ const IndexSetsComponent = () => {
   };
 
   const onSearchReset = () => {
-    setSearchTerm(undefined); resetPage();
+    setSearchTerm(undefined);
+    resetPage();
   };
 
-  const onToggleStats = () => { setStatsEnabled(!statsEnabled); };
-
-  const onSetDefault = (indexSet: IndexSet) => {
-    return () => {
-      sendTelemetry('click', {
-        appSection: 'index_sets',
-        eventElement: 'set-default-index-set',
-      });
-
-      IndexSetsActions.setDefault(indexSet).then(() => loadData());
-    };
+  const onToggleStats = () => {
+    setStatsEnabled(!statsEnabled);
   };
 
-  const onDelete = (indexSet: IndexSet) => {
-    return () => {
-      formsRef.current[`index-set-deletion-form-${indexSet.id}`].open();
-    };
+  const onSetDefault = (indexSet: IndexSet) => () => {
+    sendTelemetry('click', {
+      app_pathname: 'indices',
+      app_section: 'index-sets',
+      app_action_value: 'set-default-index-set',
+    });
+
+    IndexSetsActions.setDefault(indexSet).then(() => loadData());
+  };
+
+  const onDelete = (indexSet: IndexSet) => () => {
+    formsRef.current[`index-set-deletion-form-${indexSet.id}`].open();
   };
 
   const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
-    sendTelemetry('submit_form', {
-      appSection: 'index_sets',
-      eventElement: 'delete-index-set',
+    sendTelemetry('form_submit', {
+      app_pathname: 'indices',
+      app_section: 'index-sets',
+      app_action_value: 'delete-index-set',
     });
 
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
@@ -123,22 +124,22 @@ const IndexSetsComponent = () => {
   const Toolbar = styled(Row)(({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[90]};
     padding-bottom: 15px;
-  `);
+`);
 
   const GlobalStatsCol = styled(Col)`
     display: flex;
     align-items: center;
     gap: 10px;
-  `;
+`;
 
   const GlobalStats = styled.p`
     margin-bottom: 0;
-  `;
+`;
 
-  const StatsInfoText = styled.span(({ theme }: {theme: DefaultTheme }) => css`
+  const StatsInfoText = styled.span(({ theme }: { theme: DefaultTheme }) => css`
     color: ${theme.colors.textAlt};
     font-style: italic;
-  `);
+`);
 
   const statsDisabledText = 'Stats are disabled by default';
 
@@ -163,8 +164,10 @@ const IndexSetsComponent = () => {
         <IndexSetDetails indexSet={indexSet} />
 
         <IndexSetDeletionForm ref={
-          (elem) => { formsRef.current = { ...formsRef.current, [`index-set-deletion-form-${indexSet.id}`]: elem }; }
-}
+          (elem) => {
+            formsRef.current = { ...formsRef.current, [`index-set-deletion-form-${indexSet.id}`]: elem };
+          }
+        }
                               indexSet={indexSet}
                               onDelete={deleteIndexSet} />
       </Col>
@@ -176,8 +179,10 @@ const IndexSetsComponent = () => {
       </Link>
     );
 
-    const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
-    const isReadOnly = !indexSet.writable ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
+    const isDefault = indexSet.default
+      ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
+    const isReadOnly = !indexSet.writable
+      ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
     let { description } = indexSet;
 
     if (indexSet.default) {
@@ -194,7 +199,11 @@ const IndexSetsComponent = () => {
     return (
       <EntityListItem key={`index-set-${indexSet.id}`}
                       title={indexSetTitle}
-                      titleSuffix={<span>{statsEnabled ? statsString : <StatsInfoText>{statsDisabledText}</StatsInfoText>} {isDefault} {isReadOnly}</span>}
+                      titleSuffix={(
+                        <span>{statsEnabled ? statsString
+                          : <StatsInfoText>{statsDisabledText}</StatsInfoText>} {isDefault} {isReadOnly}
+                        </span>
+                      )}
                       description={description}
                       actions={actions}
                       contentRow={content} />

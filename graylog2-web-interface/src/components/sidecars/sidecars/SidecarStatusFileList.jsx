@@ -24,9 +24,7 @@ class SidecarStatusFileList extends React.Component {
     files: PropTypes.array.isRequired,
   };
 
-  _headerCellFormatter = (header) => {
-    return <th>{header}</th>;
-  };
+  _headerCellFormatter = (header) => <th>{header}</th>;
 
   _activityFormatter = (time) => {
     const now = new Date().getTime();

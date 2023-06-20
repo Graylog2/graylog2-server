@@ -75,6 +75,8 @@ const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
   }
 };
 
+const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.originalName ?? chart.name) } });
+
 const XYPlot = ({
   axisType,
   config,
@@ -152,7 +154,7 @@ XYPlot.defaultProps = {
   axisType: DEFAULT_AXIS_TYPE,
   plotLayout: {},
   getChartColor: undefined,
-  setChartColor: undefined,
+  setChartColor: defaultSetColor,
   effectiveTimerange: undefined,
   onZoom: undefined,
   height: undefined,

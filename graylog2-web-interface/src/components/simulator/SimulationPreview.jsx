@@ -35,13 +35,11 @@ const SimulationPreview = ({ simulationResults, streams }) => {
     );
   }
 
-  const formattedMessages = messages.map((message) => {
-    return (
-      <MessageShow key={message.id}
-                   message={message}
-                   streams={streams} />
-    );
-  });
+  const formattedMessages = messages.map((message) => (
+    <MessageShow key={message.id}
+                 message={message}
+                 streams={streams} />
+  ));
 
   return <div className="message-preview-wrapper">{formattedMessages}</div>;
 };

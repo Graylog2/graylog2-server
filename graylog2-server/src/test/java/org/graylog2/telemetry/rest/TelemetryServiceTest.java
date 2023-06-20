@@ -16,52 +16,48 @@
  */
 package org.graylog2.telemetry.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.traffic.TrafficCounterService;
-import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
+import org.graylog2.telemetry.cluster.TelemetryClusterService;
 import org.graylog2.telemetry.enterprise.TelemetryEnterpriseDataProvider;
+import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.graylog2.telemetry.user.db.TelemetryUserSettingsDto;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.graylog2.system.traffic.TrafficCounterService.TrafficHistogram;
+import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.CLUSTER;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.CURRENT_USER;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.LICENSE;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.PLUGIN;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.SEARCH_CLUSTER;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.USER_TELEMETRY_SETTINGS;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.mockTrafficData;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TelemetryServiceTest {
 
-    public static final TrafficHistogram TRAFFIC_HISTOGRAM = TrafficHistogram.create(
-            DateTime.now(DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC), Map.of(), Map.of(), Map.of());
-    private static final String CURRENT_USER = "current_user";
-    private static final String USER_TELEMETRY_SETTINGS = "user_telemetry_settings";
-    private static final String CLUSTER = "cluster";
-    private static final String LICENSE = "license";
-    private static final String PLUGIN = "plugin";
-    private static final String SEARCH_CLUSTER = "search_cluster";
     @Mock
     TrafficCounterService trafficCounterService;
-    @Mock
-    ClusterConfigService clusterConfigService;
     @Mock
     TelemetryEnterpriseDataProvider enterpriseDataProvider;
     @Mock
@@ -73,11 +69,9 @@ public class TelemetryServiceTest {
     @Mock
     SearchVersion elasticsearchVersion;
     @Mock
-    ObjectMapper objectMapper;
-    @Mock
     DBTelemetryUserSettingsService dbTelemetryUserSettingsService;
     @Mock
-    DBTelemetryClusterInfo dbTelemetryClusterInfo;
+    TelemetryClusterService telemetryClusterService;
     @Mock
     EventBus eventBus;
     @Mock
@@ -106,7 +100,7 @@ public class TelemetryServiceTest {
     @Test
     void test_no_telemetry_user_settings() {
         TelemetryService telemetryService = createTelemetryService(true);
-        when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
+        mockTrafficData(trafficCounterService);
 
         Map<String, Object> response = telemetryService.getTelemetryResponse(user);
 
@@ -117,21 +111,69 @@ public class TelemetryServiceTest {
     void test_telemetry_enabled_for_user() {
         TelemetryService telemetryService = createTelemetryService(true);
         mockUserTelemetryEnabled(true);
-        when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
+        mockTrafficData(trafficCounterService);
 
         Map<String, Object> response = telemetryService.getTelemetryResponse(user);
 
         assertThatAllTelemetryDataIsPresent(response);
     }
 
-    @Test
-    void test_json_serialization_error() throws JsonProcessingException {
-        TelemetryService telemetryService = createTelemetryService(true, objectMapper);
-        mockUserTelemetryEnabled(true);
-        when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-        when(trafficCounterService.clusterTrafficOfLastDays(any(), any())).thenReturn(TRAFFIC_HISTOGRAM);
 
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> telemetryService.getTelemetryResponse(user));
+    @Test
+    void test_licenses() {
+        TelemetryService telemetryService = createTelemetryService(true);
+        mockUserTelemetryEnabled(true);
+        mockTrafficData(trafficCounterService);
+        TelemetryLicenseStatus enterpriseLicense = createLicense("/license/enterprise");
+        TelemetryLicenseStatus expiredEnterpriseLicense = enterpriseLicense.toBuilder().expired(true).build();
+        TelemetryLicenseStatus invalidEnterpriseLicense = enterpriseLicense.toBuilder().valid(false).build();
+        TelemetryLicenseStatus olderEnterpriseLicense = enterpriseLicense.toBuilder()
+                .expirationDate(enterpriseLicense.expirationDate().minusDays(1)).build();
+        TelemetryLicenseStatus securityLicense = createLicense("/license/security");
+        when(enterpriseDataProvider.licenseStatus()).thenReturn(List.of(
+                olderEnterpriseLicense,
+                invalidEnterpriseLicense,
+                enterpriseLicense,
+                expiredEnterpriseLicense,
+                securityLicense));
+
+        Map<String, Object> response = telemetryService.getTelemetryResponse(user);
+
+        assertThat(response.get(LICENSE)).isEqualTo(merge(
+                toMap(enterpriseLicense, "enterprise"),
+                toMap(securityLicense, "security")));
+    }
+
+
+    @SafeVarargs
+    public final Map<String, Object> merge(Map<String, Object>... values) {
+        return Stream.of(values)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> v1));
+    }
+
+    private Map<String, Object> toMap(TelemetryLicenseStatus license, String licenseName) {
+        return Map.of(
+                f("license_%s_violated", licenseName), license.violated(),
+                f("license_%s_expired", licenseName), license.expired(),
+                f("license_%s_valid", licenseName), license.valid(),
+                f("license_%s_expiration_date", licenseName), license.expirationDate(),
+                f("license_%s_traffic_limit", licenseName), license.trafficLimit()
+        );
+    }
+
+    private TelemetryLicenseStatus createLicense(String subject) {
+        return TelemetryLicenseStatus.builder()
+                .valid(true)
+                .violated(false)
+                .expired(false)
+                .subject(subject)
+                .expirationDate(ZonedDateTime.now())
+                .trafficLimit(0L)
+                .build();
     }
 
     private void assertThatAllTelemetryDataIsPresent(Map<String, Object> response) {
@@ -139,24 +181,18 @@ public class TelemetryServiceTest {
     }
 
     private TelemetryService createTelemetryService(boolean isTelemetryEnabled) {
-        return createTelemetryService(isTelemetryEnabled, new ObjectMapper());
-    }
-
-    private TelemetryService createTelemetryService(boolean isTelemetryEnabled, ObjectMapper objectMapper) {
         return new TelemetryService(
                 isTelemetryEnabled,
                 trafficCounterService,
-                clusterConfigService,
                 enterpriseDataProvider,
                 userService,
                 pluginMetaDataSet,
                 elasticClusterAdapter,
                 elasticsearchVersion,
-                new TelemetryResponseFactory(objectMapper),
+                new TelemetryResponseFactory(),
                 dbTelemetryUserSettingsService,
-                dbTelemetryClusterInfo,
-                eventBus
-        );
+                eventBus,
+                telemetryClusterService);
     }
 
     private void mockUserTelemetryEnabled(boolean isTelemetryEnabled) {

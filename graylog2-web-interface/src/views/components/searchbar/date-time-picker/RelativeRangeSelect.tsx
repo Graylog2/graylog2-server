@@ -27,9 +27,6 @@ import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './
 import RelativeRangeValueInput from './RelativeRangeValueInput';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 
-import TimerangeSelector from '../TimerangeSelector';
-import RangePresetDropdown from '../RangePresetDropdown';
-
 const RangeWrapper = styled.div`
   flex: 4;
   align-items: center;
@@ -93,12 +90,6 @@ const ErrorMessage = styled.span(({ theme }) => css`
   padding: 3px;
 `);
 
-const ConfiguredWrapper = styled.div`
-  grid-area: 3 / 5 / 3 / 7;
-  margin: 3px 12px 3px 0;
-  justify-self: end;
-`;
-
 const buildRangeTypes = (limitDuration) => RELATIVE_RANGE_TYPES.map(({ label, type }) => {
   const typeDuration = moment.duration(1, type).asSeconds();
 
@@ -110,7 +101,6 @@ const buildRangeTypes = (limitDuration) => RELATIVE_RANGE_TYPES.map(({ label, ty
 }).filter(Boolean);
 
 type Props = {
-  classifyRange: (range: number) => RangeClassified,
   defaultRange: RangeClassified
   disableUnsetRange?: boolean,
   disabled?: boolean,
@@ -119,12 +109,10 @@ type Props = {
   onUnsetRange?: () => void,
   title: string,
   unsetRangeLabel: string,
-  unsetRangeValue: number | undefined,
 }
 
 const RelativeRangeSelectInner = ({
   classifiedRange,
-  classifyRange,
   defaultRange,
   disableUnsetRange,
   disabled,
@@ -136,7 +124,6 @@ const RelativeRangeSelectInner = ({
   onUnsetRange,
   title,
   unsetRangeLabel,
-  unsetRangeValue,
 }: Required<Props> & {
   classifiedRange: RangeClassified,
   error: string | undefined,
@@ -185,17 +172,6 @@ const RelativeRangeSelectInner = ({
     _onChange(isUnsetting ? RELATIVE_CLASSIFIED_ALL_TIME_RANGE : _defaultRange);
   };
 
-  const _onSetPreset = (range) => {
-    const isUnsetting = range === 0;
-    const newRange = isUnsetting ? unsetRangeValue : range;
-
-    if (isUnsetting && !!onUnsetRange) {
-      onUnsetRange();
-    }
-
-    _onChange(classifyRange(newRange));
-  };
-
   return (
     <RangeWrapper>
       <RangeTitle>{title}</RangeTitle>
@@ -234,19 +210,11 @@ const RelativeRangeSelectInner = ({
           {error}
         </ErrorMessage>
       )}
-
-      <ConfiguredWrapper>
-        <TimerangeSelector className="relative">
-          <RangePresetDropdown disabled={disabled}
-                               onChange={_onSetPreset} />
-        </TimerangeSelector>
-      </ConfiguredWrapper>
     </RangeWrapper>
   );
 };
 
 const RelativeRangeSelect = ({
-  classifyRange,
   defaultRange,
   disableUnsetRange,
   disabled,
@@ -255,12 +223,10 @@ const RelativeRangeSelect = ({
   onUnsetRange,
   title,
   unsetRangeLabel,
-  unsetRangeValue,
 }: Props) => (
   <Field name={`nextTimeRange.${fieldName}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => (
       <RelativeRangeSelectInner classifiedRange={value}
-                                classifyRange={classifyRange}
                                 defaultRange={defaultRange}
                                 disableUnsetRange={disableUnsetRange}
                                 disabled={disabled}
@@ -271,8 +237,7 @@ const RelativeRangeSelect = ({
                                 onUnsetRange={onUnsetRange}
                                 onChange={onChange}
                                 title={title}
-                                unsetRangeLabel={unsetRangeLabel}
-                                unsetRangeValue={unsetRangeValue} />
+                                unsetRangeLabel={unsetRangeLabel} />
     )}
   </Field>
 );

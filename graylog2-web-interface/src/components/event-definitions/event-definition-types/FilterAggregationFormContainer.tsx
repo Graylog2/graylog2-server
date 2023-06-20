@@ -31,9 +31,7 @@ type Props = {
   }
 };
 
-const FilterAggregationFormContainer = (props: Props) => {
-  return <FilterAggregationForm {...props} />;
-};
+const FilterAggregationFormContainer = (props: Props) => <FilterAggregationForm {...props} />;
 
 FilterAggregationFormContainer.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']).isRequired,

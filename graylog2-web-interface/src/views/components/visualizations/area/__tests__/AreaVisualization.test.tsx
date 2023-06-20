@@ -24,6 +24,8 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixtures';
 
@@ -40,7 +42,9 @@ jest.mock('util/AppConfig', () => ({
 
 const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
-    <OriginalAreaVisualization {...props} />
+    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }) }}>
+      <OriginalAreaVisualization {...props} />
+    </FieldTypesContext.Provider>
   </TestStoreProvider>
 );
 
@@ -87,6 +91,7 @@ describe('AreaVisualization', () => {
         y: [24558.239393939395, 3660.5666666666666, 49989.69, 2475.225, 10034.822222222223],
         fill: 'tozeroy',
         line: { shape: 'linear' },
+        originalName: 'avg(nf_bytes)',
       },
       {
         type: 'scatter',
@@ -101,6 +106,7 @@ describe('AreaVisualization', () => {
         y: [14967, 1239, 20776, 1285, 4377],
         fill: 'tozeroy',
         line: { shape: 'linear' },
+        originalName: 'sum(nf_pkts)',
       },
     ]);
   });

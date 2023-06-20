@@ -26,6 +26,8 @@ import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
 const MOCK_VIEW_QUERY_ID = 'query-id';
 
+jest.mock('views/logic/slices/createSearch', () => (s: Search) => s);
+
 describe('BindSearchParamsFromQuery should', () => {
   const query = Query.builder()
     .id(MOCK_VIEW_QUERY_ID)

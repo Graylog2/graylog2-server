@@ -18,7 +18,6 @@ package org.graylog.failure;
 
 import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class FailureBatchTest {
         final IndexingFailure indFailure2 = createIndexingFailure();
 
         // when
-        final FailureBatch failureBatch = FailureBatch.indexingFailureBatch(ImmutableList.of(indFailure1, indFailure2));
+        final FailureBatch failureBatch = FailureBatch.indexingFailureBatch(List.of(indFailure1, indFailure2));
 
         // then
         assertThat(failureBatch.size()).isEqualTo(2);
@@ -71,7 +70,7 @@ public class FailureBatchTest {
     @Test
     public void indexingFailureBatch_creationFailsUponMixedTypesOfFailures() {
         assertThatCode(() ->
-                FailureBatch.indexingFailureBatch(ImmutableList.of(createIndexingFailure(), createIndexingFailure(), new CustomIndexingFailure())))
+                FailureBatch.indexingFailureBatch(List.of(createIndexingFailure(), createIndexingFailure(), new CustomIndexingFailure())))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -82,7 +81,7 @@ public class FailureBatchTest {
         final ProcessingFailure prcFailure2 = createProcessingFailure();
 
         // when
-        final FailureBatch failureBatch = FailureBatch.processingFailureBatch(ImmutableList.of(prcFailure1, prcFailure2));
+        final FailureBatch failureBatch = FailureBatch.processingFailureBatch(List.of(prcFailure1, prcFailure2));
 
         // then
         assertThat(failureBatch.size()).isEqualTo(2);
@@ -108,14 +107,14 @@ public class FailureBatchTest {
 
     @Test
     public void containsIndexingFailures_returnsTrueForIndexingFailuresAndFalseForOtherFailures() {
-        assertThat(FailureBatch.indexingFailureBatch(ImmutableList.of(createIndexingFailure())).containsIndexingFailures()).isTrue();
-        assertThat(FailureBatch.processingFailureBatch(ImmutableList.of(createProcessingFailure())).containsIndexingFailures()).isFalse();
+        assertThat(FailureBatch.indexingFailureBatch(List.of(createIndexingFailure())).containsIndexingFailures()).isTrue();
+        assertThat(FailureBatch.processingFailureBatch(List.of(createProcessingFailure())).containsIndexingFailures()).isFalse();
     }
 
     @Test
     public void containsProcessingFailures_returnsTrueForProcessingFailuresAndFalseForOtherFailures() {
-        assertThat(FailureBatch.processingFailureBatch(ImmutableList.of(createProcessingFailure())).containsProcessingFailures()).isTrue();
-        assertThat(FailureBatch.indexingFailureBatch(ImmutableList.of(createIndexingFailure())).containsProcessingFailures()).isFalse();
+        assertThat(FailureBatch.processingFailureBatch(List.of(createProcessingFailure())).containsProcessingFailures()).isTrue();
+        assertThat(FailureBatch.indexingFailureBatch(List.of(createIndexingFailure())).containsProcessingFailures()).isFalse();
     }
 
     private IndexingFailure createIndexingFailure() {

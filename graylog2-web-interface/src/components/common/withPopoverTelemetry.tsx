@@ -17,34 +17,32 @@
 // eslint-disable-next-line no-restricted-imports
 import type { PopoverProps } from 'react-bootstrap';
 import React, { useEffect } from 'react';
+import kebabCase from 'lodash/kebabCase';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const withPopoverTelemetry = (Component) => {
-  return (props: PopoverProps) => {
-    const { 'data-event-element': eventElement, 'data-app-section': appSection }: any = props;
-    const sendTelemetry = useSendTelemetry();
+const withPopoverTelemetry = (Component) => (props: PopoverProps) => {
+  const { 'data-event-element': eventElement, 'data-app-section': appSection }: any = props;
+  const sendTelemetry = useSendTelemetry();
 
-    useEffect(() => {
-      const telemetryEvent = {
-        appSection,
-        eventElement,
-        eventInfo: {},
-      };
+  useEffect(() => {
+    const telemetryEvent = {
+      app_section: kebabCase(appSection),
+      app_action_value: kebabCase(eventElement),
+    };
 
-      if (telemetryEvent.eventElement) {
-        sendTelemetry('open_popover', telemetryEvent);
+    if (telemetryEvent.app_action_value) {
+      sendTelemetry('popover_open', telemetryEvent);
+    }
+
+    return () => {
+      if (telemetryEvent.app_action_value) {
+        sendTelemetry('popover_close', telemetryEvent);
       }
+    };
+  }, [eventElement, appSection, sendTelemetry]);
 
-      return () => {
-        if (telemetryEvent.eventElement) {
-          sendTelemetry('close_popover', telemetryEvent);
-        }
-      };
-    }, [eventElement, appSection, sendTelemetry]);
-
-    return <Component {...props} />;
-  };
+  return <Component {...props} />;
 };
 
 export default withPopoverTelemetry;

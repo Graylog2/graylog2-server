@@ -21,9 +21,7 @@ import { InputGroup as BootstrapInputGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import classNames from 'classnames';
 
-const StyledBootstrapInputAddon = ({ className, ...rest }) => {
-  return <BootstrapInputGroup.Addon bsClass={className} {...rest} />;
-};
+const StyledBootstrapInputAddon = ({ className, ...rest }) => <BootstrapInputGroup.Addon bsClass={className} {...rest} />;
 
 export const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
   color: ${theme.colors.input.color};
@@ -31,17 +29,11 @@ export const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
   border-color: ${theme.colors.input.border};
 `);
 
-const Addon = ({ bsClass, className, ...addonProps }) => {
-  return <StyledAddon className={classNames(bsClass, className)} {...addonProps} />;
-};
+const Addon = ({ bsClass, className, ...addonProps }) => <StyledAddon className={classNames(bsClass, className)} {...addonProps} />;
 
-const Button = ({ bsClass, className, ...addonProps }) => {
-  return <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />;
-};
+const Button = ({ bsClass, className, ...addonProps }) => <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />;
 
-const InputGroup = ({ bsClass, className, ...restProps }) => {
-  return <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />;
-};
+const InputGroup = ({ bsClass, className, ...restProps }) => <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />;
 
 InputGroup.Addon = Addon;
 InputGroup.Button = Button;
