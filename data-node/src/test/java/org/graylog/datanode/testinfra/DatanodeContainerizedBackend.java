@@ -16,6 +16,10 @@
  */
 package org.graylog.datanode.testinfra;
 
+import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
+import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
+import org.graylog.testing.graylognode.MavenPackager;
+import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
@@ -24,6 +28,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Properties;
 
 public class DatanodeContainerizedBackend {
@@ -60,6 +65,9 @@ public class DatanodeContainerizedBackend {
     }
 
     private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion) {
+
+        MavenPackager.packageJarIfNecessary(createConfig());
+
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
@@ -94,6 +102,10 @@ public class DatanodeContainerizedBackend {
                 .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
         customizer.onContainer(container);
         return container;
+    }
+
+    private NodeContainerConfig createConfig() {
+        return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
     }
 
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
