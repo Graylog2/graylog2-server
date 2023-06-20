@@ -172,6 +172,7 @@ const Metric = ({ index }: Props) => {
                              properties={percentageRequiredFieldOptions}
                              name={name}
                              value={value}
+                             menuPortalTarget={document.body}
                              ariaLabel="Select a field" />
               </Input>
             )}
