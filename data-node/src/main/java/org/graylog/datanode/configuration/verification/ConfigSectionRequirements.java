@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public record ConfigRequirements(Collection<ConfigProperty> requiredStringProperties,
-                                 Collection<Path> requiredFiles) {
+public record ConfigSectionRequirements(Collection<ConfigProperty> requiredStringProperties,
+                                        Collection<Path> requiredFiles) {
 
-    public ConfigRequirements(Collection<ConfigProperty> requiredStringProperties, Collection<Path> requiredFiles) {
+    public ConfigSectionRequirements(Collection<ConfigProperty> requiredStringProperties, Collection<Path> requiredFiles) {
         this.requiredStringProperties = requiredStringProperties != null ? requiredStringProperties : List.of();
         this.requiredFiles = requiredFiles != null ? requiredFiles : List.of();
     }

@@ -26,12 +26,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.graylog.datanode.configuration.verification.ConfigVerificationResult.INCOMPLETE;
-import static org.graylog.datanode.configuration.verification.ConfigVerificationResult.MISSING;
-import static org.graylog.datanode.configuration.verification.ConfigVerificationResult.OK;
+import static org.graylog.datanode.configuration.verification.ConfigSectionCompleteness.COMPLETE;
+import static org.graylog.datanode.configuration.verification.ConfigSectionCompleteness.INCOMPLETE;
+import static org.graylog.datanode.configuration.verification.ConfigSectionCompleteness.MISSING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ConfigVerifierTest {
+class ConfigSectionCompletenessVerifierTest {
 
     private static Path existingFile;
 
@@ -43,18 +43,18 @@ class ConfigVerifierTest {
 
     @Test
     void testReturnsOkOnNullRequirements() {
-        assertEquals(OK, new ConfigVerifier().verifyConfig(null));
+        assertEquals(COMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(null));
     }
 
     @Test
     void testReturnsOkOnEmptyRequirements() {
-        assertEquals(OK, new ConfigVerifier().verifyConfig(new ConfigRequirements(null, null)));
-        assertEquals(OK, new ConfigVerifier().verifyConfig(new ConfigRequirements(List.of(), List.of())));
+        assertEquals(COMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(null, null)));
+        assertEquals(COMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(List.of(), List.of())));
     }
 
     @Test
     void testReturnsOkIfAllRequirementsMet() {
-        assertEquals(OK, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(COMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "I am present"),
                         new ConfigProperty("whatever", "Mee too!")),
                 List.of(existingFile)
@@ -63,7 +63,7 @@ class ConfigVerifierTest {
 
     @Test
     void testReturnsIncompleteIfSomePropertiesMissing() {
-        assertEquals(INCOMPLETE, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(INCOMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "I am present"),
                         new ConfigProperty("whatever", "Mee too!"),
                         new ConfigProperty("nvmd", "")
@@ -74,7 +74,7 @@ class ConfigVerifierTest {
 
     @Test
     void testReturnsIncompleteIfSomePropertiesNull() {
-        assertEquals(INCOMPLETE, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(INCOMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "I am present"),
                         new ConfigProperty("whatever", "Mee too!"),
                         new ConfigProperty("nvmd", null)
@@ -85,7 +85,7 @@ class ConfigVerifierTest {
 
     @Test
     void testReturnsIncompleteIfNullFilePathPresent() {
-        assertEquals(INCOMPLETE, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(INCOMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "I am present"),
                         new ConfigProperty("whatever", "Mee too!")),
                 Arrays.asList(existingFile, null)
@@ -94,7 +94,7 @@ class ConfigVerifierTest {
 
     @Test
     void testReturnsIncompleteIfNonExistingFilePathPresent() {
-        assertEquals(INCOMPLETE, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(INCOMPLETE, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "I am present"),
                         new ConfigProperty("whatever", "Mee too!")),
                 List.of(existingFile, Path.of("I_am_not_at_home.txt"))
@@ -103,17 +103,17 @@ class ConfigVerifierTest {
 
     @Test
     void testReturnsMissingIfAllPropertiesRequirementsAreNotMet() {
-        assertEquals(MISSING, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(MISSING, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 Arrays.asList(new ConfigProperty("importantProperty", ""),
                         new ConfigProperty("whatever", ""),
                         new ConfigProperty("x", null)),
                 Arrays.asList(null, null, Path.of("I_am_not_at_home.txt"))
         )));
-        assertEquals(MISSING, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(MISSING, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 List.of(),
                 List.of(Path.of("I_am_not_at_home.txt"))
         )));
-        assertEquals(MISSING, new ConfigVerifier().verifyConfig(new ConfigRequirements(
+        assertEquals(MISSING, new ConfigSectionCompletenessVerifier().verifyConfigSectionCompleteness(new ConfigSectionRequirements(
                 List.of(new ConfigProperty("x", "")),
                 List.of()
         )));

@@ -25,9 +25,9 @@ import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.datanode.configuration.certificates.CertificateMetaData;
 import org.graylog.datanode.configuration.certificates.KeystoreReEncryption;
 import org.graylog.datanode.configuration.verification.ConfigProperty;
-import org.graylog.datanode.configuration.verification.ConfigRequirements;
-import org.graylog.datanode.configuration.verification.ConfigVerificationResult;
-import org.graylog.datanode.configuration.verification.ConfigVerifier;
+import org.graylog.datanode.configuration.verification.ConfigSectionCompleteness;
+import org.graylog.datanode.configuration.verification.ConfigSectionCompletenessVerifier;
+import org.graylog.datanode.configuration.verification.ConfigSectionRequirements;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
@@ -59,7 +59,7 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
     private final TlsConfigurationSupplier tlsConfigurationSupplier;
     private final TruststoreCreator truststoreCreator;
     private final RootCertificateFinder rootCertificateFinder;
-    private final ConfigVerifier configVerifier;
+    private final ConfigSectionCompletenessVerifier configSectionCompletenessVerifier;
 
     @Inject
     public UploadedCertFilesSecureConfiguration(final Configuration localConfiguration,
@@ -67,13 +67,13 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
                                                 final TlsConfigurationSupplier tlsConfigurationSupplier,
                                                 final TruststoreCreator truststoreCreator,
                                                 final RootCertificateFinder rootCertificateFinder,
-                                                final ConfigVerifier configVerifier) {
+                                                final ConfigSectionCompletenessVerifier configSectionCompletenessVerifier) {
         super(localConfiguration);
         this.keystoreReEncryption = keystoreReEncryption;
         this.tlsConfigurationSupplier = tlsConfigurationSupplier;
         this.truststoreCreator = truststoreCreator;
         this.rootCertificateFinder = rootCertificateFinder;
-        this.configVerifier = configVerifier;
+        this.configSectionCompletenessVerifier = configSectionCompletenessVerifier;
         this.uploadedTransportKeystorePath = datanodeConfigDir
                 .resolve(localConfiguration.getDatanodeTransportCertificate());
         this.uploadedHttpKeystorePath = datanodeConfigDir
@@ -93,16 +93,16 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
 
     @Override
     public boolean checkPrerequisites(Configuration localConfiguration) {
-        final ConfigRequirements configRequirements = new ConfigRequirements(
+        final ConfigSectionRequirements configSectionRequirements = new ConfigSectionRequirements(
                 List.of(new ConfigProperty(TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY, datanodeTransportCertificatePassword),
                         new ConfigProperty(HTTP_CERTIFICATE_PASSWORD_PROPERTY, datanodeHttpCertificatePassword)),
                 Arrays.asList(uploadedTransportKeystorePath,
                         uploadedHttpKeystorePath)
         );
-        final ConfigVerificationResult configVerificationResult = configVerifier.verifyConfig(configRequirements);
-        return switch (configVerificationResult) {
-            case INCOMPLETE -> throw new OpensearchConfigurationException("Configuration incomplete, check the following settings: " + configRequirements.requirementsList());
-            case OK -> true;
+        final ConfigSectionCompleteness configSectionCompleteness = configSectionCompletenessVerifier.verifyConfigSectionCompleteness(configSectionRequirements);
+        return switch (configSectionCompleteness) {
+            case INCOMPLETE -> throw new OpensearchConfigurationException("Configuration incomplete, check the following settings: " + configSectionRequirements.requirementsList());
+            case COMPLETE -> true;
             case MISSING -> false;
         };
     }

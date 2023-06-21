@@ -16,6 +16,6 @@
  */
 package org.graylog.datanode.configuration.verification;
 
-public enum ConfigVerificationResult {
-    OK, INCOMPLETE, MISSING
+public enum ConfigSectionCompleteness {
+    COMPLETE, INCOMPLETE, MISSING
 }

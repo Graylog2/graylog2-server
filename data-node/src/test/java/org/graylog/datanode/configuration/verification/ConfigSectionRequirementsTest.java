@@ -26,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ConfigRequirementsTest {
+class ConfigSectionRequirementsTest {
 
     @Test
     void testReplacesNullValuesWithEmptyCollectionsDuringConstruction() {
-        ConfigRequirements toTest = new ConfigRequirements(null, null);
+        ConfigSectionRequirements toTest = new ConfigSectionRequirements(null, null);
 
         assertNotNull(toTest.requiredStringProperties());
         assertNotNull(toTest.requiredFiles());
@@ -40,14 +40,14 @@ class ConfigRequirementsTest {
 
     @Test
     void testRequirementCounting() {
-        assertEquals(0, new ConfigRequirements(null, null).requirementsCount());
-        assertEquals(0, new ConfigRequirements(List.of(), null).requirementsCount());
-        assertEquals(0, new ConfigRequirements(null, List.of()).requirementsCount());
-        assertEquals(1, new ConfigRequirements(null, List.of(Path.of("whatever"))).requirementsCount());
-        assertEquals(1, new ConfigRequirements(
+        assertEquals(0, new ConfigSectionRequirements(null, null).requirementsCount());
+        assertEquals(0, new ConfigSectionRequirements(List.of(), null).requirementsCount());
+        assertEquals(0, new ConfigSectionRequirements(null, List.of()).requirementsCount());
+        assertEquals(1, new ConfigSectionRequirements(null, List.of(Path.of("whatever"))).requirementsCount());
+        assertEquals(1, new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "whatever")),
                 List.of()).requirementsCount());
-        assertEquals(3, new ConfigRequirements(
+        assertEquals(3, new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "whatever"),
                         new ConfigProperty("importantProperty2", "smthelse")),
                 List.of(Path.of("secret.file"))).requirementsCount());
@@ -55,7 +55,7 @@ class ConfigRequirementsTest {
 
     @Test
     void testRequirementList() {
-        final List<String> requirementsList = new ConfigRequirements(
+        final List<String> requirementsList = new ConfigSectionRequirements(
                 List.of(new ConfigProperty("importantProperty", "whatever"),
                         new ConfigProperty("importantProperty2", "smthelse")),
                 List.of(Path.of("secret.file"))).requirementsList();

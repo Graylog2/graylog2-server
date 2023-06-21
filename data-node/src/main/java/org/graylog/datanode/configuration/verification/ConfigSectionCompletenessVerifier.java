@@ -19,14 +19,14 @@ package org.graylog.datanode.configuration.verification;
 import java.nio.file.Files;
 import java.util.Objects;
 
-public class ConfigVerifier {
+public class ConfigSectionCompletenessVerifier {
 
-    public ConfigVerificationResult verifyConfig(final ConfigRequirements configRequirements) {
-        if (configRequirements == null || configRequirements.requirementsCount() == 0) {
-            return ConfigVerificationResult.OK; //no requirements
+    public ConfigSectionCompleteness verifyConfigSectionCompleteness(final ConfigSectionRequirements configSectionRequirements) {
+        if (configSectionRequirements == null || configSectionRequirements.requirementsCount() == 0) {
+            return ConfigSectionCompleteness.COMPLETE; //no requirements
         }
 
-        final long properStringPropertiesCount = configRequirements.requiredStringProperties()
+        final long properStringPropertiesCount = configSectionRequirements.requiredStringProperties()
                 .stream()
                 .filter(Objects::nonNull)
                 .map(ConfigProperty::propertyValue)
@@ -34,7 +34,7 @@ public class ConfigVerifier {
                 .filter(value -> !value.isEmpty())
                 .count();
 
-        final long properFilePropertiesCount = configRequirements.requiredFiles()
+        final long properFilePropertiesCount = configSectionRequirements.requiredFiles()
                 .stream()
                 .filter(Objects::nonNull)
                 .filter(Files::exists)
@@ -43,10 +43,10 @@ public class ConfigVerifier {
         final long totalRequirementsMet = properFilePropertiesCount + properStringPropertiesCount;
 
         if (totalRequirementsMet == 0) {
-            return ConfigVerificationResult.MISSING;
-        } else if (totalRequirementsMet == configRequirements.requirementsCount()) {
-            return ConfigVerificationResult.OK;
+            return ConfigSectionCompleteness.MISSING;
+        } else if (totalRequirementsMet == configSectionRequirements.requirementsCount()) {
+            return ConfigSectionCompleteness.COMPLETE;
         }
-        return ConfigVerificationResult.INCOMPLETE;
+        return ConfigSectionCompleteness.INCOMPLETE;
     }
 }
