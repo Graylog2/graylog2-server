@@ -94,7 +94,7 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
         return RuleFragment.builder()
                 .fragment("""
                         let gl2_fragment_date_results = parse_date(
-                          value: to_string(),
+                          value: to_string(${value}),
                           pattern: ${pattern}<#if locale??>,
                           locale: ${locale}</#if><#if timezone??>,
                           locale: ${timezone}</#if>
