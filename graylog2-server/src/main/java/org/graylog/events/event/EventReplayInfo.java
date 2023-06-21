@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.Parameter;
 import org.joda.time.DateTime;
 
 import java.util.Set;
@@ -35,6 +37,7 @@ public abstract class EventReplayInfo {
     public static final String FIELD_TIMERANGE_END = "timerange_end";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_QUERY_PARAMETERS = "query_parameters";
 
     @JsonProperty(FIELD_TIMERANGE_START)
     public abstract DateTime timerangeStart();
@@ -44,6 +47,9 @@ public abstract class EventReplayInfo {
 
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
+
+    @JsonProperty(FIELD_QUERY_PARAMETERS)
+    public abstract ImmutableSet<Parameter> queryParameters();
 
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
@@ -67,6 +73,9 @@ public abstract class EventReplayInfo {
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty(FIELD_QUERY_PARAMETERS)
+        public abstract Builder queryParameters(Set<Parameter> queryParameters);
 
         public abstract EventReplayInfo build();
 
