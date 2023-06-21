@@ -871,6 +871,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- there is a bug in maven causing it to resolve test-jar types
+                 at compile time rather than test-compile. Move the compilation
+                 of the test classes earlier in the build cycle and also generate the -tests.jar earlier
+                 see: https://stackoverflow.com/questions/4786881/why-is-test-jar-dependency-required-for-mvn-compile -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
