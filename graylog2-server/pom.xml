@@ -883,6 +883,7 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <phase>compile</phase>
                         <goals>
                             <!-- Building a test-jar allows us to share common test infrastructure classes like
                               ~  elasticsearch test base classes in other maven modules. (e.g. plugins)
