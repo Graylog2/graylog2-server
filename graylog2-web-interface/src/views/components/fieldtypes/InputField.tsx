@@ -24,16 +24,20 @@ type Props = {
   value: string,
 }
 
-const useForwarderInput = (inputId: string) => {
-  const { fetchForwarderInput = () => Promise.reject() } = usePluginEntities('forwarder')[0];
-  const { data: forwarderInput, isError, isLoading } = useQuery(['forwarder', 'input', inputId], () => fetchForwarderInput(inputId));
+const useForwarderInput = (inputId: string, enabled: boolean) => {
+  const { fetchForwarderInput } = usePluginEntities('forwarder')[0] ?? {};
+  const { data: forwarderInput, isError, isLoading } = useQuery(
+    ['forwarder', 'input', inputId],
+    () => fetchForwarderInput(inputId),
+    { enabled: fetchForwarderInput && enabled },
+  );
 
   return (isLoading || isError) ? undefined : forwarderInput;
 };
 
 const InputField = ({ value }: Props) => {
   const inputsMap = useInputs();
-  const forwarderInput = useForwarderInput(value);
+  const forwarderInput = useForwarderInput(value, inputsMap && !inputsMap[value]);
 
   const inputTitle = inputsMap[value]?.title ?? forwarderInput?.title ?? value;
 
