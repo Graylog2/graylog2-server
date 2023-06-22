@@ -24,7 +24,6 @@ import org.graylog2.contentpacks.ContentPackService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -78,16 +77,4 @@ public class Catalog {
         }
     }
 
-    public String getType(final GRN grn) {
-        try {
-            var item = cache.get(grn.entity());
-            if(item.type() != null) {
-                return item.type().toLowerCase(Locale.ROOT);
-            } else {
-                return UNKNOWN_ENTITY_TEXT + grn;
-            }
-        } catch (ExecutionException cex) {
-            return UNKNOWN_ENTITY_TEXT + grn;
-        }
-    }
 }
