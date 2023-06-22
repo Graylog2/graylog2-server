@@ -38,4 +38,12 @@ export type AggregationElement<T extends keyof WidgetConfigFormValues> = {
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
   }>,
   validate?: (formValues: WidgetConfigFormValues) => WidgetConfigValidationErrors,
+  show?: ({ formValues }: { formValues: WidgetConfigFormValues }) => boolean,
+  onChangeEffect?: (params:
+  {
+    formValues: WidgetConfigFormValues,
+    name: string,
+    newValue: WidgetConfigFormValues[T],
+    setFieldValue: (name: string, value: WidgetConfigFormValues[keyof WidgetConfigFormValues]) => void
+  }) => void;
 }

@@ -275,7 +275,7 @@ const GroupByElement: AggregationElement<'groupBy'> = {
   title: 'Grouping',
   key: 'groupBy',
   order: 1,
-  allowCreate: () => true,
+  allowCreate: (formValues : WidgetConfigFormValues) => !(formValues.visualization.type === 'numeric'),
   onCreate: (formValues: WidgetConfigFormValues) => ({
     ...formValues,
     groupBy: {
@@ -316,6 +316,7 @@ const GroupByElement: AggregationElement<'groupBy'> = {
   component: GroupingsConfiguration,
   validate: validateGroupings,
   isEmpty: (formValues: WidgetConfigFormValues['groupBy']) => (formValues?.groupings ?? []).length === 0,
+  show: ({ formValues }: { formValues: WidgetConfigFormValues }) => !(formValues.visualization.type === 'numeric'),
 };
 
 export default GroupByElement;

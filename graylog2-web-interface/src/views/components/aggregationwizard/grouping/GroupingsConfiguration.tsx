@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled, { css } from 'styled-components';
 
@@ -64,6 +64,8 @@ const SettingsSeparator = styled.hr(({ theme }) => css`
 
 const GroupingsConfiguration = () => {
   const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const show = useMemo(() => GroupingElement.show({ formValues: values }), [values]);
+
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => () => {
     setValues(GroupingElement.onRemove(index, values));
@@ -83,6 +85,8 @@ const GroupingsConfiguration = () => {
       <GroupingConfiguration index={index} />
     </ElementConfigurationContainer>
   ), [removeGrouping]);
+
+  if (show === false) return null;
 
   return (
     <>
