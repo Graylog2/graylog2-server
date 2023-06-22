@@ -24,9 +24,14 @@ import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 
 const mapInputs = (state: ExtractStoreState<typeof InputsStore>) => Object.fromEntries(state?.inputs?.map((input) => [input.id, input]) ?? []);
 
-const InputsProvider = ({ children }: React.PropsWithChildren<{}>) => {
+const useInputs = () => {
   useEffect(() => { InputsActions.list(); }, []);
-  const value = useStore(InputsStore, mapInputs);
+
+  return useStore(InputsStore, mapInputs);
+};
+
+const InputsProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  const value = useInputs();
 
   return (
     <InputsContext.Provider value={value}>
