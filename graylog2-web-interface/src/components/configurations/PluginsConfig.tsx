@@ -85,7 +85,8 @@ const PluginsConfig = () => {
              activeKey={activeSectionKey}
              onSelect={setActiveSectionKey}>
           {pluginSystemConfigs.map(({ configType }, index) => {
-            const { displayName } = pluginDisplayNames.find((entry) => entry.configType === configType);
+            const obj = pluginDisplayNames.find((entry) => entry.configType === configType);
+            const displayName = obj ? obj.displayName : configType;
 
             return (
               <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
