@@ -27,10 +27,12 @@ import useCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForE
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
+import useCreateSearch from 'views/hooks/useCreateSearch';
 
 const EventView = () => {
   const { eventDefinition, aggregations } = useAlertAndEventDefinitionData();
-  const view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
+  const _view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
+  const view = useCreateSearch(_view);
 
   return (
     <SearchPage view={view}
