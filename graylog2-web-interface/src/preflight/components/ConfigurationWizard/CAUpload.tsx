@@ -20,7 +20,7 @@ import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
 
-import fetch from 'logic/rest/FetchProvider';
+import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
 import { Input, Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
@@ -60,7 +60,18 @@ const File = styled.div`
 const DeleteIcon = styled(Icon)`
   cursor: pointer;
 `;
-const submitUpload = (formValues: FormValues) => fetch('POST', qualifyUrl('/api/ca/upload'), formValues, false);
+
+const submitUpload = (formValues: FormValues) => {
+  const formData = new FormData();
+
+  if (formValues.password !== undefined) {
+    formData.append('password', formValues.password);
+  }
+
+  formValues.files.forEach((file) => formData.append('files', file));
+
+  return fetchMultiPartFormData(qualifyUrl('/api/ca/upload'), formData, false);
+};
 
 const validate = (formValues: FormValues) => {
   let errors = {};

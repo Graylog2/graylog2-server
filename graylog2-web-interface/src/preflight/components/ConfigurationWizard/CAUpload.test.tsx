@@ -19,13 +19,13 @@ import React from 'react';
 import { renderPreflight, screen, waitFor } from 'wrappedTestingLibrary';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
-import fetch from 'logic/rest/FetchProvider';
+import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
 import UserNotification from 'preflight/util/UserNotification';
 
 import CAUpload from './CAUpload';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
 
 jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
@@ -42,12 +42,19 @@ const logger = {
 
 describe('CAUpload', () => {
   beforeEach(() => {
-    asMock(fetch).mockReturnValue(Promise.resolve());
+    asMock(fetchMultiPartFormData).mockReturnValue(Promise.resolve());
   });
 
   const files = [
     new File(['fileBits'], 'fileName', { type: 'application/x-pem-file' }),
   ];
+
+  const formData = () => {
+    const f = new FormData();
+    files.forEach((file) => f.append('files', file));
+
+    return f;
+  };
 
   const findDropZone = async () => {
     const dropzoneContainer = await screen.findByTestId('upload-dropzone');
@@ -63,10 +70,9 @@ describe('CAUpload', () => {
     userEvent.upload(dropzone, files);
     userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
+    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
       expect.stringContaining('/api/ca/upload'),
-      { files },
+      formData(),
       false,
     ));
 
@@ -74,7 +80,7 @@ describe('CAUpload', () => {
   });
 
   it('should show error when CA upload fails', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(fetchMultiPartFormData).mockImplementation(() => Promise.reject(new Error('Error')));
 
     renderPreflight(
       <DefaultQueryClientProvider options={{ logger }}>
@@ -87,10 +93,9 @@ describe('CAUpload', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
+    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
       expect.stringContaining('/api/ca/upload'),
-      { files },
+      formData(),
       false,
     ));
 

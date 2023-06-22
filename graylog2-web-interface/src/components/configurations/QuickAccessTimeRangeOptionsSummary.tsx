@@ -37,11 +37,12 @@ const StyledDL = styled.dl`
     
     dt {
       white-space: nowrap;
-      flex-basis: 175px
+      flex-basis: 175px;
     }
+
     dd {
       margin: 0;
-      flex: 1
+      flex: 1;
     }
   }
 `;
