@@ -21,7 +21,6 @@ import com.google.common.eventbus.EventBus;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
@@ -34,7 +33,6 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
-import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.TestUserService;
 import org.graylog.testing.TestUserServiceExtension;
@@ -80,11 +78,6 @@ public class StartPageServiceTest {
 
         @Override
         public String getTitle(final GRN id) {
-            return "";
-        }
-
-        @Override
-        public String getType(final GRN id) {
             return "";
         }
     }

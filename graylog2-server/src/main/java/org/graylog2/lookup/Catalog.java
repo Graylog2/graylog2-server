@@ -32,7 +32,8 @@ public class Catalog {
 
     public static final String UNKNOWN_ENTITY_TEXT = "Unknown entity: ";
 
-    protected record Entry(String type, String title) {}
+    public record Entry(String title) {
+    }
 
     private final ContentPackService contentPackService;
     private final LoadingCache<String, Entry> cache;
@@ -56,18 +57,30 @@ public class Catalog {
                         var catalog = contentPackService.getEntityExcerpts();
                         var excerpt = catalog.get(id);
                         if (excerpt != null) {
-                            return new Entry(excerpt.type().name(), excerpt.title());
+                            if (excerpt.title() != null) {
+                                return new Entry(excerpt.title());
+                            } else {
+                                return new Entry(id);
+                            }
                         } else {
-                            return new Entry(UNKNOWN_ENTITY_TEXT + id, UNKNOWN_ENTITY_TEXT + id);
+                            return new Entry(UNKNOWN_ENTITY_TEXT + id);
                         }
                     }
                 });
     }
 
+    public Entry getEntry(final GRN grn) {
+        try {
+            return cache.get(grn.entity());
+        } catch (ExecutionException cex) {
+            return new Entry(UNKNOWN_ENTITY_TEXT + grn);
+        }
+    }
+
     public String getTitle(final GRN grn) {
         try {
             var item = cache.get(grn.entity());
-            if(item.title() != null) {
+            if (item.title() != null) {
                 return item.title();
             } else {
                 return UNKNOWN_ENTITY_TEXT + grn;
