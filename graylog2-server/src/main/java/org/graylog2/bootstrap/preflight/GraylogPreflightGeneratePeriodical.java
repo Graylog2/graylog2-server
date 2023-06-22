@@ -16,11 +16,23 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import okhttp3.Authenticator;
+import okhttp3.Call;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Route;
+import org.graylog.security.certutil.CaConfiguration;
+import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
+import org.graylog2.Configuration;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
 import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -28,59 +40,113 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.FileInputStream;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Optional;
+
+import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
 @Singleton
 public class GraylogPreflightGeneratePeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogPreflightGeneratePeriodical.class);
 
     private final NodePreflightConfigService nodePreflightConfigService;
+    private final NodeService nodeService;
 
+    private final CaConfiguration configuration;
     private final CsrMongoStorage csrStorage;
     private final CertChainStorage certMongoStorage;
-
-    private String caKeystoreFilename = "datanode-ca.p12";
-    private Integer DEFAULT_VALIDITY = 90;
-    private static final String DEFAULT_PASSWORD = "admin";
+    private final CaService caService;
+    private final String passwordSecret;
+    private final OkHttpClient okHttpClient;
+    private OkHttpClient tmpClient;
 
     @Inject
     public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
                                               final CsrMongoStorage csrStorage,
-                                              final CertChainMongoStorage certMongoStorage) {
+                                              final CertChainMongoStorage certMongoStorage,
+                                              final CaService caService,
+                                              final Configuration configuration,
+                                              final NodeService nodeService,
+                                              final OkHttpClient okHttpClient,
+                                              final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
+        this.caService = caService;
+        this.passwordSecret = passwordSecret;
+        this.configuration = configuration;
+        this.nodeService = nodeService;
+        this.okHttpClient = okHttpClient;
+        buildTempHttpClient();
+    }
+
+    // building a non checking httpclient
+    private void buildTempHttpClient() {
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[]{};
+                        }
+                    }
+            };
+
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
+            newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
+            newBuilder.hostnameVerifier((hostname, session) -> true);
+            newBuilder.authenticator(new Authenticator() {
+                public Request authenticate(Route route, Response response) throws IOException {
+                    String credential = Credentials.basic("admin", "admin");
+                    return response.request().newBuilder().header("Authorization", credential).build();
+                }
+            });
+
+            tmpClient = newBuilder.build();
+        } catch (Exception ex) {
+            LOG.error("Could not create tmp okhttpclient " + ex.getMessage(), ex);
+        }
     }
 
     @Override
     public void doRun() {
         LOG.debug("checking if there are configuration steps to take care of");
-        final Path caKeystorePath = Path.of(caKeystoreFilename);
-
-        if(!Files.exists(caKeystorePath)) {
-            LOG.warn("mandatory keystore file does not exist.");
-            return;
-        }
 
         try {
-            char[] password = DEFAULT_PASSWORD.toCharArray();
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
-            caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
+            final var password = configuration.configuredCaExists() ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
+            Optional<KeyStore> optKey = caService.loadKeyStore();
+            if(optKey.isEmpty()) {
+                LOG.warn("No keystore available.");
+                return;
+            }
 
+            KeyStore caKeystore = optKey.get();
             var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
             var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
+
             var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
             nodePreflightConfigService.streamAll()
@@ -106,11 +172,31 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                         }
                     });
 
-        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException |
-                 UnrecoverableKeyException e) {
+            nodePreflightConfigService.streamAll()
+                    .filter(c -> NodePreflightConfig.State.STORED.equals(c.state()))
+                    .forEach(c -> {
+                        try {
+                            if(checkConnectivity(c.nodeId())) {
+                                nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
+                            }
+                        } catch (Exception e) {
+                            LOG.warn("Exception trying to connect to node "  + c.nodeId() + ": " + e.getMessage() + ", retrying", e);
+                        }
+                    });
+
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private boolean checkConnectivity(final String nodeId) throws NodeNotFoundException, IOException {
+        final var node = nodeService.byNodeId(nodeId);
+        Request request = new Request.Builder().url(node.getTransportAddress()).build();
+        Call call = tmpClient.newCall(request);
+        try(Response response = call.execute()) {
+            return response.isSuccessful();
         }
     }
 

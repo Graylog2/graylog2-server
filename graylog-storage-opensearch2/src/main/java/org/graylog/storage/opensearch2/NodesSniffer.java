@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil;
+package org.graylog.storage.opensearch2;
 
-/**
- * Place to store constants that are not a subject of user/client configuration.
- */
-public interface CertConstants {
-    String KEY_GENERATION_ALGORITHM = "RSA";
-    String SIGNING_ALGORITHM = "SHA256withRSA";
-    String PKCS12 = "PKCS12";
-    String DATANODE_KEY_ALIAS = "datanode";
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+
+import java.io.IOException;
+import java.util.List;
+
+public interface NodesSniffer {
+    List<Node> sniff(List<Node> nodes) throws IOException;
 }

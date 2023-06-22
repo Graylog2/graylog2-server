@@ -16,12 +16,27 @@
  */
 package org.graylog.security.certutil;
 
-/**
- * Place to store constants that are not a subject of user/client configuration.
- */
-public interface CertConstants {
-    String KEY_GENERATION_ALGORITHM = "RSA";
-    String SIGNING_ALGORITHM = "SHA256withRSA";
-    String PKCS12 = "PKCS12";
-    String DATANODE_KEY_ALIAS = "datanode";
+import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.plugin.BaseConfiguration;
+
+import java.nio.file.Path;
+
+public class CaConfiguration extends BaseConfiguration {
+    @Parameter(value = "ca_keystore_file")
+    private Path caKeystoreFile;
+
+    @Parameter(value = "ca_password")
+    private String caPassword;
+
+    public Path getCaKeystoreFile() {
+        return caKeystoreFile;
+    }
+
+    public String getCaPassword() {
+        return caPassword;
+    }
+
+    public boolean configuredCaExists() {
+        return getCaKeystoreFile() != null;
+    }
 }
