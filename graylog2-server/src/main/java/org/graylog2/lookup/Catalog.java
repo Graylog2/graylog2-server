@@ -30,9 +30,15 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class Catalog {
 
-    public static final String UNKNOWN_ENTITY_TEXT = "Unknown entity: ";
-
     public record Entry(String title) {
+
+        static final String UNKNOWN_ENTITY_TEXT = "Unknown entity: ";
+        static Entry UNKNOWN_ENTITY = new Entry(UNKNOWN_ENTITY_TEXT);
+
+        public boolean isUnknown() {
+            return this == UNKNOWN_ENTITY;
+        }
+
     }
 
     private final ContentPackService contentPackService;
@@ -63,7 +69,7 @@ public class Catalog {
                                 return new Entry(id);
                             }
                         } else {
-                            return new Entry(UNKNOWN_ENTITY_TEXT + id);
+                            return Entry.UNKNOWN_ENTITY;
                         }
                     }
                 });
@@ -73,20 +79,7 @@ public class Catalog {
         try {
             return cache.get(grn.entity());
         } catch (ExecutionException cex) {
-            return new Entry(UNKNOWN_ENTITY_TEXT + grn);
-        }
-    }
-
-    public String getTitle(final GRN grn) {
-        try {
-            var item = cache.get(grn.entity());
-            if (item.title() != null) {
-                return item.title();
-            } else {
-                return UNKNOWN_ENTITY_TEXT + grn;
-            }
-        } catch (ExecutionException cex) {
-            return UNKNOWN_ENTITY_TEXT + grn;
+            return Entry.UNKNOWN_ENTITY;
         }
     }
 

@@ -37,6 +37,7 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
@@ -64,8 +65,15 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         var items = this.findForUser(searchUser)
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
-                .stream().filter(i -> type.isPresent() ? i.type().equals(type.get()) : true)
-                .map(i -> new Favorite(i, catalog.getTitle(i)))
+                .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
+                .map(i -> {
+                    final Catalog.Entry entry = catalog.getEntry(i);
+                    if (entry.isUnknown()) {
+                        return null;
+                    }
+                    return new Favorite(i, entry.title());
+                })
+                .filter(Objects::nonNull)
                 .toList();
 
         return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));

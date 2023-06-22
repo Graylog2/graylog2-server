@@ -77,8 +77,8 @@ public class StartPageServiceTest {
         }
 
         @Override
-        public String getTitle(final GRN id) {
-            return "";
+        public Entry getEntry(GRN grn) {
+            return new Entry("");
         }
     }
 
