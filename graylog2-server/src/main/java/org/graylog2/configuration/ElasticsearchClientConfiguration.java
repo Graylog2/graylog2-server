@@ -67,6 +67,9 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_discovery_enabled")
     boolean discoveryEnabled = false;
 
+    @Parameter(value = "elasticsearch_node_activity_logger_enabled")
+    boolean nodeActivityLogger = false;
+
     @Parameter(value = "elasticsearch_discovery_filter")
     String discoveryFilter = null;
 
