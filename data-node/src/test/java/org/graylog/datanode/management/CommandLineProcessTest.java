@@ -127,7 +127,7 @@ class CommandLineProcessTest {
     }
 
     @Test
-    void testExitCode() throws IOException, ExecutionException, InterruptedException, TimeoutException {
+    void testExitCode() throws ExecutionException, InterruptedException, TimeoutException {
         final CompletableFuture<Integer> exitCodeFuture = new CompletableFuture<>();
 
         final ProcessListener listener = new ProcessListener() {

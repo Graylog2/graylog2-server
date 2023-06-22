@@ -50,7 +50,7 @@ const TimeRangeWrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const dateOutput = (timerange: TimeRange) => {
+export const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
@@ -80,7 +80,7 @@ const dateOutput = (timerange: TimeRange) => {
     case 'keyword':
       return { from: timerange.from, until: timerange.to };
     default:
-      throw new Error('Invalid Timerange Type');
+      throw new Error('Invalid Time Range Type');
   }
 };
 

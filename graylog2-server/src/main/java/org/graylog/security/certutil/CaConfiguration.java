@@ -14,7 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.security.certutil;
 
-public record DataNodeClusterWideConfig(String test) {
+import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.plugin.BaseConfiguration;
+
+import java.nio.file.Path;
+
+public class CaConfiguration extends BaseConfiguration {
+    @Parameter(value = "ca_keystore_file")
+    private Path caKeystoreFile;
+
+    @Parameter(value = "ca_password")
+    private String caPassword;
+
+    public Path getCaKeystoreFile() {
+        return caKeystoreFile;
+    }
+
+    public String getCaPassword() {
+        return caPassword;
+    }
+
+    public boolean configuredCaExists() {
+        return getCaKeystoreFile() != null;
+    }
 }

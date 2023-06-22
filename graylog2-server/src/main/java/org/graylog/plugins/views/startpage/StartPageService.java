@@ -29,7 +29,6 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityDTO;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -60,15 +59,20 @@ public class StartPageService {
     }
 
     public PaginatedResponse<LastOpened> findLastOpenedFor(final SearchUser searchUser, final int page, final int perPage) {
+        if (perPage <= 0 || page <= 0) {
+            throw new IllegalArgumentException("invalid page size: " + perPage);
+        }
         var items = lastOpenedService
                 .findForUser(searchUser)
                 .orElse(new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream()
+                .skip((long) (page - 1) * perPage)
+                .limit(perPage)
                 .map(i -> new LastOpened(i.grn(), catalog.getTitle(i.grn()), i.timestamp()))
                 .toList();
 
-        return PaginatedResponse.create("lastOpened", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
+        return PaginatedResponse.create("lastOpened", new PaginatedList<>(items, items.size(), page, perPage));
     }
 
     private String getTitle(RecentActivityDTO i) {

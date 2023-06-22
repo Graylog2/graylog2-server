@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -39,6 +39,7 @@ import type { DateTimeFormats, DateTime } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
@@ -248,8 +249,10 @@ const TimeRangeDropdown = ({
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
-  limitDuration,
+  limitDuration: configLimitDuration,
 }: TimeRangeDropdownProps) => {
+  const { ignoreLimitDurationInTimeRangeDropdown } = useContext(TimeRangeInputSettingsContext);
+  const limitDuration = useMemo(() => (ignoreLimitDurationInTimeRangeDropdown ? 0 : configLimitDuration), [configLimitDuration, ignoreLimitDurationInTimeRangeDropdown]);
   const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const sendTelemetry = useSendTelemetry();
@@ -329,7 +332,6 @@ const TimeRangeDropdown = ({
                 <Row>
                   <Col md={12}>
                     <TimeRangeLivePreview timerange={normalizeIfClassifiedRelativeTimeRange(nextTimeRange)} />
-
                     <TimeRangeTabs currentTimeRange={currentTimeRange}
                                    handleActiveTab={handleActiveTab}
                                    limitDuration={limitDuration}
