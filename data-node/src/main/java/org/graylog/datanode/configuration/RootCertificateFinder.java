@@ -16,29 +16,30 @@
  */
 package org.graylog.datanode.configuration;
 
+import org.graylog.security.certutil.CertConstants;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 public class RootCertificateFinder {
 
     public X509Certificate findRootCert(Path keystorePath,
-                                        String password,
-                                        final String alias) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+                                        char[] password,
+                                        final String alias) throws IOException, GeneralSecurityException {
         final KeyStore keystore = loadKeystore(keystorePath, password);
         final Certificate[] certs = keystore.getCertificateChain(alias);
 
         return Arrays.stream(certs)
                 .filter(cert -> cert instanceof X509Certificate)
                 .map(cert -> (X509Certificate) cert)
-                .filter(this::isRootCaCertificate)
+                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)//TODO: certs.length == 1 may be temporary, our merged does not create a proper cert chain, it seems
                 .findFirst()
                 .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
     }
@@ -47,10 +48,12 @@ public class RootCertificateFinder {
         return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
     }
 
-    private KeyStore loadKeystore(Path keystorePath, String password) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
-        final FileInputStream is = new FileInputStream(keystorePath.toFile());
-        nodeKeystore.load(is, password.toCharArray());
+    private KeyStore loadKeystore(final Path keystorePath,
+                                  final char[] password) throws IOException, GeneralSecurityException {
+        KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
+        try (final FileInputStream is = new FileInputStream(keystorePath.toFile())) {
+            nodeKeystore.load(is, password);
+        }
         return nodeKeystore;
     }
 }

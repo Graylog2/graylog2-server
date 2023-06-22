@@ -16,58 +16,54 @@
  */
 package org.graylog.datanode.configuration;
 
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import org.graylog.datanode.configuration.certificates.CertificateMetaData;
 
-import static org.graylog.datanode.configuration.ConfigurationProvider.SSL_PREFIX;
+import static org.graylog.datanode.configuration.variants.SecureConfiguration.SSL_PREFIX;
 
 public class TlsConfigurationSupplier {
 
     static final String KEYSTORE_FORMAT = "PKCS12";
     static final String TRUSTSTORE_FORMAT = "PKCS12";
 
-    static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
+    public static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
 
-    public void addTransportTlsConfig(Map<String, String> config,
-                                      final String alias,
-                                      final String keystoreFile,
-                                      final String keystoreFilePassword
-
-    ) {
+    public ImmutableMap<String, String> getTransportTlsConfig(final CertificateMetaData certificateMetaData) {
         final String configSubPart = SSL_PREFIX + "transport";
-        addTlsConfig(config, configSubPart, alias, keystoreFile, keystoreFilePassword);
+        return getTlsConfig(configSubPart, certificateMetaData);
     }
 
-    public void addHttpTlsConfig(Map<String, String> config,
-                                 final String alias,
-                                 final String keystoreFile,
-                                 final String keystoreFilePassword) {
+    public ImmutableMap<String, String> getHttpTlsConfig(final CertificateMetaData certificateMetaData) {
         final String configSubPart = SSL_PREFIX + "http";
-        addTlsConfig(config, configSubPart, alias, keystoreFile, keystoreFilePassword);
-        config.put(configSubPart + ".enabled", "true");
+        return ImmutableMap.<String, String>builder()
+                .putAll(getTlsConfig(configSubPart, certificateMetaData))
+                .put(configSubPart + ".enabled", "true")
+                .build();
     }
 
-    public void addTrustStoreTlsConfig(Map<String, String> config,
-                                       final String truststorePassword) {
+    public ImmutableMap<String, String> getTrustStoreTlsConfig(final String truststorePassword) {
+        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+
         String configSubPart = SSL_PREFIX + "http";
-        config.put(configSubPart + ".truststore_type", TRUSTSTORE_FORMAT);
-        config.put(configSubPart + ".truststore_filepath", TRUSTSTORE_FILENAME);
-        config.put(configSubPart + ".truststore_password", truststorePassword);
+        builder.put(configSubPart + ".truststore_type", TRUSTSTORE_FORMAT);
+        builder.put(configSubPart + ".truststore_filepath", TRUSTSTORE_FILENAME);
+        builder.put(configSubPart + ".truststore_password", truststorePassword);
 
         configSubPart = SSL_PREFIX + "transport";
-        config.put(configSubPart + ".truststore_type", TRUSTSTORE_FORMAT);
-        config.put(configSubPart + ".truststore_filepath", TRUSTSTORE_FILENAME);
-        config.put(configSubPart + ".truststore_password", truststorePassword);
+        builder.put(configSubPart + ".truststore_type", TRUSTSTORE_FORMAT);
+        builder.put(configSubPart + ".truststore_filepath", TRUSTSTORE_FILENAME);
+        builder.put(configSubPart + ".truststore_password", truststorePassword);
+        return builder.build();
     }
 
-    private void addTlsConfig(Map<String, String> config,
-                              final String configPrefix,
-                              final String alias,
-                              final String keystoreFilePath,
-                              final String keystoreFilePassword
+    private ImmutableMap<String, String> getTlsConfig(final String configPrefix,
+                                                      final CertificateMetaData certificateMetaData
     ) {
-        config.put(configPrefix + ".keystore_type", KEYSTORE_FORMAT);
-        config.put(configPrefix + ".keystore_filepath", keystoreFilePath);
-        config.put(configPrefix + ".keystore_password", keystoreFilePassword);
-        config.put(configPrefix + ".keystore_alias", alias);
+        return ImmutableMap.<String, String>builder()
+                .put(configPrefix + ".keystore_type", KEYSTORE_FORMAT)
+                .put(configPrefix + ".keystore_filepath", certificateMetaData.keystoreFilePath())
+                .put(configPrefix + ".keystore_password", certificateMetaData.passwordAsString())
+                .put(configPrefix + ".keystore_alias", certificateMetaData.alias())
+                .build();
     }
 }

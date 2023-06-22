@@ -20,7 +20,6 @@ import org.apache.lucene.queryparser.classic.QueryParserConstants;
 import org.apache.lucene.queryparser.classic.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ class FieldTypeValidationTest {
 
     @Test
     void validateNumericFieldValueTypes() {
-        List<String> numericTypes = ImmutableList.of("long", "int", "short", "byte", "double", "float");
+        List<String> numericTypes = List.of("long", "int", "short", "byte", "double", "float");
         for (String numericType : numericTypes) {
             assertThat(fieldTypeValidation.validateFieldValueType(term("123"), numericType)).isNotPresent();
             assertThat(fieldTypeValidation.validateFieldValueType(term(">123"), numericType)).isNotPresent();

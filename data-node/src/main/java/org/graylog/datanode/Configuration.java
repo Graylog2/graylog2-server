@@ -87,7 +87,7 @@ public class Configuration extends BaseConfiguration {
     private String configLocation;
 
     @Parameter(value = "process_logs_buffer_size")
-    private Integer logs = 500;
+    private Integer opensearchProcessLogsBufferSize = 500;
 
 
     @Parameter(value = "node_name")
@@ -172,7 +172,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public Integer getProcessLogsBufferSize() {
-        return logs;
+        return opensearchProcessLogsBufferSize;
     }
 
     @Parameter(value = "rest_api_username")

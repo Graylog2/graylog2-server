@@ -25,8 +25,10 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -37,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -63,6 +66,7 @@ public class BlockingBatchedESOutputTest {
     private BlockingBatchedESOutput output;
 
     @BeforeEach
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         MetricRegistry metricRegistry = new MetricRegistry();
         NoopJournal journal = new NoopJournal();
@@ -78,7 +82,13 @@ public class BlockingBatchedESOutputTest {
             }
         };
 
-        output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger, cluster);
+        output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger, cluster, Executors.newSingleThreadScheduledExecutor());
+        output.initialize();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        output.stop();
     }
 
     @Test
@@ -94,6 +104,15 @@ public class BlockingBatchedESOutputTest {
 
         // Should flush the buffer even though the batch size is not reached yet
         output.forceFlushIfTimedout();
+
+        verify(messages, times(1)).bulkIndex(eq(messageList));
+    }
+
+    @Test
+    public void flushWithService() throws Exception {
+        final List<Map.Entry<IndexSet, Message>> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
+
+        Thread.sleep(config.getOutputFlushInterval() * 1000L + 100); // let the flushservice run
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
     }

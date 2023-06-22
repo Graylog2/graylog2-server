@@ -21,8 +21,8 @@ import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.indexer.FailureIndexMappingFactory;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.storage.DetectedSearchVersion;
-import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 
 public class ElasticsearchModule extends AbstractModule {
     @Override

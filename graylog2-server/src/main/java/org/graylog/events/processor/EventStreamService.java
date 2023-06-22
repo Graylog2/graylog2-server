@@ -17,11 +17,11 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
+import javax.inject.Inject;
 import java.util.Set;
 import java.util.stream.Collectors;
 

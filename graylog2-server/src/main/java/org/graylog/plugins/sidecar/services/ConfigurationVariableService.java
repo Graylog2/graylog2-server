@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import com.google.inject.Singleton;
 import com.mongodb.BasicDBObject;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -25,6 +24,7 @@ import org.graylog2.database.PaginatedDbService;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

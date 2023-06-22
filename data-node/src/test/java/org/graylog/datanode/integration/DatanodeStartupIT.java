@@ -55,16 +55,14 @@ public class DatanodeStartupIT {
                     .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                     .retryIfException(input -> input instanceof NoHttpResponseException)
                     .retryIfException(input -> input instanceof SocketException)
-                    .retryIfResult(input -> !input.extract().body().path("process.info.status").equals("AVAILABLE"))
+                    .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                     .build();
 
-             final Integer datanodeRestApiPort = backend.getDatanodeRestPort();
-
-                    retryer.call(() -> this.getStatus(datanodeRestApiPort))
+            final Integer datanodeRestApiPort = backend.getDatanodeRestPort();
+            retryer.call(() -> this.getStatus(datanodeRestApiPort))
                     .assertThat()
-                    .body("process.info.node_name", Matchers.equalTo("node1"))
-                    .body("process.info.pid", Matchers.notNullValue())
-                    .body("process.info.user", Matchers.equalTo("opensearch"));
+                    .body("opensearch.node.node_name", Matchers.equalTo("node1"))
+                    .body("opensearch.node.process.pid", Matchers.notNullValue());
         } catch (RetryException retryException) {
             LOG.error("DataNode Container logs follow:\n" + backend.getLogs());
             throw retryException;

@@ -34,6 +34,7 @@ import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
+import org.graylog2.cluster.preflight.PreflightConfigBindings;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -84,6 +85,7 @@ public class Server extends ServerBootstrap {
                 new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new RestBindings(),
+                new PreflightConfigBindings(),
                 new PeriodicalBindings(),
 //               new InitializerBindings(),
                 new ObjectMapperModule(chainingClassLoader),

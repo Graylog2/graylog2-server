@@ -21,4 +21,8 @@ public class KeyStoreStorageException extends Exception {
     public KeyStoreStorageException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public KeyStoreStorageException(String message) {
+        super(message);
+    }
 }

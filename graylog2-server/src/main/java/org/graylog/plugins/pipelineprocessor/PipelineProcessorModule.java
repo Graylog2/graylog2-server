@@ -26,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.SimulatorResource;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderModule;
 import org.graylog2.plugin.PluginModule;
 
 public class PipelineProcessorModule extends PluginModule {
@@ -42,6 +43,7 @@ public class PipelineProcessorModule extends PluginModule {
         addSystemRestResource(SimulatorResource.class);
 
         install(new ProcessorFunctionsModule());
+        install(new RuleBuilderModule());
 
         installSearchResponseDecorator(searchResponseDecoratorBinder(),
                 PipelineProcessorMessageDecorator.class,

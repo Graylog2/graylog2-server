@@ -30,6 +30,7 @@ const searchConfig: SearchesConfig = {
     'somefield',
     'someotherfield',
   ],
+  quick_access_timerange_presets: [],
   surrounding_timerange_options: {
     PT1S: '1 second',
     PT1M: 'Only a minute',

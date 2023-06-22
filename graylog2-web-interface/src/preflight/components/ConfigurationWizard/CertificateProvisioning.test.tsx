@@ -56,7 +56,7 @@ describe('CertificateProvisioning', () => {
     });
   });
 
-  it('should provision CA', async () => {
+  it('should provision certificates', async () => {
     renderPreflight(<CertificateProvisioning />);
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
@@ -68,10 +68,12 @@ describe('CertificateProvisioning', () => {
       false,
     ));
 
-    expect(UserNotification.success).toHaveBeenCalledWith('CA provisioned successfully');
+    expect(UserNotification.success).toHaveBeenCalledWith('Certificate provisioning successful');
+
+    await screen.findByRole('button', { name: /provision certificate and continue/i });
   });
 
-  it('should show error when CA provisioning failed', async () => {
+  it('should show error when certificate provisioning failed', async () => {
     asMock(fetch).mockImplementationOnce(() => Promise.reject(new Error('Error')));
 
     renderPreflight(
@@ -89,7 +91,9 @@ describe('CertificateProvisioning', () => {
       false,
     ));
 
-    expect(UserNotification.error).toHaveBeenCalledWith('CA provisioning failed with error: Error: Error');
+    expect(UserNotification.error).toHaveBeenCalledWith('Certificate provisioning failed with error: Error: Error');
+
+    await screen.findByRole('button', { name: /provision certificate and continue/i });
   });
 
   it('should disable provisioning when there are no data nodes', async () => {
