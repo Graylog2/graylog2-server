@@ -76,7 +76,7 @@ public class MongoDbSession extends PersistedImpl {
             final Object o = ois.readObject();
             return (Map<Object, Object>) o;
         } catch (Exception e) {
-            LOG.error("Error deserializing binary stream for attributes from Mongo: " + e.getMessage(), e);
+            LOG.error("Error deserializing binary stream for attributes from Mongo: {}", e.getMessage(), e);
         }
         return null;
     }
