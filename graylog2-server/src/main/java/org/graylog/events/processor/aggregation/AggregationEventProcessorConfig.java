@@ -225,4 +225,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 mutableGraph.putEdge(entityDescriptor, depStream);
             });
     }
+
+    public Optional<Parameter> getQueryParameter(final String name) {
+        return queryParameters().stream().filter(p -> p.name().equals(name)).findFirst();
+    }
 }

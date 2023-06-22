@@ -21,6 +21,7 @@ import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -39,6 +40,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,7 +93,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
@@ -189,7 +193,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -262,7 +268,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
