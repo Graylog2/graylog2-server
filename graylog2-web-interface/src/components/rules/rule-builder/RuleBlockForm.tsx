@@ -148,8 +148,8 @@ const RuleBlockForm = ({
             <div>
               <Row>
                 <Col md={12}>
-                  <Select id="existingBlock-select"
-                          name="existingBlock-select"
+                  <Select id={`existingBlock-select-${type}`}
+                          name={`existingBlock-select-${type}`}
                           placeholder={`Select ${type}`}
                           options={options}
                           clearable={false}
