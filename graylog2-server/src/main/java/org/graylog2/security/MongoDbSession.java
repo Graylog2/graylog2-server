@@ -81,22 +81,17 @@ public class MongoDbSession extends PersistedImpl {
         return null;
     }
 
-    public void setAttributes(Map<Object, Object> attributes) {
-        fields.put("attributes", transformAttributes(attributes));
-    }
-
     @SuppressForbidden("Deliberate use of ObjectOutputStream")
-    public static byte[] transformAttributes(Map attributes) {
+    public void setAttributes(Map<Object, Object> attributes) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
             // FIXME: This could break backward compatibility if different Java versions are being used.
             final ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(attributes);
             oos.close();
-            return bos.toByteArray();
+            fields.put("attributes", bos.toByteArray());
         } catch (IOException e) {
-            LOG.error("too bad :(", e);
-            return null;
+            LOG.error("Error serializing into binary stream for attributes in Mongo: {}", e.getMessage(), e);
         }
     }
 
