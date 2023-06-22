@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix enabled_index_rotation_strategies configuration to allow setting of TimeBasedSizeOptimizingStrategy"
+
+pulls = ["15750"]
