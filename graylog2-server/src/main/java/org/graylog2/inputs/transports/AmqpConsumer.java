@@ -29,12 +29,15 @@ import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -56,6 +59,7 @@ import static org.graylog2.inputs.transports.AmqpTransport.CK_ROUTING_KEY;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_TLS;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_USERNAME;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_VHOST;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class AmqpConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(AmqpConsumer.class);
@@ -66,7 +70,7 @@ public class AmqpConsumer {
     private final int port;
     private final String virtualHost;
     private final String username;
-    private final String password;
+    private final EncryptedValue password;
     private final int prefetchCount;
 
     private final String queue;
@@ -81,6 +85,8 @@ public class AmqpConsumer {
     private final ScheduledExecutorService scheduler;
     private final InputFailureRecorder inputFailureRecorder;
     private final AmqpTransport amqpTransport;
+    private final EncryptedValueService encryptedValueService;
+    private final Duration connectionRecoveryInterval;
 
     private final AtomicLong totalBytesRead = new AtomicLong(0);
     private final AtomicLong lastSecBytesRead = new AtomicLong(0);
@@ -95,12 +101,14 @@ public class AmqpConsumer {
                         Configuration configuration,
                         ScheduledExecutorService scheduler,
                         InputFailureRecorder inputFailureRecorder,
-                        AmqpTransport amqpTransport) {
+                        AmqpTransport amqpTransport,
+                        EncryptedValueService encryptedValueService,
+                        Duration connectionRecoveryInterval) {
         this.hostname = configuration.getString(CK_HOSTNAME);
         this.port = configuration.getInt(CK_PORT);
         this.virtualHost = configuration.getString(CK_VHOST);
         this.username = configuration.getString(CK_USERNAME);
-        this.password = configuration.getString(CK_PASSWORD);
+        this.password = configuration.getEncryptedValue(CK_PASSWORD);
         this.prefetchCount = configuration.getInt(CK_PREFETCH);
         this.queue = configuration.getString(CK_QUEUE);
         this.exchange = configuration.getString(CK_EXCHANGE);
@@ -114,7 +122,8 @@ public class AmqpConsumer {
         this.scheduler = scheduler;
         this.inputFailureRecorder = inputFailureRecorder;
         this.amqpTransport = amqpTransport;
-
+        this.encryptedValueService = encryptedValueService;
+        this.connectionRecoveryInterval = connectionRecoveryInterval;
     }
 
     public void run() throws IOException, TimeoutException {
@@ -192,6 +201,7 @@ public class AmqpConsumer {
         factory.setRequestedHeartbeat(heartbeatTimeout);
         // explicitly setting this, to ensure it is true even if the default changes.
         factory.setAutomaticRecoveryEnabled(true);
+        factory.setNetworkRecoveryInterval(connectionRecoveryInterval.toMillis());
 
         if (tls) {
             try {
@@ -203,9 +213,9 @@ public class AmqpConsumer {
         }
 
         // Authenticate?
-        if (!isNullOrEmpty(username) && !isNullOrEmpty(password)) {
+        if (!isNullOrEmpty(username) && password.isSet()) {
             factory.setUsername(username);
-            factory.setPassword(password);
+            factory.setPassword(encryptedValueService.decrypt(password));
         }
         connection = factory.newConnection();
         channel = connection.createChannel();
@@ -225,7 +235,9 @@ public class AmqpConsumer {
                 LOG.info("Shutting down AMPQ consumer.");
                 return;
             }
-            LOG.warn("AMQP connection lost! Reconnecting ...");
+
+            inputFailureRecorder.setFailing(getClass(),
+                    f("AMQP connection lost (reason: %s)! Reconnecting ...", cause.getReason().protocolMethodName()));
         });
     }
 
