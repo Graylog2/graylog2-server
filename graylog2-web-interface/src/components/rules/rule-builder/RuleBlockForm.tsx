@@ -145,7 +145,7 @@ const RuleBlockForm = ({
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
         <Formik enableReinitialize onSubmit={handleSubmit} initialValues={initialValues}>
           {({ resetForm, setFieldValue, values }) => (
-            <div>
+            <>
               <Row>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
@@ -189,7 +189,7 @@ const RuleBlockForm = ({
 
                 </SelectedBlock>
               )}
-            </div>
+            </>
           )}
         </Formik>
         <Errors objectWithErrors={existingBlock} />
