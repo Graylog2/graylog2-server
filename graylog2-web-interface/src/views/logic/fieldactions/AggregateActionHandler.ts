@@ -35,7 +35,7 @@ const AggregateActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
     .newId()
     .config(AggregationWidgetConfig.builder()
       .rowPivots([pivotForField(field, type)])
-      .series([Series.forFunction('count()')])
+      .series([Series.forFunction('count()'), Series.forFunction('percentage()')])
       .visualization(DataTable.type)
       .build());
   const newWidget = duplicateCommonWidgetSettings(newWidgetBuilder, widget).build();

@@ -25,6 +25,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import InputField from 'views/components/fieldtypes/InputField';
 import NodeField from 'views/components/fieldtypes/NodeField';
 import StreamsField from 'views/components/fieldtypes/StreamsField';
+import PercentageField from 'views/components/fieldtypes/PercentageField';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
@@ -67,6 +68,7 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
     case 'input': return <InputField value={String(value)} />;
     case 'node': return <NodeField value={String(value)} />;
     case 'streams': return <StreamsField value={value} />;
+    case 'percentage': return <PercentageField value={value} />;
     default: return _formatValue(field, value, truncate, render, type);
   }
 };

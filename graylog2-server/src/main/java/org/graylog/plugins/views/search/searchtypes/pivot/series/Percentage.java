@@ -29,10 +29,15 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
-@JsonTypeName(Count.NAME)
-@JsonDeserialize(builder = Count.Builder.class)
-public abstract class Count implements SeriesSpec {
-    public static final String NAME = "count";
+@JsonTypeName(Percentage.NAME)
+@JsonDeserialize(builder = Percentage.Builder.class)
+public abstract class Percentage implements SeriesSpec {
+    public static final String NAME = "percentage";
+
+    public enum Strategy {
+        COUNT,
+        SUM
+    }
 
     @Override
     public abstract String type();
@@ -40,42 +45,60 @@ public abstract class Count implements SeriesSpec {
     @Override
     public abstract String id();
 
-    @Nullable
     @JsonProperty
-    public abstract String field();
+    public abstract Optional<Strategy> strategy();
+
+    @JsonProperty
+    public abstract Optional<String> field();
 
     @Override
     public String literal() {
-        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+        return type() + "(" + field().map(Strings::nullToEmpty).orElse("") + "," + strategy().orElse(Strategy.COUNT) + ")";
     }
 
     public static Builder builder() {
-        return new AutoValue_Count.Builder().type(NAME);
+        return new AutoValue_Percentage.Builder().type(Percentage.NAME);
     }
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
-    public abstract static class Builder extends SeriesSpecBuilder<Count, Builder> {
+    public abstract static class Builder extends SeriesSpecBuilder<Percentage, Builder> {
         @JsonCreator
         public static Builder create() {
-            return Count.builder();
+            return new AutoValue_Percentage.Builder()
+                    .strategy(Strategy.COUNT);
         }
 
         @Override
         @JsonProperty
         public abstract Builder id(String id);
 
-        @JsonProperty
+        abstract Optional<String> id();
+
         public abstract Builder field(@Nullable String field);
 
-        abstract Optional<String> id();
-        abstract String field();
-        abstract Count autoBuild();
+        @JsonProperty("field")
+        public Builder nonEmptyField(@Nullable String field) {
+            return field(Strings.emptyToNull(field));
+        }
+
+        abstract Optional<String> field();
+
+        @JsonProperty
+        public abstract Builder strategy(@Nullable Strategy strategy);
+
+        abstract Optional<Strategy> strategy();
+
+        abstract Percentage autoBuild();
 
         @Override
-        public Count build() {
+        public Percentage build() {
             if (id().isEmpty()) {
-                id(NAME + "(" + Strings.nullToEmpty(field()) + ")");
+                id(NAME + "(" + field().map(Strings::nullToEmpty).orElse("") + "," + strategy().orElse(Strategy.COUNT) + ")");
+            }
+
+            if (strategy().filter(Strategy.SUM::equals).isPresent() && field().isEmpty()) {
+                throw new IllegalArgumentException("When strategy is sum, a field must be specified.");
             }
             return autoBuild();
         }

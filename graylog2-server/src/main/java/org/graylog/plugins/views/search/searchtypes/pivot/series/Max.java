@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -30,15 +31,20 @@ import java.util.Optional;
 @JsonDeserialize(builder = Max.Builder.class)
 public abstract class Max implements SeriesSpec {
     public static final String NAME = "max";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
+
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
 
     public static Builder builder() {
         return new AutoValue_Max.Builder().type(NAME);
@@ -55,7 +61,6 @@ public abstract class Max implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -65,7 +70,7 @@ public abstract class Max implements SeriesSpec {
 
         @Override
         public Max build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
             }
             return autoBuild();
