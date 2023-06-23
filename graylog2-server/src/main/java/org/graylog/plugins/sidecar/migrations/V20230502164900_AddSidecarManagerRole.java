@@ -46,8 +46,20 @@ public class V20230502164900_AddSidecarManagerRole extends Migration {
                 ImmutableSet.of(
                         SidecarRestPermissions.COLLECTORS_READ,
                         SidecarRestPermissions.CONFIGURATIONS_READ,
+                        SidecarRestPermissions.CONFIGURATIONS_UPDATE,
+                        SidecarRestPermissions.CONFIGURATIONS_CREATE,
+                        SidecarRestPermissions.CONFIGURATIONS_DELETE,
                         SidecarRestPermissions.SIDECARS_READ,
+                        SidecarRestPermissions.SIDECARS_CREATE,
+                        SidecarRestPermissions.SIDECARS_DELETE,
                         SidecarRestPermissions.SIDECARS_UPDATE));
+        helpers.ensureBuiltinRole(
+                "Sidecar Reader",
+                "Grants access to read configurations for Sidecars (built-in)",
+                ImmutableSet.of(
+                        SidecarRestPermissions.COLLECTORS_READ,
+                        SidecarRestPermissions.CONFIGURATIONS_READ,
+                        SidecarRestPermissions.SIDECARS_READ));
 
     }
 }
