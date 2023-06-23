@@ -203,7 +203,7 @@ class DataTable extends React.Component {
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <StyledTable className={`table ${className}`}>
+        <StyledTable className={`table ${className ?? ''}`}>
           <thead>
             {this.getFormattedHeaders()}
           </thead>
