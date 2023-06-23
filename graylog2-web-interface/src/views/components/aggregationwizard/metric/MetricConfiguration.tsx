@@ -42,7 +42,6 @@ const percentageStrategyOptions = [
   { label: 'Document Count', value: 'COUNT' },
   { label: 'Field Sum', value: 'SUM' },
 ];
-const percentageRequiredFieldOptions = [Properties.Numeric];
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
@@ -52,14 +51,15 @@ const Metric = ({ index }: Props) => {
     .sort(sortByLabel)), [functions, isLoading]);
 
   const { values: { metrics }, errors: { metrics: metricsError }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
-  const currentFunction = metrics[index].function;
+  const currentMetric = metrics[index];
+  const currentFunction = currentMetric.function;
 
   const hasFieldOption = currentFunction !== 'percentage';
   const isFieldRequired = !['count', 'percentage'].includes(currentFunction);
 
   const isPercentile = currentFunction === 'percentile';
   const isPercentage = currentFunction === 'percentage';
-  const requiresNumericField = !['card', 'count', 'latest'].includes(currentFunction);
+  const requiresNumericField = (isPercentage && currentMetric.strategy === 'SUM') || !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
   const requiredProperties = requiresNumericField
     ? [Properties.Numeric]
     : [];
@@ -169,7 +169,7 @@ const Metric = ({ index }: Props) => {
                              selectRef={metricFieldSelectRef}
                              onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
                              clearable={!isFieldRequired}
-                             properties={percentageRequiredFieldOptions}
+                             properties={requiredProperties}
                              name={name}
                              value={value}
                              menuPortalTarget={document.body}
