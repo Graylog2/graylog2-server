@@ -54,7 +54,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
         log.debug("Migrating simple condition fragments for the rule builder ui");
         if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
-            return;
+//            return;
         }
 
         addFragment(createHasFieldEqualsFragment());
@@ -73,7 +73,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 
     private RuleFragment createHasFieldLessOrEqualFragment() {
         return RuleFragment.builder()
-                .fragment("( has_field(\"${field}\") && to_long($message.${field}) <= ${fieldValue} )")
+                .fragment("( has_field(${field}) && to_long($message.${field}) <= ${fieldValue} )")
                 .descriptor(FunctionDescriptor.builder()
                         .name("has_field_less_or_equal")
                         .params(ImmutableList.of(
@@ -91,7 +91,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 
     private RuleFragment createHasFieldGreateOrEqualFragment() {
         return RuleFragment.builder()
-                .fragment("( has_field(\"${field}\") && to_long($message.${field}) >= ${fieldValue} )")
+                .fragment("( has_field(${field}) && to_long($message.${field}) >= ${fieldValue} )")
                 .descriptor(FunctionDescriptor.builder()
                         .name("has_field_greater_or_equal")
                         .params(ImmutableList.of(
@@ -109,7 +109,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 
     private RuleFragment createHasFieldEqualsFragment() {
         return RuleFragment.builder()
-                .fragment("( has_field(\"${field}\") && to_string($message.${field}) == \"${fieldValue}\" )")
+                .fragment("( has_field(${field}) && to_string($message.${field}) == ${fieldValue} )")
                 .descriptor(FunctionDescriptor.builder()
                         .name("has_field_equals")
                         .params(ImmutableList.of(
