@@ -426,7 +426,7 @@ public class PivotAggregationSearch implements AggregationSearch {
      * @param executeEveryMs
      * @return aggregation query
      */
-    private Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
+     protected Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(true);
