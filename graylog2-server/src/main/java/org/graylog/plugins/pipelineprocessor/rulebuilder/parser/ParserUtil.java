@@ -28,6 +28,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -85,7 +86,22 @@ public class ParserUtil {
         try {
             Template template = configuration.getTemplate(fragmentName);
             StringWriter writer = new StringWriter();
-            template.process(step.parameters(), writer);
+            Map<String, Object> filteredParams = new HashMap<>();
+            if (step.parameters() != null) {
+                for (Map.Entry<String, Object> val : step.parameters().entrySet()) {
+                    if (val.getValue() instanceof String s) {
+                        if (StringUtils.isBlank(s)) {
+                        } else if (s.startsWith("$")) {
+                            filteredParams.put(val.getKey(), s.substring(1));
+                        } else {
+                            filteredParams.put(val.getKey(), "\"" + s + "\"");
+                        }
+                    } else {
+                        filteredParams.put(val.getKey(), val.getValue());
+                    }
+                }
+            }
+            template.process(filteredParams, writer);
             writer.close();
             return writer.toString();
         } catch (TemplateNotFoundException e) {

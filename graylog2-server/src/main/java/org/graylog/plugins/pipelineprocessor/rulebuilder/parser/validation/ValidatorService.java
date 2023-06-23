@@ -56,6 +56,7 @@ public class ValidatorService {
         validationBuilder.conditions(validatedConditions);
 
         try {
+            validationBuilder.errors(null);
             parseRule(ruleBuilderDto, validationBuilder.build());
         } catch (Exception exception) {
             validationBuilder.errors(List.of(exception.getMessage()));
@@ -66,7 +67,7 @@ public class ValidatorService {
     }
 
     private void parseRule(RuleBuilderDto ruleBuilderDto, RuleBuilder validatedRuleBuilder) throws ParseException {
-        String source = ruleBuilderService.generateRuleSource(ruleBuilderDto.title(), validatedRuleBuilder, true);
+        String source = ruleBuilderService.generateRuleSource(ruleBuilderDto.title(), validatedRuleBuilder, false);
         pipelineRuleParser.parseRule(source, true);
     }
 
