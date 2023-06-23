@@ -17,11 +17,12 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
-import { Box, Title } from '@mantine/core';
+import { Box } from '@mantine/core';
 import type { BoxProps, TitleOrder } from '@mantine/core';
 
 import Col from 'preflight/components/common/Col';
 import Row from 'preflight/components/common/Row';
+import { Title } from 'preflight/components/common';
 
 type ContainerType = BoxProps & {
   theme: DefaultTheme,

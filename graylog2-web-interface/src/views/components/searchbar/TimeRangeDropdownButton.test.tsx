@@ -51,13 +51,13 @@ describe('TimeRangeDropdownButton', () => {
 
   const SUTTimeRangeDropDownButton = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
-      <TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props}><></></TimeRangeDropdownButton>
+      <TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
     </Formik>
   );
 
   it('button can be clicked and Popover appears', async () => {
     const toggleShow = jest.fn();
-    render(<SUTTimeRangeDropDownButton toggleShow={toggleShow}><></></SUTTimeRangeDropDownButton>);
+    render(<SUTTimeRangeDropDownButton toggleShow={toggleShow} />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
 
@@ -69,7 +69,7 @@ describe('TimeRangeDropdownButton', () => {
   it('changes time range and submits form when selecting relative time range preset', async () => {
     const setCurrentTimeRange = jest.fn();
     const onSubmit = jest.fn();
-    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit}><></></SUTTimeRangeDropDownButton>);
+    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
 
     await selectRangePreset('30 minutes');
 
@@ -84,7 +84,7 @@ describe('TimeRangeDropdownButton', () => {
   it('updates time range with range attribute when selecting "all messages" relative time range preset', async () => {
     const setCurrentTimeRange = jest.fn();
     const onSubmit = jest.fn();
-    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit}><></></SUTTimeRangeDropDownButton>);
+    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
 
     await selectRangePreset('all messages');
 

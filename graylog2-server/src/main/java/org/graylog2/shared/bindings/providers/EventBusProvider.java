@@ -21,10 +21,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.shared.events.DeadEventLoggingListener;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,18 +33,18 @@ import java.util.concurrent.ThreadFactory;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class EventBusProvider implements Provider<EventBus> {
-    private final BaseConfiguration configuration;
+    private final int asyncEventbusProcessors;
     private final MetricRegistry metricRegistry;
 
     @Inject
-    public EventBusProvider(final BaseConfiguration configuration, final MetricRegistry metricRegistry) {
-        this.configuration = configuration;
+    public EventBusProvider(final @Named("async_eventbus_processors") int asyncEventbusProcessors, final MetricRegistry metricRegistry) {
+        this.asyncEventbusProcessors = asyncEventbusProcessors;
         this.metricRegistry = metricRegistry;
     }
 
     @Override
     public EventBus get() {
-        final EventBus eventBus = new AsyncEventBus("graylog-eventbus", executorService(configuration.getAsyncEventbusProcessors()));
+        final EventBus eventBus = new AsyncEventBus("graylog-eventbus", executorService(asyncEventbusProcessors));
         eventBus.register(new DeadEventLoggingListener());
 
         return eventBus;

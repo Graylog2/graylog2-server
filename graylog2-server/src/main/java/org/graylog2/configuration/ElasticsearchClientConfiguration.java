@@ -29,6 +29,7 @@ import org.graylog2.configuration.validators.NonEmptyListValidator;
 import org.graylog2.storage.SearchVersion;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,8 +37,8 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_version", converter = MajorVersionConverter.class, validators = {ElasticsearchVersionValidator.class})
     SearchVersion elasticsearchVersion;
 
-    @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {NonEmptyListValidator.class, ListOfURIsWithHostAndSchemeValidator.class})
-    List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));
+    @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {ListOfURIsWithHostAndSchemeValidator.class})
+    List<URI> elasticsearchHosts = new ArrayList<>();
 
     @Parameter(value = "elasticsearch_connect_timeout", validators = {PositiveDurationValidator.class})
     Duration elasticsearchConnectTimeout = Duration.seconds(10);
@@ -65,6 +66,9 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_discovery_enabled")
     boolean discoveryEnabled = false;
+
+    @Parameter(value = "elasticsearch_node_activity_logger_enabled")
+    boolean nodeActivityLogger = false;
 
     @Parameter(value = "elasticsearch_discovery_filter")
     String discoveryFilter = null;

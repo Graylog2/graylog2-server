@@ -35,6 +35,9 @@ import javax.security.auth.x500.X500Principal;
 import java.security.KeyPairGenerator;
 import java.util.List;
 
+import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
+import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
+
 public class CsrGenerator {
 
     /**
@@ -50,7 +53,7 @@ public class CsrGenerator {
                                                   final List<String> altNames,
                                                   final PrivateKeyEncryptedStorage privateKeyEncryptedStorage) throws CSRGenerationException {
         try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
             java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
 
             privateKeyEncryptedStorage.writeEncryptedKey(privateKeyPassword, certKeyPair.getPrivate());
@@ -79,7 +82,7 @@ public class CsrGenerator {
             }
 
 
-            JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
+            JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(SIGNING_ALGORITHM);
             ContentSigner signer = csBuilder.build(certKeyPair.getPrivate());
             return p10Builder.build(signer);
 

@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.net.URI;
 import java.util.Collections;
@@ -65,15 +66,6 @@ public class ElasticsearchClientConfigurationTest {
         assertThat(configuration.discoveryFrequency).isEqualTo(Duration.minutes(1L));
         assertThat(configuration.defaultSchemeForDiscoveredNodes).isEqualTo("http");
         assertThat(configuration.compressionEnabled).isTrue();
-    }
-
-    @Test
-    public void jadConfigFailsWithEmptyElasticsearchHosts() throws Exception {
-        final InMemoryRepository repository = new InMemoryRepository(Collections.singletonMap("elasticsearch_hosts", ""));
-        final ElasticsearchClientConfiguration configuration = new ElasticsearchClientConfiguration();
-        JadConfig jadConfig = new JadConfig(repository, configuration);
-        assertThatExceptionOfType(ValidationException.class).isThrownBy(jadConfig::process)
-                .withMessage("Parameter elasticsearch_hosts should be non-empty list (found [])");
     }
 
     @Test

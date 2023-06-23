@@ -48,4 +48,6 @@ public class FunctionRegistry {
     public Collection<Function<?>> all() {
         return functions.values().stream().collect(Collectors.toList());
     }
+
 }
+

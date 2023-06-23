@@ -109,23 +109,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
-        final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(p -> StringUtils.isNotBlank(p)).collect(Collectors.toList());
+        final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(StringUtils::isNotBlank).collect(Collectors.toList());
         if(!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
         }
-    }
-
-    public void purgeData() {
-        mongodb.dropDatabase();
-        searchServer.cleanUp();
-    }
-
-    public void fullReset(List<URL> mongoDBFixtures) {
-        LOG.debug("Resetting backend.");
-        purgeData();
-        mongodb.importFixtures(mongoDBFixtures);
-        node.restart();
     }
 
     @Override
@@ -161,10 +149,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public Network network() {
         return this.network;
-    }
-
-    public MongoDBInstance mongoDB() {
-        return mongodb;
     }
 
     public Optional<MailServerInstance> getEmailServerInstance() {

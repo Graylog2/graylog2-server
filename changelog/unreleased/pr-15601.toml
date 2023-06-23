@@ -1,0 +1,4 @@
+type = "added"
+message = "Implementing highlighting for advanced field types (streams, nodes, inputs)."
+
+pulls = ["15601"]

@@ -73,9 +73,15 @@ const _validateIndexPrefix = (value: string) => {
   return error;
 };
 
-const _getRotationConfigState = (strategy: string, data: string) => ({ rotation_strategy_class: strategy, rotation_strategy: data });
+const _getRotationConfigState = (strategy: string, data: string) => ({
+  rotation_strategy_class: strategy,
+  rotation_strategy: data,
+});
 
-const _getRetentionConfigState = (strategy: string, data: string) => ({ retention_strategy_class: strategy, retention_strategy: data });
+const _getRetentionConfigState = (strategy: string, data: string) => ({
+  retention_strategy_class: strategy,
+  retention_strategy: data,
+});
 
 class IndexSetConfigurationForm extends React.Component<Props, State> {
   static propTypes = {

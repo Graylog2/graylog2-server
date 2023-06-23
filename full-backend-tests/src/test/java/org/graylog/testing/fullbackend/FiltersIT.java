@@ -24,11 +24,15 @@ import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPResponseFilter;
 import org.hamcrest.Matchers;
 
+import java.util.regex.Pattern;
+
 import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
     private final GraylogApis api;
+    private static final Pattern defaultCSPPattern = Pattern.compile(Pattern.quote(CSP.CSP_DEFAULT)
+            .replaceAll("\\{nonce}", "\\\\E[a-zA-Z0-9-]+\\\\Q"));
 
     public FiltersIT(GraylogApis api) {
         this.api = api;
@@ -49,7 +53,6 @@ public class FiltersIT {
 
     @ContainerMatrixTest
     void cspWebInterfaceAssets() {
-        String expected = CSP.CSP_DEFAULT;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -58,12 +61,11 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(expected));
+                        Matchers.matchesPattern(defaultCSPPattern));
     }
 
     @ContainerMatrixTest
     void cspWebAppNotFound() {
-        String expected = CSP.CSP_DEFAULT;
         given()
                 .spec(api.requestSpecification())
                 .basePath("/")
@@ -71,6 +73,6 @@ public class FiltersIT {
                 .get("streams")
                 .then()
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.equalTo(expected));
+                        Matchers.matchesPattern(defaultCSPPattern));
     }
 }

@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix archiving failure in case of AWS Opensearch 429 error"
+
+issues = ["Graylog2/graylog-plugin-enterprise#5136"]
+pulls = ["15503"]
+

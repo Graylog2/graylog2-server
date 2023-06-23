@@ -19,6 +19,11 @@ package org.graylog2.bootstrap;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.certutil.CertutilCa;
+import org.graylog.security.certutil.CertutilCert;
+import org.graylog.security.certutil.CertutilCsr;
+import org.graylog.security.certutil.CertutilCsrSign;
+import org.graylog.security.certutil.CertutilHttp;
 import org.graylog2.bootstrap.commands.CliCommandHelp;
 import org.graylog2.bootstrap.commands.ShowVersion;
 
@@ -30,6 +35,11 @@ public class Main {
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(CliCommandHelp.class)
                 .withCommands(ImmutableSet.of(
+                        CertutilCa.class,
+                        CertutilCert.class,
+                        CertutilHttp.class,
+                        CertutilCsr.class,
+                        CertutilCsrSign.class,
                         ShowVersion.class,
                         CliCommandHelp.class));
 

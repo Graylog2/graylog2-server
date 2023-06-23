@@ -18,11 +18,11 @@ package org.graylog2.alerts;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Set;
 

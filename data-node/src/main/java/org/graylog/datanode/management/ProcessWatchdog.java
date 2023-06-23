@@ -16,87 +16,80 @@
  */
 package org.graylog.datanode.management;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.datanode.process.FailuresCounter;
+import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.process.StateMachineTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class ProcessWatchdog implements Runnable {
+/**
+ * This process watchdog follows transitions of the state machine and will try to restart the process in case of termination.
+ * If the process is actually stopped, it won't restart it and will automatically deactivate itself.
+ */
+public class ProcessWatchdog implements StateMachineTracer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessWatchdog.class);
-    public static final int WATCHDOG_DEFAULT_DELAY_MS = 1_000;
 
-    private final ManagableProcess process;
-    private final int watchdogDelayMs;
+    private boolean active;
+    private final FailuresCounter restartCounter;
+    private final ManagableProcess<?> process;
 
-    private final FailuresCounter failureCounter = FailuresCounter.zeroBased(3);
-
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("process-watchdog-%d").build());
-    private volatile boolean stopped;
-
-    public ProcessWatchdog(ManagableProcess process) {
-        this(process, WATCHDOG_DEFAULT_DELAY_MS);
-    }
-
-    public ProcessWatchdog(ManagableProcess process, int watchdogDelayMs) {
+    public ProcessWatchdog(ManagableProcess<?> process, int restartAttemptsCount) {
         this.process = process;
-        this.watchdogDelayMs = watchdogDelayMs;
+        this.restartCounter = FailuresCounter.zeroBased(restartAttemptsCount);
     }
 
     @Override
-    public void run() {
-        // TODO:  remove busy-waiting and replace with some post-termination hook of the process
-        while (!Thread.interrupted() && !stopped) {
-            if (process.isInState(ProcessState.TERMINATED)) {
-                if (!failureCounter.failedTooManyTimes()) {
-                    restartProcess();
-                } else {
-                    // give up trying, stop the watchdog
-                    LOG.warn("Process watchdog terminated after too many restart attempts");
-                    stopped = true;
-                }
-            }
+    public void trigger(ProcessEvent trigger) {
+        LOG.debug("Watchdog trigger: {}", trigger);
+    }
 
-            try {
-                Thread.sleep(this.watchdogDelayMs);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
+    @Override
+    public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
+        LOG.debug("Watchdog transition event:{}, source:{}, destination:{}", trigger, source, destination);
+        switch (trigger) {
+            case PROCESS_STARTED -> activateWatchdog();
+            case PROCESS_TERMINATED -> restartProcess();
+            case HEALTH_CHECK_OK -> resetCounter();
+            case PROCESS_STOPPED -> deactivateWatchdog();
         }
-        stopped = true;
-        LOG.warn("Process watchdog terminated");
+    }
+
+    private void resetCounter() {
+        this.restartCounter.resetFailuresCounter();
+    }
+
+    private void activateWatchdog() {
+        this.active = true;
+    }
+
+    private void deactivateWatchdog() {
+        this.active = false;
     }
 
     private void restartProcess() {
-        try {
-            LOG.info("Detected terminated process, restarting");
-            process.start();
-        } catch (IOException e) {
-            LOG.warn("Failed to start the process.", e);
-        } finally {
-            failureCounter.increment();
+        if (this.active) {
+            if (!restartCounter.failedTooManyTimes()) {
+                try {
+                    LOG.info("Detected terminated process, restarting. Attempt #{}", restartCounter.failuresCount() + 1);
+                    process.restart();
+                } catch (IOException e) {
+                    LOG.warn("Failed to restart process", e);
+                } finally {
+                    restartCounter.increment();
+                }
+            } else {
+                // give up trying, stop the watchdog
+                LOG.warn("Process watchdog terminated after too many restart attempts");
+                active = false;
+            }
         }
     }
 
-    public void start() {
-        LOG.info("Starting watchdog for process");
-        stopped = false;
-        executor.submit(this);
-    }
-
-    public void stop() {
-        LOG.info("Stopping watchdog for process");
-        stopped = true;
-        executor.shutdownNow();
-    }
-
-    public boolean isStopped() {
-        return stopped;
+    public boolean isActive() {
+        return active;
     }
 }

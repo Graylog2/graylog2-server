@@ -19,7 +19,6 @@ package org.graylog2.security;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.primitives.Ints;
-import com.google.inject.Singleton;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
@@ -27,6 +26,7 @@ import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.shared.metrics.MetricUtils;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;

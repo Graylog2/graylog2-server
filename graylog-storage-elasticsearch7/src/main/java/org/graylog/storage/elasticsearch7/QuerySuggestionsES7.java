@@ -32,7 +32,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.ScriptQue
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.ScriptType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.SuggestBuilder;

@@ -21,7 +21,10 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
+import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightAssetsResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
@@ -30,6 +33,7 @@ import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 
 public class PreflightWebModule extends Graylog2Module {
@@ -42,16 +46,21 @@ public class PreflightWebModule extends Graylog2Module {
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
+        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
 
-        bind(PreflightConfigService.class);
+        bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
+        bind(PreflightBoot.class).asEagerSingleton();
 
         addPreflightRestResource(PreflightResource.class);
         addPreflightRestResource(PreflightStatusResource.class);
         addPreflightRestResource(PreflightAssetsResource.class);
 
+        Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
+        periodicalBinder.addBinding().to(GraylogPreflightGeneratePeriodical.class);
+
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
-
+        serviceBinder.addBinding().to(PreflightPeriodicalsService.class);
 
         // needed for the ObjectMapperModule
         MapBinder.newMapBinder(binder(),

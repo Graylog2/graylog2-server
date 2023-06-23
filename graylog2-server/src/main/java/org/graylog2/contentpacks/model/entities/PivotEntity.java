@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -44,7 +45,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -91,10 +91,10 @@ public abstract class PivotEntity implements SearchTypeEntity {
     public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty("row_limit")
-    public abstract OptionalInt rowLimit();
+    public abstract Optional<Integer> rowLimit();
 
     @JsonProperty("column_limit")
-    public abstract OptionalInt columnLimit();
+    public abstract Optional<Integer> columnLimit();
 
     public abstract Builder toBuilder();
 
@@ -139,10 +139,10 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder columnGroups(List<BucketSpec> columnGroups);
 
         @JsonProperty("row_limit")
-        public abstract Builder rowLimit(int rowLimit);
+        public abstract Builder rowLimit(@Nullable Integer rowLimit);
 
         @JsonProperty("column_limit")
-        public abstract Builder columnLimit(int columnLimit);
+        public abstract Builder columnLimit(@Nullable Integer columnLimit);
 
         @JsonProperty
         public abstract Builder series(List<SeriesSpec> series);
@@ -185,13 +185,15 @@ public abstract class PivotEntity implements SearchTypeEntity {
 
     @Override
     public SearchType toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        var rowGroups = rowLimit().map(rowLimit -> applyGroupLimit(rowGroups(), rowLimit)).orElse(rowGroups());
+        var columnGroups = columnLimit().map(columnLimit -> applyGroupLimit(columnGroups(), columnLimit)).orElse(columnGroups());
         return Pivot.builder()
                 .streams(mappedStreams(nativeEntities))
                 .name(name().orElse(null))
                 .sort(sort())
                 .timerange(timerange().orElse(null))
-                .rowGroups(rowGroups())
-                .columnGroups(columnGroups())
+                .rowGroups(rowGroups)
+                .columnGroups(columnGroups)
                 .series(series())
                 .rollup(rollup())
                 .query(query().orElse(null))
@@ -200,5 +202,16 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .type(type())
                 .id(id())
                 .build();
+    }
+
+    private List<BucketSpec> applyGroupLimit(List<BucketSpec> bucketSpecs, int limit) {
+        return bucketSpecs.stream()
+                .map(rowGroup -> {
+                    if (rowGroup instanceof Values values) {
+                        return values.withLimit(limit);
+                    }
+                    return rowGroup;
+                })
+                .toList();
     }
 }

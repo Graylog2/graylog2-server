@@ -50,8 +50,10 @@ type ChartMarker = {
 export type ChartConfig = {
   name: string,
   labels: Array<string>,
+  originalLabels?: Array<string>,
   line?: ChartMarker,
   marker?: ChartMarker,
+  originalName?: string,
 };
 
 export type ColorMap = {

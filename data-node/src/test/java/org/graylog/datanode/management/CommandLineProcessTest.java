@@ -23,6 +23,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.apache.commons.exec.ExecuteException;
 import org.assertj.core.api.Assertions;
+import org.graylog.datanode.process.ProcessEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -126,7 +127,7 @@ class CommandLineProcessTest {
     }
 
     @Test
-    void testExitCode() throws IOException, ExecutionException, InterruptedException, TimeoutException {
+    void testExitCode() throws ExecutionException, InterruptedException, TimeoutException {
         final CompletableFuture<Integer> exitCodeFuture = new CompletableFuture<>();
 
         final ProcessListener listener = new ProcessListener() {

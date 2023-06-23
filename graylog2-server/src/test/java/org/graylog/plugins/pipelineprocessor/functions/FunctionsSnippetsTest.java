@@ -122,6 +122,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.StringEntropy;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
@@ -276,6 +277,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Replace.NAME, new Replace());
         functions.put(Length.NAME, new Length());
         functions.put(FirstNonNull.NAME, new FirstNonNull());
+        functions.put(StringEntropy.NAME, new StringEntropy());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -1328,6 +1330,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void stringEntropy() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("zero_entropy")).isEqualTo(0.0D);
+        assertThat(message.getField("one_entropy")).isEqualTo(1.0D);
+    }
+
+    @   Test
     public void notExpressionTypeCheck() {
         try {
             Rule rule = parser.parseRule(ruleForTest(), true);
