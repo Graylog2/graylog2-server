@@ -776,6 +776,28 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
+    void testPercentageMetricWithCountOnFieldForColumnPivotOnly() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .columnGroups(Values.builder().field("http_method").build())
+                .series(Percentage.builder().strategy(Percentage.Strategy.COUNT).field("http_method").build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of(), List.of("GET", "percentage(http_method,COUNT)")), equalTo(0.86f))
+                .body(pathToMetricResult(List.of(), List.of("DELETE", "percentage(http_method,COUNT)")), equalTo(0.052f))
+                .body(pathToMetricResult(List.of(), List.of("POST", "percentage(http_method,COUNT)")), equalTo(0.045f))
+                .body(pathToMetricResult(List.of(), List.of("PUT", "percentage(http_method,COUNT)")), equalTo(0.043f));
+    }
+
+    @ContainerMatrixTest
     void testPercentageMetricWithSumOnField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
