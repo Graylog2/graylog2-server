@@ -96,7 +96,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                         case ROW -> rootAggregation.subAggregation(result.aggregationBuilder());
                         case ROOT -> {
                             if (!generateRollups) {
-                                rootAggregation.subAggregation(result.aggregationBuilder());
+                                searchSourceBuilder.aggregation(result.aggregationBuilder());
                             }
                         }
                     }
