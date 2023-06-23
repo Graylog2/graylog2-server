@@ -150,7 +150,7 @@ const Metric = ({ index }: Props) => {
                 <Select options={percentageStrategyOptions}
                         clearable={false}
                         name={name}
-                        value={value}
+                        value={value ?? 'COUNT'}
                         aria-label="Select strategy"
                         size="small"
                         menuPortalTarget={document.body}
