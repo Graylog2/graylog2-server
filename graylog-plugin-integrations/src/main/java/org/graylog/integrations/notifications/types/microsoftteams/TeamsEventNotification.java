@@ -114,6 +114,7 @@ public class TeamsEventNotification implements EventNotification {
         String description = buildMessageDescription(ctx);
         String customMessage = null;
         String template = config.customMessage();
+        String summary = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Graylog Event");
         if (!isNullOrEmpty(template)) {
             customMessage = buildCustomMessage(ctx, config, template);
         }
@@ -127,6 +128,7 @@ public class TeamsEventNotification implements EventNotification {
         return TeamsMessage.builder()
                 .color(config.color())
                 .text(messageTitle)
+                .summary(summary)
                 .sections(Collections.singleton(section))
                 .build();
     }

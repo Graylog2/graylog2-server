@@ -38,6 +38,7 @@ public abstract class TeamsMessage {
     static final String FIELD_SECTIONS = "sections";
     static final String FIELD_ACTIVITY_SUBTITLE = "activitySubtitle";
     static final String FIELD_ACTIVITY_IMAGE = "activityImage";
+    static final String FIELD_SUMMARY = "summary";
 
     @JsonProperty(FIELD_TYPE)
     public abstract String type();
@@ -50,6 +51,9 @@ public abstract class TeamsMessage {
 
     @JsonProperty(FIELD_TEXT)
     public abstract String text();
+
+    @JsonProperty(FIELD_SUMMARY)
+    public abstract String summary();
 
     @JsonProperty(FIELD_SECTIONS)
     public abstract Set<Sections> sections();
@@ -73,6 +77,9 @@ public abstract class TeamsMessage {
 
         @JsonProperty(FIELD_TEXT)
         public abstract Builder text(String text);
+
+        @JsonProperty(FIELD_SUMMARY)
+        public abstract Builder summary(String summary);
 
         @JsonProperty(FIELD_SECTIONS)
         public abstract Builder sections(Set<Sections> sections);
