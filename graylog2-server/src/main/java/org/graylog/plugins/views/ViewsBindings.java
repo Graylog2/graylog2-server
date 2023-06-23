@@ -87,6 +87,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
@@ -186,6 +187,7 @@ public class ViewsBindings extends ViewsModule {
         registerPivotAggregationFunction(Sum.NAME, "Sum", Sum.class);
         registerPivotAggregationFunction(SumOfSquares.NAME, "Sum of Squares", SumOfSquares.class);
         registerPivotAggregationFunction(Variance.NAME, "Variance", Variance.class);
+        registerPivotAggregationFunction(Percentage.NAME, "Percentage", Percentage.class);
         registerPivotAggregationFunction(Percentile.NAME, "Percentile", Percentile.class);
         registerPivotAggregationFunction(Latest.NAME, "Latest Value", Latest.class);
 

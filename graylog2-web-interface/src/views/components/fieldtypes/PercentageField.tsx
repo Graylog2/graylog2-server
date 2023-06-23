@@ -14,13 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.searchtypes.pivot.series;
+import * as React from 'react';
+import { useMemo } from 'react';
+import numeral from 'numeral';
+import styled from 'styled-components';
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
-
-public abstract class SeriesSpecBuilder<V, B> extends TypedBuilder<V, B> {
-
-    @JsonProperty
-    public abstract B id(String id);
+type Props = {
+  value: number,
 }
+
+const NumberCell = styled.span`
+  float: right;
+`;
+
+const PercentageField = ({ value }: Props) => {
+  const formatted = useMemo(() => numeral(value).format('0.00%'), [value]);
+
+  return <NumberCell title={String(value)}>{formatted}</NumberCell>;
+};
+
+export default PercentageField;
