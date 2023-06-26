@@ -40,10 +40,10 @@ public class AWSModule extends PluginModule {
     protected void configure() {
         if (!isForwarder()) {
             // CloudTrail
-            bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
             addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
             addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
             addMessageInput(CloudTrailInput.class);
+            bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
         }
         if (!(configuration.isCloud() || isForwarder())) {
             // Instance name lookup
