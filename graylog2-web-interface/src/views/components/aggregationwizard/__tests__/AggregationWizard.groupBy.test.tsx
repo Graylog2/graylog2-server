@@ -127,7 +127,7 @@ describe('AggregationWizard', () => {
     await selectField('took_ms');
     await submitWidgetConfigForm();
 
-    const pivot = Pivot.create(['took_ms'], 'values', { limit: 15 });
+    const pivot = Pivot.createValues(['took_ms']);
     const updatedConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot])
@@ -148,7 +148,7 @@ describe('AggregationWizard', () => {
     await selectField('status_code');
     await submitWidgetConfigForm();
 
-    const pivot = Pivot.create(['status_code'], 'values');
+    const pivot = Pivot.createValues(['status_code']);
     const updatedConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot])
@@ -161,7 +161,7 @@ describe('AggregationWizard', () => {
 
   it('should not throw an error when field in config no longer exists in field types list.', async () => {
     const onChange = jest.fn();
-    const pivot = Pivot.create(['status_code'], 'values');
+    const pivot = Pivot.createValues(['status_code']);
     const initialConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot])
@@ -187,7 +187,7 @@ describe('AggregationWizard', () => {
     await submitWidgetConfigForm();
 
     const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create(['took_ms'], 'values', { limit: 15 });
+    const pivot1 = Pivot.createValues(['took_ms']);
     const updatedConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot0, pivot1])
@@ -226,8 +226,8 @@ describe('AggregationWizard', () => {
   }, extendedTimeout);
 
   it('should add multiple fields to one pivot', async () => {
-    const initialPivot = Pivot.create(['took_ms'], 'values', { limit: 15 });
-    const updatedPivot = Pivot.create(['took_ms', 'http_method'], 'values', { limit: 15 });
+    const initialPivot = Pivot.createValues(['took_ms']);
+    const updatedPivot = Pivot.createValues(['took_ms', 'http_method']);
     const config = widgetConfig
       .toBuilder()
       .rowPivots([initialPivot])
@@ -251,8 +251,8 @@ describe('AggregationWizard', () => {
   });
 
   it('should save pivot with type "values" when adding date and values field', async () => {
-    const initialPivot = Pivot.create(['took_ms'], 'values', { limit: 15 });
-    const updatedPivot = Pivot.create(['took_ms', 'timestamp'], 'values', { limit: 15 });
+    const initialPivot = Pivot.createValues(['took_ms']);
+    const updatedPivot = Pivot.createValues(['took_ms', 'timestamp']);
     const config = widgetConfig
       .toBuilder()
       .rowPivots([initialPivot])
@@ -292,7 +292,7 @@ describe('AggregationWizard', () => {
 
   it('should display groupings with values from config', async () => {
     const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create(['took_ms'], 'values', { limit: 15 });
+    const pivot1 = Pivot.createValues(['took_ms']);
     const config = widgetConfig
       .toBuilder()
       .rowPivots([pivot0, pivot1])
@@ -305,7 +305,7 @@ describe('AggregationWizard', () => {
   });
 
   it('should remove all groupings', async () => {
-    const pivot = Pivot.create(['took_ms'], 'values', { limit: 15 });
+    const pivot = Pivot.createValues(['took_ms']);
     const config = widgetConfig
       .toBuilder()
       .rowPivots([pivot])
@@ -342,7 +342,7 @@ describe('AggregationWizard', () => {
 
   it('should correctly update sort of groupings', async () => {
     const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create(['took_ms'], 'values', { limit: 15 });
+    const pivot1 = Pivot.createValues(['took_ms']);
     const config = widgetConfig
       .toBuilder()
       .rowPivots([pivot0, pivot1])
@@ -374,8 +374,8 @@ describe('AggregationWizard', () => {
   }, extendedTimeout);
 
   it('should correctly update sort of grouping fields', async () => {
-    const initialPivot = Pivot.create(['http_method', 'took_ms'], 'values', { limit: 15 });
-    const updatedPivot = Pivot.create(['took_ms', 'http_method'], 'values', { limit: 15 });
+    const initialPivot = Pivot.createValues(['http_method', 'took_ms']);
+    const updatedPivot = Pivot.createValues(['took_ms', 'http_method']);
     const config = widgetConfig
       .toBuilder()
       .rowPivots([initialPivot])
