@@ -28,8 +28,8 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.plugins.views.startpage.title.StartPageTitleRetriever;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -39,22 +39,22 @@ import java.util.List;
 import java.util.Objects;
 
 public class StartPageService {
-    private final Catalog catalog;
     private final GRNRegistry grnRegistry;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
+    private final StartPageTitleRetriever startPageTitleRetriever;
     private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
-    public StartPageService(Catalog catalog,
-                            GRNRegistry grnRegistry,
+    public StartPageService(GRNRegistry grnRegistry,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
-                            EventBus eventBus) {
-        this.catalog = catalog;
+                            EventBus eventBus,
+                            StartPageTitleRetriever startPageTitleRetriever) {
         this.grnRegistry = grnRegistry;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
+        this.startPageTitleRetriever = startPageTitleRetriever;
         eventBus.register(this);
     }
 
@@ -68,13 +68,10 @@ public class StartPageService {
                 .items()
                 .stream()
                 .skip((long) (page - 1) * perPage)
-                .map(i -> {
-                    final Catalog.Entry entry = catalog.getEntry(i.grn());
-                    if (entry.isUnknown()) {
-                        return null;
-                    }
-                    return new LastOpened(i.grn(), entry.title(), i.timestamp());
-                })
+                .map(i -> startPageTitleRetriever
+                        .retrieveTitle(i.grn())
+                        .map(title -> new LastOpened(i.grn(), title, i.timestamp()))
+                        .orElse(null))
                 .filter(Objects::nonNull)
                 .limit(perPage)
                 .toList();
@@ -85,18 +82,16 @@ public class StartPageService {
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
         final var items = recentActivityService.findRecentActivitiesFor(searchUser, page, perPage);
         final var mapped = items.stream()
-                .map(i -> {
-                    final Catalog.Entry entry = catalog.getEntry(i.itemGrn());
-                    if (entry.isUnknown()) {
-                        return null;
-                    }
-                    return new RecentActivity(i.id(),
-                            i.activityType(),
-                            i.itemGrn(),
-                            entry.title(),
-                            i.userName(),
-                            i.timestamp());
-                })
+                .map(i -> startPageTitleRetriever
+                        .retrieveTitle(i.itemGrn())
+                        .map(title -> new RecentActivity(i.id(),
+                                i.activityType(),
+                                i.itemGrn(),
+                                title,
+                                i.userName(),
+                                i.timestamp()))
+                        .orElse(null)
+                )
                 .filter(Objects::nonNull)
                 .toList();
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(mapped, items.pagination().total(), page, perPage));

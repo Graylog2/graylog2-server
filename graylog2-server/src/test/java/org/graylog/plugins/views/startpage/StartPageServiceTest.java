@@ -31,6 +31,7 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.plugins.views.startpage.title.StartPageTitleRetriever;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.testing.GRNExtension;
@@ -49,6 +50,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,13 +74,13 @@ public class StartPageServiceTest {
         }
 
         @Override
-        protected LoadingCache<String, Entry> createCache() {
+        protected LoadingCache<String, Optional<Entry>> createCache() {
             return null;
         }
 
         @Override
-        public Entry getEntry(GRN grn) {
-            return new Entry("");
+        public Optional<Entry> getEntry(GRN grn) {
+            return Optional.of(new Entry("", ""));
         }
     }
 
@@ -114,7 +116,7 @@ public class StartPageServiceTest {
         var dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus);
         var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
-        startPageService = new StartPageService(new TestCatalog(), grnRegistry, lastOpenedService, recentActivityService, eventbus);
+        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageTitleRetriever(new TestCatalog()));
     }
 
     @Test

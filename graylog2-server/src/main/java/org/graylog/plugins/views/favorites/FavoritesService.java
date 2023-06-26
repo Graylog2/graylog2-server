@@ -25,11 +25,11 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
+import org.graylog.plugins.views.startpage.title.StartPageTitleRetriever;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.users.events.UserDeletedEvent;
 import org.mongojack.DBQuery;
@@ -43,18 +43,18 @@ import java.util.Optional;
 public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public static final String COLLECTION_NAME = "favorites";
 
-    private final Catalog catalog;
+    private final StartPageTitleRetriever startPageTitleRetriever;
     private final GRNRegistry grnRegistry;
 
     @Inject
     protected FavoritesService(final MongoConnection mongoConnection,
                                EventBus eventBus,
                                final MongoJackObjectMapperProvider mapper,
-                               final Catalog catalog,
+                               final StartPageTitleRetriever startPageTitleRetriever,
                                final GRNRegistry grnRegistry) {
         super(mongoConnection, mapper, FavoritesForUserDTO.class, COLLECTION_NAME);
         eventBus.register(this);
-        this.catalog = catalog;
+        this.startPageTitleRetriever = startPageTitleRetriever;
         this.grnRegistry = grnRegistry;
 
         db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_USER_ID, 1));
@@ -66,13 +66,11 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
-                .map(i -> {
-                    final Catalog.Entry entry = catalog.getEntry(i);
-                    if (entry.isUnknown()) {
-                        return null;
-                    }
-                    return new Favorite(i, entry.title());
-                })
+                .map(i -> startPageTitleRetriever
+                        .retrieveTitle(i)
+                        .map(title -> new Favorite(i, title))
+                        .orElse(null)
+                )
                 .filter(Objects::nonNull)
                 .toList();
 
