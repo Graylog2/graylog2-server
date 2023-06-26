@@ -87,6 +87,10 @@ public abstract class Values implements BucketSpec {
 
         public abstract Builder skipEmptyValues(Boolean skipEmptyValues);
 
+        public Builder skipEmptyValues() {
+            return skipEmptyValues(true);
+        }
+
         @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
         public Builder setSkipEmptyValues(@Nullable Boolean skipEmptyValues) {
             return skipEmptyValues(firstNonNull(skipEmptyValues, false));

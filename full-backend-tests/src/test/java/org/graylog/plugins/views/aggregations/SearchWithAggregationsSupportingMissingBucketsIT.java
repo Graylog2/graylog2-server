@@ -47,6 +47,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.IsNot.not;
 
 @ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1, ES7, OS2, OS2_LATEST})
 public class SearchWithAggregationsSupportingMissingBucketsIT {
@@ -123,6 +124,39 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         validatableResponse.body(".rows[3].values[0].value", equalTo(1));
         validatableResponse.body(".rows[3].values[1].key", contains("avg(age)"));
         validatableResponse.body(".rows[3].values[1].value", equalTo(60.0f));
+
+        //Top bucket verification
+        //There are 2 "Joes" in a fixture: {(...)"lastName": "Smith","age": 50(...)} and {(...)"lastName": "Biden","age": 80(...)}
+        validatableResponse.body(".rows[0].key", contains("Joe"));
+        validatableResponse.body(".rows[0].values[0].key", contains("count()"));
+        validatableResponse.body(".rows[0].values[0].value", equalTo(2));
+        validatableResponse.body(".rows[0].values[1].key", contains("avg(age)"));
+        validatableResponse.body(".rows[0].values[1].value", equalTo(65.0f));
+
+    }
+
+    @ContainerMatrixTest
+    void testSingleFieldAggregationHasNoMissingBucketWhenSkipEmptyValuesIsUsed() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(Values.builder().field("firstName").limit(8).skipEmptyValues().build())
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        //General verification
+        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows", hasSize(4))
+                .body(".total", equalTo(5))
+                .body(".rows.find{ it.key[0] == 'Joe' }", notNullValue())
+                .body(".rows.find{ it.key[0] == 'Jane' }", notNullValue())
+                .body(".rows.find{ it.key[0] == 'Bob' }", notNullValue())
+                .body(".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", nullValue())
+                .body(".rows.find{ it.key == [] }", notNullValue());
+
+        //Empty bucket verification (should precede the last/total one - index 3)
+        //The only message with "empty" first name in a fixture is {(...)"lastName": "Cooper","age": 60(...)}
+        validatableResponse.body(".rows[3].key", not(contains("(Empty Value)")));
 
         //Top bucket verification
         //There are 2 "Joes" in a fixture: {(...)"lastName": "Smith","age": 50(...)} and {(...)"lastName": "Biden","age": 80(...)}
