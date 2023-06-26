@@ -38,13 +38,13 @@ public class AWSModule extends PluginModule {
 
     @Override
     protected void configure() {
-        // CloudTrail
-        addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
-        addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
-        addMessageInput(CloudTrailInput.class);
-
-        bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
-
+        if (!isForwarder()) {
+            // CloudTrail
+            bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
+            addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
+            addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
+            addMessageInput(CloudTrailInput.class);
+        }
         if (!(configuration.isCloud() || isForwarder())) {
             // Instance name lookup
             addMessageProcessor(AWSInstanceNameLookupProcessor.class, AWSInstanceNameLookupProcessor.Descriptor.class);
