@@ -82,12 +82,14 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
       <FieldComponent groupingIndex={index} />
       {fieldType === DateType && (<Time index={index} />)}
       {fieldType === ValuesType && (
-        <FormikFormGroup label="Limit"
-                         name={`groupBy.groupings.${index}.limit`}
-                         type="number"
-                         bsSize="small" />
+        <>
+          <FormikFormGroup label="Limit"
+                           name={`groupBy.groupings.${index}.limit`}
+                           type="number"
+                           bsSize="small" />
+          <SkipEmptyValues index={index} />
+        </>
       )}
-      <SkipEmptyValues index={index} />
     </Wrapper>
   );
 });

@@ -138,11 +138,12 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Override
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
+        var values = (Values) bucketSpecs;
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpecs.fields(), pivot.sort());
 
-        if (bucketSpecs.skipEmptyValues()) {
+        if (values.skipEmptyValues()) {
             final MultiBucketsAggregation termsAggregation = previousBucket.getAggregations().get(AGG_NAME);
             return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
         } else {

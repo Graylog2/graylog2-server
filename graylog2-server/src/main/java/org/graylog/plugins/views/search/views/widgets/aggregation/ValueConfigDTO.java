@@ -17,12 +17,14 @@
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 @AutoValue
@@ -31,6 +33,7 @@ import java.util.OptionalInt;
 public abstract class ValueConfigDTO implements PivotConfigDTO {
     public static final String NAME = "values";
     static final String FIELD_LIMIT = "limit";
+    static final String FIELD_SKIP_EMPTY_VALUES = "skip_empty_values";
 
     @JsonProperty
     public abstract OptionalInt limit();
@@ -40,6 +43,10 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
     }
 
     abstract Builder toBuilder();
+
+    @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public abstract Optional<Boolean> skipEmptyValues();
 
     public ValueConfigDTO withLimit(int limit) {
         return toBuilder().limit(limit).build();

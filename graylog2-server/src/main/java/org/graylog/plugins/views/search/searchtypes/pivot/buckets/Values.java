@@ -35,6 +35,7 @@ import java.util.List;
 public abstract class Values implements BucketSpec {
     public static final String NAME = "values";
     public static final int DEFAULT_LIMIT = 15;
+    private static final String FIELD_SKIP_EMPTY_VALUES = "skip_empty_values";
 
     @Override
     public abstract String type();

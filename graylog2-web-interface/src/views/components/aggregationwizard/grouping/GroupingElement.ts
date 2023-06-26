@@ -205,14 +205,13 @@ const addRandomId = <GroupingType extends GroupByFormValues>(baseGrouping: Omit<
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
   const { fields, config } = pivot;
 
-  const { interval, skip_empty_values } = config as TimeConfigType;
+  const { interval } = config as TimeConfigType;
 
   return addRandomId<DateGrouping>({
     direction,
     fields,
     type: DateType,
     interval,
-    skipEmptyValues: skip_empty_values,
   });
 };
 
@@ -249,10 +248,9 @@ const pivotsToGrouping = (config: AggregationWidgetConfig) => {
 };
 
 const groupingToPivot = (grouping: GroupByFormValues) => {
-  const baseConfig = { skip_empty_values: grouping.skipEmptyValues };
-  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: parseNumber(grouping.limit) };
+  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: parseNumber(grouping.limit), skip_empty_values: grouping.skipEmptyValues };
 
-  return Pivot.create(grouping.fields, grouping.type, { ...baseConfig, ...pivotConfig });
+  return Pivot.create(grouping.fields, grouping.type, pivotConfig);
 };
 
 const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: AggregationWidgetConfigBuilder) => {

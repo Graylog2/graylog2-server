@@ -114,11 +114,12 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
     @Override
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
+        var values = (Values) bucketSpec;
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpec.fields(), pivot.sort());
 
-        if (bucketSpec.skipEmptyValues()) {
+        if (values.skipEmptyValues()) {
             final MultiBucketsAggregation termsAggregation = previousBucket.getAggregations().get(AGG_NAME);
             return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
         } else {

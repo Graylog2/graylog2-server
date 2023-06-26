@@ -30,7 +30,6 @@ export type TimeUnitConfig = {
 
 export type TimeConfigType = {
   interval: AutoTimeConfig | TimeUnitConfig,
-  skip_empty_values: boolean,
 };
 
 export type ValuesConfigType = {
