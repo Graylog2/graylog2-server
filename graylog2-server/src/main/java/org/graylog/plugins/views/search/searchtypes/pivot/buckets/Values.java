@@ -29,6 +29,8 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @AutoValue
 @JsonTypeName(Values.NAME)
 @JsonDeserialize(builder = Values.Builder.class)
@@ -87,7 +89,7 @@ public abstract class Values implements BucketSpec {
 
         @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
         public Builder setSkipEmptyValues(@Nullable Boolean skipEmptyValues) {
-            return skipEmptyValues == null ? skipEmptyValues(false) : skipEmptyValues(skipEmptyValues);
+            return skipEmptyValues(firstNonNull(skipEmptyValues, false));
         }
     }
 }

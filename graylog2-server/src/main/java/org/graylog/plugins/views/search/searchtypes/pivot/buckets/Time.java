@@ -48,7 +48,6 @@ public abstract class Time implements BucketSpec {
         return new AutoValue_Time.Builder()
                 .type(NAME);
     }
-
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder extends TypedBuilder<Time, Builder> {
@@ -62,8 +61,6 @@ public abstract class Time implements BucketSpec {
         public Builder field(String field) {
             return fields(Collections.singletonList(field));
         }
-
-        ;
 
         @JsonProperty
         public abstract Builder fields(List<String> fields);

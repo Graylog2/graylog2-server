@@ -27,6 +27,8 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @AutoValue
 @JsonTypeName(ValueConfigDTO.NAME)
 @JsonDeserialize(builder = ValueConfigDTO.Builder.class)
@@ -57,8 +59,12 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
         @JsonProperty(FIELD_LIMIT)
         public abstract Builder limit(int limit);
 
+        public abstract Builder skipEmptyValues(Boolean skipEmptyValues);
+
         @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
-        public abstract Builder skipEmptyValues(@Nullable Boolean skipEmptyValues);
+        public Builder setSkipEmptyValues(@Nullable Boolean skipEmptyValues) {
+            return skipEmptyValues(firstNonNull(skipEmptyValues, false));
+        }
 
         public abstract ValueConfigDTO build();
 
