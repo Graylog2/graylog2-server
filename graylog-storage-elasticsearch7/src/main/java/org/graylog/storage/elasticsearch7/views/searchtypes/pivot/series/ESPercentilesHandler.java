@@ -19,25 +19,25 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Percentiles;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.PercentilesAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class ESPercentilesHandler extends ESPivotSeriesSpecHandler<Percentile, Percentiles> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final PercentilesAggregationBuilder percentiles = AggregationBuilders.percentiles(name).field(percentileSpec.field()).percentiles(percentileSpec.percentile());
         record(queryContext, pivot, percentileSpec, name, Percentiles.class);
-        return Optional.of(percentiles);
+        return List.of(SeriesAggregationBuilder.metric(percentiles));
     }
 
     @Override

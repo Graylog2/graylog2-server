@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import moment from 'moment';
+import Immutable from 'immutable';
 
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
@@ -29,15 +30,19 @@ import Spinner from 'components/common/Spinner';
 import type { SearchConfig } from 'components/search';
 import Select from 'components/common/Select/Select';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-
 import 'moment-duration-format';
+import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import QuickAccessTimeRangeForm from 'components/configurations/QuickAccessTimeRangeForm';
+import generateId from 'logic/generateId';
+import QuickAccessTimeRangeOptionsSummary from 'components/configurations/QuickAccessTimeRangeOptionsSummary';
+import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import useUserDateTime from 'hooks/useUserDateTime';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
 const queryTimeRangeLimitValidator = (milliseconds: number) => milliseconds >= 1;
-
-const relativeTimeRangeValidator = (milliseconds: number, duration: string) => milliseconds >= 1 || duration === 'PT0S';
 
 const surroundingTimeRangeValidator = (milliseconds: number) => milliseconds >= 1;
 
@@ -51,7 +56,14 @@ const buildTimeRangeOptions = (options: { [x: string]: string; }) => Object.keys
 
 type Option = { period: string, description: string };
 
+const mapQuickAccessBEData = (items: Array<QuickAccessTimeRange>, formatTime: (time: DateTime, format?: DateTimeFormats) => string): Immutable.List<QuickAccessTimeRange> => Immutable.List(items.map(({ timerange, description, id }) => {
+  const presetId = id ?? generateId();
+
+  return { description, id: presetId, timerange: onInitializingTimerange(timerange, formatTime) };
+}));
+
 const SearchesConfig = () => {
+  const { userTimezone, formatTime } = useUserDateTime();
   const isLimitEnabled = (config) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
@@ -63,13 +75,12 @@ const SearchesConfig = () => {
   const [surroundingFilterFieldsUpdate, setSurroundingFilterFieldsUpdate] = useState<string | undefined>(undefined);
   const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState<string | undefined>(undefined);
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
-
+  const [quickAccessTimeRangePresetsUpdated, setQuickAccessTimeRangePresetsUpdated] = useState<Immutable.List<QuickAccessTimeRange>>(undefined);
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
       const config = getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration);
-
       setViewConfig(config);
       setFormConfig(config);
     });
@@ -79,8 +90,8 @@ const SearchesConfig = () => {
     setFormConfig({ ...formConfig, [field]: newOptions });
   };
 
-  const onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {
-    setRelativeTimeRangeOptionsUpdate(data);
+  const onQuickAccessTimeRangePresetsUpdate = (data: Immutable.List<QuickAccessTimeRange>) => {
+    setQuickAccessTimeRangePresetsUpdated(data);
   };
 
   const onSurroundingTimeRangeOptionsUpdate = (data: Array<Option>) => {
@@ -128,6 +139,7 @@ const SearchesConfig = () => {
     setAnalysisDisabledFieldsUpdate(undefined);
     setAutoRefreshTimeRangeOptionsUpdate(undefined);
     setDefaultAutoRefreshOptionUpdate(undefined);
+    setQuickAccessTimeRangePresetsUpdated(undefined);
   };
 
   const handleModalCancel = () => {
@@ -153,6 +165,14 @@ const SearchesConfig = () => {
       });
 
       setRelativeTimeRangeOptionsUpdate(undefined);
+    }
+
+    if (quickAccessTimeRangePresetsUpdated) {
+      update.quick_access_timerange_presets = quickAccessTimeRangePresetsUpdated.toArray().map(({ description, timerange, id }) => ({
+        description, timerange: onSubmittingTimerange(timerange, userTimezone), id,
+      }));
+
+      setQuickAccessTimeRangePresetsUpdated(undefined);
     }
 
     if (surroundingTimeRangeOptionsUpdate) {
@@ -197,6 +217,9 @@ const SearchesConfig = () => {
     });
   };
 
+  const quickAccessTimeRangePresetsFromBE = useMemo(() => mapQuickAccessBEData(formConfig?.quick_access_timerange_presets ?? [], formatTime), [formConfig?.quick_access_timerange_presets, formatTime]);
+  const quickAccessTimeRangePresets = useMemo(() => quickAccessTimeRangePresetsUpdated ?? quickAccessTimeRangePresetsFromBE, [quickAccessTimeRangePresetsFromBE, quickAccessTimeRangePresetsUpdated]);
+
   if (!viewConfig) {
     return <Spinner />;
   }
@@ -224,8 +247,8 @@ const SearchesConfig = () => {
 
       <Row>
         <Col md={4}>
-          <strong>Relative time range options</strong>
-          <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
+          <strong>Quick access time range options</strong>
+          <QuickAccessTimeRangeOptionsSummary options={quickAccessTimeRangePresetsFromBE.toArray()} />
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>
@@ -267,12 +290,13 @@ const SearchesConfig = () => {
 
       {showConfigModal && formConfig && (
         <BootstrapModalForm show
+                            bsSize="large"
                             title="Update Search Configuration"
                             onSubmitForm={saveConfig}
                             onCancel={handleModalCancel}
                             submitButtonText="Update configuration">
           <fieldset>
-            <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
+            <label htmlFor="query-limit-checkbox">Query Time Range Limit</label>
             <Input id="query-limit-checkbox"
                    type="checkbox"
                    label="Enable query limit"
@@ -288,13 +312,7 @@ const SearchesConfig = () => {
                                 validator={queryTimeRangeLimitValidator}
                                 required />
             )}
-            <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.relative_timerange_options)}
-                                  update={onRelativeTimeRangeOptionsUpdate}
-                                  validator={relativeTimeRangeValidator}
-                                  title="Relative Timerange Options"
-                                  help={
-                                    <span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>
-              } />
+            <QuickAccessTimeRangeForm options={quickAccessTimeRangePresets} onUpdate={onQuickAccessTimeRangePresetsUpdate} />
             <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
                                   update={onSurroundingTimeRangeOptionsUpdate}
                                   validator={surroundingTimeRangeValidator}

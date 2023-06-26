@@ -23,7 +23,10 @@ import AppConfig from 'util/AppConfig';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-const HelpMenu = ({ active }) => (
+type Props = {
+  active: boolean,
+}
+const HelpMenu = ({ active }: Props) => (
   <NavDropdown active={active}
                id="help-menu-dropdown"
                title={<Icon name="question-circle" size="lg" />}

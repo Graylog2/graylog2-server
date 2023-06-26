@@ -68,8 +68,8 @@ public class FormatDate extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(of(value, format, timeZoneParam))
                 .description("Formats a date using the given format string")
-                .ruleBuilderEnabled()
-                .ruleBuilderTitle("Format date (format '${format}')")
+//                .ruleBuilderEnabled()
+//                .ruleBuilderTitle("Format date (format '${format}')")
                 .build();
     }
 

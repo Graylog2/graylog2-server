@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
 import { Badge, Nav } from 'components/bootstrap';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import Routes from 'routing/Routes';
 import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
@@ -44,43 +44,30 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
   }
 `;
 
-class NotificationBadge extends React.PureComponent {
-  POLL_INTERVAL = 3000;
+const POLL_INTERVAL = 3000;
 
-  static propTypes = {
-    total: PropTypes.number,
-  };
+const NotificationBadge = () => {
+  const total = useStore(NotificationsStore, (notifications) => notifications?.total);
 
-  static defaultProps = {
-    total: undefined,
-  };
+  useEffect(() => {
+    const interval = setInterval(NotificationsActions.list, POLL_INTERVAL);
 
-  componentDidMount() {
-    NotificationsActions.list();
-    this.interval = setInterval(NotificationsActions.list, this.POLL_INTERVAL);
-  }
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  render() {
-    const { total } = this.props;
-
-    if (!total) {
-      return null;
-    }
-
-    return (
+  return total
+    ? (
       <StyledNav navbar>
         <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
           <StyledInactiveNavItem>
-            <Badge bsStyle="danger" id="notification-badge">{total}</Badge>
+            <Badge bsStyle="danger" data-testid="notification-badge">{total}</Badge>
           </StyledInactiveNavItem>
         </LinkContainer>
       </StyledNav>
-    );
-  }
-}
+    )
+    : null;
+};
 
-export default connect(NotificationBadge, { notifications: NotificationsStore }, ({ notifications }) => ({ total: notifications ? notifications.total : undefined }));
+export default NotificationBadge;

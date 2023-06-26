@@ -38,6 +38,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
+import static org.graylog.security.certutil.CertConstants.PKCS12;
+
+
 @Command(name = "cert", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilCert implements CliCommand {
 
@@ -71,7 +74,7 @@ public class CertutilCert implements CliCommand {
 
         try {
             char[] password = console.readPassword("Enter CA password: ");
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
+            KeyStore caKeystore = KeyStore.getInstance(PKCS12);
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
             final Key caPrivateKey = caKeystore.getKey("ca", password);
@@ -94,7 +97,7 @@ public class CertutilCert implements CliCommand {
                     .validity(Duration.ofDays(10 * 365));
             KeyPair nodePair = CertificateGenerator.generate(req);
 
-            KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
+            KeyStore nodeKeystore = KeyStore.getInstance(PKCS12);
             nodeKeystore.load(null, null);
 
             char[] nodeKeystorePassword = console.readPassword("Enter datanode certificate password: ");

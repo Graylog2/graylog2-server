@@ -41,6 +41,7 @@ export type MetricFormValues = {
   field: string | undefined,
   name?: string | undefined,
   percentile?: number | undefined,
+  strategy?: string,
 };
 
 export type GroupingDirection = 'row' | 'column';

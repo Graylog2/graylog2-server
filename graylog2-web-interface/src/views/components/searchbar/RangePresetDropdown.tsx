@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -23,6 +23,17 @@ import { Icon, IfPermitted } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useUserDateTime from 'hooks/useUserDateTime';
+import { onInitializingTimerange } from 'views/components/TimerangeForForm';
+import type {
+  TimeRange,
+  KeywordTimeRange,
+  RelativeTimeRangeWithEnd,
+  AbsoluteTimeRange,
+  RelativeTimeRangeStartOnly,
+} from 'views/logic/queries/Query';
+import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 type Props = {
   onToggle?: (open: boolean) => void,
@@ -31,7 +42,30 @@ type Props = {
   bsSize?: string,
   header: string,
   disabled?: boolean,
-  onChange?: (range: number) => void,
+  onChange?: (timerange: TimeRange) => void,
+  availableOptions?: Array<QuickAccessTimeRange>,
+};
+
+const getPassedByLimit = async (quickAccessTimeRange: QuickAccessTimeRange, limit: number) => {
+  const { timerange } = quickAccessTimeRange;
+
+  const checkIsPassed = async () => {
+    switch (timerange.type) {
+      case 'relative':
+        return ((timerange as RelativeTimeRangeWithEnd).from || (timerange as RelativeTimeRangeStartOnly).range) <= limit;
+      case 'absolute':
+        return moment().diff((timerange as AbsoluteTimeRange).from, 'seconds') <= limit;
+      case 'keyword':
+        return ToolsStore.testNaturalDate((timerange as KeywordTimeRange).keyword, (timerange as KeywordTimeRange).timezone)
+          .then((response) => moment().diff(response.from, 'seconds') <= limit);
+      default:
+        throw Error('Time range type doesn\'t not exist');
+    }
+  };
+
+  const isPassed = await checkIsPassed();
+
+  return isPassed ? quickAccessTimeRange : null;
 };
 
 const ExternalIcon = styled(Icon)`
@@ -42,55 +76,54 @@ const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
-const RangePresetDropdown = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
-  const { config } = useSearchConfiguration();
+const RangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const availableOptions = config?.relative_timerange_options;
-  const timeRangeLimit = moment.duration(config?.query_time_range_limit);
-  const title = displayTitle && (availableOptions ? 'Preset Times' : 'Loading Ranges...');
+  const { config } = useSearchConfiguration();
+  const [filtratedByLimitOptions, setFiltratedByLimitOptions] = useState([]);
+
+  const timeRangeLimit = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds(), [config?.query_time_range_limit]);
+  const title = displayTitle && (availableOptions ? 'Preset Times' : 'No available presets');
+
+  useEffect(() => {
+    const filtrateOptions = async () => {
+      const res = !timeRangeLimit ? availableOptions : await Promise
+        .all(availableOptions?.map((quickAccessTimeRange) => getPassedByLimit(quickAccessTimeRange, timeRangeLimit)));
+
+      if (res) {
+        setFiltratedByLimitOptions(res.filter((item) => item !== null));
+      }
+    };
+
+    filtrateOptions();
+  }, [availableOptions, timeRangeLimit]);
+
   let options;
 
-  if (availableOptions) {
-    let all = null;
+  if (filtratedByLimitOptions?.length) {
+    options = filtratedByLimitOptions.map(({ description, timerange, id }) => {
+      const optionLabel = description.replace(/Search\sin(\sthe\slast)?\s/, '');
 
-    options = Object.keys(availableOptions).map((key) => {
-      const seconds = moment.duration(key).asSeconds();
-
-      if (timeRangeLimit.asSeconds() > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
-        return null;
-      }
-
-      const optionLabel = availableOptions[key].replace(/Search\sin(\sthe\slast)?\s/, '');
       const option = (
-        <MenuItem eventKey={seconds} key={`relative-option-${key}`} disabled={disabled}>{optionLabel}</MenuItem>);
-
-      // The "search in all messages" option should be the last one.
-      if (key === 'PT0S') {
-        all = option;
-
-        return null;
-      }
+        <MenuItem eventKey={timerange} key={`timerange-option-${id}`} disabled={disabled}>{optionLabel}</MenuItem>);
 
       return option;
     });
-
-    if (all) {
-      options.push(all);
-    }
   } else {
-    options = (<MenuItem eventKey="300" disabled>Loading...</MenuItem>);
+    options = (<MenuItem eventKey="300" disabled>No available presets</MenuItem>);
   }
 
-  const _onChange = (range) => {
-    if (range !== null && range !== undefined) {
+  const { formatTime } = useUserDateTime();
+
+  const _onChange = (timerange) => {
+    if (timerange !== null && timerange !== undefined) {
       sendTelemetry('input_value_change', {
         app_pathname: 'search',
         app_section: 'search-bar',
-        app_action_value: 'relative-timerange-selector',
-        event_details: { range },
+        app_action_value: 'timerange-preset-selector',
+        event_details: { timerange },
       });
 
-      onChange(parseInt(range, 10));
+      onChange(onInitializingTimerange(timerange, formatTime));
     }
   };
 
@@ -123,6 +156,7 @@ RangePresetDropdown.propTypes = {
   header: PropTypes.string,
   onChange: PropTypes.func,
   onToggle: PropTypes.func,
+  availableOptions: PropTypes.array,
 };
 
 RangePresetDropdown.defaultProps = {
@@ -133,6 +167,7 @@ RangePresetDropdown.defaultProps = {
   onToggle: undefined,
   header: undefined,
   displayTitle: true,
+  availableOptions: [],
 };
 
 export default RangePresetDropdown;

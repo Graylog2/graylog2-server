@@ -307,7 +307,7 @@ const RuleBuilder = () => {
   };
 
   return (
-    <>
+    <form onSubmit={(e) => handleSave(e, true)}>
       <Row className="content">
         <Col md={12}>
           <RuleBuilderForm rule={rule}
@@ -381,16 +381,14 @@ const RuleBuilder = () => {
           <RuleSimulation rule={rule} />
         </Col>
         <ActionsCol md={12}>
-          <form onSubmit={(e) => handleSave(e, true)}>
-            <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
-                        submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
-                        centerCol={initialRule && (
-                          <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
-                            Update rule
-                          </Button>
-                        )}
-                        onCancel={handleCancel} />
-          </form>
+          <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
+                      submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
+                      centerCol={initialRule && (
+                        <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
+                          Update rule
+                        </Button>
+                      )}
+                      onCancel={handleCancel} />
         </ActionsCol>
       </Row>
       {blockToDelete && (
@@ -409,7 +407,7 @@ const RuleBuilder = () => {
                                   onHide={() => setRuleSourceCodeToShow(null)}
                                   rule={ruleSourceCodeToShow} />
       )}
-    </>
+    </form>
   );
 };
 
