@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonTypeName(TimeHistogramConfigDTO.NAME)
 @JsonDeserialize(builder = TimeHistogramConfigDTO.Builder.class)
@@ -40,6 +42,9 @@ public abstract class TimeHistogramConfigDTO implements PivotConfigDTO {
     public abstract static class Builder {
         @JsonProperty(FIELD_INTERVAL)
         public abstract Builder interval(IntervalDTO interval);
+
+        @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+        public abstract Builder skipEmptyValues(@Nullable Boolean skipEmptyValues);
 
         public abstract TimeHistogramConfigDTO build();
 

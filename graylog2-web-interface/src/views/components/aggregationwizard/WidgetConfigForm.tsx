@@ -50,6 +50,7 @@ export type BaseGrouping = {
   fields: Array<string>,
   direction: GroupingDirection,
   id: string,
+  skipEmptyValues?: boolean,
 };
 
 export type DateGrouping = Required<BaseGrouping, 'id'> & {

@@ -16,10 +16,11 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useFormikContext } from 'formik';
+import { useFormikContext, Field } from 'formik';
 
+import { Checkbox } from 'components/bootstrap';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import { FormikFormGroup } from 'components/common';
+import { FormikFormGroup, HoverForHelp } from 'components/common';
 import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 
 import Direction from './configuration/Direction';
@@ -31,6 +32,45 @@ const Wrapper = styled.div``;
 type Props = {
   index: number,
 }
+
+type SkipEmptyValuesHoverForHelpProps = {
+  children: React.ReactNode,
+  title: string,
+};
+
+const SkipEmptyValuesHoverForHelp = styled((props: SkipEmptyValuesHoverForHelpProps) => <HoverForHelp {...props} />)`
+  margin-left: 5px;
+`;
+
+const SkipEmptyValuesCheckbox = styled(Checkbox)`
+  &.checkbox {
+    padding-top: 0;
+  }
+`;
+const SkipEmptyValuesLabel = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+type SkipEmptyValuesPropes = {
+  index: number,
+}
+const SkipEmptyValues = ({ index }: SkipEmptyValuesPropes) => (
+  <Field name={`groupBy.groupings.${index}.skipEmptyValues`}>
+    {({ field: { name, value, onChange } }) => (
+      <SkipEmptyValuesCheckbox onChange={() => onChange({ target: { name, value: !value } })} checked={value ?? false}>
+        <SkipEmptyValuesLabel>
+          Skip Empty Values
+          <SkipEmptyValuesHoverForHelp title="Skip Empty Values">
+            When this is enabled, messages which do not contain the configured fields will be skipped.
+            <p />
+            Otherwise an &quot;(Empty Value)&quot; bucket will be created.
+          </SkipEmptyValuesHoverForHelp>
+        </SkipEmptyValuesLabel>
+      </SkipEmptyValuesCheckbox>
+    )}
+  </Field>
+);
 
 const GroupingConfiguration = React.memo(({ index }: Props) => {
   const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
@@ -47,6 +87,7 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
                          type="number"
                          bsSize="small" />
       )}
+      <SkipEmptyValues index={index} />
     </Wrapper>
   );
 });

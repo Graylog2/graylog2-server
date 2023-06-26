@@ -25,6 +25,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,10 +46,14 @@ public abstract class Values implements BucketSpec {
     @JsonProperty
     public abstract Integer limit();
 
+    @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+    public abstract boolean skipEmptyValues();
+
     public static Values.Builder builder() {
         return new AutoValue_Values.Builder()
                 .type(NAME)
-                .limit(DEFAULT_LIMIT);
+                .limit(DEFAULT_LIMIT)
+                .skipEmptyValues(false);
     }
 
     public Values withLimit(int limit) {
@@ -77,7 +82,12 @@ public abstract class Values implements BucketSpec {
         @JsonProperty
         public abstract Builder limit(Integer limit);
 
-    }
+        public abstract Builder skipEmptyValues(Boolean skipEmptyValues);
 
+        @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+        public Builder setSkipEmptyValues(@Nullable Boolean skipEmptyValues) {
+            return skipEmptyValues == null ? skipEmptyValues(false) : skipEmptyValues(skipEmptyValues);
+        }
+    }
 }
 

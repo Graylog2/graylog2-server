@@ -17,7 +17,14 @@
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Optional;
 
 @JsonAutoDetect
 public interface PivotConfigDTO {
+    static final String FIELD_SKIP_EMPTY_VALUES = "skip_empty_values";
+
+    @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+    Optional<Boolean> skipEmptyValues();
 }

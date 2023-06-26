@@ -44,9 +44,13 @@ public abstract class Time implements BucketSpec {
     @JsonProperty
     public abstract Interval interval();
 
+    @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+    public abstract boolean skipEmptyValues();
+
     public static Time.Builder builder() {
         return new AutoValue_Time.Builder()
-                .type(NAME);
+                .type(NAME)
+                .skipEmptyValues(false);
     }
 
     @AutoValue.Builder
@@ -61,14 +65,22 @@ public abstract class Time implements BucketSpec {
         @JsonProperty
         public Builder field(String field) {
             return fields(Collections.singletonList(field));
-        };
+        }
+
+        ;
 
         @JsonProperty
         public abstract Builder fields(List<String> fields);
 
         @JsonProperty
         public abstract Builder interval(Interval interval);
-    }
 
+        public abstract Builder skipEmptyValues(Boolean skipEmptyValues);
+
+        @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+        public Builder setSkipEmptyValues(Boolean skipEmptyValues) {
+            return skipEmptyValues == null ? skipEmptyValues(false) : skipEmptyValues(skipEmptyValues);
+        }
+    }
 }
 

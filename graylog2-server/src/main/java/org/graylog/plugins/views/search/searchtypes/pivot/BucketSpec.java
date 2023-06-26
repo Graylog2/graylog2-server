@@ -39,12 +39,16 @@ import java.util.Objects;
         defaultImpl = BucketSpec.Fallback.class)
 public interface BucketSpec extends PivotSpec {
     String TYPE_FIELD = "type";
+    String FIELD_SKIP_EMPTY_VALUES = "skip_empty_values";
 
     @JsonProperty
     String type();
 
     @JsonProperty
     List<String> fields();
+
+    @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+    boolean skipEmptyValues();
 
     @JsonAutoDetect
     class Fallback implements BucketSpec {
@@ -62,6 +66,11 @@ public interface BucketSpec extends PivotSpec {
         @Override
         public List<String> fields() {
             return fields;
+        }
+
+        @Override
+        public boolean skipEmptyValues() {
+            return false;
         }
 
         @JsonAnySetter

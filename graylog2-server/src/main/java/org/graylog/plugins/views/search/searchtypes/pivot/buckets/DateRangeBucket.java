@@ -54,10 +54,14 @@ public abstract class DateRangeBucket implements BucketSpec {
     @JsonProperty
     public abstract List<DateRange> ranges();
 
+    @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+    public abstract boolean skipEmptyValues();
+
     public static DateRangeBucket.Builder builder() {
         return new AutoValue_DateRangeBucket.Builder()
                 .type(NAME)
-                .bucketKey(BucketKey.TO);
+                .bucketKey(BucketKey.TO)
+                .skipEmptyValues(false);
     }
 
     @AutoValue.Builder
@@ -82,6 +86,13 @@ public abstract class DateRangeBucket implements BucketSpec {
 
         @JsonProperty
         public abstract Builder bucketKey(BucketKey key);
+
+        public abstract Builder skipEmptyValues(Boolean skipEmptyValues);
+
+        @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+        public Builder setSkipEmptyValues(Boolean skipEmptyValues) {
+            return skipEmptyValues == null ? skipEmptyValues(false) : skipEmptyValues(skipEmptyValues);
+        }
     }
 
 }

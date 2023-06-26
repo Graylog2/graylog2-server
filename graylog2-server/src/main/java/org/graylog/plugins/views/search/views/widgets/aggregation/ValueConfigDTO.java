@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.util.OptionalInt;
 
 @AutoValue
@@ -48,6 +49,9 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
     public abstract static class Builder {
         @JsonProperty(FIELD_LIMIT)
         public abstract Builder limit(int limit);
+
+        @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+        public abstract Builder skipEmptyValues(@Nullable Boolean skipEmptyValues);
 
         public abstract ValueConfigDTO build();
 
