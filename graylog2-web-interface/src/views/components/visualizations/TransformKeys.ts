@@ -20,6 +20,7 @@ import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { isValidDate } from 'util/DateTime';
 
 type TimeFormatter = (time: DateTime, format?: DateTimeFormats) => string;
+export type KeyMapper = (key: Key, field: string) => Key;
 
 const transformKey = (key: Key, indices: Array<number>, formatTimestamp: TimeFormatter) => {
   if (indices.length === 0) {
@@ -43,39 +44,37 @@ const findIndices = <T> (ary: Array<T>, predicate: (value: T) => boolean): Array
   .filter(({ value }) => predicate(value))
   .map(({ idx }) => idx);
 
-export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, formatTime: TimeFormatter): (rows: Rows) => Rows => {
-  return (result = []) => {
-    const rowIndices = findIndices(rowPivots, (pivot) => (pivot.type === 'time'));
-    const columnIndices = findIndices(columnPivots, (pivot) => (pivot.type === 'time'));
+export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, formatTime: TimeFormatter): (rows: Rows) => Rows => (result = []) => {
+  const rowIndices = findIndices(rowPivots, (pivot) => (pivot.type === 'time'));
+  const columnIndices = findIndices(columnPivots, (pivot) => (pivot.type === 'time'));
 
-    if (rowIndices.length === 0 && columnIndices.length === 0) {
-      return result;
+  if (rowIndices.length === 0 && columnIndices.length === 0) {
+    return result;
+  }
+
+  return result.map((row) => {
+    if (row.source !== 'leaf') {
+      return row;
     }
 
-    return result.map((row) => {
-      if (row.source !== 'leaf') {
-        return row;
-      }
+    const newRow: Leaf = { ...row };
 
-      const newRow: Leaf = { ...row };
+    newRow.key = transformKey(row.key, rowIndices, formatTime);
 
-      newRow.key = transformKey(row.key, rowIndices, formatTime);
+    if (columnIndices.length > 0) {
+      newRow.values = row.values.map((values) => {
+        if (values.source !== 'col-leaf') {
+          return values;
+        }
 
-      if (columnIndices.length > 0) {
-        newRow.values = row.values.map((values) => {
-          if (values.source !== 'col-leaf') {
-            return values;
-          }
+        const newValues: ColLeaf = { ...values };
 
-          const newValues: ColLeaf = { ...values };
+        newValues.key = transformKey(values.key, columnIndices, formatTime);
 
-          newValues.key = transformKey(values.key, columnIndices, formatTime);
+        return newValues;
+      });
+    }
 
-          return newValues;
-        });
-      }
-
-      return newRow;
-    });
-  };
+    return newRow;
+  });
 };

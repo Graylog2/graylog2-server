@@ -1,0 +1,6 @@
+type = "f"
+message = "Save modified search when query is changed through URL parameters."
+
+issues = ["15642"]
+pulls = ["15653"]
+

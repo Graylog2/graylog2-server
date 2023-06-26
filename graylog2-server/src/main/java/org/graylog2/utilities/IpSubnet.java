@@ -140,6 +140,9 @@ public class IpSubnet {
         return (st == -1 || st == 0) && (te == -1 || te == 0);
     }
 
+    public int getPrefixLength() {
+        return prefixLength;
+    }
 
     @Override
     public boolean equals(Object o) {

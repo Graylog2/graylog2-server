@@ -32,7 +32,7 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-import CustomHighlighting from '../messagelist/CustomHighlighting';
+import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
 const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`
@@ -98,16 +98,20 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
 
-  const fieldColumns = fields.toSeq().toJS().map(({ field: fieldName, source }, i) => _c(
+  const fieldColumns = fields.toArray().map(({ field: fieldName, source }, i) => _c(
     fieldName,
     item[fieldName],
     fullValuePathForField(fieldName, valuePath).slice(0, i + 1),
     source,
   ));
-  const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
-    const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
-    const [k, v]: Array<string> = translatedPath;
-    const parentValuePath = [...valuePath, { [k]: v }];
+  const columnPivotFields = columnPivotValues.flatMap((columnPivotValueKeys) => {
+    const translatedPath = columnPivotValueKeys.flatMap((value, idx) => [columnPivots[idx], value]);
+    const parentValuePath = [...valuePath];
+
+    for (let i = 0; i < translatedPath.length; i += 2) {
+      const [k, v]: Array<string> = translatedPath.slice(i, i + 2);
+      parentValuePath.push({ [k]: v });
+    }
 
     return series.map(({ effectiveName, function: fn }) => {
       const fullPath = [].concat(translatedPath, [effectiveName]);
@@ -115,27 +119,25 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
 
       return _c(effectiveName, value, fullValuePathForField(fn, parentValuePath), fn);
     });
-  }));
+  });
 
   const columns = flatten([fieldColumns, columnPivotFields]);
 
   return (
-    (
-      <tr className={`fields-row ${classes}`}>
-        {columns.map(({ field, value, path, source }, idx) => {
-          const key = `${activeQuery}-${field}=${value}-${idx}`;
+    <tr className={`fields-row ${classes}`}>
+      {columns.map(({ field, value, path, source }, idx) => {
+        const key = `${activeQuery}-${field}=${value}-${idx}`;
 
-          return (
-            <Column key={key}
-                    field={field}
-                    value={value}
-                    type={fieldTypeFor(columnNameToField(field, series), types)}
-                    valuePath={path.slice()}
-                    source={source} />
-          );
-        })}
-      </tr>
-    )
+        return (
+          <Column key={key}
+                  field={field}
+                  value={value}
+                  type={fieldTypeFor(columnNameToField(field, series), types)}
+                  valuePath={path.slice()}
+                  source={source} />
+        );
+      })}
+    </tr>
   );
 };
 

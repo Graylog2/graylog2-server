@@ -17,18 +17,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const ClosingRetentionStrategySummary = ({ config }) => {
-  return (
-    <div>
-      <dl>
-        <dt>Index retention strategy:</dt>
-        <dd>Close</dd>
-        <dt>Max number of indices:</dt>
-        <dd>{config.max_number_of_indices}</dd>
-      </dl>
-    </div>
-  );
-};
+const ClosingRetentionStrategySummary = ({ config }) => (
+  <div>
+    <dl>
+      <dt>Index retention strategy:</dt>
+      <dd>Close</dd>
+      <dt>Max number of indices:</dt>
+      <dd>{config.max_number_of_indices}</dd>
+    </dl>
+  </div>
+);
 
 ClosingRetentionStrategySummary.propTypes = {
   config: PropTypes.object.isRequired,

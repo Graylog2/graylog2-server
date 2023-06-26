@@ -29,6 +29,7 @@ import org.graylog2.rest.RestTools;
 import org.graylog2.shared.plugins.DocumentationRestResourceClasses;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.csp.CSP;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -49,6 +50,7 @@ import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
+@CSP(value = CSP.CSP_SWAGGER)
 public class DocumentationResource extends RestResource {
 
     private final Generator generator;

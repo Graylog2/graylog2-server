@@ -29,13 +29,11 @@ const checkReturnType = ((result) => {
   return result;
 });
 
-const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
-  return hooks.reduce(
-    (prev, cur: ViewHook) => prev.then(checkReturnType)
-      .then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
-    Promise.resolve([args.view, args.executionState] as const),
-  );
-};
+const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => hooks.reduce(
+  (prev, cur: ViewHook) => prev.then(checkReturnType)
+    .then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
+  Promise.resolve([args.view, args.executionState] as const),
+);
 
 type Query = { [key: string]: any };
 type OnSuccess = (view: View, executionState: SearchExecutionState) => void;
@@ -70,10 +68,8 @@ const processHooks = (
   executingViewHooks: Array<ViewHook> = [],
   query: Query = {},
   onSuccess: OnSuccess = () => {},
-) => {
-  return promise
-    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess))
-    .then(([newView, newExecutionState]) => _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess));
-};
+) => promise
+  .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess))
+  .then(([newView, newExecutionState]) => _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess));
 
 export default processHooks;

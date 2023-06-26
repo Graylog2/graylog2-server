@@ -18,12 +18,21 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useContext, useMemo } from 'react';
 
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import TabPresetDropdown from 'views/components/searchbar/date-time-picker/TabPresetDropdown';
 
-import { classifyToRange, classifyFromRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
+import {
+  classifyToRange,
+  classifyFromRange,
+  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  classifyRelativeTimeRange,
+} from './RelativeTimeRangeClassifiedHelper';
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
@@ -46,33 +55,40 @@ const StyledIcon = styled(Icon)`
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangeDropDownFormValues>();
   const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
+  const { config } = useSearchConfiguration();
+  const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
+  const relativeOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'relative'), [config?.quick_access_timerange_presets]);
+
+  const onSetPreset = (range) => {
+    setFieldValue('nextTimeRange', classifyRelativeTimeRange(range));
+  };
 
   return (
-    <RelativeWrapper>
-      <>
-        <RelativeRangeSelect classifyRange={(range) => classifyFromRange(range)}
-                             defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
-                             disableUnsetRange={limitDuration !== 0}
-                             disabled={disabled}
-                             fieldName="from"
-                             limitDuration={limitDuration}
-                             onUnsetRange={() => { setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
-                             title="From:"
-                             unsetRangeLabel="All Time"
-                             unsetRangeValue={0} />
-        <StyledIcon name="arrow-right" />
+    <div>
+      <RelativeWrapper>
+        <>
+          <RelativeRangeSelect defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
+                               disableUnsetRange={limitDuration !== 0}
+                               disabled={disabled}
+                               fieldName="from"
+                               limitDuration={limitDuration}
+                               onUnsetRange={() => { setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
+                               title="From:"
+                               unsetRangeLabel="All Time" />
+          <StyledIcon name="arrow-right" />
 
-        <RelativeRangeSelect classifyRange={(range) => classifyToRange(range)}
-                             defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
-                             disableUnsetRange={disableUntil}
-                             disabled={disableUntil}
-                             fieldName="to"
-                             limitDuration={limitDuration}
-                             title="Until:"
-                             unsetRangeLabel="Now"
-                             unsetRangeValue={undefined} />
-      </>
-    </RelativeWrapper>
+          <RelativeRangeSelect defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
+                               disableUnsetRange={disableUntil}
+                               disabled={disableUntil}
+                               fieldName="to"
+                               limitDuration={limitDuration}
+                               title="Until:"
+                               unsetRangeLabel="Now" />
+        </>
+      </RelativeWrapper>
+      {showRelativePresetsButton
+        && (<TabPresetDropdown disabled={disabled} onSetPreset={onSetPreset} availableOptions={relativeOptions} />)}
+    </div>
   );
 };
 

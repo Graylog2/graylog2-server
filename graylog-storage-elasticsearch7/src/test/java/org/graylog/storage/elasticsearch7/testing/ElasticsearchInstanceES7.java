@@ -83,6 +83,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 1,
                 1,
                 false,
+                false,
                 null,
                 Duration.seconds(60),
                 "http",
@@ -132,6 +133,11 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
         return this.adapters;
     }
 
+    @Override
+    public String getLogs() {
+        return this.container.getLogs();
+    }
+
     public ElasticsearchClient elasticsearchClient() {
         return this.elasticsearchClient;
     }
@@ -151,6 +157,6 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 .withEnv("cluster.info.update.interval", "10s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
+                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
     }
 }

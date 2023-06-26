@@ -29,6 +29,8 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useCreateSearch from 'views/hooks/useCreateSearch';
+import type View from 'views/logic/views/View';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -40,7 +42,7 @@ jest.mock('routing/useQuery');
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 
 describe('NewSearchPage', () => {
   const query = {
@@ -49,7 +51,7 @@ describe('NewSearchPage', () => {
     relative: '300',
   };
   const SimpleNewSearchPage = () => (
-    <StreamsContext.Provider value={[{}]}>
+    <StreamsContext.Provider value={[{ id: 'stream1', title: 'Stream 1' }]}>
       <NewSearchPage />
     </StreamsContext.Provider>
   );
@@ -63,6 +65,7 @@ describe('NewSearchPage', () => {
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
+    asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
   it('should render minimal', async () => {

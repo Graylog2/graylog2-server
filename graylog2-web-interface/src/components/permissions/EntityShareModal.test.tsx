@@ -56,16 +56,14 @@ describe('EntityShareModal', () => {
     jest.clearAllMocks();
   });
 
-  const SimpleEntityShareModal = ({ ...props }) => {
-    return (
-      <EntityShareModal description="The description"
-                        entityId="dashboard-id"
-                        entityType="dashboard"
-                        onClose={() => {}}
-                        entityTitle="The title"
-                        {...props} />
-    );
-  };
+  const SimpleEntityShareModal = ({ ...props }) => (
+    <EntityShareModal description="The description"
+                      entityId="dashboard-id"
+                      entityType="dashboard"
+                      onClose={() => {}}
+                      entityTitle="The title"
+                      {...props} />
+  );
 
   const getModalSubmitButton = () => screen.getByRole('button', { name: /update sharing/i, hidden: true });
 

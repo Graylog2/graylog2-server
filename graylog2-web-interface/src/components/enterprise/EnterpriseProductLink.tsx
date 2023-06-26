@@ -21,15 +21,13 @@ type Props = {
   children: React.ReactNode,
 }
 
-const EnterpriseProductLink = ({ children }: Props) => {
-  return (
-    <a href="https://www.graylog.org/products/enterprise"
-       rel="noopener noreferrer"
-       target="_blank">
-      {children}
-    </a>
-  );
-};
+const EnterpriseProductLink = ({ children }: Props) => (
+  <a href="https://www.graylog.org/products/enterprise"
+     rel="noopener noreferrer"
+     target="_blank">
+    {children}
+  </a>
+);
 
 EnterpriseProductLink.propTypes = {
   children: PropTypes.node,

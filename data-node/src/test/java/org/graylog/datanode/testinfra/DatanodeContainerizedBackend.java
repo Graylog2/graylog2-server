@@ -16,6 +16,10 @@
  */
 package org.graylog.datanode.testinfra;
 
+import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
+import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
+import org.graylog.testing.graylognode.MavenPackager;
+import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
@@ -24,6 +28,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Properties;
 
 public class DatanodeContainerizedBackend {
@@ -60,6 +65,9 @@ public class DatanodeContainerizedBackend {
     }
 
     private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion) {
+
+        MavenPackager.packageJarIfNecessary(createConfig());
+
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
@@ -68,6 +76,7 @@ public class DatanodeContainerizedBackend {
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
+                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/bin/config")
 
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
@@ -77,12 +86,6 @@ public class DatanodeContainerizedBackend {
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "node1:9300")
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
-
-                //datanode_transport_certificate=datanode-transport-certificates.p12
-                //datanode_transport_certificate_password=password
-
-                //datanode_http_certificate=datanode-http-certificates.p12
-                //datanode_http_certificate_password=password
 
                 .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
                 .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
@@ -101,6 +104,10 @@ public class DatanodeContainerizedBackend {
         return container;
     }
 
+    private NodeContainerConfig createConfig() {
+        return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
+    }
+
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
         final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
@@ -111,6 +118,9 @@ public class DatanodeContainerizedBackend {
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
                                 .run("mkdir -p config")
+                                .run("mkdir -p config/opensearch")
+                                .run("mkdir -p bin")
+                                .run("mkdir -p bin/config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
                                 .add(opensearchTarArchive, ".") // this will automatically extract the tar

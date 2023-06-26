@@ -73,9 +73,7 @@ class ContentPackApplyParameter extends React.Component {
     this.setState(newValue);
   };
 
-  _valuesSelected = () => {
-    return this.state.parameter.length > 0 && this.state.config_key.length > 0;
-  };
+  _valuesSelected = () => this.state.parameter.length > 0 && this.state.config_key.length > 0;
 
   _applyParameter = (e) => {
     e.preventDefault();
@@ -84,9 +82,7 @@ class ContentPackApplyParameter extends React.Component {
       return;
     }
 
-    const configKeyIndex = this.props.appliedParameter.findIndex((appliedParameter) => {
-      return appliedParameter.configKey === this.state.config_key;
-    });
+    const configKeyIndex = this.props.appliedParameter.findIndex((appliedParameter) => appliedParameter.configKey === this.state.config_key);
 
     if (configKeyIndex >= 0) {
       return;
@@ -107,12 +103,8 @@ class ContentPackApplyParameter extends React.Component {
     const configKeys = Object.keys(configPaths)
       .sort(naturalSort)
       .filter((configKey) => configPaths[configKey].isValueRef()) // Only allow value-refs as parameters
-      .filter((configKey) => {
-        return this.props.appliedParameter.findIndex((paramMap) => {
-          return configKey === paramMap.configKey;
-        }) < 0;
-      });
-    const emptyOption = (name) => { return (<option key="EMPTY" value="">{name}</option>); };
+      .filter((configKey) => this.props.appliedParameter.findIndex((paramMap) => configKey === paramMap.configKey) < 0);
+    const emptyOption = (name) => (<option key="EMPTY" value="">{name}</option>);
     const configOptions = [emptyOption('Choose Config Key')].concat(configKeys.map((key) => <option key={key} value={key}>{key}</option>));
     let { parameters } = this.props;
     let emptyName = parameters.length <= 0 ? 'Create a parameter first' : 'Choose...';

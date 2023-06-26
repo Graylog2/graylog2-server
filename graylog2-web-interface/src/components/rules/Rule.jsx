@@ -21,12 +21,13 @@ import { PageHeader } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 
+import RuleBuilder from './rule-builder/RuleBuilder';
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
 
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
-const Rule = ({ create, title }) => {
+const Rule = ({ create, title, isRuleBuilder }) => {
   let pageTitle;
 
   if (create) {
@@ -50,14 +51,19 @@ const Rule = ({ create, title }) => {
         </span>
       </PageHeader>
 
-      <Row className="content">
-        <Col md={6}>
-          <RuleForm create={create} />
-        </Col>
-        <Col md={6}>
-          <RuleHelper />
-        </Col>
-      </Row>
+      {isRuleBuilder ? (
+        <RuleBuilder />
+      ) : (
+        <Row className="content">
+          <Col md={6}>
+            <RuleForm create={create} />
+          </Col>
+          <Col md={6}>
+            <RuleHelper />
+          </Col>
+        </Row>
+      )}
+
     </div>
   );
 };
@@ -65,11 +71,13 @@ const Rule = ({ create, title }) => {
 Rule.propTypes = {
   title: PropTypes.string,
   create: PropTypes.bool,
+  isRuleBuilder: PropTypes.bool,
 };
 
 Rule.defaultProps = {
   title: '',
   create: false,
+  isRuleBuilder: false,
 };
 
 export default Rule;

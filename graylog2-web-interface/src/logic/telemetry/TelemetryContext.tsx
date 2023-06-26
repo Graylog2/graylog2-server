@@ -19,15 +19,28 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 export type TelemetryEvent = {
-  appSection?: string,
-  eventElement?: string
-  eventInfo?: {
-    [key: string]: string | boolean | number,
+  app_pathname?: string,
+  app_section?: string,
+  app_action_value?: string
+  event_details?: {
+    [key: string]: unknown,
   }
 };
 
-export type TelemetryEventType = '$pageview' | 'view' | 'click' | 'submit_form' | 'open_popover'
-  | 'close_popover' | 'toggle_input_button' | 'change_input_value' | 'close_modal' | 'open_modal';
+export type TelemetryEventType =
+  '$pageview'
+  | 'view'
+  | 'click'
+  | 'form_submit'
+  | 'popover_open'
+  | 'popover_close'
+  | 'input_button_toggle'
+  | 'input_value_change'
+  | 'modal_close'
+  | 'modal_open'
+  | 'select'
+  | 'visit'
+  | 'navigate';
 
 type ContextType = {
   sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,

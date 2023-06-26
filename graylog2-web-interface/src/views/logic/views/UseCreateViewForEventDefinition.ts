@@ -28,10 +28,10 @@ const useCreateViewForEventDefinition = (
     aggregations,
   }: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
-  const { streams } = eventDefinition.config;
+  const streams = eventDefinition?.config?.streams ?? [];
   const timeRange: RelativeTimeRangeStartOnly = {
     type: 'relative',
-    range: eventDefinition.config.search_within_ms / 1000,
+    range: (eventDefinition?.config?.search_within_ms ?? 0) / 1000,
   };
   const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
@@ -40,7 +40,7 @@ const useCreateViewForEventDefinition = (
 
   const queryParameters = eventDefinition?.config?.query_parameters || [];
 
-  const groupBy = eventDefinition.config.group_by;
+  const groupBy = eventDefinition?.config?.group_by ?? [];
 
   return useMemo(
     () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters }),

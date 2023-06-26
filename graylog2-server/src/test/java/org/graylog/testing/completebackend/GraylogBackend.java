@@ -39,4 +39,6 @@ public interface GraylogBackend {
     String getLogs();
 
     Optional<MailServerInstance> getEmailServerInstance();
+
+    String getSearchLogs();
 }

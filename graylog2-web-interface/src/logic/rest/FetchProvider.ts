@@ -76,6 +76,16 @@ const defaultResponseHandler = (resp: Response) => {
   throw resp;
 };
 
+const textResponseHandler = (resp: Response) => {
+  if (resp.ok) {
+    reportServerSuccess();
+
+    return resp.text();
+  }
+
+  throw resp;
+};
+
 export class Builder {
   private options = {};
 
@@ -165,8 +175,19 @@ export class Builder {
     return this;
   }
 
+  streamingplaintext(body) {
+    this.body = { body, mimeType: 'text/plain' };
+    this.accept = 'text/plain';
+
+    this.responseHandler = textResponseHandler;
+    this.errorHandler = (error: Response) => onServerError(error);
+
+    return this;
+  }
+
   ignoreUnauthorized() {
-    this.errorHandler = (error: Response) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => {
+    });
 
     return this;
   }
@@ -226,9 +247,29 @@ export default function fetch<T = any>(method: Method, url: string, body?: any, 
   return promise();
 }
 
+export function fetchMultiPartFormData<T = any>(url: string, body?: any, requireSession: boolean = true): Promise<T> {
+  const promise = () => new Builder('POST', url)
+    .formData(body)
+    .build();
+
+  if (requireSession) {
+    return queuePromiseIfNotLoggedin(promise)();
+  }
+
+  return promise();
+}
+
 export function fetchPlainText(method, url, body) {
   const promise = () => new Builder(method, url)
     .plaintext(body)
+    .build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchStreamingPlainText(method, url, body) {
+  const promise = () => new Builder(method, url)
+    .streamingplaintext(body)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();

@@ -21,6 +21,7 @@ import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
 import Routes from 'routing/Routes';
+import useQuery from 'routing/useQuery';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
 import withParams from 'routing/withParams';
 import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
@@ -33,16 +34,16 @@ function filterRules(rule, ruleId) {
 }
 
 function filterPipelines(pipelines = [], title = '') {
-  return pipelines.filter((pipeline) => {
-    return pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1);
-  });
+  return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));
 }
 
 const RuleDetailsPage = ({ params, rule, pipelines }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [filteredRule, setFilteredRule] = useState(undefined);
   const history = useHistory();
+  const { rule_builder } = useQuery();
 
+  const isRuleBuilder = rule_builder === 'true';
   const isNewRule = params.ruleId === 'new';
   const title = filteredRule?.title || '';
   const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
@@ -76,7 +77,7 @@ const RuleDetailsPage = ({ params, rule, pipelines }) => {
   return (
     <DocumentTitle title={pageTitle}>
       <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={filteredRule}>
-        <Rule create={isNewRule} title={title} />
+        <Rule create={isNewRule} isRuleBuilder={isRuleBuilder} title={title} />
       </PipelineRulesProvider>
     </DocumentTitle>
   );

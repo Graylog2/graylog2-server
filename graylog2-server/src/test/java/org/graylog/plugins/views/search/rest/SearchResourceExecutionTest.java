@@ -170,10 +170,10 @@ public class SearchResourceExecutionTest {
         final SearchJobExecutionEvent searchJobExecutionEvent = eventCaptor.getValue();
         assertThat(searchJobExecutionEvent)
                 .extracting(SearchJobExecutionEvent::user)
-                .containsExactly(currentUser);
+                .isEqualTo(currentUser);
         assertThat(searchJobExecutionEvent)
                 .extracting(event -> event.searchJob().getId())
-                .containsExactly("deadbeef");
+                .isEqualTo("deadbeef");
     }
 
     @Test

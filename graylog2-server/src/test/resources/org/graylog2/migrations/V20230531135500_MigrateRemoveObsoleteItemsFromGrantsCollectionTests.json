@@ -1,0 +1,224 @@
+{
+  "grants": [
+    {
+      "_id": {
+        "$oid": "63cfeac66349342ff7d3fd2b"
+      },
+      "grantee": "grn::::user:63ce738136a00d0192d2b1c3",
+      "capability": "view",
+      "target": "grn::::event_definition:63ce738136a00d0192d2b1af",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2023-01-24T14:27:18.937Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2023-01-24T14:27:18.937Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "63f757ae282a965d701b9bb3"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "own",
+      "target": "grn::::search:63f757aef0a57e53e6822110",
+      "created_by": "jheise",
+      "created_at": {
+        "$date": "2023-02-23T12:10:22.511Z"
+      },
+      "updated_by": "jheise",
+      "updated_at": {
+        "$date": "2023-02-23T12:10:22.511Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "641320178fb433259718029a"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "view",
+      "target": "grn::::stream:000000000000000000000001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2023-03-16T13:56:39.645Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2023-03-16T13:56:39.645Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "643e9699f0715b72fa15955a"
+      },
+      "grantee": "grn::::user:643e9695f0715b72fa1594e6",
+      "capability": "view",
+      "target": "grn::::stream:000000000000000000000001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2023-04-18T13:09:45.588Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2023-04-18T13:09:45.588Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "643e9793f0715b72fa1599a9"
+      },
+      "grantee": "grn::::user:643e978ff0715b72fa159946",
+      "capability": "view",
+      "target": "grn::::stream:000000000000000000000001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2023-04-18T13:13:55.711Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2023-04-18T13:13:55.711Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "643e980c8c6f56519a3361b0"
+      },
+      "grantee": "grn::::user:643e98088c6f56519a33614f",
+      "capability": "view",
+      "target": "grn::::stream:000000000000000000000001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2023-04-18T13:15:56.607Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2023-04-18T13:15:56.607Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "643e98128c6f56519a3361c7"
+      },
+      "grantee": "grn::::user:643e98088c6f56519a33614f",
+      "capability": "own",
+      "target": "grn::::dashboard:643e981152cbc924396d0962",
+      "created_by": "cy-test@email-24876.com",
+      "created_at": {
+        "$date": "2023-04-18T13:16:02.054Z"
+      },
+      "updated_by": "cy-test@email-24876.com",
+      "updated_at": {
+        "$date": "2023-04-18T13:16:02.054Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "644001d97157f24fdd14d580"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "view",
+      "target": "grn::::dashboard:644001bb5ceda4d926efac86",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2023-04-19T14:59:37.654Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2023-04-19T14:59:37.654Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "644259e88c9d3b1488aeb5ca"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "own",
+      "target": "grn::::search:644259e86b6eec4b18e85fe3",
+      "created_by": "jheise",
+      "created_at": {
+        "$date": "2023-04-21T09:39:52.156Z"
+      },
+      "updated_by": "jheise",
+      "updated_at": {
+        "$date": "2023-04-21T09:39:52.156Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "6477339b3f251c73e6ea32e2"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "own",
+      "target": "grn::::last_opened:647733983f251c73e6ea32e1",
+      "created_by": "jheise",
+      "created_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "updated_by": "jheise",
+      "updated_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "6477339b3f251c73e6ea32e3"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "own",
+      "target": "grn::::last_opened:647733983f251c73e6ea32e3",
+      "created_by": "jheise",
+      "created_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "updated_by": "jheise",
+      "updated_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "6477339b3f251c73e6ea32e4"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "own",
+      "target": "grn::::favorite:647733983f251c73e6ea32e4",
+      "created_by": "jheise",
+      "created_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "updated_by": "jheise",
+      "updated_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "6477339b3f251c73e6ea32e5"
+      },
+      "grantee": "grn::::user:63dcbdb5123c1a49c53c368c",
+      "capability": "own",
+      "target": "grn::::favorite:647733983f251c73e6ea32e5",
+      "created_by": "jheise",
+      "created_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "updated_by": "jheise",
+      "updated_at": {
+        "$date": "2023-05-31T11:46:35.507Z"
+      },
+      "expires_at": null
+    }]
+}

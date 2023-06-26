@@ -49,6 +49,9 @@ describe('RuleForm', () => {
         usedInPipelines: [],
         onAceLoaded: () => {},
         onChangeSource: () => {},
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
       }}>
         <RuleForm create={false} />
       </PipelineRulesContext.Provider>
@@ -78,7 +81,7 @@ describe('RuleForm', () => {
     const setRawMessageToSimulate = jest.fn();
     const ruleInput = 'new_test';
 
-    const { getByRole, getByPlaceholderText } = renderWithDataRouter(
+    const { getByRole, getByTitle } = renderWithDataRouter(
       <PipelineRulesContext.Provider value={{
         ruleSource: ruleToUpdate.source,
         ruleSourceRef: {},
@@ -86,12 +89,14 @@ describe('RuleForm', () => {
         rawMessageToSimulate: '',
         startRuleSimulation: true,
         setRawMessageToSimulate,
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
       }}>
         <RuleForm create={false} />
       </PipelineRulesContext.Provider>,
     );
 
-    const rawMessageInput = getByPlaceholderText('Message string');
+    const rawMessageInput = getByTitle('Message string or JSON');
 
     expect(rawMessageInput).toHaveValue('');
 

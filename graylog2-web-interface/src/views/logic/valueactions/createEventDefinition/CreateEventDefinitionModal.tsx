@@ -19,8 +19,9 @@ import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
+import styled from 'styled-components';
 
-import { Checkbox, Modal, Button } from 'components/bootstrap';
+import { Modal, Button } from 'components/bootstrap';
 import type {
   ItemKey,
   Checked,
@@ -33,11 +34,15 @@ import {
   labels,
 } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
-import { Icon, LinkButton } from 'components/common';
-import useUrlConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useUrlConfigData';
+import { ExpandableList, ExpandableListItem, Icon, LinkButton } from 'components/common';
+import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
 import Routes from 'routing/Routes';
 import useModalReducer from 'views/logic/valueactions/createEventDefinition/hooks/useModalReducer';
+import generateId from 'logic/generateId';
 
+const Container = styled.div`
+  margin-top: 10px;
+`;
 const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | number}) => (
   <span>
     <i>{`${labels[itemKey]}: `}</i>
@@ -47,8 +52,8 @@ const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | n
 
 const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { mappedData: MappedData, modalData: ModalData, show: boolean, onClose: () => void }) => {
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
-  const urlConfig = useUrlConfigData({ mappedData, checked });
-
+  const localStorageConfig = useLocalStorageConfigData({ mappedData, checked });
+  const sessionId = useMemo(() => `cedfv-${generateId()}`, []);
   const onCheckboxChange = useCallback((updates) => {
     dispatchWithData({ type: 'UPDATE_CHECKED_ITEMS', payload: updates });
   }, [dispatchWithData]);
@@ -64,36 +69,29 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   const searchChecks = useMemo<Partial<Checked>>(() => pick(checked, searchGroup), [checked]);
   const restChecks = useMemo<Partial<Checked>>(() => omit(checked, [...searchGroup, ...aggregationGroup]), [checked]);
 
-  const aggregationLabels = useMemo<{ [name: string]: JSX.Element }>(() => {
-    return mapValues(pick(modalData, aggregationGroup), (value, key: ItemKey) => {
-      return <CheckboxLabel itemKey={key} value={value} />;
-    });
-  }, [modalData]);
-  const searchLabels = useMemo<{ [name: string]: JSX.Element }>(() => {
-    return mapValues(pick(modalData, searchGroup), (value, key: ItemKey) => (
-      <CheckboxLabel itemKey={key} value={value} />
-    ));
-  }, [modalData]);
+  const aggregationLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(pick(modalData, aggregationGroup), (value, key: ItemKey) => <CheckboxLabel itemKey={key} value={value} />), [modalData]);
+  const searchLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(pick(modalData, searchGroup), (value, key: ItemKey) => (
+    <CheckboxLabel itemKey={key} value={value} />
+  )), [modalData]);
 
-  const restLabels = useMemo<{ [name: string]: JSX.Element }>(() => {
-    return mapValues(omit(modalData, [...aggregationGroup, ...searchGroup]), (value, key: ItemKey) => (
-      <CheckboxLabel itemKey={key} value={value} />
-    ));
-  }, [modalData]);
+  const restLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(omit(modalData, [...aggregationGroup, ...searchGroup]), (value, key: ItemKey) => (
+    <CheckboxLabel itemKey={key} value={value} />
+  )), [modalData]);
 
-  const eventDefinitionCreationUrl = useMemo(() => {
-    return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&config=${JSON.stringify(urlConfig)}`;
-  }, [urlConfig]);
+  const eventDefinitionCreationUrl = useMemo(() => `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&session-id=${sessionId}`, [sessionId]);
 
-  const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => {
-    return ({
-      ALL: true,
-      ROW: !!mappedData?.rowValuePath?.length,
-      COL: !!mappedData?.columnValuePath?.length,
-      CUSTOM: true,
-      EXACT: true,
-    });
-  }, [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
+  const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => ({
+    ALL: true,
+    ROW: !!mappedData?.rowValuePath?.length,
+    COL: !!mappedData?.columnValuePath?.length,
+    CUSTOM: true,
+    EXACT: true,
+  }), [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
+
+  const onContinueConfigurationClick = useCallback(() => {
+    localStorage.setItem(sessionId, JSON.stringify(localStorageConfig));
+    onClose();
+  }, [sessionId, localStorageConfig, onClose]);
 
   return (
     <Modal onHide={onClose} show={show}>
@@ -108,32 +106,37 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
         </Button>
         {
           showDetails && (
-          <div>
-            {!isEmpty(aggregationChecks) && (
-            <CheckBoxGroup onChange={onCheckboxChange}
-                           groupLabel="Aggregation"
-                           checked={aggregationChecks}
-                           labels={aggregationLabels} />
-            )}
-            {!isEmpty(searchChecks) && (
-            <CheckBoxGroup onChange={onCheckboxChange}
-                           groupLabel="Search query"
-                           checked={searchChecks}
-                           labels={searchLabels} />
-            )}
-            {
+          <Container>
+            <ExpandableList>
+              {!isEmpty(aggregationChecks) && (
+                <CheckBoxGroup onChange={onCheckboxChange}
+                               groupLabel="Aggregation"
+                               checked={aggregationChecks}
+                               labels={aggregationLabels} />
+              )}
+              {!isEmpty(searchChecks) && (
+                <CheckBoxGroup onChange={onCheckboxChange}
+                               groupLabel="Search query"
+                               checked={searchChecks}
+                               labels={searchLabels} />
+              )}
+              {
               Object.entries(restChecks).map(([key, isChecked]) => (
-                <Checkbox key={key} checked={isChecked} onChange={() => onCheckboxChange({ [key]: !isChecked })}>
-                  {restLabels[key]}
-                </Checkbox>
+                <ExpandableListItem key={key}
+                                    checked={isChecked}
+                                    onChange={() => onCheckboxChange({ [key]: !isChecked })}
+                                    header={restLabels[key]}
+                                    padded={false}
+                                    expandable={false} />
               ))
             }
-          </div>
+            </ExpandableList>
+          </Container>
           )
         }
       </Modal.Body>
       <Modal.Footer>
-        <LinkButton bsStyle="primary" onClick={onClose} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</LinkButton>
+        <LinkButton bsStyle="primary" onClick={onContinueConfigurationClick} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</LinkButton>
       </Modal.Footer>
     </Modal>
   );

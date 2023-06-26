@@ -120,9 +120,7 @@ class ContentPackParameterList extends React.Component {
     }
 
     const regexp = RegExp(filter, 'i');
-    const filteredParameters = parameters.filter((parameter) => {
-      return regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name);
-    });
+    const filteredParameters = parameters.filter((parameter) => regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name));
 
     this.setState({ filteredParameters: filteredParameters, filter: filter });
   };

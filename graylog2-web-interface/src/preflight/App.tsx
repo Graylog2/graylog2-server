@@ -15,42 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { AppShell, Title, Space } from '@mantine/core';
-import styled from 'styled-components';
+import { AppShell } from '@mantine/core';
+import { useState } from 'react';
 
-import Section from 'preflight/components/common/Section';
 import Navigation from 'preflight/navigation/Navigation';
-import DataNodesOverview from 'preflight/components/DataNodesOverview';
+import Setup from 'preflight/components/Setup';
+import WaitingForStartup from 'preflight/components/WaitingForStartup';
 
-import DocumentationLink from '../components/support/DocumentationLink';
+const App = () => {
+  const [isWaitingForStartup, setIsWaitingForStartup] = useState(false);
 
-const P = styled.p`
-  max-width: 700px;
-`;
-
-const App = () => (
-  <AppShell padding="md" header={<Navigation />}>
-    <Section title="Welcome!" titleOrder={1}>
-      <P>
-        It looks like you are starting Graylog for the first time and have not configured a data node.<br />
-        Data nodes allow you to index and search through all the messages in your Graylog message database.
-      </P>
-      <P>
-        You can either implement a <DocumentationLink page="" text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page="" text="Elasticsearch" /> or <DocumentationLink page="" text="OpenSearch" /> node manually.
-      </P>
-
-      <Space h="md" />
-      <Title order={2}>Graylog Data Nodes</Title>
-      <DataNodesOverview />
-
-      <Space h="md" />
-      <Title order={2}>Manual Data Node Configuration</Title>
-      <P>
-        If you want to configure an Elasticsearch or OpenSearch node manually, you need to adjust the Graylog configuration and restart the Graylog server.
-        After the restart this page will not show up again.
-      </P>
-    </Section>
-  </AppShell>
-);
+  return (
+    <AppShell padding="md" header={<Navigation />}>
+      {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
+      {isWaitingForStartup && <WaitingForStartup />}
+    </AppShell>
+  );
+};
 
 export default App;

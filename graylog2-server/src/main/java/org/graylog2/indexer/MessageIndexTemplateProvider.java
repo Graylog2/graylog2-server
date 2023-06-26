@@ -21,6 +21,7 @@ import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
 
+import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
@@ -31,7 +32,10 @@ public class MessageIndexTemplateProvider implements IndexTemplateProvider {
     @Nonnull
     @Override
     public IndexMapping create(@Nonnull final SearchVersion searchVersion, @Nonnull final IndexSetConfig indexSetConfig) {
-        if (searchVersion.satisfies(ELASTICSEARCH, "^7.0.0") || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")) {
+        if (searchVersion.satisfies(ELASTICSEARCH, "^7.0.0")
+                || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
+                || searchVersion.satisfies(DATANODE, "^5.2.0")
+        ) {
             return new IndexMapping7();
         } else {
             throw new ElasticsearchException("Unsupported Search version: " + searchVersion);

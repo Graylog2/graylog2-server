@@ -35,12 +35,23 @@ const Spacer = styled.div`
   height: 1em;
 `;
 
+const _title = (disabled: boolean, disabledChange: boolean, description: string) => {
+  if (disabledChange) {
+    return description;
+  }
+
+  return disabled ? 'Start stream' : 'Pause stream';
+};
+
 type Props = {
   stream: Stream,
 };
 
 const StatusCell = ({ stream }: Props) => {
   const disableChange = stream.is_default || !stream.is_editable;
+  const description = stream.disabled ? 'Paused' : 'Running';
+  const title = _title(stream.disabled, disableChange, description);
+
   const toggleStreamStatus = useCallback(async () => {
     if (stream.disabled) {
       await StreamsStore.resume(stream.id, (response) => response);
@@ -55,6 +66,9 @@ const StatusCell = ({ stream }: Props) => {
   return (
     <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}
                  onClick={disableChange ? undefined : toggleStreamStatus}
+                 title={title}
+                 aria-label={title}
+                 role="button"
                  $clickable={!disableChange}>
       {stream.disabled ? 'Paused' : 'Running'}
       {!disableChange && (

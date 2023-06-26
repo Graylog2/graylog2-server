@@ -69,9 +69,7 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
   }
 
   const options = Object.keys(nodes)
-    .map((nodeId) => {
-      return <option key={nodeId} value={nodeId}>{nodes[nodeId].short_node_id} / {nodes[nodeId].hostname}</option>;
-    });
+    .map((nodeId) => <option key={nodeId} value={nodeId}>{nodes[nodeId].short_node_id} / {nodes[nodeId].hostname}</option>);
 
   const nodeSelect = !globalState ? (
     <Input id="node-select"

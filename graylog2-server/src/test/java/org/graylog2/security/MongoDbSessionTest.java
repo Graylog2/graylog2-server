@@ -19,10 +19,10 @@ package org.graylog2.security;
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
@@ -61,7 +61,7 @@ class MongoDbSessionTest {
     public void principalsCollection() {
         final MongoDbSession session = new MongoDbSession(fields);
         session.setAttributes(ImmutableMap.of(PRINCIPALS_SESSION_KEY,
-                ImmutableList.of("a-user-id", "secondary-principal")));
+                List.of("a-user-id", "secondary-principal")));
         assertThat(session.getUserIdAttribute()).contains("a-user-id");
     }
 }

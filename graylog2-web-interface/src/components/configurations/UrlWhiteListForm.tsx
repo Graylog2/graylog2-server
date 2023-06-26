@@ -144,59 +144,53 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
     _validate('type', idx, type);
   };
 
-  const _getErrorMessage = (type: string) => {
-    return type === regex ? 'Not a valid Java regular expression' : 'Not a valid URL';
-  };
+  const _getErrorMessage = (type: string) => (type === regex ? 'Not a valid Java regular expression' : 'Not a valid URL');
 
-  const _getSummary = () => {
-    return (config.entries.map((url, idx) => {
-      return (
-        <tr key={url.id}>
-          <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{idx + 1}</td>
-          <td>
-            <Input type="text"
-                   id={`title-input${idx}`}
-                   ref={(elem) => { inputs[`title${idx}`] = elem; }}
-                   help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Required field' : null}
-                   name="title"
-                   bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
-                   onChange={(event) => _onInputChange(event, idx)}
-                   defaultValue={url.title}
-                   required />
-          </td>
-          <td>
-            <Input type="text"
-                   id={`value-input${idx}`}
-                   ref={(elem) => { inputs[`value${idx}`] = elem; }}
-                   help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
-                   name="value"
-                   bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
-                   onChange={(event) => _onInputChange(event, idx)}
-                   defaultValue={url.value}
-                   required />
-          </td>
-          <td>
-            <Input id={`url-input-type-${idx}`}
-                   required
-                   autoFocus>
-              <Select clearable={false}
-                      options={options}
-                      matchProp="label"
-                      placeholder="Select url type"
-                      onChange={(option: string) => _onUpdateType(idx, option)}
-                      value={url.type} />
-            </Input>
-          </td>
-          <td>
-            <Button onClick={(event) => _onRemove(event, idx)}>
-              <Icon name="trash-alt" />
-              <span className="sr-only">Delete entry</span>
-            </Button>
-          </td>
-        </tr>
-      );
-    }));
-  };
+  const _getSummary = () => (config.entries.map((url, idx) => (
+    <tr key={url.id}>
+      <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{idx + 1}</td>
+      <td>
+        <Input type="text"
+               id={`title-input${idx}`}
+               ref={(elem) => { inputs[`title${idx}`] = elem; }}
+               help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Required field' : null}
+               name="title"
+               bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
+               onChange={(event) => _onInputChange(event, idx)}
+               defaultValue={url.title}
+               required />
+      </td>
+      <td>
+        <Input type="text"
+               id={`value-input${idx}`}
+               ref={(elem) => { inputs[`value${idx}`] = elem; }}
+               help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
+               name="value"
+               bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
+               onChange={(event) => _onInputChange(event, idx)}
+               defaultValue={url.value}
+               required />
+      </td>
+      <td>
+        <Input id={`url-input-type-${idx}`}
+               required
+               autoFocus>
+          <Select clearable={false}
+                  options={options}
+                  matchProp="label"
+                  placeholder="Select url type"
+                  onChange={(option: string) => _onUpdateType(idx, option)}
+                  value={url.type} />
+        </Input>
+      </td>
+      <td>
+        <Button onClick={(event) => _onRemove(event, idx)}>
+          <Icon name="trash-alt" />
+          <span className="sr-only">Delete entry</span>
+        </Button>
+      </td>
+    </tr>
+  )));
 
   useEffect(() => {
     const isNewEntryValid = async () => {

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing search creation when replaying events/event definitions."
+
+pulls = ["15688"]
+issues = ["15552", "15689"]

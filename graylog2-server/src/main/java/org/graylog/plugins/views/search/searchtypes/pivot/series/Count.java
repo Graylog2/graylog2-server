@@ -33,16 +33,21 @@ import java.util.Optional;
 @JsonDeserialize(builder = Count.Builder.class)
 public abstract class Count implements SeriesSpec {
     public static final String NAME = "count";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
     @Nullable
     @JsonProperty
     public abstract String field();
+
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
 
     public static Builder builder() {
         return new AutoValue_Count.Builder().type(NAME);
@@ -60,7 +65,6 @@ public abstract class Count implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(@Nullable String field);
 
@@ -70,7 +74,7 @@ public abstract class Count implements SeriesSpec {
 
         @Override
         public Count build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + Strings.nullToEmpty(field()) + ")");
             }
             return autoBuild();

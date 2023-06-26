@@ -24,6 +24,10 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import * as fixtures from './HeatmapVisualization.fixtures';
 
@@ -31,7 +35,19 @@ import HeatmapVisualization from '../HeatmapVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
+const WrappedHeatMap = (props: React.ComponentProps<typeof HeatmapVisualization>) => (
+  <TestStoreProvider>
+    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }) }}>
+      <HeatmapVisualization {...props} />
+    </FieldTypesContext.Provider>
+  </TestStoreProvider>
+);
+
 describe('HeatmapVisualization', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   it('generates correct props for plot component', () => {
     const columnPivot = Pivot.create(['http_status'], 'values');
     const rowPivot = Pivot.create(['hour'], 'values');
@@ -55,17 +71,18 @@ describe('HeatmapVisualization', () => {
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
         colorscale: 'Viridis',
         reversescale: false,
+        originalName: 'Heatmap Chart',
       },
     ];
 
-    const wrapper = mount(<HeatmapVisualization data={fixtures.validData}
-                                                config={config}
-                                                effectiveTimerange={effectiveTimerange}
-                                                fields={Immutable.List()}
-                                                height={1024}
-                                                onChange={() => {}}
-                                                toggleEdit={() => {}}
-                                                width={800} />);
+    const wrapper = mount(<WrappedHeatMap data={fixtures.validData}
+                                          config={config}
+                                          effectiveTimerange={effectiveTimerange}
+                                          fields={Immutable.List()}
+                                          height={1024}
+                                          onChange={() => {}}
+                                          toggleEdit={() => {}}
+                                          width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);
@@ -100,17 +117,18 @@ describe('HeatmapVisualization', () => {
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
         colorscale: 'Viridis',
         reversescale: false,
+        originalName: 'Heatmap Chart',
       },
     ];
 
-    const wrapper = mount(<HeatmapVisualization data={{ chart: [] }}
-                                                config={config}
-                                                effectiveTimerange={effectiveTimerange}
-                                                fields={Immutable.List()}
-                                                height={1024}
-                                                onChange={() => {}}
-                                                toggleEdit={() => {}}
-                                                width={800} />);
+    const wrapper = mount(<WrappedHeatMap data={{ chart: [] }}
+                                          config={config}
+                                          effectiveTimerange={effectiveTimerange}
+                                          fields={Immutable.List()}
+                                          height={1024}
+                                          onChange={() => {}}
+                                          toggleEdit={() => {}}
+                                          width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);

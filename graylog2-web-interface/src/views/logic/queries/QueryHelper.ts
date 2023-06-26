@@ -16,9 +16,7 @@
  */
 import trim from 'lodash/trim';
 
-const isPhrase = (searchTerm: string | undefined | null) => {
-  return String(searchTerm).indexOf(' ') !== -1;
-};
+const isPhrase = (searchTerm: string | undefined | null) => String(searchTerm).indexOf(' ') !== -1;
 
 const escape = (searchTerm: string | number | undefined | null) => {
   let escapedTerm = String(searchTerm);
@@ -52,7 +50,10 @@ const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND')
 };
 
 const concatQueryStrings = (queryStrings: Array<string>, { operator = 'AND', withBrackets = true } = {}): string => {
-  return queryStrings.map((s) => (withBrackets ? `(${s})` : s)).join(` ${operator} `);
+  const withRemovedEmpty = queryStrings.filter((s: string) => !!(s?.trim()));
+  const showBracketsForChild = withBrackets && withRemovedEmpty.length > 1;
+
+  return withRemovedEmpty.map((s) => (showBracketsForChild ? `(${s})` : s)).join(` ${operator} `);
 };
 
 export { isPhrase, escape, addToQuery, concatQueryStrings };

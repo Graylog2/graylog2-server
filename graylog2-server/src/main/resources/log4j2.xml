@@ -34,7 +34,11 @@
         <Logger name="com.azure.messaging.eventhubs.PartitionPumpManager" level="off"/>
         <Logger name="com.azure.core.amqp.implementation.ReactorReceiver" level="off"/>
         <Logger name="com.azure.core.amqp.implementation.ReactorDispatcher" level="off"/>
-        <Root level="warn">
+        <!-- Silence Apache Hadoop/Avro log chatter -->
+        <Logger name="org.apache.hadoop" level="warn"/>
+        <Logger name="org.apache.parquet.hadoop.InternalParquetRecordReader" level="warn"/>
+        <Logger name="org.apache.avro.Schema" level="error"/>
+        <Root level="info">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>
         </Root>

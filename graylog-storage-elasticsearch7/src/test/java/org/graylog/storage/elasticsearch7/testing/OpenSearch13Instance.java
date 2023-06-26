@@ -79,6 +79,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 1,
                 1,
                 false,
+                false,
                 null,
                 Duration.seconds(60),
                 "http",
@@ -138,5 +139,10 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     @Override
     public Adapters adapters() {
         return this.adapters;
+    }
+
+    @Override
+    public String getLogs() {
+        return this.container.getLogs();
     }
 }

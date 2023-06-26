@@ -1,0 +1,5 @@
+type = "added"
+message = "Advanced field types for scripting api - support for stream, node and input name resolution"
+
+pulls = ["15421"]
+

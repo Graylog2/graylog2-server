@@ -69,6 +69,7 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
                 1,
                 1,
                 false,
+                false,
                 null,
                 Duration.seconds(60),
                 "http",
@@ -154,5 +155,10 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
 
     public RestHighLevelClient restHighLevelClient() {
         return this.restHighLevelClient;
+    }
+
+    @Override
+    public String getLogs() {
+        return "noop -> working against running ES Instance.";
     }
 }

@@ -95,6 +95,7 @@ import {
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
+  SystemLogsPage,
   UserDetailsPage,
   UserCreatePage,
   UserEditPage,
@@ -154,7 +155,7 @@ const AppRouter = () => {
         ...pluginRoutesWithParent,
         ...pluginRoutesWithAppParent,
         {
-          path: '/',
+          path: `${AppConfig.gl2AppPathPrefix()}/`,
           element: <PageContentLayout />,
           children: [
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
@@ -282,6 +283,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
             { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
+            { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
             { path: RoutePaths.SYSTEM.ENTERPRISE, element: <EnterprisePage /> },
             { path: RoutePaths.SECURITY, element: <SecurityPage /> },
 

@@ -79,19 +79,17 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 `);
 
-const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft, show }) => {
-  return (
-    <StyledTooltip className={`${className} ${show ? 'in' : ''}`}
-                   id={id}
-                   placement={placement}
-                   positionTop={positionTop}
-                   positionLeft={positionLeft}
-                   arrowOffsetTop={arrowOffsetTop}
-                   arrowOffsetLeft={arrowOffsetLeft}>
-      {children}
-    </StyledTooltip>
-  );
-};
+const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft, show }) => (
+  <StyledTooltip className={`${className} ${show ? 'in' : ''}`}
+                 id={id}
+                 placement={placement}
+                 positionTop={positionTop}
+                 positionLeft={positionLeft}
+                 arrowOffsetTop={arrowOffsetTop}
+                 arrowOffsetLeft={arrowOffsetLeft}>
+    {children}
+  </StyledTooltip>
+);
 
 Tooltip.propTypes = {
   className: PropTypes.string,
@@ -129,7 +127,7 @@ Tooltip.propTypes = {
 };
 
 Tooltip.defaultProps = {
-  className: undefined,
+  className: '',
   placement: 'right',
   positionTop: undefined,
   positionLeft: undefined,

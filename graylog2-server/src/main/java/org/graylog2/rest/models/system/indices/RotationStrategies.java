@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.joda.time.Period;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @AutoValue
@@ -36,8 +38,24 @@ public abstract class RotationStrategies {
     @JsonProperty
     public abstract List<RotationStrategyDescription> strategies();
 
+    @JsonProperty
+    public abstract RotationStrategies.Context context();
+
     @JsonCreator
-    public static RotationStrategies create(@JsonProperty("strategies") List<RotationStrategyDescription> strategies) {
-        return new AutoValue_RotationStrategies(strategies);
+    public static RotationStrategies create(@JsonProperty("strategies") List<RotationStrategyDescription> strategies,
+                                            @JsonProperty("context") RotationStrategies.Context context) {
+        return new AutoValue_RotationStrategies(strategies, context);
+    }
+
+    @AutoValue
+    public static abstract class Context {
+        @Nullable
+        @JsonProperty("time_size_optimizing_retention_fixed_leeway")
+        public abstract Period timeSizeOptimizingRotationFixedLeeway();
+
+        @JsonCreator
+        public static RotationStrategies.Context create(@Nullable @JsonProperty("time_size_optimizing_retention_fixed_leeway") Period timeSizeOptimizingRotationFixedLeeway) {
+            return new AutoValue_RotationStrategies_Context(timeSizeOptimizingRotationFixedLeeway);
+        }
     }
 }

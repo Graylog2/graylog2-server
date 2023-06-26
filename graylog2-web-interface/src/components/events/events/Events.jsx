@@ -83,7 +83,12 @@ const EventsIcon = styled(Icon)(({ theme }) => css`
   vertical-align: top;
 `);
 
+const EventListContainer = styled.div`
+  margin-top: -50px;
+`;
+
 export const PAGE_SIZES = [10, 25, 50, 100];
+export const EVENTS_MAX_OFFSET_LIMIT = 10000;
 
 const priorityFormatter = (eventId, priority) => {
   const priorityName = capitalize(EventDefinitionPriorityEnum.properties[priority].name);
@@ -113,25 +118,23 @@ const priorityFormatter = (eventId, priority) => {
   );
 };
 
-const renderEmptyContent = () => {
-  return (
-    <Row>
-      <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
-        <EmptyEntity title="Looks like you didn't define any Events yet">
-          <p>
-            Create Event Definitions that are able to search, aggregate or correlate Messages and other
-            Events, allowing you to record significant Events in Graylog and alert on them.
-          </p>
-          <IfPermitted permissions="eventdefinitions:create">
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success">Get Started!</Button>
-            </LinkContainer>
-          </IfPermitted>
-        </EmptyEntity>
-      </Col>
-    </Row>
-  );
-};
+const renderEmptyContent = () => (
+  <Row>
+    <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
+      <EmptyEntity title="Looks like you didn't define any Events yet">
+        <p>
+          Create Event Definitions that are able to search, aggregate or correlate Messages and other
+          Events, allowing you to record significant Events in Graylog and alert on them.
+        </p>
+        <IfPermitted permissions="eventdefinitions:create">
+          <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+            <Button bsStyle="success">Get Started!</Button>
+          </LinkContainer>
+        </IfPermitted>
+      </EmptyEntity>
+    </Col>
+  </Row>
+);
 
 class Events extends React.Component {
   static propTypes = {
@@ -157,21 +160,11 @@ class Events extends React.Component {
     };
   }
 
-  handlePageSizeChange = (nextPageSize) => {
-    const { onPageChange } = this.props;
-    const { setPageSize } = this.props.paginationQueryParameter;
+  expandRow = (eventId) => () => {
+    const { expanded } = this.state;
+    const nextExpanded = expanded.includes(eventId) ? without(expanded, eventId) : expanded.concat([eventId]);
 
-    setPageSize(nextPageSize);
-    onPageChange(1, nextPageSize);
-  };
-
-  expandRow = (eventId) => {
-    return () => {
-      const { expanded } = this.state;
-      const nextExpanded = expanded.includes(eventId) ? without(expanded, eventId) : expanded.concat([eventId]);
-
-      this.setState({ expanded: nextExpanded });
-    };
+    this.setState({ expanded: nextExpanded });
   };
 
   renderLinkToEventDefinition = (event, eventDefinitionContext) => {
@@ -242,6 +235,7 @@ class Events extends React.Component {
     const { query, filter: { alerts: filter } } = parameters;
     const excludedFile = filter === 'exclude' ? 'Events' : 'Alerts & Events';
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
+    const offsetLimitError = paginationQueryParameter.page * paginationQueryParameter.pageSize > EVENTS_MAX_OFFSET_LIMIT;
 
     const emptyListComponent = query ? (
       <NoSearchResult>
@@ -253,6 +247,19 @@ class Events extends React.Component {
       </NoEntitiesExist>
     );
 
+    const offsetLimitErrorComponent = (
+      <tbody>
+        <tr>
+          <td colSpan={5}>
+            <NoSearchResult>
+              Unfortunately we can only fetch Events with an Offset (page number * rows per page) less than or equal to: [10000].
+              Please use more advanced methods (Search Field and Date Filter) in order to get distant chunks of results.
+            </NoSearchResult>
+          </td>
+        </tr>
+      </tbody>
+    );
+
     return (
       <Row>
         <Col md={12}>
@@ -260,30 +267,33 @@ class Events extends React.Component {
                            onQueryChange={onQueryChange}
                            onAlertFilterChange={onAlertFilterChange}
                            onTimeRangeChange={onTimeRangeChange}
-                           onPageSizeChange={this.handlePageSizeChange}
-                           onSearchReload={onSearchReload}
-                           pageSize={paginationQueryParameter.pageSize}
-                           pageSizes={PAGE_SIZES} />
-          <PaginatedList showPageSizeSelect={false}
-                         totalItems={totalEvents}
-                         onChange={onPageChange}>
-            {eventList.length === 0 ? (
-              emptyListComponent
-            ) : (
-              <EventsTable id="events-table">
-                <thead>
-                  <tr>
-                    {HEADERS.map((header) => <th key={header}>{header}</th>)}
-                  </tr>
-                </thead>
-                {eventList.map(this.renderEvent)}
-              </EventsTable>
-            )}
-          </PaginatedList>
+                           onSearchReload={onSearchReload} />
+          {(eventList.length === 0 && !offsetLimitError) ? (
+            emptyListComponent
+          ) : (
+            <EventListContainer>
+              <PaginatedList totalItems={totalEvents}
+                             onChange={onPageChange}
+                             pageSizes={PAGE_SIZES}>
+                <EventsTable id="events-table">
+                  <thead>
+                    <tr>
+                      {HEADERS.map((header) => <th key={header}>{header}</th>)}
+                    </tr>
+                  </thead>
+                  {offsetLimitError ? (
+                    offsetLimitErrorComponent
+                  ) : (
+                    eventList.map(this.renderEvent)
+                  )}
+                </EventsTable>
+              </PaginatedList>
+            </EventListContainer>
+          )}
         </Col>
       </Row>
     );
   }
 }
 
-export default withPaginationQueryParameter(Events, { pageSizes: PAGE_SIZES });
+export default withPaginationQueryParameter(Events);

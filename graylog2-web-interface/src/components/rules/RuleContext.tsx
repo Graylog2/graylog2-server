@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 
 import type { RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
+import { getSavedRuleSourceCode, removeSavedRuleSourceCode } from 'hooks/useRuleBuilder';
 
 let VALIDATE_TIMEOUT;
 
@@ -45,43 +46,42 @@ type Props = {
 export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props) => {
   const ruleSourceRef = useRef(undefined);
   const [, setAceLoaded] = useState(false);
-  const [ruleSource, setRuleSource] = useState(rule.source);
-  const [description, setDescription] = useState(rule.description);
+  const [ruleSource, setRuleSource] = useState(rule?.source);
+  const [description, setDescription] = useState(rule?.description);
   const [startRuleSimulation, setStartRuleSimulation] = useState(false);
   const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
-  const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
-    const nextErrorAnnotations = nextErrors.map((e) => {
-      return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
-    });
+  useEffect(() => {
+    const savedSourceCode = getSavedRuleSourceCode();
+    setRuleSource(savedSourceCode || rule?.source);
+    setDescription(rule?.description);
+    removeSavedRuleSourceCode();
+  }, [rule]);
 
-    ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
+  const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
+    const nextErrorAnnotations = nextErrors.map((e) => ({ row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' }));
+
+    ruleSourceRef?.current?.editor?.getSession().setAnnotations(nextErrorAnnotations);
   }, []);
 
   const validateNewRule = useCallback((callback) => {
     const nextRule = {
       ...rule,
-      source: ruleSourceRef.current.editor.getSession().getValue(),
+      source: ruleSourceRef?.current?.editor?.getSession().getValue(),
       description,
     };
 
     RulesActions.parse(nextRule, callback);
   }, [rule, description]);
 
-  const simulateRule = useCallback((messageString: string, callback: () => void) => {
-    const nextRule = {
-      ...rule,
-      source: ruleSourceRef.current.editor.getSession().getValue(),
-      description,
-    };
-
-    RulesActions.simulate(messageString, nextRule, callback);
-  }, [rule, description]);
+  const simulateRule = useCallback((messageString: string, _rule: RuleType, callback: () => void) => {
+    RulesActions.simulate(messageString, _rule, callback);
+  }, []);
 
   useEffect(() => {
-    if (ruleSourceRef.current) {
-      ruleSourceRef.current.editor.session.setOption('useWorker', false);
+    if (ruleSourceRef?.current) {
+      ruleSourceRef?.current?.editor?.session.setOption('useWorker', false);
     }
   });
 
@@ -89,7 +89,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     const validateBeforeSave = (callback: (nextRule: RuleType) => void = () => {}) => {
       const savedRule = {
         ...rule,
-        source: ruleSourceRef.current.editor.getSession().getValue(),
+        source: ruleSourceRef?.current?.editor?.getSession().getValue(),
         description,
       };
 
@@ -118,6 +118,11 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     };
 
     return ({
+      rule: {
+        ...rule,
+        description,
+        source: ruleSource,
+      },
       description,
       handleDescription: setDescription,
       handleSavePipelineRule,

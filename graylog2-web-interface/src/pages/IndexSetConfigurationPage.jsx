@@ -64,14 +64,22 @@ class IndexSetConfigurationPage extends React.Component {
       return <Spinner />;
     }
 
-    const { indexSet, retentionStrategiesContext, rotationStrategies, retentionStrategies, history, sendTelemetry } = this.props;
+    const {
+      indexSet,
+      retentionStrategiesContext,
+      rotationStrategies,
+      retentionStrategies,
+      history,
+      sendTelemetry,
+    } = this.props;
 
     const saveConfiguration = (newIndexSet) => {
       _saveConfiguration(history, newIndexSet);
 
-      sendTelemetry('submit_form', {
-        appSection: 'index_sets',
-        eventElement: 'update-index-set',
+      sendTelemetry('form_submit', {
+        app_pathname: 'indexsets',
+        app_section: 'indexset',
+        app_action_value: 'configuration-form',
       });
     };
 
@@ -87,7 +95,7 @@ class IndexSetConfigurationPage extends React.Component {
                         <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
                           <Button bsStyle="info">Index sets overview</Button>
                         </LinkContainer>
-                      )}>
+            )}>
             <span>
               Modify the current configuration for this index set, allowing you to customize the retention, sharding,
               and replication of messages coming from one or more streams.

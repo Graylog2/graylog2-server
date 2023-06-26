@@ -57,6 +57,7 @@ import javax.ws.rs.NotFoundException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -114,25 +115,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void list() {
-        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-                "id",
-                "title",
-                "description",
-                true, true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                null,
-                1,
-                false
-        );
+        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
         final IndexSetResponse list = indexSetsResource.list(0, 0, false);
@@ -149,25 +132,7 @@ public class IndexSetsResourceTest {
     public void listDenied() {
         notPermitted();
 
-        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-                "id",
-                "title",
-                "description",
-                true, true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                null,
-                1,
-                false
-        );
+        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
         final IndexSetResponse list = indexSetsResource.list(0, 0, false);
@@ -196,25 +161,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void get() {
-        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-                "id",
-                "title",
-                "description",
-                true, true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                null,
-                1,
-                false
-        );
+        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
         when(indexSetService.get("id")).thenReturn(Optional.of(indexSetConfig));
 
         final IndexSetSummary summary = indexSetsResource.get("id");
@@ -408,25 +355,7 @@ public class IndexSetsResourceTest {
     @Test
     public void updateDenied() {
         notPermitted();
-        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-                "id",
-                "title",
-                "description",
-                true, true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                null,
-                1,
-                false
-        );
+        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
 
         expectedException.expect(ForbiddenException.class);
         expectedException.expectMessage("Not authorized to access resource id <wrong-id>");
@@ -763,6 +692,49 @@ public class IndexSetsResourceTest {
         } finally {
             verifyZeroInteractions(clusterConfigService);
         }
+    }
+
+    @Test
+    public void testSearchIndexSets() {
+        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        String searchTitle = "itle";
+        when(indexSetService.searchByTitle(searchTitle)).thenReturn(Collections.singletonList(indexSetConfig));
+        final IndexSetResponse firstPage = indexSetsResource.search(searchTitle, 0, 0, false);
+
+        verify(indexSetService, times(1)).searchByTitle(searchTitle);
+        verify(indexSetService, times(1)).getDefault();
+        verifyNoMoreInteractions(indexSetService);
+
+        assertThat(firstPage.total()).isEqualTo(1);
+        assertThat(firstPage.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+
+        final IndexSetConfig indexSetConfig2 = createTestConfig("id2", "title2");
+        when(indexSetService.searchByTitle(searchTitle)).thenReturn(List.of(indexSetConfig, indexSetConfig2));
+        final IndexSetResponse secondPage = indexSetsResource.search(searchTitle, 1, 0, false);
+
+        assertThat(secondPage.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig2, false));
+    }
+
+    private IndexSetConfig createTestConfig(String id, String title) {
+        return IndexSetConfig.create(
+                id,
+                title,
+                "description",
+                true, true,
+                "prefix",
+                1,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(1),
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                null,
+                1,
+                false
+        );
     }
 
     private static class TestResource extends IndexSetsResource {

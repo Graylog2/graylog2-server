@@ -53,31 +53,27 @@ const links = {
     dataTestId: 'view-title',
   },
   ],
-  alert: ({ id }) => {
-    return [
-      {
-        link: Routes.ALERTS.LIST,
-        label: 'Alerts & Events',
-      },
-      {
-        label: id,
-        dataTestId: 'alert-id-title',
-      },
-    ];
-  },
-  eventDefinition: ({ id, title }) => {
-    return [
-      {
-        link: Routes.ALERTS.DEFINITIONS.LIST,
-        label: 'Event definitions',
-      },
-      {
-        link: Routes.ALERTS.DEFINITIONS.show(id),
-        label: title || id,
-        dataTestId: 'event-definition-title',
-      },
-    ];
-  },
+  alert: ({ id }) => [
+    {
+      link: Routes.ALERTS.LIST,
+      label: 'Alerts & Events',
+    },
+    {
+      label: id,
+      dataTestId: 'alert-id-title',
+    },
+  ],
+  eventDefinition: ({ id, title }) => [
+    {
+      link: Routes.ALERTS.DEFINITIONS.LIST,
+      label: 'Event definitions',
+    },
+    {
+      link: Routes.ALERTS.DEFINITIONS.show(id),
+      label: title || id,
+      dataTestId: 'event-definition-title',
+    },
+  ],
 };
 
 const Content = styled.div(({ theme }) => css`

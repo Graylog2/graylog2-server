@@ -26,6 +26,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';
+import ThemeModeContext from './ThemeModeContext';
 import type { Colors } from './colors';
 import type { ThemeMode } from './constants';
 import { THEME_MODES } from './constants';
@@ -72,14 +73,10 @@ const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLo
       graylogColors: colors[mode],
       mode,
       initialLoad,
-    }).then((currentThemeColors) => {
-      return buildTheme(currentThemeColors, changeMode, mode);
-    });
+    }).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
   }
 
-  return Promise.resolve(colors[mode]).then((currentThemeColors) => {
-    return buildTheme(currentThemeColors, changeMode, mode);
-  });
+  return Promise.resolve(colors[mode]).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
 };
 
 const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
@@ -102,11 +99,15 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
     return ({ regenerateTheme });
   }, [changeMode, generateCustomThemeColors, mode]);
 
+  const themeModeContextValue = useMemo(() => mode, [mode]);
+
   return theme ? (
     <RegeneratableThemeContext.Provider value={regeneratableThemeContextValue}>
-      <ThemeProvider theme={theme}>
-        {children}
-      </ThemeProvider>
+      <ThemeModeContext.Provider value={themeModeContextValue}>
+        <ThemeProvider theme={theme}>
+          {children}
+        </ThemeProvider>
+      </ThemeModeContext.Provider>
     </RegeneratableThemeContext.Provider>
   ) : null;
 };

@@ -52,8 +52,10 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
 
       ruleTitle = <span><Icon name="exclamation-triangle" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
     } else {
+      const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
+
       ruleTitle = (
-        <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
+        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${isRuleBuilder}`}>
           {rule.title}
         </Link>
       );
@@ -83,6 +85,7 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
     <DataTable id="processing-timeline"
                className="table-hover"
                headers={headers}
+               // eslint-disable-next-line react/no-unstable-nested-components
                headerCellFormatter={(header) => (<th>{header}</th>)}
                rows={rules}
                dataRowFormatter={_ruleRowFormatter}

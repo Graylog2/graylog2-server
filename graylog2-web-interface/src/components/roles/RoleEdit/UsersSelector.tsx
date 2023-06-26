@@ -97,9 +97,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
     }
 
     const newUsers = user.split(',');
-    const userOverview: Immutable.Set<UserOverview> = Immutable.Set(compact(newUsers.map((newUser) => {
-      return users.find((u) => u.username === newUser);
-    })));
+    const userOverview: Immutable.Set<UserOverview> = Immutable.Set(compact(newUsers.map((newUser) => users.find((u) => u.username === newUser))));
 
     if (!userOverview) {
       setError(`This is an exceptional error! Unable to find user with name ${user} in ${users.map((u) => u.username).join(', ')}`);

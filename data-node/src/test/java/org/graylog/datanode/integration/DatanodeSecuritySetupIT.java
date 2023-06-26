@@ -70,8 +70,8 @@ public class DatanodeSecuritySetupIT {
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
-            datanodeContainer.withFileSystemBind(nodeCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-transport-certificates.p12");
-            datanodeContainer.withFileSystemBind(httpCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-https-certificates.p12");
+            datanodeContainer.withFileSystemBind(nodeCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/bin/config/datanode-transport-certificates.p12");
+            datanodeContainer.withFileSystemBind(httpCert.toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/bin/config/datanode-https-certificates.p12");
 
             // configure transport security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
@@ -108,7 +108,7 @@ public class DatanodeSecuritySetupIT {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
-                .retryIfResult(input -> !input.extract().body().path("process.info.status").equals("AVAILABLE"))
+                .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
         retryer.call(() -> RestAssured.given()
