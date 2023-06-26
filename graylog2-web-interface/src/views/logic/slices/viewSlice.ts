@@ -122,43 +122,28 @@ export const loadView = (newView: View, recreateSearch: boolean = false) => asyn
   return dispatch(setView(newView));
 };
 
-export const updateView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
+type UpdateViewOptions = { hasToPushRevision: boolean };
+const defaultUpdateViewOptions = { hasToPushRevision: true };
+
+export const updateView = (
+  newView: View,
+  recreateSearch: boolean = false,
+  options: UpdateViewOptions = defaultUpdateViewOptions,
+) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const view = selectView(state);
 
-  await dispatch(pushIntoBuffer({
-    type: 'view',
-    state: {
-      ...state.view,
-    },
-  }));
-
-  if (recreateSearch || !isViewEqualForSearch(view, newView)) {
-    const updatedViewWithSearch = await _recreateSearch(newView);
-    await dispatch(setView(updatedViewWithSearch, true));
-
-    return dispatch(execute());
-  }
-
-  return dispatch(setView(newView, true));
-};
-
-export const updateViewNoBufferPush = ({ newView, recreateSearch = false, hasToPushRevision = false }: { newView: View, recreateSearch: boolean, hasToPushRevision: boolean }) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const state = getState();
-  const view = selectView(state);
-
-  if (hasToPushRevision) {
+  if (options.hasToPushRevision) {
     await dispatch(pushIntoBuffer({
       type: 'view',
       state: {
         ...state.view,
       },
-    }, false));
+    }));
   }
 
   if (recreateSearch || !isViewEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
-
     await dispatch(setView(updatedViewWithSearch, true));
 
     return dispatch(execute());

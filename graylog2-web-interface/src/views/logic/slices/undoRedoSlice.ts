@@ -18,7 +18,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import type { AppDispatch } from 'stores/useAppDispatch';
-import { updateViewNoBufferPush } from 'views/logic/slices/viewSlice';
+import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
 import type { RootState, ViewState } from 'views/types';
 import { selectRootUndoRedo, selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 
@@ -34,7 +34,7 @@ export type UndoRedoState = {
 }
 
 const handlers: { [name in BufferItemType]: any} = {
-  view: (state: ViewState, hasToPushRevision: boolean = false) => updateViewNoBufferPush({ newView: state.view, recreateSearch: state.isDirty, hasToPushRevision }),
+  view: (state: ViewState, { hasToPushRevision, dispatch }: { hasToPushRevision: boolean, dispatch: AppDispatch}): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => dispatch(updateView(state.view, state.isDirty, { hasToPushRevision }))),
 };
 
 const undoRedoSlice = createSlice({
@@ -81,7 +81,7 @@ export const undo = () => async (dispatch: AppDispatch, getState: () => RootStat
     const { type, state } = buffer[newRevision];
     const bufferHandler = handlers[type];
 
-    dispatch(bufferHandler(state, hasToPushRevision)).then(() => dispatch(setCurrentRevision(newRevision)));
+    bufferHandler(state, { hasToPushRevision, dispatch }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
 };
 
@@ -95,6 +95,6 @@ export const redo = () => async (dispatch: AppDispatch, getState: () => RootStat
 
     const { type, state } = buffer[newRevision];
     const bufferHandler = handlers[type];
-    dispatch(bufferHandler(state)).then(() => dispatch(setCurrentRevision(newRevision)));
+    bufferHandler(state, { dispatch, hasToPushRevision: false }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
 };
