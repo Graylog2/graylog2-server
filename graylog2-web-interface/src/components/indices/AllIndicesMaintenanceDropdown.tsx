@@ -20,6 +20,7 @@ import { SystemIndexRanges } from '@graylog/server-api';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 
 const _onRecalculateAllIndexRange = () => {
+  // eslint-disable-next-line no-alert
   if (window.confirm('This will cleanup & recalculate all index ranges existing. Do you want to proceed?')) {
     SystemIndexRanges.rebuild();
   }
