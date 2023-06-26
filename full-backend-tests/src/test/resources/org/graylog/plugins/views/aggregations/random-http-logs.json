@@ -22,7 +22,8 @@
             "http_response_code": 200,
             "streams": [
               "000000000000000000000001"
-            ]
+            ],
+            "test_boolean": true
           }
         }
       ]
@@ -49,7 +50,8 @@
             "http_response_code": 200,
             "streams": [
               "000000000000000000000001"
-            ]
+            ],
+            "test_boolean": false
           }
         }
       ]
