@@ -79,6 +79,8 @@ const submitWidgetConfigForm = async () => {
   fireEvent.click(applyButton);
 };
 
+const expectedPivotConfig = { skip_empty_values: undefined, limit: 15 };
+
 describe('AggregationWizard', () => {
   type Props = Partial<React.ComponentProps<typeof AggregationWizard>> & {
     fieldTypesList?: {
@@ -127,7 +129,7 @@ describe('AggregationWizard', () => {
     await selectField('took_ms');
     await submitWidgetConfigForm();
 
-    const pivot = Pivot.createValues(['took_ms']);
+    const pivot = Pivot.createValues(['took_ms'], expectedPivotConfig);
     const updatedConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot])
@@ -148,7 +150,7 @@ describe('AggregationWizard', () => {
     await selectField('status_code');
     await submitWidgetConfigForm();
 
-    const pivot = Pivot.createValues(['status_code']);
+    const pivot = Pivot.createValues(['status_code'], expectedPivotConfig);
     const updatedConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot])
@@ -187,7 +189,7 @@ describe('AggregationWizard', () => {
     await submitWidgetConfigForm();
 
     const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.createValues(['took_ms']);
+    const pivot1 = Pivot.createValues(['took_ms'], expectedPivotConfig);
     const updatedConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot0, pivot1])

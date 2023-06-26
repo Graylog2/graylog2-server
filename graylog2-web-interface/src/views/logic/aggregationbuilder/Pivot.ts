@@ -81,8 +81,8 @@ export default class Pivot {
     return new Pivot(fields, type, config);
   }
 
-  static createValues(fields: Array<string>) {
-    return Pivot.create(fields, ValuesType);
+  static createValues(fields: Array<string>, config: ValuesConfigType = DEFAULT_PIVOT_CONFIG) {
+    return Pivot.create(fields, ValuesType, config);
   }
 
   static fromJSON(value: PivotJson) {
