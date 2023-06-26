@@ -17,8 +17,10 @@
 package org.graylog2.bindings;
 
 import com.google.common.base.Strings;
+import com.google.inject.Key;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.BlockingBatchedESOutput;
 import org.graylog2.outputs.DefaultMessageOutput;
@@ -48,7 +50,8 @@ public class MessageOutputBindings extends Graylog2Module {
     protected void configure() {
         final Class<? extends MessageOutput> defaultMessageOutputClass = getDefaultMessageOutputClass(BlockingBatchedESOutput.class);
         LOG.debug("Using default message output class: {}", defaultMessageOutputClass.getCanonicalName());
-        bind(MessageOutput.class).annotatedWith(DefaultMessageOutput.class).to(defaultMessageOutputClass).in(Scopes.SINGLETON);
+        OptionalBinder.newOptionalBinder(binder(), Key.get(MessageOutput.class, DefaultMessageOutput.class))
+                .setDefault().to(defaultMessageOutputClass).in(Scopes.SINGLETON);
 
         final MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder = outputsMapBinder();
         installOutput(outputMapBinder, GelfOutput.class, GelfOutput.Factory.class);
