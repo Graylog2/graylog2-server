@@ -28,18 +28,18 @@ import java.util.concurrent.ExecutionException;
  * Retrieves titles from cache, using {@link org.graylog2.lookup.Catalog}.
  */
 @Singleton
-public class StartPageTitleRetriever {
+public class StartPageItemTitleRetriever {
 
     private final Catalog catalog;
 
     @Inject
-    public StartPageTitleRetriever(final Catalog catalog) {
+    public StartPageItemTitleRetriever(final Catalog catalog) {
         this.catalog = catalog;
     }
 
-    public Optional<String> retrieveTitle(final GRN grn) {
+    public Optional<String> retrieveTitle(final GRN itemGrn) {
         try {
-            final Optional<Catalog.Entry> entry = catalog.getEntry(grn);
+            final Optional<Catalog.Entry> entry = catalog.getEntry(itemGrn);
             final Optional<String> title = entry.map(Catalog.Entry::title);
             if (title.isPresent()) {
                 return title;

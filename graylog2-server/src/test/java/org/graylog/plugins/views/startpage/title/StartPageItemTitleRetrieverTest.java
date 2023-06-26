@@ -34,7 +34,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
-class StartPageTitleRetrieverTest {
+class StartPageItemTitleRetrieverTest {
 
     @Mock
     private Catalog catalog;
@@ -42,11 +42,11 @@ class StartPageTitleRetrieverTest {
     @Mock
     private GRN grn;
 
-    private StartPageTitleRetriever toTest;
+    private StartPageItemTitleRetriever toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new StartPageTitleRetriever(catalog);
+        toTest = new StartPageItemTitleRetriever(catalog);
     }
 
     @Test

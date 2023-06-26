@@ -31,7 +31,7 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
-import org.graylog.plugins.views.startpage.title.StartPageTitleRetriever;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.testing.GRNExtension;
@@ -116,7 +116,7 @@ public class StartPageServiceTest {
         var dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus);
         var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
-        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageTitleRetriever(new TestCatalog()));
+        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(new TestCatalog()));
     }
 
     @Test

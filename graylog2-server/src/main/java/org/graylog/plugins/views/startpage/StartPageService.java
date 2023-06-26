@@ -28,7 +28,7 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
-import org.graylog.plugins.views.startpage.title.StartPageTitleRetriever;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.joda.time.DateTime;
@@ -42,7 +42,7 @@ public class StartPageService {
     private final GRNRegistry grnRegistry;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
-    private final StartPageTitleRetriever startPageTitleRetriever;
+    private final StartPageItemTitleRetriever startPageItemTitleRetriever;
     private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
@@ -50,11 +50,11 @@ public class StartPageService {
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
                             EventBus eventBus,
-                            StartPageTitleRetriever startPageTitleRetriever) {
+                            StartPageItemTitleRetriever startPageItemTitleRetriever) {
         this.grnRegistry = grnRegistry;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
-        this.startPageTitleRetriever = startPageTitleRetriever;
+        this.startPageItemTitleRetriever = startPageItemTitleRetriever;
         eventBus.register(this);
     }
 
@@ -68,7 +68,7 @@ public class StartPageService {
                 .items()
                 .stream()
                 .skip((long) (page - 1) * perPage)
-                .map(i -> startPageTitleRetriever
+                .map(i -> startPageItemTitleRetriever
                         .retrieveTitle(i.grn())
                         .map(title -> new LastOpened(i.grn(), title, i.timestamp()))
                         .orElse(null))
@@ -82,7 +82,7 @@ public class StartPageService {
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
         final var items = recentActivityService.findRecentActivitiesFor(searchUser, page, perPage);
         final var mapped = items.stream()
-                .map(i -> startPageTitleRetriever
+                .map(i -> startPageItemTitleRetriever
                         .retrieveTitle(i.itemGrn())
                         .map(title -> new RecentActivity(i.id(),
                                 i.activityType(),

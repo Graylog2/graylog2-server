@@ -25,7 +25,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
-import org.graylog.plugins.views.startpage.title.StartPageTitleRetriever;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -43,18 +43,18 @@ import java.util.Optional;
 public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public static final String COLLECTION_NAME = "favorites";
 
-    private final StartPageTitleRetriever startPageTitleRetriever;
+    private final StartPageItemTitleRetriever startPageItemTitleRetriever;
     private final GRNRegistry grnRegistry;
 
     @Inject
     protected FavoritesService(final MongoConnection mongoConnection,
                                EventBus eventBus,
                                final MongoJackObjectMapperProvider mapper,
-                               final StartPageTitleRetriever startPageTitleRetriever,
+                               final StartPageItemTitleRetriever startPageItemTitleRetriever,
                                final GRNRegistry grnRegistry) {
         super(mongoConnection, mapper, FavoritesForUserDTO.class, COLLECTION_NAME);
         eventBus.register(this);
-        this.startPageTitleRetriever = startPageTitleRetriever;
+        this.startPageItemTitleRetriever = startPageItemTitleRetriever;
         this.grnRegistry = grnRegistry;
 
         db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_USER_ID, 1));
@@ -66,7 +66,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
-                .map(i -> startPageTitleRetriever
+                .map(i -> startPageItemTitleRetriever
                         .retrieveTitle(i)
                         .map(title -> new Favorite(i, title))
                         .orElse(null)
