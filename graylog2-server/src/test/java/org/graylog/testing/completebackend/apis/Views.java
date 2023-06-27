@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.completebackend.apis;
 
-import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 
 import java.util.Locale;

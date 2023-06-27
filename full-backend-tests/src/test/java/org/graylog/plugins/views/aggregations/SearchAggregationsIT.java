@@ -819,6 +819,27 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("PUT", "percentage(took_ms,SUM)"), equalTo(0.11320802641605283f));
     }
 
+    @ContainerMatrixTest
+    void testBooleanFieldsAreReturnedAsTrueOrFalse() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(Values.builder().field("test_boolean").build(), Values.builder().field("user_id").build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(4));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of("true", "6476752"), List.of("count()")), equalTo(1))
+                .body(pathToMetricResult(List.of("false", "6469981"), List.of("count()")), equalTo(1))
+                .body(pathToMetricResult("(Empty Value)", "count()"), equalTo(998));
+    }
+
     private String listToGroovy(Collection<String> strings) {
         final List<String> quotedStrings = strings.stream()
                 .map(string -> "'" + string + "'")
