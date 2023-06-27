@@ -2713,17 +2713,18 @@
   resolved "https://registry.yarnpkg.com/@tanstack/eslint-plugin-query/-/eslint-plugin-query-4.29.9.tgz#1635e7d60975bcff8bf10f1015d77ea3ce3db260"
   integrity sha512-JlIZcs+zhl/ihta49iIbMCf3E8tSvGDqMIH+oItnYLOzWI7oiujXu7FYgna2E1V79KhR0PaxkPX6jHZLpvacgw==
 
-"@tanstack/query-core@4.29.15":
-  version "4.29.15"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.29.15.tgz#6f8721341dbece517326a8e402d29ea3365538a8"
-  integrity sha512-Recc1d5rjHesKhzlH3Aw66v+vQxtB9OHEXP/vxgEcEJ0DwEpfe3EQ4id20vuBJHY2XRjfgWGmUs6ZgK6PSsTXA==
+"@tanstack/query-core@4.29.17":
+  version "4.29.17"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.29.17.tgz#bbef3a30190732ae3554187702f6e34c5caaefd8"
+  integrity sha512-iDbO8yZOpm1lqgq6L8mpxGbKaoiyZSjthxEB3WGU7mNPYss9q4H3Q67+e2xXGwkemEVmtEX/WwvtFitrvVU8TA==
 
-"@tanstack/react-query@4.29.15":
-  version "4.29.15"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.29.15.tgz#83598e46964185199c59757e6b9c63c15eff81c1"
-  integrity sha512-1zDkv95ljuJ623hhbYU8YIprPW2x6774kh3IQNEuZav62+S+Zr26uUOrE2zGRp9I1uO5Liw/0uYB3dWXQP5+3Q==
+"@tanstack/react-query@4.29.17":
+  version "4.29.17"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.29.17.tgz#bfd5da849bb7fd1b66eb9d47853ee030864a435e"
+  integrity sha512-udOy/jgqiBHBAP93YPAU3QoVYO+Rtx9HT/10xGDQzC8iQU/wIxcIaT/usX+1NSzoUFYU5hUcPaNErPWZnR7XgA==
   dependencies:
-    "@tanstack/query-core" "4.29.15"
+    "@tanstack/query-core" "4.29.17"
+    client-only "0.0.1"
     use-sync-external-store "^1.2.0"
 
 "@testing-library/dom@9.3.1":
@@ -5055,6 +5056,11 @@ clean-css@^5.1.5:
   dependencies:
     source-map "~0.6.0"
 
+client-only@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/client-only/-/client-only-0.0.1.tgz#38bba5d403c41ab150bff64a95c85013cf73bca1"
+  integrity sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==
+
 clipboard@*, clipboard@^2.0.0:
   version "2.0.11"
   resolved "https://registry.yarnpkg.com/clipboard/-/clipboard-2.0.11.tgz#62180360b97dd668b6b3a84ec226975762a70be5"
@@ -6750,7 +6756,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.1.4"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-42986eaf-fd88-43bc-94e5-55b4cc0c4dc8-1687435560604/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-eslint-config-graylog-1.3.0-c0f8da4e-f762-41f7-b171-e510794ba701-1687773839854/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.2.2"
     eslint-plugin-jest-dom "5.0.1"
@@ -8052,17 +8058,17 @@ graphemer@^1.4.0:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "5.2.0-SNAPSHOT"
   dependencies:
-    "@tanstack/react-query" "4.29.15"
+    "@tanstack/react-query" "4.29.17"
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.16"
     "@types/react" "18.2.13"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-202129e8-97a9-413a-80b9-ec0132075d98-1687435560290/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-f899c995-728a-4531-bf34-1a7bc0c9d680-1687773839740/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-202129e8-97a9-413a-80b9-ec0132075d98-1687435560290/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-f899c995-728a-4531-bf34-1a7bc0c9d680-1687773839740/node_modules/eslint-config-graylog"
     formik "2.4.2"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-202129e8-97a9-413a-80b9-ec0132075d98-1687435560290/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../../../../Users/ousmanesamba/Library/Caches/Yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-f899c995-728a-4531-bf34-1a7bc0c9d680-1687773839740/node_modules/jest-preset-graylog"
     jquery "3.7.0"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -9518,6 +9524,7 @@ jest-pnp-resolver@^1.2.2:
     "@testing-library/jest-dom" "5.16.5"
     "@testing-library/react" "12.1.5"
     "@testing-library/react-hooks" "^8.0.0"
+    "@testing-library/user-event" "^13.5.0"
     "@types/enzyme" "3.10.12"
     babel-jest "29.5.0"
     enzyme "3.11.0"

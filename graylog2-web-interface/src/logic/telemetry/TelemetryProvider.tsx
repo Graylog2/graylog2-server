@@ -17,6 +17,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { usePostHog } from 'posthog-js/react';
 
+import { getPathnameWithoutId } from 'util/URLUtils';
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
@@ -59,6 +60,8 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const [globalProps, setGlobalProps] = useState({});
 
   useEffect(() => {
+    const app_pathname = getPathnameWithoutId(window.location.pathname);
+
     const setGroup = () => {
       if (isTelemetryDataLoaded
         && telemetryData
@@ -74,6 +77,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
         setGlobalProps(getGlobalProps(telemetryData));
 
         posthog.group('cluster', clusterId, {
+          app_pathname,
           ...clusterDetails,
           ...license,
           ...plugin,
