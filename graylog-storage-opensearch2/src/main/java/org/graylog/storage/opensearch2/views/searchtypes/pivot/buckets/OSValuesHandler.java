@@ -181,7 +181,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
             return ImmutableList.of((String)key);
         }
 
-        return ImmutableList.of(String.valueOf(key));
+        return ImmutableList.of(bucket.getKeyAsString());
     }
 
     private ImmutableList<String> splitKeys(String keys) {
