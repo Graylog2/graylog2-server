@@ -119,7 +119,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
         //Empty bucket verification (should precede the last/total one - index 3)
         //The only message with "empty" first name in a fixture is {(...)"lastName": "Cooper","age": 60(...)}
-        validatableResponse.body(".rows[3].key", contains("(Empty Value)"));
+        validatableResponse.body(".rows[3].key", contains(MISSING_BUCKET_NAME));
         validatableResponse.body(".rows[3].values[0].key", contains("count()"));
         validatableResponse.body(".rows[3].values[0].value", equalTo(1));
         validatableResponse.body(".rows[3].values[1].key", contains("avg(age)"));
@@ -156,7 +156,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
         //Empty bucket verification (should precede the last/total one - index 3)
         //The only message with "empty" first name in a fixture is {(...)"lastName": "Cooper","age": 60(...)}
-        validatableResponse.body(".rows[3].key", not(contains("(Empty Value)")));
+        validatableResponse.body(".rows[3].key", not(contains(MISSING_BUCKET_NAME)));
 
         //Top bucket verification
         //There are 2 "Joes" in a fixture: {(...)"lastName": "Smith","age": 50(...)} and {(...)"lastName": "Biden","age": 80(...)}
