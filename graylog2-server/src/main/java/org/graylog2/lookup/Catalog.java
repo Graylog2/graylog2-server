@@ -25,7 +25,6 @@ import org.graylog2.contentpacks.ContentPackService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
@@ -66,8 +65,8 @@ public class Catalog {
                 });
     }
 
-    public Optional<Entry> getEntry(final GRN grn) throws ExecutionException {
-        return cache.get(grn.entity());
+    public Optional<Entry> getEntry(final GRN grn) {
+        return cache.getUnchecked(grn.entity());
     }
 
 }

@@ -36,7 +36,7 @@ import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 public class StartPageService {
     private final GRNRegistry grnRegistry;
@@ -71,8 +71,8 @@ public class StartPageService {
                 .map(i -> startPageItemTitleRetriever
                         .retrieveTitle(i.grn())
                         .map(title -> new LastOpened(i.grn(), title, i.timestamp()))
-                        .orElse(null))
-                .filter(Objects::nonNull)
+                )
+                .flatMap(Optional::stream)
                 .limit(perPage)
                 .toList();
 
@@ -90,9 +90,9 @@ public class StartPageService {
                                 title,
                                 i.userName(),
                                 i.timestamp()))
-                        .orElse(null)
+
                 )
-                .filter(Objects::nonNull)
+                .flatMap(Optional::stream)
                 .toList();
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(mapped, items.pagination().total(), page, perPage));
     }

@@ -22,7 +22,6 @@ import org.graylog2.lookup.Catalog;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Retrieves titles from cache, using {@link org.graylog2.lookup.Catalog}.
@@ -38,16 +37,12 @@ public class StartPageItemTitleRetriever {
     }
 
     public Optional<String> retrieveTitle(final GRN itemGrn) {
-        try {
-            final Optional<Catalog.Entry> entry = catalog.getEntry(itemGrn);
-            final Optional<String> title = entry.map(Catalog.Entry::title);
-            if (title.isPresent()) {
-                return title;
-            } else {
-                return entry.map(Catalog.Entry::id);
-            }
-        } catch (ExecutionException ex) {
-            return Optional.empty();
+        final Optional<Catalog.Entry> entry = catalog.getEntry(itemGrn);
+        final Optional<String> title = entry.map(Catalog.Entry::title);
+        if (title.isPresent()) {
+            return title;
+        } else {
+            return entry.map(Catalog.Entry::id);
         }
     }
 }

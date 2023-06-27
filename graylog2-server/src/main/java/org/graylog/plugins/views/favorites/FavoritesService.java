@@ -37,7 +37,6 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
@@ -69,9 +68,8 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
                 .map(i -> startPageItemTitleRetriever
                         .retrieveTitle(i)
                         .map(title -> new Favorite(i, title))
-                        .orElse(null)
                 )
-                .filter(Objects::nonNull)
+                .flatMap(Optional::stream)
                 .toList();
 
         return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));

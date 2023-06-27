@@ -25,13 +25,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class StartPageItemTitleRetrieverTest {
@@ -52,12 +50,6 @@ class StartPageItemTitleRetrieverTest {
     @Test
     void testReturnsEmptyOptionalOnEmptyEntryInCatalog() throws Exception {
         doReturn(Optional.empty()).when(catalog).getEntry(any());
-        assertTrue(toTest.retrieveTitle(grn).isEmpty());
-    }
-
-    @Test
-    void testReturnsEmptyOptionalOnExecutionExceptionInCacheLoading() throws Exception {
-        doThrow(ExecutionException.class).when(catalog).getEntry(any());
         assertTrue(toTest.retrieveTitle(grn).isEmpty());
     }
 
