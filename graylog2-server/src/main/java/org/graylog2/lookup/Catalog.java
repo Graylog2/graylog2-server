@@ -16,16 +16,17 @@
  */
 package org.graylog2.lookup;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.google.common.base.Suppliers;
 import org.graylog.grn.GRN;
 import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Singleton
 public class Catalog {
@@ -33,40 +34,28 @@ public class Catalog {
     public record Entry(String id, String title) {
     }
 
-    private final ContentPackService contentPackService;
-    private final LoadingCache<String, Optional<Entry>> cache;
-
-    private final int MAXIMUM_CACHE_SIZE = 10000;
+    private final Supplier<Map<String, EntityExcerpt>> memoizedExcerptSupplier;
 
     @Inject
     public Catalog(ContentPackService contentPackService) {
-        this.contentPackService = contentPackService;
-        this.cache = createCache();
-    }
-
-    protected LoadingCache<String, Optional<Entry>> createCache() {
-        return CacheBuilder
-                .newBuilder()
-                .maximumSize(MAXIMUM_CACHE_SIZE)
-                .expireAfterAccess(1, TimeUnit.SECONDS)
-                .build(new CacheLoader<>() {
-                    @Override
-                    public Optional<Entry> load(String id) {
-                        var catalog = contentPackService.getEntityExcerpts();
-                        var excerpt = catalog.get(id);
-                        if (excerpt != null) {
-                            return Optional.of(
-                                    new Entry(id, excerpt.title())
-                            );
-                        } else {
-                            return Optional.empty();
-                        }
-                    }
-                });
+        /*
+         * TODO: This approach does not perform and should be replaced.
+         * It was implemented as a quick improvement for even worse approach, where getEntityExcerpts() could be invoked for each entry retrieval.
+         */
+        this.memoizedExcerptSupplier = Suppliers.memoizeWithExpiration(contentPackService::getEntityExcerpts, 5, TimeUnit.SECONDS);
     }
 
     public Optional<Entry> getEntry(final GRN grn) {
-        return cache.getUnchecked(grn.entity());
+        final String id = grn.entity();
+        var catalog = memoizedExcerptSupplier.get();
+        var excerpt = catalog.get(id);
+        if (excerpt != null) {
+            return Optional.of(
+                    new Entry(id, excerpt.title())
+            );
+        } else {
+            return Optional.empty();
+        }
     }
 
 }
