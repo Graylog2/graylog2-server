@@ -21,7 +21,6 @@ import com.google.common.eventbus.EventBus;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
@@ -32,9 +31,9 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
-import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.TestUserService;
 import org.graylog.testing.TestUserServiceExtension;
@@ -51,6 +50,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,18 +74,13 @@ public class StartPageServiceTest {
         }
 
         @Override
-        protected LoadingCache<String, Entry> createCache() {
+        protected LoadingCache<String, Optional<Entry>> createCache() {
             return null;
         }
 
         @Override
-        public String getTitle(final GRN id) {
-            return "";
-        }
-
-        @Override
-        public String getType(final GRN id) {
-            return "";
+        public Optional<Entry> getEntry(GRN grn) {
+            return Optional.of(new Entry("", ""));
         }
     }
 
@@ -121,7 +116,7 @@ public class StartPageServiceTest {
         var dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus);
         var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
-        startPageService = new StartPageService(new TestCatalog(), grnRegistry, lastOpenedService, recentActivityService, eventbus);
+        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(new TestCatalog()));
     }
 
     @Test
