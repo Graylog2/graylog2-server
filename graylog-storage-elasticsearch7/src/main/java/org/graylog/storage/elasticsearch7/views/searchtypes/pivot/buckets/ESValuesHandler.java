@@ -19,6 +19,7 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -42,6 +43,8 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketS
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -54,6 +57,12 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     private static final String AGG_NAME = "agg";
     private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
     private static final BucketOrder defaultOrder = BucketOrder.count(false);
+    private final boolean skipEmptyValues;
+
+    @Inject
+    public ESValuesHandler(@Named(ViewsConfig.AGGREGATIONS_SKIP_EMPTY_VALUES) boolean skipEmptyValues) {
+        this.skipEmptyValues = skipEmptyValues;
+    }
 
     @Nonnull
     @Override
@@ -62,10 +71,15 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
-        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
-                .subAggregation(termsAggregation);
 
-        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+        if (skipEmptyValues) {
+            return CreatedAggregations.create(termsAggregation);
+        } else {
+            final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
+                    .subAggregation(termsAggregation);
+
+            return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+        }
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<String> fields) {
@@ -111,16 +125,37 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
-        final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
-        if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
-            // This happens when the other bucket is passed for column value extraction
-            return Stream.of(initialBucket);
-        }
-        final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
-        final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
-
         final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpec.fields(), pivot.sort());
-        final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
+
+        if (skipEmptyValues) {
+            final MultiBucketsAggregation termsAggregation = previousBucket.getAggregations().get(AGG_NAME);
+            return extractTermsAggregation(previousKeys, termsAggregation, reorderKeys);
+        } else {
+            final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+            if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
+                // This happens when the other bucket is passed for column value extraction
+                return Stream.of(initialBucket);
+            }
+            final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
+            final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+
+            final Stream<PivotBucket> bucketStream = extractTermsAggregation(previousKeys, termsAggregation, reorderKeys);
+
+            return otherBucket.getDocCount() > 0
+                    ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
+                    ImmutableList.<String>builder()
+                            .addAll(previousKeys)
+                            .addAll(MISSING_BUCKET_KEYS)
+                            .build(),
+                    otherBucket,
+                    true
+            )))
+                    : bucketStream;
+        }
+    }
+
+    private Stream<PivotBucket> extractTermsAggregation(ImmutableList<String> previousKeys, MultiBucketsAggregation termsAggregation, Function<List<String>, List<String>> reorderKeys) {
+        return termsAggregation.getBuckets()
                 .stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
@@ -130,17 +165,6 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
                     return PivotBucket.create(keys, bucket, false);
                 });
-
-        return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
-                    ImmutableList.<String>builder()
-                        .addAll(previousKeys)
-                        .addAll(MISSING_BUCKET_KEYS)
-                        .build(),
-                    otherBucket,
-                    true
-                )))
-                : bucketStream;
     }
 
     private ImmutableList<String> splitKeys(String keys) {

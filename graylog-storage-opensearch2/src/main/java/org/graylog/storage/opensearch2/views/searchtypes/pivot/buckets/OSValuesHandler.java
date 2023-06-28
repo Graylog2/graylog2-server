@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -46,6 +47,7 @@ import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -59,13 +61,15 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
     private static final BucketOrder defaultOrder = BucketOrder.count(false);
     private final boolean supportsMultiTerms;
+    private final boolean skipEmptyValues;
 
     @Inject
-    public OSValuesHandler(@DetectedSearchVersion SearchVersion version) {
+    public OSValuesHandler(@DetectedSearchVersion SearchVersion version, @Named(ViewsConfig.AGGREGATIONS_SKIP_EMPTY_VALUES) boolean skipEmptyValues) {
         this.supportsMultiTerms =
                 version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0") ||
-                version.satisfies(SearchVersion.Distribution.DATANODE, ">=5.2.0");
+                        version.satisfies(SearchVersion.Distribution.DATANODE, ">=5.2.0");
 
+        this.skipEmptyValues = skipEmptyValues;
     }
 
     @Nonnull
@@ -75,9 +79,13 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
-        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
-                .subAggregation(termsAggregation);
-        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+        if (skipEmptyValues) {
+            return CreatedAggregations.create(termsAggregation);
+        } else {
+            final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
+                    .subAggregation(termsAggregation);
+            return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+        }
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<String> bucketSpecs) {
@@ -135,16 +143,36 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
-        final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
-        if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
-            // This happens when the other bucket is passed for column value extraction
-            return Stream.of(initialBucket);
-        }
-        final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
-        final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
-
         final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpecs.fields(), pivot.sort());
-        final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets().stream()
+
+        if (skipEmptyValues) {
+            final MultiBucketsAggregation termsAggregation = previousBucket.getAggregations().get(AGG_NAME);
+            return extractTermsAggregation(previousKeys, termsAggregation, reorderKeys);
+        } else {
+            final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+            if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
+                // This happens when the other bucket is passed for column value extraction
+                return Stream.of(initialBucket);
+            }
+            final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
+            final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+
+            final Stream<PivotBucket> bucketStream = extractTermsAggregation(previousKeys, termsAggregation, reorderKeys);
+
+            return otherBucket.getDocCount() > 0
+                    ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
+                    ImmutableList.<String>builder()
+                            .addAll(previousKeys)
+                            .addAll(MISSING_BUCKET_KEYS)
+                            .build(),
+                    otherBucket
+            )))
+                    : bucketStream;
+        }
+    }
+
+    private Stream<PivotBucket> extractTermsAggregation(ImmutableList<String> previousKeys, MultiBucketsAggregation termsAggregation, Function<List<String>, List<String>> reorderKeys) {
+        return termsAggregation.getBuckets().stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
@@ -153,16 +181,6 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
                     return PivotBucket.create(keys, bucket);
                 });
-
-        return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
-                    ImmutableList.<String>builder()
-                            .addAll(previousKeys)
-                            .addAll(MISSING_BUCKET_KEYS)
-                            .build(),
-                    otherBucket
-                )))
-                : bucketStream;
     }
 
     private List<String> extractKeys(MultiBucketsAggregation.Bucket bucket) {
