@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
@@ -55,6 +56,7 @@ public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
             case Latest.NAME -> Latest.builder().field(metric.fieldName()).build();
             case Max.NAME -> Max.builder().field(metric.fieldName()).build();
             case Min.NAME -> Min.builder().field(metric.fieldName()).build();
+            case Percentage.NAME -> Percentage.builder().field(metric.fieldName()).build();
             case Percentile.NAME -> Percentile.builder()
                     .field(metric.fieldName())
                     .percentile(((PercentileConfiguration) metric.configuration()).percentile())
