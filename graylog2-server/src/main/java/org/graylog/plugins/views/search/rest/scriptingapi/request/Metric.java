@@ -46,7 +46,8 @@ public class Metric implements Sortable {
                   use = JsonTypeInfo.Id.NAME,
                   property = "function")
     @JsonSubTypes({
-            @JsonSubTypes.Type(name = "percentile", value = PercentileConfiguration.class)
+            @JsonSubTypes.Type(name = "percentile", value = PercentileConfiguration.class),
+            @JsonSubTypes.Type(name = "percentage", value = PercentageConfiguration.class)
     })
     private MetricConfiguration configuration;
 
