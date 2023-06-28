@@ -30,8 +30,12 @@ import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -71,8 +75,8 @@ public class PivotAggregationSearchTest {
     public void testExtractValuesWithGroupBy() throws Exception {
         final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
-        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
-        final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
+        final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
+        final SeriesSpec seriesCard = Cardinality.builder().id("abc123").field("source").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("")
                 .streams(Collections.emptySet())
@@ -170,9 +174,9 @@ public class PivotAggregationSearchTest {
     public void testExtractValuesWithoutGroupBy() throws Exception {
         final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
-        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
-        final AggregationSeries seriesCountNoField = AggregationSeries.create("abc123", AggregationFunction.COUNT, "");
-        final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
+        final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
+        final SeriesSpec seriesCountNoField = Count.builder().id("abc123").build();
+        final SeriesSpec seriesCard = Cardinality.builder().id("abc123").field("source").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("")
                 .streams(Collections.emptySet())
@@ -246,8 +250,8 @@ public class PivotAggregationSearchTest {
     public void testExtractValuesWithNullValues() throws Exception {
         final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
-        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
-        final AggregationSeries seriesAvg = AggregationSeries.create("abc123", AggregationFunction.AVG, "some_field");
+        final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
+        final SeriesSpec seriesAvg = Average.builder().id("abc123").field("some_field").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("")
                 .streams(Collections.emptySet())

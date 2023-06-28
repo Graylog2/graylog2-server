@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import javax.annotation.Nullable;
@@ -31,7 +32,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Count.NAME)
 @JsonDeserialize(builder = Count.Builder.class)
-public abstract class Count implements SeriesSpec {
+public abstract class Count implements SeriesSpec, HasField {
     public static final String NAME = "count";
 
     @Override

@@ -90,13 +90,7 @@ public class V20200102140000_UnifyEventSeriesId extends Migration {
         final AggregationEventProcessorConfig.Builder configBuilder = config.toBuilder();
         final Map<String, String> refMap = new HashMap<>();
 
-        configBuilder.series(config.series().stream().map(s -> {
-            final String newId = s.function().toSeriesId(s.field());
-            refMap.put(s.id(), newId);
-            return s.toBuilder()
-                    .id(newId)
-                    .build();
-        }).collect(Collectors.toList()));
+        configBuilder.series(config.series());
 
         // convert conditions to json, fix them and convert back to POJO
         final JsonNode conditionsJson = objectMapper.valueToTree(config.conditions());

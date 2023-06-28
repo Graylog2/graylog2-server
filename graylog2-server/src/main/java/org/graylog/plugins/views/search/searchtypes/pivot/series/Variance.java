@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -29,7 +30,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Variance.NAME)
 @JsonDeserialize(builder = Variance.Builder.class)
-public abstract class Variance implements SeriesSpec {
+public abstract class Variance implements SeriesSpec, HasField {
     public static final String NAME = "variance";
 
     @Override

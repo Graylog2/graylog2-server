@@ -124,9 +124,8 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.queryStringDecorators = queryStringDecorators;
     }
 
-    private String metricName(AggregationSeries series) {
-        return String.format(Locale.ROOT, "metric/%s/%s/%s",
-                series.function().toString().toLowerCase(Locale.ROOT), series.field().orElse("<no-field>"), series.id());
+    private String metricName(SeriesSpec series) {
+        return String.format(Locale.ROOT, "metric/%s", series.literal());
     }
 
     @Override
@@ -323,7 +322,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                     continue;
                 }
 
-                for (final AggregationSeries series : config.series()) {
+                for (var series : config.series()) {
                     if (!value.key().isEmpty() && value.key().get(0).equals(metricName(series))) {
                         // Some Elasticsearch aggregations can return a "null" value. (e.g. avg on a non-existent field)
                         // We are using NaN in that case to make sure our conditions will work.
@@ -431,9 +430,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .id(PIVOT_ID)
                 .rollup(true);
 
-        final ImmutableList<SeriesSpec> series = config.series().stream()
-                .map(entry -> entry.function().toSeriesSpec(metricName(entry), entry.field().orElse(null)))
-                .collect(ImmutableList.toImmutableList());
+        final ImmutableList<SeriesSpec> series = ImmutableList.copyOf(config.series());
 
         if (!series.isEmpty()) {
             pivotBuilder.series(series);

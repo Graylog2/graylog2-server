@@ -27,10 +27,11 @@ import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEn
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
+import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -78,7 +79,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     public abstract List<String> groupBy();
 
     @JsonProperty(FIELD_SERIES)
-    public abstract List<AggregationSeries> series();
+    public abstract List<SeriesSpec> series();
 
     @JsonProperty(FIELD_CONDITIONS)
     public abstract Optional<AggregationConditions> conditions();
@@ -152,7 +153,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         public abstract Builder groupBy(List<String> groupBy);
 
         @JsonProperty(FIELD_SERIES)
-        public abstract Builder series(List<AggregationSeries> series);
+        public abstract Builder series(List<SeriesSpec> series);
 
         @JsonProperty(FIELD_CONDITIONS)
         public abstract Builder conditions(@Nullable AggregationConditions conditions);

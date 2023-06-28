@@ -26,7 +26,7 @@ import com.google.common.graph.MutableGraph;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
-import org.graylog.events.processor.aggregation.AggregationSeries;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -67,7 +67,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     public abstract List<String> groupBy();
 
     @JsonProperty(FIELD_SERIES)
-    public abstract List<AggregationSeries> series();
+    public abstract List<SeriesSpec> series();
 
     @JsonProperty(FIELD_CONDITIONS)
     public abstract Optional<AggregationConditions> conditions();
@@ -103,7 +103,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         public abstract Builder groupBy(List<String> groupBy);
 
         @JsonProperty(FIELD_SERIES)
-        public abstract Builder series(List<AggregationSeries> series);
+        public abstract Builder series(List<SeriesSpec> series);
 
         @JsonProperty(FIELD_CONDITIONS)
         public abstract Builder conditions(@Nullable AggregationConditions conditions);

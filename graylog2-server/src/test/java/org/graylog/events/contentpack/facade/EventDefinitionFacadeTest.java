@@ -41,9 +41,9 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
-import org.graylog.events.processor.aggregation.AggregationFunction;
-import org.graylog.events.processor.aggregation.AggregationSeries;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
@@ -203,7 +203,7 @@ public class EventDefinitionFacadeTest {
                 .providers(ImmutableList.of(TemplateFieldValueProvider.Config.builder().template("template").build()))
                 .build();
         final Expr.Greater trueExpr = Expr.Greater.create(Expr.NumberValue.create(2), Expr.NumberValue.create(1));
-        final AggregationSeries serie = AggregationSeries.create("id-deef", AggregationFunction.COUNT, "field");
+        final SeriesSpec series = Count.builder().id("id-deef").field("field").build();
         final AggregationConditions condition = AggregationConditions.builder()
                 .expression(Expr.And.create(trueExpr, trueExpr))
                 .build();
@@ -211,7 +211,7 @@ public class EventDefinitionFacadeTest {
                 .query(ValueReference.of("author: \"Jane Hopper\""))
                 .streams(ImmutableSet.of())
                 .groupBy(ImmutableList.of("project"))
-                .series(ImmutableList.of(serie))
+                .series(ImmutableList.of(series))
                 .conditions(condition)
                 .executeEveryMs(122200000L)
                 .searchWithinMs(1231312123L)
