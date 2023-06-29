@@ -33,9 +33,7 @@ export type UndoRedoState = {
   currentRevision: number
 }
 
-const handlers: { [name in BufferItemType]: any} = {
-  view: (state: ViewState, { hasToPushRevision, dispatch }: { hasToPushRevision: boolean, dispatch: AppDispatch}): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => dispatch(updateView(state.view, state.isDirty, { hasToPushRevision }))),
-};
+const viewHandler = (state: ViewState, { hasToPushRevision, dispatch }: { hasToPushRevision: boolean, dispatch: AppDispatch}): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => dispatch(updateView(state.view, state.isDirty, { hasToPushRevision })));
 
 const undoRedoSlice = createSlice({
   name: 'undoRedo',
@@ -78,10 +76,9 @@ export const undo = () => async (dispatch: AppDispatch, getState: () => RootStat
 
   if (isUndoAvailable) {
     const newRevision = currentRevision - 1;
-    const { type, state } = buffer[newRevision];
-    const bufferHandler = handlers[type];
+    const { state } = buffer[newRevision];
 
-    bufferHandler(state, { hasToPushRevision, dispatch }).then(() => dispatch(setCurrentRevision(newRevision)));
+    viewHandler(state, { hasToPushRevision, dispatch }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
 };
 
@@ -93,8 +90,8 @@ export const redo = () => async (dispatch: AppDispatch, getState: () => RootStat
   if (isRedoAvailable) {
     const newRevision = currentRevision + 1;
 
-    const { type, state } = buffer[newRevision];
-    const bufferHandler = handlers[type];
-    bufferHandler(state, { dispatch, hasToPushRevision: false }).then(() => dispatch(setCurrentRevision(newRevision)));
+    const { state } = buffer[newRevision];
+
+    viewHandler(state, { dispatch, hasToPushRevision: false }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
 };
