@@ -41,7 +41,7 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import { pushIntoBuffer } from 'views/logic/slices/undoRedoSlice';
+import { pushIntoRevisions } from 'views/logic/slices/undoRedoSlice';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -134,7 +134,7 @@ export const updateView = (
   const view = selectView(state);
 
   if (options.hasToPushRevision) {
-    await dispatch(pushIntoBuffer({
+    await dispatch(pushIntoRevisions({
       type: 'view',
       state: {
         ...state.view,

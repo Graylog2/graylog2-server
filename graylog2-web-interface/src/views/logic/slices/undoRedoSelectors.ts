@@ -19,9 +19,8 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from 'views/types';
 
 export const selectRootUndoRedo = (state: RootState) => state.undoRedo;
-export const selectBuffer = createSelector(selectRootUndoRedo, (state) => state.buffer);
 
-export const selectUndoRedoAvailability = createSelector(selectRootUndoRedo, ({ currentRevision, buffer }) => ({
+export const selectUndoRedoAvailability = createSelector(selectRootUndoRedo, ({ currentRevision, revisions }) => ({
   isUndoAvailable: currentRevision > 0,
-  isRedoAvailable: currentRevision < (buffer.length - 1),
+  isRedoAvailable: currentRevision < (revisions.length - 1),
 }));

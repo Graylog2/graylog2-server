@@ -22,14 +22,14 @@ import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
 import type { RootState, ViewState } from 'views/types';
 import { selectRootUndoRedo, selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 
-const BUFFER_MAX_SIZE = 10;
+const REVISIONS_MAX_SIZE = 10;
 
-type BufferItemType = 'view';
+type RevisionItemType = 'view';
 
-export type BufferItem = { type: BufferItemType, state: any }
+export type RevisionItem = { type: RevisionItemType, state: any }
 
 export type UndoRedoState = {
-  buffer: Array<BufferItem>,
+  revisions: Array<RevisionItem>,
   currentRevision: number
 }
 
@@ -38,13 +38,13 @@ const viewHandler = (state: ViewState, { hasToPushRevision, dispatch }: { hasToP
 const undoRedoSlice = createSlice({
   name: 'undoRedo',
   initialState: {
-    buffer: [],
+    revisions: [],
     currentRevision: 0,
   },
   reducers: {
-    setBuffer: (state, action) => ({
+    setRevisions: (state, action) => ({
       ...state,
-      buffer: action.payload,
+      revisions: action.payload,
     }),
     setCurrentRevision: (state, action) => ({
       ...state,
@@ -53,30 +53,30 @@ const undoRedoSlice = createSlice({
   },
 });
 export const undoRedoSliceReducer = undoRedoSlice.reducer;
-export const { setBuffer, setCurrentRevision } = undoRedoSlice.actions;
+const { setRevisions, setCurrentRevision } = undoRedoSlice.actions;
 
-export const pushIntoBuffer = (bufferItem: BufferItem, setAsLastRevision: boolean = true) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const { buffer, currentRevision } = selectRootUndoRedo(getState());
-  const isLast = currentRevision === buffer.length;
+export const pushIntoRevisions = (revisionItem: RevisionItem, setAsLastRevision: boolean = true) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const { revisions, currentRevision } = selectRootUndoRedo(getState());
+  const isLast = currentRevision === revisions.length;
   // if we are in the middle of the buffer, we have to remove all items after current;
-  const cutBuffer = isLast ? buffer : buffer.slice(0, currentRevision);
+  const cutRevisions = isLast ? revisions : revisions.slice(0, currentRevision);
   // if we reach max size of the buffer we have to remove first item;
-  const newBuffer: Array<BufferItem> = (cutBuffer.length < BUFFER_MAX_SIZE) ? [...cutBuffer, bufferItem] : [...cutBuffer.slice(1), bufferItem];
-  const newRevision = setAsLastRevision ? newBuffer.length : currentRevision;
-  dispatch(setBuffer(newBuffer));
+  const newRevisions: Array<RevisionItem> = (cutRevisions.length < REVISIONS_MAX_SIZE) ? [...cutRevisions, revisionItem] : [...cutRevisions.slice(1), revisionItem];
+  const newRevision = setAsLastRevision ? newRevisions.length : currentRevision;
+  dispatch(setRevisions(newRevisions));
   dispatch(setCurrentRevision(newRevision));
 };
 
 export const undo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const rootState = getState();
-  const { buffer, currentRevision } = selectRootUndoRedo(rootState);
+  const { revisions, currentRevision } = selectRootUndoRedo(rootState);
   const { isUndoAvailable } = selectUndoRedoAvailability(rootState);
 
-  const hasToPushRevision = currentRevision === buffer.length;
+  const hasToPushRevision = currentRevision === revisions.length;
 
   if (isUndoAvailable) {
     const newRevision = currentRevision - 1;
-    const { state } = buffer[newRevision];
+    const { state } = revisions[newRevision];
 
     viewHandler(state, { hasToPushRevision, dispatch }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
@@ -84,13 +84,13 @@ export const undo = () => async (dispatch: AppDispatch, getState: () => RootStat
 
 export const redo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const rootState = getState();
-  const { buffer, currentRevision } = selectRootUndoRedo(rootState);
+  const { revisions, currentRevision } = selectRootUndoRedo(rootState);
   const { isRedoAvailable } = selectUndoRedoAvailability(rootState);
 
   if (isRedoAvailable) {
     const newRevision = currentRevision + 1;
 
-    const { state } = buffer[newRevision];
+    const { state } = revisions[newRevision];
 
     viewHandler(state, { dispatch, hasToPushRevision: false }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
