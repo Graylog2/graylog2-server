@@ -24,16 +24,17 @@ import org.graylog2.contentpacks.ContentPackService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class Catalog {
-    protected record Entry(String type, String title) {}
+
+    public record Entry(String id, String title) {
+    }
 
     private final ContentPackService contentPackService;
-    private final LoadingCache<String, Entry> cache;
+    private final LoadingCache<String, Optional<Entry>> cache;
 
     private final int MAXIMUM_CACHE_SIZE = 10000;
 
@@ -43,48 +44,29 @@ public class Catalog {
         this.cache = createCache();
     }
 
-    protected LoadingCache<String, Entry> createCache() {
+    protected LoadingCache<String, Optional<Entry>> createCache() {
         return CacheBuilder
                 .newBuilder()
                 .maximumSize(MAXIMUM_CACHE_SIZE)
                 .expireAfterAccess(1, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
-                    public Entry load(String id) {
+                    public Optional<Entry> load(String id) {
                         var catalog = contentPackService.getEntityExcerpts();
                         var excerpt = catalog.get(id);
                         if (excerpt != null) {
-                            return new Entry(excerpt.type().name(), excerpt.title());
+                            return Optional.of(
+                                    new Entry(id, excerpt.title())
+                            );
                         } else {
-                            return new Entry("Unknown entity: " + id, "Unknown entity: " + id);
+                            return Optional.empty();
                         }
                     }
                 });
     }
 
-    public String getTitle(final GRN grn) {
-        try {
-            var item = cache.get(grn.entity());
-            if(item.title() != null) {
-                return item.title();
-            } else {
-                return "Unknown entity: " + grn;
-            }
-        } catch (ExecutionException cex) {
-            return "Unknown entity: " + grn;
-        }
+    public Optional<Entry> getEntry(final GRN grn) {
+        return cache.getUnchecked(grn.entity());
     }
 
-    public String getType(final GRN grn) {
-        try {
-            var item = cache.get(grn.entity());
-            if(item.type() != null) {
-                return item.type().toLowerCase(Locale.ROOT);
-            } else {
-                return "Unknown entity: " + grn;
-            }
-        } catch (ExecutionException cex) {
-            return "Unknown entity: " + grn;
-        }
-    }
 }
