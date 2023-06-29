@@ -127,7 +127,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
           <>
             <Input id="message"
                    type="textarea"
-              // eslint-disable-next-line quotes
+                   // eslint-disable-next-line quotes
                    placeholder={`{\n    "message": "test"\n}`}
                    value={rawMessageToSimulate}
                    onChange={handleRawMessageChange}
