@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 import { Button, ControlLabel, FormGroup, Input } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import type { RuleType } from 'stores/rules/RulesStore';
-import { getBasePathname } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { getBasePathname } from 'util/URLUtils';
 
 import { PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
@@ -59,6 +59,12 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+
+  useEffect(() => () => {
+    setRawMessageToSimulate('');
+    setRuleSimulationResult(null);
+    setStartRuleSimulation(false);
+  }, [setRawMessageToSimulate, setRuleSimulationResult, setStartRuleSimulation]);
 
   const disableSimulation = !rawMessageToSimulate || (!ruleSource && !currentRule?.rule_builder?.conditions?.length && !currentRule?.rule_builder?.actions?.length);
   const is_rule_builder = Boolean(currentRule?.rule_builder);
