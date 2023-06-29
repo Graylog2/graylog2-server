@@ -17,12 +17,15 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import type { SidebarAction } from 'views/components/sidebar/sidebarActions';
+
 import NavItem from './NavItem';
 import type { SidebarSection } from './sidebarSections';
 
 type Props = {
   activeSection: SidebarSection | undefined | null,
   sections: Array<SidebarSection>,
+  actions: Array<SidebarAction>,
   selectSidebarSection: (sectionKey: string) => void,
   sidebarIsPinned: boolean,
   toggleSidebar: () => void,
@@ -70,7 +73,7 @@ const HorizontalRuleWrapper = styled.div`
   }
 `;
 
-const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, toggleSidebar }: Props) => {
+const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, toggleSidebar, actions }: Props) => {
   const toggleIcon = activeSection ? 'chevron-left' : 'chevron-right';
   const activeSectionKey = activeSection?.key;
 
@@ -95,6 +98,12 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
                           sidebarIsPinned={sidebarIsPinned} />
           );
         })}
+      </SectionList>
+      <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
+      <SectionList>
+        {actions.map(({ key, Component }) => (
+          <Component key={key} sidebarIsPinned={sidebarIsPinned} />
+        ))}
       </SectionList>
     </Container>
   );
