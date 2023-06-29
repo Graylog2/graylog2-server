@@ -18,9 +18,9 @@ import React, { useCallback } from 'react';
 
 import NavItem from 'views/components/sidebar/NavItem';
 import useAppDispatch from 'stores/useAppDispatch';
-import { undo } from 'views/logic/slices/undoRedoSlice';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
+import { undo } from 'views/logic/slices/undoRedoActions';
 
 const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();

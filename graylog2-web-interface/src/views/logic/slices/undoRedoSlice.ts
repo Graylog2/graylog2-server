@@ -18,9 +18,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import type { AppDispatch } from 'stores/useAppDispatch';
-import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
-import type { RootState, ViewState } from 'views/types';
-import { selectRootUndoRedo, selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
+import type { RootState } from 'views/types';
+import { selectRootUndoRedo } from 'views/logic/slices/undoRedoSelectors';
 
 const REVISIONS_MAX_SIZE = 10;
 
@@ -32,8 +31,6 @@ export type UndoRedoState = {
   revisions: Array<RevisionItem>,
   currentRevision: number
 }
-
-const viewHandler = (state: ViewState, { hasToPushRevision, dispatch }: { hasToPushRevision: boolean, dispatch: AppDispatch}): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => dispatch(updateView(state.view, state.isDirty, { hasToPushRevision })));
 
 const undoRedoSlice = createSlice({
   name: 'undoRedo',
@@ -54,7 +51,7 @@ const undoRedoSlice = createSlice({
   },
 });
 export const undoRedoSliceReducer = undoRedoSlice.reducer;
-const { setRevisions, setCurrentRevision } = undoRedoSlice.actions;
+export const { setRevisions, setCurrentRevision } = undoRedoSlice.actions;
 
 export const pushIntoRevisions = (revisionItem: RevisionItem, setAsLastRevision: boolean = true) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const { revisions, currentRevision } = selectRootUndoRedo(getState());
@@ -65,33 +62,4 @@ export const pushIntoRevisions = (revisionItem: RevisionItem, setAsLastRevision:
   const newRevisions: Array<RevisionItem> = (cutRevisions.length < REVISIONS_MAX_SIZE) ? [...cutRevisions, revisionItem] : [...cutRevisions.slice(1), revisionItem];
   const newRevision = setAsLastRevision ? newRevisions.length : currentRevision;
   dispatch(setRevisions({ revisions: newRevisions, currentRevision: newRevision }));
-};
-
-export const undo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const rootState = getState();
-  const { revisions, currentRevision } = selectRootUndoRedo(rootState);
-  const { isUndoAvailable } = selectUndoRedoAvailability(rootState);
-
-  const hasToPushRevision = currentRevision === revisions.length;
-
-  if (isUndoAvailable) {
-    const newRevision = currentRevision - 1;
-    const { state } = revisions[newRevision];
-
-    viewHandler(state, { hasToPushRevision, dispatch }).then(() => dispatch(setCurrentRevision(newRevision)));
-  }
-};
-
-export const redo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const rootState = getState();
-  const { revisions, currentRevision } = selectRootUndoRedo(rootState);
-  const { isRedoAvailable } = selectUndoRedoAvailability(rootState);
-
-  if (isRedoAvailable) {
-    const newRevision = currentRevision + 1;
-
-    const { state } = revisions[newRevision];
-
-    viewHandler(state, { dispatch, hasToPushRevision: false }).then(() => dispatch(setCurrentRevision(newRevision)));
-  }
 };

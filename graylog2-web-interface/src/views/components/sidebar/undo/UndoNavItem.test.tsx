@@ -23,12 +23,13 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import ViewsBindings from 'views/bindings';
-import { undo, undoRedoSliceReducer } from 'views/logic/slices/undoRedoSlice';
+import { undoRedoSliceReducer } from 'views/logic/slices/undoRedoSlice';
 import { testView2, undoRedoTestStore } from 'fixtures/undoRedo';
 import UndoNavItem from 'views/components/sidebar/undo/UndoNavItem';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import useAppDispatch from 'stores/useAppDispatch';
+import { undo } from 'views/logic/slices/undoRedoActions';
 
 jest.mock('stores/useAppDispatch');
 
