@@ -36,6 +36,7 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
       users_count,
       license_count,
       node_leader_app_version,
+      installation_source,
     },
     license,
     current_user,
@@ -44,6 +45,7 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
   return {
     cluster_id,
     cluster_creation_date,
+    installation_source,
     nodes_count,
     traffic_last_month,
     users_count,
