@@ -44,7 +44,8 @@ const undoRedoSlice = createSlice({
   reducers: {
     setRevisions: (state, action) => ({
       ...state,
-      revisions: action.payload,
+      revisions: action.payload.revisions,
+      currentRevision: action.payload.currentRevision,
     }),
     setCurrentRevision: (state, action) => ({
       ...state,
@@ -63,8 +64,7 @@ export const pushIntoRevisions = (revisionItem: RevisionItem, setAsLastRevision:
   // if we reach max size of the buffer we have to remove first item;
   const newRevisions: Array<RevisionItem> = (cutRevisions.length < REVISIONS_MAX_SIZE) ? [...cutRevisions, revisionItem] : [...cutRevisions.slice(1), revisionItem];
   const newRevision = setAsLastRevision ? newRevisions.length : currentRevision;
-  dispatch(setRevisions(newRevisions));
-  dispatch(setCurrentRevision(newRevision));
+  dispatch(setRevisions({ revisions: newRevisions, currentRevision: newRevision }));
 };
 
 export const undo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
