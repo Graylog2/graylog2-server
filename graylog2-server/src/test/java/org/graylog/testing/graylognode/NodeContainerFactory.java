@@ -144,7 +144,11 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
 
                 .waitingFor(new WaitAllStrategy()
-                        .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(".*Graylog server up and running.*", ".*Exception while running migrations.*", ".*Graylog startup failed.*"))
+                        .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(
+                                ".*Graylog server up and running.*",
+                                ".*Exception while running migrations.*",
+                                ".*Graylog startup failed.*",
+                                ".*Guice/MissingImplementation.*"))
                         // To be able to search for data we need the index ranges to be computed. Since this is an async
                         // background job, we need to wait until they have been created.
                         .withStrategy(new HttpWaitStrategy()
