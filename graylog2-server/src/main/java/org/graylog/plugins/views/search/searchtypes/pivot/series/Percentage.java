@@ -56,6 +56,13 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField {
         return type() + "(" + field().map(Strings::nullToEmpty).orElse("") + "," + strategy().orElse(Strategy.COUNT) + ")";
     }
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public Percentage withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
     public static Builder builder() {
         return new AutoValue_Percentage.Builder().type(Percentage.NAME);
     }

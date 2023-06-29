@@ -47,6 +47,13 @@ public abstract class Max implements SeriesSpec, HasField {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public Max withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
     public static Builder builder() {
         return new AutoValue_Max.Builder().type(NAME);
     }

@@ -49,6 +49,13 @@ public abstract class Percentile implements SeriesSpec, HasField {
         return type() + "(" + field() + "," + percentile() + ")";
     }
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public Percentile withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
     public static Builder builder() {
         return new AutoValue_Percentile.Builder().type(NAME);
     }

@@ -52,7 +52,14 @@ public abstract class Variance implements SeriesSpec, HasField {
         return Optional.of(NAME);
     }
 
-    public static Variance.Builder builder() {
+    public abstract Builder toBuilder();
+
+    @Override
+    public Variance withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
+    public static Builder builder() {
         return new AutoValue_Variance.Builder().type(NAME);
     }
 

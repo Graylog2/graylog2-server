@@ -141,8 +141,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             final Set<SearchError> errors = aggregationErrors.isEmpty() ? streamErrors : aggregationErrors;
 
             errors.forEach(error -> {
-                if (error instanceof QueryError) {
-                    final QueryError queryError = (QueryError) error;
+                if (error instanceof final QueryError queryError) {
                     final String backtrace = queryError.backtrace() != null ? queryError.backtrace() : "";
                     if (error instanceof EmptyParameterError) {
                         LOG.debug("Aggregation search query <{}> with empty Parameter: {}\n{}",
@@ -184,7 +183,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final PivotResult streamsResult = (PivotResult) streamQueryResult.searchTypes().get(STREAMS_PIVOT_ID);
 
         return AggregationResult.builder()
-                .keyResults( extractValues(pivotResult))
+                .keyResults(extractValues(pivotResult))
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
@@ -430,7 +429,10 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .id(PIVOT_ID)
                 .rollup(true);
 
-        final ImmutableList<SeriesSpec> series = ImmutableList.copyOf(config.series());
+        final ImmutableList<SeriesSpec> series = config.series()
+                .stream()
+                .map(s -> s.withId(metricName(s)))
+                .collect(ImmutableList.toImmutableList());
 
         if (!series.isEmpty()) {
             pivotBuilder.series(series);
@@ -469,7 +471,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                             .limit(Integer.MAX_VALUE)
                             .field(field)
                             .build())
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         // We always have row groups because of the date range buckets

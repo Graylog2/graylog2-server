@@ -47,6 +47,13 @@ public abstract class Average implements SeriesSpec, HasField {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public Average withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
     public static Builder builder() {
         return new AutoValue_Average.Builder().type(NAME);
     }

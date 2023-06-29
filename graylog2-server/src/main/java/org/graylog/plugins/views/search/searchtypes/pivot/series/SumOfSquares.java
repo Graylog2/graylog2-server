@@ -52,7 +52,14 @@ public abstract class SumOfSquares implements SeriesSpec, HasField {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
 
-    public static SumOfSquares.Builder builder() {
+    public abstract Builder toBuilder();
+
+    @Override
+    public SumOfSquares withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
+    public static Builder builder() {
         return new AutoValue_SumOfSquares.Builder().type(NAME);
     }
 

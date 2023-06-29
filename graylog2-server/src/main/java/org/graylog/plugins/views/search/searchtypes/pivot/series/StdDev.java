@@ -52,7 +52,14 @@ public abstract class StdDev implements SeriesSpec, HasField {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
 
-    public static StdDev.Builder builder() {
+    public abstract Builder toBuilder();
+
+    @Override
+    public StdDev withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
+    public static Builder builder() {
         return new AutoValue_StdDev.Builder().type(NAME);
     }
 

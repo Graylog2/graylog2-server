@@ -43,7 +43,7 @@ const NumberRefExpression = ({
 
   const getOrCreateSeries = (seriesId) => getSeries(seriesId) || createSeries();
 
-  const getSeriesId = (currentSeries, func, field) => `${defaultTo(func, currentSeries.function)}-${defaultTo(field, currentSeries.field || '')}`;
+  const getSeriesId = (currentSeries, func, field) => `${defaultTo(func, currentSeries.type)}-${defaultTo(field, currentSeries.field || '')}`;
 
   const handleFieldChange = ({ nextFunction, nextField }) => {
     const series = cloneDeep(eventDefinition.config.series);
@@ -51,7 +51,7 @@ const NumberRefExpression = ({
     const nextSeriesId = getSeriesId(nextSeries, nextFunction, nextField);
 
     if (nextFunction !== undefined) {
-      nextSeries.function = nextFunction;
+      nextSeries.type = nextFunction;
     }
 
     if (nextField !== undefined) {
@@ -100,7 +100,7 @@ const NumberRefExpression = ({
                     onChange={handleAggregationFunctionChange}
                     options={formatFunctions(aggregationFunctions)}
                     clearable={false}
-                    value={series.function} />
+                    value={series.type} />
           </Col>
           <Col md={6}>
             <Select className="aggregation-function-field"

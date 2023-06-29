@@ -30,8 +30,8 @@ const AggregationConditionSummary = ({ conditions, series }) => {
         // eslint-disable-next-line no-case-declarations
         const selectedSeries = series.find((s) => s.id === expression.ref);
 
-        return (selectedSeries && selectedSeries.function
-          ? <var>{selectedSeries.function}({selectedSeries.field})</var>
+        return (selectedSeries && selectedSeries.type
+          ? <var>{selectedSeries.type}({selectedSeries.field})</var>
           : <span>No series selected</span>);
       case '&&':
       case '||':

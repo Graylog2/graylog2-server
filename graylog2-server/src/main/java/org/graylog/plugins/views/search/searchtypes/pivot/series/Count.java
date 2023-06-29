@@ -50,6 +50,13 @@ public abstract class Count implements SeriesSpec, HasField {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public Count withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
     public static Builder builder() {
         return new AutoValue_Count.Builder().type(NAME);
     }

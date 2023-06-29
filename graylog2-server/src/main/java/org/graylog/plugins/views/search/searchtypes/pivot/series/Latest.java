@@ -47,7 +47,14 @@ public abstract class Latest implements SeriesSpec, HasField {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
 
-    public static Latest.Builder builder() {
+    public abstract Builder toBuilder();
+
+    @Override
+    public Latest withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
+    public static Builder builder() {
         return new AutoValue_Latest.Builder().type(NAME);
     }
 

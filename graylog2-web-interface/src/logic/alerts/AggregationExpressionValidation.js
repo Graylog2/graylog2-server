@@ -46,7 +46,7 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
 
       const selectedSeries = series.find((s) => s.id === expression.ref);
 
-      return (selectedSeries && selectedSeries.function ? {} : error);
+      return (selectedSeries?.type ? {} : error);
       /* eslint-enable no-case-declarations */
     case '&&':
     case '||':
