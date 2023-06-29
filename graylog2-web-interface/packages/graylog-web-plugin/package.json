@@ -52,7 +52,7 @@
     "styled-components": "5.3.11",
     "typescript": "5.1.6",
     "use-query-params": "^2.2.0",
-    "webpack": "5.88.0",
+    "webpack": "5.88.1",
     "webpack-cli": "5.1.4",
     "webpack-merge": "4.2.2"
   }
