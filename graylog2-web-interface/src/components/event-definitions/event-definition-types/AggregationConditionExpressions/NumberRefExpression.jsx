@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
-import defaultTo from 'lodash/defaultTo';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
@@ -28,6 +28,8 @@ const formatFunctions = (functions) => functions
   .sort(naturalSort)
   .map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
 
+const getSeriesId = (currentSeries) => `${currentSeries.type}-${currentSeries.field ?? ''}`;
+
 const NumberRefExpression = ({
   aggregationFunctions,
   formattedFields,
@@ -37,27 +39,21 @@ const NumberRefExpression = ({
   renderLabel,
   validation,
 }) => {
-  const getSeries = (seriesId) => eventDefinition.config.series.find((series) => series.id === seriesId);
+  const getSeries = useCallback((seriesId) => eventDefinition.config.series.find((series) => series.id === seriesId), [eventDefinition.config.series]);
 
-  const createSeries = () => ({ id: expression.ref });
+  const createSeries = useCallback(() => ({ id: expression.ref }), [expression.ref]);
 
-  const getOrCreateSeries = (seriesId) => getSeries(seriesId) || createSeries();
+  const getOrCreateSeries = useCallback((seriesId) => getSeries(seriesId) || createSeries(), [getSeries]);
 
-  const getSeriesId = (currentSeries, func, field) => `${defaultTo(func, currentSeries.type)}-${defaultTo(field, currentSeries.field || '')}`;
-
-  const handleFieldChange = ({ nextFunction, nextField }) => {
+  const handleFieldChange = useCallback((key, value) => {
     const series = cloneDeep(eventDefinition.config.series);
     const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
-    const nextSeriesId = getSeriesId(nextSeries, nextFunction, nextField);
 
-    if (nextFunction !== undefined) {
-      nextSeries.type = nextFunction;
+    if (value !== undefined) {
+      nextSeries[key] = value;
     }
 
-    if (nextField !== undefined) {
-      nextSeries.field = nextField;
-    }
-
+    const nextSeriesId = getSeriesId(nextSeries);
     nextSeries.id = nextSeriesId;
 
     const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
@@ -76,15 +72,15 @@ const NumberRefExpression = ({
       series: series,
       conditions: nextExpression,
     });
-  };
+  }, [eventDefinition.config.series, expression, getOrCreateSeries, onChange]);
 
-  const handleAggregationFunctionChange = (nextFunction) => {
-    handleFieldChange({ nextFunction });
-  };
+  const handleAggregationFunctionChange = useCallback((nextFunction) => {
+    handleFieldChange('type', nextFunction);
+  }, [handleFieldChange]);
 
-  const handleAggregationFieldChange = (nextField) => {
-    handleFieldChange({ nextField });
-  };
+  const handleAggregationFieldChange = useCallback((nextField) => {
+    handleFieldChange('field', nextField);
+  }, [handleFieldChange]);
 
   const series = getSeries(expression.ref) || {};
 
