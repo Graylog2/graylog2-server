@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
@@ -23,6 +23,8 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
+
+import { percentileOptions, percentageStrategyOptions } from '../../../../views/Constants';
 
 const formatFunctions = (functions) => functions
   .sort(naturalSort)
@@ -51,6 +53,14 @@ const NumberRefExpression = ({
 
     if (value !== undefined) {
       nextSeries[key] = value;
+    }
+
+    if (key === 'type' && value !== 'percentage') {
+      delete nextSeries.strategy;
+    }
+
+    if (key === 'type' && value !== 'percentage') {
+      delete nextSeries.percentile;
     }
 
     const nextSeriesId = getSeriesId(nextSeries);
@@ -84,12 +94,14 @@ const NumberRefExpression = ({
 
   const series = getSeries(expression.ref) || {};
 
+  const elements = ['percentage', 'percentile'].includes(series.type) ? 3 : 2;
+
   return (
     <Col md={6}>
       <FormGroup controlId="aggregation-function" validationState={validation.message ? 'error' : null}>
         {renderLabel && <ControlLabel>If</ControlLabel>}
         <Row className="row-sm">
-          <Col md={6}>
+          <Col md={12 / elements}>
             <Select className="aggregation-function"
                     matchProp="label"
                     placeholder="Select Function"
@@ -98,7 +110,17 @@ const NumberRefExpression = ({
                     clearable={false}
                     value={series.type} />
           </Col>
-          <Col md={6}>
+          {series.type === 'percentage' && (
+            <Col md={12 / elements}>
+              <Select className="aggregation-function-strategy"
+                      matchProp="label"
+                      placeholder="Select Strategy (Optional)"
+                      onChange={(newValue) => handleFieldChange('strategy', newValue)}
+                      options={percentageStrategyOptions}
+                      value={series.strategy} />
+            </Col>
+          )}
+          <Col md={12 / elements}>
             <Select className="aggregation-function-field"
                     ignoreAccents={false}
                     matchProp="label"
@@ -108,6 +130,15 @@ const NumberRefExpression = ({
                     value={series.field}
                     allowCreate />
           </Col>
+          {series.type === 'percentile' && (
+            <Col md={12 / elements}>
+              <Select className="aggregation-function-percentile"
+                      placeholder="Select Percentile"
+                      onChange={(newValue) => handleFieldChange('percentile', newValue)}
+                      options={percentileOptions}
+                      value={series.percentile} />
+            </Col>
+          )}
         </Row>
         {validation.message && <HelpBlock>{validation.message}</HelpBlock>}
       </FormGroup>

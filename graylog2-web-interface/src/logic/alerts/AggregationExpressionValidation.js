@@ -46,6 +46,14 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
 
       const selectedSeries = series.find((s) => s.id === expression.ref);
 
+      if (selectedSeries?.type === 'percentage' && selectedSeries?.strategy === 'SUM' && !selectedSeries?.field) {
+        return 'Field must be set';
+      }
+
+      if (selectedSeries?.type === 'percentile' && !selectedSeries?.field) {
+        return 'Field must be set';
+      }
+
       return (selectedSeries?.type ? {} : error);
       /* eslint-enable no-case-declarations */
     case '&&':
