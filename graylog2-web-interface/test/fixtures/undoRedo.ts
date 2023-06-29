@@ -39,7 +39,7 @@ export const testView1 = getViewWithTitle('View test title 1', 'view-1');
 export const testView2 = getViewWithTitle('View test title 2', 'view-2');
 export const testView3 = getViewWithTitle('View test title 3', 'view-3');
 export const undoRedoTestStore: UndoRedoState = {
-  buffer: [{
+  revisions: [{
     type: 'view',
     state: {
       activeQuery: 'query-id-1',

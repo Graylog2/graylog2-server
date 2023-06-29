@@ -86,18 +86,14 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
                sidebarIsPinned={sidebarIsPinned} />
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>
-        {sections.map(({ key, icon, title, CustomNavComponent }) => {
-          const NavComponent = CustomNavComponent || NavItem;
-
-          return (
-            <NavComponent isSelected={activeSectionKey === key}
-                          icon={icon}
-                          onClick={() => selectSidebarSection(key)}
-                          key={key}
-                          title={title}
-                          sidebarIsPinned={sidebarIsPinned} />
-          );
-        })}
+        {sections.map(({ key, icon, title }) => (
+          <NavItem isSelected={activeSectionKey === key}
+                   icon={icon}
+                   onClick={() => selectSidebarSection(key)}
+                   key={key}
+                   title={title}
+                   sidebarIsPinned={sidebarIsPinned} />
+        ))}
       </SectionList>
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>

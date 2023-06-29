@@ -44,7 +44,6 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSele
   height: 40px;
   text-align: center;
   cursor: ${disabled ? 'not-allowed' : 'pointer'};
-  opacity: ${disabled ? 0.65 : 1};
   font-size: ${fonts.size.h3};
   color: ${colors.variant.darkest.default};
   background: ${isSelected ? colors.gray[90] : colors.global.contentBackground};
@@ -87,14 +86,16 @@ type IconWrapProps = {
   showTitleOnHover: boolean,
   isSelected: boolean,
   sidebarIsPinned: boolean,
+  $disabled: boolean,
 }
-const IconWrap = styled.span<IconWrapProps>(({ showTitleOnHover, isSelected, theme: { colors }, sidebarIsPinned }) => `
+const IconWrap = styled.span<IconWrapProps>(({ showTitleOnHover, isSelected, $disabled, theme: { colors }, sidebarIsPinned }) => css`
   display: flex;
   width: 100%;
   height: 100%;
   align-items: center;
   justify-content: center;
   position: relative;
+  opacity: ${$disabled ? 0.65 : 1};
 
   :hover {
     + div {
@@ -153,7 +154,8 @@ const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIs
              disabled={disabled}>
     <IconWrap showTitleOnHover={showTitleOnHover}
               isSelected={isSelected}
-              sidebarIsPinned={sidebarIsPinned}>
+              sidebarIsPinned={sidebarIsPinned}
+              $disabled={disabled}>
       <Icon name={icon} />
     </IconWrap>
     {(showTitleOnHover && !isSelected) && <Title><span>{title}</span></Title>}
