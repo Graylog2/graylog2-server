@@ -24,8 +24,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,21 +40,18 @@ public class SetIndexReadOnlyJob extends SystemJob {
     private final Indices indices;
     private final IndexSetRegistry indexSetRegistry;
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
-    private final SystemJobManager systemJobManager;
     private final String index;
     private final ActivityWriter activityWriter;
 
     @AssistedInject
     public SetIndexReadOnlyJob(Indices indices,
                                IndexSetRegistry indexSetRegistry,
-                               SystemJobManager systemJobManager,
                                OptimizeIndexJob.Factory optimizeIndexJobFactory,
                                ActivityWriter activityWriter,
                                @Assisted String index) {
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
-        this.systemJobManager = systemJobManager;
         this.index = index;
         this.activityWriter = activityWriter;
     }
@@ -74,7 +69,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
         final Optional<IndexSet> indexSet = indexSetRegistry.getForIndex(index);
 
-        if (!indexSet.isPresent()) {
+        if (indexSet.isEmpty()) {
             log.error("Couldn't find index set for index <{}>", index);
             return;
         }
@@ -92,12 +87,8 @@ public class SetIndexReadOnlyJob extends SystemJob {
         activityWriter.write(new Activity("Flushed and set <" + index + "> to read-only.", SetIndexReadOnlyJob.class));
 
         if (!indexSet.get().getConfig().indexOptimizationDisabled()) {
-            try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(index, indexSet.get().getConfig().indexOptimizationMaxNumSegments()));
-            } catch (SystemJobConcurrencyException e) {
-                // The concurrency limit is very high. This should never happen.
-                log.error("Cannot optimize index <" + index + ">.", e);
-            }
+            final int maxNumSegments = indexSet.get().getConfig().indexOptimizationMaxNumSegments();
+            optimizeIndexJobFactory.create(index, maxNumSegments).execute();
         }
     }
 
