@@ -24,12 +24,12 @@ import org.graylog2.migrations.MigrationHelpers;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
-public class V20230502164900_AddSidecarManagerRole extends Migration {
+public class V20230502164900_AddSidecarManagerAndReaderRole extends Migration {
 
     private final MigrationHelpers helpers;
 
     @Inject
-    public V20230502164900_AddSidecarManagerRole(MigrationHelpers migrationHelpers) {
+    public V20230502164900_AddSidecarManagerAndReaderRole(MigrationHelpers migrationHelpers) {
         this.helpers = migrationHelpers;
     }
 
