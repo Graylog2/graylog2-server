@@ -25,6 +25,7 @@ import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { sam } from 'fixtures/users';
 
 jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
   data: {
@@ -87,7 +88,7 @@ jest.mock('routing/Routes', () => ({
   SEARCH: '/search',
   SYSTEM: {
     USERS: {
-      edit: () => '/',
+      edit: () => '/edit-profile-page',
     },
   },
 }));
@@ -97,6 +98,21 @@ jest.mock('hooks/useCurrentUser');
 describe('Welcome', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
+  describe('Page header', () => {
+    it('Shows link to edit profile in case user has permission', async () => {
+      render(<Welcome />);
+      const linkToEditProfile = await screen.findByText('edit profile');
+
+      expect(linkToEditProfile).toHaveAttribute('href', '/edit-profile-page');
+    });
+
+    it('Shows ask administrator to edit profile in case user has not permission', async () => {
+      asMock(useCurrentUser).mockReturnValue(sam);
+      render(<Welcome />);
+      await screen.findByText('If you like, you can ask administrator to change your personal start page');
+    });
   });
 
   describe('Last opened list', () => {
