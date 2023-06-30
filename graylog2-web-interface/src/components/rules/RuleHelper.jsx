@@ -208,7 +208,7 @@ class RuleHelper extends React.Component {
                                 label="Filter rules"
                                 topMargin={0}
                                 onReset={this._onFilterReset} />
-                    <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
+                    <div className={`table-responsive ${RuleHelperStyle.marginTab} ref-rule`}>
                       <PaginatedList totalItems={ruleDescriptors.length}
                                      pageSize={pageSize}
                                      onChange={this._onPageChange}

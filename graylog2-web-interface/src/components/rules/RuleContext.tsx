@@ -48,7 +48,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
   const [description, setDescription] = useState(rule?.description);
-  const [startRuleSimulation, setStartRuleSimulation] = useState(false);
+  const [startRuleSimulation, setStartRuleSimulation] = useState(true);
   const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
