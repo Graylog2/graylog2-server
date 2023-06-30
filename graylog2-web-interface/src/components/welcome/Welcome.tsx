@@ -19,6 +19,8 @@ import styled from 'styled-components';
 
 import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -31,8 +33,26 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
+const ChangeStartPageHelper = ({ readOnly, userId }: { readOnly: boolean, userId: string}) => {
+  if (readOnly) {
+    return (
+      <span>
+        {' '}
+        If you like, you can ask administrator to change your personal start page
+      </span>
+    );
+  }
+
+  return (
+    <span>
+      {' '}
+      You can change your personal start page on <Link to={Routes.SYSTEM.USERS.edit(userId)}>edit profile</Link> page
+    </span>
+  );
+};
+
 const Welcome = () => {
-  const { permissions } = useCurrentUser();
+  const { permissions, readOnly, id: userId } = useCurrentUser();
   const isAdmin = permissions.includes('*');
 
   return (
@@ -41,6 +61,7 @@ const Welcome = () => {
         <span>
           This is your personal start page, allowing easy access to the content most relevant for you.
         </span>
+        <ChangeStartPageHelper userId={userId} readOnly={readOnly} />
       </PageHeader>
       <SectionGrid>
         <StyledSectionComponent title="Last Opened">
