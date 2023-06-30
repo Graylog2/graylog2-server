@@ -40,7 +40,11 @@ describe('RuleBuilder', () => {
     } as any);
 
     const { getByLabelText, getByRole } = renderWithDataRouter((
-      <PipelineRulesContext.Provider value={{}}>
+      <PipelineRulesContext.Provider value={{
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
+      }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
@@ -71,7 +75,11 @@ describe('RuleBuilder', () => {
     } as any);
 
     const { getByLabelText, getByRole } = renderWithDataRouter((
-      <PipelineRulesContext.Provider value={{}}>
+      <PipelineRulesContext.Provider value={{
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
+      }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
@@ -100,7 +108,11 @@ describe('RuleBuilder', () => {
     } as any);
 
     const { getByRole } = renderWithDataRouter((
-      <PipelineRulesContext.Provider value={{}}>
+      <PipelineRulesContext.Provider value={{
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
+      }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));

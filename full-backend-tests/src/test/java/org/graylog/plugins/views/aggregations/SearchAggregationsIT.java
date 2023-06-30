@@ -33,6 +33,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -727,6 +728,116 @@ public class SearchAggregationsIT {
                 .jsonPath().getList(searchTypeResultPath + "*.values*.value");
 
         assertThat(rowValues).containsExactly(List.of(5300.0f, 5300.0f));
+    }
+
+    // Percentage Metric tests
+    @ContainerMatrixTest
+    void testSimplestPercentageMetricWithCount() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(Values.builder().field("http_method").build())
+                .series(Percentage.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(4));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult("GET", "percentage(,COUNT)"), equalTo(0.86f))
+                .body(pathToMetricResult("DELETE", "percentage(,COUNT)"), equalTo(0.052f))
+                .body(pathToMetricResult("POST", "percentage(,COUNT)"), equalTo(0.045f))
+                .body(pathToMetricResult("PUT", "percentage(,COUNT)"), equalTo(0.043f));
+    }
+
+    @ContainerMatrixTest
+    void testPercentageMetricWithCountOnField() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(Values.builder().field("http_method").build())
+                .series(Percentage.builder().strategy(Percentage.Strategy.COUNT).field("http_method").build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(5));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult("GET", "percentage(http_method,COUNT)"), equalTo(0.86f))
+                .body(pathToMetricResult("DELETE", "percentage(http_method,COUNT)"), equalTo(0.052f))
+                .body(pathToMetricResult("POST", "percentage(http_method,COUNT)"), equalTo(0.045f))
+                .body(pathToMetricResult("PUT", "percentage(http_method,COUNT)"), equalTo(0.043f));
+    }
+
+    @ContainerMatrixTest
+    void testPercentageMetricWithCountOnFieldForColumnPivotOnly() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .columnGroups(Values.builder().field("http_method").build())
+                .series(Percentage.builder().strategy(Percentage.Strategy.COUNT).field("http_method").build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(1));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of(), List.of("GET", "percentage(http_method,COUNT)")), equalTo(0.86f))
+                .body(pathToMetricResult(List.of(), List.of("DELETE", "percentage(http_method,COUNT)")), equalTo(0.052f))
+                .body(pathToMetricResult(List.of(), List.of("POST", "percentage(http_method,COUNT)")), equalTo(0.045f))
+                .body(pathToMetricResult(List.of(), List.of("PUT", "percentage(http_method,COUNT)")), equalTo(0.043f));
+    }
+
+    @ContainerMatrixTest
+    void testPercentageMetricWithSumOnField() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(Values.builder().field("http_method").build())
+                .series(Percentage.builder().strategy(Percentage.Strategy.SUM).field("took_ms").build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(5));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult("GET", "percentage(took_ms,SUM)"), equalTo(0.689713f))
+                .body(pathToMetricResult("DELETE", "percentage(took_ms,SUM)"), equalTo(0.04857759715519431f))
+                .body(pathToMetricResult("POST", "percentage(took_ms,SUM)"), equalTo(0.148501397002794f))
+                .body(pathToMetricResult("PUT", "percentage(took_ms,SUM)"), equalTo(0.11320802641605283f));
+    }
+
+    @ContainerMatrixTest
+    void testBooleanFieldsAreReturnedAsTrueOrFalse() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(Values.builder().field("test_boolean").build(), Values.builder().field("user_id").build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(4));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of("true", "6476752"), List.of("count()")), equalTo(1))
+                .body(pathToMetricResult(List.of("false", "6469981"), List.of("count()")), equalTo(1))
+                .body(pathToMetricResult("(Empty Value)", "count()"), equalTo(998));
     }
 
     private String listToGroovy(Collection<String> strings) {
