@@ -64,6 +64,7 @@ import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
@@ -136,8 +137,8 @@ public class Server extends ServerBootstrap {
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
     private final GeoIpProcessorConfig geoIpProcessorConfig = new GeoIpProcessorConfig();
-
     private final TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
+    private final ContentStreamConfiguration contentStreamConfiguration = new ContentStreamConfiguration();
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
 
@@ -220,7 +221,8 @@ public class Server extends ServerBootstrap {
                 prometheusExporterConfiguration,
                 tlsConfiguration,
                 geoIpProcessorConfig,
-                telemetryConfiguration);
+                telemetryConfiguration,
+                contentStreamConfiguration);
     }
 
     @Override
