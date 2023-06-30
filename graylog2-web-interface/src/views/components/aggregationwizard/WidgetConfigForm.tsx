@@ -100,12 +100,12 @@ export interface WidgetConfigFormValues {
   rowLimit?: string,
   columnLimit?: string,
 }
-
+export type GroupingValidationErrors = {
+  groupings?: Array<{ [key: string]: string }>,
+}
 export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
-  groupBy?: {
-    groupings?: Array<{ [key: string]: string }>,
-  } | string,
+  groupBy?: GroupingValidationErrors | string,
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,
 }
