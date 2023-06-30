@@ -743,6 +743,132 @@ public class ScriptingApiResourceIT {
         assertThat(expected.containsAll(response)).isTrue();
     }
 
+    @ContainerMatrixTest
+    void testPercentageMetric() {
+        final String req = """
+                {
+                  "group_by": [
+                    {
+                      "field": "facility"
+                    }
+                  ],
+                  "metrics": [
+                    {
+                      "function": "percentage"
+                    }
+                  ]
+                }
+                """;
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(String.format(Locale.ROOT, req, stream2Id))
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> percentageMetricExpectedResult = """
+                ┌────────────────────────┬───────────────────────┐
+                │grouping: facility      │metric: percentage()   │
+                ├────────────────────────┼───────────────────────┤
+                │another-test            │0.6666666666666666     │
+                │test                    │0.3333333333333333     │
+                └────────────────────────┴───────────────────────┘
+                """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(percentageMetricExpectedResult.size());
+        assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
+    }
+
+    @ContainerMatrixTest
+    void testPercentageMetricWithFieldName() {
+        final String req = """
+                {
+                  "group_by": [
+                    {
+                      "field": "facility"
+                    }
+                  ],
+                  "metrics": [
+                    {
+                      "function": "percentage",
+                      "field": "facility"
+                    }
+                  ]
+                }
+                """;
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(String.format(Locale.ROOT, req, stream2Id))
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> percentageMetricExpectedResult = """
+                ┌────────────────────────┬───────────────────────┐
+                │grouping: facility      │metric:                │
+                │                        │percentage(facility)   │
+                ├────────────────────────┼───────────────────────┤
+                │another-test            │0.6666666666666666     │
+                │test                    │0.3333333333333333     │
+                └────────────────────────┴───────────────────────┘
+                """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(percentageMetricExpectedResult.size());
+        assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
+    }
+
+    @ContainerMatrixTest
+    void testPercentageMetricWithConfig() {
+        final String req = """
+                {
+                  "group_by": [
+                    {
+                      "field": "facility"
+                    }
+                  ],
+                  "metrics": [
+                    {
+                      "function": "percentage",
+                      "field": "facility",
+                      "configuration" : {
+                        "strategy" : "COUNT"
+                      }
+                    }
+                  ]
+                }
+                """;
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(String.format(Locale.ROOT, req, stream2Id))
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> percentageMetricExpectedResult = """
+                ┌────────────────────────┬───────────────────────┐
+                │grouping: facility      │metric:                │
+                │                        │percentage(facility)   │
+                ├────────────────────────┼───────────────────────┤
+                │another-test            │0.6666666666666666     │
+                │test                    │0.3333333333333333     │
+                └────────────────────────┴───────────────────────┘
+                """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(percentageMetricExpectedResult.size());
+        assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
+    }
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
         response.assertThat().body("schema", Matchers.hasItem(
