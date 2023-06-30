@@ -25,27 +25,20 @@ import org.graylog2.shared.rest.resources.csp.CSPResources;
 import org.graylog2.shared.rest.resources.csp.CSPResponseFilter;
 import org.hamcrest.Matchers;
 
-import java.util.regex.Pattern;
-
 import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
-    private static final String DEFAULT_CONNECT_SRC = "connect-src 'self' https://telemetry.graylog.cloud;";
     private final GraylogApis api;
     private final CSPResources cspResources;
-    private final Pattern defaultCSPPattern;
 
     public FiltersIT(GraylogApis api) {
         this.api = api;
         this.cspResources = new CSPResources();
-        this.defaultCSPPattern = Pattern.compile(Pattern.quote(DEFAULT_CONNECT_SRC + cspResources.cspString(CSP.DEFAULT))
-                .replaceAll("\\{nonce}", "\\\\E[a-zA-Z0-9-]+\\\\Q"));
     }
 
     @ContainerMatrixTest
     void cspDocumentationBrowser() {
-        String expected = cspResources.cspString(CSP.SWAGGER);
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -53,7 +46,7 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.containsString(expected));
+                        Matchers.containsString(cspResources.cspString(CSP.SWAGGER)));
     }
 
     @ContainerMatrixTest
@@ -66,7 +59,7 @@ public class FiltersIT {
                 .then()
                 .statusCode(200)
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.matchesPattern(defaultCSPPattern));
+                        Matchers.containsString(cspResources.cspString(CSP.DEFAULT)));
     }
 
     @ContainerMatrixTest
@@ -78,6 +71,6 @@ public class FiltersIT {
                 .get("streams")
                 .then()
                 .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.matchesPattern(defaultCSPPattern));
+                        Matchers.containsString(cspResources.cspString(CSP.DEFAULT)));
     }
 }

@@ -21,16 +21,12 @@ import com.google.common.collect.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -59,7 +55,7 @@ public class CSPResources {
 
     public CSPResources(String resourceName) {
         try {
-            cspTable = readFromFile(resourceName);
+            cspTable = loadProperties(resourceName);
         } catch (Exception e) {
             LOG.warn("Could not load config resource {}: {}", resourceName, e.getMessage());
             cspTable = HashBasedTable.create();
@@ -102,38 +98,25 @@ public class CSPResources {
     }
 
     /**
-     * Parse a config file where lines are formatted as:
-     * group.key=value1 value2 value3
-     * Unlike property files, this may contain duplicate keys, in which case the values are merged.
+     * Parse a property file where all property names are like 'group.key'.
      *
      * @param path path of resource file
      * @return table of property values
      * @throws IOException
      */
-    private Table<String, String, Set<String>> readFromFile(String path) throws IOException {
-        final Pattern pattern = Pattern.compile("^\\s*(\\S+)\\.(\\S+)\\s*=\\s*(.+)");
-        Table<String, String, Set<String>> resources = HashBasedTable.create();
+    private Table<String, String, Set<String>> loadProperties(String path) throws IOException {
         InputStream inputStream = CSPResources.class.getResourceAsStream(path);
+        Properties properties = new Properties();
+        properties.load(inputStream);
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            while (reader.ready()) {
-                String line = reader.readLine();
-                if (line.startsWith("#")) continue;
-                if (line.startsWith("!")) continue;
-                if (line.isBlank()) continue;
-
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.find()) {
-                    final HashSet<String> values = new HashSet<>(Arrays.asList(matcher.group(3).split(" ")));
-                    final String rowKey = matcher.group(1);
-                    final String columnKey = matcher.group(2);
-                    if (resources.contains(rowKey, columnKey)) {
-                        values.addAll(resources.get(rowKey, columnKey));
-                    }
-                    resources.put(rowKey, columnKey, values);
-                } else {
-                    LOG.warn("Skipping malformed line: {}", line);
-                }
+        Table<String, String, Set<String>> resources = HashBasedTable.create();
+        for (String propertyName : properties.stringPropertyNames()) {
+            String[] substrings = propertyName.split("[.]");
+            if (substrings.length != 2) {
+                LOG.warn("Skipping malformed property {}: expecting format <group>.<key>", propertyName);
+            } else {
+                String[] valueArray = properties.getProperty(propertyName).split(" ");
+                resources.put(substrings[0], substrings[1], new HashSet<>(Arrays.asList(valueArray)));
             }
         }
         return resources;
