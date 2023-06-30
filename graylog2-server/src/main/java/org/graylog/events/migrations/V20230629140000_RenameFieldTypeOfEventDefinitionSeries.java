@@ -73,7 +73,9 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
             }
 
         }
-        collection.bulkWrite(bulkOperations);
+        if (bulkOperations.size() > 0) {
+            collection.bulkWrite(bulkOperations);
+        }
 
         this.clusterConfigService.write(new MigrationCompleted());
     }
