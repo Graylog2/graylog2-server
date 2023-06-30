@@ -33,8 +33,8 @@ import { redo } from 'views/logic/slices/undoRedoActions';
 
 jest.mock('stores/useAppDispatch');
 
-jest.mock('views/logic/slices/undoRedoSlice', () => ({
-  ...jest.requireActual('views/logic/slices/undoRedoSlice'),
+jest.mock('views/logic/slices/undoRedoActions', () => ({
+  ...jest.requireActual('views/logic/slices/undoRedoActions'),
   redo: jest.fn(() => Promise.resolve()),
 }));
 
