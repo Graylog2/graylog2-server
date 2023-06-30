@@ -63,16 +63,6 @@ const VisualizationConfiguration = () => {
   const currentVisualizationType = findVisualizationType(values.visualization.type);
 
   const setNewVisualizationType = useCallback((newValue: string) => {
-    VisualizationElement.onChangeEffect({
-      newValue: {
-        ...values.visualization,
-        type: newValue,
-      },
-      formValues: values,
-      name: 'visualization.type',
-      setFieldValue,
-    });
-
     const type = findVisualizationType(newValue);
     const createConfig = type.config?.createConfig ?? (() => ({}));
 
@@ -80,7 +70,7 @@ const VisualizationConfiguration = () => {
       type: newValue,
       config: createConfig(),
     }, true);
-  }, [findVisualizationType, setFieldValue, values]);
+  }, [findVisualizationType, setFieldValue]);
 
   const isTimelineChart = isTimeline(values);
   const supportsEventAnnotations = currentVisualizationType.capabilities?.includes('event-annotations') ?? false;

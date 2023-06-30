@@ -111,11 +111,6 @@ const VisualizationElement: AggregationElement<'visualization'> = {
   toConfig,
   validate,
   isEmpty: () => false,
-  onChangeEffect: ({ formValues, newValue, name, setFieldValue }) => {
-    if (name === 'visualization.type' && !isEmpty(formValues.groupBy) && newValue.type === 'numeric') {
-      setFieldValue('groupBy', { groupings: [], columnRollup: false });
-    }
-  },
 };
 
 export default VisualizationElement;
