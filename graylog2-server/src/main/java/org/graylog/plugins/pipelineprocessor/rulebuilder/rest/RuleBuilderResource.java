@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRuleService;
@@ -52,6 +53,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -126,6 +128,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleBuilderRegistry.actions()
                 .values().stream()
                 .map(RuleFragment::descriptor)
+                .sorted(Comparator.comparing(FunctionDescriptor::name))
                 .collect(Collectors.toList());
     }
 
@@ -136,6 +139,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleBuilderRegistry.conditions()
                 .values().stream()
                 .map(RuleFragment::descriptor)
+                .sorted(Comparator.comparing(FunctionDescriptor::name))
                 .collect(Collectors.toList());
     }
 
@@ -167,7 +171,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .title(ruleBuilderDto.title())
                 .description(ruleBuilderDto.description())
                 .ruleBuilder(ruleBuilderDto.ruleBuilder())
-                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilderDto.ruleBuilder(), true))
+                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilderDto.ruleBuilder(), false))
                 .build();
     }
 

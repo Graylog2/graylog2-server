@@ -37,7 +37,6 @@ public abstract class Percentile implements SeriesSpec {
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
 
@@ -64,7 +63,6 @@ public abstract class Percentile implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -78,7 +76,7 @@ public abstract class Percentile implements SeriesSpec {
 
         @Override
         public Percentile build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + "," + percentile().toString() + ")");
             }
             return autoBuild();

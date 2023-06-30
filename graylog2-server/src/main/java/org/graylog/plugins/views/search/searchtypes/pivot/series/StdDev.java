@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -30,15 +31,20 @@ import java.util.Optional;
 @JsonDeserialize(builder = StdDev.Builder.class)
 public abstract class StdDev implements SeriesSpec {
     public static final String NAME = "stddev";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
+
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
 
     public static StdDev.Builder builder() {
         return new AutoValue_StdDev.Builder().type(NAME);
@@ -55,7 +61,6 @@ public abstract class StdDev implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -65,7 +70,7 @@ public abstract class StdDev implements SeriesSpec {
 
         @Override
         public StdDev build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
             }
             return autoBuild();
