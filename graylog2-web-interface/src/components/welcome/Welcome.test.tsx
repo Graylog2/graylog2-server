@@ -17,12 +17,14 @@
 
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import Welcome from 'components/welcome/Welcome';
 import { asMock } from 'helpers/mocking';
 import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
   data: {
@@ -83,9 +85,20 @@ jest.mock('routing/Routes', () => ({
   dashboard_show: (x) => `/route/DASHBOARDS_VIEWID/${x}`,
   getPluginRoute: (x) => () => x,
   SEARCH: '/search',
+  SYSTEM: {
+    USERS: {
+      edit: () => '/',
+    },
+  },
 }));
 
+jest.mock('hooks/useCurrentUser');
+
 describe('Welcome', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
   describe('Last opened list', () => {
     it('Show items', async () => {
       render(<Welcome />);
