@@ -32,6 +32,7 @@ import org.graylog.security.authservice.ldap.LDAPTransportSecurity;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.security.encryption.EncryptedValue;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @AutoValue
 @JsonDeserialize(builder = ADAuthServiceBackendConfig.Builder.class)
 @JsonTypeName(ADAuthServiceBackend.TYPE_NAME)
-public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendConfig, LDAPConnectorConfigProvider {
+    public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendConfig, LDAPConnectorConfigProvider {
     private static final String FIELD_SERVERS = "servers";
     private static final String FIELD_TRANSPORT_SECURITY = "transport_security";
     private static final String FIELD_VERIFY_CERTIFICATES = "verify_certificates";
@@ -50,6 +51,7 @@ public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendCo
     private static final String FIELD_USER_SEARCH_PATTERN = "user_search_pattern";
     private static final String FIELD_USER_NAME_ATTRIBUTE = "user_name_attribute";
     private static final String FIELD_USER_FULL_NAME_ATTRIBUTE = "user_full_name_attribute";
+    private static final String FIELD_EMAIL_ATTRIBUTES = "email_attributes";
 
     @JsonProperty(FIELD_SERVERS)
     public abstract ImmutableList<HostAndPort> servers();
@@ -77,6 +79,11 @@ public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendCo
 
     @JsonProperty(FIELD_USER_FULL_NAME_ATTRIBUTE)
     public abstract String userFullNameAttribute();
+
+    @Nullable
+    @JsonProperty(FIELD_EMAIL_ATTRIBUTES)
+    public abstract ImmutableList<String> emailAttributes();
+
 
     @Override
     public void validate(ValidationResult result) {
@@ -133,7 +140,8 @@ public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendCo
                     .systemUserPassword(EncryptedValue.createUnset())
                     .userSearchPattern(ADAuthServiceBackend.AD_DEFAULT_USER_SEARCH_PATTERN.toNormalizedString())
                     .userNameAttribute(ADAuthServiceBackend.AD_USER_PRINCIPAL_NAME)
-                    .userFullNameAttribute(ADAuthServiceBackend.AD_DISPLAY_NAME);
+                    .userFullNameAttribute(ADAuthServiceBackend.AD_DISPLAY_NAME)
+                    .emailAttributes(ImmutableList.of("mail"));
         }
 
         @JsonProperty(FIELD_SERVERS)
@@ -162,6 +170,9 @@ public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendCo
 
         @JsonProperty(FIELD_USER_FULL_NAME_ATTRIBUTE)
         public abstract Builder userFullNameAttribute(String userFullNameAttribute);
+
+        @JsonProperty(FIELD_EMAIL_ATTRIBUTES)
+        public abstract Builder emailAttributes(List<String> emailAttributes);
 
         public abstract ADAuthServiceBackendConfig build();
     }
