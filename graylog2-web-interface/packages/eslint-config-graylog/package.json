@@ -17,7 +17,7 @@
     "@tanstack/eslint-plugin-query": "4.29.9",
     "@typescript-eslint/eslint-plugin": "5.60.1",
     "@typescript-eslint/parser": "5.60.1",
-    "eslint": "8.43.0",
+    "eslint": "8.44.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-import-resolver-webpack": "0.13.2",
     "eslint-plugin-compat": "4.1.4",
