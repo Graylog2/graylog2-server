@@ -118,6 +118,13 @@ public class LegacyAlertConditionMigratorTest {
         objectMapper.registerSubtypes(new NamedType(LegacyAlarmCallbackEventNotificationConfig.class, LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(EventNotificationExecutionJob.Config.class, EventNotificationExecutionJob.TYPE_NAME));
 
+        objectMapper.registerSubtypes(new NamedType(Average.class, Average.NAME));
+        objectMapper.registerSubtypes(new NamedType(Count.class, Count.NAME));
+        objectMapper.registerSubtypes(new NamedType(Max.class, Max.NAME));
+        objectMapper.registerSubtypes(new NamedType(Min.class, Min.NAME));
+        objectMapper.registerSubtypes(new NamedType(StdDev.class, StdDev.NAME));
+        objectMapper.registerSubtypes(new NamedType(Sum.class, Sum.NAME));
+
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
