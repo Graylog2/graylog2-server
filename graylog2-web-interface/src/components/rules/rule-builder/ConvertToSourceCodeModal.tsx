@@ -24,7 +24,7 @@ import useHistory from 'routing/useHistory';
 import copyToClipboard from 'util/copyToClipboard';
 import UserNotification from 'util/UserNotification';
 import { saveRuleSourceCode } from 'hooks/useRuleBuilder';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 
@@ -67,7 +67,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
                 bsStyle="success"
                 onClick={() => {
                   sendTelemetry('click', {
-                    app_pathname: getBasePathname(pathname),
+                    app_pathname: getPathnameWithoutId(pathname),
                     app_section: 'convert-rule-builder-to-source-code-modal',
                     app_action_value: 'create-new-rule-from-code-button',
                   });
@@ -81,7 +81,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
                 bsStyle="info"
                 onClick={() => {
                   sendTelemetry('click', {
-                    app_pathname: getBasePathname(pathname),
+                    app_pathname: getPathnameWithoutId(pathname),
                     app_section: 'convert-rule-builder-to-source-code-modal',
                     app_action_value: 'copy-rule-code-and-close-button',
                   });

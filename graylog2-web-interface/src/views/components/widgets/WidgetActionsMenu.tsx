@@ -19,7 +19,7 @@ import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
@@ -159,7 +159,7 @@ const WidgetActionsMenu = ({
 
   const onDuplicate = useCallback(() => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-duplicate-button',
     });
@@ -168,7 +168,7 @@ const WidgetActionsMenu = ({
   }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-copy-to-dashboard-button',
     });
@@ -177,7 +177,7 @@ const WidgetActionsMenu = ({
   }, [history, pathname, sendTelemetry, view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-move-button',
     });
@@ -186,7 +186,7 @@ const WidgetActionsMenu = ({
   }, [dispatch, pathname, sendTelemetry, view]);
   const onDelete = useCallback(() => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-delete-button',
     });
@@ -195,7 +195,7 @@ const WidgetActionsMenu = ({
   }, [dispatch, pathname, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-focus-button',
     });
