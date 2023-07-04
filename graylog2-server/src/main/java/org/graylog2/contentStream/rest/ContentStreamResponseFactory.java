@@ -27,5 +27,4 @@ class ContentStreamResponseFactory {
         contentStreamResponse.put(USER_CONTENT_STREAM_SETTINGS, contentStreamUserSettings);
         return contentStreamResponse;
     }
-
 }

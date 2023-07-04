@@ -23,11 +23,15 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 @AutoValue
 public abstract class ContentStreamUserSettingsDto {
 
     public static final String FIELD_USER_ID = "user_id";
+    public static final String FIELD_ENABLED = "content_stream_enabled";
+    public static final String FIELD_TOPICS = "content_stream_topics";
 
     public static Builder builder() {
         return new AutoValue_ContentStreamUserSettingsDto.Builder();
@@ -36,11 +40,14 @@ public abstract class ContentStreamUserSettingsDto {
     @JsonCreator
     public static ContentStreamUserSettingsDto create(@JsonProperty("id") @Id @ObjectId String id,
                                                       @JsonProperty(FIELD_USER_ID) String userId,
-                                                      @JsonProperty("content_stream_enabled") Boolean contentStreamEnabled) {
+                                                      @JsonProperty(FIELD_ENABLED) Boolean contentStreamEnabled,
+                                                      @JsonProperty(FIELD_TOPICS) List<String> topicList
+    ) {
         return builder()
                 .id(id)
                 .userId(userId)
                 .contentStreamEnabled(contentStreamEnabled)
+                .topics(topicList != null ? topicList : new ArrayList<>())
                 .build();
     }
 
@@ -50,11 +57,14 @@ public abstract class ContentStreamUserSettingsDto {
     @JsonProperty
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty(FIELD_USER_ID)
     public abstract String userId();
 
-    @JsonProperty
+    @JsonProperty(FIELD_ENABLED)
     public abstract Boolean contentStreamEnabled();
+
+    @JsonProperty(FIELD_TOPICS)
+    public abstract List<String> topics();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -64,6 +74,8 @@ public abstract class ContentStreamUserSettingsDto {
         public abstract Builder userId(String userId);
 
         public abstract Builder contentStreamEnabled(Boolean contentStreamEnabled);
+
+        public abstract Builder topics(List<String> topicList);
 
         public abstract ContentStreamUserSettingsDto build();
     }

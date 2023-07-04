@@ -31,21 +31,21 @@ import org.graylog2.shared.users.UserService;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Api(value = "ContentStream", description = "Content Stream", tags = {CLOUD_VISIBLE})
-@Path("/contentStream")
+@Path("/contentStream/")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+//@Consumes(MediaType.APPLICATION_JSON)
 public class ContentStreamResource extends RestResource {
 
     private final ContentStreamService contentStreamService;
@@ -62,11 +62,54 @@ public class ContentStreamResource extends RestResource {
     }
 
     @GET
-    @Path("user/settings/{username}")
+    @Path("settings/{username}")
     @ApiOperation("Retrieve Content Stream settings for specified user")
     public ContentStreamUserSettings getContentStreamUserSettings(
             @ApiParam(name = "username") @PathParam("username") String username
     ) throws NotFoundException {
+        return getSettings(username);
+    }
+
+    @PUT
+    @Path("enable/{username}")
+    @ApiOperation("Enable Content Stream for specified user")
+    @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
+    public void contentStreamEnable(
+            @ApiParam(name = "username") @PathParam("username") String username) throws NotFoundException {
+        setStatus(username, true);
+    }
+
+    @PUT
+    @Path("disable/{username}")
+    @ApiOperation("Disable Content Stream for specified user")
+    @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
+    public void contentStreamDisable(
+            @ApiParam(name = "username") @PathParam("username") String username) throws NotFoundException {
+        setStatus(username, false);
+    }
+
+    @PUT
+    @Path("topics/{username}")
+    @ApiOperation("Update Content Stream topic list for specified user")
+    @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
+    public void saveContentStreamUserTopics(
+            @ApiParam(name = "username") @PathParam("username") String username,
+            @ApiParam(name = "JSON body", value = "Content Stream topics for the specified user.", required = true)
+            @Valid @NotNull List<String> topicList) throws NotFoundException {
+
+        final User user = userService.load(username);
+        if (user == null) {
+            throw new org.graylog2.database.NotFoundException("User " + username + " has not been found.");
+        }
+        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getContentStreamUserSettings(user);
+        contentStreamService.saveUserSettings(user,
+                ContentStreamUserSettings.builder()
+                        .contentStreamEnabled(contentStreamUserSettings.contentStreamEnabled())
+                        .topics(topicList)
+                        .build());
+    }
+
+    private ContentStreamUserSettings getSettings(String username) throws NotFoundException {
         final User user = userService.load(username);
         if (user == null) {
             throw new org.graylog2.database.NotFoundException("User " + username + " has not been found.");
@@ -74,19 +117,29 @@ public class ContentStreamResource extends RestResource {
         return contentStreamService.getContentStreamUserSettings(user);
     }
 
-    @PUT
-    @Path("user/settings/{username}")
-    @ApiOperation("Update Content Stream settings for specified user")
-    @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
-    public void saveContentStreamUserSettings(
-            @ApiParam(name = "username") @PathParam("username") String username,
-            @ApiParam(name = "JSON body", value = "The Content Stream settings to assign to the user.", required = true)
-            @Valid @NotNull ContentStreamUserSettings contentStreamUserSettings) throws NotFoundException {
-
+    private void setStatus(String username, boolean isEnabled) throws NotFoundException {
         final User user = userService.load(username);
         if (user == null) {
             throw new org.graylog2.database.NotFoundException("User " + username + " has not been found.");
         }
-        contentStreamService.saveUserSettings(user, contentStreamUserSettings);
+        setStatus(user, isEnabled);
+    }
+
+    private void setStatus(User user, boolean isEnabled) {
+        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getContentStreamUserSettings(user);
+        contentStreamService.saveUserSettings(user,
+                ContentStreamUserSettings.builder()
+                        .contentStreamEnabled(isEnabled)
+                        .topics(contentStreamUserSettings.topics())
+                        .build());
+    }
+
+    private void setTopics(User user, List<String> topics) {
+        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getContentStreamUserSettings(user);
+        contentStreamService.saveUserSettings(user,
+                ContentStreamUserSettings.builder()
+                        .contentStreamEnabled(contentStreamUserSettings.contentStreamEnabled())
+                        .topics(topics)
+                        .build());
     }
 }

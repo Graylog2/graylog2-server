@@ -20,27 +20,42 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import java.util.List;
+
 @AutoValue
 public abstract class ContentStreamUserSettings {
+    private static final String FIELD_ENABLED = "content_stream_enabled";
+    private static final String FIELD_TOPICS = "content_stream_topics";
+
+    @JsonProperty(FIELD_ENABLED)
+    public abstract Boolean contentStreamEnabled();
+
+    @JsonProperty(FIELD_TOPICS)
+    public abstract List<String> topics();
 
     public static Builder builder() {
         return new AutoValue_ContentStreamUserSettings.Builder();
     }
 
     @JsonCreator
-    public static ContentStreamUserSettings create(@JsonProperty("content_stream_enabled") Boolean enabled) {
+    public static ContentStreamUserSettings create(
+            @JsonProperty(FIELD_ENABLED) Boolean enabled,
+            @JsonProperty(FIELD_TOPICS) List<String> topics
+    ) {
         return builder()
                 .contentStreamEnabled(enabled)
+                .topics(topics)
                 .build();
     }
-
-    @JsonProperty
-    public abstract Boolean contentStreamEnabled();
 
     @AutoValue.Builder
     public abstract static class Builder {
 
+        @JsonProperty(FIELD_ENABLED)
         public abstract Builder contentStreamEnabled(Boolean enabled);
+
+        @JsonProperty(FIELD_TOPICS)
+        public abstract Builder topics(List<String> topics);
 
         public abstract ContentStreamUserSettings build();
     }
