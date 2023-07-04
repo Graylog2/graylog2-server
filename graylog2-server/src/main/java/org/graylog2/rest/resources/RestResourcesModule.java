@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources;
 
 import org.graylog2.Configuration;
+import org.graylog2.contentStream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
 import org.graylog2.rest.resources.cluster.ClusterInputStatesResource;
@@ -141,6 +142,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
         addSystemRestResource(TelemetryResource.class);
+        addSystemRestResource(ContentStreamResource.class);
     }
 
     private void addDebugResources() {

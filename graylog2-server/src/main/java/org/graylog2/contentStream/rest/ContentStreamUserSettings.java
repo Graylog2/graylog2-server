@@ -19,7 +19,6 @@ package org.graylog2.contentStream.rest;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentStream.rest.AutoValue_ContentStreamUserSettings;
 
 @AutoValue
 public abstract class ContentStreamUserSettings {
@@ -29,7 +28,7 @@ public abstract class ContentStreamUserSettings {
     }
 
     @JsonCreator
-    public static ContentStreamUserSettings create(@JsonProperty("contentStream_enabled") Boolean enabled) {
+    public static ContentStreamUserSettings create(@JsonProperty("content_stream_enabled") Boolean enabled) {
         return builder()
                 .contentStreamEnabled(enabled)
                 .build();

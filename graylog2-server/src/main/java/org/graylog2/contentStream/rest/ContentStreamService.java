@@ -45,30 +45,27 @@ public class ContentStreamService {
         eventBus.register(this);
     }
 
-    public Map<String, Object> getContentStreamResponse(User currentUser) {
-        ContentStreamUserSettings contentStreamUserSettings = getContentStreamUserSettings(currentUser);
+    public Map<String, Object> getContentStreamResponse(User user) {
+        ContentStreamUserSettings contentStreamUserSettings = getContentStreamUserSettings(user);
         return contentStreamResponseFactory.createContentStreamResponse(contentStreamUserSettings);
     }
 
-    public ContentStreamUserSettings getContentStreamUserSettings(User currentUser) {
-        Optional<ContentStreamUserSettingsDto> contentStreamUserSettings = dbContentStreamUserSettingsService.findByUserId(currentUser.getId());
-        return contentStreamUserSettings
-                .map(dto -> ContentStreamUserSettings.builder()
-                        .build())
-                .orElse(ContentStreamUserSettings.builder()
-                        .build());
+    public ContentStreamUserSettings getContentStreamUserSettings(User user) {
+        Optional<ContentStreamUserSettingsDto> dto = dbContentStreamUserSettingsService.findByUserId(user.getId());
+        Boolean enabled = dto.isPresent() ? dto.get().contentStreamEnabled() : true;
+        return ContentStreamUserSettings.builder().contentStreamEnabled(enabled).build();
     }
 
-    public void saveUserSettings(User currentUser, ContentStreamUserSettings contentStreamUserSettings) {
+    public void saveUserSettings(User user, ContentStreamUserSettings contentStreamUserSettings) {
         ContentStreamUserSettingsDto.Builder builder = ContentStreamUserSettingsDto.builder()
-                .userId(currentUser.getId());
-
-        dbContentStreamUserSettingsService.findByUserId(currentUser.getId()).ifPresent(dto -> builder.id(dto.id()));
+                .userId(user.getId())
+                .contentStreamEnabled(contentStreamUserSettings.contentStreamEnabled());
+        dbContentStreamUserSettingsService.findByUserId(user.getId()).ifPresent(dto -> builder.id(dto.id()));
         dbContentStreamUserSettingsService.save(builder.build());
     }
 
-    public void deleteUserSettingsByUser(User currentUser) {
-        deleteUserSettingsByUserId(currentUser.getId());
+    public void deleteUserSettingsByUser(User user) {
+        deleteUserSettingsByUserId(user.getId());
     }
 
     @Subscribe
