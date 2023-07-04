@@ -107,6 +107,22 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
         uncheckedJSONAssertEquals(expectedCollection, actualCollection);
     }
 
+    @Test
+    @MongoDBFixtures("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json")
+    public void doesNotChangeMigratedEventDefinitions() {
+        this.migration.upgrade();
+
+        final V20230629140000_RenameFieldTypeOfEventDefinitionSeries.MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted).isNotNull();
+
+        assertThat(eventDefinitionsCollection.countDocuments()).isEqualTo(4);
+
+        var actualCollection = collectionToJson();
+        var expectedCollection = resourceFile("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json");
+
+        uncheckedJSONAssertEquals(expectedCollection, actualCollection);
+    }
+
     private String collectionToJson() {
         var documents = StreamSupport.stream(this.eventDefinitionsCollection.find().spliterator(), false)
                 .map(Document::toJson)
