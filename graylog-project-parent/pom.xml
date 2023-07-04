@@ -591,6 +591,18 @@
                 <artifactId>opentelemetry-semconv</artifactId>
                 <version>${opentelemetry-semconv.version}</version>
             </dependency>
+            <dependency>
+                <groupId>software.amazon.msk</groupId>
+                <artifactId>aws-msk-iam-auth</artifactId>
+                <version>${aws-msk-iam-auth.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>commons-logging</artifactId>
+                        <groupId>commons-logging</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
 
             <!-- AWS plugin -->
             <dependency>
