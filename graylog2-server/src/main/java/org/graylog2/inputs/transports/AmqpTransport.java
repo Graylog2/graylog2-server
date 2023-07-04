@@ -23,6 +23,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.rabbitmq.client.ConnectionFactory;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -35,17 +36,23 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
-import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
+import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class AmqpTransport extends ThrottleableTransport {
+public class AmqpTransport extends ThrottleableTransport2 {
     public static final String CK_HOSTNAME = "broker_hostname";
     public static final String CK_PORT = "broker_port";
     public static final String CK_VHOST = "broker_vhost";
@@ -60,47 +67,62 @@ public class AmqpTransport extends ThrottleableTransport {
     public static final String CK_TLS = "tls";
     public static final String CK_REQUEUE_INVALID_MESSAGES = "requeue_invalid_messages";
     public static final String CK_HEARTBEAT_TIMEOUT = "heartbeat";
+    public static final String CK_CONNECTION_RECOVERY_INTERVAL = "connection_recovery_interval";
 
+    private static final int DEFAULT_CONNECTION_RECOVERY_INTERVAL_VALUE = 5;
     private static final Logger LOG = LoggerFactory.getLogger(AmqpTransport.class);
 
     private final Configuration configuration;
     private final EventBus eventBus;
     private final MetricRegistry localRegistry;
+    private final EncryptedValueService encryptedValueService;
     private final ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService amqpScheduler;
 
     private AmqpConsumer consumer;
+
+    private InputFailureRecorder inputFailureRecorder;
+    private final AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<>();
 
     @AssistedInject
     public AmqpTransport(@Assisted Configuration configuration,
                          EventBus eventBus,
                          LocalMetricRegistry localRegistry,
-                         @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+                         EncryptedValueService encryptedValueService,
+                         @Named("daemonScheduler") ScheduledExecutorService scheduler,
+                         @Named("AMQP Executor") ScheduledExecutorService amqpScheduler) {
         super(eventBus, configuration);
         this.configuration = configuration;
         this.eventBus = eventBus;
         this.localRegistry = localRegistry;
+        this.encryptedValueService = encryptedValueService;
         this.scheduler = scheduler;
+        this.amqpScheduler = amqpScheduler;
 
         localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
             @Override
-            public Long getValue() { return consumer.getLastSecBytesRead().get();
+            public Long getValue() {
+                return consumer.getLastSecBytesRead().get();
             }
         });
         localRegistry.register("written_bytes_1sec", new Gauge<Long>() {
-                                    @Override
-                                    public Long getValue() { return 0L;
-                                    }
-                                });
+            @Override
+            public Long getValue() {
+                return 0L;
+            }
+        });
         localRegistry.register("read_bytes_total", new Gauge<Long>() {
-                                    @Override
-                                    public Long getValue() { return consumer.getTotalBytesRead().get();
-                                    }
-                                });
+            @Override
+            public Long getValue() {
+                return consumer.getTotalBytesRead().get();
+            }
+        });
         localRegistry.register("written_bytes_total", new Gauge<Long>() {
-                                    @Override
-                                    public Long getValue() { return 0L;
-                                    }
-                                });
+            @Override
+            public Long getValue() {
+                return 0L;
+            }
+        });
     }
 
     @Subscribe
@@ -108,28 +130,14 @@ public class AmqpTransport extends ThrottleableTransport {
         try {
             LOG.debug("Lifecycle changed to {}", lifecycle);
             switch (lifecycle) {
-                case PAUSED:
-                case FAILED:
-                case HALTING:
-                    try {
-                        if (consumer != null) {
-                            consumer.stop();
-                        }
-                    } catch (IOException e) {
-                        LOG.warn("Unable to stop consumer", e);
-                    }
-                    break;
-                default:
+                case PAUSED, FAILED, HALTING -> stopConsumer();
+                default -> {
                     if (consumer.isConnected()) {
                         LOG.debug("Consumer is already connected, not running it a second time.");
                         break;
                     }
-                    try {
-                        consumer.run();
-                    } catch (IOException e) {
-                        LOG.warn("Unable to resume consumer", e);
-                    }
-                    break;
+                    runConsumer();
+                }
             }
         } catch (Exception e) {
             LOG.warn("This should not throw any exceptions", e);
@@ -142,54 +150,81 @@ public class AmqpTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void doLaunch(MessageInput input) throws MisfireException {
+    public void doLaunch(MessageInput input, InputFailureRecorder inputFailureRecorder) throws MisfireException {
+        this.inputFailureRecorder = inputFailureRecorder;
+
         int heartbeatTimeout = ConnectionFactory.DEFAULT_HEARTBEAT;
         if (configuration.intIsSet(CK_HEARTBEAT_TIMEOUT)) {
             heartbeatTimeout = configuration.getInt(CK_HEARTBEAT_TIMEOUT);
             if (heartbeatTimeout < 0) {
                 LOG.warn("AMQP heartbeat interval must not be negative ({}), using default timeout ({}).",
-                         heartbeatTimeout, ConnectionFactory.DEFAULT_HEARTBEAT);
+                        heartbeatTimeout, ConnectionFactory.DEFAULT_HEARTBEAT);
                 heartbeatTimeout = ConnectionFactory.DEFAULT_HEARTBEAT;
             }
         }
+
         consumer = new AmqpConsumer(
-                configuration.getString(CK_HOSTNAME),
-                configuration.getInt(CK_PORT),
-                configuration.getString(CK_VHOST),
-                configuration.getString(CK_USERNAME),
-                configuration.getString(CK_PASSWORD),
-                configuration.getInt(CK_PREFETCH),
-                configuration.getString(CK_QUEUE),
-                configuration.getString(CK_EXCHANGE),
-                configuration.getBoolean(CK_EXCHANGE_BIND),
-                configuration.getString(CK_ROUTING_KEY),
-                configuration.getInt(CK_PARALLEL_QUEUES),
-                configuration.getBoolean(CK_TLS),
-                configuration.getBoolean(CK_REQUEUE_INVALID_MESSAGES),
                 heartbeatTimeout,
                 input,
+                configuration,
                 scheduler,
-                this
+                inputFailureRecorder,
+                this,
+                encryptedValueService,
+                connectionRecoveryInterval()
         );
         eventBus.register(this);
-        try {
-            consumer.run();
-        } catch (IOException e) {
-            eventBus.unregister(this);
-            throw new MisfireException("Could not launch AMQP consumer.", e);
-        }
+        runConsumer();
+    }
+
+    private void runConsumer() {
+        cancelConsumerRunScheduler();
+        scheduledFuture.set(scheduleConsumerRun());
+    }
+
+    private ScheduledFuture<?> scheduleConsumerRun() {
+        return amqpScheduler.scheduleAtFixedRate(() -> {
+            try {
+                consumer.run();
+                cancelConsumerRunScheduler();
+                inputFailureRecorder.setRunning();
+            } catch (TimeoutException e) {
+                inputFailureRecorder.setFailing(getClass(), "Timeout while opening new AMQP connection", e);
+            } catch (Exception e) {
+                inputFailureRecorder.setFailing(getClass(), "Could not launch AMQP consumer.", e);
+            }
+        }, 0, connectionRecoveryInterval().getSeconds(), TimeUnit.SECONDS);
+    }
+
+    private void cancelConsumerRunScheduler() {
+        scheduledFuture.updateAndGet(f -> {
+            if (f != null) {
+                f.cancel(true);
+            }
+            return null;
+        });
+    }
+
+    private Duration connectionRecoveryInterval() {
+        return Duration.ofSeconds(configuration.getInt(CK_CONNECTION_RECOVERY_INTERVAL, DEFAULT_CONNECTION_RECOVERY_INTERVAL_VALUE));
     }
 
     @Override
     public void doStop() {
-        if (consumer != null) {
-            try {
-                consumer.stop();
-            } catch (IOException e) {
-                LOG.error("Could not stop AMQP consumer.", e);
-            }
-        }
+        stopConsumer();
         eventBus.unregister(this);
+    }
+
+    private void stopConsumer() {
+        try {
+            if (consumer != null) {
+                consumer.stop();
+            }
+        } catch (IOException e) {
+            LOG.warn("Unable to stop consumer", e);
+        }
+
+        cancelConsumerRunScheduler();
     }
 
     @Override
@@ -207,7 +242,7 @@ public class AmqpTransport extends ThrottleableTransport {
     }
 
     @ConfigClass
-    public static class Config extends ThrottleableTransport.Config {
+    public static class Config extends ThrottleableTransport2.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest cr = super.getRequestedConfiguration();
@@ -259,6 +294,7 @@ public class AmqpTransport extends ThrottleableTransport {
                             "",
                             "Password to connect to AMQP broker",
                             ConfigurationField.Optional.OPTIONAL,
+                            true,
                             TextField.Attribute.IS_PASSWORD
                     )
             );
@@ -347,6 +383,15 @@ public class AmqpTransport extends ThrottleableTransport {
                             "Re-queue invalid messages?",
                             true,
                             "Invalid messages will be discarded if disabled."
+                    )
+            );
+            cr.addField(
+                    new NumberField(
+                            CK_CONNECTION_RECOVERY_INTERVAL,
+                            "Connection recovery interval",
+                            DEFAULT_CONNECTION_RECOVERY_INTERVAL_VALUE,
+                            "Connection recovery interval in seconds.",
+                            ConfigurationField.Optional.OPTIONAL
                     )
             );
 

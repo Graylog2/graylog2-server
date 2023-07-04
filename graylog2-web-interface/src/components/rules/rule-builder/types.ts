@@ -70,6 +70,7 @@ export const RULE_BUILDER_TYPES_WITH_OUTPUT = [
   RuleBuilderTypes.String,
   RuleBuilderTypes.Object,
   RuleBuilderTypes.Message,
+  RuleBuilderTypes.DateTime,
 ] as const;
 
 export type BlockFieldDict = {

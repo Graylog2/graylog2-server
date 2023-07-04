@@ -34,6 +34,7 @@ export type Definition = {
   type: string,
   field?: string,
   percentile?: string,
+  strategy?: string,
 };
 
 const parametersRegex = /\((.+)\)/;
@@ -45,6 +46,10 @@ const definitionFor = (type: string, parameters: Array<string>): Definition => {
 
   if (type === 'percentile') {
     return { type, field, percentile: parameter };
+  }
+
+  if (type === 'percentage') {
+    return { type, field, strategy: parameter };
   }
 
   return { type, field };

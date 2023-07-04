@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 
 import javax.inject.Inject;
 import javax.validation.ValidationException;
@@ -53,7 +54,9 @@ public class MetricValidator {
     }
 
     private boolean hasFieldIfFunctionNeedsIt(final Metric metric) {
-        return Count.NAME.equals(metric.functionName()) || !StringUtils.isBlank(metric.fieldName());
+        return Percentage.NAME.equals(metric.functionName())
+                || Count.NAME.equals(metric.functionName())
+                || !StringUtils.isBlank(metric.fieldName());
     }
 
     private boolean isValidFunction(final String functionName) {

@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Formik } from 'formik';
+import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Select } from 'components/common';
@@ -144,12 +144,12 @@ const RuleBlockForm = ({
       <Col md={12}>
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
         <Formik enableReinitialize onSubmit={handleSubmit} initialValues={initialValues}>
-          {({ resetForm, setFieldValue }) => (
-            <Form>
+          {({ resetForm, setFieldValue, values }) => (
+            <>
               <Row>
                 <Col md={12}>
-                  <Select id="existingBlock-select"
-                          name="existingBlock-select"
+                  <Select id={`existingBlock-select-${type}`}
+                          name={`existingBlock-select-${type}`}
                           placeholder={`Select ${type}`}
                           options={options}
                           clearable={false}
@@ -171,7 +171,7 @@ const RuleBlockForm = ({
                   </SelectedBlockInfo>
 
                   {selectedBlockDict.params.map((param) => (
-                    <Row key={`${order}_${param}`}>
+                    <Row key={`${order}_${param.name}`}>
                       <RuleBlockFormField param={param}
                                           functionName={selectedBlockDict.name}
                                           order={order}
@@ -183,11 +183,13 @@ const RuleBlockForm = ({
 
                   <FormSubmit bsSize="small"
                               submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
+                              submitButtonType="button"
+                              onSubmit={() => handleSubmit(values)}
                               onCancel={() => { resetForm(); onCancel(); }} />
 
                 </SelectedBlock>
               )}
-            </Form>
+            </>
           )}
         </Formik>
         <Errors objectWithErrors={existingBlock} />
