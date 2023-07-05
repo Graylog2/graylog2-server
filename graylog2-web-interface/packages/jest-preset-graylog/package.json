@@ -10,7 +10,7 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0",
   "dependencies": {
-    "@jest/types": "29.5.0",
+    "@jest/types": "29.6.0",
     "@testing-library/dom": "9.3.1",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "12.1.5",
