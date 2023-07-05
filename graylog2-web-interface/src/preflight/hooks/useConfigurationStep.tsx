@@ -31,7 +31,7 @@ const configurationStep = (dataNodes: DataNodes, dataNodesCA: DataNodesCA) => {
   const finishedProvisioning = !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED.key);
 
   if (!finishedProvisioning) {
-    return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
+    return CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key;
   }
 
   return CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key;
