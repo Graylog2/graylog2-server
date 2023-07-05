@@ -215,6 +215,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(INDEX_SET_UPDATE)
             .add(INSTANT_ARCHIVING_CONFIGURATION_CREATE)
             .add(INSTANT_ARCHIVING_CONFIGURATION_UPDATE)
+            .add(INSTANT_ARCHIVING_JOB_RESTORE)
+            .add(INSTANT_ARCHIVING_JOB_DELETE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
             .add(LOOKUP_ADAPTER_CREATE)
