@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.ImmutableSet;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -29,6 +30,7 @@ import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
@@ -88,15 +90,20 @@ public class UsersResourceTest {
     private Subject subject;
     @Mock
     private UserManagementService userManagementService;
+    @Mock
+    private UserSessionTerminationService sessionTerminationService;
+    @Mock
+    private DefaultSecurityManager securityManager;
 
     UserImplFactory userImplFactory;
 
     @Before
     public void setUp() throws Exception {
         userImplFactory = new UserImplFactory(new Configuration(),
-                                              new Permissions(ImmutableSet.of(new RestPermissions())));
+                new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
-                                              roleService, sessionService, new HttpConfiguration(), subject);
+                roleService, sessionService, new HttpConfiguration(), subject,
+                sessionTerminationService, securityManager);
     }
 
     /**
@@ -137,8 +144,10 @@ public class UsersResourceTest {
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
                                  AccessTokenService accessTokenService, RoleService roleService,
                                  MongoDBSessionService sessionService, HttpConfiguration configuration,
-                                 Subject subject) {
-            super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService);
+                                 Subject subject, UserSessionTerminationService sessionTerminationService,
+                                 DefaultSecurityManager securityManager) {
+            super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
+                    sessionTerminationService, securityManager);
             this.subject = subject;
             super.configuration = configuration;
         }

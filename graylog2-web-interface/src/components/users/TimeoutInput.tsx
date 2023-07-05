@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Col, HelpBlock, Input } from 'components/bootstrap';
+import { Row, Col, HelpBlock, Input, Alert } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
+import { Icon } from 'components/common';
 
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
@@ -84,6 +85,16 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9"
            label="Sessions Timeout">
+      <Row className="no-bm">
+        <Col xs={12}>
+          <Alert bsStyle="info">
+            <Icon name="info-circle" />{' '}<b>Changing the session timeout</b><br />
+            Changing the timeout setting for sessions will log the user out of Graylog and will invalidate all their
+            current sessions. If you are changing the setting for your own user, you will be logged out at the moment
+            of saving the setting. In that case, make sure to save any pending changes before changing the timeout.
+          </Alert>
+        </Col>
+      </Row>
       <>
         <Input type="checkbox"
                id="session-timeout-never"
