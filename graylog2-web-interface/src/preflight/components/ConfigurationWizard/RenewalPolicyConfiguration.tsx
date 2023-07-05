@@ -26,7 +26,7 @@ const createPolicy = ({ renewal_policy, lifetime_unit, lifetime_value }: FormVal
 
   return fetch(
     'POST',
-    qualifyUrl('/api/renewal_policy/create'),
+    qualifyUrl('/api/renewal_policy'),
     payload,
     false,
   );

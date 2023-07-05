@@ -29,7 +29,6 @@ public class CertificateRenewalPolicyResource {
     }
 
     @POST
-    @Path("/create")
     @NoAuditEvent("No Audit Event needed")
     public void set(@NotNull RenewalPolicy renewalPolicy) {
         this.clusterConfigService.write(renewalPolicy);
