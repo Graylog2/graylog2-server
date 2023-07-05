@@ -24,7 +24,7 @@ import { IconButton } from 'components/common';
 import { Position } from 'views/components/widgets/WidgetPropTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 type PositionType = {
   col: number,
@@ -53,7 +53,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     });
 
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-stretch-button',
     });

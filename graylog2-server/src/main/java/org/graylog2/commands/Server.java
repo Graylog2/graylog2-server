@@ -64,7 +64,6 @@ import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
@@ -81,6 +80,8 @@ import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration;
+import org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration;
 import org.graylog2.messageprocessors.MessageProcessorModule;
 import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
@@ -139,6 +140,8 @@ public class Server extends ServerBootstrap {
     private final GeoIpProcessorConfig geoIpProcessorConfig = new GeoIpProcessorConfig();
     private final TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
     private final ContentStreamConfiguration contentStreamConfiguration = new ContentStreamConfiguration();
+    private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
+
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
 
@@ -222,7 +225,8 @@ public class Server extends ServerBootstrap {
                 tlsConfiguration,
                 geoIpProcessorConfig,
                 telemetryConfiguration,
-                contentStreamConfiguration);
+                contentStreamConfiguration,
+                dnsLookupAdapterConfiguration);
     }
 
     @Override

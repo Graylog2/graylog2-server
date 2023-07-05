@@ -192,7 +192,8 @@ public class TelemetryServiceTest {
                 new TelemetryResponseFactory(),
                 dbTelemetryUserSettingsService,
                 eventBus,
-                telemetryClusterService);
+                telemetryClusterService,
+                "unknown");
     }
 
     private void mockUserTelemetryEnabled(boolean isTelemetryEnabled) {
