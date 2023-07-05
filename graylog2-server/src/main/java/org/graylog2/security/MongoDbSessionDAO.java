@@ -59,12 +59,12 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         fields.put("start_timestamp", session.getStartTimestamp());
         fields.put("last_access_time", session.getLastAccessTime());
         fields.put("timeout", session.getTimeout());
-        Map<String, Object> attributes = Maps.newHashMap();
+        Map<Object, Object> attributes = Maps.newHashMap();
         for (Object key : session.getAttributeKeys()) {
             attributes.put(key.toString(), session.getAttribute(key));
         }
-        fields.put("attributes", attributes);
         final MongoDbSession dbSession = new MongoDbSession(fields);
+        dbSession.setAttributes(attributes);
         final String objectId = mongoDBSessionService.saveWithoutValidation(dbSession);
         LOG.debug("Created session {}", objectId);
 

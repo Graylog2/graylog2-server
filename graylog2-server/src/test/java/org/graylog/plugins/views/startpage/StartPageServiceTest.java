@@ -16,12 +16,10 @@
  */
 package org.graylog.plugins.views.startpage;
 
-import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
@@ -32,11 +30,9 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
-import org.graylog.security.DBGrantService;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog.security.PermissionAndRoleResolver;
-import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.GRNExtension;
-import org.graylog.testing.TestUserService;
 import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -51,9 +47,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -68,32 +68,13 @@ public class StartPageServiceTest {
 
     private GRNRegistry grnRegistry;
 
-    static class TestCatalog extends Catalog {
-        public TestCatalog() {
-            super(null);
-        }
-
-        @Override
-        protected LoadingCache<String, Entry> createCache() {
-            return null;
-        }
-
-        @Override
-        public String getTitle(final GRN id) {
-            return "";
-        }
-
-        @Override
-        public String getType(final GRN id) {
-            return "";
-        }
-    }
+    private Catalog catalog;
 
     @BeforeEach
     public void init(MongoDBTestService mongodb,
                      MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                     GRNRegistry grnRegistry,
-                     TestUserService testUserService) {
+                     GRNRegistry grnRegistry) {
+
         var admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
         var user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
         this.searchUser = TestSearchUser.builder().withUser(user).build();
@@ -118,10 +99,11 @@ public class StartPageServiceTest {
         };
 
         var eventbus = new EventBus();
-        var dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus);
         var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
-        startPageService = new StartPageService(new TestCatalog(), grnRegistry, lastOpenedService, recentActivityService, eventbus);
+        catalog = mock(Catalog.class);
+        doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
+        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog));
     }
 
     @Test

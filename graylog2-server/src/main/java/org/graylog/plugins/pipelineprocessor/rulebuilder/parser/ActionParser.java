@@ -78,9 +78,9 @@ public class ActionParser {
         // set output variable to fragment output variable
         if (ruleFragment.isFragment() && Objects.nonNull(ruleFragment.fragmentOutputVariable())
                 && Objects.nonNull(step.outputvariable())) {
-            syntax += "let " + step.outputvariable() + " = " +
+            syntax += NL + "  let " + step.outputvariable() + " = " +
                     ((ruleFragment.isFragment() && step.negate()) ? "! " : "") +
-                    ruleFragment.fragmentOutputVariable();
+                    ruleFragment.fragmentOutputVariable() + ";";
         }
 
         // generate message fields for simulator

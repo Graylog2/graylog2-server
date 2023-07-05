@@ -110,8 +110,8 @@ const URLUtils = {
 
     return acceptedProtocols.includes(url.protocol);
   },
-  getBasePathname(pathname: string) {
-    return pathname.split('/')[1];
+  getPathnameWithoutId(pathname: string) {
+    return pathname.replace(/\/[0-9a-fA-F]{24}/, '').slice(1);
   },
 };
 
@@ -121,7 +121,7 @@ export const {
   appPrefixed,
   getParsedHash,
   getParsedSearch,
-  getBasePathname,
+  getPathnameWithoutId,
   qualifyUrl,
   replaceHashParam,
   concatURLPath,

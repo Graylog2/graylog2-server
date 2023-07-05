@@ -22,7 +22,7 @@ assignees: ''
 <!--- Include as many relevant details about the environment you are currently working with -->
 
 * Graylog Version:
-* Elasticsearch Version:
+* OpenSearch Version:
 * MongoDB Version:
 * Operating System:
 * Browser version:

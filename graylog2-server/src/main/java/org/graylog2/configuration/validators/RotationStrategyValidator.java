@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class RotationStrategyValidator implements Validator<List<String>> {
     Set<String> VALID_STRATEGIES = Sets.newHashSet(
-            MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME, TimeBasedRotationStrategy.NAME);
+            MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME, TimeBasedRotationStrategy.NAME, TimeBasedSizeOptimizingStrategy.NAME);
 
     @Override
     // The set of valid rotation strategies must
