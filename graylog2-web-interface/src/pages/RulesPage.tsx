@@ -29,7 +29,7 @@ import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/R
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import CreateRuleModal from 'components/rules/CreateRuleModal';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 
@@ -117,7 +117,7 @@ const RulesPage = () => {
       <Button bsStyle="success"
               onClick={() => {
                 sendTelemetry('click', {
-                  app_pathname: getBasePathname(pathname),
+                  app_pathname: getPathnameWithoutId(pathname),
                   app_section: 'pipeline-rules',
                   app_action_value: 'create-rule-button',
                 });
@@ -167,7 +167,10 @@ const RulesPage = () => {
             <Row>
               <Col md={12}>
                 <PaginatedList totalItems={total}>
-                  <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
+                  <RuleList rules={rules}
+                            rulesContext={rulesContext}
+                            onDelete={handleDelete}
+                            searchFilter={searchFilter} />
                   {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
                 </PaginatedList>
               </Col>

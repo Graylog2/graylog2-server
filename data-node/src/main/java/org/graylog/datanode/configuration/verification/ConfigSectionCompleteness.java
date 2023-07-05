@@ -14,25 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+package org.graylog.datanode.configuration.verification;
 
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-
-const NavigationTelemetry = () => {
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
-
-  useEffect(() => {
-    if (location.pathname) {
-      sendTelemetry('$pageview', {
-        app_pathname: getPathnameWithoutId(location.pathname),
-      });
-    }
-  }, [location.pathname, sendTelemetry]);
-
-  return null;
-};
-
-export default NavigationTelemetry;
+public enum ConfigSectionCompleteness {
+    COMPLETE, INCOMPLETE, MISSING
+}

@@ -23,7 +23,7 @@ import { Select, SourceCodeEditor } from 'components/common';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useHistory from 'routing/useHistory';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 const SubTitle = styled.label(({ theme }) => css`
   color: ${theme.colors.variant.default};
@@ -32,7 +32,7 @@ const SubTitle = styled.label(({ theme }) => css`
 
 const CreateRuleContainer = styled(Row)`
   margin-top: 25px;
-  
+
   .source-code-editor {
     pointer-events: none;
   }
@@ -86,14 +86,34 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => {
             <RuleBuilderRow>
               <Col md={6}>
                 <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
-                <Select value="has_field" clearable={false} onChange={() => {}} options={[]} />
-                <StyledInput value="transaction_date" type="text" id="transaction_date" onChange={() => {}} />
+                <Select value="has_field"
+                        clearable={false}
+                        onChange={() => {
+                        }}
+                        options={[]} />
+                <StyledInput value="transaction_date"
+                             type="text"
+                             id="transaction_date"
+                             onChange={() => {
+                             }} />
               </Col>
               <Col md={6}>
                 <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-                <Select value="set_field" clearable={false} onChange={() => {}} options={[]} />
-                <StyledInput value="transaction_year" type="text" id="transaction_year" onChange={() => {}} />
-                <StyledInput value={new Date().getFullYear()} type="text" id="transaction_year_value" onChange={() => {}} />
+                <Select value="set_field"
+                        clearable={false}
+                        onChange={() => {
+                        }}
+                        options={[]} />
+                <StyledInput value="transaction_year"
+                             type="text"
+                             id="transaction_year"
+                             onChange={() => {
+                             }} />
+                <StyledInput value={new Date().getFullYear()}
+                             type="text"
+                             id="transaction_year_value"
+                             onChange={() => {
+                             }} />
               </Col>
             </RuleBuilderRow>
             <br />
@@ -104,7 +124,7 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => {
             <Button bsStyle="success"
                     onClick={() => {
                       sendTelemetry('click', {
-                        app_pathname: getBasePathname(pathname),
+                        app_pathname: getPathnameWithoutId(pathname),
                         app_section: 'pipeline-rules',
                         app_action_value: 'create-rule-using-rule-builder-button',
                       });
@@ -131,7 +151,7 @@ const CreateRuleModal = ({ showModal, onClose }: Props) => {
             <Button bsStyle="success"
                     onClick={() => {
                       sendTelemetry('click', {
-                        app_pathname: getBasePathname(pathname),
+                        app_pathname: getPathnameWithoutId(pathname),
                         app_section: 'pipeline-rules',
                         app_action_value: 'create-rule-using-source-code-button',
                       });

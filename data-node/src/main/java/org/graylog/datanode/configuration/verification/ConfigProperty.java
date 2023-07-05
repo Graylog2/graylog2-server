@@ -14,25 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+package org.graylog.datanode.configuration.verification;
 
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+public record ConfigProperty(String propertyName, String propertyValue) {
 
-const NavigationTelemetry = () => {
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
-
-  useEffect(() => {
-    if (location.pathname) {
-      sendTelemetry('$pageview', {
-        app_pathname: getPathnameWithoutId(location.pathname),
-      });
+    public ConfigProperty {
+        if (propertyName == null || propertyName.isEmpty()) {
+            throw new IllegalArgumentException("Property name cannot be empty");
+        }
     }
-  }, [location.pathname, sendTelemetry]);
-
-  return null;
-};
-
-export default NavigationTelemetry;
+}
