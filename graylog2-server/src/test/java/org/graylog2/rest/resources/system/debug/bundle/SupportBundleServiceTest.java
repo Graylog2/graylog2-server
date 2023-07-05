@@ -21,10 +21,13 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.ws.rs.NotFoundException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -32,6 +35,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 public class SupportBundleServiceTest {
@@ -94,5 +99,33 @@ public class SupportBundleServiceTest {
 
         assertThat(shrinkedList).hasSize(3);
         assertThat(shrinkedList).extracting(LogFile::id).contains("memory", "0", "1");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/tmp/safe_dir", "safe_dir", "../safe_dir"})
+    void ensureWithinBundleDir(String bundleDirString) throws Exception {
+        final var bundleDir = Path.of(bundleDirString);
+
+        assertThatCode(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "file.zip"))
+                .doesNotThrowAnyException();
+        assertThatCode(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "hello/file.zip"))
+                .doesNotThrowAnyException();
+        assertThatCode(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "hello/world/file.zip"))
+                .doesNotThrowAnyException();
+        assertThatCode(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "..file.zip"))
+                .doesNotThrowAnyException();
+
+        assertThatThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "/etc/file.zip"))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "/etc/hello/../world/../file.zip"))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "../file.zip"))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "../../file.zip"))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "../safe_dir_insecure/file.zip"))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> supportBundleService.ensureFileWithinBundleDir(bundleDir, "/safe_dir_insecure/file.zip"))
+                .isInstanceOf(NotFoundException.class);
     }
 }

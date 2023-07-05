@@ -500,7 +500,7 @@ public class SupportBundleService {
     }
 
     public void downloadBundle(String filename, OutputStream outputStream) throws IOException {
-        ensureFileWithinBundleDir(filename);
+        ensureFileWithinBundleDir(bundleDir, filename);
 
         try {
             final Path filePath = bundleDir.resolve(filename);
@@ -512,14 +512,15 @@ public class SupportBundleService {
         }
     }
 
-    private void ensureFileWithinBundleDir(String filename) throws IOException {
-        if (!bundleDir.resolve(filename).toFile().getCanonicalPath().startsWith(bundleDir.toFile().getCanonicalPath())) {
+    @VisibleForTesting
+    void ensureFileWithinBundleDir(Path bundleDir, String filename) {
+        if (!bundleDir.resolve(filename).toAbsolutePath().normalize().startsWith(bundleDir.toAbsolutePath().normalize())) {
             throw new NotFoundException();
         }
     }
 
     public void deleteBundle(String filename) throws IOException {
-        ensureFileWithinBundleDir(filename);
+        ensureFileWithinBundleDir(bundleDir, filename);
         final Path filePath = bundleDir.resolve(filename);
         Files.delete(filePath);
     }
