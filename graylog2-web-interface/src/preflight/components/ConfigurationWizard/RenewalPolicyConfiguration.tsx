@@ -9,8 +9,7 @@ import UserNotification from 'preflight/util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import Select from 'preflight/components/common/Select';
-
-const RENEWAL_POLICY_QUERY_KEY = ['data_node_renewal_policy'];
+import { QUERY_KEY as RENEWAL_POLICY_QUERY_KEY } from 'preflight/hooks/useRenewalPolicy';
 
 type FormValues = {
   renewal_policy: 'Automatic' | 'Manual',
@@ -67,11 +66,11 @@ const RenewalPolicyConfiguration = () => {
 
   const { mutate: onSubmit } = useMutation(createPolicy, {
     onSuccess: () => {
-      UserNotification.success('CA created successfully');
+      UserNotification.success('Renewal policy created successfully');
       queryClient.invalidateQueries(RENEWAL_POLICY_QUERY_KEY);
     },
     onError: (error) => {
-      UserNotification.error(`CA creation failed with error: ${error}`);
+      UserNotification.error(`Renewal policy creation failed with error: ${error}`);
     },
   });
 
