@@ -42,7 +42,7 @@ import {
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 
 import RuleSimulation from '../RuleSimulation';
-import RuleHelper from '../RuleHelper';
+import RuleHelper from '../rule-helper/RuleHelper';
 
 const ActionsCol = styled(Col)`
   margin-top: 50px;

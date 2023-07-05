@@ -19,14 +19,16 @@ import PropTypes from 'prop-types';
 
 import ObjectUtils from 'util/ObjectUtils';
 import connect from 'stores/connect';
-import { Icon, PaginatedList, Spinner, SearchForm } from 'components/common';
-import { Row, Col, Panel, Table, Tabs, Tab } from 'components/bootstrap';
+import { PaginatedList, Spinner, SearchForm } from 'components/common';
+import { Row, Col, Panel, Tabs, Tab } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import DocsHelper from 'util/DocsHelper';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
+import { functionSignature } from './helpers';
 import RuleHelperStyle from './RuleHelper.css';
+import RuleHelperTable from './RulerHelperTable';
 
 const ruleTemplate = `rule "function howto"
 when
@@ -36,23 +38,6 @@ then
   let new_date = parse_date(to_string($message.transaction_date), "yyyy-MM-dd HH:mm:ss");
   set_field("transaction_year", new_date.year);
 end`;
-
-const _niceType = (typeName) => typeName.replace(/^.*\.(.*?)$/, '$1');
-
-const _functionSignature = (descriptor) => {
-  const args = descriptor.params.map((p) => (p.optional ? `[${p.name}]` : p.name));
-
-  return `${descriptor.name}(${args.join(', ')}) : ${_niceType(descriptor.return_type)}`;
-};
-
-const _parameters = (descriptor) => descriptor.params.map((p) => (
-  <tr key={p.name}>
-    <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
-    <td className={RuleHelperStyle.adjustedTableCellWidth}>{_niceType(p.type)}</td>
-    <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
-    <td>{p.description}</td>
-  </tr>
-));
 
 class RuleHelper extends React.Component {
   constructor(props) {
@@ -77,50 +62,6 @@ class RuleHelper extends React.Component {
     newState[functionName] = !newState[functionName];
 
     this.setState({ expanded: newState });
-  };
-
-  _renderFunctions = (descriptors) => {
-    const { expanded } = this.state;
-
-    if (!descriptors) {
-      return [];
-    }
-
-    return descriptors.map((d) => {
-      let details = null;
-
-      if (expanded[d.name]) {
-        details = (
-          <tr>
-            <td colSpan="2">
-              <Table condensed striped hover>
-                <thead>
-                  <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Required</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {_parameters(d)}
-                </tbody>
-              </Table>
-            </td>
-          </tr>
-        );
-      }
-
-      return (
-        <tbody key={d.name}>
-          <tr onClick={() => this._toggleFunctionDetail(d.name)} className={RuleHelperStyle.clickableRow}>
-            <td className={RuleHelperStyle.functionTableCell}><code>{_functionSignature(d)}</code></td>
-            <td>{d.description}</td>
-          </tr>
-          {details}
-        </tbody>
-      );
-    });
   };
 
   _onPageChange = (newPage, pageSize) => {
@@ -148,7 +89,7 @@ class RuleHelper extends React.Component {
     const filteredDescriptiors = functionDescriptors.filter((descriptor) => {
       const regexp = RegExp(filter);
 
-      return regexp.test(_functionSignature(descriptor)) || regexp.test(descriptor.description);
+      return regexp.test(functionSignature(descriptor)) || regexp.test(descriptor.description);
     });
 
     this.setState({
@@ -213,15 +154,9 @@ class RuleHelper extends React.Component {
                                      pageSize={pageSize}
                                      onChange={this._onPageChange}
                                      showPageSizeSelect={false}>
-                        <Table condensed>
-                          <thead>
-                            <tr>
-                              <th>Function</th>
-                              <th>Description</th>
-                            </tr>
-                          </thead>
-                          {this._renderFunctions(pagedEntries)}
-                        </Table>
+                        <RuleHelperTable entries={pagedEntries}
+                                         expanded={this.state.expanded}
+                                         onFunctionClick={this._toggleFunctionDetail} />
                       </PaginatedList>
                     </div>
                   </Col>
