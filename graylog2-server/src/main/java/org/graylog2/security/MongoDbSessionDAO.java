@@ -23,6 +23,8 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.DuplicateKeyException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
@@ -44,8 +46,19 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     private final MongoDBSessionService mongoDBSessionService;
 
     @Inject
-    public MongoDbSessionDAO(MongoDBSessionService mongoDBSessionService) {
+    public MongoDbSessionDAO(MongoDBSessionService mongoDBSessionService, EventBus eventBus) {
         this.mongoDBSessionService = mongoDBSessionService;
+        eventBus.register(this);
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void sessionDeleted(SessionDeletedEvent event) {
+        final Session cachedSession = getCachedSession(event.sessionId());
+        if (cachedSession != null) {
+            LOG.debug("Removing deleted session from cache.");
+            uncache(cachedSession);
+        }
     }
 
     @Override

@@ -184,6 +184,14 @@ const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
   return validateValuesGrouping(grouping);
 };
 
+const validateGroupBy = ({ values }: { values: WidgetConfigFormValues }) => {
+  if (values?.visualization?.type === 'numeric' && values?.groupBy?.groupings?.length > 0) {
+    return { groupBy: 'Single Number widget does not support Group By' };
+  }
+
+  return {};
+};
+
 const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidationErrors => {
   const emptyErrors = {};
 
@@ -192,9 +200,15 @@ const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidati
   }
 
   const { groupings } = values.groupBy;
-  const groupingErrors = groupings.map(validateGrouping);
 
-  return hasErrors(groupingErrors) ? { groupBy: { groupings: groupingErrors } } : emptyErrors;
+  const groupingErrors = groupings.map(validateGrouping);
+  const groupByErrors = validateGroupBy({ values });
+
+  if (hasErrors([groupByErrors])) return groupByErrors;
+
+  if (hasErrors(groupingErrors)) return ({ groupBy: { groupings: groupingErrors } });
+
+  return emptyErrors;
 };
 
 const addRandomId = <GroupingType extends GroupByFormValues>(baseGrouping: Omit<GroupingType, 'id'>) => ({
@@ -275,7 +289,7 @@ const GroupByElement: AggregationElement<'groupBy'> = {
   title: 'Grouping',
   key: 'groupBy',
   order: 1,
-  allowCreate: () => true,
+  allowCreate: (formValues : WidgetConfigFormValues) => !(formValues.visualization.type === 'numeric'),
   onCreate: (formValues: WidgetConfigFormValues) => ({
     ...formValues,
     groupBy: {
