@@ -1,0 +1,5 @@
+type = "f"
+message = "Force user to select an entity for when picking a start page type."
+
+issues = ["15578"]
+pulls = ["15869"]
