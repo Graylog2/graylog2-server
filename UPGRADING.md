@@ -15,14 +15,20 @@ Upgrading to Graylog 5.2.x
 ## Java API Changes
 The following Java Code API changes have been made.
 
-| File/method                   | Description                                                      |
-|-------------------------------|------------------------------------------------------------------|
-| `ExampleClass#exampleFuntion` | TODO placeholder comment                                         |
+| File/method                   | Description                                                     |
+|-------------------------------|-----------------------------------------------------------------|
+| `ExampleClass#exampleFuntion` | TODO placeholder comment             |
 
 
 ## REST API Endpoint Changes
 The following REST API changes have been made.
 
-| Endpoint                                              | Description                               |
-|-------------------------------------------------------|-------------------------------------------|
-| `PUT /example/placeholder`                            | TODO placeholder comment                  |
+| Endpoint                              | Description                                |
+|---------------------------------------|--------------------------------------------|
+| `GET /contentStream/settings/{username}` | Retrieve Content Stream settings for specified user |
+| `PUT /contentStream/enable/{username}` | Enable Content Stream for specified user   |
+| `PUT /contentStream/disable/{username}` | Disable Content Stream for specified user  |
+| `PUT /contentStream/topics/{username}` | Update per user Content Stream topic list  |
+
+
+

@@ -1,0 +1,5 @@
+type = "add"
+message = "New API group to support Content Stream feature."
+
+issues = ["Graylog2/graylog-plugin-enterprise#5404"]
+pulls = ["15843"]
