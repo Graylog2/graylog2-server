@@ -42,6 +42,11 @@ public abstract class SumOfSquares implements SeriesSpec {
     public abstract String field();
 
     @Override
+    public Optional<String> statsSubfieldName() {
+        return Optional.of("sum_of_squares");
+    }
+
+    @Override
     public String literal() {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
