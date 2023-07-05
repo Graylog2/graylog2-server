@@ -1,0 +1,2 @@
+type = "security"
+message = "Fix insecure source port usage for DNS Lookup adapter queries. [GHSA-g96c-x7rh-99r3](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-g96c-x7rh-99r3)"
