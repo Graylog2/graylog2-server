@@ -27,7 +27,7 @@ import type { BlockDict } from '../rule-builder/types';
 
 type Props = {
   entries: Array<BlockDict>,
-  expanded?: boolean,
+  expanded?: {[key: string] : boolean},
   onFunctionClick?: (functionName: string) => void
 }
 
@@ -105,12 +105,12 @@ const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
 
 RuleHelperTable.propTypes = {
   entries: PropTypes.number.isRequired,
-  expanded: PropTypes.bool,
+  expanded: PropTypes.objectOf(PropTypes.bool),
   onFunctionClick: PropTypes.func,
 };
 
 RuleHelperTable.defaultProps = {
-  expanded: false,
+  expanded: {},
   onFunctionClick: undefined,
 };
 
