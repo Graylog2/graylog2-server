@@ -1,6 +1,6 @@
 type = "fixed"
-message = "Restore mail attribute for AD authentication."
+message = "Fix email_attributes error message in AD auth server edit form."
 
-issues = ["15536"]
-pulls = [""]
+issues = ["15652"]
+pulls = ["15655","15877"]
 
