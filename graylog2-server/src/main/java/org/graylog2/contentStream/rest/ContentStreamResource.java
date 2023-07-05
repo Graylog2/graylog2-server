@@ -101,7 +101,7 @@ public class ContentStreamResource extends RestResource {
         if (user == null) {
             throw new org.graylog2.database.NotFoundException("User " + username + " has not been found.");
         }
-        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getContentStreamUserSettings(user);
+        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getUserSettings(user);
         contentStreamService.saveUserSettings(user,
                 ContentStreamUserSettings.builder()
                         .contentStreamEnabled(contentStreamUserSettings.contentStreamEnabled())
@@ -114,7 +114,7 @@ public class ContentStreamResource extends RestResource {
         if (user == null) {
             throw new org.graylog2.database.NotFoundException("User " + username + " has not been found.");
         }
-        return contentStreamService.getContentStreamUserSettings(user);
+        return contentStreamService.getUserSettings(user);
     }
 
     private void setStatus(String username, boolean isEnabled) throws NotFoundException {
@@ -126,7 +126,7 @@ public class ContentStreamResource extends RestResource {
     }
 
     private void setStatus(User user, boolean isEnabled) {
-        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getContentStreamUserSettings(user);
+        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getUserSettings(user);
         contentStreamService.saveUserSettings(user,
                 ContentStreamUserSettings.builder()
                         .contentStreamEnabled(isEnabled)
@@ -135,7 +135,7 @@ public class ContentStreamResource extends RestResource {
     }
 
     private void setTopics(User user, List<String> topics) {
-        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getContentStreamUserSettings(user);
+        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getUserSettings(user);
         contentStreamService.saveUserSettings(user,
                 ContentStreamUserSettings.builder()
                         .contentStreamEnabled(contentStreamUserSettings.contentStreamEnabled())

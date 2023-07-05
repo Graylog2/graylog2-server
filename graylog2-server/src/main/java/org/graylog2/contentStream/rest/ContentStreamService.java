@@ -29,25 +29,17 @@ import java.util.List;
 import java.util.Optional;
 
 public class ContentStreamService {
-    //    private final ContentStreamResponseFactory contentStreamResponseFactory;
     private final DBContentStreamUserSettingsService dbContentStreamUserSettingsService;
 
     @Inject
     public ContentStreamService(
-//            ContentStreamResponseFactory contentStreamResponseFactory,
             DBContentStreamUserSettingsService dbContentStreamUserSettingsService,
             EventBus eventBus) {
-//        this.contentStreamResponseFactory = contentStreamResponseFactory;
         this.dbContentStreamUserSettingsService = dbContentStreamUserSettingsService;
         eventBus.register(this);
     }
 
-//    public Map<String, Object> getContentStreamResponse(User user) {
-//        ContentStreamUserSettings contentStreamUserSettings = getContentStreamUserSettings(user);
-//        return contentStreamResponseFactory.createContentStreamResponse(contentStreamUserSettings);
-//    }
-
-    public ContentStreamUserSettings getContentStreamUserSettings(User user) {
+    public ContentStreamUserSettings getUserSettings(User user) {
         Optional<ContentStreamUserSettingsDto> dto = dbContentStreamUserSettingsService.findByUserId(user.getId());
         Boolean isEnabled = dto.isPresent() ? dto.get().contentStreamEnabled() : true;
         List<String> topicList = dto.isPresent() && dto.get().topics() != null ? dto.get().topics() : new ArrayList<>();
