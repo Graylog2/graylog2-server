@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { FormSubmit, Select } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
+import { FormSubmit, Icon, OverlayTrigger, Select } from 'components/common';
+import { Button, Col, Popover, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
@@ -30,6 +30,8 @@ import Errors from './Errors';
 import { paramValueIsVariable } from './helpers';
 import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
 import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
+
+import RuleHelperTable from '../rule-helper/RulerHelperTable';
 
 type Props = {
   existingBlock?: RuleBlock,
@@ -65,6 +67,10 @@ const SelectedBlock = styled.div(({ theme }) => css`
 
 const SelectedBlockInfo = styled(Row)(({ theme }) => css`
   margin-bottom: ${theme.spacings.md};
+`);
+
+const HelpPopover = styled(Popover)(() => css`
+  min-width: 600px;
 `);
 
 const RuleBlockForm = ({
@@ -139,6 +145,15 @@ const RuleBlockForm = ({
     }
   };
 
+  const buildHelpPopover = (blockDict: BlockDict) => (
+    <HelpPopover id="selected-block-Dict-help"
+                 title="Function Syntax Help"
+                 data-app-section="pipeline-rule-builder"
+                 data-event-element="Function Syntax Help">
+      <RuleHelperTable entries={[blockDict]} expanded={{ [blockDict.name]: true }} />
+    </HelpPopover>
+  );
+
   return (
     <Row>
       <Col md={12}>
@@ -165,6 +180,11 @@ const RuleBlockForm = ({
                     <Col md={12}>
                       <BlockTitle>
                         {existingBlock?.step_title || selectedBlockDict.name}
+                        <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover(selectedBlockDict)}>
+                          <Button bsStyle="link">
+                            <Icon name="question-circle" fixedWidth />
+                          </Button>
+                        </OverlayTrigger>
                       </BlockTitle>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>
