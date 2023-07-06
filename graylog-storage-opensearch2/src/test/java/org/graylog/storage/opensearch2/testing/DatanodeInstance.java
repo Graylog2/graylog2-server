@@ -90,7 +90,8 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 "http",
                 false,
                 false,
-                new BasicCredentialsProvider())
+                new BasicCredentialsProvider(),
+                null)
                 .get();
     }
 

@@ -17,34 +17,44 @@
 package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.security.DefaultX509TrustManager;
+import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.Sniffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
+    private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
     private final Supplier<RestHighLevelClient> clientSupplier;
+    private final TrustManagerProvider trustManagerProvider;
 
     @SuppressWarnings("unused")
     @Inject
@@ -64,7 +74,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
-            CredentialsProvider credentialsProvider) {
+            CredentialsProvider credentialsProvider,
+            TrustManagerProvider trustManagerProvider) {
+
+        this.trustManagerProvider = trustManagerProvider;
 
         clientSupplier = Suppliers.memoize(() -> {
             final RestHighLevelClient client = buildClient(hosts,
@@ -135,6 +148,18 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
                     if(muteElasticsearchDeprecationWarnings) {
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
+                    }
+
+                    try {
+                        var hostNames = hosts.stream().map(URI::getHost).toList();
+                        SSLContext sslContext = SSLContext.getInstance("TLS");
+                        sslContext.init(null, new TrustManager[]{trustManagerProvider.create(hostNames)}, new SecureRandom());
+
+                        httpClientConfig.setSSLContext(sslContext);
+                        // TODO: verify hostnames?
+                        // httpClientConfig.setSSLHostnameVerifier();
+                    } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
+                        LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
                     }
 
                     return httpClientConfig;

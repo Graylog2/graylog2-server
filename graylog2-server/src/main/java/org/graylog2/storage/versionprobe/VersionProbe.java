@@ -30,6 +30,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.plugin.Version;
+import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -41,10 +42,15 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -56,16 +62,19 @@ public class VersionProbe {
     private final OkHttpClient okHttpClient;
     private final int connectionAttempts;
     private final Duration delayBetweenAttempts;
+    private final TrustManagerProvider trustManagerProvider;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
                         OkHttpClient okHttpClient,
                         @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
-                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
+                        TrustManagerProvider trustManagerProvider) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.connectionAttempts = elasticsearchVersionProbeAttempts;
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
+        this.trustManagerProvider = trustManagerProvider;
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
@@ -140,6 +149,13 @@ public class VersionProbe {
     }
 
     private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
+        try {
+            SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
+            okHttpClient = okHttpClient.newBuilder().sslSocketFactory(sslSocketFactory, (X509TrustManager) trustManagerProvider.create(host.getHost())).build();
+        } catch (NoSuchAlgorithmException | KeyStoreException ex) {
+            LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
+        }
+
         if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];

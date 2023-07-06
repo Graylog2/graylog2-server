@@ -28,6 +28,7 @@ import java.util.Map;
 public record OpensearchConfiguration(
         Path opensearchDir,
         Path opensearchConfigDir,
+        String host,
         int httpPort,
         int transportPort,
         String authUsername,
@@ -45,6 +46,9 @@ public record OpensearchConfiguration(
             config.put("bootstrap.system_call_filter", "false");
         }
 
+        if (host != null && !host.isBlank()) {
+            config.put("network.host", host);
+        }
         config.put("http.port", String.valueOf(httpPort));
         config.put("transport.port", String.valueOf(transportPort));
         if (clusterName != null && !clusterName.isBlank()) {
@@ -74,7 +78,11 @@ public record OpensearchConfiguration(
     }
 
     public HttpHost getRestBaseUrl() {
+        var hostname = "localhost";
+        if (host != null && !host.isBlank()) {
+            hostname = host;
+        }
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        return new HttpHost("localhost", httpPort(), sslEnabled ? "https" : "http");
+        return new HttpHost(hostname, httpPort(), sslEnabled ? "https" : "http");
     }
 }

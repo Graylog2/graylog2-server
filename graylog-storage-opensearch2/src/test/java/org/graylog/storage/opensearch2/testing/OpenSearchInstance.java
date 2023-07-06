@@ -88,7 +88,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 "http",
                 false,
                 false,
-                new BasicCredentialsProvider())
+                new BasicCredentialsProvider(),
+                null)
                 .get();
     }
 

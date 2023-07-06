@@ -22,7 +22,7 @@ import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
-import org.graylog2.security.DefaultX509TrustManager;
+import org.graylog2.security.GraylogX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -39,7 +39,7 @@ public class SecurityBindings extends PluginModule {
         addInitializer(UserSessionTerminationService.class);
 
         install(new FactoryModuleBuilder()
-                .implement(TrustManager.class, DefaultX509TrustManager.class)
+                .implement(TrustManager.class, GraylogX509TrustManager.class)
                 .build(TrustManagerProvider.class));
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
