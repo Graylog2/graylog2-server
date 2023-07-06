@@ -1,6 +1,7 @@
 import React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import { Carousel, Timestamp } from 'components/common';
 import { Panel } from 'components/bootstrap';
@@ -35,16 +36,18 @@ const StyledPanel = styled(Panel)`
   border: none;
   border-radius: 4px;
 `;
+const _sanitizeText = (text) => DOMPurify.sanitize(text);
 
 const ContentStreamNewsItem = ({ feed }: Props) => (
   <Carousel.Slide>
     <StyledPanel>
       <StyledImage src="https://placehold.co/600x400" alt="test" />
       <StyledPanelBody>
-        <a href={feed.link} target="_blank" rel="noreferrer">{feed.title}</a>
+        <a href={feed.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed.title) }} />
+        </a>
       </StyledPanelBody>
       <StyledPanelFooter>
-        <Timestamp dateTime={feed.pubDate} format="shortReadable" />
+        <Timestamp dateTime={_sanitizeText(feed.pubDate)} format="shortReadable" />
       </StyledPanelFooter>
     </StyledPanel>
   </Carousel.Slide>

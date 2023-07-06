@@ -17,9 +17,18 @@ const StyledActionDiv = styled.div`
   justify-content: right;
 `;
 
+const StyledReadMoreDiv = styled.div`
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+`;
 const ContentStreamNewsFooter = () => (
   <StyledDiv>
-    <div><a href="https://www.graylog.org/blog/" target="_blank" rel="noreferrer">Read more</a></div>
+    <StyledReadMoreDiv>
+      <a href="https://www.graylog.org/blog/" target="_blank" rel="noreferrer">
+        Read more
+      </a>
+    </StyledReadMoreDiv>
     <StyledActionDiv><ContentStreamNewsContentActions /></StyledActionDiv>
   </StyledDiv>
 );
