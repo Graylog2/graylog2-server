@@ -119,6 +119,7 @@ const Metric = ({ index }: Props) => {
                  wrapperClassName="col-sm-9">
             <FieldSelect id="metric-field-select"
                          selectRef={metricFieldSelectRef}
+                         menuPortalTarget={document.body}
                          onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
                          clearable={!isFieldRequired}
                          isFieldQualified={isFieldQualified}

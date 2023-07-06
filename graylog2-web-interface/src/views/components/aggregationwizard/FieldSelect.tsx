@@ -37,6 +37,7 @@ const FieldName = styled.span`
 type Props = {
   ariaLabel?: string,
   autoFocus?: boolean,
+  allowCreate?: boolean,
   className?: string,
   clearable?: boolean,
   excludedFields?: Array<string>,
@@ -63,18 +64,27 @@ const UnqualifiedOption = styled.span(({ theme }) => css`
 type OptionRendererProps = {
   label: string,
   qualified: boolean,
-  type: FieldType,
+  type?: FieldType,
 };
 
 const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
-  const children = <FieldName><FieldTypeIcon type={type} /> {label}</FieldName>;
+  const children = (
+    <FieldName>
+      {type && <><FieldTypeIcon type={type} /> </>}{label}
+    </FieldName>
+  );
 
   return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
+};
+
+OptionRenderer.defaultProps = {
+  type: undefined,
 };
 
 const FieldSelect = ({
   ariaLabel,
   autoFocus,
+  allowCreate,
   className,
   clearable,
   excludedFields,
@@ -109,12 +119,12 @@ const FieldSelect = ({
     <Select options={fieldOptions}
             inputId={`select-${id}`}
             forwardedRef={selectRef}
+            allowCreate={allowCreate}
             className={className}
             onMenuClose={onMenuClose}
             openMenuOnFocus={openMenuOnFocus}
             persistSelection={persistSelection}
             clearable={clearable}
-            inputProps={{ 'aria-label': placeholder }}
             placeholder={placeholder}
             name={name}
             value={value}
@@ -129,6 +139,7 @@ const FieldSelect = ({
 };
 
 FieldSelect.defaultProps = {
+  allowCreate: false,
   ariaLabel: undefined,
   autoFocus: undefined,
   className: undefined,
