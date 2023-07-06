@@ -6442,6 +6442,24 @@ elementary-circuits-directed-graph@^1.0.4:
   dependencies:
     strongly-connected-components "^1.0.1"
 
+embla-carousel-react@^8.0.0-rc07:
+  version "8.0.0-rc07"
+  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0-rc07.tgz#526aacb736d4695dbfdeeeaeb3d87583973699f0"
+  integrity sha512-8JX2kIMTbqHvsG6O0XRUHdZJ/66kyKCwFwFVZXZ1YpdrdMlrMHBNyIQP+ETBWgOsNtpbcBeWyZx29YtzCVLgJA==
+  dependencies:
+    embla-carousel "8.0.0-rc07"
+    embla-carousel-reactive-utils "8.0.0-rc07"
+
+embla-carousel-reactive-utils@8.0.0-rc07:
+  version "8.0.0-rc07"
+  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0-rc07.tgz#e998c28972a87da3809d450f8db0032d91faf884"
+  integrity sha512-MfdReTR3p0GTcUqLY0DNF5mkYRHF/pler9yBUjRjjjBb1OTQjcFedXYhoCDO49009x/IPM00kcbQQuEtJWpQRQ==
+
+embla-carousel@8.0.0-rc07:
+  version "8.0.0-rc07"
+  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0-rc07.tgz#3d0efd24a45d4439f29299bf6b6c3e5cdedc40ee"
+  integrity sha512-IdGbZH042gRT0/3dOCbiv45jOt5E7jpM4h25VzyJujule/3GitJ1/Ib3U/X83auiI3aojKoBe13e1g5g7bwnjg==
+
 emittery@^0.13.1:
   version "0.13.1"
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.13.1.tgz#c04b8c3457490e0847ae51fced3af52d338e3dad"
@@ -6912,7 +6930,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.1.4"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-6ae7b818-4027-4304-bc83-f670ff08f6ee-1688602768459/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-d04b143f-dbe9-4540-ae89-b72fc212a66f-1688652591563/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.2.2"
     eslint-plugin-jest-dom "5.0.1"
@@ -7477,6 +7495,13 @@ fast-memoize@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/fast-memoize/-/fast-memoize-2.5.1.tgz#c3519241e80552ce395e1a32dcdde8d1fd680f5d"
   integrity sha512-xdmw296PCL01tMOXx9mdJSmWY29jQgxyuZdq0rEHMu+Tpe1eOEtCycoG6chzlcrWsNgpZP7oL8RiQr7+G6Bl6g==
+
+fast-xml-parser@^4.2.5:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.2.5.tgz#a6747a09296a6cb34f2ae634019bf1738f3b421f"
+  integrity sha512-B9/wizE4WngqQftFPmdaMYlXoJlJOYxGQOanC77fq9k8+Z0v5dDSVh+3glErdIROP//s/jgb7ZuxKfB8nVyo0g==
+  dependencies:
+    strnum "^1.0.5"
 
 fastest-levenshtein@^1.0.12, fastest-levenshtein@^1.0.16:
   version "1.0.16"
@@ -8213,13 +8238,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.16"
     "@types/react" "18.2.14"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-76235e47-4d0c-4a4f-932c-a3685aeac71b-1688602768293/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-7194eea7-12ad-4064-b1e9-fce13ccab8b4-1688652591527/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-76235e47-4d0c-4a4f-932c-a3685aeac71b-1688602768293/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-7194eea7-12ad-4064-b1e9-fce13ccab8b4-1688652591527/node_modules/eslint-config-graylog"
     formik "2.4.2"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-76235e47-4d0c-4a4f-932c-a3685aeac71b-1688602768293/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-7194eea7-12ad-4064-b1e9-fce13ccab8b4-1688652591527/node_modules/jest-preset-graylog"
     jquery "3.7.0"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -13972,6 +13997,11 @@ strip-json-comments@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-3.1.1.tgz#31f1281b3832630434831c310c01cccda8cbe006"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
+
+strnum@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/strnum/-/strnum-1.0.5.tgz#5c4e829fe15ad4ff0d20c3db5ac97b73c9b072db"
+  integrity sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==
 
 strongly-connected-components@^1.0.1:
   version "1.0.1"
