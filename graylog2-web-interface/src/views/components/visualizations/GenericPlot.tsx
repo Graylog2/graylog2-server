@@ -37,17 +37,19 @@ import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 
 const StyledPlot = styled(Plot)(({ theme }) => css`
-  .hoverlayer .hovertext rect {
-    fill: ${theme.colors.global.contentBackground} !important;
-    opcity: 0.9 !important;
-  }
+  .hoverlayer .hovertext {
+    rect {
+      fill: ${theme.colors.global.contentBackground} !important;
+      opcity: 0.9 !important;
+    }
 
-  .hoverlayer .hovertext .name {
-    fill: ${theme.colors.global.textDefault} !important;
-  }
+    .name {
+      fill: ${theme.colors.global.textDefault} !important;
+    }
 
-  .hoverlayer .hovertext path {
-    stroke: ${theme.colors.global.contentBackground} !important;
+    path {
+      stroke: ${theme.colors.global.contentBackground} !important;
+    }
   }
 `);
 
