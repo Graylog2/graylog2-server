@@ -6,16 +6,20 @@ import useContentStream from 'components/content-stream/hook/useContentStream';
 import { Spinner } from 'components/common';
 import ContentStreamNewsItem from 'components/content-stream/news/ContentStreamNewsItem';
 
-const ContentStreamNews = () => {
-  const { newsList, isLoadingFeed } = useContentStream();
+type Props = {
+  rssUrl: string,
+}
 
-  if (isLoadingFeed && !isEmpty(newsList)) {
+const ContentStreamNews = ({ rssUrl }: Props) => {
+  const { feedList, isLoadingFeed } = useContentStream(rssUrl);
+
+  if (isLoadingFeed && !isEmpty(feedList)) {
     return <Spinner />;
   }
 
   return (
     <Carousel>
-      {newsList?.map((news) => <ContentStreamNewsItem feed={news} />)}
+      {feedList?.map((feed) => <ContentStreamNewsItem key={feed['post-id']} feed={feed} />)}
     </Carousel>
   );
 };

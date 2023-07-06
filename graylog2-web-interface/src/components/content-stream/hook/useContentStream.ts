@@ -33,24 +33,23 @@ type RssFeed = {
     }
   }
 }
-const FEED_URL = 'http://localhost:8010/proxy';
 
-const parseXML = (text: string) => {
+const parseXML = (text: string): Array<FeedITem> => {
   const parser = new XMLParser();
   const parsed = parser.parse(text);
 
   const { rss: { channel: { item: items = undefined } } } = parsed as RssFeed;
 
-  return Promise.resolve(items);
+  return items;
 };
 
-export const fetchNewsFeed = () => window.fetch(FEED_URL, { method: 'GET' })
+export const fetchNewsFeed = (rssUrl: string) => window.fetch(rssUrl, { method: 'GET' })
   .then((response) => response.text())
   .then(parseXML);
 export const NEWS_FEED_QUERY_KEY = 'news_feed_query_key';
 
-const useContentStream = () => {
-  const { data, isLoading } = useQuery<Array<FeedITem>, Error>([NEWS_FEED_QUERY_KEY], () => fetchNewsFeed(), {
+const useContentStream = (rssUrl: string): { isLoadingFeed: boolean, feedList: Array<FeedITem> } => {
+  const { data, isLoading } = useQuery<Array<FeedITem>, Error>([NEWS_FEED_QUERY_KEY], () => fetchNewsFeed(rssUrl), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading news feed failed with status: ${errorThrown}`,
         'Could not load news feed');
@@ -59,7 +58,7 @@ const useContentStream = () => {
   });
 
   return {
-    newsList: data,
+    feedList: data,
     isLoadingFeed: isLoading,
   };
 };

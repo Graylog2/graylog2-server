@@ -43,6 +43,7 @@ const ContentStreamNewsItem = ({ feed }: Props) => (
     <StyledPanel>
       <StyledImage src="https://placehold.co/600x400" alt="test" />
       <StyledPanelBody>
+        {/* eslint-disable-next-line react/no-danger */}
         <a href={feed.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed.title) }} />
         </a>
       </StyledPanelBody>
