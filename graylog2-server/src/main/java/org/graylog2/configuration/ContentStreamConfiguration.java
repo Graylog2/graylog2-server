@@ -21,6 +21,7 @@ import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Map;
 
 public class ContentStreamConfiguration {
     @Parameter(value = "content_stream_rss_url")
@@ -37,4 +38,12 @@ public class ContentStreamConfiguration {
     public Duration getContentStreamRefreshInterval() {
         return contentStreamRefreshInterval;
     }
+
+    public Map<String, ?> contentStreamFrontendSettings() {
+        return Map.of(
+                "rss_url", getContentStreamRssUri(),
+                "refresh_interval", getContentStreamRefreshInterval()
+        );
+    }
+
 }
