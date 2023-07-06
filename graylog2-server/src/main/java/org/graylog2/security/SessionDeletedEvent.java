@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.rest.resources.csp;
+package org.graylog2.security;
 
-public interface CSPService {
-    void updateConnectSrc();
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    String cspString(String group);
+public record SessionDeletedEvent(@JsonProperty("session_id") String sessionId) {
 }

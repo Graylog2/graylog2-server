@@ -46,7 +46,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
-@CSP(value = CSP.CSP_SWAGGER)
+@CSP(group = CSP.SWAGGER)
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;

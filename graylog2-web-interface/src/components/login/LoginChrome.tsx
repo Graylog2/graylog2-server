@@ -37,6 +37,7 @@ const Background = styled.div`
 `;
 
 const BackgroundText = styled.div`
+  z-index: -1;
   display: flex;
   flex-direction: column;
   position: absolute;
