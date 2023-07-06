@@ -19,6 +19,7 @@ import styled from 'styled-components';
 
 import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import ContentStreamSection from 'components/content-stream/ContentStreamSection';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -60,6 +61,7 @@ const Welcome = () => {
         </p>
         <RecentActivityList />
       </StyledSectionComponent>
+      <ContentStreamSection />
     </>
   );
 };
