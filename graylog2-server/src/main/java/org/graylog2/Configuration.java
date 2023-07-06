@@ -28,12 +28,12 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog.security.certutil.CaConfiguration;
+import org.graylog2.bindings.ParameterNamedInjectOverride;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
@@ -43,6 +43,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -51,6 +52,7 @@ import java.util.Set;
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends CaConfiguration {
 
+    public static final String CONTENT_PACKS_DIR = "content_packs_dir";
     /**
      * Deprecated! Use isLeader() instead.
      */
@@ -159,8 +161,8 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "content_packs_loader_enabled")
     private boolean contentPacksLoaderEnabled = false;
 
-    @Parameter(value = "content_packs_dir")
-    private Path contentPacksDir = DEFAULT_DATA_DIR.resolve("contentpacks");
+    @Parameter(value = CONTENT_PACKS_DIR)
+    private Path contentPacksDir;
 
     @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoInstall = Collections.emptySet();
@@ -393,8 +395,9 @@ public class Configuration extends CaConfiguration {
         return contentPacksLoaderEnabled;
     }
 
+    @ParameterNamedInjectOverride(value = CONTENT_PACKS_DIR)
     public Path getContentPacksDir() {
-        return contentPacksDir;
+        return Optional.ofNullable(contentPacksDir).orElse(getDataDir().resolve("contentpacks"));
     }
 
     public Set<String> getContentPacksAutoInstall() {
