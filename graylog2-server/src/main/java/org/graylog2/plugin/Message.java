@@ -76,6 +76,7 @@ import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_TAGS;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_VERSION;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ASSOCIATED_ASSETS;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -228,7 +229,8 @@ public class Message implements Messages, Indexable {
             FIELD_ILLUMINATE_GIM_EVENT_TYPE,
             FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE,
             FIELD_ILLUMINATE_GIM_TAGS,
-            FIELD_ILLUMINATE_GIM_VERSION
+            FIELD_ILLUMINATE_GIM_VERSION,
+            FIELD_ASSOCIATED_ASSETS
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
