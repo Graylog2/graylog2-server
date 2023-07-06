@@ -110,7 +110,8 @@ public class TelemetryServiceWithDbTest {
                 new TelemetryResponseFactory(),
                 new DBTelemetryUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
                 eventBus,
-                telemetryClusterService);
+                telemetryClusterService,
+                "unknown");
     }
 
     @Test

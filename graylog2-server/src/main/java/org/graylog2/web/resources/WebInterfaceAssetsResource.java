@@ -67,7 +67,7 @@ import static java.util.Objects.requireNonNull;
 
 @Singleton
 @Path("")
-@CSP(value = CSP.CSP_DEFAULT)
+@CSP(group = CSP.DEFAULT)
 public class WebInterfaceAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final IndexHtmlGenerator indexHtmlGenerator;
