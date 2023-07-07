@@ -45,7 +45,7 @@ const NumberRefExpression = ({
 
   const createSeries = useCallback(() => ({ id: expression.ref }), [expression.ref]);
 
-  const getOrCreateSeries = useCallback((seriesId) => getSeries(seriesId) || createSeries(), [getSeries]);
+  const getOrCreateSeries = useCallback((seriesId) => getSeries(seriesId) || createSeries(), [createSeries, getSeries]);
 
   const handleFieldChange = useCallback((key, value) => {
     const series = cloneDeep(eventDefinition.config.series);
