@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Decreasing z-index of login background."
+
+issues = ["15884"]
+pulls = ["15901"]
