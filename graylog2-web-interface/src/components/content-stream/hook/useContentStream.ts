@@ -27,8 +27,13 @@ export type FeedITem = {
   pubDate: string,
   'dc:creator': string,
   link: string,
-  'post-id': string,
+  'post-id': {
+    '#text': string
+  },
   guid: string
+  'media:thumbnail': {
+    attr_url: string,
+  }
 }
 
 type RssFeed = {
@@ -51,7 +56,11 @@ type RssFeed = {
 }
 
 const parseXML = (text: string): Array<FeedITem> => {
-  const parser = new XMLParser();
+  const options = {
+    ignoreAttributes: false,
+    attributeNamePrefix: 'attr_',
+  };
+  const parser = new XMLParser(options);
   const parsed = parser.parse(text);
 
   const { rss: { channel: { item: items = undefined } } } = parsed as RssFeed;

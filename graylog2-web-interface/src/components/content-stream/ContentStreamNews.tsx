@@ -35,7 +35,7 @@ const ContentStreamNews = ({ rssUrl }: Props) => {
 
   return (
     <Carousel>
-      {feedList?.map((feed) => <ContentStreamNewsItem key={feed['post-id']} feed={feed} />)}
+      {feedList?.map((feed) => <ContentStreamNewsItem key={feed['post-id']['#text']} feed={feed} />)}
     </Carousel>
   );
 };

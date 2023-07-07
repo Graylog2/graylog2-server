@@ -28,7 +28,7 @@ const StyledDiv = styled.div`
   &.carousel {
     overflow: hidden;
 
-    .carousel__container {
+    .carousel-container {
       backface-visibility: hidden;
       display: flex;
       flex-direction: row;
@@ -42,7 +42,7 @@ const Carousel = ({ children }: Props) => {
 
   return (
     <StyledDiv className="carousel" ref={emblaRef}>
-      <div className="carousel__container">
+      <div className="carousel-container">
         {children}
       </div>
     </StyledDiv>

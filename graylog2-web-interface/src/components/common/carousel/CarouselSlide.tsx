@@ -31,7 +31,7 @@ const StyledSlide = styled.div(({ $size, $gap, theme }: {
   $size: string | number,
   $gap: number
 }) => css`
-  flex: 0 0 ${$size ?? '24%'};;
+  flex: 0 0 ${$size ?? '24%'};
   min-width: 0;
   min-height: 100px;
   margin-right: ${$gap ?? theme.spacings.sm};
