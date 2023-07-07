@@ -21,7 +21,7 @@
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "29.5.0",
+    "jest": "29.6.1",
     "jest-canvas-mock": "^2.3.1",
     "jest-environment-enzyme": "^7.1.2",
     "jest-environment-jsdom": "29.6.0",
