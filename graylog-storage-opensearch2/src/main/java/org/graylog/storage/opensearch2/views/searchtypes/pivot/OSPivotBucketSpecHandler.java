@@ -63,7 +63,11 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                     }
-                                    return BucketOrder.aggregation(queryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    String orderPath = seriesSpec.statsSubfieldName()
+                                            .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "." + subField)
+                                            .orElse(queryContext.seriesName(seriesSpec, pivot));
+
+                                    return BucketOrder.aggregation(orderPath, sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                 })
                                 .orElse(null);
                     }

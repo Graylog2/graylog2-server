@@ -36,33 +36,20 @@ public class CSPDynamicFeature implements DynamicFeature {
         this.cspService = cspService;
     }
 
-    public String dynamicCspString() {
-        return dynamicCspString(CSP.CSP_DEFAULT);
-    }
-
-    public String dynamicCspString(String staticCspString) {
-        if (!staticCspString.contains("connect-src")) {
-            return staticCspString + "connect-src " + cspService.connectSrcValue();
-        }
-        return staticCspString;
+    public String cspDefault() {
+        return cspService.cspString(CSP.DEFAULT);
     }
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         final Method resourceMethod = resourceInfo.getResourceMethod();
         final Class<?> resourceClass = resourceInfo.getResourceClass();
-        String cspValue = null;
         if (resourceClass != null && resourceClass.isAnnotationPresent(CSP.class)) {
-            cspValue = dynamicCspString(resourceClass.getAnnotation(CSP.class).value());
-            LOG.debug("CSP class annotation for {}: {}", resourceClass.getSimpleName(), cspValue);
-        } else if (resourceMethod != null && resourceMethod.isAnnotationPresent(CSP.class)) {
-            cspValue = dynamicCspString(resourceMethod.getAnnotation(CSP.class).value());
-            LOG.debug("CSP method annotation for {}: {}", resourceMethod.getName(), cspValue);
-        }
-        if (cspValue != null) {
             context.register(new CSPNonceRequestFilter());
-            context.register(new CSPResponseFilter(cspValue));
+            context.register(new CSPResponseFilter(resourceClass.getAnnotation(CSP.class).group(), cspService));
+        } else if (resourceMethod != null && resourceMethod.isAnnotationPresent(CSP.class)) {
+            context.register(new CSPNonceRequestFilter());
+            context.register(new CSPResponseFilter(resourceMethod.getAnnotation(CSP.class).group(), cspService));
         }
     }
-
 }

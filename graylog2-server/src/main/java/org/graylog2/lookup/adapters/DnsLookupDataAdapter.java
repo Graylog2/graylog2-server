@@ -37,6 +37,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.adapters.dnslookup.ADnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.DnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.DnsClient;
+import org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration;
 import org.graylog2.lookup.adapters.dnslookup.DnsLookupType;
 import org.graylog2.lookup.adapters.dnslookup.PtrDnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.TxtDnsAnswer;
@@ -80,6 +81,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     private static final String TIMER_TEXT_LOOKUP = "textLookupTime";
     private DnsClient dnsClient;
     private final Config config;
+    private final DnsLookupAdapterConfiguration adapterConfiguration;
 
     private final Counter errorCounter;
 
@@ -90,9 +92,11 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     @Inject
     public DnsLookupDataAdapter(@Assisted("dto") DataAdapterDto dto,
-                                MetricRegistry metricRegistry) {
+                                MetricRegistry metricRegistry,
+                                DnsLookupAdapterConfiguration adapterConfiguration) {
         super(dto, metricRegistry);
         this.config = (Config) dto.config();
+        this.adapterConfiguration = adapterConfiguration;
         this.errorCounter = metricRegistry.counter(MetricRegistry.name(getClass(), dto.id(), ERROR_COUNTER));
         this.resolveDomainNameTimer = metricRegistry.timer(MetricRegistry.name(getClass(), dto.id(), TIMER_RESOLVE_DOMAIN_NAME));
         this.reverseLookupTimer = metricRegistry.timer(MetricRegistry.name(getClass(), dto.id(), TIMER_REVERSE_LOOKUP));
@@ -101,8 +105,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doStart() {
-
-        dnsClient = new DnsClient(config.requestTimeout());
+        dnsClient = new DnsClient(config.requestTimeout(), adapterConfiguration.getPoolSize(),
+                adapterConfiguration.getPoolRefreshInterval().toSeconds());
         dnsClient.start(config.serverIps());
     }
 

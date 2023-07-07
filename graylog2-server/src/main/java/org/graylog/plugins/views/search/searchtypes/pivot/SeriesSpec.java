@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -45,6 +46,14 @@ public interface SeriesSpec extends PivotSpec {
 
     default String literal() {
         return type() + "()";
+    }
+
+    /**
+     * Override if your series are based on "stats" or "extended stats" aggregation,
+     * to give exact name of the subfield of those aggregations which represents the series.
+     */
+    default Optional<String> statsSubfieldName() {
+        return Optional.empty();
     }
 
     @JsonAutoDetect

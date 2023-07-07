@@ -177,7 +177,7 @@ public class MongoIndexRangeService implements IndexRangeService {
                 LOG.debug("Not handling deleted index <{}> because it's not managed by any index set.", index);
                 continue;
             }
-            LOG.debug("Index \"{}\" has been deleted. Removing index range.");
+            LOG.debug("Index \"{}\" has been deleted. Removing index range.", index);
             if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
@@ -192,7 +192,7 @@ public class MongoIndexRangeService implements IndexRangeService {
                 LOG.debug("Not handling closed index <{}> because it's not managed by any index set.", index);
                 continue;
             }
-            LOG.debug("Index \"{}\" has been closed. Removing index range.");
+            LOG.debug("Index \"{}\" has been closed. Removing index range.", index);
             if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
