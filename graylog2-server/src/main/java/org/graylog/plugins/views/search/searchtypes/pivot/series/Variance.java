@@ -46,6 +46,11 @@ public abstract class Variance implements SeriesSpec {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
 
+    @Override
+    public Optional<String> statsSubfieldName() {
+        return Optional.of(NAME);
+    }
+
     public static Variance.Builder builder() {
         return new AutoValue_Variance.Builder().type(NAME);
     }
