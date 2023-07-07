@@ -17,7 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
-import { withTheme } from 'styled-components';
+import styled, { css, withTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
@@ -34,6 +34,21 @@ import styles from './GenericPlot.lazy.css';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+
+const StyledPlot = styled(Plot)(({ theme }) => css`
+  .hoverlayer .hovertext {
+    rect {
+      fill: ${theme.colors.global.contentBackground} !important;
+      opcity: 0.9 !important;
+    }
+    .name {
+      fill: ${theme.colors.global.textDefault} !important;
+    }
+    path {
+      stroke: ${theme.colors.global.contentBackground} !important;
+    }
+  }
+`);
 
 type LegendConfig = {
   name: string,
@@ -243,15 +258,15 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
                 <RenderCompletionCallback.Consumer>
                   {(onRenderComplete) => (
                     <>
-                      <Plot data={newChartData}
-                            useResizeHandler
-                            layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                            style={style}
-                            onAfterPlot={onRenderComplete}
-                            onClick={interactive ? null : () => false}
-                            onLegendClick={interactive ? this._onLegendClick : () => false}
-                            onRelayout={interactive ? this._onRelayout : () => false}
-                            config={config} />
+                      <StyledPlot data={newChartData}
+                                  useResizeHandler
+                                  layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
+                                  style={style}
+                                  onAfterPlot={onRenderComplete}
+                                  onClick={interactive ? null : () => false}
+                                  onLegendClick={interactive ? this._onLegendClick : () => false}
+                                  onRelayout={interactive ? this._onRelayout : () => false}
+                                  config={config} />
                       {legendConfig && (
                         <RootCloseWrapper event="mousedown"
                                           onRootClose={this._onCloseColorPopup}>
