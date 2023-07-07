@@ -35,7 +35,6 @@ import styles from './GenericPlot.lazy.css';
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
-
 const StyledPlot = styled(Plot)(({ theme }) => css`
   .hoverlayer .hovertext {
     rect {
@@ -263,14 +262,14 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
                   {(onRenderComplete) => (
                     <>
                       <StyledPlot data={newChartData}
-                            useResizeHandler
-                            layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                            style={style}
-                            onAfterPlot={onRenderComplete}
-                            onClick={interactive ? null : () => false}
-                            onLegendClick={interactive ? this._onLegendClick : () => false}
-                            onRelayout={interactive ? this._onRelayout : () => false}
-                            config={config} />
+                                  useResizeHandler
+                                  layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
+                                  style={style}
+                                  onAfterPlot={onRenderComplete}
+                                  onClick={interactive ? null : () => false}
+                                  onLegendClick={interactive ? this._onLegendClick : () => false}
+                                  onRelayout={interactive ? this._onRelayout : () => false}
+                                  config={config} />
                       {legendConfig && (
                         <RootCloseWrapper event="mousedown"
                                           onRootClose={this._onCloseColorPopup}>
