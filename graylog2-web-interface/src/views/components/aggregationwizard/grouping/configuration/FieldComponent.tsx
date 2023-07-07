@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback, useContext } from 'react';
 import { useFormikContext } from 'formik';
-import type FieldTypeMapping from 'src/views/logic/fieldtypes/FieldTypeMapping';
 
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
