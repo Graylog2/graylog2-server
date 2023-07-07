@@ -24,6 +24,8 @@ import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 
+jest.mock('components/content-stream/ContentStreamSection', () => 'content-stream-section');
+
 jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
   data: {
     lastOpened: [{ grn: 'grn::::dashboard:1', title: 'Title 1' }, {
@@ -100,7 +102,11 @@ describe('Welcome', () => {
     });
 
     it('Show no items', async () => {
-      asMock(useLastOpened).mockImplementation(() => ({ data: { lastOpened: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useLastOpened).mockImplementation(() => ({
+        data: { lastOpened: [], page: 1, count: 0, total: 0, per_page: 5 },
+        isFetching: false,
+      }));
+
       render(<Welcome />);
       await screen.findByText(/You do not have opened any searches\/dashboards yet/i);
     });
@@ -120,7 +126,17 @@ describe('Welcome', () => {
     });
 
     it('Show no items', async () => {
-      asMock(useFavoriteItems).mockImplementation(() => ({ data: { favorites: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useFavoriteItems).mockImplementation(() => ({
+        data: {
+          favorites: [],
+          page: 1,
+          count: 0,
+          total: 0,
+          per_page: 5,
+        },
+        isFetching: false,
+      }));
+
       render(<Welcome />);
       await screen.findByText(/You do not have any favorite items yet./i);
     });
@@ -140,7 +156,17 @@ describe('Welcome', () => {
     });
 
     it('Show no items', async () => {
-      asMock(useRecentActivity).mockImplementation(() => ({ data: { recentActivity: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useRecentActivity).mockImplementation(() => ({
+        data: {
+          recentActivity: [],
+          page: 1,
+          count: 0,
+          total: 0,
+          per_page: 5,
+        },
+        isFetching: false,
+      }));
+
       render(<Welcome />);
       await screen.findByText(/There is no recent activity/i);
     });
