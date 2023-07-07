@@ -29,6 +29,7 @@ const defaultOptions = {
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      networkMode: 'always' as const,
     },
   },
 };
