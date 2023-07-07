@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Improve readability of hover legend in aggregations."
+
+issues = ["15084"]
+pulls = ["15888"]
