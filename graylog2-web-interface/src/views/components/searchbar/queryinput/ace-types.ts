@@ -63,6 +63,7 @@ export type Editor = {
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
+  isFocused: () => boolean,
 };
 
 export type CompletionResult = {
