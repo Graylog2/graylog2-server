@@ -97,9 +97,8 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
             nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
-                var altNames = List.of("jheise-mp.fritz.box", "jheise-mp");
                 var node = nodeService.byNodeId(nodeId);
-                var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), altNames, privateKeyEncryptedStorage);
+                var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
                 csrStorage.writeCsr(csr, nodeId.getNodeId());
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
