@@ -147,7 +147,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
     const isFunction = isLabelAFunction(value, series[0]);
     const field = (fieldMapper ?? defaultFieldMapper)(isFunction);
-    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field}>{value}</Value> : value;
+    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field} /> : value;
 
     return (
       <LegendCell key={value}>
