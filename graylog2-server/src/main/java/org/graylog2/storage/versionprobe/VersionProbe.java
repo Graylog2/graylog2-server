@@ -44,14 +44,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -158,9 +162,17 @@ public class VersionProbe {
     private void addSSLContextIfHttps(final URI host, final OkHttpClient.Builder okHttpClient) {
         if("https".equalsIgnoreCase(host.getScheme())) {
             try {
-                SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
-                okHttpClient.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustManagerProvider.create(host.getHost()));
-            } catch (NoSuchAlgorithmException | KeyStoreException ex) {
+                var sslContext = SSLContext.getInstance("TLS");
+                var tm = trustManagerProvider.create(host.getHost());
+                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
+                okHttpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager)tm);
+                okHttpClient.hostnameVerifier((hostname, session) -> true);
+
+                okHttpClient.authenticator((route, response) -> {
+                    String credential = Credentials.basic("admin", "admin");
+                    return response.request().newBuilder().header("Authorization", credential).build();
+                });
+            } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
                 LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
             }
         }
@@ -205,7 +217,7 @@ public class VersionProbe {
             final String error = ExceptionUtils.formatMessageCause(e);
             final String rootCause = ExceptionUtils.formatMessageCause(ExceptionUtils.getRootCause(e));
             LOG.error("Unable to retrieve version from Elasticsearch node: {} - {}", error, rootCause);
-            LOG.debug("Complete exception for version probe error: ", e);
+            LOG.info("Complete exception for version probe error: ", e);
         }
         return Optional.empty();
     }

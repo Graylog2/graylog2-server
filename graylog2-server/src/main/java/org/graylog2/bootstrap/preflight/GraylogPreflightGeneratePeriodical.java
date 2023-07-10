@@ -16,7 +16,6 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.google.inject.assistedinject.Assisted;
 import okhttp3.Call;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -49,6 +48,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -93,7 +93,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
                 SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
-                clientBuilder.sslSocketFactory(sslSocketFactory, new CustomCAX509TrustManager("jheise-mp.fritz.box", caService));
+                clientBuilder.sslSocketFactory(sslSocketFactory, new CustomCAX509TrustManager((String)null, caService));
             } catch (NoSuchAlgorithmException ex) {
                 LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
             }

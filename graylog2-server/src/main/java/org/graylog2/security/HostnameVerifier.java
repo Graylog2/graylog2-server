@@ -46,7 +46,7 @@ public class HostnameVerifier {
     }
 
     private boolean certificateMatchesHostname(X509Certificate x509Certificate) {
-        return this.hosts.stream().anyMatch(host -> {
+        return this.hosts.isEmpty() || this.hosts.stream().anyMatch(host -> {
             try {
                 return this.authorizer.verify(host, x509Certificate);
             } catch (IOException e) {
