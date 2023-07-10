@@ -43,6 +43,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -92,8 +94,11 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         try {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
-                SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
-                clientBuilder.sslSocketFactory(sslSocketFactory, new CustomCAX509TrustManager((String)null, caService));
+                var sslContext = SSLContext.getInstance("TLS");
+                var tm = new CustomCAX509TrustManager((String)null, caService);
+                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
+                clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
+                clientBuilder.hostnameVerifier((hostname, session) -> true);
             } catch (NoSuchAlgorithmException ex) {
                 LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
             }
