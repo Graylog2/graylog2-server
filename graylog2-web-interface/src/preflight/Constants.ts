@@ -33,7 +33,7 @@ export const CONFIGURATION_STEPS = {
     key: 'CONFIGURATION_FINISHED',
     description: 'All data nodes are secured and reachable',
   },
-};
+} as const;
 
 export const CONFIGURATION_STEPS_ORDER = [
   CONFIGURATION_STEPS.CA_CONFIGURATION.key,
