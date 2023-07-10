@@ -44,7 +44,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.KeyStore;
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
