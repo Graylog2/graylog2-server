@@ -71,7 +71,6 @@ export type Completer = {
 export type Editor = {
   commands: Commands,
   completer: Completer,
-
   completers: Array<AutoCompleter>,
   execCommand: (command: string) => void,
   session: Session,
@@ -79,6 +78,7 @@ export type Editor = {
   setFontSize: (newFontSize: number) => void,
   getValue: () => string,
   setValue: (newValue: string) => void,
+  isFocused: () => boolean,
 };
 
 export type CompletionResult = {
