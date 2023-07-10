@@ -23,7 +23,7 @@ import DocsHelper from 'util/DocsHelper';
 
 import RuleBuilder from './rule-builder/RuleBuilder';
 import RuleForm from './RuleForm';
-import RuleHelper from './RuleHelper';
+import RuleHelper from './rule-helper/RuleHelper';
 
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
