@@ -316,7 +316,7 @@ const RuleBuilder = () => {
   return (
     <form onSubmit={(e) => handleSave(e, true)}>
       <Row className="content">
-        <Col md={8}>
+        <Col xs={8}>
           <RuleBuilderForm rule={rule}
                            onChange={setRule} />
           <label htmlFor="rule_builder">Rule Builder</label>
@@ -336,10 +336,10 @@ const RuleBuilder = () => {
             Convert to Source Code
           </ConvertButton>
         </Col>
-        <ReferenceRuleCol md={4}>
+        <ReferenceRuleCol xs={4}>
           <RuleHelper />
         </ReferenceRuleCol>
-        <Col md={4}>
+        <Col xs={4}>
           <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
           {rule.rule_builder.conditions.map((condition, index) => (
             // eslint-disable-next-line react/no-array-index-key
@@ -362,7 +362,7 @@ const RuleBuilder = () => {
                               type: 'condition',
                             })} />
         </Col>
-        <Col md={4}>
+        <Col xs={4}>
           <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
           {rule.rule_builder.actions.map((action, index) => (
             // eslint-disable-next-line react/no-array-index-key
@@ -384,13 +384,13 @@ const RuleBuilder = () => {
                             updateBlock={updateBlock}
                             deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
         </Col>
-        <Col md={4}>
+        <Col xs={4}>
           <RuleSimulation rule={rule} />
         </Col>
-        <Col md={12}>
+        <Col xs={12}>
           <Errors objectWithErrors={rule.rule_builder} />
         </Col>
-        <ActionsCol md={12}>
+        <ActionsCol xs={12}>
           <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
                       submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
                       centerCol={initialRule && (
