@@ -55,7 +55,7 @@ We mainly develop using IntelliJ or WebStorm. If you also decide to use them to 
     * Commit any changes in both `package.json` and `yarn.lock` files
     * Do any changes required to adapt the code to the upgraded modules
 
-1. Update many dependencies
+2. Update many dependencies
 
     * It may be dangerous updating many dependencies at the same time, so be sure you checked the upgrade notes of all modules before getting started. Once you are ready to upgrade the modules, Yarn provides a few options to do it:
         * You can pass all packages you want to upgrade to Yarn: `yarn upgrade <package1> <package2>...`

@@ -14,6 +14,6 @@
 ### `EmptyEntity` & `NoEntitiesExist` & `NoSearchResults` components
 
 - These three components are closely related and maybe confusing to decide which one to use for which situation.
-  - `EmptyEntity` should be used to display a message for an entity that does not have any entries in the database yet. This components supports displaying a message explaining what the entity is and can also support including a button link to create one via the children props
+  - `EmptyEntity` should be used to display a message for an entity that does not have any entries in the database yet. This component supports displaying a message explaining what the entity is and can also support including a button link to create one via the children props
   - `NoEntitiesExist` is similar to `EmptyEntity` except it is a more generic message without including the option to create a new one
   - `NoSearchResults` should be used in the case when a search is performed with a query and the result is no matching entries. This component should inform the user that entities still exist, just that none match the current filter.

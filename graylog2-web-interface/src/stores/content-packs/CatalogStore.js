@@ -52,7 +52,7 @@ export const CatalogStore = singletonStore(
 
     getSelectedEntities(requestedEntities) {
       const payload = Object.keys(requestedEntities).reduce((result, key) => result.concat(requestedEntities[key]
-        .filter((entitiy) => entitiy instanceof EntityIndex)
+        .filter((entity) => entity instanceof EntityIndex)
         .map((entity) => entity.toJSON())), []);
       const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
       const promise = fetch('POST', url, { entities: payload });
