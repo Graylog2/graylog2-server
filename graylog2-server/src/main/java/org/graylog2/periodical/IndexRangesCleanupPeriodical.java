@@ -62,7 +62,6 @@ public class IndexRangesCleanupPeriodical extends Periodical {
         this.indexRangeService = requireNonNull(indexRangeService);
         this.eventBus = requireNonNull(eventBus);
         this.periodSeconds = Ints.saturatedCast(indexRangesCleanupInterval.toSeconds());
-
     }
 
     @Override
