@@ -44,6 +44,8 @@ const unitValues = [
   'MINUTES',
   'HOURS',
   'DAYS',
+  'MONTHS',
+  'YEARS',
 ];
 const unitType = PropTypes.oneOf(unitValues);
 
