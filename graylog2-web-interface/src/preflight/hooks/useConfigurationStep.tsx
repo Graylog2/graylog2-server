@@ -57,7 +57,7 @@ const useConfigurationStep = (): { step: ConfigurationStep | undefined, isLoadin
       isLoading: false,
       step,
     });
-  }, [isLoadingCAStatus, isLoadingDataNodes, step]);
+  }, [isLoadingCAStatus, isLoadingDataNodes, isLoadingRenewalPolicy, step]);
 };
 
 export default useConfigurationStep;
