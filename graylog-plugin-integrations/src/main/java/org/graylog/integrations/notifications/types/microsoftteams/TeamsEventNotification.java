@@ -27,6 +27,7 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -56,19 +58,22 @@ public class TeamsEventNotification implements EventNotification {
     private final ObjectMapperProvider objectMapperProvider;
     private final NodeId nodeId;
     private final RequestClient requestClient;
+    private final URI httpExternalUri;
 
     @Inject
     public TeamsEventNotification(EventNotificationService notificationCallbackService,
                                   ObjectMapperProvider objectMapperProvider,
                                   Engine templateEngine,
                                   NotificationService notificationService,
-                                  NodeId nodeId, RequestClient requestClient) {
+                                  NodeId nodeId, RequestClient requestClient,
+                                  HttpConfiguration httpConfiguration) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.templateEngine = requireNonNull(templateEngine);
         this.notificationService = requireNonNull(notificationService);
         this.nodeId = requireNonNull(nodeId);
         this.requestClient = requireNonNull(requestClient);
+        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
     /**
@@ -175,6 +180,7 @@ public class TeamsEventNotification implements EventNotification {
         LOG.debug("the custom message model data is {}", modelData);
         Map<String, Object> objectMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         objectMap.put("type", type);
+        objectMap.put("http_external_uri", this.httpExternalUri);
 
         return objectMap;
     }
