@@ -17,13 +17,11 @@
 package org.graylog2.bootstrap.preflight;
 
 import com.google.inject.assistedinject.Assisted;
-import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.Route;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.cert.CertificateChain;
@@ -37,7 +35,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
 import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.security.GraylogX509TrustManager;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +44,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -72,7 +68,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
     private final String passwordSecret;
-    private final String host;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
     @Inject
@@ -82,8 +77,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                               final CaService caService,
                                               final Configuration configuration,
                                               final NodeService nodeService,
-                                              final @Named("password_secret") String passwordSecret,
-                                              @Assisted String host) {
+                                              final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -91,7 +85,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         this.passwordSecret = passwordSecret;
         this.configuration = configuration;
         this.nodeService = nodeService;
-        this.host = host;
     }
 
     // building a non checking httpclient
@@ -100,7 +93,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
                 SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
-                clientBuilder.sslSocketFactory(sslSocketFactory, new GraylogX509TrustManager(host, caService));
+                clientBuilder.sslSocketFactory(sslSocketFactory, new CustomCAX509TrustManager("jheise-mp.fritz.box", caService));
             } catch (NoSuchAlgorithmException ex) {
                 LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
             }

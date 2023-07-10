@@ -35,12 +35,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GraylogX509TrustManager implements X509TrustManager {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogX509TrustManager.class);
+public class CustomCAX509TrustManager implements X509TrustManager {
+    private static final Logger LOG = LoggerFactory.getLogger(CustomCAX509TrustManager.class);
     private final List<X509TrustManager> trustManagers = new ArrayList<>();
 
     @AssistedInject
-    public GraylogX509TrustManager(@Assisted String host, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
+    public CustomCAX509TrustManager(@Assisted String host, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
         this(List.of(host), caService);
     }
 
@@ -55,7 +55,7 @@ public class GraylogX509TrustManager implements X509TrustManager {
      * @throws KeyStoreException
      */
     @AssistedInject
-    public GraylogX509TrustManager(@Assisted List<String> hosts, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
+    public CustomCAX509TrustManager(@Assisted List<String> hosts, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
         trustManagers.add(new DefaultX509TrustManager(hosts));
         try {
             caService.loadKeyStore().ifPresent(keystore -> trustManagers.add(getTrustManager(keystore)));
@@ -69,6 +69,7 @@ public class GraylogX509TrustManager implements X509TrustManager {
         for (X509TrustManager trustManager : trustManagers) {
             try {
                 trustManager.checkClientTrusted(chain, authType);
+                return;
             } catch (CertificateException e) {}
         }
         throw new CertificateException("None of the TrustManagers trust this certificate chain.");

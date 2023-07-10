@@ -123,7 +123,7 @@ public class VersionProbe {
             retrofit = new Retrofit.Builder()
                     .baseUrl(host.toURL())
                     .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-                    .client(addAuthenticationIfPresent(host, okHttpClient))
+                    .client(clientWithAdditions(host, okHttpClient))
                     .build();
         } catch (MalformedURLException e) {
             LOG.error("Elasticsearch node URL is invalid: " + host.toString(), e);
@@ -148,31 +148,39 @@ public class VersionProbe {
                 .flatMap(this::parseVersion);
     }
 
-    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
-        try {
-            SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
-            okHttpClient = okHttpClient.newBuilder().sslSocketFactory(sslSocketFactory, (X509TrustManager) trustManagerProvider.create(host.getHost())).build();
-        } catch (NoSuchAlgorithmException | KeyStoreException ex) {
-            LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
-        }
+    private OkHttpClient clientWithAdditions(final URI host, final OkHttpClient okHttpClient) {
+        var builder = okHttpClient.newBuilder();
+        addSSLContextIfHttps(host, builder);
+        addAuthenticationIfPresent(host, builder);
+        return builder.build();
+    }
 
+    private void addSSLContextIfHttps(final URI host, final OkHttpClient.Builder okHttpClient) {
+        if("https".equalsIgnoreCase(host.getScheme())) {
+            try {
+                SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
+                okHttpClient.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustManagerProvider.create(host.getHost()));
+            } catch (NoSuchAlgorithmException | KeyStoreException ex) {
+                LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
+            }
+        }
+    }
+
+    private void addAuthenticationIfPresent(final URI host, final OkHttpClient.Builder okHttpClient) {
         if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];
             final String password = credentials[1];
             final String authToken = Credentials.basic(username, password);
 
-            return okHttpClient.newBuilder()
+            okHttpClient
                     .addInterceptor(chain -> {
                         final Request originalRequest = chain.request();
                         final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken);
                         final Request newRequest = builder.build();
                         return chain.proceed(newRequest);
-                    })
-                    .build();
+                    });
         }
-
-        return okHttpClient;
     }
 
     private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {

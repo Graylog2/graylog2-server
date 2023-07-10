@@ -103,15 +103,6 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
 
-        /* Todo: remove?
-        try {
-            SSLSocketFactory sslSocketFactory = SSLContext.getDefault().getSocketFactory();
-            clientBuilder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustManagerProvider.create("ignore"));
-        } catch (NoSuchAlgorithmException | KeyStoreException ex) {
-            LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
-        }
-        */
-
         if (httpProxyUri != null) {
             final ProxySelector proxySelector = new ProxySelector() {
                 @Override

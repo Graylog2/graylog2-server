@@ -44,6 +44,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.KeyStore;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -96,8 +97,9 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
             nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
+                var altNames = List.of("jheise-mp.fritz.box", "jheise-mp");
                 var node = nodeService.byNodeId(nodeId);
-                var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
+                var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), altNames, privateKeyEncryptedStorage);
                 csrStorage.writeCsr(csr, nodeId.getNodeId());
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
@@ -130,12 +132,6 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                     LOG.error("Config entry in signed state, but wrong certificate data present in Mongo");
                 }
             }
-
-            // write certificate to local truststore
-            // configure SSL
-            // start DataNode
-            // set state to State.CONNECTED
-            // nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
         }
     }
 

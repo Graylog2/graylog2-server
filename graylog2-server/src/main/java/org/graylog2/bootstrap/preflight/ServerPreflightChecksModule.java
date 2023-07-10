@@ -16,7 +16,6 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import okhttp3.OkHttpClient;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
@@ -26,7 +25,7 @@ import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.security.GraylogX509TrustManager;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
@@ -38,7 +37,7 @@ public class ServerPreflightChecksModule extends Graylog2Module {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-                .implement(TrustManager.class, GraylogX509TrustManager.class)
+                .implement(TrustManager.class, CustomCAX509TrustManager.class)
                 .build(TrustManagerProvider.class));
 
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
