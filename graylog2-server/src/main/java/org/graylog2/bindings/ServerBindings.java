@@ -36,6 +36,7 @@ import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
+import org.graylog2.bootstrap.uncaughtexeptions.DefaultUncaughtExceptionHandlerCreator;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
@@ -178,6 +179,7 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindSingletons() {
+        bind(DefaultUncaughtExceptionHandlerCreator.class).asEagerSingleton();
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
