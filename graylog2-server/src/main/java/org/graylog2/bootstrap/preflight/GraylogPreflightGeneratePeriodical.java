@@ -89,7 +89,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         this.nodeService = nodeService;
     }
 
-    // building a non checking httpclient
+    // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
     private Optional<OkHttpClient> buildTempHttpClient() {
         try {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
@@ -110,7 +110,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
             return Optional.of(clientBuilder.build());
         } catch (Exception ex) {
-            LOG.error("Could not create tmp okhttpclient " + ex.getMessage(), ex);
+            LOG.error("Could not create temporary okhttpclient " + ex.getMessage(), ex);
         }
         return Optional.empty();
     }
