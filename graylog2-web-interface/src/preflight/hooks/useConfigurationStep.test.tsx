@@ -94,7 +94,21 @@ describe('useConfigurationStep', () => {
     }));
   });
 
-  it('should define certificate provisioning step as active step, when CA has not been provisioned', async () => {
+  it('should define renewal policy creation step as active step, when none is configured', async () => {
+    asMock(useDataNodesCA).mockReturnValue({
+      ...useDataNodesResult,
+      data: { id: 'ca-id', type: 'ca-type' },
+    });
+
+    const { result, waitFor } = renderHook(() => useConfigurationStep());
+
+    await waitFor(() => expect(result.current).toEqual({
+      step: CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
+      isLoading: false,
+    }));
+  });
+
+  it('should define certificate provisioning step as active step, when data nodes have not been provisioned', async () => {
     asMock(useDataNodesCA).mockReturnValue({
       ...useDataNodesResult,
       data: { id: 'ca-id', type: 'ca-type' },
@@ -132,7 +146,7 @@ describe('useConfigurationStep', () => {
     }));
   });
 
-  it('should define success step as active step, when CA been provisioned', async () => {
+  it('should define success step as active step, when data nodes have been provisioned', async () => {
     asMock(useDataNodesCA).mockReturnValue({
       ...useDataNodesResult,
       data: { id: 'ca-id', type: 'ca-type' },
