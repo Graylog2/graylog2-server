@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix problem with STOPPED reactor on OutOfMemoryError. This error stops the whole GL instance now, instead of constantly logging errors related to stopped reactor."
+
+issues = ["graylog-plugin-enterprise#4980"]
+pulls = ["15889"]
