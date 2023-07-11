@@ -26,6 +26,8 @@ import { ConfirmDialog, FormSubmit } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+// eslint-disable-next-line no-irregular-whitespace
+import { Toggle } from 'components/navigation/ThemeModeToggle';
 
 import Errors from './Errors';
 import RuleBuilderBlock from './RuleBuilderBlock';
@@ -62,6 +64,16 @@ const SubTitle = styled.label`
   color: #aaa;
 `;
 
+const ActionsHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const SimulatorSwitchContaner = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const RuleBuilder = () => {
   const {
     rule: initialRule,
@@ -79,6 +91,7 @@ const RuleBuilder = () => {
   });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
+  const [showSimulator, setShowSimulator] = useState<boolean>(false);
 
   useEffect(() => {
     if (initialRule) {
@@ -339,7 +352,7 @@ const RuleBuilder = () => {
         <ReferenceRuleCol xs={4}>
           <RuleHelper />
         </ReferenceRuleCol>
-        <Col xs={4}>
+        <Col xs={showSimulator ? 4 : 6}>
           <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
           {rule.rule_builder.conditions.map((condition, index) => (
             // eslint-disable-next-line react/no-array-index-key
@@ -362,8 +375,19 @@ const RuleBuilder = () => {
                               type: 'condition',
                             })} />
         </Col>
-        <Col xs={4}>
-          <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
+        <Col xs={showSimulator ? 4 : 6}>
+          <ActionsHeader>
+            <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
+            <SimulatorSwitchContaner>
+              <Toggle>
+                <input type="checkbox"
+                       onChange={() => setShowSimulator(!showSimulator)}
+                       checked={showSimulator} />
+                <span className="slider" />
+              </Toggle>
+              Simulator
+            </SimulatorSwitchContaner>
+          </ActionsHeader>
           {rule.rule_builder.actions.map((action, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <RuleBuilderBlock key={index}
@@ -384,9 +408,11 @@ const RuleBuilder = () => {
                             updateBlock={updateBlock}
                             deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
         </Col>
-        <Col xs={4}>
-          <RuleSimulation rule={rule} />
-        </Col>
+        {showSimulator && (
+          <Col xs={4}>
+            <RuleSimulation rule={rule} />
+          </Col>
+        )}
         <Col xs={12}>
           <Errors objectWithErrors={rule.rule_builder} />
         </Col>

@@ -40,6 +40,14 @@ const MessageShowContainer = styled.div`
   padding: 16px;
 `;
 
+const ActionOutputIndex = styled.b`
+  color: #aaa;
+`;
+
+const ActionsOutputContainer = styled.div`
+  margin-top: 16px;
+`;
+
 type Props = {
   rule?: RuleType | RuleBuilderRule,
 };
@@ -53,15 +61,17 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setRawMessageToSimulate,
     ruleSimulationResult,
     setRuleSimulationResult,
-    startRuleSimulation,
     setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
+
+  const actionsOuputPrefix = 'gl2_simulator_output_actions';
+  const actionsOutputKeys = Object.keys(ruleSimulationResult?.fields || {}).filter((key) => key.includes(actionsOuputPrefix));
+  const getActionOutpuKey = (actionIndex: number) => `${actionsOuputPrefix}_${actionIndex}`;
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => () => {
-    setRawMessageToSimulate('');
     setRuleSimulationResult(null);
     setStartRuleSimulation(false);
   }, [setRawMessageToSimulate, setRuleSimulationResult, setStartRuleSimulation]);
@@ -96,61 +106,48 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
       event_details: { is_rule_builder },
     });
 
-    setRawMessageToSimulate('');
     setRuleSimulationResult(null);
     setStartRuleSimulation(false);
-  };
-
-  const handleStartRuleSimulation = () => {
-    sendTelemetry('click', {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-simulation',
-      app_action_value: 'start-rule-simulation-button',
-      event_details: { is_rule_builder },
-    });
-
-    setStartRuleSimulation(true);
   };
 
   return (
     <RuleSimulationFormGroup>
       <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
       <div>
-        {!startRuleSimulation && (
-          <Button bsStyle="info"
-                  bsSize="xsmall"
-                  onClick={handleStartRuleSimulation}>
-            Start rule simulation
-          </Button>
+        <Input id="message"
+               type="textarea"
+               // eslint-disable-next-line quotes
+               placeholder={`{\n    "message": "test"\n}`}
+               value={rawMessageToSimulate}
+               onChange={handleRawMessageChange}
+               title="Message string or JSON"
+               help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
+               rows={3} />
+        <Button bsStyle="info"
+                bsSize="xsmall"
+                disabled={disableSimulation}
+                onClick={handleRunRuleSimulation}>
+          Run rule simulation
+        </Button>
+        <ResetButton bsStyle="default"
+                     bsSize="xsmall"
+                     onClick={handleResetRuleSimulation}>
+          Reset
+        </ResetButton>
+        {ruleSimulationResult && (
+          <ActionsOutputContainer>
+            <label htmlFor="simulation_actions_output">Actions Output</label>
+            {actionsOutputKeys.map((actionsOutputKey, key) => (
+              <div key={actionsOutputKey}>
+                <ActionOutputIndex>Action {key + 1}</ActionOutputIndex>: {ruleSimulationResult?.fields[getActionOutpuKey(key + 1)]}
+              </div>
+            ))}
+          </ActionsOutputContainer>
         )}
-        {startRuleSimulation && (
-          <>
-            <Input id="message"
-                   type="textarea"
-                   // eslint-disable-next-line quotes
-                   placeholder={`{\n    "message": "test"\n}`}
-                   value={rawMessageToSimulate}
-                   onChange={handleRawMessageChange}
-                   title="Message string or JSON"
-                   help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
-                   rows={5} />
-            <Button bsStyle="info"
-                    bsSize="xsmall"
-                    disabled={disableSimulation}
-                    onClick={handleRunRuleSimulation}>
-              Run rule simulation
-            </Button>
-            <ResetButton bsStyle="default"
-                         bsSize="xsmall"
-                         onClick={handleResetRuleSimulation}>
-              Reset
-            </ResetButton>
-            {ruleSimulationResult && (
-              <MessageShowContainer>
-                <MessageShow message={ruleSimulationResult} />
-              </MessageShowContainer>
-            )}
-          </>
+        {ruleSimulationResult && (
+          <MessageShowContainer>
+            <MessageShow message={ruleSimulationResult} />
+          </MessageShowContainer>
         )}
       </div>
     </RuleSimulationFormGroup>

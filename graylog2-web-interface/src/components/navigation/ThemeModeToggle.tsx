@@ -42,7 +42,7 @@ const ModeIcon = styled(({ currentMode, theme, ...props }) => <Icon {...props} /
   color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default)};
 `;
 
-const Toggle = styled.label(({ theme }) => css`
+export const Toggle = styled.label(({ theme }) => css`
   display: flex;
   align-items: center;
   margin: 0;

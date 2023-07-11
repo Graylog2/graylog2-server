@@ -49,7 +49,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [ruleSource, setRuleSource] = useState(rule?.source);
   const [description, setDescription] = useState(rule?.description);
   const [startRuleSimulation, setStartRuleSimulation] = useState(true);
-  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
+  // eslint-disable-next-line quotes
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState(`{\n    "message": "test"\n}`);
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   useEffect(() => {
