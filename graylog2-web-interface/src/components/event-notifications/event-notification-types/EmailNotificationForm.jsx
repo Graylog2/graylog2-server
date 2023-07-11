@@ -31,6 +31,7 @@ Title:       \${event_definition_title}
 Description: \${event_definition_description}
 Type:        \${event_definition_type}
 --- [Event] --------------------------------------
+Alert Replay:         \${http_external_uri}alerts/\${event.id}/replay-search
 Timestamp:            \${event.timestamp}
 Message:              \${event.message}
 Source:               \${event.source}
@@ -60,6 +61,7 @@ const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="
 </tbody></table>
 <br /><table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
 <tr><th colspan="2" style="background-color:#e6e6e6;line-height:1.5">Event</th></tr>
+<tr><td>Alert Replay</td><td>\${http_external_uri}alerts/\${event.id}/replay-search</td></tr>
 <tr><td width="200px">Timestamp</td><td>\${event.timestamp}</td></tr>
 <tr><td>Message</td><td>\${event.message}</td></tr>
 <tr><td>Source</td><td>\${event.source}</td></tr>
