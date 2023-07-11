@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.process;
 
+import org.apache.commons.exec.OS;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
@@ -37,6 +38,13 @@ public record OpensearchConfiguration(
     public Map<String, String> asMap() {
 
         Map<String, String> config = new LinkedHashMap<>();
+
+        // currently, startup fails on macOS without disabling this filter.
+        // for a description of the filter (although it's for ES), see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/_system_call_filter_check.html
+        if(OS.isFamilyMac()) {
+            config.put("bootstrap.system_call_filter", "false");
+        }
+
         config.put("http.port", String.valueOf(httpPort));
         config.put("transport.port", String.valueOf(transportPort));
         if (clusterName != null && !clusterName.isBlank()) {

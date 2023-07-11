@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -30,15 +31,25 @@ import java.util.Optional;
 @JsonDeserialize(builder = SumOfSquares.Builder.class)
 public abstract class SumOfSquares implements SeriesSpec {
     public static final String NAME = "sumofsquares";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
+
+    @Override
+    public Optional<String> statsSubfieldName() {
+        return Optional.of("sum_of_squares");
+    }
+
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
 
     public static SumOfSquares.Builder builder() {
         return new AutoValue_SumOfSquares.Builder().type(NAME);
@@ -55,7 +66,6 @@ public abstract class SumOfSquares implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -65,7 +75,7 @@ public abstract class SumOfSquares implements SeriesSpec {
 
         @Override
         public SumOfSquares build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
             }
             return autoBuild();

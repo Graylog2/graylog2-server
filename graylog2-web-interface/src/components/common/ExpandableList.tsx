@@ -37,7 +37,7 @@ const ExpandableList = ({ children, className }: Props) => (
 );
 
 ExpandableList.defaultProps = {
-  className: undefined,
+  className: '',
 };
 
 ExpandableList.propTypes = {

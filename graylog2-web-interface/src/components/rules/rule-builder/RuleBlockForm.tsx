@@ -16,13 +16,13 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Formik } from 'formik';
+import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Select } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -33,10 +33,10 @@ import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
 
 type Props = {
   existingBlock?: RuleBlock,
-  onAdd: (values: {[key: string]: any}) => void,
+  onAdd: (values: { [key: string]: any }) => void,
   onCancel: () => void,
   onSelect: (option: string) => void,
-  onUpdate: (values: {[key: string]: any}, functionName: string) => void,
+  onUpdate: (values: { [key: string]: any }, functionName: string) => void,
   previousOutputPresent: boolean,
   options: Array<{ label: string, value: any }>,
   order: number,
@@ -111,7 +111,7 @@ const RuleBlockForm = ({
 
   const handleChange = (option: string, resetForm: () => void) => {
     sendTelemetry('select', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `select-${type}`,
       event_details: { option },
@@ -125,9 +125,9 @@ const RuleBlockForm = ({
     setFieldValue(fieldName, null);
   };
 
-  const handleSubmit = (values: {[key: string]: any}) => {
+  const handleSubmit = (values: { [key: string]: any }) => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `${existingBlock ? 'update' : 'add'}-${type}-button`,
     });
@@ -144,12 +144,12 @@ const RuleBlockForm = ({
       <Col md={12}>
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
         <Formik enableReinitialize onSubmit={handleSubmit} initialValues={initialValues}>
-          {({ resetForm, setFieldValue }) => (
-            <Form>
+          {({ resetForm, setFieldValue, values }) => (
+            <>
               <Row>
                 <Col md={12}>
-                  <Select id="existingBlock-select"
-                          name="existingBlock-select"
+                  <Select id={`existingBlock-select-${type}`}
+                          name={`existingBlock-select-${type}`}
                           placeholder={`Select ${type}`}
                           options={options}
                           clearable={false}
@@ -171,7 +171,7 @@ const RuleBlockForm = ({
                   </SelectedBlockInfo>
 
                   {selectedBlockDict.params.map((param) => (
-                    <Row key={`${order}_${param}`}>
+                    <Row key={`${order}_${param.name}`}>
                       <RuleBlockFormField param={param}
                                           functionName={selectedBlockDict.name}
                                           order={order}
@@ -183,11 +183,16 @@ const RuleBlockForm = ({
 
                   <FormSubmit bsSize="small"
                               submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
-                              onCancel={() => { resetForm(); onCancel(); }} />
+                              submitButtonType="button"
+                              onSubmit={() => handleSubmit(values)}
+                              onCancel={() => {
+                                resetForm();
+                                onCancel();
+                              }} />
 
                 </SelectedBlock>
               )}
-            </Form>
+            </>
           )}
         </Formik>
         <Errors objectWithErrors={existingBlock} />

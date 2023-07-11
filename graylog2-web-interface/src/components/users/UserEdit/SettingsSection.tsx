@@ -53,6 +53,18 @@ type Props = {
   onSubmit: (payload: { timezone: $PropertyType<User, 'timezone'> }) => Promise<void>,
 };
 
+const _validate = async (values) => {
+  let errors = {};
+
+  const { type, id } = values.startpage ?? {};
+
+  if (type && !id) {
+    errors = { startpage: 'Please select an entity.' };
+  }
+
+  return errors;
+};
+
 const SettingsSection = ({
   user: {
     id,
@@ -69,6 +81,7 @@ const SettingsSection = ({
   return (
     <SectionComponent title="Settings">
       <Formik<SettingsFormValues> onSubmit={onSubmit}
+                                  validate={_validate}
                                   initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">

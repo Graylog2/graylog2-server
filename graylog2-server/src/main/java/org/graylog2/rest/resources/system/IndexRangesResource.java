@@ -34,6 +34,7 @@ import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -74,18 +75,21 @@ public class IndexRangesResource extends RestResource {
     private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final SystemJobManager systemJobManager;
+    private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
 
     @Inject
     public IndexRangesResource(IndexRangeService indexRangeService,
                                RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
                                IndexSetRegistry indexSetRegistry,
-                               SystemJobManager systemJobManager) {
+                               SystemJobManager systemJobManager,
+                               IndexRangesCleanupPeriodical indexRangesCleanupPeriodical) {
         this.indexRangeService = indexRangeService;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.systemJobManager = systemJobManager;
+        this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
     }
 
     @GET
@@ -149,6 +153,7 @@ public class IndexRangesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
+        submitIndexRangesCleanupJob();
         submitIndexRangesJob(indexSetRegistry.getAll());
 
         return Response.accepted().build();
@@ -219,4 +224,7 @@ public class IndexRangesResource extends RestResource {
         }
     }
 
+    private void submitIndexRangesCleanupJob() {
+        this.indexRangesCleanupPeriodical.doRun();
+    }
 }

@@ -184,7 +184,7 @@ public class ParserUtilTest {
         Map<String, Object> params = Map.of("field", "my_field");
         when(step.parameters()).thenReturn(params);
         assertThat(ParserUtil.generateForFragment(step, configuration))
-                .isEqualTo("let gl2_fragmentvar_v1 = $message.my_field;");
+                .isEqualTo("let gl2_fragmentvar_v1 = $message.\"my_field\";");
     }
 
 

@@ -127,7 +127,7 @@ Tooltip.propTypes = {
 };
 
 Tooltip.defaultProps = {
-  className: undefined,
+  className: '',
   placement: 'right',
   positionTop: undefined,
   positionLeft: undefined,

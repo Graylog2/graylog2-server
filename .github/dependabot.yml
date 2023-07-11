@@ -53,6 +53,10 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+    groups:
+      babel:
+        patterns:
+          - "@babel/*"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/eslint-config-graylog"
@@ -75,6 +79,13 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+    groups:
+      jest:
+        patterns:
+          - "babel-jest"
+          - "jest"
+          - "jest-environment-*"
+          - "@jest/types"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/stylelint-config-graylog"

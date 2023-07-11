@@ -55,7 +55,7 @@ type Props = {
 
 const StyleGuideWrapper = ({ children }: Props) => {
   const router = createBrowserRouter([{
-    path: '/',
+    path: '/:url?',
     element: (
       <CurrentUserContext.Provider value={adminUser}>
         <GraylogThemeProvider initialThemeModeOverride="teint">

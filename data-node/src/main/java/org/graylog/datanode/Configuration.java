@@ -55,6 +55,8 @@ import java.util.Optional;
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
+    public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
 
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
@@ -109,13 +111,13 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "transport_certificate")
     private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
 
-    @Parameter(value = "transport_certificate_password")
+    @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = "datanode-http-certificates.p12";
 
-    @Parameter(value = "http_certificate_password")
+    @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)

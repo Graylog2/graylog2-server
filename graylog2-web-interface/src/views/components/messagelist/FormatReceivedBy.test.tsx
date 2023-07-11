@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { MockStore } from 'helpers/mocking';
@@ -73,8 +74,10 @@ describe('FormatReceivedBy', () => {
           isLocalNode,
           ForwarderReceivedBy,
           messageLoaders: { ForwarderInputDropdown: () => <div /> },
+          fetchForwarderNode: async () => ({ node_id: 'deadbeef', title: 'Test Node' }),
+          fetchForwarderInput: async () => ({ id: 'deadbeef', title: 'Test Input' }),
         }],
-      },
+      } as PluginExports,
     };
 
     beforeEach(() => PluginStore.register(pluginManifest));

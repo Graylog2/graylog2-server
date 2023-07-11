@@ -30,10 +30,14 @@ const StyledInactiveNav = styled(NavItem)`
 `;
 
 // Don't pass active prop, since NavItem should always be inactive
-// eslint-disable-next-line no-unused-vars
-function InactiveNavItem({ active, className, children, ...props }) {
-  return <StyledInactiveNav className={className} {...props}>{children}</StyledInactiveNav>;
+type Props = {
+  active: boolean,
+  className: string,
 }
+
+const InactiveNavItem = ({ active: _active, className, children, ...props }: React.PropsWithChildren<Props>) => (
+  <StyledInactiveNav className={className} {...props}>{children}</StyledInactiveNav>
+);
 
 InactiveNavItem.propTypes = {
   active: PropTypes.any,

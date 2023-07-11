@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -30,17 +31,22 @@ import java.util.Optional;
 @JsonDeserialize(builder = Min.Builder.class)
 public abstract class Min implements SeriesSpec {
     public static final String NAME = "min";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
 
-    public static Min.Builder builder() {
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
+
+    public static Builder builder() {
         return new AutoValue_Min.Builder().type(NAME);
     }
 
@@ -55,7 +61,6 @@ public abstract class Min implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -65,7 +70,7 @@ public abstract class Min implements SeriesSpec {
 
         @Override
         public Min build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
             }
             return autoBuild();

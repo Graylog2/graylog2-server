@@ -64,6 +64,7 @@ public class TelemetryService {
     private final DBTelemetryUserSettingsService dbTelemetryUserSettingsService;
     private final boolean isTelemetryEnabled;
     private final TelemetryClusterService telemetryClusterService;
+    private final String installationSource;
 
 
     @Inject
@@ -78,7 +79,8 @@ public class TelemetryService {
             TelemetryResponseFactory telemetryResponseFactory,
             DBTelemetryUserSettingsService dbTelemetryUserSettingsService,
             EventBus eventBus,
-            TelemetryClusterService telemetryClusterService) {
+            TelemetryClusterService telemetryClusterService,
+            @Named("installation_source") String installationSource) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
         this.enterpriseDataProvider = enterpriseDataProvider;
@@ -89,6 +91,7 @@ public class TelemetryService {
         this.telemetryResponseFactory = telemetryResponseFactory;
         this.dbTelemetryUserSettingsService = dbTelemetryUserSettingsService;
         this.telemetryClusterService = telemetryClusterService;
+        this.installationSource = installationSource;
         eventBus.register(this);
     }
 
@@ -175,7 +178,8 @@ public class TelemetryService {
                 telemetryClusterService.nodesTelemetryInfo(),
                 getAverageLastMonthTraffic(),
                 userService.loadAll().stream().filter(user -> !user.isServiceAccount()).count(),
-                licenseStatuses.size());
+                licenseStatuses.size(),
+                installationSource);
     }
 
     private Map<String, Object> getPluginInfo() {

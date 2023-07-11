@@ -16,8 +16,14 @@
  */
 package org.graylog.plugins.views.search;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ParameterProvider {
     Optional<Parameter> getParameter(final String name);
+
+    static ParameterProvider of(Set<Parameter> parameterSet) {
+        return (name) -> parameterSet.stream().filter(p -> Objects.equals(name, p.name())).findFirst();
+    }
 }

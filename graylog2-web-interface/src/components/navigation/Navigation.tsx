@@ -42,7 +42,9 @@ import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
-const _isActive = (requestPath, prefix) => requestPath.indexOf(appPrefixed(prefix)) === 0;
+const _isActive = (requestPath, path, end = undefined) => (
+  end ? requestPath === appPrefixed(path) : requestPath.indexOf(appPrefixed(path)) === 0
+);
 
 /**
  * Checks if a plugin and its corresponding route is registered to the PluginStore
@@ -75,7 +77,7 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
   }
 
   if (pluginRoute.children) {
-    const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(pathname, path)));
+    const activeChild = pluginRoute.children.filter(({ path, end }) => (path && _isActive(pathname, path, end)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(currentUserPermissions, child.permissions) && (child.requiredFeatureFlag ? AppConfig.isFeatureEnabled(child.requiredFeatureFlag) : true));
 

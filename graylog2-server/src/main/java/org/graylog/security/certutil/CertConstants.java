@@ -20,7 +20,6 @@ package org.graylog.security.certutil;
  * Place to store constants that are not a subject of user/client configuration.
  */
 public interface CertConstants {
-
     String KEY_GENERATION_ALGORITHM = "RSA";
     String SIGNING_ALGORITHM = "SHA256withRSA";
     String PKCS12 = "PKCS12";
