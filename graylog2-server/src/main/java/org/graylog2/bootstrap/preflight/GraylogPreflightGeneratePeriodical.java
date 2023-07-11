@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import com.google.common.base.Splitter;
 import okhttp3.Call;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -44,6 +45,8 @@ import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -54,6 +57,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
 @Singleton
@@ -100,12 +104,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             } catch (NoSuchAlgorithmException ex) {
                 LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
             }
-
-            clientBuilder.authenticator((route, response) -> {
-                String credential = Credentials.basic("admin", "admin");
-                return response.request().newBuilder().header("Authorization", credential).build();
-            });
-
             return Optional.of(clientBuilder.build());
         } catch (Exception ex) {
             LOG.error("Could not create temporary okhttpclient " + ex.getMessage(), ex);
@@ -181,7 +179,22 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         final var node = nodeService.byNodeId(nodeId);
         Request request = new Request.Builder().url(node.getTransportAddress()).build();
         if(okHttpClient.isPresent()) {
-            Call call = okHttpClient.get().newCall(request);
+            OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
+            try {
+                URI uri = new URI(node.getTransportAddress());
+                if (!isNullOrEmpty(uri.getUserInfo())) {
+                    var list = Splitter.on(":")
+                            .limit(2)
+                            .splitToList(uri.getUserInfo());
+                    builder.authenticator((route, response) -> {
+                        String credential = Credentials.basic(list.get(0), list.get(1));
+                        return response.request().newBuilder().header("Authorization", credential).build();
+                    });
+                }
+            } catch (URISyntaxException ex) {
+                return false;
+            }
+            Call call = builder.build().newCall(request);
             try(Response response = call.execute()) {
                 return response.isSuccessful();
             }

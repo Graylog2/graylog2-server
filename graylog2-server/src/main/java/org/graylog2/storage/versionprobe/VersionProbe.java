@@ -24,6 +24,7 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -59,6 +61,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
@@ -168,10 +172,15 @@ public class VersionProbe {
                 okHttpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager)tm);
                 okHttpClient.hostnameVerifier((hostname, session) -> true);
 
-                okHttpClient.authenticator((route, response) -> {
-                    String credential = Credentials.basic("admin", "admin");
-                    return response.request().newBuilder().header("Authorization", credential).build();
-                });
+                if (!isNullOrEmpty(host.getUserInfo())) {
+                    var list = Splitter.on(":")
+                            .limit(2)
+                            .splitToList(host.getUserInfo());
+                    okHttpClient.authenticator((route, response) -> {
+                        String credential = Credentials.basic(list.get(0), list.get(1));
+                        return response.request().newBuilder().header("Authorization", credential).build();
+                    });
+                }
             } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
                 LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
             }

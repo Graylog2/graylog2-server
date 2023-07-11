@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -43,6 +44,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +84,17 @@ public class PreflightResource {
 
         return activeDataNodes.values().stream().map(n -> {
             final var preflight = preflightDataNodes.get(n.getNodeId());
-            return new DataNode(n.getNodeId(), n.getType(), n.getTransportAddress(), preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null, n.getHostname(), n.getShortNodeId());
+            return new DataNode(n.getNodeId(), n.getType(), rebuildTransportAddress(n.getTransportAddress()), preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null, n.getHostname(), n.getShortNodeId());
         }).collect(Collectors.toList());
+    }
+
+    private String rebuildTransportAddress(final String orig) {
+        try {
+            final var uri = new URI(orig);
+            return new URIBuilder().setScheme(uri.getScheme()).setHost(uri.getHost()).setPort(uri.getPort()).toString();
+        } catch (URISyntaxException ex) {
+            return "Invalid URI";
+        }
     }
 
     @GET

@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.google.common.base.Suppliers;
 import okhttp3.Credentials;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -50,9 +51,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
@@ -136,6 +140,16 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
+        final Optional<UsernamePasswordCredentials> credentials = hosts.stream().map(uri -> {
+            if (!isNullOrEmpty(uri.getUserInfo())) {
+                var list = Splitter.on(":")
+                        .limit(2)
+                        .splitToList(uri.getUserInfo());
+                return new UsernamePasswordCredentials(list.get(0), list.get(1));
+            } else {
+                return null;
+            }
+        }).filter(Objects::nonNull).findAny();
 
         final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
                 .setRequestConfigCallback(requestConfig -> requestConfig
@@ -162,9 +176,9 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         httpClientConfig.setSSLContext(sslContext);
                         httpClientConfig.setSSLHostnameVerifier((hostname, session) -> true);
 
-                        // TODO: fix
-                        credentialsProvider.setCredentials(AuthScope.ANY,
-                                new UsernamePasswordCredentials("admin", "admin"));
+                        if(credentials.isEmpty()) {
+                            credentialsProvider.setCredentials(AuthScope.ANY, credentials.get());
+                        }
                     } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
                         LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
                     }
