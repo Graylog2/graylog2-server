@@ -113,7 +113,7 @@ const ThemeModeToggle = ({ theme }: Props) => {
     if (loadingTheme) {
       setLoadingTheme(false);
     }
-  }, [theme]);
+  }, [loadingTheme, theme]);
 
   const toggleThemeMode = (event) => {
     const { checked } = event.target;
