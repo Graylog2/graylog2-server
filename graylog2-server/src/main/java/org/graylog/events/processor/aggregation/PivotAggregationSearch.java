@@ -495,11 +495,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     }
 
     private BackendQuery decorateQuery(AggregationEventProcessorConfig config) {
-        Query dummyQuery = Query.builder()
-                .id("123")
-                .query(ElasticsearchQueryString.of(config.query()))
-                .build();
-        final String decorated = queryStringDecorators.decorate(config.query(), config::getQueryParameter, dummyQuery);
+        final String decorated = queryStringDecorators.decorate(config.query(), ParameterProvider.of(config.queryParameters()));
         return ElasticsearchQueryString.of(decorated);
     }
 
