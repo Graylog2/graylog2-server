@@ -31,6 +31,7 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -95,7 +96,9 @@ public class SlackEventNotificationTest {
         slackEventNotification = new SlackEventNotification(notificationCallbackService, new ObjectMapperProvider(),
                 Engine.createEngine(),
                 mockNotificationService,
-                nodeId, mockSlackClient);
+                nodeId,
+                mockSlackClient,
+                new HttpConfiguration());
 
     }
 

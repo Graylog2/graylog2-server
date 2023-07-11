@@ -31,6 +31,7 @@ import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -94,7 +95,9 @@ public class TeamsEventNotificationTest {
                 new ObjectMapperProvider(),
                 Engine.createEngine(),
                 mockNotificationService,
-                nodeId, mockrequestClient);
+                nodeId,
+                mockrequestClient,
+                new HttpConfiguration());
     }
 
     private void getDummyTeamsNotificationConfig() {
