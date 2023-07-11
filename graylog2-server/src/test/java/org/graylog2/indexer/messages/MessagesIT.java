@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -119,7 +120,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final int MESSAGECOUNT = 101;
         // Each Message is about 1 MB
         final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
-        final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
 
         assertThat(failedItems).isEmpty();
 
@@ -139,7 +140,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final int LARGE_MESSAGECOUNT = 20;
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
         messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
 
         assertThat(failedItems).isEmpty();
 
@@ -161,7 +162,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 entry(indexSet, message2)
         );
 
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
 
         assertThat(failedItems).hasSize(1);
 
@@ -175,13 +176,13 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final AtomicBoolean succeeded = new AtomicBoolean(false);
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
 
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<Set<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
         countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
 
-        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
+        final Set<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
 
         client().refreshNode();
@@ -220,13 +221,13 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
 
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<Set<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
         countDownLatch.await();
 
         client().removeAliasMapping(index2, INDEX_NAME);
 
-        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
+        final Set<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
 
         client().refreshNode();
@@ -243,7 +244,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 Maps.immutableEntry(indexSet, message)
         );
 
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
 
         assertThat(failedItems).isEmpty();
 
@@ -254,7 +255,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(resultMessage.getMessage().getField("custom_object")).isEqualTo("foo");
     }
 
-    private Future<List<String>> background(Callable<List<String>> task) {
+    private Future<Set<String>> background(Callable<Set<String>> task) {
         final ExecutorService executor = Executors.newFixedThreadPool(1,
                 new ThreadFactoryBuilder().setNameFormat("messages-it-%d").build());
 

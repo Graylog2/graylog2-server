@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,7 +77,7 @@ public class MessagesTest {
 
     @Test
     public void bulkIndexingShouldNotDoAnythingForEmptyList() throws Exception {
-        final List<String> result = messages.bulkIndex(Collections.emptyList());
+        final Set<String> result = messages.bulkIndex(Collections.emptyList());
 
         assertThat(result).isNotNull()
                 .isEmpty();
@@ -140,7 +141,7 @@ public class MessagesTest {
         );
 
         // when
-        final List<String> failureIds = messages.bulkIndexRequests(indexingRequest, false);
+        final Set<String> failureIds = messages.bulkIndexRequests(indexingRequest, false);
 
         // then
         assertThat(failureIds).hasSize(2)
@@ -180,7 +181,7 @@ public class MessagesTest {
         when(messagesAdapter.bulkIndex(indexingRequest)).thenReturn(ImmutableList.of());
 
         // when
-        final List<String> failureIds = messages.bulkIndexRequests(indexingRequest, false);
+        final Set<String> failureIds = messages.bulkIndexRequests(indexingRequest, false);
 
         // then
         assertThat(failureIds).isEmpty();
