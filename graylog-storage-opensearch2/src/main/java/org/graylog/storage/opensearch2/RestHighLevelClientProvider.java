@@ -19,8 +19,12 @@ package org.graylog.storage.opensearch2;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
+import okhttp3.Credentials;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -156,8 +160,11 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         sslContext.init(null, new TrustManager[]{trustManagerProvider.create(hostNames)}, new SecureRandom());
 
                         httpClientConfig.setSSLContext(sslContext);
-                        // TODO: verify hostnames?
-                        // httpClientConfig.setSSLHostnameVerifier();
+                        httpClientConfig.setSSLHostnameVerifier((hostname, session) -> true);
+
+                        // TODO: fix
+                        credentialsProvider.setCredentials(AuthScope.ANY,
+                                new UsernamePasswordCredentials("admin", "admin"));
                     } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
                         LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
                     }

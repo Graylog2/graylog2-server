@@ -41,7 +41,7 @@ public class CustomCAX509TrustManager implements X509TrustManager {
 
     @AssistedInject
     public CustomCAX509TrustManager(@Assisted String host, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
-        this(List.of(host), caService);
+        this(host != null ? List.of(host) : List.of(), caService);
     }
 
     /**
