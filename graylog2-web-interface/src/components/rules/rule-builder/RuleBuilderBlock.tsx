@@ -156,7 +156,7 @@ const RuleBuilderBlock = ({
     getDictForFunction(blockDict, block.function)?.return_type === RuleBuilderTypes.Boolean
   );
 
-  const options = blockDict.map(({ name }) => ({ label: name, value: name }));
+  const options = blockDict.map(({ name, description }) => ({ label: name, value: name, description: description }));
 
   const showForm = !block || editMode;
 

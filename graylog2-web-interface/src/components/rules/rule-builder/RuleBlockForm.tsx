@@ -33,6 +33,8 @@ import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
 
 import RuleHelperTable from '../rule-helper/RulerHelperTable';
 
+type Option = { label: string, value: any, description?: string | null };
+
 type Props = {
   existingBlock?: RuleBlock,
   onAdd: (values: { [key: string]: any }) => void,
@@ -40,7 +42,7 @@ type Props = {
   onSelect: (option: string) => void,
   onUpdate: (values: { [key: string]: any }, functionName: string) => void,
   previousOutputPresent: boolean,
-  options: Array<{ label: string, value: any }>,
+  options: Array<Option>,
   order: number,
   selectedBlockDict?: BlockDict,
   type: BlockType,
@@ -71,6 +73,15 @@ const SelectedBlockInfo = styled(Row)(({ theme }) => css`
 
 const HelpPopover = styled(Popover)(() => css`
   min-width: 600px;
+`);
+
+const OptionTitle = styled.p(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xxs};
+`);
+
+const OptionDescription = styled.p(({ theme }) => css`
+  color: ${theme.colors.gray[50]};
+  margin-bottom: ${theme.spacings.xxs};
 `);
 
 const RuleBlockForm = ({
@@ -154,6 +165,13 @@ const RuleBlockForm = ({
     </HelpPopover>
   );
 
+  const optionRenderer = (option: Option) => (
+    <>
+      <OptionTitle>{option.label}</OptionTitle>
+      {option.description && (<OptionDescription>{option.description}</OptionDescription>)}
+    </>
+  );
+
   return (
     <Row>
       <Col md={12}>
@@ -167,6 +185,7 @@ const RuleBlockForm = ({
                           name={`existingBlock-select-${type}`}
                           placeholder={`Select ${type}`}
                           options={options}
+                          optionRenderer={optionRenderer}
                           clearable={false}
                           matchProp="label"
                           onChange={(option: string) => handleChange(option, resetForm)}
