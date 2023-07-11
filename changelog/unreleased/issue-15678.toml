@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Include link to replay an alert in alert mail notification template."
+
+issues = ["15678"]
+pulls = ["15922"]
