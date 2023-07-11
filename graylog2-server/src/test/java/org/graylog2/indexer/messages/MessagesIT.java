@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog2.bootstrap.preflight.SearchDbPreflightCheck;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -32,6 +33,8 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -61,6 +64,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     protected static final IndexSet indexSet = new MessagesTestIndexSet();
 
+    private static final Logger LOG = LoggerFactory.getLogger(MessagesIT.class);
+
     protected MessagesAdapter createMessagesAdapter() {
         return searchServer().adapters().messagesAdapter();
     }
@@ -79,6 +84,12 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     @After
     public void tearDown() {
         client().cleanUp();
+        final String block = client().getSetting("cluster.blocks.create_index");
+        if(Boolean.parseBoolean(block)) {
+            // high memory usage in these tests may cause a cluster block. If that happens, we should reset this block after the test.
+            LOG.info("Indexer cluster is blocked after heavy memory usage, test done, resetting the block");
+            client().resetClusterBlock();
+        }
     }
 
     protected abstract boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id);

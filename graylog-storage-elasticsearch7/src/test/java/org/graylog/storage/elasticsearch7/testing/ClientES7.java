@@ -24,6 +24,8 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
@@ -246,6 +248,14 @@ public class ClientES7 implements Client {
                 .map(index -> index.path("index").asText())
                 .distinct()
                 .toArray(String[]::new);
+    }
+
+
+    public String getSetting(String setting) {
+        final ClusterGetSettingsRequest req = new ClusterGetSettingsRequest();
+        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(req, requestOptions),
+                "Unable to read OS cluster setting: " + setting);
+        return response.getSetting(setting);
     }
 
     @Override
