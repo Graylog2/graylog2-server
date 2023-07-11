@@ -63,14 +63,10 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
 
-        if (bucketSpec.skipEmptyValues()) {
-            return CreatedAggregations.create(termsAggregation);
-        } else {
-            final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
-                    .subAggregation(termsAggregation);
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
+                .subAggregation(termsAggregation);
 
-            return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
-        }
+        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<String> fields) {
@@ -119,16 +115,16 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpec.fields(), pivot.sort());
 
+        final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
+            // This happens when the other bucket is passed for column value extraction
+            return Stream.of(initialBucket);
+        }
+        final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         if (values.skipEmptyValues()) {
-            final MultiBucketsAggregation termsAggregation = previousBucket.getAggregations().get(AGG_NAME);
             return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
         } else {
-            final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
-            if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
-                // This happens when the other bucket is passed for column value extraction
-                return Stream.of(initialBucket);
-            }
-            final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
+
             final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
 
             final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);

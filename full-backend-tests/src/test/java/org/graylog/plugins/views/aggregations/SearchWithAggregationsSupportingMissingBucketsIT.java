@@ -194,6 +194,31 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     }
 
     @ContainerMatrixTest
+    void testTwoTupledFieldAggregationHasNoMissingBucketWhenSkipEmptyValuesIsUsed() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(
+                        Values.builder().fields(List.of("firstName", "lastName")).limit(8).skipEmptyValues().build()
+                )
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        //General verification
+        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows", hasSize(4))
+                .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
+                .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
+                .body(".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(0))
+                .body(".rows.find{ it.key == [] }", notNullValue()) //totals
+                .body(".total", equalTo(5));
+
+        //Empty buckets verification
+        //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", nullValue());
+    }
+
+    @ContainerMatrixTest
     void testTwoNestedFieldAggregationHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
