@@ -223,6 +223,7 @@ public class ClientOS2 implements Client {
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
         refreshNode();
+        resetClusterBlock();
     }
 
     private String[] existingTemplates() {
@@ -302,8 +303,13 @@ public class ClientOS2 implements Client {
 
     @Override
     public void resetClusterBlock() {
-        // reset create_index block for OpenSearch 2.x see https://github.com/opensearch-project/OpenSearch/pull/5852
-        putPersistentSetting("cluster.blocks.create_index", null);
+        final String block = getSetting("cluster.blocks.create_index");
+        if(Boolean.parseBoolean(block)) {
+            // high memory usage in previous tests may cause a cluster block. If that happens, we should reset this block before the next test.
+            LOG.info("Indexer cluster is blocked after heavy memory/disk usage, resetting the block");
+            // reset create_index block for OpenSearch 2.x see https://github.com/opensearch-project/OpenSearch/pull/5852
+            putPersistentSetting("cluster.blocks.create_index", null);
+        }
     }
 
     @Override
