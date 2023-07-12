@@ -120,7 +120,15 @@ public class DatanodeSecuritySetupIT {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
-                .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
+                .retryIfResult(input -> {
+                    var body = input.extract().body();
+                    if(!body.path("opensearch.node.state").equals("AVAILABLE")) {
+                        LOG.info("Response was: \n{}", body.toString());
+                        return false;
+                    } else {
+                        return true;
+                    }
+                })
                 .build();
 
         try {
