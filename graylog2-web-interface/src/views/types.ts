@@ -261,7 +261,7 @@ type DashboardActionModalProps = {
 }
 
 type AssetActionComponentProps = {
-  identifier: unknown,
+  identifiers: unknown,
 }
 
 type DashboardAction = {
@@ -271,7 +271,6 @@ type DashboardAction = {
 }
 
 type AssetAction = {
-  key: string,
   component: React.ComponentType<AssetActionComponentProps>,
 }
 
