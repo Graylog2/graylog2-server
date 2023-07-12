@@ -91,6 +91,7 @@ public class CertutilCert implements CliCommand {
             final CertRequest req = CertRequest.signed("localhost", intermediateCA)
                     .withSubjectAlternativeName("localhost")
                     .withSubjectAlternativeName(Tools.getLocalHostname())
+                    .withSubjectAlternativeName(Tools.getLocalCanonicalHostname())
                     .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
                     .withSubjectAlternativeName("127.0.0.1")
                     .withSubjectAlternativeName("ip6-localhost")
