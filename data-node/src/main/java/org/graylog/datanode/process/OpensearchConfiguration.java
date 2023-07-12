@@ -80,7 +80,7 @@ public record OpensearchConfiguration(
 
     private String getHostName() {
         if (host != null && !host.isBlank()) {
-            return host;
+            return host.equals("0.0.0.0") ? Tools.getLocalCanonicalHostname() : host;
         } else {
             return Tools.getLocalCanonicalHostname();
         }

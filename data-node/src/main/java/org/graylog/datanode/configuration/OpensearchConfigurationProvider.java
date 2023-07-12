@@ -80,7 +80,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistribution().directory(),
                     Path.of(opensearchConfigLocation),
-                    localConfiguration.getHttpBindAddress().getHost().equals("0.0.0.0") ? Tools.getLocalCanonicalHostname() : localConfiguration.getHttpBindAddress().getHost(),
+                    localConfiguration.getHttpBindAddress().getHost(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getRestApiUsername(),
