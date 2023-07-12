@@ -124,8 +124,11 @@ public class DatanodeSecuritySetupIT {
                 .build();
 
         try {
+            var hostname = Tools.getLocalCanonicalHostname();
+            var url = "https://" + hostname + ":" + datanodeRestPort;
+            LOG.info("Trying to connect to: {}", url);
             retryer.call(() -> RestAssured.given()
-                    .get("https://localhost:" + datanodeRestPort)
+                    .get(url)
                     .then());
         } catch (Exception rx) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
