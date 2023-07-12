@@ -29,6 +29,7 @@ import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog2.plugin.Tools;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +89,8 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin");
 
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "graylog-datanode-host");
+//            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "graylog-datanode-host");
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0");
             datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName("graylog-datanode-host"));
         }).start();
     }
@@ -108,8 +110,8 @@ public class DatanodeSecuritySetupIT {
 
     }
 
-    private String getHostname() {
-        return "graylog-datanode-host"; // Tools.getLocalCanonicalHostname();
+    private String getHostnames() {
+        return "graylog-datanode-host," + Tools.getLocalCanonicalHostname();
     }
 
     private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
@@ -182,7 +184,7 @@ public class DatanodeSecuritySetupIT {
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", getHostname())
+                .register("Enter alternative names (addresses) of this node [comma separated]", getHostnames())
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),

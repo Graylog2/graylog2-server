@@ -78,16 +78,13 @@ public record OpensearchConfiguration(
         return env;
     }
 
-    private String getHostName() {
-        if (host != null && !host.isBlank()) {
-            return host.equals("0.0.0.0") ? Tools.getLocalCanonicalHostname() : host;
-        } else {
-            return Tools.getLocalCanonicalHostname();
-        }
+    // also return a hostname if we bound to all interfaces - as we can not connect to "0.0.0.0" ;-)
+    private String getHostNameForRestBaseUrl() {
+        return (host != null && !host.isBlank() & !"0.0.0.0".equals(host)) ? host : Tools.getLocalCanonicalHostname();
     }
 
     public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        return new HttpHost(getHostName(), httpPort(), sslEnabled ? "https" : "http");
+        return new HttpHost(getHostNameForRestBaseUrl(), httpPort(), sslEnabled ? "https" : "http");
     }
 }
