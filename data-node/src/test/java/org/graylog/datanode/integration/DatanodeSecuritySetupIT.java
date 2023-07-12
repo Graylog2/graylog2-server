@@ -100,6 +100,8 @@ public class DatanodeSecuritySetupIT {
 
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort());
 
+        try {
+//            System.setProperty("javax.net.debug", "all");
         given()
                 .auth().basic("admin", "admin")
                 .trustStore(buildTruststore(httpCert, "password"))
@@ -108,6 +110,10 @@ public class DatanodeSecuritySetupIT {
                 .body("name", Matchers.equalTo("node1"))
                 .body("cluster_name", Matchers.equalTo("datanode-cluster"));
 
+        } catch (Exception rx) {
+            LOG.error("Error connecting to OpenSearch in the DataNode, showing logs:\n{}", backend.getLogs());
+            throw rx;
+        }
     }
 
     private String getHostnames() {
@@ -123,7 +129,7 @@ public class DatanodeSecuritySetupIT {
                 .retryIfResult(input -> {
                     var body = input.extract().body();
                     if(!body.path("opensearch.node.state").equals("AVAILABLE")) {
-                        LOG.info("Response was: \n{}", body.toString());
+                        LOG.info("Response was: \n{}", body.asPrettyString());
                         return false;
                     } else {
                         return true;
