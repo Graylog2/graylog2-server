@@ -168,19 +168,21 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
                     }
 
-                    try {
-                        var hostNames = hosts.stream().map(URI::getHost).toList();
-                        SSLContext sslContext = SSLContext.getInstance("TLS");
-                        sslContext.init(null, new TrustManager[]{trustManagerProvider.create(hostNames)}, new SecureRandom());
+                    if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
+                        try {
+                            var hostNames = hosts.stream().map(URI::getHost).toList();
+                            SSLContext sslContext = SSLContext.getInstance("TLS");
+                            sslContext.init(null, new TrustManager[]{trustManagerProvider.create(hostNames)}, new SecureRandom());
 
-                        httpClientConfig.setSSLContext(sslContext);
-                        httpClientConfig.setSSLHostnameVerifier((hostname, session) -> true);
+                            httpClientConfig.setSSLContext(sslContext);
+                            httpClientConfig.setSSLHostnameVerifier((hostname, session) -> true);
 
-                        if(credentials.isEmpty()) {
-                            credentialsProvider.setCredentials(AuthScope.ANY, credentials.get());
+                            if (credentials.isEmpty()) {
+                                credentialsProvider.setCredentials(AuthScope.ANY, credentials.get());
+                            }
+                        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
+                            LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
                         }
-                    } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
-                        LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
                     }
 
                     return httpClientConfig;
