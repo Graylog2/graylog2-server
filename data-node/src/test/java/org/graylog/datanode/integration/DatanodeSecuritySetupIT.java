@@ -127,7 +127,7 @@ public class DatanodeSecuritySetupIT {
             retryer.call(() -> RestAssured.given()
                     .get("https://localhost:" + datanodeRestPort)
                     .then());
-        } catch (RetryException rx) {
+        } catch (Exception rx) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
             throw rx;
         }
