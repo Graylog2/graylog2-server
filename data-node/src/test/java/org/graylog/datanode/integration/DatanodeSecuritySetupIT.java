@@ -29,10 +29,13 @@ import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog2.plugin.Tools;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,6 +55,7 @@ import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_
 
 
 public class DatanodeSecuritySetupIT {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
 
     @TempDir
     static Path tempDir;
@@ -95,11 +99,15 @@ public class DatanodeSecuritySetupIT {
         given()
                 .auth().basic("admin", "admin")
                 .trustStore(buildTruststore(httpCert, "password"))
-                .get("https://localhost:" + backend.getOpensearchRestPort())
+                .get("https://" + getHostname() + ":" + backend.getOpensearchRestPort())
                 .then().assertThat()
                 .body("name", Matchers.equalTo("node1"))
                 .body("cluster_name", Matchers.equalTo("datanode-cluster"));
 
+    }
+
+    private String getHostname() {
+        return Tools.getLocalCanonicalHostname();
     }
 
     private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
@@ -111,9 +119,14 @@ public class DatanodeSecuritySetupIT {
                 .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
-        retryer.call(() -> RestAssured.given()
-                .get("http://localhost:" + datanodeRestPort)
-                .then());
+        try {
+            retryer.call(() -> RestAssured.given()
+                    .get("http://" + getHostname() + ":" + datanodeRestPort)
+                    .then());
+        } catch (RetryException rx) {
+            LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
+            throw rx;
+        }
     }
 
     /**
@@ -167,7 +180,7 @@ public class DatanodeSecuritySetupIT {
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", "example.com")
+                .register("Enter alternative names (addresses) of this node [comma separated]", getHostname())
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),

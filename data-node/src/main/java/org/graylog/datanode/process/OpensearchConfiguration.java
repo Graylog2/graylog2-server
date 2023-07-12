@@ -19,6 +19,7 @@ package org.graylog.datanode.process;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.graylog2.plugin.Tools;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -77,12 +78,16 @@ public record OpensearchConfiguration(
         return env;
     }
 
-    public HttpHost getRestBaseUrl() {
-        var hostname = "localhost";
+    private String getHostName() {
         if (host != null && !host.isBlank()) {
-            hostname = host;
+            return host;
+        } else {
+            return Tools.getLocalCanonicalHostname();
         }
+    }
+
+    public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        return new HttpHost(hostname, httpPort(), sslEnabled ? "https" : "http");
+        return new HttpHost(getHostName(), httpPort(), sslEnabled ? "https" : "http");
     }
 }
