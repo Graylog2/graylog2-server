@@ -66,6 +66,7 @@ class SetIndexReadOnlyJobTest {
 
         toTest.execute();
 
+        verifyNoMoreInteractions(indices);
         verifyNoInteractions(indexSetRegistry);
         verifyNoInteractions(optimizeIndexJobFactory);
         verifyNoInteractions(activityWriter);
@@ -78,6 +79,7 @@ class SetIndexReadOnlyJobTest {
 
         toTest.execute();
 
+        verifyNoMoreInteractions(indices);
         verifyNoInteractions(indexSetRegistry);
         verifyNoInteractions(optimizeIndexJobFactory);
         verifyNoInteractions(activityWriter);
@@ -91,6 +93,7 @@ class SetIndexReadOnlyJobTest {
 
         toTest.execute();
 
+        verifyNoMoreInteractions(indices);
         verifyNoMoreInteractions(indexSetRegistry);
         verifyNoInteractions(optimizeIndexJobFactory);
         verifyNoInteractions(activityWriter);
