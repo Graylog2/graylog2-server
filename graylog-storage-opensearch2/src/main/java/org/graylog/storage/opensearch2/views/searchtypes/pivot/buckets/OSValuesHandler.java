@@ -62,9 +62,8 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Inject
     public OSValuesHandler(@DetectedSearchVersion SearchVersion version) {
-        this.supportsMultiTerms = false;
-                /* version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0") ||
-                version.satisfies(SearchVersion.Distribution.DATANODE, ">=5.2.0"); */
+        this.supportsMultiTerms = version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0") ||
+                version.satisfies(SearchVersion.Distribution.DATANODE, ">=5.2.0");
 
     }
 
@@ -74,7 +73,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
-        final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
+        final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit, bucketSpec.skipEmptyValues());
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
@@ -90,11 +89,11 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .otherBucket(true);
     }
 
-    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit, boolean skipEmptyValues) {
         return valueBuckets.size() > 1
-                ? supportsMultiTerms
-                    ? createMultiTerms(valueBuckets, ordering, limit)
-                    : createScriptedTerms(valueBuckets, ordering, limit)
+                ? supportsMultiTerms && skipEmptyValues
+                ? createMultiTerms(valueBuckets, ordering, limit)
+                : createScriptedTerms(valueBuckets, ordering, limit)
                 : createSimpleTerms(valueBuckets.get(0), ordering, limit);
     }
 
@@ -146,11 +145,11 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         }
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         if (values.skipEmptyValues()) {
-            return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
+            return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation, values.skipEmptyValues());
         } else {
             final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
 
-            final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
+            final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation, values.skipEmptyValues());
 
             return otherBucket.getDocCount() > 0
                     ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
@@ -164,20 +163,20 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         }
     }
 
-    private Stream<PivotBucket> extractTermsBuckets(ImmutableList<String> previousKeys, Function<List<String>, List<String>> reorderKeys, MultiBucketsAggregation termsAggregation) {
+    private Stream<PivotBucket> extractTermsBuckets(ImmutableList<String> previousKeys, Function<List<String>, List<String>> reorderKeys, MultiBucketsAggregation termsAggregation, boolean skipEmptyValues) {
         return termsAggregation.getBuckets().stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
-                            .addAll(reorderKeys.apply(extractKeys(bucket)))
+                            .addAll(reorderKeys.apply(extractKeys(bucket, skipEmptyValues)))
                             .build();
 
                     return PivotBucket.create(keys, bucket);
                 });
     }
 
-    private List<String> extractKeys(MultiBucketsAggregation.Bucket bucket) {
-        return supportsMultiTerms ? extractMultiTermsKeys(bucket) : splitKeys(bucket.getKeyAsString());
+    private List<String> extractKeys(MultiBucketsAggregation.Bucket bucket, boolean skipEmptyValues) {
+        return supportsMultiTerms && skipEmptyValues ? extractMultiTermsKeys(bucket) : splitKeys(bucket.getKeyAsString());
     }
 
     private ImmutableList<String> extractMultiTermsKeys(MultiBucketsAggregation.Bucket bucket) {
