@@ -62,9 +62,9 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Inject
     public OSValuesHandler(@DetectedSearchVersion SearchVersion version) {
-        this.supportsMultiTerms =
-                version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0") ||
-                version.satisfies(SearchVersion.Distribution.DATANODE, ">=5.2.0");
+        this.supportsMultiTerms = false;
+                /* version.satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.2.0") ||
+                version.satisfies(SearchVersion.Distribution.DATANODE, ">=5.2.0"); */
 
     }
 
@@ -76,16 +76,16 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
 
-        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
-    private FiltersAggregationBuilder createFilter(String name, List<String> bucketSpecs) {
+    private FiltersAggregationBuilder createFilter(String name, List<String> bucketSpecs, boolean skipEmptyValues) {
         final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         bucketSpecs.stream()
                 .map(QueryBuilders::existsQuery)
-                .forEach(queryBuilder::filter);
+                .forEach(skipEmptyValues ? queryBuilder::must : queryBuilder::should);
         return AggregationBuilders.filters(name, queryBuilder)
                 .otherBucket(true);
     }

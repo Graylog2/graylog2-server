@@ -63,17 +63,17 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
 
-        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
 
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
-    private FiltersAggregationBuilder createFilter(String name, List<String> fields) {
+    private FiltersAggregationBuilder createFilter(String name, List<String> fields, boolean skipEmptyValues) {
         final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         fields.stream()
                 .map(QueryBuilders::existsQuery)
-                .forEach(queryBuilder::filter);
+                .forEach(skipEmptyValues ? queryBuilder::must : queryBuilder::should);
         return AggregationBuilders.filters(name, queryBuilder)
                 .otherBucket(true);
     }

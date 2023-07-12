@@ -33,6 +33,8 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.plugins.views.search.aggregations.MissingBucketConstants.MISSING_BUCKET_NAME;
@@ -181,16 +183,22 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
         //General verification
         validatableResponse.rootPath(PIVOT_RESULTS_PATH)
-                .body(".rows", hasSize(5))
-                .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
-                .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
-                .body(".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(1))
-                .body(".rows.find{ it.key == [] }", notNullValue()) //totals
+                .body(tupledItemPath(MISSING_BUCKET_NAME, "Cooper"), hasItems(List.of(1, 60.0f)))
+                .body(tupledItemPath("Bob", MISSING_BUCKET_NAME), hasItems(List.of(1, 60.0f)))
+                .body(tupledItemPath("Joe", "Smith"), hasItems(List.of(1, 50.0f)))
+                .body(tupledItemPath("Joe", "Biden"), hasItems(List.of(1, 80.0f)))
+                .body(tupledItemPath("Jane", "Smith"), hasItems(List.of(1, 40.0f)))
+                .body(".rows.find{ it.key == [] }.values.value", hasItems(5, 58.0f)) //totals
+                .body(".rows", hasSize(6))
                 .body(".total", equalTo(5));
+    }
 
-        //Empty buckets verification
-        //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
-        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(2, 60.0f));
+    private String tupledItemPath(String... keys) {
+        var condition = IntStream.range(0, keys.length)
+                .mapToObj(idx -> "it.key[" + idx + "] == '" + keys[idx] + "'")
+                .collect(Collectors.joining(" && "));
+
+        return ".rows.findAll { " + condition + " }.values.value";
     }
 
     @ContainerMatrixTest
