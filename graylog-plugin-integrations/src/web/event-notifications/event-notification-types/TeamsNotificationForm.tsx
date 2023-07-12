@@ -46,6 +46,7 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
       + '\n'
       + '<b>--- [Event] ---</b>\n'
       + '<table>\n'
+      + '<tr><td><b>Alert Replay:</b></td><td>${http_external_uri}alerts/${event.id}/replay-search</td></tr>\n'
       + '<tr><td><b>Timestamp:</b></td><td>${event.timestamp}</td></tr>\n'
       + '<tr><td><b>Message:</b></td><td>${event.message}</td></tr>\n'
       + '<tr><td><b>Source:</b></td><td>${event.source}</td></tr>\n'
