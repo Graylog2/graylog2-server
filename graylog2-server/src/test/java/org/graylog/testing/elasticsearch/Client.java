@@ -61,12 +61,15 @@ public interface Client {
     String fieldType(String testIndexName, String source);
 
     void putSetting(String setting, String value);
+    String getSetting(String setting);
 
     void waitForIndexBlock(String index);
 
     void resetIndexBlock(String index);
 
     void setIndexBlock(String index);
+
+    void resetClusterBlock();
 
     void updateMapping(String index, Map<String, Object> mapping);
     Map<String, Object> getMapping(String index);

@@ -69,6 +69,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        client().resetClusterBlock(); // the index may be blocked with delay from a previous test, if yes then reset it.
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
