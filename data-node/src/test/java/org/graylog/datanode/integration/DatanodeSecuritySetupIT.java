@@ -124,9 +124,9 @@ public class DatanodeSecuritySetupIT {
                 .build();
 
         try {
-            System.setProperty("javax.net.debug", "all");
+//            System.setProperty("javax.net.debug", "all");
             var hostname = Tools.getLocalCanonicalHostname();
-            var url = "https://" + hostname + ":" + datanodeRestPort;
+            var url = "http://" + hostname + ":" + datanodeRestPort;
             LOG.info("Trying to connect to: {}", url);
             retryer.call(() -> RestAssured.given()
                     .get(url)
