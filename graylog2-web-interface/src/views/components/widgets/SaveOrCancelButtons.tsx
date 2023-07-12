@@ -21,6 +21,8 @@ import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEd
 import { ModalSubmit } from 'components/common';
 import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
 
+export const UPDATE_WIDGET_BTN_TEXT = 'Update widget';
+
 type Props = {
   onCancel: () => void,
   onSubmit: () => void,
@@ -44,7 +46,7 @@ const SaveOrCancelButtons = ({ onSubmit, onCancel }: Props) => {
 
   return (
     <ModalSubmit isAsyncSubmit
-                 submitButtonText="Update widget"
+                 submitButtonText={UPDATE_WIDGET_BTN_TEXT}
                  submitLoadingText="Updating widget..."
                  onSubmit={_onSubmit}
                  submitButtonType="button"

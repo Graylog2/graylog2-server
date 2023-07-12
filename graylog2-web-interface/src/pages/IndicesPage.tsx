@@ -18,20 +18,24 @@ import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import { Col, Row, Button } from 'components/bootstrap';
+import { Col, Row, Button, ButtonToolbar } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { IndexSetsComponent } from 'components/indices';
 import { IndexerClusterHealth } from 'components/indexers';
+import AllIndicesMaintenanceDropdown from 'components/indices/AllIndicesMaintenanceDropdown';
 
 const IndicesPage = () => (
   <DocumentTitle title="Indices and Index Sets">
     <PageHeader title="Indices & Index Sets"
                 actions={(
-                  <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
-                    <Button bsStyle="success">Create index set</Button>
-                  </LinkContainer>
+                  <ButtonToolbar>
+                    <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
+                      <Button bsStyle="success">Create index set</Button>
+                    </LinkContainer>
+                    <AllIndicesMaintenanceDropdown />
+                  </ButtonToolbar>
                 )}
                 documentationLink={{
                   title: 'Index model documentation',
