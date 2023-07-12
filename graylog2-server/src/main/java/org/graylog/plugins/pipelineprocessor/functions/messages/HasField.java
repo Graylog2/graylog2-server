@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -54,7 +55,9 @@ public class HasField extends AbstractFunction<Boolean> {
                 .params(ImmutableList.of(fieldParam, messageParam))
                 .description("Checks whether a message contains a value for a field")
                 .ruleBuilderEnabled()
+                .ruleBuilderName("Has field")
                 .ruleBuilderTitle("Message has field '${field}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

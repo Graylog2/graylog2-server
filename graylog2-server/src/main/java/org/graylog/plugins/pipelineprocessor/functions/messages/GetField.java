@@ -54,6 +54,7 @@ public class GetField extends AbstractFunction<Object> {
                 .params(ImmutableList.of(fieldParam, messageParam))
                 .description("Retrieves the value for a field")
                 .ruleBuilderEnabled()
+                .ruleBuilderName("Get field value")
                 .ruleBuilderTitle("Retrieve value for field '${field}'")
                 .build();
     }

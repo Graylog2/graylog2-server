@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
@@ -84,7 +85,9 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                         .returnType(String.class)
                         .description("Get substring of value")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Substring")
                         .ruleBuilderTitle("Get substring from '${start}' to '${end!\"end\"}' of value")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                         .build())
                 .fragmentOutputVariable("gl2_fragment_substring_results")
                 .build();
@@ -110,7 +113,9 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                         .returnType(DateTime.class)
                         .description("Parses a value using the given date format")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Parse date")
                         .ruleBuilderTitle("Parse date from value")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)
                         .build())
                 .fragmentOutputVariable("gl2_fragment_date_results")
                 .build();

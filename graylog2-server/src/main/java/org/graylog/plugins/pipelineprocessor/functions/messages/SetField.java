@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import java.util.Optional;
@@ -98,7 +99,9 @@ public class SetField extends AbstractFunction<Void> {
                         defaultParam))
                 .description("Sets a new field in a message")
                 .ruleBuilderEnabled()
+                .ruleBuilderName("Set to field")
                 .ruleBuilderTitle("Set value to field '${field}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

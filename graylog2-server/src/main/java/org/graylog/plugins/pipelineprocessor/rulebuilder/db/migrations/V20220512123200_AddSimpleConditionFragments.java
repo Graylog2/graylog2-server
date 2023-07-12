@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
@@ -83,7 +84,9 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
                         .returnType(Boolean.class)
                         .description("Checks if the message has a field and if this field's numeric value is less than or equal to the given fieldValue")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Field <=")
                         .ruleBuilderTitle("Field '${field}' less than or equal '${fieldValue}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.NUMBER)
                         .build())
                 .isCondition()
                 .build();
@@ -101,7 +104,9 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
                         .returnType(Boolean.class)
                         .description("Checks if the message has a field and if this field's numeric value is greater than or equal to the given fieldValue")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Field >=")
                         .ruleBuilderTitle("Field '${field}' greater than or equal '${fieldValue}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.NUMBER)
                         .build())
                 .isCondition()
                 .build();
@@ -119,7 +124,9 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
                         .returnType(Boolean.class)
                         .description("Checks if the message has a field and if this field's string value is equal to the given fieldValue")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Field equals")
                         .ruleBuilderTitle("Field '${field}' equals '${fieldValue}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                         .build())
                 .isCondition()
                 .build();

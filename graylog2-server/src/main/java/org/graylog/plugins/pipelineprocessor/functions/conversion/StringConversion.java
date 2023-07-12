@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.joda.time.DateTime;
 
 import java.util.LinkedHashMap;
@@ -104,7 +105,9 @@ public class StringConversion extends AbstractFunction<String> {
                 ))
                 .description("Converts a value to its string representation")
                 .ruleBuilderEnabled()
+                .ruleBuilderName("Convert to string")
                 .ruleBuilderTitle("Convert value to string")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

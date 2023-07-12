@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
@@ -93,7 +94,9 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
                         .returnType(Void.class)
                         .description("Match grok pattern and set fields")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Extract grok to fields")
                         .ruleBuilderTitle("Match grok pattern on field '${field}' and set fields")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
                         .build())
                 .build();
     }
