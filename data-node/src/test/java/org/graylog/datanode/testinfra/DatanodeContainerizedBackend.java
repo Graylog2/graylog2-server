@@ -129,7 +129,7 @@ public class DatanodeContainerizedBackend {
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
-                                .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
+                                .entryPoint("java", "-Djavax.net.debug=all", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
                                 .build());
     }
 

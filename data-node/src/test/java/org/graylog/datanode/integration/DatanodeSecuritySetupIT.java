@@ -124,6 +124,7 @@ public class DatanodeSecuritySetupIT {
                 .build();
 
         try {
+            System.setProperty("javax.net.debug", "all");
             var hostname = Tools.getLocalCanonicalHostname();
             var url = "https://" + hostname + ":" + datanodeRestPort;
             LOG.info("Trying to connect to: {}", url);
