@@ -29,7 +29,6 @@ import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
-import org.graylog2.plugin.Tools;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,6 +87,9 @@ public class DatanodeSecuritySetupIT {
             // configure initial admin username and password for Opensearch REST
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin");
+
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "graylog-datanode-host");
+            datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName("graylog-datanode-host"));
         }).start();
     }
 
@@ -99,7 +101,7 @@ public class DatanodeSecuritySetupIT {
         given()
                 .auth().basic("admin", "admin")
                 .trustStore(buildTruststore(httpCert, "password"))
-                .get("https://" + getHostname() + ":" + backend.getOpensearchRestPort())
+                .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
                 .body("name", Matchers.equalTo("node1"))
                 .body("cluster_name", Matchers.equalTo("datanode-cluster"));
@@ -107,7 +109,7 @@ public class DatanodeSecuritySetupIT {
     }
 
     private String getHostname() {
-        return Tools.getLocalCanonicalHostname();
+        return "graylog-datanode-host"; // Tools.getLocalCanonicalHostname();
     }
 
     private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
@@ -121,7 +123,7 @@ public class DatanodeSecuritySetupIT {
 
         try {
             retryer.call(() -> RestAssured.given()
-                    .get("http://" + getHostname() + ":" + datanodeRestPort)
+                    .get("http://localhost:" + datanodeRestPort)
                     .then());
         } catch (RetryException rx) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
