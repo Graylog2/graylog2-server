@@ -90,6 +90,7 @@ public class CertutilCert implements CliCommand {
 
             final CertRequest req = CertRequest.signed("localhost", intermediateCA)
                     .withSubjectAlternativeName("localhost")
+                    .withSubjectAlternativeName("graylog-datanode-host")
                     .withSubjectAlternativeName(Tools.getLocalHostname())
                     .withSubjectAlternativeName(Tools.getLocalCanonicalHostname())
                     .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
