@@ -90,7 +90,6 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin");
 
-//            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "graylog-datanode-host");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0");
             datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName("graylog-datanode-host"));
         }).start();
@@ -102,18 +101,16 @@ public class DatanodeSecuritySetupIT {
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort());
 
         try {
-//            System.setProperty("javax.net.debug", "all");
-        given()
+            given()
                 .auth().basic("admin", "admin")
                 .trustStore(buildTruststore(httpCert, "password"))
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
                 .body("name", Matchers.equalTo("node1"))
                 .body("cluster_name", Matchers.equalTo("datanode-cluster"));
-
-        } catch (Exception rx) {
+        } catch (Exception ex) {
             LOG.error("Error connecting to OpenSearch in the DataNode, showing logs:\n{}", backend.getLogs());
-            throw rx;
+            throw ex;
         }
     }
 
@@ -142,16 +139,15 @@ public class DatanodeSecuritySetupIT {
                 .build();
 
         try {
-//            System.setProperty("javax.net.debug", "all");
             var hostname = Tools.getLocalCanonicalHostname();
             var url = "http://" + hostname + ":" + datanodeRestPort;
             LOG.info("Trying to connect to: {}", url);
             retryer.call(() -> RestAssured.given()
                     .get(url)
                     .then());
-        } catch (Exception rx) {
+        } catch (Exception ex) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
-            throw rx;
+            throw ex;
         }
     }
 
