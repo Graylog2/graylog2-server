@@ -21,7 +21,7 @@ import * as React from 'react';
 import MockStore from 'helpers/mocking/StoreMock';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
-import TimeRangeDropdownButton from './TimeRangePresetSelect';
+import TimeRangePresetSelect from './TimeRangePresetSelect';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
@@ -44,14 +44,14 @@ const selectRangePreset = async (optionLabel: string) => {
   fireEvent.click(rangePresetOption);
 };
 
-describe('TimeRangeDropdownButton', () => {
-  type SUTProps = Partial<React.ComponentProps<typeof TimeRangeDropdownButton>> & {
+describe('TimeRangePresetSelect', () => {
+  type SUTProps = Partial<React.ComponentProps<typeof TimeRangePresetSelect>> & {
     onSubmit?: () => void
   }
 
   const SUTTimeRangePresetSelect = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
-      <TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
+      <TimeRangePresetSelect toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
     </Formik>
   );
 
