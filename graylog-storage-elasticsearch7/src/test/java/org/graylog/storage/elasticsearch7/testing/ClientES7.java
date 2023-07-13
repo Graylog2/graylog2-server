@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.testing;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rholder.retry.Retryer;
@@ -52,6 +53,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.Cluste
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
@@ -177,9 +179,11 @@ public class ClientES7 implements Client {
     }
 
     @Override
-    public void putTemplate(String templateName, Template source) {
-        var serializedMapping = serialize(source.mappings());
-        var indexTemplate = new ComposableIndexTemplate(source.indexPatterns(), new org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Template(null, serializedMapping, null), null, null, null, null);
+    public void putTemplate(String templateName, Template template) {
+        var serializedMapping = serialize(template.mappings());
+        var settings = Settings.builder().loadFromSource(serializeJson(template.settings()), XContentType.JSON).build();
+        var esTemplate = new org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Template(settings, serializedMapping, null);
+        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), esTemplate, null, null, null, null);
         var request = new PutComposableIndexTemplateRequest()
                 .name(templateName)
                 .indexTemplate(indexTemplate);
@@ -187,9 +191,17 @@ public class ClientES7 implements Client {
                 "Unable to put template " + templateName);
     }
 
+    private String serializeJson(Object obj) {
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private CompressedXContent serialize(Object obj) {
         try {
-            return new CompressedXContent(objectMapper.writeValueAsString(obj));
+            return new CompressedXContent(serializeJson(obj));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

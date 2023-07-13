@@ -218,7 +218,8 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public boolean ensureIndexTemplate(String templateName, Template template) {
         var serializedMapping = serialize(template.mappings());
         var settings = Settings.builder().loadFromSource(serializeJson(template.settings()), XContentType.JSON).build();
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), new org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Template(settings, serializedMapping, null), null, template.order(), null, null);
+        var esTemplate = new org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Template(settings, serializedMapping, null);
+        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), esTemplate, null, template.order(), null, null);
         var request = new PutComposableIndexTemplateRequest()
                 .name(templateName)
                 .indexTemplate(indexTemplate);

@@ -215,7 +215,8 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     public boolean ensureIndexTemplate(String templateName, Template template) {
         var serializedMapping = serialize(template.mappings());
         var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null), null, template.order(), null, null);
+        var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
+        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), osTemplate, null, template.order(), null, null);
         var request = new PutComposableIndexTemplateRequest()
                 .name(templateName)
                 .indexTemplate(indexTemplate);
