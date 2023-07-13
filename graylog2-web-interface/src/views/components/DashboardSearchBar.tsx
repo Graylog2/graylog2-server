@@ -59,7 +59,7 @@ import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHandlerContext from 'views/components/useHandlerContext';
 import type { TimeRange } from 'views/logic/queries/Query';
 
-import TimeRangeFilter from './searchbar/TimeRangeFilter';
+import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';

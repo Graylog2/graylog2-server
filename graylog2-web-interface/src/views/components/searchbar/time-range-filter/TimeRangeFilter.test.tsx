@@ -21,7 +21,7 @@ import { defaultUser } from 'defaultMockValues';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-import TimeRangeFilter from 'views/components/searchbar/TimeRangeFilter';
+import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser, alice } from 'fixtures/users';

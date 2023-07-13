@@ -23,7 +23,7 @@ import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
-import TimeRangeButton from './TimeRangeButton';
+import TimeRangeButton from './time-range-filter/TimeRangeButton';
 
 const Wrapper = styled.div`
   display: flex;

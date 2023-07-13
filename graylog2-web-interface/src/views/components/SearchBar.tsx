@@ -26,7 +26,7 @@ import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
-import TimeRangeFilter from 'views/components/searchbar/TimeRangeFilter';
+import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';

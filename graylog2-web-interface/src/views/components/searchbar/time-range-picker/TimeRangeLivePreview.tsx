@@ -29,7 +29,7 @@ import TimeRangeAddToQuickListButton from 'views/components/searchbar/time-range
 import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/time-range-picker/TimeRangePicker';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
-import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
+import { EMPTY_OUTPUT, EMPTY_RANGE } from '../time-range-filter/TimeRangeDisplay';
 
 type Props = {
   timerange?: TimeRange | NoTimeRangeOverride,
