@@ -30,8 +30,8 @@ import type { KeywordTimeRange, AbsoluteTimeRange } from 'views/logic/queries/Qu
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/date-time-picker/TimeRangeDropdown';
-import TabPresetDropdown from 'views/components/searchbar/date-time-picker/TabPresetDropdown';
+import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/time-range-picker/TimeRangePicker';
+import TabPresetDropdown from 'views/components/searchbar/time-range-picker/TabPresetDropdown';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 

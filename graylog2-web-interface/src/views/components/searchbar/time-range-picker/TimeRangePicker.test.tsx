@@ -22,8 +22,7 @@ import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 import ToolsStore from 'stores/tools/ToolsStore';
 
-import type { TimeRangeDropdownProps } from './TimeRangeDropdown';
-import OriginalTimeRangeDropDown from './TimeRangeDropdown';
+import TimeRangePicker from './TimeRangePicker';
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -52,11 +51,7 @@ const defaultProps = {
   position: 'bottom',
 } as const;
 
-const TimeRangeDropdown = (allProps: TimeRangeDropdownProps) => (
-  <OriginalTimeRangeDropDown {...allProps} />
-);
-
-describe('TimeRangeDropdown', () => {
+describe('TimeRangePicker', () => {
   beforeEach(() => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
       from: '2018-11-14 13:52:38',
@@ -66,7 +61,7 @@ describe('TimeRangeDropdown', () => {
   });
 
   it('renders initial time range value', async () => {
-    render(<TimeRangeDropdown {...defaultProps} />);
+    render(<TimeRangePicker {...defaultProps} />);
 
     const title = await screen.findByText(/search time range/i);
 
@@ -74,7 +69,7 @@ describe('TimeRangeDropdown', () => {
   });
 
   it('Clicking apply run handler', async () => {
-    render(<TimeRangeDropdown {...defaultProps} />);
+    render(<TimeRangePicker {...defaultProps} />);
 
     const applyButton = screen.getByRole('button', { name: /update time range/i });
     fireEvent.click(applyButton);
@@ -88,7 +83,7 @@ describe('TimeRangeDropdown', () => {
   });
 
   it('Limit duration is shown when setup', async () => {
-    render(<TimeRangeDropdown {...defaultProps} />);
+    render(<TimeRangePicker {...defaultProps} />);
 
     const limitDuration = await screen.findByText(/admin has limited searching to 3 days ago/i);
 
@@ -96,7 +91,7 @@ describe('TimeRangeDropdown', () => {
   });
 
   it('Render Tabs', async () => {
-    render(<TimeRangeDropdown {...defaultProps} />);
+    render(<TimeRangePicker {...defaultProps} />);
 
     const relativeTabButton = await screen.findByRole('tab', { name: /relative/i });
     const absoluteTabButton = screen.getByRole('tab', { name: /absolute/i });
@@ -108,7 +103,7 @@ describe('TimeRangeDropdown', () => {
   });
 
   it('Absolute tab has Accordion', async () => {
-    render(<TimeRangeDropdown {...defaultProps} currentTimeRange={{ type: 'absolute', from: '1955-05-11 06:15:00', to: '1985-10-25 08:18:00' }} />);
+    render(<TimeRangePicker {...defaultProps} currentTimeRange={{ type: 'absolute', from: '1955-05-11 06:15:00', to: '1985-10-25 08:18:00' }} />);
 
     const calendarButton = await screen.findByRole('button', { name: /calendar/i });
     const timestampButton = screen.getByRole('button', { name: /timestamp/i });
@@ -124,7 +119,7 @@ describe('TimeRangeDropdown', () => {
   }, applyTimeoutMultiplier(15000));
 
   it('Renders No Override Tab for Dashboard', async () => {
-    render(<TimeRangeDropdown {...defaultProps} currentTimeRange={{}} noOverride />);
+    render(<TimeRangePicker {...defaultProps} currentTimeRange={{}} noOverride />);
 
     const noOverrideContent = await screen.findByText(/No Date\/Time Override chosen./i);
     const noOverrideButton = screen.getByRole('button', { name: /no override/i });

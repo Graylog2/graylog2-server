@@ -25,7 +25,7 @@ import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'v
 import { Icon } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import TabPresetDropdown from 'views/components/searchbar/date-time-picker/TabPresetDropdown';
+import TabPresetDropdown from 'views/components/searchbar/time-range-picker/TabPresetDropdown';
 
 import {
   classifyToRange,
@@ -33,7 +33,7 @@ import {
   RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
   classifyRelativeTimeRange,
 } from './RelativeTimeRangeClassifiedHelper';
-import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
+import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
 type Props = {

@@ -33,7 +33,7 @@ import type {
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
-import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
+import type { RelativeTimeRangeClassified } from 'views/components/searchbar/time-range-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTimeFormats, DateTime } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
@@ -55,16 +55,6 @@ import {
 
 export type TimeRangeDropDownFormValues = {
   nextTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
-};
-
-export type TimeRangeDropdownProps = {
-  currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
-  limitDuration: number,
-  noOverride?: boolean,
-  position: 'bottom' | 'right',
-  setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
-  toggleDropdownShow: () => void,
-  validTypes?: Array<TimeRangeType>,
 };
 
 export type TimeRangeType = keyof typeof timeRangeTypes;
@@ -242,7 +232,17 @@ const TimeRangeTabs = ({
   );
 };
 
-const TimeRangeDropdown = ({
+type Props = {
+  currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  limitDuration: number,
+  noOverride?: boolean,
+  position: 'bottom' | 'right',
+  setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
+  toggleDropdownShow: () => void,
+  validTypes?: Array<TimeRangeType>,
+};
+
+const TimeRangePicker = ({
   noOverride,
   toggleDropdownShow,
   currentTimeRange,
@@ -250,7 +250,7 @@ const TimeRangeDropdown = ({
   validTypes = allTimeRangeTypes,
   position,
   limitDuration: configLimitDuration,
-}: TimeRangeDropdownProps) => {
+}: Props) => {
   const { ignoreLimitDurationInTimeRangeDropdown } = useContext(TimeRangeInputSettingsContext);
   const limitDuration = useMemo(() => (ignoreLimitDurationInTimeRangeDropdown ? 0 : configLimitDuration), [configLimitDuration, ignoreLimitDurationInTimeRangeDropdown]);
   const { formatTime, userTimezone } = useUserDateTime();
@@ -331,6 +331,7 @@ const TimeRangeDropdown = ({
               <Form>
                 <Row>
                   <Col md={12}>
+                    <TimeRangeLivePreview timerange={normalizeIfClassifiedRelativeTimeRange(nextTimeRange)} />
                     <TimeRangeTabs currentTimeRange={currentTimeRange}
                                    handleActiveTab={handleActiveTab}
                                    limitDuration={limitDuration}
@@ -359,9 +360,9 @@ const TimeRangeDropdown = ({
   );
 };
 
-TimeRangeDropdown.defaultProps = {
+TimeRangePicker.defaultProps = {
   noOverride: false,
   validTypes: allTimeRangeTypes,
 };
 
-export default TimeRangeDropdown;
+export default TimeRangePicker;
