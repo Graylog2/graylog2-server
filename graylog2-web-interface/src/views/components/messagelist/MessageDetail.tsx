@@ -176,9 +176,9 @@ const MessageDetail = ({
                                                    sourceInputId={gl2_source_input} />
                                )}
                                streams={streamsListItems}
-                               assets={(
+                               assets={associated_assets ? (
                                  <FormatAssetList assets={assetsList} />
-                               )} />
+                               ) : <div />} />
               <MessageAugmentations message={message} />
             </Col>
             <Col md={9}>
