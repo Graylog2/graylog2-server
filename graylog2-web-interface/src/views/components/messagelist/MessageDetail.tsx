@@ -94,7 +94,7 @@ const MessageDetail = ({
   const { gl2_source_node, gl2_source_input, associated_assets } = fields;
   const { isLocalNode } = useIsLocalNode(gl2_source_node);
   const additionalContext = useMemo(() => ({ isLocalNode }), [isLocalNode]);
-  const pluggableAssetListComponent = usePluginEntities('views.components.assetValueActions');
+  const pluggableAssetListComponent = usePluginEntities('views.components.assetInformationActions');
 
   const assetsList = React.useMemo(() => pluggableAssetListComponent.map(
     ({ component: PluggableAssetListItem }) => (
