@@ -27,7 +27,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
-import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
