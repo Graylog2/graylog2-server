@@ -67,7 +67,7 @@ public class EventsIndexMappingTest {
     }
 
     private void assertStandardSettingsValues(JsonPathAssert at) {
-        at.jsonPathAsString("$.index.refresh_interval").isEqualTo("1s");
+        at.jsonPathAsString("$.['index.refresh_interval']").isEqualTo("1s");
     }
 
     private void assertStandardMappingValues(JsonPathAssert at) {
