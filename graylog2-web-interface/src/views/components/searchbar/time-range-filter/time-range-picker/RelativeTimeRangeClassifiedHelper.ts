@@ -23,7 +23,7 @@ import type {
   KeywordTimeRange,
   NoTimeRangeOverride, TimeRange,
 } from 'views/logic/queries/Query';
-import type { RelativeTimeRangeClassified, RangeClassified } from 'views/components/searchbar/time-range-picker/types';
+import type { RelativeTimeRangeClassified, RangeClassified } from 'views/components/searchbar/time-range-filter/time-range-picker/types';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
 const DEFAULT_CLASSIFIED_RANGE: RangeClassified = {

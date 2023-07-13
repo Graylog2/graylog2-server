@@ -25,7 +25,7 @@ import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'v
 import { Icon } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import TabPresetDropdown from 'views/components/searchbar/time-range-picker/TabPresetDropdown';
+import TabPresetDropdown from 'views/components/searchbar/time-range-filter/time-range-picker/TabPresetDropdown';
 
 import {
   classifyToRange,

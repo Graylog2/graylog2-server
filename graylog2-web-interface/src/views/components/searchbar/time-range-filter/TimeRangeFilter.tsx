@@ -24,9 +24,9 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { TimeRangeType } from 'views/components/searchbar/time-range-picker/TimeRangePicker';
-import TimeRangePicker from 'views/components/searchbar/time-range-picker/index';
-import TimeRangePresetSelect from 'views/components/searchbar/time-range-preset-select';
+import type { TimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import TimeRangePicker from 'views/components/searchbar/time-range-filter/time-range-picker/index';
+import TimeRangePresetSelect from 'views/components/searchbar/time-range-filter/time-range-preset-select';
 
 import TimeRangeDisplay from './TimeRangeDisplay';
 

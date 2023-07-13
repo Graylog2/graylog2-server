@@ -19,7 +19,7 @@ import moment from 'moment';
 
 import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
-import type { RelativeTimeRangeClassified } from 'views/components/searchbar/time-range-picker/types';
+import type { RelativeTimeRangeClassified } from 'views/components/searchbar/time-range-filter/time-range-picker/types';
 import type { DateTime } from 'util/DateTime';
 
 import {

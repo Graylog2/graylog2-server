@@ -34,7 +34,7 @@ import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeIn
 import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
 import TabPresetDropdown from './TabPresetDropdown';
 
-import { EMPTY_RANGE } from '../time-range-filter/TimeRangeDisplay';
+import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
 const KeywordInput = styled(FormControl)(({ theme }) => css`
   min-height: 34px;

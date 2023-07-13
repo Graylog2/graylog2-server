@@ -20,7 +20,7 @@ import { Formik, Form } from 'formik';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/searchbar/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
 
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 

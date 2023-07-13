@@ -20,7 +20,7 @@ import { Formik, Form, Field } from 'formik';
 import moment from 'moment/moment';
 
 import useUserDateTime from 'hooks/useUserDateTime';
-import AbsoluteDateInput from 'views/components/searchbar/time-range-picker/AbsoluteDateInput';
+import AbsoluteDateInput from 'views/components/searchbar/time-range-filter/time-range-picker/AbsoluteDateInput';
 import { ModalSubmit } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';

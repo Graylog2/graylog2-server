@@ -25,7 +25,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import RangePresetDropdown from './TimeRangePresetDropdown';
 
-import TimeRangeButton from '../time-range-filter/TimeRangeButton';
+import TimeRangeButton from '../TimeRangeButton';
 
 type Props = {
   disabled?: boolean,

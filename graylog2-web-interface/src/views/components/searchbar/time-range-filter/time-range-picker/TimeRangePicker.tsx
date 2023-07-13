@@ -33,7 +33,7 @@ import type {
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
-import type { RelativeTimeRangeClassified } from 'views/components/searchbar/time-range-picker/types';
+import type { RelativeTimeRangeClassified } from 'views/components/searchbar/time-range-filter/time-range-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTimeFormats, DateTime } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
