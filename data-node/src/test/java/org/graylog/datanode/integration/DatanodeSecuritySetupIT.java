@@ -129,14 +129,14 @@ public class DatanodeSecuritySetupIT {
                 .retryIfException(input -> input instanceof SocketException)
                 .retryIfResult(input -> {
                     var body = input.extract().body();
-                    if(!body.path("opensearch.node.state").equals("AVAILABLE")) {
-                        LOG.info("Response was: \n{}", body.asPrettyString());
-                        return true;
-                    } else if(!body.path("opensearch.node.state").equals("FAILED")) {
+                    if(body.path("opensearch.node.state").equals("AVAILABLE")) {
+                        return false;
+                    } else if(body.path("opensearch.node.state").equals("FAILED")) {
                         LOG.info("OpenSearch started but response was: \n{}", body.asPrettyString());
                         return false;
                     } else {
-                        return false;
+                        LOG.info("Response was: \n{}", body.asPrettyString());
+                        return true;
                     }
                 })
                 .build();
