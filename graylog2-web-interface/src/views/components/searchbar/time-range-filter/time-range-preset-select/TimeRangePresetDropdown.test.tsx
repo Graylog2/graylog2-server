@@ -35,8 +35,8 @@ describe('RangePresetDropdown', () => {
     const onSelectOption = jest.fn();
     render(<RangePresetDropdown onChange={onSelectOption} availableOptions={[]} />);
 
-    const timeRangeButton = screen.getByLabelText('Open time range preset select');
-    fireEvent.click(timeRangeButton);
+    const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
+    fireEvent.click(timeRangePresetButton);
     const rangePresetOption = await screen.findByText('Configure Ranges');
     fireEvent.click(rangePresetOption);
 
@@ -75,8 +75,8 @@ describe('RangePresetDropdown', () => {
                                   },
                                 ]} />);
 
-    const timeRangeButton = screen.getByLabelText('Open time range preset select');
-    fireEvent.click(timeRangeButton);
+    const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
+    fireEvent.click(timeRangePresetButton);
 
     const tenMinTR = screen.queryByText('Keyword ten min');
     await screen.findByText('5 minutes');

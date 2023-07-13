@@ -38,8 +38,8 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 }));
 
 const selectRangePreset = async (optionLabel: string) => {
-  const timeRangeButton = screen.getByLabelText('Open time range preset select');
-  fireEvent.click(timeRangeButton);
+  const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
+  fireEvent.click(timeRangePresetButton);
   const rangePresetOption = await screen.findByText(optionLabel);
   fireEvent.click(rangePresetOption);
 };
@@ -59,9 +59,9 @@ describe('TimeRangePresetSelect', () => {
     const toggleShow = jest.fn();
     render(<SUTTimeRangePresetSelect toggleShow={toggleShow} />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangePickerButton = screen.getByLabelText('Open Time Range Selector');
 
-    fireEvent.click(timeRangeButton);
+    fireEvent.click(timeRangePickerButton);
 
     expect(toggleShow).toHaveBeenCalled();
   });

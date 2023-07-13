@@ -23,7 +23,7 @@ import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
-import TimeRangeButton from './time-range-filter/TimeRangeButton';
+import TimeRangePickerButton from './time-range-filter/time-range-picker/TimeRangePickerButton';
 
 const Wrapper = styled.div`
   display: flex;
@@ -71,7 +71,7 @@ const WidgetTimeRangeOverride = ({ value, onReset }: Props) => {
 
   return (
     <Wrapper>
-      <TimeRangeButton disabled />
+      <TimeRangePickerButton disabled />
       <TimeRangeInfo>
         <TimeRangeString title={internalTime}>{localTimeWithMS}</TimeRangeString>
         <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">

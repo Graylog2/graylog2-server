@@ -25,7 +25,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import RangePresetDropdown from './TimeRangePresetDropdown';
 
-import TimeRangeButton from '../TimeRangeButton';
+import TimeRangePickerButton from '../time-range-picker/TimeRangePickerButton';
 
 type Props = {
   disabled?: boolean,
@@ -78,9 +78,9 @@ const TimeRangePresetSelect = ({
 
   return (
     <StyledButtonGroup>
-      <TimeRangeButton hasError={hasErrorOnMount}
-                       disabled={disabled}
-                       onClick={_onClick} />
+      <TimeRangePickerButton hasError={hasErrorOnMount}
+                             disabled={disabled}
+                             onClick={_onClick} />
       {showPresetDropdown && (
         <StyledRangePresetDropdown disabled={disabled}
                                    displayTitle={false}

@@ -26,7 +26,7 @@ type Props = {
   onClick?: (e: SyntheticEvent) => void,
 };
 
-const TimeRangeButton = ({ hasError, disabled, onClick }: Props) => (
+const TimeRangePickerButton = ({ hasError, disabled, onClick }: Props) => (
   <Button bsStyle={hasError ? 'danger' : 'info'}
           disabled={disabled}
           onClick={onClick}
@@ -35,10 +35,10 @@ const TimeRangeButton = ({ hasError, disabled, onClick }: Props) => (
   </Button>
 );
 
-TimeRangeButton.defaultProps = {
+TimeRangePickerButton.defaultProps = {
   hasError: false,
   disabled: false,
   onClick: undefined,
 };
 
-export default TimeRangeButton;
+export default TimeRangePickerButton;
