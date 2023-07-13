@@ -21,7 +21,7 @@ import * as React from 'react';
 import MockStore from 'helpers/mocking/StoreMock';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
-import TimeRangeDropdownButton from './TimeRangeDropdownButton';
+import TimeRangeDropdownButton from './TimeRangePresetSelect';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
@@ -49,7 +49,7 @@ describe('TimeRangeDropdownButton', () => {
     onSubmit?: () => void
   }
 
-  const SUTTimeRangeDropDownButton = ({ onSubmit = () => {}, ...props }: SUTProps) => (
+  const SUTTimeRangePresetSelect = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
       <TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
     </Formik>
@@ -57,7 +57,7 @@ describe('TimeRangeDropdownButton', () => {
 
   it('button can be clicked and Popover appears', async () => {
     const toggleShow = jest.fn();
-    render(<SUTTimeRangeDropDownButton toggleShow={toggleShow} />);
+    render(<SUTTimeRangePresetSelect toggleShow={toggleShow} />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
 
@@ -69,7 +69,7 @@ describe('TimeRangeDropdownButton', () => {
   it('changes time range and submits form when selecting relative time range preset', async () => {
     const setCurrentTimeRange = jest.fn();
     const onSubmit = jest.fn();
-    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
+    render(<SUTTimeRangePresetSelect setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
 
     await selectRangePreset('30 minutes');
 
@@ -84,7 +84,7 @@ describe('TimeRangeDropdownButton', () => {
   it('updates time range with range attribute when selecting "all messages" relative time range preset', async () => {
     const setCurrentTimeRange = jest.fn();
     const onSubmit = jest.fn();
-    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
+    render(<SUTTimeRangePresetSelect setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
 
     await selectRangePreset('all messages');
 

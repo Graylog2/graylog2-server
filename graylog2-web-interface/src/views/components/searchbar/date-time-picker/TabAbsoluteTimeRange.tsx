@@ -147,8 +147,11 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
           </AccordionItem>
         </StyledAccordion>
       </AbsoluteWrapper>
-      {showAbsolutePresetsButton
-  && (<TabPresetDropdown disabled={disabled} onSetPreset={onSetPreset} availableOptions={absoluteOptions} />)}
+      {showAbsolutePresetsButton && (
+        <TabPresetDropdown disabled={disabled}
+                           onSetPreset={onSetPreset}
+                           availableOptions={absoluteOptions} />
+      )}
     </>
   );
 };

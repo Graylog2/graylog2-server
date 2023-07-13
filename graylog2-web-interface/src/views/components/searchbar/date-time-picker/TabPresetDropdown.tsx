@@ -18,7 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import TimerangeSelector from 'views/components/searchbar/TimerangeSelector';
-import RangePresetDropdown from 'views/components/searchbar/RangePresetDropdown';
+import RangePresetDropdown from 'views/components/searchbar/TimeRangePresetDropdown';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 

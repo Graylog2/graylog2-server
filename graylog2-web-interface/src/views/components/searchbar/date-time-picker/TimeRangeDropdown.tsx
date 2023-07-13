@@ -331,7 +331,6 @@ const TimeRangeDropdown = ({
               <Form>
                 <Row>
                   <Col md={12}>
-                    <TimeRangeLivePreview timerange={normalizeIfClassifiedRelativeTimeRange(nextTimeRange)} />
                     <TimeRangeTabs currentTimeRange={currentTimeRange}
                                    handleActiveTab={handleActiveTab}
                                    limitDuration={limitDuration}

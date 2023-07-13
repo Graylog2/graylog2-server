@@ -136,9 +136,9 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
         <Date title={`Dates Formatted as [${DATE_TIME_FORMATS.complete}]`}>{until}</Date>
       </UntilWrapper>
       {showAddToQuickListButton && !!(timerange as TimeRange).type && (
-      <IfPermitted permissions="clusterconfigentry:edit">
-        <TimeRangeAddToQuickListButton timerange={timerange as TimeRange} isTimerangeValid={isTimerangeValid} />
-      </IfPermitted>
+        <IfPermitted permissions="clusterconfigentry:edit">
+          <TimeRangeAddToQuickListButton timerange={timerange as TimeRange} isTimerangeValid={isTimerangeValid} />
+        </IfPermitted>
       )}
     </PreviewWrapper>
   );

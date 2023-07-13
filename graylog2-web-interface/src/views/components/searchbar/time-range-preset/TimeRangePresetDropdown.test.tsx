@@ -21,7 +21,7 @@ import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import asMock from 'helpers/mocking/AsMock';
 
-import RangePresetDropdown from './RangePresetDropdown';
+import RangePresetDropdown from './TimeRangePresetDropdown';
 
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
