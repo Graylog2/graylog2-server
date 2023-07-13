@@ -37,7 +37,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLHandshakeException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketException;
@@ -57,6 +56,7 @@ import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_
 
 public class DatanodeSecuritySetupIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
+    public static final String HOSTNAME = "graylog-datanode-host";
 
     @TempDir
     static Path tempDir;
@@ -90,8 +90,14 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin");
 
+            // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
+            // to be able to reach opensearch from outside the container and docker network (true?)
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0");
-            datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName("graylog-datanode-host"));
+
+            // HOSTNAME is used to generate the SSL certificates and to communicate inside the
+            // container and docker network, where we do the hostname validation.
+            datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(HOSTNAME));
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", HOSTNAME);
         }).start();
     }
 
@@ -114,28 +120,13 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private String getHostnames() {
-        return "graylog-datanode-host," + Tools.getLocalCanonicalHostname();
-    }
-
     private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
-                .retryIfResult(input -> {
-                    var body = input.extract().body();
-                    if(body.path("opensearch.node.state").equals("AVAILABLE")) {
-                        return false;
-                    } else if(body.path("opensearch.node.state").equals("FAILED")) {
-                        LOG.info("OpenSearch started but response was: \n{}", body.asPrettyString());
-                        return false;
-                    } else {
-                        LOG.info("Response was: \n{}", body.asPrettyString());
-                        return true;
-                    }
-                })
+                .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
         try {
@@ -202,7 +193,7 @@ public class DatanodeSecuritySetupIT {
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", getHostnames())
+                .register("Enter alternative names (addresses) of this node [comma separated]", HOSTNAME)
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),

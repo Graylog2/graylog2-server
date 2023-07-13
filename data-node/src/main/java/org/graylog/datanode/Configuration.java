@@ -336,6 +336,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "http_bind_address", required = true)
     private HostAndPort httpBindAddress = HostAndPort.fromParts("0.0.0.0", GRAYLOG_DEFAULT_PORT);
 
+    @Parameter(value = "hostname", required = true)
+    private String hostname = Tools.getLocalCanonicalHostname();
+
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
 
@@ -549,5 +552,9 @@ public class Configuration extends BaseConfiguration {
 
     private boolean isRegularFileAndReadable(Path path) {
         return path != null && Files.isRegularFile(path) && Files.isReadable(path);
+    }
+
+    public String getHostname() {
+        return hostname;
     }
 }

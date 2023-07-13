@@ -19,7 +19,6 @@ package org.graylog.datanode.process;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.graylog2.plugin.Tools;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -29,7 +28,8 @@ import java.util.Map;
 public record OpensearchConfiguration(
         Path opensearchDir,
         Path opensearchConfigDir,
-        String host,
+        String bindAddress,
+        String hostname,
         int httpPort,
         int transportPort,
         String authUsername,
@@ -47,8 +47,8 @@ public record OpensearchConfiguration(
             config.put("bootstrap.system_call_filter", "false");
         }
 
-        if (host != null && !host.isBlank()) {
-            config.put("network.host", host);
+        if (bindAddress != null && !bindAddress.isBlank()) {
+            config.put("network.host", bindAddress);
         }
         config.put("http.port", String.valueOf(httpPort));
         config.put("transport.port", String.valueOf(transportPort));
@@ -78,13 +78,8 @@ public record OpensearchConfiguration(
         return env;
     }
 
-    // also return a hostname if we bound to all interfaces - as we can not connect to "0.0.0.0" ;-)
-    private String getHostNameForRestBaseUrl() {
-        return (host != null && !host.isBlank() & !"0.0.0.0".equals(host)) ? host : Tools.getLocalCanonicalHostname();
-    }
-
     public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        return new HttpHost(getHostNameForRestBaseUrl(), httpPort(), sslEnabled ? "https" : "http");
+        return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
     }
 }

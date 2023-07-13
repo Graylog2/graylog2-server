@@ -81,6 +81,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     datanodeConfiguration.opensearchDistribution().directory(),
                     Path.of(opensearchConfigLocation),
                     localConfiguration.getHttpBindAddress().getHost(),
+                    localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getRestApiUsername(),
