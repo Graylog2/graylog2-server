@@ -35,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -61,7 +60,7 @@ class IndexMappingTest {
         final SearchVersion version = SearchVersion.decode(versionString);
         final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, Mockito.mock(IndexSetConfig.class));
 
-        final Map<String, Object> template = mapping.toTemplate(indexSetConfig, "sampleIndexTemplate");
+        var template = mapping.toTemplate(indexSetConfig, "sampleIndexTemplate");
         final String fixture = resourceFile(expectedTemplateFileName);
 
         JSONAssert.assertEquals(json(template), fixture, true);

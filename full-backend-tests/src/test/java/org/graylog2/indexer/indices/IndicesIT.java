@@ -306,7 +306,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 "properties", ImmutableMap.of("message",
                         ImmutableMap.of("type", "text")));
 
-        final Map<String, Object> templateSource = createTemplateFor(indexSet.getIndexWildcard(), beforeMapping);
+        var templateSource = Template.create(indexSet.getIndexWildcard(), new Template.Mappings(beforeMapping), 0L, new Template.Settings(Map.of()));
 
         client().putTemplate(templateName, templateSource);
 

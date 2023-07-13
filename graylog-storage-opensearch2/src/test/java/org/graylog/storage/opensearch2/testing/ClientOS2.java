@@ -46,17 +46,21 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemp
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplateMetadata;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
+import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -173,10 +177,22 @@ public class ClientOS2 implements Client {
     }
 
     @Override
-    public void putTemplate(String templateName, Map<String, Object> source) {
-        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName).source(source);
-        client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
+    public void putTemplate(String templateName, Template source) {
+        var serializedMapping = serialize(source.mappings());
+        var indexTemplate = new ComposableIndexTemplate(source.indexPatterns(), new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(null, serializedMapping, null), null, null, null, null);
+        var request = new PutComposableIndexTemplateRequest()
+                .name(templateName)
+                .indexTemplate(indexTemplate);
+        client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
                 "Unable to put template " + templateName);
+    }
+
+    private CompressedXContent serialize(Object obj) {
+        try {
+            return new CompressedXContent(objectMapper.writeValueAsString(obj));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

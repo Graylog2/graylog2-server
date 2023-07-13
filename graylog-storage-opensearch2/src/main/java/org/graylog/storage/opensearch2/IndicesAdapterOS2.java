@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -42,14 +43,16 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.Ackno
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.ComposableIndexTemplateExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplatesExistRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
+import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
@@ -72,6 +75,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
@@ -83,6 +87,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -105,16 +110,19 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final StatsApi statsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
                              StatsApi statsApi,
                              CatApi catApi,
-                             ClusterStateApi clusterStateApi) {
+                             ClusterStateApi clusterStateApi,
+                             ObjectMapper objectMapper) {
         this.client = client;
         this.statsApi = statsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -204,19 +212,31 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
-        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
-                .source(template);
+    public boolean ensureIndexTemplate(String templateName, Template template) {
+        var serializedMapping = serialize(template.mappings());
+        var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
+        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null), null, template.order(), null, null);
+        var request = new PutComposableIndexTemplateRequest()
+                .name(templateName)
+                .indexTemplate(indexTemplate);
 
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
+        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
                 "Unable to create index template " + templateName);
 
         return result.isAcknowledged();
     }
 
+    private CompressedXContent serialize(Object obj) {
+        try {
+            return new CompressedXContent(objectMapper.writeValueAsString(obj));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
+        return client.execute((c, requestOptions) -> c.indices().existsIndexTemplate(new ComposableIndexTemplateExistRequest(templateName),
                 requestOptions), "Unable to verify index template existence " + templateName);
     }
 
