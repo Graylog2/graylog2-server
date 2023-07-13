@@ -17,23 +17,19 @@
 package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.Suppliers;
-import okhttp3.Credentials;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
 import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.IndexerHosts;
-import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,9 +138,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
         final Optional<UsernamePasswordCredentials> credentials = hosts.stream().map(uri -> {
             if (!isNullOrEmpty(uri.getUserInfo())) {
-                var list = Splitter.on(":")
-                        .limit(2)
-                        .splitToList(uri.getUserInfo());
+                var list = Splitter.on(":").limit(2).splitToList(uri.getUserInfo());
                 return new UsernamePasswordCredentials(list.get(0), list.get(1));
             } else {
                 return null;
