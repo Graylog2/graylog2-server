@@ -44,7 +44,7 @@ const StyledButtonGroup = styled(ButtonGroup)`
   align-items: start;
 `;
 
-const TimeRangePresetSelect = ({
+const TimeRangeFilterButtons = ({
   disabled,
   hasErrorOnMount,
   onPresetSelectOpen,
@@ -93,10 +93,10 @@ const TimeRangePresetSelect = ({
   );
 };
 
-TimeRangePresetSelect.defaultProps = {
+TimeRangeFilterButtons.defaultProps = {
   hasErrorOnMount: false,
   disabled: false,
   showPresetDropdown: true,
 };
 
-export default TimeRangePresetSelect;
+export default TimeRangeFilterButtons;
