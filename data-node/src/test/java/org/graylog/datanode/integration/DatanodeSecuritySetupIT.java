@@ -132,9 +132,9 @@ public class DatanodeSecuritySetupIT {
                     var body = input.extract().body();
                     if(!body.path("opensearch.node.state").equals("AVAILABLE")) {
                         LOG.info("Response was: \n{}", body.asPrettyString());
-                        return false;
-                    } else {
                         return true;
+                    } else {
+                        return false;
                     }
                 })
                 .build();
