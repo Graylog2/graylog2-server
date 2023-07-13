@@ -25,9 +25,10 @@ import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } fr
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon, IfPermitted } from 'components/common';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
-import TimeRangeAddToQuickListButton from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangeAddToQuickListButton';
-import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+
+import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
+import TimeRangeAddToQuickListButton from './TimeRangeAddToQuickListButton';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 

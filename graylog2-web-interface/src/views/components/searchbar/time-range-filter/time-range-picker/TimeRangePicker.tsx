@@ -33,7 +33,6 @@ import type {
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
-import type { RelativeTimeRangeClassified } from 'views/components/searchbar/time-range-filter/time-range-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTimeFormats, DateTime } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
@@ -41,6 +40,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
+import type { RelativeTimeRangeClassified } from './types';
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';

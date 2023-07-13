@@ -21,8 +21,8 @@ import moment from 'moment';
 
 import { RELATIVE_RANGE_TYPES } from 'views/Constants';
 import { Select } from 'components/common';
-import type { RangeClassified } from 'views/components/searchbar/time-range-filter/time-range-picker/types';
 
+import type { RangeClassified } from './types';
 import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import RelativeRangeValueInput from './RelativeRangeValueInput';
 import type { TimeRangeDropDownFormValues } from './TimeRangePicker';

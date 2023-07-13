@@ -26,8 +26,8 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import TabPresetDropdown from 'views/components/searchbar/time-range-filter/time-range-picker/TabPresetDropdown';
 
+import TabPresetDropdown from './TabPresetDropdown';
 import AbsoluteCalendar from './AbsoluteCalendar';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
 import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
