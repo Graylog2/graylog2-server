@@ -66,7 +66,6 @@ public class Indices {
     private final IndexMappingFactory indexMappingFactory;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
-    @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus;
     private final IndicesAdapter indicesAdapter;
 
@@ -74,7 +73,7 @@ public class Indices {
     public Indices(IndexMappingFactory indexMappingFactory,
                    NodeId nodeId,
                    AuditEventSender auditEventSender,
-                   @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
+                   EventBus eventBus,
                    IndicesAdapter indicesAdapter) {
         this.indexMappingFactory = indexMappingFactory;
         this.nodeId = nodeId;
@@ -108,7 +107,6 @@ public class Indices {
 
     public void delete(String indexName) {
         indicesAdapter.delete(indexName);
-        //noinspection UnstableApiUsage
         eventBus.post(IndicesDeletedEvent.create(indexName));
     }
 
@@ -117,7 +115,6 @@ public class Indices {
             indicesAdapter.removeAlias(indexName, indexName + REOPENED_ALIAS_SUFFIX);
         }
         indicesAdapter.close(indexName);
-        //noinspection UnstableApiUsage
         eventBus.post(IndicesClosedEvent.create(indexName));
     }
 
@@ -170,7 +167,7 @@ public class Indices {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
         try {
-            final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
+            var template = buildTemplate(indexSet, indexSetConfig);
             if (indicesAdapter.ensureIndexTemplate(templateName, template)) {
                 LOG.info("Successfully ensured index template {}", templateName);
             } else {
@@ -185,7 +182,7 @@ public class Indices {
         }
     }
 
-    public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
+    public Template getIndexTemplate(IndexSet indexSet) {
         return indexMappingFactory.createIndexMapping(indexSet.getConfig())
                 .toTemplate(indexSet.getConfig(), indexSet.getIndexWildcard());
     }
@@ -219,9 +216,9 @@ public class Indices {
         return true;
     }
 
-    private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
+    private Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         return indexMappingFactory.createIndexMapping(indexSetConfig)
-                .toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
+                .toTemplate(indexSetConfig, indexSet.getIndexWildcard(), 0L);
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {
@@ -259,7 +256,6 @@ public class Indices {
 
     private void openIndex(String index) {
         indicesAdapter.openIndex(index);
-        //noinspection UnstableApiUsage
         eventBus.post(IndicesReopenedEvent.create(index));
     }
 
