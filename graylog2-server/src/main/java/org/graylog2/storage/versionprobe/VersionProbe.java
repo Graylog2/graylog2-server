@@ -30,7 +30,6 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
-import org.graylog2.plugin.Version;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
@@ -44,20 +43,17 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -173,9 +169,7 @@ public class VersionProbe {
                 okHttpClient.hostnameVerifier((hostname, session) -> true);
 
                 if (!isNullOrEmpty(host.getUserInfo())) {
-                    var list = Splitter.on(":")
-                            .limit(2)
-                            .splitToList(host.getUserInfo());
+                    var list = Splitter.on(":").limit(2).splitToList(host.getUserInfo());
                     okHttpClient.authenticator((route, response) -> {
                         String credential = Credentials.basic(list.get(0), list.get(1));
                         return response.request().newBuilder().header("Authorization", credential).build();
