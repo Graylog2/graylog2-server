@@ -20,6 +20,10 @@ export const CONFIGURATION_STEPS = {
     key: 'CA_CONFIGURATION',
     description: 'Configure a certificate authority',
   },
+  RENEWAL_POLICY_CONFIGURATION: {
+    key: 'RENEWAL_POLICY_CONFIGURATION',
+    description: 'Configure a renewal policy',
+  },
   CERTIFICATE_PROVISIONING: {
     key: 'CERTIFICATE_PROVISIONING',
     description: 'Provision certificates for your data nodes',
@@ -29,10 +33,11 @@ export const CONFIGURATION_STEPS = {
     key: 'CONFIGURATION_FINISHED',
     description: 'All data nodes are secured and reachable',
   },
-};
+} as const;
 
 export const CONFIGURATION_STEPS_ORDER = [
   CONFIGURATION_STEPS.CA_CONFIGURATION.key,
+  CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
   CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
   CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
 ];

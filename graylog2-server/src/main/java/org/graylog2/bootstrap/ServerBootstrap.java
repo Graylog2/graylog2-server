@@ -62,6 +62,7 @@ import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.graylog2.shared.initializers.ServiceManagerListener;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -172,6 +173,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         modules.add(new PreflightWebModule());
         modules.add(new ObjectMapperModule(chainingClassLoader));
         modules.add(new SchedulerBindings());
+        modules.add((binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         final Injector preflightInjector = getPreflightInjector(modules);
         GuiceInjectorHolder.setInjector(preflightInjector);
