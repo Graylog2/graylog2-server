@@ -183,9 +183,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             try {
                 URI uri = new URI(node.getTransportAddress());
                 if (!isNullOrEmpty(uri.getUserInfo())) {
-                    var list = Splitter.on(":")
-                            .limit(2)
-                            .splitToList(uri.getUserInfo());
+                    var list = Splitter.on(":").limit(2).splitToList(uri.getUserInfo());
                     builder.authenticator((route, response) -> {
                         String credential = Credentials.basic(list.get(0), list.get(1));
                         return response.request().newBuilder().header("Authorization", credential).build();
