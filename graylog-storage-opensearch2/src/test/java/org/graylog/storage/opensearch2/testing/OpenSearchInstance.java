@@ -46,7 +46,7 @@ import static java.util.Objects.isNull;
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
-    public static final String DEFAULT_HEAP_SIZE = "2g";
+    public static final String DEFAULT_HEAP_SIZE = "3g";
     public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
     private final OpenSearchClient openSearchClient;
