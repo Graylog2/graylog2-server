@@ -146,7 +146,6 @@ public class ParameterizedHttpClientProviderTest {
                 Duration.milliseconds(500L),
                 Duration.milliseconds(500L),
                 proxyURI,
-                null,
                 null);
 
         return provider;

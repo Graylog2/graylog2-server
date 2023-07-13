@@ -293,7 +293,6 @@ public class OkHttpClientProviderTest {
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
                 server.url("/").uri(),
-                null,
                 null);
 
         OkHttpClientProvider spyClientProvider = Mockito.spy(provider);
@@ -337,7 +336,6 @@ public class OkHttpClientProviderTest {
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
                 proxyURI,
-                null,
                 null);
 
         return provider.get();

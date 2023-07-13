@@ -38,10 +38,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -50,8 +46,6 @@ import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -77,21 +71,18 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     protected final Duration writeTimeout;
     protected final URI httpProxyUri;
     protected final ProxyHostsPattern nonProxyHostsPattern;
-    protected final TrustManagerProvider trustManagerProvider;
 
     @Inject
     public OkHttpClientProvider(@Named("http_connect_timeout") Duration connectTimeout,
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
                                 @Named("http_proxy_uri") @Nullable URI httpProxyUri,
-                                @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern,
-                                TrustManagerProvider trustManagerProvider) {
+                                @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern) {
         this.connectTimeout = requireNonNull(connectTimeout);
         this.readTimeout = requireNonNull(readTimeout);
         this.writeTimeout = requireNonNull(writeTimeout);
         this.httpProxyUri = httpProxyUri;
         this.nonProxyHostsPattern = nonProxyHostsPattern;
-        this.trustManagerProvider = trustManagerProvider;
     }
 
 
