@@ -126,4 +126,8 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
         this.defaultTrustManager.checkClientTrusted(x509Certificates, s);
         hostnameVerifier.validateHostnames(x509Certificates, s);
     }
+
+    public HostnameVerifier getHostnameVerifier() {
+        return hostnameVerifier;
+    }
 }

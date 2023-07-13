@@ -30,6 +30,7 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
@@ -162,11 +163,11 @@ public class VersionProbe {
     private void addSSLContextIfHttps(final URI host, final OkHttpClient.Builder okHttpClient) {
         if("https".equalsIgnoreCase(host.getScheme())) {
             try {
-                var sslContext = SSLContext.getInstance("TLS");
-                var tm = trustManagerProvider.create(host.getHost());
+                final var sslContext = SSLContext.getInstance("TLS");
+                final var tm = trustManagerProvider.create(host.getHost());
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
                 okHttpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager)tm);
-                okHttpClient.hostnameVerifier((hostname, session) -> true);
+                okHttpClient.hostnameVerifier((hostname, session) -> tm instanceof CustomCAX509TrustManager trustManager ? trustManager.verifyHostname(hostname, session) : false);
 
                 if (!isNullOrEmpty(host.getUserInfo())) {
                     var list = Splitter.on(":").limit(2).splitToList(host.getUserInfo());

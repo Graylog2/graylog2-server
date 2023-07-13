@@ -28,6 +28,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
@@ -155,12 +156,13 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
                     if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
                         try {
-                            var hostNames = hosts.stream().map(URI::getHost).toList();
-                            SSLContext sslContext = SSLContext.getInstance("TLS");
-                            sslContext.init(null, new TrustManager[]{trustManagerProvider.create(hostNames)}, new SecureRandom());
+                            final var hostNames = hosts.stream().map(URI::getHost).toList();
+                            final var sslContext = SSLContext.getInstance("TLS");
+                            final var tm = trustManagerProvider.create(hostNames);
+                            sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
 
                             httpClientConfig.setSSLContext(sslContext);
-                            httpClientConfig.setSSLHostnameVerifier((hostname, session) -> true);
+                            httpClientConfig.setSSLHostnameVerifier((hostname, session) -> tm instanceof CustomCAX509TrustManager trustManager ? trustManager.verifyHostname(hostname, session) : false);
                         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
                             LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
                         }

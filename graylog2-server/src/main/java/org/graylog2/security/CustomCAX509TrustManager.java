@@ -24,6 +24,8 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
@@ -38,6 +40,7 @@ import java.util.List;
 public class CustomCAX509TrustManager implements X509TrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CustomCAX509TrustManager.class);
     private final List<X509TrustManager> trustManagers = new ArrayList<>();
+    private final DefaultX509TrustManager defaultX509TrustManager;
 
     @AssistedInject
     public CustomCAX509TrustManager(@Assisted String host, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
@@ -56,7 +59,8 @@ public class CustomCAX509TrustManager implements X509TrustManager {
      */
     @AssistedInject
     public CustomCAX509TrustManager(@Assisted List<String> hosts, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
-        trustManagers.add(new DefaultX509TrustManager(hosts));
+        defaultX509TrustManager = new DefaultX509TrustManager(hosts);
+        trustManagers.add(defaultX509TrustManager);
         try {
             caService.loadKeyStore().ifPresent(keystore -> trustManagers.add(getTrustManager(keystore)));
         } catch (KeyStoreException | KeyStoreStorageException k) {
@@ -102,5 +106,17 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             LOG.error("Could not create TrustManager: {}", e.getMessage(), e);
         }
         return null;
+    }
+
+    public boolean verifyHostname(final String hostname, final SSLSession session) {
+        try {
+            defaultX509TrustManager.getHostnameVerifier().validateHostnames((X509Certificate[])session.getPeerCertificates(), "");
+            return true;
+        } catch (CertificateException e) {
+            LOG.warn("Could not verify hostname from certificates.");
+        } catch (SSLPeerUnverifiedException e) {
+            LOG.warn("Could not validate peer certificates: {}", e.getMessage());
+        }
+        return false;
     }
 }
