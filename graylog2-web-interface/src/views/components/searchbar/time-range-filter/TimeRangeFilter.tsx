@@ -26,8 +26,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import type { TimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 import TimeRangePicker from 'views/components/searchbar/time-range-filter/time-range-picker/index';
-import TimeRangePresetSelect from 'views/components/searchbar/time-range-filter/time-range-preset-select';
 
+import TimeRangeFilterButtons from './TimeRangeFilterButtons';
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 const FlexContainer = styled.div`
@@ -92,12 +92,12 @@ const TimeRangeFilter = ({
   return (
     <FlexContainer className={className} ref={containerRef}>
       {showDropdownButton && (
-      <TimeRangePresetSelect disabled={disabled}
-                             toggleShow={toggleShow}
-                             onPresetSelectOpen={hideTimeRangeDropDown}
-                             setCurrentTimeRange={onChange}
-                             showPresetDropdown={showPresetDropdown}
-                             hasErrorOnMount={hasErrorOnMount} />
+        <TimeRangeFilterButtons disabled={disabled}
+                                toggleShow={toggleShow}
+                                onPresetSelectOpen={hideTimeRangeDropDown}
+                                setCurrentTimeRange={onChange}
+                                showPresetDropdown={showPresetDropdown}
+                                hasErrorOnMount={hasErrorOnMount} />
       )}
       <Overlay show={show}
                trigger="click"

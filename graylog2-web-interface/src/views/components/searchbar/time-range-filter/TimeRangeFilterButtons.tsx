@@ -24,8 +24,7 @@ import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRa
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import RangePresetDropdown from './TimeRangePresetDropdown';
-
-import TimeRangePickerButton from '../time-range-picker/TimeRangePickerButton';
+import TimeRangePickerButton from './time-range-picker/TimeRangePickerButton';
 
 type Props = {
   disabled?: boolean,
