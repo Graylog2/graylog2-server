@@ -24,7 +24,7 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { TimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import type { SupportedTimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 import TimeRangePicker from 'views/components/searchbar/time-range-filter/time-range-picker/index';
 
 import TimeRangeFilterButtons from './TimeRangeFilterButtons';
@@ -49,7 +49,7 @@ type Props = {
   onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
   position?: 'bottom' | 'right',
   showPresetDropdown?: boolean,
-  validTypes?: Array<TimeRangeType>,
+  validTypes?: Array<SupportedTimeRangeType>,
   value: TimeRange | NoTimeRangeOverride,
 };
 
