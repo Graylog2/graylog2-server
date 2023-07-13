@@ -20,6 +20,7 @@ import { Position } from 'react-overlays';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { Button, Input, Popover } from 'components/bootstrap';
 import { Icon, Portal, ModalSubmit } from 'components/common';
@@ -34,9 +35,22 @@ import Routes from 'routing/Routes';
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import type {
+  TimeRangePickerFormValues,
+} from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 
 const StyledModalSubmit = styled(ModalSubmit)`
   margin-top: 15px;
+`;
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  float: right;
+  transform: translateY(-3px);
+  gap: 5px;
+  margin-top: 6px;
 `;
 
 type Props = {
@@ -77,14 +91,14 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
                  onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                  formGroupClassName="" />
           {!!equalTimerange && (
-          <p>
-            <Icon name="exclamation-triangle" />
-            You already have similar time range in
-              {' '}
-            <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
-            <br />
-            <i>f.e. ({equalTimerange.description})</i>
-          </p>
+            <p>
+              <Icon name="exclamation-triangle" />
+              You already have similar time range in
+                {' '}
+              <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
+              <br />
+              <i>f.e. ({equalTimerange.description})</i>
+            </p>
           )}
           <StyledModalSubmit disabledSubmit={!description}
                              submitButtonText="Add time range"
@@ -99,18 +113,27 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
   );
 };
 
-const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timerange: TimeRange, isTimerangeValid: boolean }) => {
+const TimeRangeAddToQuickListButton = () => {
   const { userTimezone } = useUserDateTime();
+  const { values, errors } = useFormikContext<TimeRangePickerFormValues>();
   const formTarget = useRef();
+
   const { config, refresh } = useSearchConfiguration();
   const [showForm, setShowForm] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
+  const isValidTimeRange = !errors.nextTimeRange;
+
   const toggleModal = useCallback(() => {
     setShowForm((cur) => !cur);
   }, []);
-  const addTimerange = useCallback((description) => {
-    const quickAccessTimerangePreset = { description, timerange: onSubmittingTimerange(timerange, userTimezone), id: generateId() };
+
+  const addTimerange = useCallback((description: string) => {
+    const quickAccessTimerangePreset = {
+      description,
+      timerange: onSubmittingTimerange(values.nextTimeRange as TimeRange, userTimezone),
+      id: generateId(),
+    };
 
     ConfigurationsActions.update(ConfigurationType.SEARCHES_CLUSTER_CONFIG,
       {
@@ -134,21 +157,30 @@ const TimeRangeAddToQuickListButton = ({ timerange, isTimerangeValid }: {timeran
         },
       });
     }
-  }, [config, refresh, sendTelemetry, timerange, toggleModal, userTimezone]);
+  }, [config, refresh, sendTelemetry, values.nextTimeRange, toggleModal, userTimezone]);
 
   const equalTimerange = useMemo(() => config
     ?.quick_access_timerange_presets
-    ?.find((existingTimerange) => isTimerangeEqual(existingTimerange.timerange, onSubmittingTimerange(timerange, userTimezone))), [config, timerange, userTimezone]);
+    ?.find((existingTimerange) => isTimerangeEqual(
+      existingTimerange.timerange,
+      onSubmittingTimerange(values.nextTimeRange as TimeRange, userTimezone),
+    )), [config, values.nextTimeRange, userTimezone]);
 
   return (
-    <>
-      <Button disabled={!isTimerangeValid} title="Add time range to quick access time range list" ref={formTarget} onClick={toggleModal}>
+    <Container>
+      <Button disabled={!isValidTimeRange}
+              title="Add time range to quick access time range list"
+              ref={formTarget}
+              onClick={toggleModal}>
         <Icon name="floppy-disk" type="regular" />
       </Button>
       {showForm && (
-        <TimeRangeAddToQuickListForm addTimerange={addTimerange} toggleModal={toggleModal} target={formTarget.current} equalTimerange={equalTimerange} />
+        <TimeRangeAddToQuickListForm addTimerange={addTimerange}
+                                     toggleModal={toggleModal}
+                                     target={formTarget.current}
+                                     equalTimerange={equalTimerange} />
       )}
-    </>
+    </Container>
   );
 };
 

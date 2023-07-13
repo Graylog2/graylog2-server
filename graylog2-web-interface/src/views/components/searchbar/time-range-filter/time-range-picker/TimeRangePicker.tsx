@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { Button, Col, Row, Popover } from 'components/bootstrap';
-import { Icon, KeyCapture, ModalSubmit } from 'components/common';
+import { Icon, IfPermitted, KeyCapture, ModalSubmit } from 'components/common';
 import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
@@ -38,10 +38,11 @@ import { toDateObject } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import TimeRangeAddToQuickListButton
+  from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangeAddToQuickListButton';
 
 import type { RelativeTimeRangeClassified } from './types';
 import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
-import TimeRangeLivePreview from './TimeRangeLivePreview';
 import {
   classifyRelativeTimeRange,
   normalizeIfClassifiedRelativeTimeRange,
@@ -160,9 +161,9 @@ const TimeRangePicker = ({
   const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const sendTelemetry = useSendTelemetry();
-
   const positionIsBottom = position === 'bottom';
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
+  const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
 
   const handleNoOverride = useCallback(() => {
     setCurrentTimeRange({});
@@ -253,7 +254,11 @@ const TimeRangePicker = ({
               <Form>
                 <Row>
                   <Col md={12}>
-                    <TimeRangeLivePreview timerange={normalizeIfClassifiedRelativeTimeRange(nextTimeRange)} />
+                    {showAddToQuickListButton && (
+                      <IfPermitted permissions="clusterconfigentry:edit">
+                        <TimeRangeAddToQuickListButton />
+                      </IfPermitted>
+                    )}
                     <TimeRangeTabs currentTimeRange={currentTimeRange}
                                    handleActiveTab={handleActiveTab}
                                    limitDuration={limitDuration}
