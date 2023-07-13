@@ -25,7 +25,7 @@ import { Select } from 'components/common';
 import type { RangeClassified } from './types';
 import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
 import RelativeRangeValueInput from './RelativeRangeValueInput';
-import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
+import type { TimeRangePickerFormValues } from './TimeRangePicker';
 
 const RangeWrapper = styled.div`
   flex: 4;
@@ -130,7 +130,7 @@ const RelativeRangeSelectInner = ({
   name: string,
   onChange: (changeEvent: { target: { name: string, value: RangeClassified } }) => void,
 }) => {
-  const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
+  const { initialValues } = useFormikContext<TimeRangePickerFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
   const { isAllTime, value, unit } = classifiedRange;
 

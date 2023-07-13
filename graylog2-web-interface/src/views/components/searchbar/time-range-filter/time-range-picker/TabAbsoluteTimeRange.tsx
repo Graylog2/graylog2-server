@@ -30,7 +30,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangePresetRow from './TimeRangePresetRow';
 import AbsoluteCalendar from './AbsoluteCalendar';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
-import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
+import type { TimeRangePickerFormValues } from './TimeRangePicker';
 
 type Props = {
   disabled: boolean,
@@ -79,7 +79,7 @@ const FlexWrap = styled.div`
 `;
 
 const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
+  const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangePickerFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const { toUserTimezone } = useUserDateTime();
   const [activeAccordion, setActiveAccordion] = useState<'Timestamp' | 'Calendar' | undefined>();
   const toStartDate = moment(nextTimeRange.from).toDate();

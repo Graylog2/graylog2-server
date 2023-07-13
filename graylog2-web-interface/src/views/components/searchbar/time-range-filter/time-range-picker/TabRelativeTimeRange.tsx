@@ -34,7 +34,7 @@ import {
   RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
   classifyRelativeTimeRange,
 } from './RelativeTimeRangeClassifiedHelper';
-import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
+import type { TimeRangePickerFormValues } from './TimeRangePicker';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
 type Props = {
@@ -54,7 +54,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangeDropDownFormValues>();
+  const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangePickerFormValues>();
   const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
   const { config } = useSearchConfiguration();
   const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);

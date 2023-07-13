@@ -31,7 +31,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
-import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
+import type { TimeRangePickerFormValues } from './TimeRangePicker';
 import TimeRangePresetRow from './TimeRangePresetRow';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
@@ -66,7 +66,7 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
-  const { setFieldValue } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
+  const { setFieldValue } = useFormikContext<TimeRangePickerFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const { formatTime, userTimezone } = useUserDateTime();
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);

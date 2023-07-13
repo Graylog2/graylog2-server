@@ -53,7 +53,7 @@ import {
   RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
 
-export type TimeRangeDropDownFormValues = {
+export type TimeRangePickerFormValues = {
   nextTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
 };
 
@@ -276,7 +276,7 @@ const TimeRangePicker = ({
   }, [sendTelemetry, toggleDropdownShow]);
 
   const handleSubmit = useCallback(({ nextTimeRange }: {
-    nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']
+    nextTimeRange: TimeRangePickerFormValues['nextTimeRange']
   }) => {
     setCurrentTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(nextTimeRange)));
 
@@ -313,10 +313,10 @@ const TimeRangePicker = ({
                    arrowOffsetTop={positionIsBottom ? undefined : 25}
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
-      <Formik<TimeRangeDropDownFormValues> initialValues={initialTimeRange}
-                                           validate={_validateTimeRange}
-                                           onSubmit={handleSubmit}
-                                           validateOnMount>
+      <Formik<TimeRangePickerFormValues> initialValues={initialTimeRange}
+                                         validate={_validateTimeRange}
+                                         onSubmit={handleSubmit}
+                                         validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
           const handleActiveTab = (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
             if ('type' in nextTimeRange) {

@@ -27,7 +27,7 @@ import { Icon, IfPermitted } from 'components/common';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
-import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
+import type { TimeRangePickerFormValues } from './TimeRangePicker';
 import TimeRangeAddToQuickListButton from './TimeRangeAddToQuickListButton';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
@@ -105,7 +105,7 @@ export const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
-  const { isValid, errors } = useFormikContext<TimeRangeDropDownFormValues>();
+  const { isValid, errors } = useFormikContext<TimeRangePickerFormValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
 
