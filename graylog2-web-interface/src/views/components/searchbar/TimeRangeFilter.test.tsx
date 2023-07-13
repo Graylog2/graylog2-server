@@ -21,7 +21,7 @@ import { defaultUser } from 'defaultMockValues';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
-import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import TimeRangeFilter from 'views/components/searchbar/TimeRangeFilter';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser, alice } from 'fixtures/users';
@@ -35,21 +35,21 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 
 jest.mock('hooks/useCurrentUser');
 
-describe('TimeRangeInput', () => {
+describe('TimeRangeFilter', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   const defaultTimeRange = { type: 'relative', range: 300 };
 
-  const SUTTimeRangeInput = (props) => (
+  const SUTTimeRangeFilter = (props) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
-      <TimeRangeInput value={defaultTimeRange} onChange={() => {}} {...props} />
+      <TimeRangeFilter value={defaultTimeRange} onChange={() => {}} {...props} />
     </Formik>
   );
 
   it('opens date picker dropdown when clicking button', async () => {
-    render(<SUTTimeRangeInput />);
+    render(<SUTTimeRangeFilter />);
 
     const button = await screen.findByRole('button', {
       name: /open time range selector/i,
@@ -62,7 +62,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('displays relative time range of 5 minutes', async () => {
-    render(<SUTTimeRangeInput />);
+    render(<SUTTimeRangeFilter />);
 
     const from = await screen.findByTestId('from');
     await within(from).findByText(/5 minutes ago/i);
@@ -72,7 +72,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('opens date picker dropdown when clicking summary', async () => {
-    render(<SUTTimeRangeInput />);
+    render(<SUTTimeRangeFilter />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -81,7 +81,7 @@ describe('TimeRangeInput', () => {
 
   it('calls callback when changing time range', async () => {
     const onChange = jest.fn();
-    render(<SUTTimeRangeInput value={defaultTimeRange} onChange={onChange} />);
+    render(<SUTTimeRangeFilter value={defaultTimeRange} onChange={onChange} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -101,13 +101,13 @@ describe('TimeRangeInput', () => {
   });
 
   it('shows "No Override" if no time range is provided', async () => {
-    render(<SUTTimeRangeInput value={{}} onChange={() => {}} />);
+    render(<SUTTimeRangeFilter value={{}} onChange={() => {}} />);
 
     await screen.findByText('No Override');
   });
 
   it('shows all tabs if no `validTypes` prop is passed', async () => {
-    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} />);
+    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -117,7 +117,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('shows only valid tabs if `validTypes` prop is passed', async () => {
-    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -128,7 +128,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('shows a dropdown button allowing to quick-select presets', async () => {
-    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
 
     const dropdown = await screen.findByRole('button', { name: /open time range preset select/i });
 
@@ -138,7 +138,7 @@ describe('TimeRangeInput', () => {
   });
 
   it('allows hiding the dropdown button for quick-selecting presets', async () => {
-    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
+    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} showPresetDropdown={false} />);
 
     await screen.findByText(/5 minutes ago/);
 
@@ -147,7 +147,7 @@ describe('TimeRangeInput', () => {
 
   it('has no button add time renge to quick access for non admin users', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
-    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByText(/search time range/i);
@@ -158,7 +158,7 @@ describe('TimeRangeInput', () => {
   it('has button add time renge to quick access for admin users', async () => {
     asMock(useCurrentUser).mockReturnValue(adminUser);
 
-    render(<SUTTimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     await fireEvent.click(await screen.findByText(/5 minutes ago/));
     await screen.findByTitle('Add time range to quick access time range list');
   });

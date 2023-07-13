@@ -26,7 +26,7 @@ import { Icon, SortableList } from 'components/common';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import TimeRangeFilter from 'views/components/searchbar/TimeRangeFilter';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import generateId from 'logic/generateId';
 
@@ -92,7 +92,7 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
 
   return (
     <ItemWrapper data-testid={`time-range-preset-${id}`}>
-      <TimeRangeInput onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} />
+      <TimeRangeFilter onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} />
       <Description>
         <StyledInput type="text"
                      id={`quick-access-time-range-description-${id}`}

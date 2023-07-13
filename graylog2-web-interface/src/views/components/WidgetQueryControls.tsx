@@ -62,7 +62,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import useHandlerContext from 'views/components/useHandlerContext';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
-import TimeRangeInput from './searchbar/TimeRangeInput';
+import TimeRangeFilter from './searchbar/TimeRangeFilter';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/queryinput/AsyncQueryInput';
@@ -191,12 +191,12 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
               <ValidateOnParameterChange parameters={parameters} />
               <TimeRangeRow>
                 {!hasTimeRangeOverride && (
-                <TimeRangeInput disabled={hasTimeRangeOverride}
-                                limitDuration={limitDuration}
-                                onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                value={values?.timerange}
-                                hasErrorOnMount={!!errors.timerange}
-                                position="right" />
+                <TimeRangeFilter disabled={hasTimeRangeOverride}
+                                 limitDuration={limitDuration}
+                                 onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                 value={values?.timerange}
+                                 hasErrorOnMount={!!errors.timerange}
+                                 position="right" />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange}
