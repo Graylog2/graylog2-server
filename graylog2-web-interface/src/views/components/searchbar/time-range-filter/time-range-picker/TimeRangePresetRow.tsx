@@ -32,7 +32,7 @@ type Props = {
   onSetPreset: (timerange: TimeRange) => void,
   availableOptions: Array<QuickAccessTimeRange>,
 };
-const TabPresetDropdown = ({ onSetPreset, availableOptions, disabled }: Props) => (
+const TimeRangePresetRow = ({ onSetPreset, availableOptions, disabled }: Props) => (
   <ConfiguredWrapper>
     <RangePresetDropdown disabled={disabled}
                          onChange={onSetPreset}
@@ -40,4 +40,4 @@ const TabPresetDropdown = ({ onSetPreset, availableOptions, disabled }: Props) =
   </ConfiguredWrapper>
 );
 
-export default TabPresetDropdown;
+export default TimeRangePresetRow;

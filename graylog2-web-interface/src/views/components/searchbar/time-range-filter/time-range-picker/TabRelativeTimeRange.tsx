@@ -25,8 +25,9 @@ import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'v
 import { Icon } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import type { RelativeTimeRange } from 'views/logic/queries/Query';
 
-import TabPresetDropdown from './TabPresetDropdown';
+import TimeRangePresetRow from './TimeRangePresetRow';
 import {
   classifyToRange,
   classifyFromRange,
@@ -59,7 +60,7 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
   const relativeOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'relative'), [config?.quick_access_timerange_presets]);
 
-  const onSetPreset = (range) => {
+  const onSetPreset = (range: RelativeTimeRange) => {
     setFieldValue('nextTimeRange', classifyRelativeTimeRange(range));
   };
 
@@ -86,8 +87,11 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
                                unsetRangeLabel="Now" />
         </>
       </RelativeWrapper>
-      {showRelativePresetsButton
-        && (<TabPresetDropdown disabled={disabled} onSetPreset={onSetPreset} availableOptions={relativeOptions} />)}
+      {showRelativePresetsButton && (
+        <TimeRangePresetRow disabled={disabled}
+                            onSetPreset={onSetPreset}
+                            availableOptions={relativeOptions} />
+      )}
     </div>
   );
 };

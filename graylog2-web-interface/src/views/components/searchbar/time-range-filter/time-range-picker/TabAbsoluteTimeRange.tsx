@@ -27,7 +27,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
-import TabPresetDropdown from './TabPresetDropdown';
+import TimeRangePresetRow from './TimeRangePresetRow';
 import AbsoluteCalendar from './AbsoluteCalendar';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
 import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
@@ -87,7 +87,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
   const { config } = useSearchConfiguration();
   const { showAbsolutePresetsButton } = useContext(TimeRangeInputSettingsContext);
   const absoluteOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'absolute'), [config?.quick_access_timerange_presets]);
-  const onSetPreset = useCallback((range) => {
+  const onSetPreset = useCallback((range: AbsoluteTimeRange) => {
     setFieldValue('nextTimeRange', range);
   }, [setFieldValue]);
 
@@ -148,9 +148,9 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
         </StyledAccordion>
       </AbsoluteWrapper>
       {showAbsolutePresetsButton && (
-        <TabPresetDropdown disabled={disabled}
-                           onSetPreset={onSetPreset}
-                           availableOptions={absoluteOptions} />
+        <TimeRangePresetRow disabled={disabled}
+                            onSetPreset={onSetPreset}
+                            availableOptions={absoluteOptions} />
       )}
     </>
   );

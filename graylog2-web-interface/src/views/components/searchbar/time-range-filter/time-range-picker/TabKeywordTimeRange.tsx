@@ -32,7 +32,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 
 import type { TimeRangeDropDownFormValues } from './TimeRangePicker';
-import TabPresetDropdown from './TabPresetDropdown';
+import TimeRangePresetRow from './TimeRangePresetRow';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -163,8 +163,11 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
             </FormGroup>
           )}
         </Field>
-        {showKeywordPresetsButton
-          && (<TabPresetDropdown disabled={disabled} onSetPreset={onSetPreset} availableOptions={keywordOptions} />)}
+        {showKeywordPresetsButton && (
+          <TimeRangePresetRow disabled={disabled}
+                              onSetPreset={onSetPreset}
+                              availableOptions={keywordOptions} />
+        )}
       </Col>
 
       <Col sm={7}>
