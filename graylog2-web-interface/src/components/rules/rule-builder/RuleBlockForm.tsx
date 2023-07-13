@@ -72,15 +72,17 @@ const SelectedBlockInfo = styled(Row)(({ theme }) => css`
 `);
 
 const HelpPopover = styled(Popover)(() => css`
-  min-width: 600px;
+  min-width: 700px;
 `);
 
 const OptionTitle = styled.p(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
 
-const OptionDescription = styled.p(({ theme }) => css`
-  color: ${theme.colors.gray[50]};
+const OptionDescription = styled.p.attrs(({ isSelected }: { isSelected: boolean }) => ({
+  isSelected,
+}))(({ isSelected, theme }) => css`
+  color: ${isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
   margin-bottom: ${theme.spacings.xxs};
 `);
 
@@ -165,10 +167,10 @@ const RuleBlockForm = ({
     </HelpPopover>
   );
 
-  const optionRenderer = (option: Option) => (
+  const optionRenderer = (option: Option, isSelected: boolean) => (
     <>
       <OptionTitle>{option.label}</OptionTitle>
-      {option.description && (<OptionDescription>{option.description}</OptionDescription>)}
+      {option.description && (<OptionDescription isSelected={isSelected}>{option.description}</OptionDescription>)}
     </>
   );
 
