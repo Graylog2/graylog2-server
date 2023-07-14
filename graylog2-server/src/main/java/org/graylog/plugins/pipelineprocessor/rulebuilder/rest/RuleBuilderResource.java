@@ -128,7 +128,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleBuilderRegistry.actions()
                 .values().stream()
                 .map(RuleFragment::descriptor)
-                .sorted(Comparator.comparing(FunctionDescriptor::name))
+                .sorted(Comparator.comparing(FunctionDescriptor::ruleBuilderName))
                 .collect(Collectors.toList());
     }
 
@@ -139,7 +139,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleBuilderRegistry.conditions()
                 .values().stream()
                 .map(RuleFragment::descriptor)
-                .sorted(Comparator.comparing(FunctionDescriptor::name))
+                .sorted(Comparator.comparing(FunctionDescriptor::ruleBuilderName))
                 .collect(Collectors.toList());
     }
 
