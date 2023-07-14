@@ -43,10 +43,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Create
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteComposableIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetComposableIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplateMetadata;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutComposableIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
@@ -255,10 +253,10 @@ public class ClientES7 implements Client {
     }
 
     private String[] existingTemplates() {
-        var getIndexTemplatesRequest = new GetIndexTemplatesRequest();
+        var getIndexTemplatesRequest = new GetComposableIndexTemplateRequest("");
         var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
-        return result.getIndexTemplates().stream()
-                .map(IndexTemplateMetadata::name)
+        return result.getIndexTemplates()
+                .keySet()
                 .toArray(String[]::new);
     }
 
