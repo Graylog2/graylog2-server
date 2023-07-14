@@ -16,7 +16,13 @@
  */
 package org.graylog.security.certutil.csr;
 
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -29,6 +35,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
@@ -49,6 +56,36 @@ public class CsrSigner {
                 serialNumber,
                 Date.from(validFrom), Date.from(validUntil),
                 csr.getSubject(), csr.getSubjectPublicKeyInfo());
+
+
+        // see if we have the dns/rfc822/ip address extensions specified in the csr
+
+        ArrayList<GeneralName> altNames = new ArrayList<>();
+        var certAttributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
+        if (certAttributes != null && certAttributes.length > 0) {
+            for (Attribute attribute : certAttributes) {
+                Extensions extensions = Extensions.getInstance(attribute.getAttrValues().getObjectAt(0));
+                GeneralNames gns = GeneralNames.fromExtensions(extensions, Extension.subjectAlternativeName);
+                if (gns == null) {
+                    continue;
+                }
+                GeneralName[] names = gns.getNames();
+                for (int i = 0; i < names.length; i++) {
+                    switch (names[i].getTagNo()) {
+                        case GeneralName.dNSName:
+                        case GeneralName.iPAddress:
+                        case GeneralName.rfc822Name:
+                            altNames.add(names[i]);
+                            break;
+                    }
+                }
+            }
+            if (!altNames.isEmpty()) {
+                builder.addExtension(Extension.subjectAlternativeName, false,
+                        new GeneralNames(altNames.toArray(new GeneralName[altNames.size()])));
+            }
+        }
+
 
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(issuerKey);
         X509CertificateHolder certHolder = builder.build(signer);
