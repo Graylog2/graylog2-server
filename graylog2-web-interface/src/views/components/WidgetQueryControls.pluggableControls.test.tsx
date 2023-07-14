@@ -18,19 +18,18 @@ import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginManifest } from 'graylog-web-plugin/plugin';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import type Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import { undoRedoSliceReducer } from 'views/logic/slices/undoRedoSlice';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import { usePlugin } from 'views/test/testPlugins';
 
 import WidgetContext from './contexts/WidgetContext';
 import WidgetQueryControls from './WidgetQueryControls';
@@ -74,6 +73,37 @@ jest.mock('views/hooks/useGlobalOverride');
 
 jest.mock('views/logic/slices/createSearch', () => (s: Search) => s);
 
+const PluggableSearchBarControl = () => (
+  <FormikInput label="Pluggable Control"
+               name="pluggableControl"
+               id="pluggable-control" />
+);
+
+const mockOnSubmit = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
+const mockOnValidate = jest.fn(() => Promise.resolve({}));
+
+const testPlugin = new PluginManifest({}, {
+  'views.components.searchBar': [
+    () => ({
+      id: 'pluggable-search-bar-control',
+      component: PluggableSearchBarControl,
+      useInitialDashboardWidgetValues: () => ({
+        pluggableControl: 'Initial Value',
+      }),
+      onSearchSubmit: mockOnSubmit,
+      onDashboardWidgetSubmit: mockOnSubmit,
+      validationPayload: (values) => {
+        // @ts-ignore
+        const { pluggableControl } = values;
+
+        return ({ customKey: pluggableControl });
+      },
+      onValidate: mockOnValidate,
+      placement: 'right',
+    }),
+  ],
+});
+
 describe('WidgetQueryControls pluggable controls', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -95,43 +125,8 @@ describe('WidgetQueryControls pluggable controls', () => {
     .config({})
     .build();
 
-  const PluggableSearchBarControl = () => (
-    <FormikInput label="Pluggable Control"
-                 name="pluggableControl"
-                 id="pluggable-control" />
-  );
-
-  const mockOnSubmit = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
-  const mockOnValidate = jest.fn(() => Promise.resolve({}));
-
-  beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, {
-      'views.reducers': [
-        { key: 'view', reducer: viewSliceReducer },
-        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-        { key: 'undoRedo', reducer: undoRedoSliceReducer },
-      ],
-      'views.components.searchBar': [
-        () => ({
-          id: 'pluggable-search-bar-control',
-          component: PluggableSearchBarControl,
-          useInitialDashboardWidgetValues: () => ({
-            pluggableControl: 'Initial Value',
-          }),
-          onSearchSubmit: mockOnSubmit,
-          onDashboardWidgetSubmit: mockOnSubmit,
-          validationPayload: (values) => {
-            // @ts-ignore
-            const { pluggableControl } = values;
-
-            return ({ customKey: pluggableControl });
-          },
-          onValidate: mockOnValidate,
-          placement: 'right',
-        }),
-      ],
-    }));
-  });
+  useViewsPlugin();
+  usePlugin(testPlugin);
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <TestStoreProvider>

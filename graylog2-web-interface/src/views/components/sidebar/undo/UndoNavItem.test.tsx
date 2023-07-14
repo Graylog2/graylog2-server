@@ -16,20 +16,16 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
-import ViewsBindings from 'views/bindings';
-import { undoRedoSliceReducer } from 'views/logic/slices/undoRedoSlice';
 import { testView2, undoRedoTestStore } from 'fixtures/undoRedo';
 import UndoNavItem from 'views/components/sidebar/undo/UndoNavItem';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import useAppDispatch from 'stores/useAppDispatch';
 import { undo } from 'views/logic/slices/undoRedoActions';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 jest.mock('stores/useAppDispatch');
 
@@ -51,16 +47,7 @@ describe('<UndoNavItem />', () => {
     asMock(useAppDispatch).mockReturnValue(dispatch);
   });
 
-  beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, {
-      ...ViewsBindings,
-      'views.reducers': [
-        { key: 'view', reducer: viewSliceReducer },
-        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-        { key: 'undoRedo', reducer: undoRedoSliceReducer },
-      ],
-    }));
-  });
+  useViewsPlugin();
 
   it('Call Undo action on call', async () => {
     render(<RedoNavItemComponent />);
