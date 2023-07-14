@@ -167,7 +167,6 @@ public class VersionProbe {
                 final var tm = trustManagerProvider.create(host.getHost());
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
                 okHttpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager)tm);
-                okHttpClient.hostnameVerifier((hostname, session) -> tm instanceof CustomCAX509TrustManager trustManager ? trustManager.verifyHostname(hostname, session) : false);
 
                 if (!isNullOrEmpty(host.getUserInfo())) {
                     var list = Splitter.on(":").limit(2).splitToList(host.getUserInfo());

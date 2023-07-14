@@ -162,7 +162,6 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                             sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
 
                             httpClientConfig.setSSLContext(sslContext);
-                            httpClientConfig.setSSLHostnameVerifier((hostname, session) -> tm instanceof CustomCAX509TrustManager trustManager ? trustManager.verifyHostname(hostname, session) : false);
                         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
                             LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
                         }

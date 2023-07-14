@@ -100,7 +100,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                 var tm = new CustomCAX509TrustManager((String)null, caService);
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
                 clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
-                clientBuilder.hostnameVerifier((hostname, session) -> true);
             } catch (NoSuchAlgorithmException ex) {
                 LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
             }
