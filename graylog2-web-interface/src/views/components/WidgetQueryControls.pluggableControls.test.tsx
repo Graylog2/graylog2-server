@@ -30,6 +30,7 @@ import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionS
 import type Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { undoRedoSliceReducer } from 'views/logic/slices/undoRedoSlice';
 
 import WidgetContext from './contexts/WidgetContext';
 import WidgetQueryControls from './WidgetQueryControls';
@@ -108,6 +109,7 @@ describe('WidgetQueryControls pluggable controls', () => {
       'views.reducers': [
         { key: 'view', reducer: viewSliceReducer },
         { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+        { key: 'undoRedo', reducer: undoRedoSliceReducer },
       ],
       'views.components.searchBar': [
         () => ({

@@ -24,6 +24,8 @@ import useViewType from 'views/hooks/useViewType';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewTitle from 'views/hooks/useViewTitle';
 import useViewMetadata from 'views/hooks/useViewMetadata';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import Sidebar from './Sidebar';
 
@@ -31,6 +33,7 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
+  isCloud: jest.fn(() => false),
 }));
 
 jest.mock('views/hooks/useViewType');
@@ -68,6 +71,18 @@ describe('<Sidebar />', () => {
 
   const TestComponent = () => <div id="martian">Marc Watney</div>;
 
+  const renderSidebar = () => render(
+    <TestStoreProvider>
+      <Sidebar results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    </TestStoreProvider>,
+  );
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue(queryId);
     asMock(useViewMetadata).mockReturnValue(viewMetaData);
@@ -76,11 +91,7 @@ describe('<Sidebar />', () => {
   it('should render and open when clicking on header', async () => {
     asMock(useViewTitle).mockReturnValue(viewMetaData.title);
 
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -88,11 +99,7 @@ describe('<Sidebar />', () => {
   });
 
   it('should render with a description about the query results', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -102,11 +109,7 @@ describe('<Sidebar />', () => {
   it('should render summary and description of a view', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -118,11 +121,7 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
     asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, description: undefined, summary: undefined });
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -134,11 +133,7 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, description: undefined, summary: undefined });
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -149,11 +144,7 @@ describe('<Sidebar />', () => {
   it('should render a summary and description, for a saved search', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -164,11 +155,7 @@ describe('<Sidebar />', () => {
   it('should not render a summary and description, if the view is an ad hoc search', async () => {
     asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, id: undefined });
 
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -179,11 +166,7 @@ describe('<Sidebar />', () => {
   });
 
   it('should render widget create options', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByLabelText('Create'));
 
@@ -191,11 +174,7 @@ describe('<Sidebar />', () => {
   });
 
   it('should render passed children', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByLabelText('Fields'));
 
@@ -205,11 +184,7 @@ describe('<Sidebar />', () => {
   it('should close a section when clicking on its title', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
 
-    render((
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
+    renderSidebar();
 
     fireEvent.click(await screen.findByLabelText('Description'));
 
@@ -221,11 +196,7 @@ describe('<Sidebar />', () => {
   });
 
   it('should close an active section when clicking on its navigation item', async () => {
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByLabelText('Fields'));
 
