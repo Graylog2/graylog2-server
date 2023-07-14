@@ -24,13 +24,11 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
-import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -51,27 +49,22 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-
 public class VersionProbe {
     private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class);
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;
     private final int connectionAttempts;
     private final Duration delayBetweenAttempts;
-    private final TrustManagerProvider trustManagerProvider;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
                         OkHttpClient okHttpClient,
                         @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
-                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
-                        TrustManagerProvider trustManagerProvider) {
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.connectionAttempts = elasticsearchVersionProbeAttempts;
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
-        this.trustManagerProvider = trustManagerProvider;
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
@@ -120,7 +113,7 @@ public class VersionProbe {
             retrofit = new Retrofit.Builder()
                     .baseUrl(host.toURL())
                     .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-                    .client(clientWithAdditions(host, okHttpClient))
+                    .client(addAuthenticationIfPresent(host, okHttpClient))
                     .build();
         } catch (MalformedURLException e) {
             LOG.error("Elasticsearch node URL is invalid: " + host.toString(), e);
@@ -145,38 +138,24 @@ public class VersionProbe {
                 .flatMap(this::parseVersion);
     }
 
-    private OkHttpClient clientWithAdditions(final URI host, final OkHttpClient okHttpClient) {
-        var builder = okHttpClient.newBuilder();
-        addCredentialsIfExist(host, builder);
-        addAuthenticationIfPresent(host, builder);
-        return builder.build();
-    }
-
-    private void addCredentialsIfExist(final URI host, final OkHttpClient.Builder okHttpClient) {
-        if (!isNullOrEmpty(host.getUserInfo())) {
-            var list = Splitter.on(":").limit(2).splitToList(host.getUserInfo());
-            okHttpClient.authenticator((route, response) -> {
-                String credential = Credentials.basic(list.get(0), list.get(1));
-                return response.request().newBuilder().header("Authorization", credential).build();
-            });
-        }
-    }
-
-    private void addAuthenticationIfPresent(final URI host, final OkHttpClient.Builder okHttpClient) {
+    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
         if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];
             final String password = credentials[1];
             final String authToken = Credentials.basic(username, password);
 
-            okHttpClient
+            return okHttpClient.newBuilder()
                     .addInterceptor(chain -> {
                         final Request originalRequest = chain.request();
                         final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken);
                         final Request newRequest = builder.build();
                         return chain.proceed(newRequest);
-                    });
+                    })
+                    .build();
         }
+
+        return okHttpClient;
     }
 
     private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {
