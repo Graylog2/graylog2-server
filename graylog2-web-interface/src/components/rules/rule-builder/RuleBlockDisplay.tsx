@@ -18,8 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Row } from 'components/bootstrap';
-import { IconButton } from 'components/common';
+import { Button, Col, Label, Row } from 'components/bootstrap';
+import { IconButton, Icon } from 'components/common';
 
 import Errors from './Errors';
 import type { RuleBlock } from './types';
@@ -47,6 +47,15 @@ const ParamsCol = styled(Col)(({ theme }) => css`
 const Param = styled.p`
   margin-bottom: 0;
 `;
+
+const OutputVariable = styled.p(({ theme }) => css`
+  margin-left: ${theme.spacings.xxs};
+  margin-top: ${theme.spacings.sm};
+`);
+
+const OutputIcon = styled(Icon)(({ theme }) => css`
+  margin-right: ${theme.spacings.sm};
+`);
 
 const NegationButton = styled(Button).attrs(({ negate }: { negate: boolean }) => ({
   negate,
@@ -80,6 +89,14 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Pro
               && <NegationButton bsStyle="primary" negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
               {block?.step_title}
             </h3>
+            {block?.outputvariable && (
+            <OutputVariable>
+              <OutputIcon name="level-up-alt" rotation={90} />
+              <Label bsStyle="default">
+                {`$${block?.outputvariable}`}
+              </Label>
+            </OutputVariable>
+            )}
           </Col>
         </BlockInfo>
         {anyParamsSet

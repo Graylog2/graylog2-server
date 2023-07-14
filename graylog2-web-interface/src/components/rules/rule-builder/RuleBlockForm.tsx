@@ -200,7 +200,7 @@ const RuleBlockForm = ({
                   <SelectedBlockInfo>
                     <Col md={12}>
                       <BlockTitle>
-                        {existingBlock?.step_title || selectedBlockDict.name}
+                        {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
                         <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover(selectedBlockDict)}>
                           <Button bsStyle="link">
                             <Icon name="question-circle" fixedWidth />

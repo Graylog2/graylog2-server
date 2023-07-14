@@ -90,6 +90,8 @@ export type BlockDict = {
   params: Array<BlockFieldDict>,
   description: string | null,
   rule_builder_enabled: boolean,
+  rule_builder_function_group: string,
+  rule_builder_name: string,
   rule_builder_title: string | null
 }
 

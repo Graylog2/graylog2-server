@@ -79,6 +79,9 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
 
   const placeholder = shouldHandlePrimaryParam() && !showPrimaryInput ? 'Set output of the previous step' : '';
 
+  // Object param type can take any type as value
+  //
+
   switch (param.type) {
     case RuleBuilderTypes.String:
     case RuleBuilderTypes.Object:
