@@ -201,7 +201,7 @@ public class VersionProbe {
             final String error = ExceptionUtils.formatMessageCause(e);
             final String rootCause = ExceptionUtils.formatMessageCause(ExceptionUtils.getRootCause(e));
             LOG.error("Unable to retrieve version from Elasticsearch node: {} - {}", error, rootCause);
-            LOG.info("Complete exception for version probe error: ", e);
+            LOG.debug("Complete exception for version probe error: ", e);
         }
         return Optional.empty();
     }
