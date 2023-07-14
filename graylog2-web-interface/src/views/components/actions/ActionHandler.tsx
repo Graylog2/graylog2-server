@@ -70,7 +70,7 @@ type ThunkHandlerAction<Contexts> = {
   thunk: ThunkActionHandler<Contexts>,
 }
 type ComponentsHandlerAction = {
-  component: ActionComponentType | React.ComponentType,
+  component: ActionComponentType,
 };
 
 export type HandlerAction<Contexts> =

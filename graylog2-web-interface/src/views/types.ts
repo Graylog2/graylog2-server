@@ -260,8 +260,8 @@ type DashboardActionModalProps = {
   ref: React.Ref<unknown>,
 }
 
-type AssetActionComponentProps = {
-  identifier: unknown,
+type AssetInformationComponentProps = {
+  identifiers: unknown,
 }
 
 type DashboardAction = {
@@ -270,9 +270,8 @@ type DashboardAction = {
   modal?: React.ComponentType<DashboardActionModalProps>,
 }
 
-type AssetAction = {
-  key: string,
-  component: React.ComponentType<AssetActionComponentProps>,
+type AssetInformation = {
+  component: React.ComponentType<AssetInformationComponentProps>,
 }
 
 type EventActionComponentProps = {
@@ -405,7 +404,7 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
-    'views.components.assetValueActions'?: Array<AssetAction>;
+    'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.dashboardActions'?: Array<DashboardAction>;
     'views.components.eventActions'?: Array<{
       component: React.ComponentType<EventActionComponentProps>,
