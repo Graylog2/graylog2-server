@@ -40,7 +40,7 @@ public class LongConversion extends AbstractFunction<Long> {
     private final ParameterDescriptor<Long, Long> defaultParam;
 
     public LongConversion() {
-        valueParam = object(VALUE).description("Value to convert").primary().build();
+        valueParam = object(VALUE).primary().description("Value to convert").primary().build();
         defaultParam = integer(DEFAULT).optional().allowNegatives(true).description("Used when 'value' is null, defaults to 0").build();
     }
 
@@ -70,9 +70,9 @@ public class LongConversion extends AbstractFunction<Long> {
                 ))
                 .description("Converts a value to a long value using its string representation")
                 .ruleBuilderEnabled()
-                .ruleBuilderName("Convert to number")
-                .ruleBuilderTitle("Convert value to number")
-                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.NUMBER)
+                .ruleBuilderName("Convert to long")
+                .ruleBuilderTitle("Convert value to long integer")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

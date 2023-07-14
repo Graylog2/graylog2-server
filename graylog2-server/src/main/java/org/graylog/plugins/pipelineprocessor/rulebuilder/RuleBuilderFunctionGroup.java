@@ -24,10 +24,11 @@ public enum RuleBuilderFunctionGroup {
     MESSAGE("Message Functions", 0),
     STRING("String Functions", 10),
     NUMBER("Number Functions", 20),
+    BOOLEAN("Boolean Functions", 22),
+    CONVERSION("Conversion Functions", 25),
     DATE("Date Functions", 30),
     EXTRACTORS("Extractor Functions", 40),
-    OTHER("Other", 999),
-    ;
+    OTHER("Other", 999);
 
     private String name;
     private int sort;
