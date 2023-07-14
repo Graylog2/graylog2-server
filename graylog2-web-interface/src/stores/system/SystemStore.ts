@@ -19,13 +19,19 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+import { singletonStore } from 'logic/singleton';
 
-import { singletonStore } from '../../logic/singleton';
-
-// eslint-disable-next-line import/prefer-default-export
+export type Locales = {
+  language_tag: string,
+  display_name: string,
+}
+type SystemStoreState = {
+  system: {},
+  locales: Array<Locales>,
+}
 export const SystemStore = singletonStore(
   'core.System',
-  () => Reflux.createStore({
+  () => Reflux.createStore<SystemStoreState>({
     system: undefined,
     locales: undefined,
     init() {
