@@ -30,7 +30,7 @@ import type {
   RelativeTimeRange,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
-import { isTypeKeyword, isTypeRelative } from 'views/typeGuards/timeRange';
+import { isTypeKeyword, isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTimeFormats, DateTime } from 'util/DateTime';
@@ -254,7 +254,7 @@ const TimeRangePicker = ({
               <Form>
                 <Row>
                   <Col md={12}>
-                    {showAddToQuickListButton && (
+                    {showAddToQuickListButton && isTimeRange(nextTimeRange) && (
                       <IfPermitted permissions="clusterconfigentry:edit">
                         <TimeRangeAddToQuickListButton />
                       </IfPermitted>
