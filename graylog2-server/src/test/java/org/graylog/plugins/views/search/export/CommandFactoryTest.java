@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,21 +46,16 @@ import static org.graylog.plugins.views.search.export.TestData.relativeRange;
 import static org.graylog.plugins.views.search.export.TestData.validQueryBuilder;
 import static org.graylog.plugins.views.search.export.TestData.validQueryBuilderWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class CommandFactoryTest {
 
     private CommandFactory sut;
-    private QueryStringDecorator queryStringDecorator;
 
     @BeforeEach
     void setUp() {
-        queryStringDecorator = mock(QueryStringDecorator.class);
-        when(queryStringDecorator.decorateQueryString(any(), any(), any())).then(returnsFirstArg());
-        sut = new CommandFactory(queryStringDecorator);
+        final QueryStringDecorators emptyDecorator = new QueryStringDecorators(Optional.empty());
+        sut = new CommandFactory(emptyDecorator);
     }
 
     @Test
@@ -316,9 +314,16 @@ class CommandFactoryTest {
         Query q = validQueryBuilder().query(ElasticsearchQueryString.of("undecorated")).build();
         Search s = searchWithQueries(q);
 
-        when(queryStringDecorator.decorateQueryString("undecorated", s, q)).thenReturn("decorated");
 
-        ExportMessagesCommand command = buildFrom(s);
+        final QueryStringDecorators decorators = new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
+            if (queryString.equals("undecorated")) {
+                return PositionTrackingQuery.of("decorated");
+            } else {
+                throw new IllegalArgumentException("Unexpected query " + queryString);
+            }
+        }));
+
+        ExportMessagesCommand command = new CommandFactory(decorators).buildWithSearchOnly(s, ResultFormat.builder().build());
 
         assertThat(command.queryString()).isEqualTo(ElasticsearchQueryString.of("decorated"));
     }

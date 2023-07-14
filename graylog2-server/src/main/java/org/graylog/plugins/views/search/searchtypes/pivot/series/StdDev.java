@@ -42,6 +42,11 @@ public abstract class StdDev implements SeriesSpec {
     public abstract String field();
 
     @Override
+    public Optional<String> statsSubfieldName() {
+        return Optional.of("std_deviation");
+    }
+
+    @Override
     public String literal() {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
     }
