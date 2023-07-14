@@ -275,7 +275,7 @@ export function fetchStreamingPlainText(method, url, body) {
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPeriodically(method, url, body?) {
+export function fetchPeriodically<T = unknown>(method, url, body?): Promise<T> {
   const promise = () => new Builder(method, url)
     .noSessionExtension()
     .json(body)
