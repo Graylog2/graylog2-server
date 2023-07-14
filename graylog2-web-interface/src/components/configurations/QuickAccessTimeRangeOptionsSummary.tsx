@@ -24,7 +24,7 @@ import type {
   KeywordTimeRange,
   TimeRange,
 } from 'views/logic/queries/Query';
-import { dateOutput } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
+import { range } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
 
 type Props = { options : Array<QuickAccessTimeRange>};
 
@@ -50,9 +50,9 @@ const StyledDL = styled.dl`
 export const getTimeRangeValueSummary = (timerange: TimeRange) => {
   switch (timerange.type) {
     case 'relative':
-      return `${dateOutput(timerange).from} - ${dateOutput(timerange).until}`;
+      return `${range(timerange).from} - ${range(timerange).until}`;
     case 'absolute':
-      return `${dateOutput(timerange).from} - ${dateOutput(timerange).until}`;
+      return `${range(timerange).from} - ${range(timerange).until}`;
     case 'keyword':
       return (timerange as KeywordTimeRange).keyword;
     default:
