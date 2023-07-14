@@ -55,7 +55,7 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
         log.debug("Adding set_grok_to_fields extractor fragments via migration");
         if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
-            return;
+//            return;
 
         }
 
