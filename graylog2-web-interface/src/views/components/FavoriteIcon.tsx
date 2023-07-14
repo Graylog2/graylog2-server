@@ -22,7 +22,7 @@ import type { DefaultTheme } from 'styled-components';
 import { Icon } from 'components/common';
 import useFavoriteItemMutation from 'hooks/useFavoriteItemMutation';
 
-const StyledIcon = styled(Icon)(({ theme, $isFavorite }: { theme: DefaultTheme, $isFavorite: boolean }) => css`
+const StyledIcon = styled(Icon)<{ theme: DefaultTheme, $isFavorite: boolean }>(({ theme, $isFavorite }) => css`
   color: ${$isFavorite ? theme.colors.variant.info : undefined};
   cursor: pointer;
 `);

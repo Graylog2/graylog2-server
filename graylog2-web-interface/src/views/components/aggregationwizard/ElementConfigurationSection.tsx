@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
@@ -60,7 +59,7 @@ const Wrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty: boolean }) => css`
+const Header = styled.div<{ $isEmpty: boolean }>(({ theme, $isEmpty }) => css`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -81,7 +80,7 @@ const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty:
   }
 `);
 
-const ElementTitle = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty: boolean }) => css`
+const ElementTitle = styled.div<{ $isEmpty: boolean }>(({ theme, $isEmpty }) => css`
   background-color: ${theme.colors.global.contentBackground};
   color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.global.textDefault};
   z-index: 1;

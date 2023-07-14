@@ -39,7 +39,7 @@ const ShortContent = styled.p`
   font-weight: bold;
 `;
 
-const LongContent = styled.div(({ $visible }: {$visible: boolean}) => css`
+const LongContent = styled.div<{ $visible: boolean}>(({ $visible }) => css`
   white-space: pre-wrap;
   display: ${$visible ? 'block' : 'none'};
   padding-top: 12px;

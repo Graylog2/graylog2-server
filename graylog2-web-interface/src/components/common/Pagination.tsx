@@ -27,12 +27,12 @@ import Icon from './Icon';
 type Props = {
   currentPage: number,
   totalPages: number,
-  boundaryPagesRange: number,
-  siblingPagesRange: number,
-  hideEllipsis: boolean,
-  hidePreviousAndNextPageLinks: boolean,
-  hideFirstAndLastPageLinks: boolean,
-  disabled: boolean,
+  boundaryPagesRange?: number,
+  siblingPagesRange?: number,
+  hideEllipsis?: boolean,
+  hidePreviousAndNextPageLinks?: boolean,
+  hideFirstAndLastPageLinks?: boolean,
+  disabled?: boolean,
   onChange: (nextPage: number) => void,
 };
 

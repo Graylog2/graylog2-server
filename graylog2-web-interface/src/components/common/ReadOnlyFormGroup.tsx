@@ -42,7 +42,7 @@ const LabelCol = styled(Col)(({ theme }: { theme: DefaultTheme }) => css`
   }
 `);
 
-const BooleanIcon = styled(Icon)(({ theme, value }: { theme: DefaultTheme, value: Props['value']}) => `
+const BooleanIcon = styled(Icon)<{ value: Props['value'] }>(({ theme, value }) => `
   color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
 `);
 

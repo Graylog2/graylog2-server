@@ -49,7 +49,7 @@ const StyledTh = styled.th`
   }
 `;
 
-const DefaultTh = styled(StyledTh)(({ isNumeric }: { isNumeric: boolean }) => css`
+const DefaultTh = styled(StyledTh)<{ isNumeric: boolean }>(({ isNumeric }) => css`
   ${isNumeric ? 'text-align: right;' : ''}
 `);
 

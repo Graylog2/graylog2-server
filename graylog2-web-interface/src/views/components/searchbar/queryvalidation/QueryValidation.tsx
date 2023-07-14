@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css, keyframes } from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 import delay from 'lodash/delay';
@@ -50,7 +49,7 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => css`
+const ErrorIcon = styled(Icon)<{ $status: string }>(({ theme, $status }) => css`
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);

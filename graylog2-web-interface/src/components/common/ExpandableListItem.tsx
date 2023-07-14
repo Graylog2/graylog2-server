@@ -22,8 +22,8 @@ import { Checkbox } from 'components/bootstrap';
 
 import Icon from './Icon';
 
-const ItemWrap = styled.li(({ padded }: { padded: boolean }) => css`
-  padding: ${padded ? '10px 5px' : ''};
+const ItemWrap = styled.li<{ $padded: boolean }>(({ $padded }) => css`
+  padding: ${$padded ? '10px 5px' : ''};
 `);
 
 const Container = styled.div(({ theme }) => css`
@@ -231,7 +231,7 @@ class ExpandableListItem extends React.Component<Props, State> {
     const inputProps = _filterInputProps(otherProps);
 
     return (
-      <ItemWrap padded={padded}>
+      <ItemWrap $padded={padded}>
         <Container>
           {selectable && <Checkbox inputRef={(ref) => { this._checkbox = ref; }} inline checked={checked} {...inputProps} />}
           {expandable

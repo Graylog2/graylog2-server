@@ -41,7 +41,7 @@ const ContentArea = styled.div`
   height: 100%;
 `;
 
-const Textarea = styled.textarea(({ $copied, theme }: {$copied: boolean, theme:DefaultTheme}) => css`
+const Textarea = styled.textarea<{ $copied: boolean }>(({ $copied, theme }) => css`
   width: 100%;
   padding: 3px;
   resize: none;
@@ -80,7 +80,7 @@ const Footer = styled.footer(({ theme }: { theme: DefaultTheme }) => css`
   border-top: 1px solid ${theme.colors.gray[80]};
 `);
 
-const StatusMessage = styled.span(({ theme, $visible }: { theme: DefaultTheme, $visible: boolean}) => css`
+const StatusMessage = styled.span<{ $visible: boolean }>(({ theme, $visible }) => css`
   flex: 1;
   color: ${theme.colors.variant.success};
   font-style: italic;
