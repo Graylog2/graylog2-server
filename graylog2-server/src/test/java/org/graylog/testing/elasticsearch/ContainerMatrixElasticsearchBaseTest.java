@@ -59,7 +59,7 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
     private static Map<String, Template> getGraylogDefaultMessageTemplates(SearchVersion version) {
         var template =
                 new MessageIndexTemplateProvider().create(version, null)
-                        .messageTemplate("*", "standard", 0L);
+                        .messageTemplate("*", "standard", 1L);
         return Collections.singletonMap("graylog-test-internal", template);
     }
 
