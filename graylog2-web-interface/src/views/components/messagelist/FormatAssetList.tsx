@@ -14,16 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export {
-  Anchor,
-  Box,
-  Grid,
-  Divider,
-  Group,
-  Header,
-  NumberInput,
-  Text,
-  UnstyledButton,
-  Collapse,
-} from '@mantine/core';
+const FormatAssetList = ({ assets }: { assets: React.ReactElement[] }) => {
+  if (assets.length === 0) {
+    return null;
+  }
+
+  return (
+    <div>
+      <dt>Associated Assets</dt>
+      {assets.map((assetElement) => (
+        <div>
+          {assetElement}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default FormatAssetList;

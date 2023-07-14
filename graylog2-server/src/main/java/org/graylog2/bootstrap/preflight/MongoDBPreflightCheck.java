@@ -25,6 +25,7 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.zafarkhaja.semver.Version;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoTimeoutException;
+import com.mongodb.client.model.Filters;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionImpl;
@@ -99,16 +100,21 @@ public class MongoDBPreflightCheck implements PreflightCheck {
     }
 
     /**
-     * The fresh installation detecion is based on the presence of the cluster_config collection. If this
-     * collection exists, we assume that the installation is not fresh. We can't use empty database for this
+     * The fresh installation detection is based on the presence of a document in the `cluster_config` collection which
+     * is of type `org.graylog2.plugin.cluster.ClusterId`. This document is created by initial migrations. If this
+     * document exists, we assume that the installation is not fresh. We can't use empty database for this
      * verification - datanodes may register itself into the nodes collection and maybe even persist some more
      * information in other collections.
      */
     private void detectFreshInstallation() {
-        final boolean configurationExists = mongoConnection.getMongoDatabase()
+        final boolean collectionExists = mongoConnection.getMongoDatabase()
                 .listCollectionNames()
                 .into(new HashSet<>())
                 .contains(CLUSTER_CONFIG_COLLECTION_NAME);
+        final boolean configurationExists = collectionExists && mongoConnection.getMongoDatabase()
+                .getCollection("cluster_config")
+                .find(Filters.eq("type", "org.graylog2.plugin.cluster.ClusterId"))
+                .first() != null;
         this.isFreshInstallation.set(!configurationExists);
     }
 }

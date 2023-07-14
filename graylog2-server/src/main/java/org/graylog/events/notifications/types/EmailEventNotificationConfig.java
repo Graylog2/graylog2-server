@@ -50,6 +50,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             "Description: ${event_definition_description}\n" +
             "Type:        ${event_definition_type}\n" +
             "--- [Event] --------------------------------------\n" +
+            "Alert Replay:         ${http_external_uri}alerts/${event.id}/replay-search\n" +
             "Timestamp:            ${event.timestamp}\n" +
             "Message:              ${event.message}\n" +
             "Source:               ${event.source}\n" +

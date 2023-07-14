@@ -14,16 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.plugin.certificates;
 
-export {
-  Anchor,
-  Box,
-  Grid,
-  Divider,
-  Group,
-  Header,
-  NumberInput,
-  Text,
-  UnstyledButton,
-  Collapse,
-} from '@mantine/core';
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotNull;
+import java.util.Locale;
+
+public record RenewalPolicy(@JsonProperty("mode") @NotNull Mode mode,
+                            @JsonProperty("certificate_lifetime") @NotNull String certificateLifetime) {
+    public enum Mode {
+        AUTOMATIC,
+        MANUAL;
+
+        @JsonCreator
+        public static Mode create(String value) {
+            return Mode.valueOf(value.toUpperCase(Locale.ROOT));
+        }
+    }
+}
