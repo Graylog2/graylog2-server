@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
@@ -104,6 +105,10 @@ public class RouteToStream extends AbstractFunction<Void> {
                         messageParam,
                         removeFromDefault))
                 .description("Routes a message to a stream")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Route to stream")
+                .ruleBuilderTitle("Route message to stream<#if name??> '${name}'</#if><#if id??> '${id}'</#if>")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

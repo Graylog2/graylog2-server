@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -77,6 +78,10 @@ public class CreateMessage extends AbstractFunction<Message> {
                         timestampParam
                 ))
                 .description("Creates a new message")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Create message")
+                .ruleBuilderTitle("Create a new message")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

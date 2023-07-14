@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.utilities.StringUtils;
 
@@ -96,6 +97,10 @@ public class CloneMessage extends AbstractFunction<Message> {
                 .params(ImmutableList.of(messageParam, loopDetectionParam))
                 .returnType(Message.class)
                 .description("Clones a message")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Clone message")
+                .ruleBuilderTitle("Clone message")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

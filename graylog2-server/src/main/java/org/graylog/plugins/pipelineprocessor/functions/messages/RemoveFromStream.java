@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
@@ -100,6 +101,10 @@ public class RemoveFromStream extends AbstractFunction<Void> {
                         idParam,
                         messageParam))
                 .description("Removes a message from a stream. Removing the last stream will put the message back onto the default stream. To complete drop a message use the drop_message function.")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Remove from stream")
+                .ruleBuilderTitle("Remove message from stream<#if name??> '${name}'</#if><#if id??> '${id}'</#if>")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }
