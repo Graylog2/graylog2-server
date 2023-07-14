@@ -132,14 +132,14 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
         validateHostnames(x509Certificates, s);
     }
 
-    protected void validateHostnames(X509Certificate[] x509Certificates, String s) throws CertificateException {
+    private void validateHostnames(X509Certificate[] x509Certificates, String s) throws CertificateException {
         Arrays.stream(x509Certificates)
                 .filter(this::certificateMatchesHostname)
                 .findFirst()
                 .orElseThrow(() -> new CertificateException("Presented certificate does not match configured hostname!"));
     }
 
-    protected boolean certificateMatchesHostname(X509Certificate x509Certificate) {
+    private boolean certificateMatchesHostname(X509Certificate x509Certificate) {
         return this.hosts.stream().anyMatch(host -> {
             try {
                 return this.authorizer.verify(host, x509Certificate);
