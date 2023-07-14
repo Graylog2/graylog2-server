@@ -32,7 +32,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.WriteRequest;
@@ -40,12 +39,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplateMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
@@ -200,8 +200,8 @@ public class ClientOS2 implements Client {
     @Override
     public void deleteTemplates(String... templates) {
         for (String template : templates) {
-            final DeleteIndexTemplateRequest deleteIndexTemplateRequest = new DeleteIndexTemplateRequest(template);
-            client.execute((c, requestOptions) -> c.indices().deleteTemplate(deleteIndexTemplateRequest, requestOptions));
+            var deleteIndexTemplateRequest = new DeleteComposableIndexTemplateRequest(template);
+            client.execute((c, requestOptions) -> c.indices().deleteIndexTemplate(deleteIndexTemplateRequest, requestOptions));
         }
     }
 
@@ -247,10 +247,10 @@ public class ClientOS2 implements Client {
     }
 
     private String[] existingTemplates() {
-        final GetIndexTemplatesRequest getIndexTemplatesRequest = new GetIndexTemplatesRequest();
-        final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
-        return result.getIndexTemplates().stream()
-                .map(IndexTemplateMetadata::name)
+        var getIndexTemplatesRequest = new GetComposableIndexTemplateRequest("");
+        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
+        return result.getIndexTemplates()
+                .keySet()
                 .toArray(String[]::new);
     }
 
