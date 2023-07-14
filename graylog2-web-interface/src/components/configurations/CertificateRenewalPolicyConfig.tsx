@@ -23,6 +23,7 @@ import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 import moment from 'moment';
 
+import ModalSubmit from 'components/common/ModalSubmit';
 import UserNotification from 'util/UserNotification';
 import { Input, Button, Col, Modal, Row } from 'components/bootstrap';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
@@ -199,7 +200,7 @@ const CertificateRenewalPolicyConfig = () => {
              data-app-section="configurations_index_defaults"
              data-event-element={modalTitle}>
         <Formik<FormConfig> onSubmit={saveConfig} initialValues={formConfig}>
-          {({ values, setFieldValue, isSubmitting }) => (
+          {({ values, setFieldValue, isSubmitting, isValid, isValidating }) => (
             <Form>
               <Modal.Header closeButton>
                 <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
@@ -241,11 +242,12 @@ const CertificateRenewalPolicyConfig = () => {
               </Modal.Body>
 
               <Modal.Footer>
-                <Button type="button" onClick={resetConfig}>Cancel</Button>
-                <Button type="submit"
-                        bsStyle="success"
-                        disabled={isSubmitting}>{isSubmitting ? 'Updating configuration' : 'Update configuration'}
-                </Button>
+                <ModalSubmit onCancel={resetConfig}
+                             disabledSubmit={isValidating || !isValid}
+                             isSubmitting={isSubmitting}
+                             isAsyncSubmit
+                             submitLoadingText="Updating configuration"
+                             submitButtonText="Update configuration" />
               </Modal.Footer>
             </Form>
           )}
