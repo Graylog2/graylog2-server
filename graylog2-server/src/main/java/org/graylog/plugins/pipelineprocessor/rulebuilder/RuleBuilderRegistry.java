@@ -56,7 +56,8 @@ public class RuleBuilderRegistry {
     public Map<String, RuleFragment> actions() {
         final Stream<RuleFragment> functions = functionRegistry.all()
                 .stream()
-                .filter(f -> f.descriptor().ruleBuilderEnabled())
+                .filter(f -> f.descriptor().ruleBuilderEnabled()
+                        && !f.descriptor().returnType().equals(Boolean.class))
                 .map(f -> RuleFragment.builder()
                         .descriptor(f.descriptor())
                         .build()
