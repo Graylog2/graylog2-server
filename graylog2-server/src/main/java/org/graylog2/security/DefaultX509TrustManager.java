@@ -20,11 +20,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.bouncycastle.est.jcajce.JsseDefaultHostnameAuthorizer;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.net.Socket;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -32,11 +34,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class DefaultX509TrustManager extends X509ExtendedTrustManager {
+    private final List<String> hosts;
     private final X509TrustManager defaultTrustManager;
-    protected final HostnameVerifier hostnameVerifier;
+    private final JsseDefaultHostnameAuthorizer authorizer;
 
     @AssistedInject
     public DefaultX509TrustManager(@Assisted String host) throws NoSuchAlgorithmException, KeyStoreException {
@@ -77,8 +81,7 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     @VisibleForTesting
     public DefaultX509TrustManager(List<String> hosts, KeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException {
         super();
-
-        this.hostnameVerifier = new HostnameVerifier(hosts);
+        this.authorizer = new JsseDefaultHostnameAuthorizer(Collections.emptySet());
 
         final TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(keyStore);
@@ -88,6 +91,8 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
                 .map(trustManager -> (X509TrustManager)trustManager)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Unable to initialize default X509 trust manager."));
+
+        this.hosts = hosts;
     }
 
     @Override
@@ -98,7 +103,7 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     @Override
     public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
         this.defaultTrustManager.checkServerTrusted(x509Certificates, s);
-        hostnameVerifier.validateHostnames(x509Certificates, s);
+        validateHostnames(x509Certificates, s);
     }
 
     @Override
@@ -124,10 +129,23 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     @Override
     public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
         this.defaultTrustManager.checkClientTrusted(x509Certificates, s);
-        hostnameVerifier.validateHostnames(x509Certificates, s);
+        validateHostnames(x509Certificates, s);
     }
 
-    public HostnameVerifier getHostnameVerifier() {
-        return hostnameVerifier;
+    protected void validateHostnames(X509Certificate[] x509Certificates, String s) throws CertificateException {
+        Arrays.stream(x509Certificates)
+                .filter(this::certificateMatchesHostname)
+                .findFirst()
+                .orElseThrow(() -> new CertificateException("Presented certificate does not match configured hostname!"));
+    }
+
+    protected boolean certificateMatchesHostname(X509Certificate x509Certificate) {
+        return this.hosts.stream().anyMatch(host -> {
+            try {
+                return this.authorizer.verify(host, x509Certificate);
+            } catch (IOException e) {
+                return false;
+            }
+        });
     }
 }

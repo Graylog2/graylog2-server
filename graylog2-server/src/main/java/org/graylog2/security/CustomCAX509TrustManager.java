@@ -107,16 +107,4 @@ public class CustomCAX509TrustManager implements X509TrustManager {
         }
         return null;
     }
-
-    public boolean verifyHostname(final String hostname, final SSLSession session) {
-        try {
-            defaultX509TrustManager.getHostnameVerifier().validateHostnames((X509Certificate[])session.getPeerCertificates(), "");
-            return true;
-        } catch (CertificateException e) {
-            LOG.warn("Could not verify hostname from certificates.");
-        } catch (SSLPeerUnverifiedException e) {
-            LOG.warn("Could not validate peer certificates: {}", e.getMessage());
-        }
-        return false;
-    }
 }
