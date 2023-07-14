@@ -30,7 +30,6 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
-import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
@@ -43,17 +42,10 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -155,29 +147,18 @@ public class VersionProbe {
 
     private OkHttpClient clientWithAdditions(final URI host, final OkHttpClient okHttpClient) {
         var builder = okHttpClient.newBuilder();
-        addSSLContextIfHttps(host, builder);
+        addCredentialsIfExist(host, builder);
         addAuthenticationIfPresent(host, builder);
         return builder.build();
     }
 
-    private void addSSLContextIfHttps(final URI host, final OkHttpClient.Builder okHttpClient) {
-        if("https".equalsIgnoreCase(host.getScheme())) {
-            try {
-                final var sslContext = SSLContext.getInstance("TLS");
-                final var tm = trustManagerProvider.create(host.getHost());
-                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
-                okHttpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager)tm);
-
-                if (!isNullOrEmpty(host.getUserInfo())) {
-                    var list = Splitter.on(":").limit(2).splitToList(host.getUserInfo());
-                    okHttpClient.authenticator((route, response) -> {
-                        String credential = Credentials.basic(list.get(0), list.get(1));
-                        return response.request().newBuilder().header("Authorization", credential).build();
-                    });
-                }
-            } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
-                LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
-            }
+    private void addCredentialsIfExist(final URI host, final OkHttpClient.Builder okHttpClient) {
+        if (!isNullOrEmpty(host.getUserInfo())) {
+            var list = Splitter.on(":").limit(2).splitToList(host.getUserInfo());
+            okHttpClient.authenticator((route, response) -> {
+                String credential = Credentials.basic(list.get(0), list.get(1));
+                return response.request().newBuilder().header("Authorization", credential).build();
+            });
         }
     }
 

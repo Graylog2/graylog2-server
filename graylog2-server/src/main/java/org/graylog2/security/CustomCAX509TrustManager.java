@@ -17,15 +17,12 @@
 package org.graylog2.security;
 
 import com.google.common.collect.Iterables;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
+import javax.inject.Inject;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
@@ -40,30 +37,13 @@ import java.util.List;
 public class CustomCAX509TrustManager implements X509TrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CustomCAX509TrustManager.class);
     private final List<X509TrustManager> trustManagers = new ArrayList<>();
-    private final DefaultX509TrustManager defaultX509TrustManager;
 
-    @AssistedInject
-    public CustomCAX509TrustManager(@Assisted String host, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
-        this(host != null ? List.of(host) : List.of(), caService);
-    }
-
-    /**
-     * Create a X509TrustManager that verifies the certificate chain and checks whether the cert matches
-     * one of the given hosts in the list.
-     * <p>
-     * <b>Note: ANY matching host from the list is accepted. </b> <br>
-     *    E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
-     * @param hosts     The hosts to check the certificate subject against
-     * @throws NoSuchAlgorithmException
-     * @throws KeyStoreException
-     */
-    @AssistedInject
-    public CustomCAX509TrustManager(@Assisted List<String> hosts, CaService caService) throws NoSuchAlgorithmException, KeyStoreException {
-        defaultX509TrustManager = new DefaultX509TrustManager(hosts);
-        trustManagers.add(defaultX509TrustManager);
+    @Inject
+    public CustomCAX509TrustManager(CaService caService) {
         try {
+            trustManagers.add(getDefaultTrustManager());
             caService.loadKeyStore().ifPresent(keystore -> trustManagers.add(getTrustManager(keystore)));
-        } catch (KeyStoreException | KeyStoreStorageException k) {
+        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException k) {
             LOG.error("Could not add Graylog CA to TrustManagers: {}", k.getMessage(), k);
         }
     }
@@ -97,6 +77,10 @@ public class CustomCAX509TrustManager implements X509TrustManager {
         return certificates.toArray(new X509Certificate[0]);
     }
 
+    private X509TrustManager getDefaultTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
+        return getTrustManager(null);
+    }
+
     private X509TrustManager getTrustManager(KeyStore keystore) {
         try {
             TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -106,5 +90,5 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             LOG.error("Could not create TrustManager: {}", e.getMessage(), e);
         }
         return null;
-    }
+     }
 }

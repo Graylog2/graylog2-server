@@ -17,19 +17,15 @@
 package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.base.Splitter;
 import com.google.common.base.Suppliers;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.IndexerHosts;
-import org.graylog2.security.CustomCAX509TrustManager;
-import org.graylog2.security.TrustManagerProvider;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,27 +35,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
     private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
     private final Supplier<RestHighLevelClient> clientSupplier;
-    private final TrustManagerProvider trustManagerProvider;
+    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
 
     @SuppressWarnings("unused")
     @Inject
@@ -80,9 +66,9 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
             CredentialsProvider credentialsProvider,
-            TrustManagerProvider trustManagerProvider) {
+            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
 
-        this.trustManagerProvider = trustManagerProvider;
+        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
 
         clientSupplier = Suppliers.memoize(() -> {
             final RestHighLevelClient client = buildClient(hosts,
@@ -155,16 +141,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     }
 
                     if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
-                        try {
-                            final var hostNames = hosts.stream().map(URI::getHost).toList();
-                            final var sslContext = SSLContext.getInstance("TLS");
-                            final var tm = trustManagerProvider.create(hostNames);
-                            sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
-
-                            httpClientConfig.setSSLContext(sslContext);
-                        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
-                            LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
-                        }
+                        httpClientConfig.setSSLContext(trustManagerAndSocketFactoryProvider.getSslContext());
                     }
 
                     return httpClientConfig;

@@ -97,7 +97,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
                 var sslContext = SSLContext.getInstance("TLS");
-                var tm = new CustomCAX509TrustManager((String)null, caService);
+                var tm = new CustomCAX509TrustManager(caService);
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
                 clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
             } catch (NoSuchAlgorithmException ex) {
