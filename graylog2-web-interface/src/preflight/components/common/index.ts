@@ -30,6 +30,7 @@ export { default as MenuItem } from './MenuItem';
 export { default as MenuTarget } from './mantine/MenuTarget';
 export { default as Row } from './Row';
 export { default as Section } from './Section';
+export { default as Select } from './Select';
 export { default as Space } from './Space';
 export { default as Tabs } from './Tabs';
 export { default as Title } from './Title';

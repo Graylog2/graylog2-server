@@ -19,7 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -195,7 +195,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
 
   const onToggleEdit = useCallback(() => {
     sendTelemetry('input_button_toggle', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-edit-button',
     });
@@ -211,7 +211,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   }, [editing, pathname, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-edit-cancel-button',
     });

@@ -21,6 +21,7 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -61,7 +62,7 @@ class EmailSenderTest {
         when(emailFactory.htmlEmail()).thenReturn(htmlEmail);
 
         emailSender = new EmailSender(emailRecpientsFactory, notificationService, nodeId, objectMapperProvider,
-                new Engine(), new HtmlSafeJmteEngineProvider().get(), emailFactory);
+                new Engine(), new HtmlSafeJmteEngineProvider().get(), emailFactory, new HttpConfiguration());
     }
 
     @Test

@@ -569,6 +569,10 @@
             <artifactId>kafka_2.13</artifactId>
         </dependency>
         <dependency>
+            <groupId>software.amazon.msk</groupId>
+            <artifactId>aws-msk-iam-auth</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>syslog4j</artifactId>
             <version>${syslog4j.version}</version>

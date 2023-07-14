@@ -37,6 +37,13 @@ public class QueryStringDecorators {
         return decorateWithPositions(queryString, job, query).getInterpolatedQuery();
     }
 
+    public String decorate(String queryString, ParameterProvider params) {
+        Query dummyQuery = Query.builder()
+                .query(ElasticsearchQueryString.of(queryString))
+                .build();
+        return decorateWithPositions(queryString, params, dummyQuery).getInterpolatedQuery();
+    }
+
     public PositionTrackingQuery decorateWithPositions(String queryString, ParameterProvider job, Query query) {
         return this.decorator
                 .map(decorator -> decorator.decorate(queryString, job, query))

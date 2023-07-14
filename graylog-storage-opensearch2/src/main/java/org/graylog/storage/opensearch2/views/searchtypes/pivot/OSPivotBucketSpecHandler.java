@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
-import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -25,14 +24,10 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
-import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.jooq.lambda.tuple.Tuple2;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 
 import java.util.List;
 import java.util.Objects;
@@ -68,7 +63,11 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                     }
-                                    return BucketOrder.aggregation(queryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    String orderPath = seriesSpec.statsSubfieldName()
+                                            .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "." + subField)
+                                            .orElse(queryContext.seriesName(seriesSpec, pivot));
+
+                                    return BucketOrder.aggregation(orderPath, sortSpec.direction().equals(SortSpec.Direction.Ascending));
                                 })
                                 .orElse(null);
                     }

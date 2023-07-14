@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
-import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -50,7 +49,7 @@ public class Join extends AbstractFunction<String> {
                 .transform(Ints::saturatedCast)
                 .description("The first index to start joining from. It is an error to pass in an index larger than the number of elements")
                 .build();
-        endIndexParam = ParameterDescriptor.integer("end", Integer.class).optional()
+        endIndexParam = ParameterDescriptor.integer("indexEnd", Integer.class).optional()
                 .transform(Ints::saturatedCast)
                 .description("The index to stop joining from (exclusive). It is an error to pass in an index larger than the number of elements")
                 .build();

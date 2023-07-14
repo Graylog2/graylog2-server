@@ -19,6 +19,7 @@ package org.graylog.events.notifications.types;
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HostAndPort;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
@@ -26,6 +27,7 @@ import org.apache.commons.mail.SimpleEmail;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog2.alerts.EmailRecipients;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +60,7 @@ public class EmailSender {
     private final Engine templateEngine;
     private final Engine htmlTemplateEngine;
     private final EmailFactory emailFactory;
+    private final URI httpExternalUri;
 
     @Inject
     public EmailSender(EmailRecipients.Factory emailRecipientsFactory,
@@ -65,7 +69,8 @@ public class EmailSender {
                        ObjectMapperProvider objectMapperProvider,
                        Engine templateEngine,
                        @Named("HtmlSafe") Engine htmlTemplateEngine,
-                       EmailFactory emailFactory) {
+                       EmailFactory emailFactory,
+                       HttpConfiguration httpConfiguration) {
         this.emailRecipientsFactory = requireNonNull(emailRecipientsFactory, "emailRecipientsFactory");
         this.notificationService = requireNonNull(notificationService, "notificationService");
         this.nodeId = requireNonNull(nodeId, "nodeId");
@@ -73,6 +78,7 @@ public class EmailSender {
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
         this.htmlTemplateEngine = requireNonNull(htmlTemplateEngine, "htmlTemplateEngine");
         this.emailFactory = requireNonNull(emailFactory, "emailFactory");
+        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
     @VisibleForTesting
@@ -106,7 +112,9 @@ public class EmailSender {
 
     private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog, DateTimeZone timeZone) {
         final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
-        return objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+        Map<String,Object> model = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+        model.put("http_external_uri", this.httpExternalUri);
+        return model;
     }
 
     private void sendEmail(EmailEventNotificationConfig config, String emailAddress, Map<String, Object> model) throws TransportConfigurationException, EmailException {

@@ -38,7 +38,7 @@ assignees: ''
 
 * Graylog Version:
 * Java Version:
-* Elasticsearch Version:
+* OpenSearch Version:
 * MongoDB Version:
 * Operating System:
 * Browser version:

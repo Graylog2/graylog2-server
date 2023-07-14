@@ -16,75 +16,46 @@
  */
 package org.graylog2.lookup;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.google.common.base.Suppliers;
 import org.graylog.grn.GRN;
 import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Singleton
 public class Catalog {
-    protected record Entry(String type, String title) {}
 
-    private final ContentPackService contentPackService;
-    private final LoadingCache<String, Entry> cache;
+    public record Entry(String id, String title) {
+    }
 
-    private final int MAXIMUM_CACHE_SIZE = 10000;
+    private final Supplier<Map<String, EntityExcerpt>> memoizedExcerptSupplier;
 
     @Inject
     public Catalog(ContentPackService contentPackService) {
-        this.contentPackService = contentPackService;
-        this.cache = createCache();
+        /*
+         * TODO: This approach does not perform and should be replaced.
+         * It was implemented as a quick improvement for even worse approach, where getEntityExcerpts() could be invoked for each entry retrieval.
+         */
+        this.memoizedExcerptSupplier = Suppliers.memoizeWithExpiration(contentPackService::getEntityExcerpts, 5, TimeUnit.SECONDS);
     }
 
-    protected LoadingCache<String, Entry> createCache() {
-        return CacheBuilder
-                .newBuilder()
-                .maximumSize(MAXIMUM_CACHE_SIZE)
-                .expireAfterAccess(1, TimeUnit.SECONDS)
-                .build(new CacheLoader<>() {
-                    @Override
-                    public Entry load(String id) {
-                        var catalog = contentPackService.getEntityExcerpts();
-                        var excerpt = catalog.get(id);
-                        if (excerpt != null) {
-                            return new Entry(excerpt.type().name(), excerpt.title());
-                        } else {
-                            return new Entry("Unknown entity: " + id, "Unknown entity: " + id);
-                        }
-                    }
-                });
-    }
-
-    public String getTitle(final GRN grn) {
-        try {
-            var item = cache.get(grn.entity());
-            if(item.title() != null) {
-                return item.title();
-            } else {
-                return "Unknown entity: " + grn;
-            }
-        } catch (ExecutionException cex) {
-            return "Unknown entity: " + grn;
+    public Optional<Entry> getEntry(final GRN grn) {
+        final String id = grn.entity();
+        var catalog = memoizedExcerptSupplier.get();
+        var excerpt = catalog.get(id);
+        if (excerpt != null) {
+            return Optional.of(
+                    new Entry(id, excerpt.title())
+            );
+        } else {
+            return Optional.empty();
         }
     }
 
-    public String getType(final GRN grn) {
-        try {
-            var item = cache.get(grn.entity());
-            if(item.type() != null) {
-                return item.type().toLowerCase(Locale.ROOT);
-            } else {
-                return "Unknown entity: " + grn;
-            }
-        } catch (ExecutionException cex) {
-            return "Unknown entity: " + grn;
-        }
-    }
 }

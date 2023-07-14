@@ -1,0 +1,2 @@
+type = "security"
+message = "Fix partial path traversal vulnerability in Support Bundle feature. [GHSA-2q4p-f6gf-mqr5](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-2q4p-f6gf-mqr5)"
