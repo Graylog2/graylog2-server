@@ -52,12 +52,29 @@ const ActionsCol = styled(Col)`
 
 const ReferenceRuleCol = styled(Col)`
   .ref-rule {
-    height: 100px;
+    height: 88px;
+  }
+
+  .input-container {
+    display: flex;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rule-ref-descriptions {
+    display: none;
+  }
+
+  .query {
+    flex: 1;
   }
 `;
 
 const ConvertButton = styled(Button)`
-  float: right;
+  margin-left: 16px; 
 `;
 
 const SubTitle = styled.label`
@@ -328,12 +345,17 @@ const RuleBuilder = () => {
   return (
     <form onSubmit={(e) => handleSave(e, true)}>
       <Row className="content">
-        <Col xs={8}>
+        <Col xs={6}>
           <RuleBuilderForm rule={rule}
                            onChange={setRule} />
+        </Col>
+        <ReferenceRuleCol xs={6}>
+          <RuleHelper hideExampleTab />
+        </ReferenceRuleCol>
+        <Col xs={12}>
           <label htmlFor="rule_builder">Rule Builder</label>
           <ConvertButton bsStyle="info"
-                         bsSize="small"
+                         bsSize="xsmall"
                          title={initialRule ? 'Convert Rule Builder to Source Code' : 'Please Create the Rule first'}
                          disabled={!initialRule}
                          onClick={() => {
@@ -348,9 +370,6 @@ const RuleBuilder = () => {
             Convert to Source Code
           </ConvertButton>
         </Col>
-        <ReferenceRuleCol xs={4}>
-          <RuleHelper />
-        </ReferenceRuleCol>
         <Col xs={12}>
           <SimulatorSwitchContaner>
             <Toggle>

@@ -44,9 +44,10 @@ end`;
 type Props = {
   functionDescriptors: Array<BlockDict>,
   paginationQueryParameter: any,
+  hideExampleTab: boolean,
 }
 
-const RuleHelper = ({ functionDescriptors, paginationQueryParameter } : Props) => {
+const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExampleTab } : Props) => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean}>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -109,7 +110,7 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter } : Props) =
 
   return (
     <Panel header="Rules quick reference">
-      <Row className="row-sm">
+      <Row className="row-sm rule-ref-descriptions">
         <Col md={12}>
           <p className={RuleHelperStyle.marginQuickReferenceText}>
             Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
@@ -119,46 +120,64 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter } : Props) =
         </Col>
       </Row>
       <Row className="row-sm">
-        <Col md={12}>
-          <Tabs id="functionsHelper" defaultActiveKey={1} animation={false}>
-            <Tab eventKey={1} title="Functions">
-              <Row>
-                <Col sm={12}>
-                  <p className={RuleHelperStyle.marginTab}>
-                    This is a list of all available functions in pipeline rules. Click on a row to see more information
-                    about the function parameters.
-                  </p>
-                </Col>
-              </Row>
-              <Row>
-                <Col sm={12}>
-                  <SearchForm onSearch={filterDescriptors}
-                              label="Filter rules"
-                              topMargin={0}
-                              onReset={onFilterReset} />
-                  <div className={`table-responsive ${RuleHelperStyle.marginTab} ref-rule`}>
-                    <PaginatedList totalItems={ruleDescriptors.length}
-                                   pageSize={pageSize}
-                                   onChange={onPageChange}
-                                   showPageSizeSelect={false}>
-                      <RuleHelperTable entries={pagedEntries}
-                                       expanded={expanded}
-                                       onFunctionClick={toggleFunctionDetail} />
-                    </PaginatedList>
-                  </div>
-                </Col>
-              </Row>
-            </Tab>
-            <Tab eventKey={2} title="Example">
-              <p className={RuleHelperStyle.marginTab}>
-                Do you want to see how a pipeline rule looks like? Take a look at this example:
-              </p>
-              <pre className={`${RuleHelperStyle.marginTab} ${RuleHelperStyle.exampleFunction}`}>
-                {ruleTemplate}
-              </pre>
-            </Tab>
-          </Tabs>
-        </Col>
+        {hideExampleTab ? (
+          <Col sm={12}>
+            <SearchForm onSearch={filterDescriptors}
+                        topMargin={0}
+                        onReset={onFilterReset} />
+            <div className={`table-responsive ${RuleHelperStyle.marginTab} ref-rule`}>
+              <PaginatedList totalItems={ruleDescriptors.length}
+                             pageSize={pageSize}
+                             onChange={onPageChange}
+                             showPageSizeSelect={false}>
+                <RuleHelperTable entries={pagedEntries}
+                                 expanded={expanded}
+                                 onFunctionClick={toggleFunctionDetail} />
+              </PaginatedList>
+            </div>
+          </Col>
+        ) : (
+          <Col md={12}>
+            <Tabs id="functionsHelper" defaultActiveKey={1} animation={false}>
+              <Tab eventKey={1} title="Functions">
+                <Row className="rule-ref-descriptions">
+                  <Col sm={12}>
+                    <p className={RuleHelperStyle.marginTab}>
+                      This is a list of all available functions in pipeline rules. Click on a row to see more information
+                      about the function parameters.
+                    </p>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={12}>
+                    <SearchForm onSearch={filterDescriptors}
+                                label="Filter rules"
+                                topMargin={0}
+                                onReset={onFilterReset} />
+                    <div className={`table-responsive ${RuleHelperStyle.marginTab} ref-rule`}>
+                      <PaginatedList totalItems={ruleDescriptors.length}
+                                     pageSize={pageSize}
+                                     onChange={onPageChange}
+                                     showPageSizeSelect={false}>
+                        <RuleHelperTable entries={pagedEntries}
+                                         expanded={expanded}
+                                         onFunctionClick={toggleFunctionDetail} />
+                      </PaginatedList>
+                    </div>
+                  </Col>
+                </Row>
+              </Tab>
+              <Tab eventKey={2} title="Example">
+                <p className={RuleHelperStyle.marginTab}>
+                  Do you want to see how a pipeline rule looks like? Take a look at this example:
+                </p>
+                <pre className={`${RuleHelperStyle.marginTab} ${RuleHelperStyle.exampleFunction}`}>
+                  {ruleTemplate}
+                </pre>
+              </Tab>
+            </Tabs>
+          </Col>
+        )}
       </Row>
     </Panel>
   );
@@ -167,10 +186,12 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter } : Props) =
 RuleHelper.propTypes = {
   functionDescriptors: PropTypes.array,
   paginationQueryParameter: PropTypes.object.isRequired,
+  hideExampleTab: PropTypes.bool,
 };
 
 RuleHelper.defaultProps = {
   functionDescriptors: undefined,
+  hideExampleTab: false,
 };
 
 export default connect(withPaginationQueryParameter(RuleHelper),

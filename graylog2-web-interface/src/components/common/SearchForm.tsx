@@ -202,7 +202,7 @@ const SearchForm = ({
               {label}
             </Label>
           )}
-          <InputContainer>
+          <InputContainer className="input-container">
             <StyledInput id="common-search-form-query-input"
                          autoFocus={focusAfterMount}
                          onChange={onChange}
