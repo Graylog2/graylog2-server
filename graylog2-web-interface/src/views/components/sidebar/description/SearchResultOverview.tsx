@@ -22,10 +22,13 @@ import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import IfSearch from 'views/components/search/IfSearch';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
+
+const EffectiveTimeRange = styled.div`
+  margin-bottom: 10px;
+`;
 
 const EffectiveTimeRangeTable = styled.table`
   margin-bottom: 5px;
@@ -47,8 +50,6 @@ const SearchResultOverview = ({ results }: Props) => {
   const { timerange: globalOverrideTimeRange } = useGlobalOverride() ?? {};
   const viewType = useViewType();
 
-  console.log(globalOverrideTimeRange);
-
   if (isEmpty(results)) {
     return <i>No query executed yet.</i>;
   }
@@ -61,7 +62,7 @@ const SearchResultOverview = ({ results }: Props) => {
         Query executed in:<br />
         {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />.
       </p>
-      <p>
+      <EffectiveTimeRange>
         Effective time range:<br />
         {(viewType === View.Type.Dashboard && !globalOverrideTimeRange) ? <i>Varies per widget</i>
           : (
@@ -78,7 +79,7 @@ const SearchResultOverview = ({ results }: Props) => {
               </tbody>
             </EffectiveTimeRangeTable>
           )}
-      </p>
+      </EffectiveTimeRange>
     </>
   );
 };

@@ -26,6 +26,8 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import useViewMetadata from 'views/hooks/useViewMetadata';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import Sidebar from './Sidebar';
 
@@ -40,6 +42,7 @@ jest.mock('views/hooks/useViewType');
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/hooks/useViewTitle');
 jest.mock('views/hooks/useViewMetadata');
+jest.mock('views/hooks/useGlobalOverride');
 
 describe('<Sidebar />', () => {
   const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
@@ -86,6 +89,7 @@ describe('<Sidebar />', () => {
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue(queryId);
     asMock(useViewMetadata).mockReturnValue(viewMetaData);
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
   it('should render and open when clicking on header', async () => {
@@ -183,6 +187,7 @@ describe('<Sidebar />', () => {
 
   it('should close a section when clicking on its title', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
+    asMock(useViewTitle).mockReturnValue(viewMetaData.title);
 
     renderSidebar();
 
