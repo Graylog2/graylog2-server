@@ -52,7 +52,7 @@ const ActionsCol = styled(Col)`
 
 const ReferenceRuleCol = styled(Col)`
   .ref-rule {
-    height: 88px;
+    height: 100px;
   }
 
   .input-container {
