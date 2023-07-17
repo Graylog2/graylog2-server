@@ -47,8 +47,8 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-const pivot0 = Pivot.create([fieldTypeMapping1.name], 'values', { limit: 15 });
-const pivot1 = Pivot.create([fieldTypeMapping2.name], 'values', { limit: 15 });
+const pivot0 = Pivot.createValues([fieldTypeMapping1.name]);
+const pivot1 = Pivot.createValues([fieldTypeMapping2.name]);
 
 const widgetConfig = AggregationWidgetConfig
   .builder()

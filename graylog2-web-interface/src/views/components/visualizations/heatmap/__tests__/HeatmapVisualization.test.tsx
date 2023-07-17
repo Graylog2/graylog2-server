@@ -49,8 +49,8 @@ describe('HeatmapVisualization', () => {
   afterAll(unloadViewsPlugin);
 
   it('generates correct props for plot component', () => {
-    const columnPivot = Pivot.create(['http_status'], 'values');
-    const rowPivot = Pivot.create(['hour'], 'values');
+    const columnPivot = Pivot.createValues(['http_status']);
+    const rowPivot = Pivot.createValues(['hour']);
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
@@ -90,8 +90,8 @@ describe('HeatmapVisualization', () => {
   });
 
   it('generates correct props for plot component with empty data with use smallest value as default', () => {
-    const columnPivot = Pivot.create(['http_status'], 'values');
-    const rowPivot = Pivot.create(['hour'], 'values');
+    const columnPivot = Pivot.createValues(['http_status']);
+    const rowPivot = Pivot.createValues(['hour']);
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
