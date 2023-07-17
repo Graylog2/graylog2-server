@@ -29,10 +29,8 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This rule starts a Datanode instance and provides a configured {@link Client}.
@@ -40,7 +38,7 @@ import java.util.stream.Collectors;
 public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
 
-    private static final Map<SearchVersion, GenericContainer<?>> containersByVersion = new HashMap<>();
+    private static final Map<String, GenericContainer<?>> containersByVersion = new HashMap<>();
 
     protected static final int OPENSEARCH_PORT = 9200;
     protected static final String NETWORK_ALIAS = "elasticsearch";
@@ -48,6 +46,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     private final SearchVersion version;
     protected final String heapSize;
     protected final GenericContainer<?> container;
+    private final String key;
 
     @Override
     public abstract Client client();
@@ -58,20 +57,25 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected TestableSearchServerInstance(String image, SearchVersion version, Network network, String heapSize) {
         this.version = version;
         this.heapSize = heapSize;
-        this.container = createContainer(image, version, network);
+        this.container = createContainer(image, network);
+        this.key = createKey();
+    }
+
+    private String createKey() {
+        return version.toString() + "_" + heapSize;
     }
 
     @Override
-    public GenericContainer<?> createContainer(String image, SearchVersion version, Network network) {
-        if (!containersByVersion.containsKey(version)) {
+    public GenericContainer<?> createContainer(String image, Network network) {
+        if (!containersByVersion.containsKey(key)) {
             GenericContainer<?> container = buildContainer(image, network);
             container.start();
             if (LOG.isDebugEnabled()) {
                 container.followOutput(new Slf4jLogConsumer(LOG));
             }
-            containersByVersion.put(version, container);
+            containersByVersion.put(key, container);
         }
-        return containersByVersion.get(version);
+        return containersByVersion.get(key);
     }
 
     @Override
@@ -86,9 +90,8 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public void close() {
+        containersByVersion.remove(key);
         container.close();
-        final List<SearchVersion> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
-        version.forEach(containersByVersion::remove);
     }
 
     @Override

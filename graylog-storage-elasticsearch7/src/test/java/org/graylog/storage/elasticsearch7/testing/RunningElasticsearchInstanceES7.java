@@ -95,7 +95,7 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     }
 
     @Override
-    public GenericContainer<?> createContainer(String image, SearchVersion version, Network network) {
+    public GenericContainer<?> createContainer(String image, Network network) {
         return null;
     }
 
