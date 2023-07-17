@@ -59,7 +59,7 @@ describe('<Sidebar />', () => {
     to: '2018-08-28T14:39:26.192Z',
   } as const;
   const duration = 64;
-  const timestamp = '2018-08-28T14:39:26.127Z';
+  const timestamp = '2018-08-28T14:39:27.127Z';
   const query = {
     filter: { type: 'or', filters: [] },
     id: queryId,
@@ -107,7 +107,7 @@ describe('<Sidebar />', () => {
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:26.'));
+    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in:64ms at 2018-08-28 16:39:27'));
   });
 
   it('should render summary and description of a view', async () => {
@@ -167,6 +167,57 @@ describe('<Sidebar />', () => {
 
     expect(screen.queryByText(viewMetaData.summary)).toBeNull();
     expect(screen.queryByText(viewMetaData.description)).toBeNull();
+  });
+
+  it('should render the effective search execution time range for searches', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+
+    render(
+      <Sidebar results={queryResult}>
+        <TestComponent />
+      </Sidebar>,
+    );
+
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+
+    await screen.findByText('2018-08-28 16:34:26.192');
+    await screen.findByText('2018-08-28 16:39:26.192');
+  });
+
+  it('should not render the effective search execution time range for dashboards without global override', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    render(
+      <Sidebar results={queryResult}>
+        <TestComponent />
+      </Sidebar>,
+    );
+
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+
+    await screen.findByText('Varies per widget');
+  });
+
+  it('should render the effective search execution time range for dashboards with global override', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    asMock(useGlobalOverride).mockReturnValue({
+      timerange: {
+        type: 'relative',
+        from: 300,
+      },
+    } as GlobalOverride);
+
+    render(
+      <Sidebar results={queryResult}>
+        <TestComponent />
+      </Sidebar>,
+    );
+
+    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+
+    await screen.findByText('2018-08-28 16:34:26.192');
+    await screen.findByText('2018-08-28 16:39:26.192');
   });
 
   it('should render widget create options', async () => {

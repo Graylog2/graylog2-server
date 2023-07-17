@@ -60,7 +60,7 @@ const SearchResultOverview = ({ results }: Props) => {
     <>
       <p>
         Query executed in:<br />
-        {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />.
+        {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />
       </p>
       <EffectiveTimeRange>
         Effective time range:<br />
