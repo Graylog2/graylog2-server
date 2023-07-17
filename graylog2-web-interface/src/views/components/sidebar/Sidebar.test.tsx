@@ -171,12 +171,7 @@ describe('<Sidebar />', () => {
 
   it('should render the effective search execution time range for searches', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
-
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -186,12 +181,7 @@ describe('<Sidebar />', () => {
 
   it('should not render the effective search execution time range for dashboards without global override', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
-
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -208,11 +198,7 @@ describe('<Sidebar />', () => {
       },
     } as GlobalOverride);
 
-    render(
-      <Sidebar results={queryResult}>
-        <TestComponent />
-      </Sidebar>,
-    );
+    renderSidebar();
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
