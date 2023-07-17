@@ -172,7 +172,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
     &:hover,
     &:focus,
-    :not(.collapsed) {
+    &:not(.collapsed) {
       background-color: ${theme.colors.variant.lighter.default};
       border-color: ${theme.colors.variant.default};
       
