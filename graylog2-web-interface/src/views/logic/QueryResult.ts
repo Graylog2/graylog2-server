@@ -79,10 +79,10 @@ export default class QueryResult {
       duration,
       timestamp,
       effectiveTimerange: effective_timerange,
-      searchTypes: mapValues(queryResult.search_types, (searchType) =>
+      searchTypes: mapValues(queryResult.search_types, (searchType) => (
         // each search type has a custom data structure attached to it, let the plugin convert the value
-        _searchTypePlugin(searchType.type).convert(searchType),
-      ),
+        _searchTypePlugin(searchType.type).convert(searchType)
+      )),
     };
   }
 
