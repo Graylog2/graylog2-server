@@ -18,6 +18,7 @@ import * as React from 'react';
 import { forwardRef, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from 'styled-components';
+import type { IMarker } from 'react-ace';
 
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
@@ -52,7 +53,7 @@ const isDisabledInput = (props: Props): props is DisabledInputProps => props.dis
 
 const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
   const markerClassName = 'ace_marker';
-  const createMarkers = (explanations: QueryValidationState['explanations'] = [], className: string = '') => explanations.map(({
+  const createMarkers = (explanations: QueryValidationState['explanations'] = [], className: string = ''): IMarker[] => explanations.map(({
     beginLine,
     beginColumn,
     endLine,
@@ -62,7 +63,7 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
     startCol: beginColumn,
     endRow: endLine,
     endCol: endColumn,
-    type: 'background',
+    type: 'text',
     className,
   }));
 
@@ -74,7 +75,7 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
 
 // Basic query input component which is being implemented by the `QueryInput` component.
 // This is just a very basic query input which can be implemented for example to display a read only query.
-const BasicQueryInput = forwardRef<{ editor: Editor }, Props>((props, ref) => {
+const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
   const {
     className,
     disabled,
@@ -107,6 +108,7 @@ const BasicQueryInput = forwardRef<{ editor: Editor }, Props>((props, ref) => {
 
   const commonProps = {
     $height: height,
+    $scTheme: theme,
     aceTheme: 'ace-queryinput', // NOTE: is usually just `theme` but we need that prop for styled-components
     className,
     disabled,
@@ -137,7 +139,6 @@ const BasicQueryInput = forwardRef<{ editor: Editor }, Props>((props, ref) => {
     const {
       onBlur,
       onChange,
-      onExecute,
       enableAutocompletion,
     } = props;
 
@@ -146,8 +147,7 @@ const BasicQueryInput = forwardRef<{ editor: Editor }, Props>((props, ref) => {
                        enableBasicAutocompletion={enableAutocompletion}
                        enableLiveAutocompletion={enableAutocompletion}
                        onBlur={onBlur}
-                       onChange={onChange}
-                       onExecute={onExecute} />
+                       onChange={onChange} />
     );
   }
 
@@ -165,7 +165,6 @@ BasicQueryInput.propTypes = {
   maxLines: PropTypes.number,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
-  onExecute: PropTypes.func,
   onLoad: PropTypes.func,
   placeholder: PropTypes.string,
   value: PropTypes.string,
@@ -183,7 +182,6 @@ BasicQueryInput.defaultProps = {
   maxLines: 4,
   onBlur: undefined,
   onChange: undefined,
-  onExecute: undefined,
   onLoad: undefined,
   placeholder: '',
   value: '',
