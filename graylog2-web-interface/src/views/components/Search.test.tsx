@@ -16,16 +16,15 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
-import viewsReducers from 'views/viewsReducers';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { createSearch } from 'fixtures/searches';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import OriginalSearch from './Search';
 
@@ -71,19 +70,8 @@ const Search = () => (
   </TestStoreProvider>
 );
 
-const plugin = {
-  exports: {
-    'views.reducers': viewsReducers,
-  },
-  metadata: {
-    name: 'Dummy Plugin for Tests',
-  },
-};
-
 describe('Search', () => {
-  beforeAll(() => PluginStore.register(plugin));
-
-  afterAll(() => PluginStore.unregister(plugin));
+  useViewsPlugin();
 
   beforeEach(() => {
     StreamsActions.refresh = mockAction();
