@@ -39,6 +39,7 @@ import org.testcontainers.containers.Network;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(RunningElasticsearchInstanceES7.class);
@@ -95,9 +96,7 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     }
 
     @Override
-    public GenericContainer<?> createContainer(String image, Network network) {
-        return null;
-    }
+    public void createContainer(String image, Network network) {}
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {

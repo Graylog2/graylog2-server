@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.lifecycle.Startable;
 
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * This rule starts a Datanode instance and provides a configured {@link Client}.
@@ -38,15 +38,13 @@ import java.util.Map;
 public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
 
-    private static final Map<String, GenericContainer<?>> containersByVersion = new HashMap<>();
-
     protected static final int OPENSEARCH_PORT = 9200;
     protected static final String NETWORK_ALIAS = "elasticsearch";
 
     private final SearchVersion version;
     protected final String heapSize;
-    protected final GenericContainer<?> container;
-    private final String key;
+    protected static Optional<GenericContainer<?>> container = Optional.empty();
+    private String key = "";
 
     @Override
     public abstract Client client();
@@ -57,8 +55,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected TestableSearchServerInstance(String image, SearchVersion version, Network network, String heapSize) {
         this.version = version;
         this.heapSize = heapSize;
-        this.container = createContainer(image, network);
-        this.key = createKey();
+        createContainer(image, network);
     }
 
     private String createKey() {
@@ -66,16 +63,18 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     }
 
     @Override
-    public GenericContainer<?> createContainer(String image, Network network) {
-        if (!containersByVersion.containsKey(key)) {
-            GenericContainer<?> container = buildContainer(image, network);
-            container.start();
+    public void createContainer(String image, Network network) {
+        var newKey = createKey();
+        if (!key.equals(newKey)) {
+            container.ifPresent(Startable::close);
+            GenericContainer<?> c = buildContainer(image, network);
+            c.start();
             if (LOG.isDebugEnabled()) {
-                container.followOutput(new Slf4jLogConsumer(LOG));
+                c.followOutput(new Slf4jLogConsumer(LOG));
             }
-            containersByVersion.put(key, container);
+            container = Optional.of(c);
+            key = newKey;
         }
-        return containersByVersion.get(key);
     }
 
     @Override
@@ -90,8 +89,11 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public void close() {
-        containersByVersion.remove(key);
-        container.close();
+        container.ifPresent(c -> {
+            c.close();
+            container = Optional.empty();
+        });
+
     }
 
     @Override
@@ -125,7 +127,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public String getHttpHostAddress() {
-        return this.container.getHost() + ":" + this.container.getMappedPort(9200);
+        return this.container.map(c -> c.getHost() + ":" + c.getMappedPort(9200)).orElse(null);
     }
 
 }

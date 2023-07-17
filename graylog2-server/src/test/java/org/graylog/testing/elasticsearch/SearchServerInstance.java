@@ -22,6 +22,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.io.Closeable;
+import java.util.Optional;
 
 public interface SearchServerInstance extends Closeable {
     Client client();
@@ -30,7 +31,7 @@ public interface SearchServerInstance extends Closeable {
 
     FixtureImporter fixtureImporter();
 
-    GenericContainer<?> createContainer(String image, Network network);
+    void createContainer(String image, Network network);
 
     GenericContainer<?> buildContainer(String image, Network network);
 
