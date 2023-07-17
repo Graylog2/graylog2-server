@@ -47,6 +47,15 @@ const unitValues = [
   'MONTHS',
   'YEARS',
 ];
+const defaultUnits = [
+  'NANOSECONDS',
+  'MICROSECONDS',
+  'MILLISECONDS',
+  'SECONDS',
+  'MINUTES',
+  'HOURS',
+  'DAYS',
+];
 const unitType = PropTypes.oneOf(unitValues);
 
 /**
@@ -134,7 +143,7 @@ const TimeUnitInput = createReactClass({
       defaultValue: 1,
       value: undefined,
       unit: 'SECONDS',
-      units: unitValues,
+      units: defaultUnits,
       label: '',
       help: '',
       name: null,
