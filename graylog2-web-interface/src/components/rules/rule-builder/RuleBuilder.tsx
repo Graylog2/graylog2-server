@@ -356,18 +356,21 @@ const RuleBuilder = () => {
           <label htmlFor="rule_builder">Rule Builder</label>
           <ConvertButton bsStyle="info"
                          bsSize="xsmall"
-                         title={initialRule ? 'Convert Rule Builder to Source Code' : 'Please Create the Rule first'}
-                         disabled={!initialRule}
+                         title={initialRule ? 'Convert Rule Builder to Source Code' : 'Use Source Code Editor'}
                          onClick={() => {
                            sendTelemetry('click', {
                              app_pathname: getPathnameWithoutId(pathname),
                              app_section: 'pipeline-rules',
-                             app_action_value: 'convert-rule-builder-to-source-code-button',
+                             app_action_value: initialRule ? 'convert-rule-builder-to-source-code-button' : 'source-code-editor-button',
                            });
 
-                           setRuleSourceCodeToShow(rule);
+                           if (initialRule) {
+                             setRuleSourceCodeToShow(rule);
+                           } else {
+                             history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                           }
                          }}>
-            Convert to Source Code
+            {initialRule ? 'Convert to Source Code' : 'Source Code Editor'}
           </ConvertButton>
         </Col>
         <Col xs={12}>
