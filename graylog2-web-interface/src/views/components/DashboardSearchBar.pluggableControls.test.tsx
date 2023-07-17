@@ -25,10 +25,9 @@ import MockStore from 'helpers/mocking/StoreMock';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import FormikInput from 'components/common/FormikInput';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
@@ -66,12 +65,10 @@ describe('DashboardSearchBar pluggable controls', () => {
   const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
+  useViewsPlugin();
+
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, {
-      'views.reducers': [
-        { key: 'view', reducer: viewSliceReducer },
-        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-      ],
       'views.components.searchBar': [
         () => ({
           id: 'pluggable-search-bar-control',
