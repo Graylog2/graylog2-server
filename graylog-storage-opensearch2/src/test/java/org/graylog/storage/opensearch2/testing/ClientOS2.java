@@ -42,8 +42,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexR
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
@@ -169,11 +167,12 @@ public class ClientOS2 implements Client {
 
     @Override
     public boolean templateExists(String templateName) {
-        final GetIndexTemplatesRequest request = new GetIndexTemplatesRequest("*");
-        final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
+        var request = new GetComposableIndexTemplateRequest("");
+        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
         return result.getIndexTemplates()
+                .keySet()
                 .stream()
-                .anyMatch(indexTemplate -> indexTemplate.name().equals(templateName));
+                .anyMatch(indexTemplate -> indexTemplate.equals(templateName));
     }
 
     @Override
