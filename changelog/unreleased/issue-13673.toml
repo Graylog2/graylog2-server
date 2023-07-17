@@ -1,0 +1,5 @@
+type = "c"
+message = "Default values for `bin_dir`, `data_dir` and `plugin_dir` configuration options have been removed."
+
+issues = ["13673"]
+pulls = ["15902"]
