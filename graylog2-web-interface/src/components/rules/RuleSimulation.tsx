@@ -56,7 +56,6 @@ type Props = {
 const RuleSimulation = ({ rule: currentRule }: Props) => {
   const {
     rule,
-    ruleSource,
     simulateRule,
     rawMessageToSimulate,
     setRawMessageToSimulate,
@@ -77,7 +76,6 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setStartRuleSimulation(false);
   }, [setRawMessageToSimulate, setRuleSimulationResult, setStartRuleSimulation]);
 
-  const disableSimulation = !rawMessageToSimulate || (!ruleSource && !currentRule?.rule_builder?.conditions?.length && !currentRule?.rule_builder?.actions?.length);
   const is_rule_builder = Boolean(currentRule?.rule_builder);
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,6 +105,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
       event_details: { is_rule_builder },
     });
 
+    setRawMessageToSimulate('');
     setRuleSimulationResult(null);
     setStartRuleSimulation(false);
   };
@@ -125,7 +124,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                rows={3} />
         <Button bsStyle="info"
                 bsSize="xsmall"
-                disabled={disableSimulation}
+                disabled={!rawMessageToSimulate}
                 onClick={handleRunRuleSimulation}>
           Run rule simulation
         </Button>
