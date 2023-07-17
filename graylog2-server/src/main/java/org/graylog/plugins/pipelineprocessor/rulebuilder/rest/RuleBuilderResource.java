@@ -98,7 +98,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
             throw new BadRequestException(exception.getMessage());
         }
 
-        RuleSource ruleSource = toRuleSource(ruleBuilderDto);
+        RuleSource ruleSource = toRuleSource(ruleBuilderDto, false);
         final RuleSource stored = ruleResource.createFromParser(ruleSource);
         return ruleBuilderDto.toBuilder()
                 .id(stored.id())
@@ -113,7 +113,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleBuilderDto updateFromBuilder(@ApiParam(name = "id") @PathParam("id") String id,
                                             @ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) throws NotFoundException {
-        RuleSource ruleSource = toRuleSource(ruleBuilderDto);
+        RuleSource ruleSource = toRuleSource(ruleBuilderDto, false);
         final RuleSource stored = ruleResource.update(id, ruleSource);
         return ruleBuilderDto.toBuilder()
                 .id(stored.id())
@@ -159,19 +159,19 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @POST
     @NoAuditEvent("Only used to simulate a rule builder")
     public Message simulate(@ApiParam(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
-        RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto());
+        RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto(), true);
         final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
         Message message = ruleSimulator.createMessage(simulateRuleBuilderRequest.message());
 
         return ruleSimulator.simulate(rule, message);
     }
 
-    private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto) {
+    private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto, boolean generateSimulatorFields) {
         return RuleSource.builder()
                 .title(ruleBuilderDto.title())
                 .description(ruleBuilderDto.description())
                 .ruleBuilder(ruleBuilderDto.ruleBuilder())
-                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilderDto.ruleBuilder(), true))
+                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilderDto.ruleBuilder(), generateSimulatorFields))
                 .build();
     }
 
