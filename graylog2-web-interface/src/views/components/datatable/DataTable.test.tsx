@@ -112,7 +112,7 @@ describe('DataTable', () => {
       }],
   };
 
-  const columnPivot = Pivot.create(['source'], 'values', { limit: 15 });
+  const columnPivot = Pivot.createValues(['source']);
   const rowPivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const series = new Series('count()');
 
@@ -217,7 +217,7 @@ describe('DataTable', () => {
   });
 
   it('renders column pivot header without offset when rollup is disabled', () => {
-    const protocolPivot = Pivot.create(['nf_proto_name'], 'values', { limit: 15 });
+    const protocolPivot = Pivot.createValues(['nf_proto_name']);
     const protocolData = {
       chart:
         [{

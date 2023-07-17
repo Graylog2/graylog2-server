@@ -59,6 +59,7 @@ export type DateGrouping = Required<BaseGrouping, 'id'> & {
 export type ValuesGrouping = Required<BaseGrouping, 'id'> & {
   type: typeof ValuesType,
   limit: number,
+  skipEmptyValues?: boolean,
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
