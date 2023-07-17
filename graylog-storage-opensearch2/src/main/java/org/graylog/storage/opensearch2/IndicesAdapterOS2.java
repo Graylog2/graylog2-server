@@ -42,15 +42,18 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.Ackno
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.ComponentTemplatesExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.ComposableIndexTemplateExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComponentTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComponentTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
@@ -211,12 +214,50 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         return Map.of();
     }
 
-    @Override
-    public boolean ensureIndexTemplate(String templateName, Template template) {
+    private boolean componentTemplateExists(String templateName) {
+        var request = new ComponentTemplatesExistRequest(templateName);
+        return client.execute((c, requestOptions) -> c.cluster().existsComponentTemplate(request, requestOptions));
+    }
+
+    private boolean createComponentTemplate(String templateName, Template template) {
         var serializedMapping = serialize(template.mappings());
         var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
         var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), osTemplate, null, template.order(), null, null);
+        var componentTemplate = new ComponentTemplate(osTemplate, 1L, Map.of());
+        var request = new PutComponentTemplateRequest()
+                .name(templateName)
+                .componentTemplate(componentTemplate);
+        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.cluster().putComponentTemplate(request, requestOptions),
+                "Unable to create component template " + templateName);
+
+        return result.isAcknowledged();
+    }
+
+    private boolean ensureComponentTemplate(String templateNameBase, Template template) {
+        var templateName = templateNameBase + "-base";
+
+        var baseResult = createComponentTemplate(templateName, template);
+        if (!baseResult) {
+            return false;
+        }
+
+        var overridesComponentName = templateNameBase + "-overrides";
+        if (componentTemplateExists(overridesComponentName)) {
+            return true;
+        }
+
+        return createComponentTemplate(overridesComponentName, new Template(List.of(), new Template.Mappings(Map.of()), 1L, new Template.Settings(Map.of())));
+    }
+
+    @Override
+    public boolean ensureIndexTemplate(String templateName, Template template) {
+        var componentTemplateBase = templateName + "-base";
+        var componentTemplateOverrides = templateName + "-overrides";
+        var componentTemplateExists = ensureComponentTemplate(templateName, template);
+        if (!componentTemplateExists) {
+            return false;
+        }
+        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), null, List.of(componentTemplateBase, componentTemplateOverrides), template.order(), null, null);
         var request = new PutComposableIndexTemplateRequest()
                 .name(templateName)
                 .indexTemplate(indexTemplate);
