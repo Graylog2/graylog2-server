@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
@@ -28,12 +27,10 @@ import {
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import ViewsBindings from 'views/bindings';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
@@ -87,15 +84,9 @@ describe('<EventInfoBar />', () => {
     </TestStoreProvider>
   );
 
-  beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, {
-      ...ViewsBindings,
-      'views.reducers': [
-        { key: 'view', reducer: viewSliceReducer },
-        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-      ],
-    }));
+  useViewsPlugin();
 
+  beforeAll(() => {
     asMock(selectHighlightingRules)
       .mockReturnValue([
         HighlightingRule.create('count(field1)', 500, 'greater', StaticColor.create('#fff')),
