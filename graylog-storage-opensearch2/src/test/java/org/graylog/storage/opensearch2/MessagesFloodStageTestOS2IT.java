@@ -16,33 +16,17 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.rest.RestStatus;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.messages.MessagesIT;
+import org.graylog2.indexer.messages.MessagesFloodStageTestIT;
 import org.junit.Rule;
 
-import java.util.Map;
-
-public class MessagesOS2IT extends MessagesIT {
+public class MessagesFloodStageTestOS2IT extends MessagesFloodStageTestIT {
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
     protected SearchServerInstance searchServer() {
         return this.openSearchInstance;
-    }
-
-    @Override
-    protected boolean indexMessage(String index, Map<String, Object> source, String id) {
-        final IndexRequest indexRequest = new IndexRequest(index)
-                .source(source)
-                .id(id);
-
-        final IndexResponse result = this.openSearchInstance.openSearchClient().execute((c, requestOptions) -> c.index(indexRequest, requestOptions));
-
-        return result.status().equals(RestStatus.CREATED);
     }
 }

@@ -69,6 +69,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        client().resetClusterBlock(); // the index may be blocked with delay from a previous test, if yes then reset it.
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
@@ -168,28 +169,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         verify(failureSubmissionService).submitIndexingErrors(argThat(arg -> arg.size() == 1));
     }
 
-    @Test
-    public void retryIndexingMessagesDuringFloodStage() throws Exception {
-        triggerFloodStage(INDEX_NAME);
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
-        final AtomicBoolean succeeded = new AtomicBoolean(false);
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
-
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
-
-        countDownLatch.await();
-
-        resetFloodStage(INDEX_NAME);
-
-        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
-        assertThat(failedItems).isEmpty();
-
-        client().refreshNode();
-
-        assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
-        assertThat(succeeded.get()).isTrue();
-    }
-
     private Messages.IndexingListener createIndexingListener(CountDownLatch retryLatch, AtomicBoolean successionFlag) {
         return new Messages.IndexingListener() {
             @Override
@@ -259,22 +238,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 new ThreadFactoryBuilder().setNameFormat("messages-it-%d").build());
 
         return executor.submit(task);
-    }
-
-    private void triggerFloodStage(String index) {
-        client().putSetting("cluster.routing.allocation.disk.watermark.low", "0%");
-        client().putSetting("cluster.routing.allocation.disk.watermark.high", "0%");
-        client().putSetting("cluster.routing.allocation.disk.watermark.flood_stage", "0%");
-
-        client().waitForIndexBlock(index);
-    }
-
-    private void resetFloodStage(String index) {
-        client().putSetting("cluster.routing.allocation.disk.watermark.flood_stage", "95%");
-        client().putSetting("cluster.routing.allocation.disk.watermark.high", "90%");
-        client().putSetting("cluster.routing.allocation.disk.watermark.low", "85%");
-
-        client().resetIndexBlock(index);
     }
 
     private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {
