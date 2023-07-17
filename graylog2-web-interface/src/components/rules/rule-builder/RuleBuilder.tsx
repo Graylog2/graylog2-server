@@ -64,14 +64,13 @@ const SubTitle = styled.label`
   color: #aaa;
 `;
 
-const ActionsHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
 const SimulatorSwitchContaner = styled.div`
   display: flex;
   align-items: center;
+  position: absolute;
+  top: 0;
+  right: 16px;
+  z-index: 1;
 `;
 
 const RuleBuilder = () => {
@@ -352,67 +351,69 @@ const RuleBuilder = () => {
         <ReferenceRuleCol xs={4}>
           <RuleHelper />
         </ReferenceRuleCol>
-        <Col xs={showSimulator ? 4 : 6}>
-          <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
-          {rule.rule_builder.conditions.map((condition, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <RuleBuilderBlock key={index}
-                              blockDict={conditionsDict || []}
-                              block={condition}
-                              order={index}
-                              type="condition"
-                              addBlock={addBlock}
-                              updateBlock={updateBlock}
-                              deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
-          ))}
-          <RuleBuilderBlock blockDict={conditionsDict || []}
-                            order={newConditionBlockIndex}
-                            type="condition"
-                            addBlock={addBlock}
-                            updateBlock={updateBlock}
-                            deleteBlock={() => setBlockToDelete({
-                              orderIndex: newConditionBlockIndex,
-                              type: 'condition',
-                            })} />
+        <Col xs={12}>
+          <SimulatorSwitchContaner>
+            <Toggle>
+              <input type="checkbox"
+                     onChange={() => setShowSimulator(!showSimulator)}
+                     checked={showSimulator} />
+              <span className="slider" />
+            </Toggle>
+            Show Simulator
+          </SimulatorSwitchContaner>
+          <Row>
+            <Col xs={showSimulator ? 4 : 6}>
+              <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
+              {rule.rule_builder.conditions.map((condition, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <RuleBuilderBlock key={index}
+                                  blockDict={conditionsDict || []}
+                                  block={condition}
+                                  order={index}
+                                  type="condition"
+                                  addBlock={addBlock}
+                                  updateBlock={updateBlock}
+                                  deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+              ))}
+              <RuleBuilderBlock blockDict={conditionsDict || []}
+                                order={newConditionBlockIndex}
+                                type="condition"
+                                addBlock={addBlock}
+                                updateBlock={updateBlock}
+                                deleteBlock={() => setBlockToDelete({
+                                  orderIndex: newConditionBlockIndex,
+                                  type: 'condition',
+                                })} />
+            </Col>
+            <Col xs={showSimulator ? 4 : 6}>
+              <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
+              {rule.rule_builder.actions.map((action, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <RuleBuilderBlock key={index}
+                                  blockDict={actionsDict || []}
+                                  block={action}
+                                  order={index}
+                                  type="action"
+                                  previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, index).previousOutputPresent}
+                                  addBlock={addBlock}
+                                  updateBlock={updateBlock}
+                                  deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+              ))}
+              <RuleBuilderBlock blockDict={actionsDict || []}
+                                order={newActionBlockIndex}
+                                type="action"
+                                previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, newActionBlockIndex).previousOutputPresent}
+                                addBlock={addBlock}
+                                updateBlock={updateBlock}
+                                deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
+            </Col>
+            {showSimulator && (
+              <Col xs={4}>
+                <RuleSimulation rule={rule} />
+              </Col>
+            )}
+          </Row>
         </Col>
-        <Col xs={showSimulator ? 4 : 6}>
-          <ActionsHeader>
-            <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-            <SimulatorSwitchContaner>
-              <Toggle>
-                <input type="checkbox"
-                       onChange={() => setShowSimulator(!showSimulator)}
-                       checked={showSimulator} />
-                <span className="slider" />
-              </Toggle>
-              Simulator
-            </SimulatorSwitchContaner>
-          </ActionsHeader>
-          {rule.rule_builder.actions.map((action, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <RuleBuilderBlock key={index}
-                              blockDict={actionsDict || []}
-                              block={action}
-                              order={index}
-                              type="action"
-                              previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, index).previousOutputPresent}
-                              addBlock={addBlock}
-                              updateBlock={updateBlock}
-                              deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
-          ))}
-          <RuleBuilderBlock blockDict={actionsDict || []}
-                            order={newActionBlockIndex}
-                            type="action"
-                            previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, newActionBlockIndex).previousOutputPresent}
-                            addBlock={addBlock}
-                            updateBlock={updateBlock}
-                            deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
-        </Col>
-        {showSimulator && (
-          <Col xs={4}>
-            <RuleSimulation rule={rule} />
-          </Col>
-        )}
         <Col xs={12}>
           <Errors objectWithErrors={rule.rule_builder} />
         </Col>

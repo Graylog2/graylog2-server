@@ -18,7 +18,7 @@ import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { Button, ControlLabel, FormGroup, Input } from 'components/bootstrap';
+import { Button, FormGroup, Input } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import type { RuleType } from 'stores/rules/RulesStore';
 import useLocation from 'routing/useLocation';
@@ -30,6 +30,7 @@ import type { RuleBuilderRule } from './rule-builder/types';
 
 const RuleSimulationFormGroup = styled(FormGroup)`
   margin-bottom: 40px;
+  margin-top: 25px;
 `;
 
 const ResetButton = styled(Button)`
@@ -112,7 +113,6 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
 
   return (
     <RuleSimulationFormGroup>
-      <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
       <div>
         <Input id="message"
                type="textarea"
