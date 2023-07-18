@@ -41,6 +41,7 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import { pushIntoRevisions } from 'views/logic/slices/undoRedoSlice';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -121,12 +122,28 @@ export const loadView = (newView: View, recreateSearch: boolean = false) => asyn
   return dispatch(setView(newView));
 };
 
-export const updateView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const view = selectView(getState());
+type UpdateViewOptions = { hasToPushRevision: boolean };
+const defaultUpdateViewOptions = { hasToPushRevision: true };
+
+export const updateView = (
+  newView: View,
+  recreateSearch: boolean = false,
+  options: UpdateViewOptions = defaultUpdateViewOptions,
+) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const state = getState();
+  const view = selectView(state);
+
+  if (options.hasToPushRevision) {
+    await dispatch(pushIntoRevisions({
+      type: 'view',
+      state: {
+        ...state.view,
+      },
+    }));
+  }
 
   if (recreateSearch || !isViewEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
-
     await dispatch(setView(updatedViewWithSearch, true));
 
     return dispatch(execute());

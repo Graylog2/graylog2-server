@@ -38,4 +38,9 @@ export type DataNodesCA = {
   type: string,
 }
 
+export type RenewalPolicy = {
+  mode: 'AUTOMATIC' | 'MANUAL',
+  certificate_lifetime: string,
+}
+
 export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']
