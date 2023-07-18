@@ -66,7 +66,7 @@ public class RuleBuilderService {
 
     public String generateRuleSource(String title, RuleBuilder ruleBuilder, boolean generateSimulatorFields) {
         final String rule = String.format(Locale.ROOT, RULE_TEMPLATE, title,
-                conditionParser.generate(ruleBuilder.conditions()),
+                conditionParser.generate(ruleBuilder.conditions(), ruleBuilder.operator(), 1),
                 actionParser.generate(ruleBuilder.actions(), generateSimulatorFields));
         log.debug(rule);
         return rule;
@@ -74,7 +74,7 @@ public class RuleBuilderService {
 
     public String generateSimulatorRuleSourceEvaluatingConditions(RuleBuilder ruleBuilder) {
         final String rule = String.format(Locale.ROOT, RULE_TEMPLATE, "condition_evaluation",
-                conditionParser.generate(new ArrayList<>()),
+                conditionParser.generate(new ArrayList<>(), RuleBuilderStep.Operator.AND, 1),
                 conditionParser.generateConditionVariables(ruleBuilder.conditions()));
         log.debug(rule);
         return rule;

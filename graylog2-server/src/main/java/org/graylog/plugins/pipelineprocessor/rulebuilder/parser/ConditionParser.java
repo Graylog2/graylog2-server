@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
 import freemarker.template.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 public class ConditionParser {
 
     public static final String NL = System.lineSeparator();
+    private static final String INDENT = "  ";
     protected final Map<String, RuleFragment> conditions;
 
     private final Configuration freemarkerConfiguration;
@@ -45,15 +47,39 @@ public class ConditionParser {
         freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, conditions);
     }
 
-    public String generate(List<RuleBuilderStep> ruleConditions) {
-        return "  true" + NL +
-                ruleConditions.stream()
-                        .map(step -> generateCondition(step))
-                        .collect(Collectors.joining(NL));
+    public String generate(List<RuleBuilderStep> ruleConditions, RuleBuilderStep.Operator operator, int level) {
+        if (ruleConditions.isEmpty()) {
+            if (level == 1) {
+                return "  true";
+            }
+            return "";
+        }
+        if (operator == null) {
+            operator = RuleBuilderStep.Operator.AND;
+        }
+        StringBuilder syntax = new StringBuilder();
+        if (level != 1) {
+            syntax.append(StringUtils.repeat(INDENT, level)).append("(").append(NL);
+        }
+        syntax.append(generateCondition(ruleConditions.get(0), level));
+        for (int i = 1; i < ruleConditions.size(); i++) {
+            syntax.append(NL).append(StringUtils.repeat(INDENT, level + 1)).append(operator).append(NL);
+            final RuleBuilderStep step = ruleConditions.get(i);
+            if (step.conditions() == null) {
+                syntax.append(generateCondition(step, level));
+            } else {
+                syntax.append(generate(step.conditions(), step.operator(), level + 1));
+            }
+        }
+        if (level != 1) {
+            syntax.append(NL).append(StringUtils.repeat(INDENT, level)).append(")");
+        }
+        return syntax.toString();
+
     }
 
-    String generateCondition(RuleBuilderStep step) {
-        String syntax = "  && ";
+    String generateCondition(RuleBuilderStep step, int level) {
+        String syntax = StringUtils.repeat(INDENT, level + 1);
         if (step.negate()) {
             syntax += "! ";
         }
@@ -80,7 +106,7 @@ public class ConditionParser {
     }
 
     private String generateConditionVariable(int index, RuleBuilderStep step) {
-        String condition = generateCondition(step).substring(5);
+        String condition = generateCondition(step, 0);
         String fieldname = (step.outputvariable() == null) ? Integer.toString(index) : step.outputvariable();
         return "set_field(\"gl2_simulator_condition_" + fieldname + "\", " + condition + ");";
     }
