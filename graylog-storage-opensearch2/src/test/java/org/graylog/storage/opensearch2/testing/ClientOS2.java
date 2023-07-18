@@ -24,8 +24,6 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
@@ -223,7 +221,6 @@ public class ClientOS2 implements Client {
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
         refreshNode();
-        resetClusterBlock();
     }
 
     private String[] existingTemplates() {
@@ -255,31 +252,7 @@ public class ClientOS2 implements Client {
     public void putSetting(String setting, String value) {
         final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
 
-        if(value == null) {
-            request.transientSettings(Settings.builder().putNull(setting));
-        } else {
-            request.transientSettings(Settings.builder().put(setting, value));
-        }
-
-        client.execute((c, requestOptions) -> c.cluster().putSettings(request, requestOptions),
-                "Unable to update OS cluster setting: " + setting + "=" + value);
-    }
-
-    public String getSetting(String setting) {
-        final ClusterGetSettingsRequest req = new ClusterGetSettingsRequest();
-        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(req, requestOptions),
-                "Unable to read OS cluster setting: " + setting);
-        return response.getSetting(setting);
-    }
-
-    public void putPersistentSetting(String setting, String value) {
-        final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
-
-        if(value == null) {
-            request.persistentSettings(Settings.builder().putNull(setting));
-        } else {
-            request.persistentSettings(Settings.builder().put(setting, value));
-        }
+        request.persistentSettings(Settings.builder().put(setting, value));
 
         client.execute((c, requestOptions) -> c.cluster().putSettings(request, requestOptions),
                 "Unable to update OS cluster setting: " + setting + "=" + value);
@@ -299,17 +272,6 @@ public class ClientOS2 implements Client {
 
         client.execute((c, requestOptions) -> c.indices().putSettings(request, requestOptions),
                 "Unable to reset index block for " + index);
-    }
-
-    @Override
-    public void resetClusterBlock() {
-        final String block = getSetting("cluster.blocks.create_index");
-        if(Boolean.parseBoolean(block)) {
-            // high memory usage in previous tests may cause a cluster block. If that happens, we should reset this block before the next test.
-            LOG.info("Indexer cluster is blocked after heavy memory/disk usage, resetting the block");
-            // reset create_index block for OpenSearch 2.x see https://github.com/opensearch-project/OpenSearch/pull/5852
-            putPersistentSetting("cluster.blocks.create_index", null);
-        }
     }
 
     @Override
