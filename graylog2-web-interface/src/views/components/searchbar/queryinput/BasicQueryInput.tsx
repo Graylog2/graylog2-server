@@ -25,6 +25,8 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import StyledAceEditor from './StyledAceEditor';
 import type { Editor } from './ace-types';
 
+const ACE_THEME = 'ace-queryinput';
+
 export type BaseProps = {
   className?: string
   error?: QueryValidationState,
@@ -109,8 +111,8 @@ const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
   const commonProps = {
     $height: height,
     $scTheme: theme,
-    aceTheme: 'ace-queryinput', // NOTE: is usually just `theme` but we need that prop for styled-components
-    className,
+    theme: ACE_THEME,
+    className: `${className} ${ACE_THEME}`,
     disabled,
     editorProps,
     fontSize: theme.fonts.size.small,
