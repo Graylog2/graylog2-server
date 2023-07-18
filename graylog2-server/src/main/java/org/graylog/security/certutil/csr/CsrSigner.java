@@ -36,11 +36,20 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrSigner {
+    private static boolean isValidName(final int name) {
+        return switch (name) {
+            case GeneralName.dNSName, GeneralName.iPAddress, GeneralName.rfc822Name -> true;
+            default -> false;
+        };
+    }
+
     public static X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
         // TODO: cert serial number?
         BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
@@ -57,35 +66,17 @@ public class CsrSigner {
                 Date.from(validFrom), Date.from(validUntil),
                 csr.getSubject(), csr.getSubjectPublicKeyInfo());
 
-
-        // see if we have the dns/rfc822/ip address extensions specified in the csr
-
         ArrayList<GeneralName> altNames = new ArrayList<>();
-        var certAttributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
-        if (certAttributes != null && certAttributes.length > 0) {
-            for (Attribute attribute : certAttributes) {
+        Optional.ofNullable(csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest)).ifPresent(certAttributes ->
+            Arrays.stream(certAttributes).forEach(attribute -> {
                 Extensions extensions = Extensions.getInstance(attribute.getAttrValues().getObjectAt(0));
                 GeneralNames gns = GeneralNames.fromExtensions(extensions, Extension.subjectAlternativeName);
-                if (gns == null) {
-                    continue;
-                }
-                GeneralName[] names = gns.getNames();
-                for (int i = 0; i < names.length; i++) {
-                    switch (names[i].getTagNo()) {
-                        case GeneralName.dNSName:
-                        case GeneralName.iPAddress:
-                        case GeneralName.rfc822Name:
-                            altNames.add(names[i]);
-                            break;
-                    }
-                }
-            }
-            if (!altNames.isEmpty()) {
-                builder.addExtension(Extension.subjectAlternativeName, false,
-                        new GeneralNames(altNames.toArray(new GeneralName[altNames.size()])));
-            }
+                Optional.ofNullable(gns).ifPresent(g -> Arrays.stream(g.getNames()).filter(name -> isValidName(name.getTagNo())).forEach(altNames::add));
+            }));
+        if (!altNames.isEmpty()) {
+            builder.addExtension(Extension.subjectAlternativeName, false,
+                    new GeneralNames(altNames.toArray(new GeneralName[altNames.size()])));
         }
-
 
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(issuerKey);
         X509CertificateHolder certHolder = builder.build(signer);
