@@ -71,7 +71,7 @@ const Header = styled.div<{ $isEmpty: boolean }>(({ theme, $isEmpty }) => css`
   top: 0;
   z-index: 1;
   
-  ::before {
+  &::before {
     content: ' ';
     top: 50%;
     width: 100%;

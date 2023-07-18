@@ -55,7 +55,7 @@ const StyledNav = styled(Nav)(({ theme }) => css`
       }
 
       &:not(:last-child) > a {
-        ::after {
+        &::after {
           transition: background-color 150ms ease-in-out;
           background-color: ${theme.colors.global.contentBackground};
           border-color: ${theme.colors.variant.lighter.default};
@@ -72,7 +72,7 @@ const StyledNav = styled(Nav)(({ theme }) => css`
           z-index: 2;
         }
 
-        :hover::after {
+        &:hover::after {
           background-color: ${theme.colors.variant.lightest.default};
         }
       }
@@ -108,7 +108,7 @@ const StyledNav = styled(Nav)(({ theme }) => css`
         }
 
         &:not(:last-child) > a {
-          ::after {
+          &::after {
             bottom: 0;
             left: 50%;
             top: auto;

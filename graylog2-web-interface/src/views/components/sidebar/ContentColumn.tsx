@@ -42,7 +42,7 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $si
   z-index: ${$sidebarIsPinned ? 1030 : 6};
 
   ${$sidebarIsPinned && css`
-    ::before {
+    &::before {
       content: '';
       position: absolute;
       top: 0;

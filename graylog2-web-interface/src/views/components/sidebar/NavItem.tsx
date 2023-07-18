@@ -59,8 +59,8 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSel
 
   /* stylelint-disable selector-max-empty-lines, indentation */
   ${($isSelected && !$sidebarIsPinned) && css`
-    ::before,
-    ::after {
+    &::before,
+    &::after {
       content: '';
       position: absolute;
       right: -5px;
@@ -69,12 +69,12 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSel
       background-color: ${colors.global.contentBackground};
     }
 
-    ::before {
+    &::before {
       transform: skewY(-45deg);
       top: calc(50% - 12px);
     }
     
-    ::after {
+    &::after {
       transform: skewY(45deg);
       bottom: calc(50% - 12px);
     }
@@ -102,12 +102,12 @@ const IconWrap = styled.span<IconWrapProps>(({ $showTitleOnHover, $isSelected, $
       display: ${($showTitleOnHover && !$isSelected) ? 'flex' : 'none'};
     }
 
-    ::after {
+    &::after {
       display: ${($showTitleOnHover) ? 'block' : 'none'};
     }
   }
 
-  ::after {
+  &::after {
     display: ${$isSelected ? 'block' : 'none'};
     box-shadow: ${($isSelected && !$sidebarIsPinned) ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}` : 'none'};
     background-color: ${$isSelected ? colors.global.contentBackground : colors.variant.lightest.info};

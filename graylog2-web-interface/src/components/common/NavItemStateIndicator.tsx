@@ -19,7 +19,7 @@ import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 const indicatorClassName = 'nav-item-state-indicator';
-const indicatorPseudoElement = ':before';
+const indicatorPseudoElement = '::before';
 
 const itemStateIndicatorSelector = `.${indicatorClassName}${indicatorPseudoElement}`;
 

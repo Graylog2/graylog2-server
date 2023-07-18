@@ -40,7 +40,7 @@ const Container = styled.div<{ $isOpen: boolean, $sidebarIsPinned: boolean }>(({
   position: relative;
   z-index: 1031;
 
-  ::before {
+  &::before {
     content: '';
     position: absolute;
     top: 0;
