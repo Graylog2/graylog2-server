@@ -16,22 +16,6 @@
  */
 package org.graylog.security.certutil;
 
-import java.security.cert.X509Certificate;
-
-public class CertRenewalCalculator {
-    public boolean needsRenewal(X509Certificate cert) {
-        // policy lesen
-        // Threshold aus der config, default 10%, abrunden auf ganze Tage
-        // wenn <= 1, dann auf jeden Fall renewal
-
-        // lesen aller Zertifikate
-        // prüfen, ob jedes Zertifkat zum Zeitpunkt now() + x tage immer noch gültig ist
-        // wenn nicht, dann renewal
-
-        // ganze auch für CA certs machen
-
-
-
-        cert.checkValidity();
-    }
+public interface CertRenewalService {
+    void checkAllDataNodes();
 }

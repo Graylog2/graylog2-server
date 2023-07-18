@@ -19,6 +19,8 @@ package org.graylog2.shared.security;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
+import org.graylog.security.certutil.CertRenewalService;
+import org.graylog.security.certutil.CertRenewalServiceImpl;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.plugin.PluginModule;
@@ -47,6 +49,7 @@ public class SecurityBindings extends PluginModule {
                 .implement(TrustManager.class, DefaultX509TrustManager.class)
                 .build(TrustManagerProvider.class));
         bind(CustomCAX509TrustManager.class).asEagerSingleton();
+        bind(CertRenewalService.class).to(CertRenewalServiceImpl.class);
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                 .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);

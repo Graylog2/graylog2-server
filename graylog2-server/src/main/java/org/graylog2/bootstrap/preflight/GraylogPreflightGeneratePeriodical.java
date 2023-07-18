@@ -217,7 +217,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
     @Override
     public boolean leaderOnly() {
-        return false;
+        return true;
     }
 
     @Override

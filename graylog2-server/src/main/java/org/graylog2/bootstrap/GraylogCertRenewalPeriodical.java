@@ -141,7 +141,7 @@ public class GraylogCertRenewalPeriodical extends Periodical {
 
     @Override
     public boolean leaderOnly() {
-        return false;
+        return true;
     }
 
     @Override
