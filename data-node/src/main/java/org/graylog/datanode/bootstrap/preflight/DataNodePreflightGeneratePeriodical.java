@@ -85,12 +85,12 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        LOG.debug("checking if this DataNode is supposed to take configuration steps.");
+        LOG.info("checking if this DataNode is supposed to take configuration steps.");
         var cfg = nodePreflightConfigService.getPreflightConfigFor(nodeId.getNodeId());
         if (cfg == null) {
             // write default config if none exists for this node
             nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
-        } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
+        } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state()) || NodePreflightConfig.State.RENEWAL.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
                 var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);

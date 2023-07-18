@@ -116,4 +116,5 @@ public class NodePreflightConfigServiceImpl extends PaginatedDbService<NodePrefl
     public void deleteAll() {
         dbCollection.drop();
     }
+
 }

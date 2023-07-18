@@ -14,55 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog2.bootstrap;
 
-import com.google.common.base.Splitter;
-import okhttp3.Call;
-import okhttp3.Credentials;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
 import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
-@Singleton
-public class GraylogPreflightGeneratePeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogPreflightGeneratePeriodical.class);
+public class GraylogCertRenewalPeriodical extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogCertRenewalPeriodical.class);
 
     private final NodePreflightConfigService nodePreflightConfigService;
     private final NodeService nodeService;
@@ -72,10 +56,9 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
     private final String passwordSecret;
-    private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
     @Inject
-    public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
+    public GraylogCertRenewalPeriodical(final NodePreflightConfigService nodePreflightConfigService,
                                               final CsrMongoStorage csrStorage,
                                               final CertChainMongoStorage certMongoStorage,
                                               final CaService caService,
@@ -91,25 +74,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         this.nodeService = nodeService;
     }
 
-    // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private Optional<OkHttpClient> buildTempHttpClient() {
-        try {
-            OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-            try {
-                var sslContext = SSLContext.getInstance("TLS");
-                var tm = new CustomCAX509TrustManager(caService);
-                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
-                clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
-            } catch (NoSuchAlgorithmException ex) {
-                LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
-            }
-            return Optional.of(clientBuilder.build());
-        } catch (Exception ex) {
-            LOG.error("Could not create temporary okhttpclient " + ex.getMessage(), ex);
-        }
-        return Optional.empty();
-    }
-
     @Override
     public void doRun() {
         LOG.info("checking if there are configuration steps to take care of");
@@ -120,10 +84,6 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             if(optKey.isEmpty()) {
                 LOG.warn("No keystore available.");
                 return;
-            }
-
-            if(okHttpClient.isEmpty()) {
-                okHttpClient = buildTempHttpClient();
             }
 
             KeyStore caKeystore = optKey.get();
@@ -157,48 +117,12 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
             nodePreflightConfigService.streamAll()
                     .filter(c -> NodePreflightConfig.State.STORED.equals(c.state()))
-                    .forEach(c -> {
-                        try {
-                            if(checkConnectivity(c.nodeId())) {
-                                nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
-                            }
-                        } catch (Exception e) {
-                            LOG.warn("Exception trying to connect to node "  + c.nodeId() + ": " + e.getMessage() + ", retrying", e);
-                        }
-                    });
+                    .forEach(c -> nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build()));
 
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreStorageException e) {
             throw new RuntimeException(e);
         }
     }
-
-    private boolean checkConnectivity(final String nodeId) throws NodeNotFoundException, IOException {
-        final var node = nodeService.byNodeId(nodeId);
-        Request request = new Request.Builder().url(node.getTransportAddress()).build();
-        if(okHttpClient.isPresent()) {
-            OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
-            try {
-                URI uri = new URI(node.getTransportAddress());
-                if (!isNullOrEmpty(uri.getUserInfo())) {
-                    var list = Splitter.on(":").limit(2).splitToList(uri.getUserInfo());
-                    builder.authenticator((route, response) -> {
-                        String credential = Credentials.basic(list.get(0), list.get(1));
-                        return response.request().newBuilder().header("Authorization", credential).build();
-                    });
-                }
-            } catch (URISyntaxException ex) {
-                return false;
-            }
-            Call call = builder.build().newCall(request);
-            try(Response response = call.execute()) {
-                return response.isSuccessful();
-            }
-        } else {
-            return false;
-        }
-     }
 
     @Override
     protected Logger getLogger() {
@@ -232,11 +156,11 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 2;
+        return 5;
     }
 
     @Override
     public int getPeriodSeconds() {
-        return 2;
+        return 5;
     }
 }

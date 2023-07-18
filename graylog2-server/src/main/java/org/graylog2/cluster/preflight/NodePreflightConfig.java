@@ -38,7 +38,8 @@ public abstract class  NodePreflightConfig {
         SIGNED, // Graylog CA signed the CSR
         STORED, // Certificate is combined with private key and stored in Mongo
         CONNECTED, // DataNode started with the certificate
-        ERROR // sh*t happened
+        ERROR, // sh*t happened
+        RENEWAL // cert renewal requested
     }
 
     public static final String FIELD_ID = "id";

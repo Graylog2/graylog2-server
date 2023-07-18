@@ -41,6 +41,9 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.cluster.preflight.NodePreflightConfigBusEvents;
+import org.graylog2.cluster.preflight.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.NodePreflightConfigServiceImpl;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -151,6 +154,15 @@ public class ServerBindings extends Graylog2Module {
         // Just to create the binders so they are present in the injector. Prevents a server startup error when no
         // outputs are bound that implement MessageOutput.Factory2.
         outputsMapBinder2();
+        bindCAFeatures();
+    }
+
+    private void bindCAFeatures() {
+
+        // this wires the NodePreflightConfigServiceImpl delegate into the NodePreflightConfigBusEvents from above
+        bind(NodePreflightConfigService.class).annotatedWith(Names.named(NodePreflightConfigBusEvents.DELEGATE_NAME)).to(NodePreflightConfigServiceImpl.class);
+        // this is the generic dependency used by callers
+        bind(NodePreflightConfigService.class).to(NodePreflightConfigBusEvents.class);
     }
 
     private void bindProviders() {
