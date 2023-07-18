@@ -52,7 +52,8 @@ export type Popup = {
 
 export type Completer = {
   autoSelect: boolean,
-  popup: Popup,
+  popup?: Popup,
+  activated: boolean,
 };
 
 export type Editor = {
