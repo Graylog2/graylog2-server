@@ -38,7 +38,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
 
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
@@ -66,16 +65,22 @@ public class CsrSigner {
                 Date.from(validFrom), Date.from(validUntil),
                 csr.getSubject(), csr.getSubjectPublicKeyInfo());
 
-        ArrayList<GeneralName> altNames = new ArrayList<>();
-        Optional.ofNullable(csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest)).ifPresent(certAttributes ->
-            Arrays.stream(certAttributes).forEach(attribute -> {
+        var certAttributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
+        if (certAttributes != null && certAttributes.length > 0) {
+            ArrayList<GeneralName> altNames = new ArrayList<>();
+
+            for (Attribute attribute : certAttributes) {
                 Extensions extensions = Extensions.getInstance(attribute.getAttrValues().getObjectAt(0));
                 GeneralNames gns = GeneralNames.fromExtensions(extensions, Extension.subjectAlternativeName);
-                Optional.ofNullable(gns).ifPresent(g -> Arrays.stream(g.getNames()).filter(name -> isValidName(name.getTagNo())).forEach(altNames::add));
-            }));
-        if (!altNames.isEmpty()) {
-            builder.addExtension(Extension.subjectAlternativeName, false,
-                    new GeneralNames(altNames.toArray(new GeneralName[altNames.size()])));
+                if (gns == null) {
+                    continue;
+                }
+                Arrays.stream(gns.getNames()).filter(n -> isValidName(n.getTagNo())).forEach(altNames::add);
+            }
+            if (!altNames.isEmpty()) {
+                builder.addExtension(Extension.subjectAlternativeName, false,
+                        new GeneralNames(altNames.toArray(new GeneralName[altNames.size()])));
+            }
         }
 
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(issuerKey);
