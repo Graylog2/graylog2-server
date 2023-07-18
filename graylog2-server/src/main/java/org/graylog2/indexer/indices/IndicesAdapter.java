@@ -33,6 +33,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public interface IndicesAdapter {
+    String templateBaseSuffix = "-base";
+    String templateOverridesSuffic = "-overrides";
+
     void move(String source, String target, Consumer<IndexMoveResult> resultCallback);
 
     void delete(String indexName);
@@ -51,14 +54,46 @@ public interface IndicesAdapter {
 
     /**
      * Updates the metadata field (_meta) of an index mapping
-     * @param indexName existing index name
-     * @param metaData  the new metadata
+     *
+     * @param indexName     existing index name
+     * @param metaData      the new metadata
      * @param mergeExisting merge or overwrite existing metadata
      */
     void updateIndexMetaData(@Nonnull String indexName, @Nonnull Map<String, Object> metaData, boolean mergeExisting);
+
     Map<String, Object> getIndexMetaData(@Nonnull String indexName);
 
-    boolean ensureIndexTemplate(String templateName, Template template);
+    boolean componentTemplateExists(String templateName);
+
+    boolean createComponentTemplate(String templateName, Template template);
+
+    default boolean ensureComponentTemplate(String templateNameBase, Template template) {
+        var templateName = templateNameBase + templateBaseSuffix;
+
+        var baseResult = createComponentTemplate(templateName, template);
+        if (!baseResult) {
+            return false;
+        }
+
+        var overridesComponentName = templateNameBase + templateOverridesSuffic;
+        if (componentTemplateExists(overridesComponentName)) {
+            return true;
+        }
+
+        return createComponentTemplate(overridesComponentName, new Template(List.of(), new Template.Mappings(Map.of()), 1L, new Template.Settings(Map.of())));
+    }
+
+    boolean createComposableIndexTemplate(String templateName, Template template, List<String> composedOf);
+
+    default boolean ensureIndexTemplate(String templateName, Template template) {
+        var componentTemplateBase = templateName + templateBaseSuffix;
+        var componentTemplateOverrides = templateName + templateOverridesSuffic;
+        var componentTemplateExists = ensureComponentTemplate(templateName, template);
+        if (!componentTemplateExists) {
+            return false;
+        }
+        return createComposableIndexTemplate(templateName, template, List.of(componentTemplateBase, componentTemplateOverrides));
+    }
 
     boolean indexTemplateExists(String templateName);
 

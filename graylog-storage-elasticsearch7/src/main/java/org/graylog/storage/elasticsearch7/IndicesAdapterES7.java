@@ -43,15 +43,18 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.master
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Requests;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.ComponentTemplatesExistRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.ComposableIndexTemplateExistRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteComposableIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutComponentTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutComposableIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.ComponentTemplate;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
@@ -215,11 +218,29 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public boolean ensureIndexTemplate(String templateName, Template template) {
+    public boolean componentTemplateExists(String templateName) {
+        var request = new ComponentTemplatesExistRequest(templateName);
+        return client.execute((c, requestOptions) -> c.cluster().existsComponentTemplate(request, requestOptions));
+    }
+
+    @Override
+    public boolean createComponentTemplate(String templateName, Template template) {
         var serializedMapping = serialize(template.mappings());
         var settings = Settings.builder().loadFromSource(serializeJson(template.settings()), XContentType.JSON).build();
         var esTemplate = new org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), esTemplate, null, template.order(), null, null);
+        var componentTemplate = new ComponentTemplate(esTemplate, 1L, Map.of());
+        var request = new PutComponentTemplateRequest()
+                .name(templateName)
+                .componentTemplate(componentTemplate);
+        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.cluster().putComponentTemplate(request, requestOptions),
+                "Unable to create component template " + templateName);
+
+        return result.isAcknowledged();
+    }
+
+    @Override
+    public boolean createComposableIndexTemplate(String templateName, Template template, List<String> composedOf) {
+        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), null, composedOf, template.order(), null, null);
         var request = new PutComposableIndexTemplateRequest()
                 .name(templateName)
                 .indexTemplate(indexTemplate);

@@ -214,12 +214,14 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         return Map.of();
     }
 
-    private boolean componentTemplateExists(String templateName) {
+    @Override
+    public boolean componentTemplateExists(String templateName) {
         var request = new ComponentTemplatesExistRequest(templateName);
         return client.execute((c, requestOptions) -> c.cluster().existsComponentTemplate(request, requestOptions));
     }
 
-    private boolean createComponentTemplate(String templateName, Template template) {
+    @Override
+    public boolean createComponentTemplate(String templateName, Template template) {
         var serializedMapping = serialize(template.mappings());
         var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
         var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
@@ -233,31 +235,9 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         return result.isAcknowledged();
     }
 
-    private boolean ensureComponentTemplate(String templateNameBase, Template template) {
-        var templateName = templateNameBase + "-base";
-
-        var baseResult = createComponentTemplate(templateName, template);
-        if (!baseResult) {
-            return false;
-        }
-
-        var overridesComponentName = templateNameBase + "-overrides";
-        if (componentTemplateExists(overridesComponentName)) {
-            return true;
-        }
-
-        return createComponentTemplate(overridesComponentName, new Template(List.of(), new Template.Mappings(Map.of()), 1L, new Template.Settings(Map.of())));
-    }
-
     @Override
-    public boolean ensureIndexTemplate(String templateName, Template template) {
-        var componentTemplateBase = templateName + "-base";
-        var componentTemplateOverrides = templateName + "-overrides";
-        var componentTemplateExists = ensureComponentTemplate(templateName, template);
-        if (!componentTemplateExists) {
-            return false;
-        }
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), null, List.of(componentTemplateBase, componentTemplateOverrides), template.order(), null, null);
+    public boolean createComposableIndexTemplate(String templateName, Template template, List<String> composedOf) {
+        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), null, composedOf, template.order(), null, null);
         var request = new PutComposableIndexTemplateRequest()
                 .name(templateName)
                 .indexTemplate(indexTemplate);
