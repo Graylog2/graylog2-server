@@ -33,10 +33,10 @@ import Icon from './Icon';
 import './webpack-resolver';
 import './ace/theme-graylog';
 
-const SourceCodeContainer = styled.div(({ resizable, theme }) => css`
+const SourceCodeContainer = styled.div(({ $resizable, theme }) => css`
   .react-resizable-handle {
     z-index: 100; /* Ensure resize handle is over text editor */
-    display: ${resizable ? 'block' : 'none'};
+    display: ${$resizable ? 'block' : 'none'};
   }
 
   ${theme.components.aceEditor}
@@ -294,7 +294,7 @@ class SourceCodeEditor extends React.Component {
                    minConstraints={[200, 200]}
                    onResize={this.handleResize}>
           <SourceCodeContainer style={{ height: height, width: validCssWidth }}
-                               resizable={resizable}>
+                               $resizable={resizable}>
             <AceEditor ref={(c) => {
               this.reactAce = c;
               if (innerRef) { innerRef.current = c; }

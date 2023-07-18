@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -24,6 +24,10 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import CustomHighlighting from './CustomHighlighting';
+
+jest.mock('views/components/highlighting/Highlight.tsx', () => (
+  { color, children }: { color: string | undefined, children: React.ReactNode }) => <>{children} - {color}</>,
+);
 
 const renderDecorators = (decorators, field, value) => decorators.map((Decorator) => (
   <Decorator key={Decorator.name}
@@ -50,19 +54,15 @@ describe('CustomHighlighting', () => {
   );
 
   it('renders value when HighlightingRulesContext is not provided', async () => {
-    const { findByText } = render(<SimpleCustomHighlighting />);
+    render(<SimpleCustomHighlighting />);
 
-    const elem = await findByText('42');
-
-    expect(elem).not.toHaveStyleRule('background-color');
+    await screen.findByText('42');
   });
 
   it('renders value as is when no rules exist', async () => {
-    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[]} />);
+    render(<CustomHighlightingWithContext highlightingRules={[]} />);
 
-    const elem = await findByText('42');
-
-    expect(elem).not.toHaveStyleRule('background-color');
+    await screen.findByText('42');
   });
 
   it('renders value as is when no rule for this field exists', async () => {
@@ -71,11 +71,11 @@ describe('CustomHighlighting', () => {
       .value(String(value))
       .color(StaticColor.create('#bc98fd'))
       .build();
-    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    const elem = await findByText('42');
+    await screen.findByText('42');
 
-    expect(elem).not.toHaveStyleRule('background-color');
+    expect(screen.queryByText(/#bc98fd/)).not.toBeInTheDocument();
   });
 
   it('renders highlighted value if rule for value exists', async () => {
@@ -84,11 +84,10 @@ describe('CustomHighlighting', () => {
       .value(String(value))
       .color(StaticColor.create('#bc98fd'))
       .build();
-    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    const elem = await findByText('42');
-
-    expect(elem).toHaveStyle('background-color: rgb(188, 152, 253)');
+    await screen.findByText(/42/);
+    await screen.findByText(/#bc98fd/);
   });
 
   it('does not render highlight if rule value only matches substring', async () => {
@@ -97,11 +96,11 @@ describe('CustomHighlighting', () => {
       .value('2')
       .color(StaticColor.create('#bc98fd'))
       .build();
-    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    const elem = await findByText('42');
+    await screen.findByText('42');
 
-    expect(elem).not.toHaveStyleRule('background-color');
+    expect(screen.queryByText(/#bc98fd/)).not.toBeInTheDocument();
   });
 
   it('does not render highlight if rule value does not match', async () => {
@@ -110,10 +109,10 @@ describe('CustomHighlighting', () => {
       .value('23')
       .color(StaticColor.create('#bc98fd'))
       .build();
-    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    const elem = await findByText('42');
+    await screen.findByText('42');
 
-    expect(elem).not.toHaveStyleRule('background-color');
+    expect(screen.queryByText(/#bc98fd/)).not.toBeInTheDocument();
   });
 });
