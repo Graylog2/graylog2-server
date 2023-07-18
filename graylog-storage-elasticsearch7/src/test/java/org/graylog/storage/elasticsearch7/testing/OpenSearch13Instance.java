@@ -143,6 +143,6 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
 
     @Override
     public String getLogs() {
-        return this.container.getLogs();
+        return this.container.map(c -> c.getLogs()).orElse("");
     }
 }

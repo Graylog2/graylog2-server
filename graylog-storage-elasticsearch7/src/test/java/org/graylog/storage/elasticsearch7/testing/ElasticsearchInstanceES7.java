@@ -135,7 +135,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
 
     @Override
     public String getLogs() {
-        return this.container.getLogs();
+        return this.container.map(c -> c.getLogs()).orElse("");
     }
 
     public ElasticsearchClient elasticsearchClient() {
