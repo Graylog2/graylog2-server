@@ -57,7 +57,6 @@ const NotificationsList = () => {
           Notifications are triggered by Graylog and indicate a situation you should act upon. Many notification
           types will also provide a link to the Graylog documentation if you need more information or assistance.
         </p>
-        <Alert bsStyle="danger">test</Alert>
 
         {getContent(total, notifications)}
       </Col>

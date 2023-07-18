@@ -27,9 +27,7 @@ interface Props {
   onDismiss?: () => void,
 }
 
-const StyledAlert = styled(BootstrapAlert).attrs<{ bsStyle: ColorVariants }>(({ bsStyle }) => ({
-  bsStyle: bsStyle || 'default',
-}))(({ bsStyle, theme }) => {
+const StyledAlert = styled(BootstrapAlert)<{ bsStyle: ColorVariants }>(({ bsStyle = 'info', theme }) => {
   const borderColor = theme.colors.variant.lighter[bsStyle];
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
 

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { useStore } from 'stores/connect';
@@ -41,19 +41,19 @@ import CustomHighlighting from '../highlighting/CustomHighlighting';
 import TypeSpecificValue from '../TypeSpecificValue';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({
-  expanded,
-  highlighted,
+export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: boolean }>(({
+  $expanded,
+  $highlighted,
   theme,
 }) => `
   && {
     border-top: 0;
 
-    ${expanded ? `
+    ${$expanded ? css`
       border-left: 7px solid ${theme.colors.variant.light.info};
     ` : ''}
 
-    ${highlighted ? `
+    ${$highlighted ? css`
       border-left: 7px solid ${theme.colors.variant.light.success};
     ` : ''}
   }
@@ -155,7 +155,7 @@ const MessageTableEntry = ({
 
   return (
     <AdditionalContext.Provider value={additionalContextValue}>
-      <TableBody expanded={expanded} highlighted={message.id === highlightMessageId}>
+      <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
         <FieldsRow onClick={_toggleDetail}>
           {selectedFields.toArray().map((selectedFieldName, idx) => {
             const type = fieldType(selectedFieldName, message, fields);

@@ -49,8 +49,8 @@ const StyledTh = styled.th`
   }
 `;
 
-const DefaultTh = styled(StyledTh)<{ isNumeric: boolean }>(({ isNumeric }) => css`
-  ${isNumeric ? 'text-align: right;' : ''}
+const DefaultTh = styled(StyledTh)<{ $isNumeric: boolean }>(({ $isNumeric }) => css`
+  ${$isNumeric ? 'text-align: right;' : ''}
 `);
 
 const CenteredTh = styled(StyledTh)`
@@ -58,16 +58,16 @@ const CenteredTh = styled(StyledTh)`
 `;
 
 const PinIcon = styled.button(({ theme }) => css`
-    border: 0;
-    background: transparent;
-    padding: 5px;
-    cursor: pointer;
-    position: relative;
-    color: ${theme.colors.gray[70]};
+  border: 0;
+  background: transparent;
+  padding: 5px;
+  cursor: pointer;
+  position: relative;
+  color: ${theme.colors.gray[70]};
 
-    &.active {
-      color: ${theme.colors.gray[20]};
-    }
+  &.active {
+    color: ${theme.colors.gray[20]};
+  }
 `);
 
 type HeaderFilterProps = {
@@ -102,7 +102,7 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
   }, [togglePin, prefix, field]);
 
   return (
-    <DefaultTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
+    <DefaultTh ref={thRef} $isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
       {showPinIcon && <PinIcon data-testid={`pin-${prefix}${field}`} type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (

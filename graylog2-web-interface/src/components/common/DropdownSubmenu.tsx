@@ -43,16 +43,16 @@ const Toggle = styled.a.attrs({ href: '#' })(({ theme }) => css`
   }
 `);
 
-const StyledSubmenu = styled(Dropdown)<{ left: boolean }>(({ left, theme }) => css`
+const StyledSubmenu = styled(Dropdown)<{ $left: boolean }>(({ $left, theme }) => css`
   position: relative;
 
   > .dropdown-menu {
     top: 0;
-    left: ${left ? 'auto' : '100%'};
-    right: ${left ? '98%' : 'auto'};
+    left: ${$left ? 'auto' : '100%'};
+    right: ${$left ? '98%' : 'auto'};
     margin-top: -6px;
-    margin-left: ${left ? '10px' : '-1px'};
-    border-radius: ${left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
+    margin-left: ${$left ? '10px' : '-1px'};
+    border-radius: ${$left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
   }
 
   &:hover > .dropdown-menu {
@@ -65,7 +65,7 @@ const StyledSubmenu = styled(Dropdown)<{ left: boolean }>(({ left, theme }) => c
 `);
 
 const DropdownSubmenu = ({ children, left, title }: Props) => (
-  <StyledSubmenu left={left} as="li">
+  <StyledSubmenu $left={left} as="li">
     {title && <Toggle>{title}</Toggle>}
 
     <Dropdown.Menu>
