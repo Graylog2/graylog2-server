@@ -30,10 +30,10 @@ const getActionOutputVariableName = (order : number) : string => {
   return `output_actions_${order}`;
 };
 
-const paramValueExists = (paramValue: string | number | boolean) : boolean => (
+const paramValueExists = (paramValue: string | number | boolean | undefined) : boolean => (
   typeof paramValue !== 'undefined' && paramValue !== null);
 
-const paramValueIsVariable = (paramValue: string | number | boolean) : boolean => (
+const paramValueIsVariable = (paramValue: string | number | boolean | undefined) : boolean => (
   typeof paramValue === 'string' && paramValue.startsWith('$'));
 
 export { getActionOutputVariableName, getDictForFunction, getDictForParam, paramValueExists, paramValueIsVariable };

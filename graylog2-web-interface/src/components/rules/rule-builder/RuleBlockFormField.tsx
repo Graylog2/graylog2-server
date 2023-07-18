@@ -17,8 +17,8 @@
 import React, { useEffect, useState } from 'react';
 import { useField } from 'formik';
 
-import { FormikFormGroup, IconButton } from 'components/common';
-import { ControlLabel } from 'components/bootstrap';
+import { FormikFormGroup } from 'components/common';
+import { Button, ControlLabel } from 'components/bootstrap';
 
 import { RuleBuilderTypes } from './types';
 import type { BlockFieldDict } from './types';
@@ -33,17 +33,12 @@ type Props = {
 }
 
 const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent, resetField }: Props) => {
-  const [showPrimaryInput, setShowPrimaryInput] = useState<boolean>(false);
-  const [field] = useField(param.name);
+  const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
+  const [field, fieldMeta] = useField(param.name);
 
   useEffect(() => {
-    setShowPrimaryInput(false);
+    setPrimaryInputToggle(undefined);
   }, [functionName]);
-
-  const onPrimaryInputCancel = () => {
-    setShowPrimaryInput(false);
-    resetField(param.name);
-  };
 
   const shouldHandlePrimaryParam = () => {
     if (!param.primary) return false;
@@ -53,8 +48,6 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
     return true;
   };
 
-  const isValueSet = paramValueExists(field.value);
-
   const validateTextField = (value: string) : string | undefined => {
     if (paramValueExists(value) && paramValueIsVariable(value)) {
       return 'Fields starting with \'$\' are not allowed.';
@@ -63,24 +56,47 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
     return null;
   };
 
+  const onPrimaryInputToggle = (type: 'custom' | 'select') => {
+    setPrimaryInputToggle(type);
+    resetField(param.name);
+  };
+
   const buttonAfter = () => {
     if (!shouldHandlePrimaryParam()) return null;
 
-    if (showPrimaryInput || isValueSet) {
-      return (
-        <IconButton name="xmark" onClick={onPrimaryInputCancel} title="Cancel" />
-      );
-    }
-
-    return (
-      <IconButton name="edit" onClick={() => setShowPrimaryInput(true)} title="Edit" />
-    );
+    return (<Button onClick={() => onPrimaryInputToggle('select')}>Choose output to use</Button>);
   };
 
-  const placeholder = shouldHandlePrimaryParam() && !showPrimaryInput ? 'Set output of the previous step' : '';
+  const outputVariableOptions : Array<{ label: string, value: any}> = [
+    { label: 'Output from step 1', value: '$output1' },
+    { label: 'Output from step 2', value: '$output2' },
+    { label: 'Output from step 3', value: '$output3' },
+  ];
 
-  // Object param type can take any type as value
-  //
+  const showOutputVariableSelect = () => {
+    if (!shouldHandlePrimaryParam()) return false;
+
+    if (primaryInputToggle === 'select') return true;
+
+    if (typeof primaryInputToggle !== 'undefined') return false;
+
+    return !fieldMeta.initialValue || paramValueIsVariable(fieldMeta.initialValue);
+  };
+
+  if (showOutputVariableSelect()) {
+    return (
+      <FormikFormGroup type="select"
+                       key={`${functionName}_${param.name}`}
+                       name={param.name}
+                       label={param.name}
+                       required={!param.optional}
+                       buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
+                       help={param.description}
+                       {...field}>
+        {outputVariableOptions.map(({ label, value }) => <option key={`option-${value}`} value={value}>{label}</option>)}
+      </FormikFormGroup>
+    );
+  }
 
   switch (param.type) {
     case RuleBuilderTypes.String:
@@ -92,8 +108,6 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                          label={param.name}
                          required={!param.optional}
                          validate={validateTextField}
-                         disabled={shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet}
-                         placeholder={placeholder}
                          buttonAfter={buttonAfter()}
                          help={param.description}
                          {...field} />
@@ -105,8 +119,6 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                          name={param.name}
                          label={param.name}
                          required={!param.optional}
-                         disabled={shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet}
-                         placeholder={placeholder}
                          buttonAfter={buttonAfter()}
                          help={param.description}
                          {...field} />
@@ -115,21 +127,16 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
     case RuleBuilderTypes.Boolean:
       return (
         <>
-          {(shouldHandlePrimaryParam() && !showPrimaryInput && !isValueSet) ? (placeholder) : (
-            <>
-              <ControlLabel className="col-sm-3">{param.name}</ControlLabel>
-              <FormikFormGroup type="checkbox"
-                               key={`${functionName}_${param.name}`}
-                               name={param.name}
-                               label={field.value ? 'true' : 'false'}
-                               help={param.description}
-                               checked={field.value}
-                               {...field} />
-            </>
-          )}
-          {buttonAfter()}
+          <ControlLabel className="col-sm-3">{param.name}</ControlLabel>
+          <FormikFormGroup type="checkbox"
+                           key={`${functionName}_${param.name}`}
+                           name={param.name}
+                           label={field.value ? 'true' : 'false'}
+                           help={param.description}
+                           checked={field.value}
+                           buttonAfter={buttonAfter()}
+                           {...field} />
         </>
-
       );
     default:
       return null;

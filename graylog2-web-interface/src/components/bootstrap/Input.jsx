@@ -161,13 +161,21 @@ class Input extends React.Component {
   };
 
   _renderCheckboxGroup = (controlProps) => {
-    const { id, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
+    const { id, buttonAfter, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
-          <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+          {buttonAfter ? (
+            <InputGroup>
+              <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+              {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
+            </InputGroup>
+          ) : (
+            <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+          )}
           <InputDescription error={error} help={help} className={inputDescClassName} />
+
         </InputWrapper>
       </FormGroup>
     );
