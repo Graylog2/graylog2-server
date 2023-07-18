@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
@@ -73,7 +72,7 @@ const AlertNote = styled.em`
   flex: 1;
 `;
 
-const Footer = styled.footer(({ theme }: { theme: DefaultTheme }) => css`
+const Footer = styled.footer(({ theme }) => css`
   display: flex;
   align-items: center;
   padding: 7px 0 9px;

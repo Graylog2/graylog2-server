@@ -17,14 +17,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import find from 'lodash/find';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/bootstrap';
 
 import Icon from './Icon';
 
-const SubnavigationCol = styled(Col)(({ theme }: { theme: DefaultTheme }) => css`
+const SubnavigationCol = styled(Col)(({ theme }) => css`
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
@@ -32,7 +31,7 @@ const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
+const StyledNav = styled(Nav)(({ theme }) => css`
   &.nav {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};

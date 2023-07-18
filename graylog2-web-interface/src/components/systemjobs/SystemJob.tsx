@@ -17,7 +17,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
@@ -67,7 +66,7 @@ const JobWrap = styled.div`
   margin-bottom: 5px;
 `;
 
-const AcknowledgeButton = styled(Button)(({ theme }: { theme: DefaultTheme }) => css`
+const AcknowledgeButton = styled(Button)(({ theme }) => css`
   && {
     color: ${theme.colors.variant.light.default};
     

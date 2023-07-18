@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Dropdown } from 'components/bootstrap';
@@ -44,7 +43,7 @@ const Toggle = styled.a.attrs({ href: '#' })(({ theme }) => css`
   }
 `);
 
-const StyledSubmenu = styled(Dropdown)(({ left, theme }: { left: boolean, theme: DefaultTheme }) => css`
+const StyledSubmenu = styled(Dropdown)<{ left: boolean }>(({ left, theme }) => css`
   position: relative;
 
   > .dropdown-menu {

@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import type { TextProps } from '@mantine/core';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import HelpMenu from 'preflight/navigation/HelpMenu';
@@ -26,7 +25,6 @@ import NavigationBrand from './NavigationBrand';
 import ThemeModeToggle from './ThemeModeToggle';
 
 type StyledMantineTextProps = TextProps & {
-  theme: DefaultTheme,
   children: React.ReactNode,
 };
 const GraylogHeader = styled(Header)(({ theme }) => css`
@@ -39,7 +37,7 @@ const NavigationContainer = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-const StyledText = styled(Text)<React.PropsWithChildren<StyledMantineTextProps>>(({ theme }: StyledMantineTextProps) => css`
+const StyledText = styled(Text)<StyledMantineTextProps>(({ theme }) => css`
   color: ${theme.mode === 'teint' ? theme.colors.brand.concrete : 'white'};
 `);
 const Navigation = () => (

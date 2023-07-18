@@ -16,7 +16,6 @@
  */
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
@@ -136,7 +135,7 @@ const IndexSetsComponent = () => {
     margin-bottom: 0;
 `;
 
-  const StatsInfoText = styled.span(({ theme }: { theme: DefaultTheme }) => css`
+  const StatsInfoText = styled.span(({ theme }) => css`
     color: ${theme.colors.textAlt};
     font-style: italic;
 `);
