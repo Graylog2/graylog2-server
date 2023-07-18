@@ -23,20 +23,35 @@ import java.util.Map;
 
 public class RuleBuilderSimulatorResponse extends Message {
 
+    private final static String VAR_CONDITION_PREFIX = "gl2_simulator_condition_";
+    private final static String VAR_ACTION_PREFIX = "gl2_simulator_output_";
+
     private Map<String, Object> simulatorActionVariables;
+    private Map<String, Object> simulatorConditionVariables;
 
     public RuleBuilderSimulatorResponse(Message simulatorResult) {
-        super(simulatorResult.getMessage(), simulatorResult.getSource(), simulatorResult.getTimestamp());
+        super(simulatorResult.getFields());
+        this.simulatorConditionVariables = new HashMap<>();
         this.simulatorActionVariables = new HashMap<>();
         simulatorResult.getFields().entrySet().stream()
-                .filter(e -> e.getKey().startsWith("gl2_simulator_output"))
+                .filter(e -> e.getKey().startsWith(VAR_CONDITION_PREFIX))
                 .forEach(e -> {
-                    this.simulatorActionVariables.put(e.getKey().substring(21), e.getValue());
+                    this.simulatorConditionVariables.put(e.getKey().substring(VAR_CONDITION_PREFIX.length()), e.getValue());
+                    this.removeField(e.getKey());
+                });
+        simulatorResult.getFields().entrySet().stream()
+                .filter(e -> e.getKey().startsWith(VAR_ACTION_PREFIX))
+                .forEach(e -> {
+                    this.simulatorActionVariables.put(e.getKey().substring(VAR_ACTION_PREFIX.length()), e.getValue());
                     this.removeField(e.getKey());
                 });
     }
 
     public Map<String, Object> getSimulatorActionVariables() {
         return simulatorActionVariables;
+    }
+
+    public Map<String, Object> getSimulatorConditionVariables() {
+        return simulatorConditionVariables;
     }
 }

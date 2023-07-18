@@ -27,6 +27,7 @@ import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -64,10 +65,17 @@ public class RuleBuilderService {
     }
 
     public String generateRuleSource(String title, RuleBuilder ruleBuilder, boolean generateSimulatorFields) {
-        //TODO: possible injection here, sanitize input!
         final String rule = String.format(Locale.ROOT, RULE_TEMPLATE, title,
                 conditionParser.generate(ruleBuilder.conditions()),
                 actionParser.generate(ruleBuilder.actions(), generateSimulatorFields));
+        log.debug(rule);
+        return rule;
+    }
+
+    public String generateSimulatorRuleSourceEvaluatingConditions(RuleBuilder ruleBuilder) {
+        final String rule = String.format(Locale.ROOT, RULE_TEMPLATE, "condition_evaluation",
+                conditionParser.generate(new ArrayList<>()),
+                conditionParser.generateConditionVariables(ruleBuilder.conditions()));
         log.debug(rule);
         return rule;
     }

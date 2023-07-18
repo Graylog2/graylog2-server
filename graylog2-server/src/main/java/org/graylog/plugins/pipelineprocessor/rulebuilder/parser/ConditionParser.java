@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -71,4 +72,16 @@ public class ConditionParser {
         return syntax;
     }
 
+    public String generateConditionVariables(List<RuleBuilderStep> conditions) {
+        AtomicInteger index = new AtomicInteger();
+        return conditions.stream()
+                .map(condition -> generateConditionVariable(index.incrementAndGet(), condition))
+                .collect(Collectors.joining(NL));
+    }
+
+    private String generateConditionVariable(int index, RuleBuilderStep step) {
+        String condition = generateCondition(step).substring(5);
+        String fieldname = (step.outputvariable() == null) ? Integer.toString(index) : step.outputvariable();
+        return "set_field(\"gl2_simulator_condition_" + fieldname + "\", " + condition + ");";
+    }
 }

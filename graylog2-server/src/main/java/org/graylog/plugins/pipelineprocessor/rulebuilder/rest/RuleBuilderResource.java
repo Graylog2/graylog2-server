@@ -159,11 +159,18 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @POST
     @NoAuditEvent("Only used to simulate a rule builder")
     public RuleBuilderSimulatorResponse simulate(@ApiParam(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
-        RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto(), true);
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
         Message message = ruleSimulator.createMessage(simulateRuleBuilderRequest.message());
 
-        final Message result = ruleSimulator.simulate(rule, message);
+        RuleSource ruleSourceConditions = RuleSource.builder()
+                .source(ruleBuilderParser.generateSimulatorRuleSourceEvaluatingConditions(simulateRuleBuilderRequest.ruleBuilderDto().ruleBuilder()))
+                .build();
+        final Rule rule1 = pipelineRuleService.parseRuleOrThrow(ruleSourceConditions.id(), ruleSourceConditions.source(), true);
+        final Message conditionResult = ruleSimulator.simulate(rule1, message);
+
+        RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto(), true);
+        final Rule rule2 = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
+
+        final Message result = ruleSimulator.simulate(rule2, conditionResult);
 
         return new RuleBuilderSimulatorResponse(result);
     }
