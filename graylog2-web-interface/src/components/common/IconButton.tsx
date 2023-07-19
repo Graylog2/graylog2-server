@@ -33,11 +33,11 @@ const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => cs
   color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
   font-size: ${theme.fonts.size.large};
 
-  :hover {
+  &:hover {
     background-color: ${theme.colors.gray[80]};
   }
 
-  :active {
+  &:active {
     background-color: ${theme.colors.gray[70]};
   }
 `);

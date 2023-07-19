@@ -70,7 +70,7 @@ const AcknowledgeButton = styled(Button)(({ theme }) => css`
   && {
     color: ${theme.colors.variant.light.default};
     
-    :hover {
+    &:hover {
       color: ${theme.colors.variant.default};
     }
   }

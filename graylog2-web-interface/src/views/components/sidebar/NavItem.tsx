@@ -48,12 +48,12 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSel
   color: ${colors.variant.darkest.default};
   background: ${$isSelected ? colors.gray[90] : colors.global.contentBackground};
 
-  :hover {
+  &:hover {
     color: ${$isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
     background: ${$isSelected ? colors.gray[80] : colors.variant.lightest.default};
   }
 
-  :active {
+  &:active {
     background: ${colors.variant.lighter.default};
   }
 

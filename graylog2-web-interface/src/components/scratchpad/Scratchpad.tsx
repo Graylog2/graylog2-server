@@ -52,7 +52,7 @@ const Textarea = styled.textarea<{ $copied: boolean }>(({ $copied, theme }) => c
   font-family: ${theme.fonts.family.monospace};
   font-size: ${theme.fonts.size.body};
 
-  :focus {
+  &:focus {
     border-color: ${theme.colors.variant.light.info};
     outline: none;
   }
