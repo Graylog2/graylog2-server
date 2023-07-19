@@ -110,14 +110,6 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         super(elasticsearch);
     }
 
-    protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
-        return ImmutableMap.of(
-                "template", indexWildcard,
-                "mappings", mapping
-        );
-
-    }
-
     @BeforeEach
     public void setUp() {
         eventBus = new EventBus("indices-test");

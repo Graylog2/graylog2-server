@@ -32,6 +32,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.WriteRequest;
@@ -42,9 +43,12 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexR
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplateMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
@@ -66,6 +70,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
 public class ClientOS2 implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientOS2.class);
@@ -165,8 +171,7 @@ public class ClientOS2 implements Client {
         );
     }
 
-    @Override
-    public boolean templateExists(String templateName) {
+    private boolean composableTemplateExists(String templateName) {
         var request = new GetComposableIndexTemplateRequest("");
         var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
         return result.getIndexTemplates()
@@ -175,8 +180,20 @@ public class ClientOS2 implements Client {
                 .anyMatch(indexTemplate -> indexTemplate.equals(templateName));
     }
 
+    private boolean legacyTemplateExists(String templateName) {
+        var request = new GetIndexTemplatesRequest("*");
+        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
+        return result.getIndexTemplates()
+                .stream()
+                .anyMatch(indexTemplate -> indexTemplate.name().equals(templateName));
+    }
+
     @Override
-    public void putTemplate(String templateName, Template template) {
+    public boolean templateExists(String templateName) {
+        return featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? composableTemplateExists(templateName) : legacyTemplateExists(templateName);
+    }
+
+    private void putComposableTemplate(String templateName, Template template) {
         var serializedMapping = serialize(template.mappings());
         var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
         var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
@@ -188,6 +205,27 @@ public class ClientOS2 implements Client {
                 "Unable to put template " + templateName);
     }
 
+    private void putLegacyTemplate(String templateName, Template template) {
+        var source = Map.of(
+                "index_patterns", template.indexPatterns(),
+                "mappings", template.mappings(),
+                "settings", template.settings(),
+                "order", template.order()
+        );
+        var request = new PutIndexTemplateRequest(templateName).source(source);
+        client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
+                "Unable to put template " + templateName);
+    }
+
+    @Override
+    public void putTemplate(String templateName, Template template) {
+        if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            putComposableTemplate(templateName, template);
+        } else {
+            putLegacyTemplate(templateName, template);
+        }
+    }
+
     private CompressedXContent serialize(Object obj) {
         try {
             return new CompressedXContent(objectMapper.writeValueAsString(obj));
@@ -196,11 +234,26 @@ public class ClientOS2 implements Client {
         }
     }
 
-    @Override
-    public void deleteTemplates(String... templates) {
+    private void deleteComposableTemplates(String... templates) {
         for (String template : templates) {
             var deleteIndexTemplateRequest = new DeleteComposableIndexTemplateRequest(template);
             client.execute((c, requestOptions) -> c.indices().deleteIndexTemplate(deleteIndexTemplateRequest, requestOptions));
+        }
+    }
+
+    private void deleteLegacyTemplates(String... templates) {
+        for (String template : templates) {
+            var deleteIndexTemplateRequest = new DeleteIndexTemplateRequest(template);
+            client.execute((c, requestOptions) -> c.indices().deleteTemplate(deleteIndexTemplateRequest, requestOptions));
+        }
+    }
+
+    @Override
+    public void deleteTemplates(String... templates) {
+        if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            deleteComposableTemplates(templates);
+        } else {
+            deleteLegacyTemplates(templates);
         }
     }
 
@@ -245,12 +298,24 @@ public class ClientOS2 implements Client {
         refreshNode();
     }
 
-    private String[] existingTemplates() {
+    private String[] existingComposableTemplates() {
         var getIndexTemplatesRequest = new GetComposableIndexTemplateRequest("");
         var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
         return result.getIndexTemplates()
                 .keySet()
                 .toArray(String[]::new);
+    }
+
+    private String[] existingLegacyTemplates() {
+        var getIndexTemplatesRequest = new GetIndexTemplatesRequest();
+        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
+        return result.getIndexTemplates().stream()
+                .map(IndexTemplateMetadata::name)
+                .toArray(String[]::new);
+    }
+
+    private String[] existingTemplates() {
+        return featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? existingComposableTemplates() : existingLegacyTemplates();
     }
 
     private String[] existingIndices() {
