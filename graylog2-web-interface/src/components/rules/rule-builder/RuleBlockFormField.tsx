@@ -15,24 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useField } from 'formik';
 
 import { FormikFormGroup } from 'components/common';
 import { Button, ControlLabel } from 'components/bootstrap';
 
-import { RuleBuilderTypes } from './types';
-import type { BlockFieldDict } from './types';
+import { RuleBuilderTypes, outputVariablesPropType } from './types';
+import type { OutputVariables, BlockFieldDict } from './types';
 import { paramValueExists, paramValueIsVariable } from './helpers';
 
 type Props = {
   param: BlockFieldDict,
   functionName: string,
+  blockId: string,
   order: number,
   previousOutputPresent: boolean,
+  outputVariableList?: OutputVariables,
   resetField: (fieldName: string) => void;
 }
 
-const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent, resetField }: Props) => {
+const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutputPresent, outputVariableList, resetField }: Props) => {
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
 
@@ -61,29 +64,38 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
     resetField(param.name);
   };
 
-  const buttonAfter = () => {
-    if (!shouldHandlePrimaryParam()) return null;
+  const filteredOutputVariableList = () => (
+    outputVariableList.filter((outputVariable) => {
+      if (outputVariable.blockId === blockId) return false;
+
+      if (outputVariable.stepOrder >= order) return false;
+
+      if (param.type === RuleBuilderTypes.Object) return true;
+
+      return (outputVariable.variableType === param.type);
+    }));
+
+  const primaryInputButtonAfter = () => {
+    if (!shouldHandlePrimaryParam() || filteredOutputVariableList().length <= 0) return null;
 
     return (<Button onClick={() => onPrimaryInputToggle('select')}>Choose output to use</Button>);
   };
 
-  const outputVariableOptions : Array<{ label: string, value: any}> = [
-    { label: 'Output from step 1', value: '$output1' },
-    { label: 'Output from step 2', value: '$output2' },
-    { label: 'Output from step 3', value: '$output3' },
-  ];
-
   const showOutputVariableSelect = () => {
     if (!shouldHandlePrimaryParam()) return false;
+
+    if (filteredOutputVariableList().length <= 0) return false;
 
     if (primaryInputToggle === 'select') return true;
 
     if (typeof primaryInputToggle !== 'undefined') return false;
 
-    return !fieldMeta.initialValue || paramValueIsVariable(fieldMeta.initialValue);
+    return !fieldMeta.initialValue || fieldMeta.initialValue === '' || paramValueIsVariable(fieldMeta.initialValue);
   };
 
   if (showOutputVariableSelect()) {
+    // TODO: validate required
+
     return (
       <FormikFormGroup type="select"
                        key={`${functionName}_${param.name}`}
@@ -93,7 +105,10 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
                        help={param.description}
                        {...field}>
-        {outputVariableOptions.map(({ label, value }) => <option key={`option-${value}`} value={value}>{label}</option>)}
+        <option key="placeholder" disabled value="">Select output from list</option>
+        {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
+          <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)}`}</option>),
+        )}
       </FormikFormGroup>
     );
   }
@@ -108,7 +123,7 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                          label={param.name}
                          required={!param.optional}
                          validate={validateTextField}
-                         buttonAfter={buttonAfter()}
+                         buttonAfter={primaryInputButtonAfter()}
                          help={param.description}
                          {...field} />
       );
@@ -119,7 +134,7 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                          name={param.name}
                          label={param.name}
                          required={!param.optional}
-                         buttonAfter={buttonAfter()}
+                         buttonAfter={primaryInputButtonAfter()}
                          help={param.description}
                          {...field} />
 
@@ -134,13 +149,35 @@ const RuleBlockFormField = ({ param, functionName, order, previousOutputPresent,
                            label={field.value ? 'true' : 'false'}
                            help={param.description}
                            checked={field.value}
-                           buttonAfter={buttonAfter()}
+                           buttonAfter={primaryInputButtonAfter()}
                            {...field} />
         </>
       );
     default:
       return null;
   }
+};
+
+RuleBlockFormField.propTypes = {
+  param: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    transformed_type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    optional: PropTypes.bool.isRequired,
+    primary: PropTypes.bool.isRequired,
+    description: PropTypes.string,
+  }).isRequired,
+  blockId: PropTypes.string,
+  functionName: PropTypes.string.isRequired,
+  order: PropTypes.number.isRequired,
+  previousOutputPresent: PropTypes.bool.isRequired,
+  outputVariableList: outputVariablesPropType,
+  resetField: PropTypes.func.isRequired,
+};
+
+RuleBlockFormField.defaultProps = {
+  blockId: undefined,
+  outputVariableList: [],
 };
 
 export default RuleBlockFormField;

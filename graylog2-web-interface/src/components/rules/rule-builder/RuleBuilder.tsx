@@ -33,7 +33,7 @@ import Errors from './Errors';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
-import type { BlockType, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
+import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
 import {
   getDictForFunction,
   getDictForParam,
@@ -126,8 +126,6 @@ const RuleBuilder = () => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
   }).catch(() => setRule(ruleToValidate));
 
-  // TODO: Add reorder functionality (make sure to setPrimaryParamsAndOutputVariable and validate)
-
   const getPreviousBlock = (blocks: RuleBlock[], index?: number): RuleBlock | undefined => {
     if (index === 0) return undefined;
 
@@ -160,49 +158,11 @@ const RuleBuilder = () => {
     return newBlock;
   };
 
-  const setPrimaryParams = (block: RuleBlock, blocks: RuleBlock[], index?: number): RuleBlock => {
-    const blockDict = getDictForFunction(actionsDict, block.function);
-
-    if (!blockDict) return block;
-
-    const newBlock = block;
-
-    Object.keys(block.params).forEach((paramName) => {
-      if (getDictForParam(blockDict, paramName)?.primary) {
-        if (paramValueExists(block.params[paramName]) && !paramValueIsVariable(block.params[paramName])) {
-          return;
-        }
-
-        const { previousOutputPresent, outputVariable } = getPreviousOutput(blocks, index);
-
-        if (paramValueExists(block.params[paramName])) {
-          if (block.params[paramName] !== `${outputVariable}`) {
-            newBlock.params[paramName] = undefined;
-          }
-        }
-
-        if (!previousOutputPresent) {
-          return;
-        }
-
-        newBlock.params[paramName] = `$${outputVariable}`;
-      }
-    });
-
-    return newBlock;
-  };
-
-  const setPrimaryParametersAndOutputVariables = (blocks: RuleBlock[]): RuleBlock[] => {
-    const blocksWithNewOutput = blocks.map((block, index) => (
+  const setOutputVariables = (blocks: RuleBlock[]): RuleBlock[] => (
+    blocks.map((block, index) => (
       setOutputVariable(block, index)
-    ));
-
-    return (
-      blocksWithNewOutput.map((block, index) => (
-        setPrimaryParams(block, blocksWithNewOutput, index)
-      ))
-    );
-  };
+    ))
+  );
 
   const addBlock = async (type: BlockType, block: RuleBlock) => {
     let ruleToAdd;
@@ -219,7 +179,7 @@ const RuleBuilder = () => {
         },
       };
     } else {
-      const blockToSet = setPrimaryParams(setOutputVariable(block), rule.rule_builder.actions);
+      const blockToSet = setOutputVariable(block);
 
       ruleToAdd = {
         ...rule,
@@ -251,9 +211,8 @@ const RuleBuilder = () => {
       };
     } else {
       const currentActions = [...rule.rule_builder.actions];
-      const blockToSet = setPrimaryParams(block, currentActions, orderIndex);
 
-      currentActions[orderIndex] = blockToSet;
+      currentActions[orderIndex] = block;
 
       ruleToUpdate = {
         ...rule,
@@ -286,7 +245,7 @@ const RuleBuilder = () => {
       ruleToDelete = {
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, actions: setPrimaryParametersAndOutputVariables(currentActions),
+          ...rule.rule_builder, actions: setOutputVariables(currentActions),
         },
       };
     }
@@ -341,6 +300,15 @@ const RuleBuilder = () => {
 
     return false;
   };
+
+  const outputVariableList = () : OutputVariables => (
+    rule.rule_builder.actions.map((block: RuleBlock, index) => ({
+      variableName: `$${block.outputvariable}`,
+      variableType: getDictForFunction(actionsDict, block.function).return_type,
+      stepOrder: index,
+      blockId: block.id,
+    }))
+  );
 
   return (
     <form onSubmit={(e) => handleSave(e, true)}>
@@ -417,6 +385,7 @@ const RuleBuilder = () => {
                                   order={index}
                                   type="action"
                                   previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, index).previousOutputPresent}
+                                  outputVariableList={outputVariableList()}
                                   addBlock={addBlock}
                                   updateBlock={updateBlock}
                                   deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
@@ -425,6 +394,7 @@ const RuleBuilder = () => {
                                 order={newActionBlockIndex}
                                 type="action"
                                 previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, newActionBlockIndex).previousOutputPresent}
+                                outputVariableList={outputVariableList()}
                                 addBlock={addBlock}
                                 updateBlock={updateBlock}
                                 deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />

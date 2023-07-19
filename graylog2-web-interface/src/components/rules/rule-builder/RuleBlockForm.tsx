@@ -27,9 +27,8 @@ import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import Errors from './Errors';
-import { paramValueIsVariable } from './helpers';
-import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
-import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
+import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
+import type { BlockType, RuleBlock, BlockDict, BlockFieldDict, OutputVariables } from './types';
 
 import RuleHelperTable from '../rule-helper/RulerHelperTable';
 
@@ -44,6 +43,7 @@ type Props = {
   previousOutputPresent: boolean,
   options: Array<Option>,
   order: number,
+  outputVariableList?: OutputVariables,
   selectedBlockDict?: BlockDict,
   type: BlockType,
 }
@@ -95,6 +95,7 @@ const RuleBlockForm = ({
   options,
   order,
   previousOutputPresent,
+  outputVariableList,
   selectedBlockDict,
   type,
 }: Props) => {
@@ -116,8 +117,6 @@ const RuleBlockForm = ({
           } else {
             newInitialValues[param.name] = undefined;
           }
-        } else if (paramValueIsVariable(initialBlockValue)) {
-          newInitialValues[param.name] = undefined;
         } else {
           newInitialValues[param.name] = initialBlockValue;
         }
@@ -174,6 +173,11 @@ const RuleBlockForm = ({
     </>
   );
 
+  const filteredOutputVariableList = () : OutputVariables => (
+    outputVariableList.filter(({ blockId }) => (
+      blockId !== existingBlock?.id))
+  );
+
   return (
     <Row>
       <Col md={12}>
@@ -216,6 +220,8 @@ const RuleBlockForm = ({
                       <RuleBlockFormField param={param}
                                           functionName={selectedBlockDict.name}
                                           order={order}
+                                          blockId={existingBlock?.id}
+                                          outputVariableList={outputVariableList}
                                           previousOutputPresent={previousOutputPresent}
                                           resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
                     </Row>
@@ -255,6 +261,7 @@ RuleBlockForm.propTypes = {
     }),
   ).isRequired,
   order: PropTypes.number.isRequired,
+  outputVariableList: outputVariablesPropType,
   previousOutputPresent: PropTypes.bool.isRequired,
   selectedBlockDict: blockDictPropType,
   type: PropTypes.oneOf(['action', 'condition']).isRequired,
@@ -262,6 +269,7 @@ RuleBlockForm.propTypes = {
 
 RuleBlockForm.defaultProps = {
   existingBlock: undefined,
+  outputVariableList: undefined,
   selectedBlockDict: undefined,
 };
 

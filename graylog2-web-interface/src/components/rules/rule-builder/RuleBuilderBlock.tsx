@@ -24,8 +24,8 @@ import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 
-import type { RuleBlock, BlockType, BlockDict } from './types';
-import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
+import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
+import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
 import { getDictForFunction } from './helpers';
 
 const BlockContainer = styled.div.attrs(({ hasErrors }: { hasErrors: boolean }) => ({
@@ -43,6 +43,7 @@ type Props = {
   block?: RuleBlock,
   order: number,
   previousOutputPresent?: boolean,
+  outputVariableList?: OutputVariables,
   addBlock: (type: string, block: RuleBlock) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
   deleteBlock: (orderIndex: number, type: string) => void,
@@ -54,6 +55,7 @@ const RuleBuilderBlock = ({
   block,
   order,
   previousOutputPresent,
+  outputVariableList,
   addBlock,
   updateBlock,
   deleteBlock,
@@ -170,6 +172,7 @@ const RuleBuilderBlock = ({
                        onSelect={onSelect}
                        order={order}
                        options={options}
+                       outputVariableList={outputVariableList}
                        previousOutputPresent={previousOutputPresent}
                        selectedBlockDict={currentBlockDict}
                        type={type} />
@@ -190,6 +193,7 @@ RuleBuilderBlock.propTypes = {
   block: ruleBlockPropType,
   order: PropTypes.number.isRequired,
   previousOutputPresent: PropTypes.bool,
+  outputVariableList: outputVariablesPropType,
   addBlock: PropTypes.func.isRequired,
   updateBlock: PropTypes.func.isRequired,
   deleteBlock: PropTypes.func.isRequired,
@@ -197,6 +201,7 @@ RuleBuilderBlock.propTypes = {
 
 RuleBuilderBlock.defaultProps = {
   block: undefined,
+  outputVariableList: undefined,
   previousOutputPresent: false,
 };
 

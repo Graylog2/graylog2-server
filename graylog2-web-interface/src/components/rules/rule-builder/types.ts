@@ -95,6 +95,22 @@ export type BlockDict = {
   rule_builder_title: string | null
 }
 
+export type OutputVariables = Array<{
+  variableName: string,
+  variableType: RuleBuilderTypes,
+  stepOrder: number,
+  blockId: string
+}>
+
+export const outputVariablesPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    variableName: PropTypes.string.isRequired,
+    variableType: PropTypes.string.isRequired,
+    stepOrder: PropTypes.number.isRequired,
+    blockId: PropTypes.string.isRequired,
+  }),
+);
+
 export const ruleBlockPropType = PropTypes.shape({
   function: PropTypes.string.isRequired,
   params: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool])).isRequired,
