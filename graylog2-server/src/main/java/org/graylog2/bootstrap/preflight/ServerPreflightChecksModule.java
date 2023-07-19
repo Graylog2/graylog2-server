@@ -18,6 +18,8 @@ package org.graylog2.bootstrap.preflight;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import okhttp3.OkHttpClient;
+import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.audit.AuditEventSender;
@@ -36,6 +38,8 @@ public class ServerPreflightChecksModule extends Graylog2Module {
 
     @Override
     protected void configure() {
+        bind(CaService.class).to(CaServiceImpl.class);
+
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, CustomCAX509TrustManager.class)
                 .build(TrustManagerProvider.class));
