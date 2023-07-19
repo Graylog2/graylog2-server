@@ -65,6 +65,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ASSOCIATED_ASSETS;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -76,7 +77,6 @@ import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_TAGS;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_VERSION;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
-import static org.graylog.schema.GraylogSchemaFields.FIELD_ASSOCIATED_ASSETS;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -782,7 +782,7 @@ public class Message implements Messages, Indexable {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<String> getStreamIds() {
+    public Set<String> getStreamIds() {
         Collection<String> streamField;
         try {
             streamField = getFieldAs(Collection.class, FIELD_STREAMS);
