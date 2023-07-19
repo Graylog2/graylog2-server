@@ -173,11 +173,6 @@ const RuleBlockForm = ({
     </>
   );
 
-  const filteredOutputVariableList = () : OutputVariables => (
-    outputVariableList.filter(({ blockId }) => (
-      blockId !== existingBlock?.id))
-  );
-
   return (
     <Row>
       <Col md={12}>

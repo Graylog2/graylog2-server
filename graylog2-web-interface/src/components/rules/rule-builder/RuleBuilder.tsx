@@ -36,10 +36,7 @@ import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
 import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
 import {
   getDictForFunction,
-  getDictForParam,
   getActionOutputVariableName,
-  paramValueExists,
-  paramValueIsVariable,
 } from './helpers';
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 
