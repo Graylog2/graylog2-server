@@ -17,6 +17,12 @@
 package org.graylog.security.certutil;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.scheduler.DBJobTriggerService;
+import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.JobTriggerStatus;
+import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
@@ -52,6 +58,8 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final NodeService nodeService;
     private final NodePreflightConfigService nodePreflightConfigService;
     private final NotificationService notificationService;
+    private final DBJobTriggerService jobTriggerService;
+    private final DBJobDefinitionService jobDefinitionService;
     private final char[] passwordSecret;
 
     @Inject
@@ -60,12 +68,16 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final NodeService nodeService,
                                   final NodePreflightConfigService nodePreflightConfigService,
                                   final NotificationService notificationService,
+                                  final DBJobTriggerService jobTriggerService,
+                                  final DBJobDefinitionService jobDefinitionService,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeService = nodeService;
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.notificationService = notificationService;
+        this.jobTriggerService = jobTriggerService;
+        this.jobDefinitionService = jobDefinitionService;
         this.passwordSecret = passwordSecret.toCharArray();
     }
 
@@ -135,5 +147,26 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                         notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, pair.getLeft());
                     }
                 });
+    }
+
+    @Override
+    public void addCheckForRenewalJob() {
+        // TODO: check, if the two more fields are needed (see CronJobSchedule Tests)
+        final var cronJobSchedule = CronJobSchedule.builder().cronExpression("0,30 * * * *").timezone(null).build();
+
+        final var jobDefinition = JobDefinitionDto.builder().id("cert-renewal-check")
+                .title("Certificat Renewal Check")
+                .description("Runs periodically to check for certificates that are about to expire and notifies/triggers renewal")
+                .build();
+
+        final var trigger = JobTriggerDto.builder()
+                .jobDefinitionId("cert-renewal-check")
+                .jobDefinitionType(CheckForCertRenewalJob.TYPE_NAME)
+                .schedule(cronJobSchedule)
+                .status(JobTriggerStatus.RUNNABLE)
+                .build();
+
+        jobDefinitionService.save(jobDefinition);
+        jobTriggerService.create(trigger);
     }
 }

@@ -36,6 +36,7 @@ import org.graylog.security.authservice.rest.AuthServicesResource;
 import org.graylog.security.authservice.rest.GlobalAuthServiceConfigResource;
 import org.graylog.security.authservice.rest.HTTPHeaderAuthenticationConfigResource;
 import org.graylog.security.authzroles.AuthzRolesResource;
+import org.graylog.security.certutil.CheckForCertRenewalJob;
 import org.graylog.security.rest.EntitySharesResource;
 import org.graylog.security.rest.GrantsOverviewResource;
 import org.graylog.security.shares.DefaultGranteeService;
@@ -85,5 +86,10 @@ public class SecurityModule extends PluginModule {
                 ADAuthServiceBackend.class,
                 ADAuthServiceBackend.Factory.class,
                 ADAuthServiceBackendConfig.class);
+
+        addSchedulerJob(CheckForCertRenewalJob.TYPE_NAME,
+                CheckForCertRenewalJob.class,
+                CheckForCertRenewalJob.Factory.class,
+                CheckForCertRenewalJob.Config.class);
     }
 }
