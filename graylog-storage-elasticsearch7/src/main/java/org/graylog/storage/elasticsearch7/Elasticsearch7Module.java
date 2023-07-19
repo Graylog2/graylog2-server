@@ -27,6 +27,7 @@ import org.graylog.storage.elasticsearch7.client.ESCredentialsProvider;
 import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsForFieldRetrieverES7;
 import org.graylog.storage.elasticsearch7.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7;
 import org.graylog.storage.elasticsearch7.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsES7;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -41,9 +42,15 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
 
-public class Elasticsearch7Module extends VersionAwareModule {
+import javax.inject.Inject;
 
+import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
+
+public class Elasticsearch7Module extends VersionAwareModule {
     private final SearchVersion supportedVersion;
+
+    @Inject
+    private FeatureFlags featureFlags;
 
     public Elasticsearch7Module(final SearchVersion supportedVersion) {
         this.supportedVersion = supportedVersion;
@@ -54,7 +61,12 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverES7.class);
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
-        bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
+        if (featureFlags.isOn(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
+        } else {
+            bindForSupportedVersion(IndicesAdapter.class).to(LegacyIndicesAdapterES7.class);
+        }
+
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES7.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterES7.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterES7.class);

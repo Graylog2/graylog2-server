@@ -27,6 +27,7 @@ import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
 import org.graylog.storage.opensearch2.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -41,9 +42,15 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
 
-public class OpenSearch2Module extends VersionAwareModule {
+import javax.inject.Inject;
 
+import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
+
+public class OpenSearch2Module extends VersionAwareModule {
     private final SearchVersion supportedVersion;
+
+    @Inject
+    private FeatureFlags featureFlags;
 
     public OpenSearch2Module(final SearchVersion supportedVersion) {
         this.supportedVersion = supportedVersion;
@@ -54,7 +61,11 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverOS2.class);
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
-        bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
+        if (featureFlags.isOn(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
+        } else {
+            bindForSupportedVersion(IndicesAdapter.class).to(LegacyIndicesAdapterOS2.class);
+        }
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS2.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
