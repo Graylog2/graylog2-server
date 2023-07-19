@@ -97,7 +97,7 @@ const IconWrap = styled.span<IconWrapProps>(({ $showTitleOnHover, $isSelected, $
   position: relative;
   opacity: ${$disabled ? 0.65 : 1};
 
-  :hover {
+  &:hover {
     + div {
       display: ${($showTitleOnHover && !$isSelected) ? 'flex' : 'none'};
     }
