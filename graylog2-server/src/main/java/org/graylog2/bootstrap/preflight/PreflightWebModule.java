@@ -53,6 +53,7 @@ public class PreflightWebModule extends Graylog2Module {
         bind(NodeService.class).to(NodeServiceImpl.class);
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);
+        bind(CaService.class).to(CaServiceImpl.class);
 
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
