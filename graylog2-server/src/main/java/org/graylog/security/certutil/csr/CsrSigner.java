@@ -16,9 +16,9 @@
  */
 package org.graylog.security.certutil.csr;
 
+import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -39,17 +39,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import static org.bouncycastle.asn1.x509.GeneralName.dNSName;
+import static org.bouncycastle.asn1.x509.GeneralName.iPAddress;
+import static org.bouncycastle.asn1.x509.GeneralName.rfc822Name;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrSigner {
-    private static boolean isValidName(final int name) {
+    private boolean isValidName(final int name) {
         return switch (name) {
-            case GeneralName.dNSName, GeneralName.iPAddress, GeneralName.rfc822Name -> true;
+            case dNSName, iPAddress, rfc822Name -> true;
             default -> false;
         };
     }
 
-    public static X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
+    public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
         // TODO: cert serial number?
         BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
         Instant validFrom = Instant.now();
@@ -72,10 +75,9 @@ public class CsrSigner {
             for (Attribute attribute : certAttributes) {
                 Extensions extensions = Extensions.getInstance(attribute.getAttrValues().getObjectAt(0));
                 GeneralNames gns = GeneralNames.fromExtensions(extensions, Extension.subjectAlternativeName);
-                if (gns == null) {
-                    continue;
+                if (gns != null && gns.getNames() != null) {
+                    Arrays.stream(gns.getNames()).filter(n -> isValidName(n.getTagNo())).forEach(altNames::add);
                 }
-                Arrays.stream(gns.getNames()).filter(n -> isValidName(n.getTagNo())).forEach(altNames::add);
             }
             if (!altNames.isEmpty()) {
                 builder.addExtension(Extension.subjectAlternativeName, false,
