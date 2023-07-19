@@ -26,6 +26,8 @@ import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Filter;
+import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -33,7 +35,10 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -92,6 +97,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final MoreSearch moreSearch;
     private final PermittedStreams permittedStreams;
     private final NotificationService notificationService;
+    private final QueryStringDecorators queryStringDecorators;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -103,7 +109,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   EventsConfigurationProvider configProvider,
                                   MoreSearch moreSearch,
                                   PermittedStreams permittedStreams,
-                                  NotificationService notificationService) {
+                                  NotificationService notificationService,
+                                  QueryStringDecorators queryStringDecorators) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -114,6 +121,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.moreSearch = moreSearch;
         this.permittedStreams = permittedStreams;
         this.notificationService = notificationService;
+        this.queryStringDecorators = queryStringDecorators;
     }
 
     private String metricName(AggregationSeries series) {
@@ -418,7 +426,7 @@ public class PivotAggregationSearch implements AggregationSearch {
      * @param executeEveryMs
      * @return aggregation query
      */
-    private Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
+     protected Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(true);
@@ -475,7 +483,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final Query.Builder queryBuilder = Query.builder()
                 .id(QUERY_ID)
                 .searchTypes(searchTypes)
-                .query(ElasticsearchQueryString.of(config.query()))
+                .query(decorateQuery(config))
                 .timerange(parameters.timerange());
 
         final Set<String> streams = getStreams(parameters);
@@ -484,6 +492,11 @@ public class PivotAggregationSearch implements AggregationSearch {
         }
 
         return queryBuilder.build();
+    }
+
+    private BackendQuery decorateQuery(AggregationEventProcessorConfig config) {
+        final String decorated = queryStringDecorators.decorate(config.query(), ParameterProvider.of(config.queryParameters()));
+        return ElasticsearchQueryString.of(decorated);
     }
 
     private Filter filteringForStreamIds(Set<String> streamIds) {
