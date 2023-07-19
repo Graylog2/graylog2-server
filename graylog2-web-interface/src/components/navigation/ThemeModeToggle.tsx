@@ -112,6 +112,7 @@ const ThemeModeToggle = ({ theme }: Props) => {
     if (loadingTheme) {
       setLoadingTheme(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);
 
   const toggleThemeMode = (event) => {

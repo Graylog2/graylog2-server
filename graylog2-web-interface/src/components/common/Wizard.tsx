@@ -129,6 +129,26 @@ const StyledNav = styled(Nav)(({ theme }) => css`
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
+
+const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+  if (activeStep === undefined || activeStep === null) {
+    return false;
+  }
+
+  return find(steps, { key: activeStep });
+};
+
+const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+  if (activeStep === undefined || activeStep === null) {
+    return;
+  }
+
+  if (!isValidActiveStep(activeStep, steps)) {
+    // eslint-disable-next-line no-console
+    console.warn(`activeStep ${activeStep} is not a key in any element of the 'steps' prop!`);
+  }
+};
+
 export type StepKey = number | string;
 
 export type Step = {
@@ -204,7 +224,7 @@ class Wizard extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this._warnOnInvalidActiveStep(props.activeStep, props.steps);
+    warnOnInvalidActiveStep(props.activeStep, props.steps);
 
     this.state = {
       selectedStep: props.steps[0].key,
@@ -214,33 +234,14 @@ class Wizard extends React.Component<Props, State> {
   componentDidUpdate() {
     const { activeStep, steps } = this.props;
 
-    this._warnOnInvalidActiveStep(activeStep, steps);
+    warnOnInvalidActiveStep(activeStep, steps);
   }
-
-  _warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
-    if (activeStep === undefined || activeStep === null) {
-      return;
-    }
-
-    if (!this._isValidActiveStep(activeStep, steps)) {
-      // eslint-disable-next-line no-console
-      console.warn(`activeStep ${activeStep} is not a key in any element of the 'steps' prop!`);
-    }
-  };
-
-  _isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
-    if (activeStep === undefined || activeStep === null) {
-      return false;
-    }
-
-    return find(steps, { key: activeStep });
-  };
 
   _getSelectedStep = () => {
     const { activeStep, steps } = this.props;
     const { selectedStep } = this.state;
 
-    return (this._isValidActiveStep(activeStep, steps) ? activeStep : selectedStep);
+    return (isValidActiveStep(activeStep, steps) ? activeStep : selectedStep);
   };
 
   _wizardChanged = (eventKey: StepKey) => {
