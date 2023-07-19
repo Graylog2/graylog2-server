@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useField } from 'formik';
 
-import { FormikFormGroup } from 'components/common';
+import { FormikFormGroup, InputOptionalInfo } from 'components/common';
 import { Button, ControlLabel } from 'components/bootstrap';
 
 import { RuleBuilderTypes, outputVariablesPropType } from './types';
@@ -93,14 +93,20 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
     return !fieldMeta.initialValue || fieldMeta.initialValue === '' || paramValueIsVariable(fieldMeta.initialValue);
   };
 
-  if (showOutputVariableSelect()) {
-    // TODO: validate required
+  const labelText = (labelParam: BlockFieldDict): React.ReactElement | string => {
+    if (labelParam.optional) {
+      return <>{labelParam.name} <InputOptionalInfo /></>;
+    }
 
+    return labelParam.name;
+  };
+
+  if (showOutputVariableSelect()) {
     return (
       <FormikFormGroup type="select"
                        key={`${functionName}_${param.name}`}
                        name={param.name}
-                       label={param.name}
+                       label={labelText(param)}
                        required={!param.optional}
                        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
                        help={param.description}
@@ -120,7 +126,7 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
         <FormikFormGroup type="text"
                          key={`${functionName}_${param.name}`}
                          name={param.name}
-                         label={param.name}
+                         label={labelText(param)}
                          required={!param.optional}
                          validate={validateTextField}
                          buttonAfter={primaryInputButtonAfter()}
@@ -132,7 +138,7 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
         <FormikFormGroup type="number"
                          key={`${functionName}_${param.name}`}
                          name={param.name}
-                         label={param.name}
+                         label={labelText(param)}
                          required={!param.optional}
                          buttonAfter={primaryInputButtonAfter()}
                          help={param.description}
@@ -142,7 +148,7 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
     case RuleBuilderTypes.Boolean:
       return (
         <>
-          <ControlLabel className="col-sm-3">{param.name}</ControlLabel>
+          <ControlLabel className="col-sm-3">{labelText(param)}</ControlLabel>
           <FormikFormGroup type="checkbox"
                            key={`${functionName}_${param.name}`}
                            name={param.name}

@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Formik } from 'formik';
+import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Icon, OverlayTrigger, Select } from 'components/common';
@@ -143,7 +143,7 @@ const RuleBlockForm = ({
     setFieldValue(fieldName, null);
   };
 
-  const handleSubmit = (values: { [key: string]: any }) => {
+  const onSubmit = (values: { [key: string]: any }) => {
     sendTelemetry('click', {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
@@ -177,9 +177,9 @@ const RuleBlockForm = ({
     <Row>
       <Col md={12}>
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
-        <Formik enableReinitialize onSubmit={handleSubmit} initialValues={initialValues}>
-          {({ resetForm, setFieldValue, values }) => (
-            <>
+        <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
+          {({ resetForm, setFieldValue, isValid }) => (
+            <Form>
               <Row>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
@@ -224,9 +224,9 @@ const RuleBlockForm = ({
                   )}
 
                   <FormSubmit bsSize="small"
+                              disabledSubmit={!isValid}
                               submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
-                              submitButtonType="button"
-                              onSubmit={() => handleSubmit(values)}
+                              submitButtonType="submit"
                               onCancel={() => {
                                 resetForm();
                                 onCancel();
@@ -234,7 +234,7 @@ const RuleBlockForm = ({
 
                 </SelectedBlock>
               )}
-            </>
+            </Form>
           )}
         </Formik>
         <Errors objectWithErrors={existingBlock} />
