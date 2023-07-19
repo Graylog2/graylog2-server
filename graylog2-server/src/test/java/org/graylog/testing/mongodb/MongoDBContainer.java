@@ -62,6 +62,10 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
 
     public String infoString() {
         final InspectContainerResponse info = getContainerInfo();
-        return String.format(Locale.US, "%s%s/%s", info.getId(), info.getName(), info.getConfig().getImage());
+        if(info != null) {
+            return String.format(Locale.US, "%s%s/%s", info.getId(), info.getName(), info.getConfig().getImage());
+        } else {
+            return "[WARNING] Could get info from Docker container! getContainerInfo() returned null.";
+        }
     }
 }
