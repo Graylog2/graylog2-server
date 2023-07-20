@@ -18,7 +18,7 @@ import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { Button, FormGroup, Input } from 'components/bootstrap';
+import { Button, ControlLabel, FormGroup, Input } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import type { RuleType } from 'stores/rules/RulesStore';
 import useLocation from 'routing/useLocation';
@@ -30,7 +30,7 @@ import type { RuleBuilderRule } from './rule-builder/types';
 
 const RuleSimulationFormGroup = styled(FormGroup)`
   margin-bottom: 40px;
-  margin-top: 25px;
+  #margin-top: 25px;
 `;
 
 const ResetButton = styled(Button)`
@@ -111,6 +111,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
 
   return (
     <RuleSimulationFormGroup>
+      <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
       <div>
         <Input id="message"
                type="textarea"
@@ -136,25 +137,29 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
             <MessageShowContainer>
               <MessageShow message={ruleSimulationResult} />
             </MessageShowContainer>
-            {conditionsOutputKeys.length > 0 && (
-              <OutputContainer>
-                <label htmlFor="simulation_conditions_output">Conditions Output</label>
-                {conditionsOutputKeys.map((conditionsOutputKey, key) => (
-                  <div key={conditionsOutputKey}>
-                    <ActionOutputIndex>Condition {key + 1}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[key + 1])}
-                  </div>
-                ))}
-              </OutputContainer>
-            )}
-            {actionsOutputKeys.length > 0 && (
-              <OutputContainer>
-                <label htmlFor="simulation_actions_output">Actions Output</label>
-                {actionsOutputKeys.map((actionsOutputKey, key) => (
-                  <div key={actionsOutputKey}>
-                    <ActionOutputIndex>Action {key + 1}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[key + 1])}
-                  </div>
-                ))}
-              </OutputContainer>
+            {is_rule_builder && (
+              <>
+                {conditionsOutputKeys.length > 0 && (
+                  <OutputContainer>
+                    <label htmlFor="simulation_conditions_output">Conditions Output</label>
+                    {conditionsOutputKeys.map((conditionsOutputKey, key) => (
+                      <div key={conditionsOutputKey}>
+                        <ActionOutputIndex>Condition {key + 1}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[key + 1])}
+                      </div>
+                    ))}
+                  </OutputContainer>
+                )}
+                {actionsOutputKeys.length > 0 && (
+                  <OutputContainer>
+                    <label htmlFor="simulation_actions_output">Actions Output</label>
+                    {actionsOutputKeys.map((actionsOutputKey, key) => (
+                      <div key={actionsOutputKey}>
+                        <ActionOutputIndex>Action {key + 1}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[key + 1])}
+                      </div>
+                    ))}
+                  </OutputContainer>
+                )}
+              </>
             )}
           </>
         )}
