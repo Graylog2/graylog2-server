@@ -50,6 +50,8 @@ type Arguments = {
 };
 
 const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  console.log(queryId, field, value, type);
+
   const oldQuery = selectQueryString(queryId)(getState());
   const newQuery = formatNewQuery(oldQuery, field, value, type);
 
