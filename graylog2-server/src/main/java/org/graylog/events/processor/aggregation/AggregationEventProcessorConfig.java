@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
+import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
@@ -205,11 +206,11 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
             .map(Optional::get)
             .collect(Collectors.toSet()));
         return AggregationEventProcessorConfigEntity.builder()
-            .type(type())
-            .query(ValueReference.of(query()))
-            .streams(streamRefs)
-            .groupBy(groupBy())
-            .series(series())
+                .type(type())
+                .query(ValueReference.of(query()))
+                .streams(streamRefs)
+                .groupBy(groupBy())
+                .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())
             .conditions(conditions().orElse(null))
             .executeEveryMs(executeEveryMs())
             .searchWithinMs(searchWithinMs())

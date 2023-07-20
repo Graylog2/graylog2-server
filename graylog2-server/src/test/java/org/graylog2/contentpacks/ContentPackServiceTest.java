@@ -27,6 +27,7 @@ import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
+import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.fields.FieldValueType;
@@ -381,7 +382,7 @@ public class ContentPackServiceTest {
                 .query(ValueReference.of("author: \"Jane Hopper\""))
                 .streams(Stream.ALL_SYSTEM_STREAM_IDS)
                 .groupBy(ImmutableList.of("project"))
-                .series(ImmutableList.of(series))
+                .series(ImmutableList.of(series).stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(condition)
                 .executeEveryMs(122200000L)
                 .searchWithinMs(1231312123L)

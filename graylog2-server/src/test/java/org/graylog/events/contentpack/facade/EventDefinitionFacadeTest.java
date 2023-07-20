@@ -28,6 +28,7 @@ import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.NotificationEntity;
+import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.fields.FieldValueType;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
@@ -211,7 +212,7 @@ public class EventDefinitionFacadeTest {
                 .query(ValueReference.of("author: \"Jane Hopper\""))
                 .streams(ImmutableSet.of())
                 .groupBy(ImmutableList.of("project"))
-                .series(ImmutableList.of(series))
+                .series(ImmutableList.of(series).stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(condition)
                 .executeEveryMs(122200000L)
                 .searchWithinMs(1231312123L)
