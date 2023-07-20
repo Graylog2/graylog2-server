@@ -168,7 +168,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
           )}
         </Field>
 
-        Effective time range
+        Preview
         <EffectiveTimeRangeTable>
           <tbody>
             <tr>

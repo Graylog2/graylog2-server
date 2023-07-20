@@ -59,11 +59,11 @@ const SearchResultOverview = ({ results }: Props) => {
   return (
     <>
       <p>
-        Query executed in:<br />
+        Query executed in <br />
         {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />
       </p>
       <EffectiveTimeRange>
-        Effective time range:<br />
+        Effective time range<br />
         {(viewType === View.Type.Dashboard && !globalOverrideTimeRange) ? <i>Varies per widget</i>
           : (
             <EffectiveTimeRangeTable>

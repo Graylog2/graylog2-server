@@ -107,7 +107,7 @@ describe('<Sidebar />', () => {
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
-    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in:64ms at 2018-08-28 16:39:27'));
+    await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:27'));
   });
 
   it('should render summary and description of a view', async () => {

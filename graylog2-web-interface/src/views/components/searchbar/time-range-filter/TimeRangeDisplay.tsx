@@ -82,7 +82,7 @@ export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | 
 
 const TimeRange = ({ timerange }: { timerange: TimeRangeType | null | undefined }) => {
   if (isTypeKeyword(timerange)) {
-    return <span>Keyword range: <b>{timerange.keyword}</b></span>;
+    return <span>Keyword: <b>{timerange.keyword}</b></span>;
   }
 
   const { from, until } = range(timerange);
