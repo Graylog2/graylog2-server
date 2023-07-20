@@ -384,11 +384,10 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testQueryParameterSubstitution() {
-
         final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
-        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
-        final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
+        var seriesCount = Count.builder().field("source").build();
+        var seriesCard = Cardinality.builder().field("source").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("source:$secret$")
                 .queryParameters(ImmutableSet.of(ValueParameter.builder().dataType("any").name("secret").build()))
