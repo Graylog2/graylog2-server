@@ -102,7 +102,7 @@ type Props = {
   onSearch?: (query: string, reset?: () => void) => void,
   wrapperClass?: string,
   topMargin?: number,
-  onQueryChange: (query: string) => void,
+  onQueryChange?: (query: string) => void,
   query?: string,
 }
 

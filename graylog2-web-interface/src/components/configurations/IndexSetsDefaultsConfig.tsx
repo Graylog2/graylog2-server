@@ -17,7 +17,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Formik } from 'formik';
 import capitalize from 'lodash/capitalize';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import 'components/indices/rotation';
 import 'components/indices/retention';
@@ -56,9 +55,7 @@ export type IndexConfig = {
 
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
 
-const StyledDefList = styled.dl.attrs({
-  className: 'deflist',
-})(({ theme }: { theme: DefaultTheme }) => css`
+const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
   &&.deflist {
     dd {
       padding-left: ${theme.spacings.md};

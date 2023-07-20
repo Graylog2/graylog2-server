@@ -14,19 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
-
-const Wrapper = styled.div<{ $active: boolean }>(({ theme, $active }) => css`
-  color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
-`);
-
-const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper $active={active}>
-    <Icon {...rest} name={active ? 'check-circle' : 'times-circle'} />
-  </Wrapper>
-);
-
-export default LoggedInIcon;
+jest.mock('styled-components', () => (
+  jest.requireActual('styled-components/dist/styled-components.browser.esm.js')
+));

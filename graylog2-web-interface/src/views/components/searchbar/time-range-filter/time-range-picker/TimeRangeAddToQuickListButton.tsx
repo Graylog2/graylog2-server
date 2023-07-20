@@ -36,7 +36,7 @@ import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const StyledModalSubmit = styled(ModalSubmit)`
-margin-top: 15px;
+  margin-top: 15px;
 `;
 
 type Props = {
@@ -86,7 +86,13 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
             <i>f.e. ({equalTimerange.description})</i>
           </p>
           )}
-          <StyledModalSubmit disabledSubmit={!description} submitButtonText="Add time range" onCancel={toggleModal} onSubmit={onAddTimerange} bsSize="small" />
+          <StyledModalSubmit disabledSubmit={!description}
+                             submitButtonText="Add time range"
+                             isAsyncSubmit={false}
+                             displayCancel
+                             onCancel={toggleModal}
+                             onSubmit={onAddTimerange}
+                             bsSize="small" />
         </Popover>
       </Position>
     </Portal>

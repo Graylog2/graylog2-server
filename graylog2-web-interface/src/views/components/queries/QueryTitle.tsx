@@ -28,8 +28,8 @@ import { duplicateQuery } from 'views/logic/slices/viewSlice';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
-const TitleWrap = styled.span<{ active: boolean }>(({ active }) => css`
-  padding-right: ${active ? '6px' : '0'};
+const TitleWrap = styled.span<{ $active?: boolean }>(({ $active }) => css`
+  padding-right: ${$active ? '6px' : '0'};
 `);
 
 type Props = {
@@ -56,7 +56,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
 
   return (
     <>
-      <TitleWrap aria-label={titleValue} active={active} data-testid="query-tab" data-active-query-tab={active}>
+      <TitleWrap aria-label={titleValue} $active={active} data-testid="query-tab" data-active-query-tab={active}>
         {titleValue}
       </TitleWrap>
 

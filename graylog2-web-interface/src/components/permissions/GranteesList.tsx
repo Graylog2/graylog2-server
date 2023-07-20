@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
@@ -61,7 +61,7 @@ const StyledPagination = styled(Pagination)`
   margin-bottom: 0;
 `;
 
-const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => `
+const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => css`
   label {
     font-weight: normal;
     font-size: ${theme.fonts.size.body}

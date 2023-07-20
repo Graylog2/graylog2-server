@@ -36,11 +36,10 @@ const ThemeModeToggleWrap = styled.div`
   align-items: center;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ModeIcon = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
-  opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
-  color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default)};
-`;
+const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(({ theme, $currentMode }) => css`
+  opacity: ${$currentMode ? '1' : '0.5'};
+  color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
+`);
 
 export const Toggle = styled.label(({ theme }) => css`
   display: flex;
@@ -128,7 +127,9 @@ const ThemeModeToggle = ({ theme }: Props) => {
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'} spin={loadingLightMode} currentMode={currentMode === THEME_MODE_LIGHT} />
+      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
+                spin={loadingLightMode}
+                $currentMode={currentMode === THEME_MODE_LIGHT} />
       <Toggle>
         <input value={THEME_MODE_DARK}
                type="checkbox"
@@ -137,7 +138,9 @@ const ThemeModeToggle = ({ theme }: Props) => {
                disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'} spin={loadingDarkMode} currentMode={currentMode === THEME_MODE_DARK} />
+      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
+                spin={loadingDarkMode}
+                $currentMode={currentMode === THEME_MODE_DARK} />
     </ThemeModeToggleWrap>
   );
 };

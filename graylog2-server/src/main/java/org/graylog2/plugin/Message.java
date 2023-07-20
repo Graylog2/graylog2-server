@@ -92,6 +92,8 @@ public class Message implements Messages, Indexable {
      */
     public static final String FIELD_ID = "_id";
 
+    public static final String FIELD_INDEX = "_index";
+
     public static final String FIELD_MESSAGE = "message";
     public static final String FIELD_FULL_MESSAGE = "full_message";
     public static final String FIELD_SOURCE = "source";
@@ -240,25 +242,27 @@ public class Message implements Messages, Indexable {
     );
 
     private static final ImmutableSet<String> ES_FIELDS = ImmutableSet.of(
-        // ElasticSearch fields.
-        FIELD_ID,
-        "_ttl",
-        "_source",
-        "_all",
-        "_index",
-        "_type",
-        "_score"
+            // ElasticSearch fields.
+            FIELD_ID,
+            "_ttl",
+            "_source",
+            "_all",
+            FIELD_INDEX,
+            "_type",
+            "_score"
     );
 
+    public static final Set<String> SEARCHABLE_ES_FIELDS = Set.of(FIELD_INDEX, FIELD_ID);
+
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(GRAYLOG_FIELDS)
-        .addAll(CORE_MESSAGE_FIELDS)
-        .build();
+            .addAll(GRAYLOG_FIELDS)
+            .addAll(CORE_MESSAGE_FIELDS)
+            .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(RESERVED_SETTABLE_FIELDS)
-        .addAll(ES_FIELDS)
-        .build();
+            .addAll(RESERVED_SETTABLE_FIELDS)
+            .addAll(ES_FIELDS)
+            .build();
 
     public static final ImmutableSet<String> FILTERED_FIELDS = new ImmutableSet.Builder<String>()
         .addAll(GRAYLOG_FIELDS)

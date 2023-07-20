@@ -51,7 +51,7 @@ const getPrefixForType = (type: IconType): IconPrefix => {
 
 interface Props extends Omit<FontAwesomeIconProps, 'icon'> {
   name: IconName;
-  type: IconType;
+  type?: IconType;
 }
 
 const Icon = ({ name, type, ...props }: Props) => {

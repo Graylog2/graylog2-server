@@ -37,7 +37,7 @@ const PlaceholderBox = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[30]};
   margin-bottom: ${theme.spacings.xs};
   
-  :hover {
+  &:hover {
     opacity: 1;
   }
 
