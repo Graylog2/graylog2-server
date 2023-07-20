@@ -198,9 +198,13 @@ class Input extends React.Component {
     const {
       id,
       type,
+      children,
       label,
       name,
-      children,
+      // The following props need to be extracted even if they are not used
+      // so they are not passed as controll props to the input
+      bsStyle, formGroupClassName, wrapperClassName, labelClassName, inputDescClassName, // eslint-disable-line no-unused-vars
+      error, help, addonAfter, buttonAfter, // eslint-disable-line no-unused-vars
       ...controlProps
     } = this.props;
 
