@@ -14,23 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import TimeRangePicker from './TimeRangePicker';
 
-import Input from 'components/bootstrap/Input';
-
-import TimerangeSelector from './TimerangeSelector';
-
-const DisabledTimeRangeSelector = () => (
-  <TimerangeSelector style={{ marginLeft: 50 }}>
-    <Input id="no-override-timerange-selector"
-           type="select"
-           disabled
-           value="disabled"
-           title="There is no override for the timerange currently selected"
-           name="no-override">
-      <option value="disabled">No Override</option>
-    </Input>
-  </TimerangeSelector>
-);
-
-export default DisabledTimeRangeSelector;
+export default TimeRangePicker;

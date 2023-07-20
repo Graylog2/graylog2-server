@@ -21,7 +21,7 @@ import * as React from 'react';
 import MockStore from 'helpers/mocking/StoreMock';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
-import TimeRangeDropdownButton from './TimeRangeDropdownButton';
+import TimeRangeFilterButtons from './TimeRangeFilterButtons';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
@@ -38,30 +38,30 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 }));
 
 const selectRangePreset = async (optionLabel: string) => {
-  const timeRangeButton = screen.getByLabelText('Open time range preset select');
-  fireEvent.click(timeRangeButton);
+  const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
+  fireEvent.click(timeRangePresetButton);
   const rangePresetOption = await screen.findByText(optionLabel);
   fireEvent.click(rangePresetOption);
 };
 
-describe('TimeRangeDropdownButton', () => {
-  type SUTProps = Partial<React.ComponentProps<typeof TimeRangeDropdownButton>> & {
+describe('TimeRangeFilterButtons', () => {
+  type SUTProps = Partial<React.ComponentProps<typeof TimeRangeFilterButtons>> & {
     onSubmit?: () => void
   }
 
-  const SUTTimeRangeDropDownButton = ({ onSubmit = () => {}, ...props }: SUTProps) => (
+  const SUTTimeRangeFilterButtons = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
-      <TimeRangeDropdownButton toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
+      <TimeRangeFilterButtons toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
     </Formik>
   );
 
   it('button can be clicked and Popover appears', async () => {
     const toggleShow = jest.fn();
-    render(<SUTTimeRangeDropDownButton toggleShow={toggleShow} />);
+    render(<SUTTimeRangeFilterButtons toggleShow={toggleShow} />);
 
-    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangePickerButton = screen.getByLabelText('Open Time Range Selector');
 
-    fireEvent.click(timeRangeButton);
+    fireEvent.click(timeRangePickerButton);
 
     expect(toggleShow).toHaveBeenCalled();
   });
@@ -69,7 +69,7 @@ describe('TimeRangeDropdownButton', () => {
   it('changes time range and submits form when selecting relative time range preset', async () => {
     const setCurrentTimeRange = jest.fn();
     const onSubmit = jest.fn();
-    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
+    render(<SUTTimeRangeFilterButtons setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
 
     await selectRangePreset('30 minutes');
 
@@ -84,7 +84,7 @@ describe('TimeRangeDropdownButton', () => {
   it('updates time range with range attribute when selecting "all messages" relative time range preset', async () => {
     const setCurrentTimeRange = jest.fn();
     const onSubmit = jest.fn();
-    render(<SUTTimeRangeDropDownButton setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
+    render(<SUTTimeRangeFilterButtons setCurrentTimeRange={setCurrentTimeRange} onSubmit={onSubmit} />);
 
     await selectRangePreset('all messages');
 

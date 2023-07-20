@@ -21,7 +21,7 @@ import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import asMock from 'helpers/mocking/AsMock';
 
-import RangePresetDropdown from './RangePresetDropdown';
+import RangePresetDropdown from './TimeRangePresetDropdown';
 
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
@@ -35,8 +35,8 @@ describe('RangePresetDropdown', () => {
     const onSelectOption = jest.fn();
     render(<RangePresetDropdown onChange={onSelectOption} availableOptions={[]} />);
 
-    const timeRangeButton = screen.getByLabelText('Open time range preset select');
-    fireEvent.click(timeRangeButton);
+    const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
+    fireEvent.click(timeRangePresetButton);
     const rangePresetOption = await screen.findByText('Configure Ranges');
     fireEvent.click(rangePresetOption);
 
@@ -75,8 +75,8 @@ describe('RangePresetDropdown', () => {
                                   },
                                 ]} />);
 
-    const timeRangeButton = screen.getByLabelText('Open time range preset select');
-    fireEvent.click(timeRangeButton);
+    const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
+    fireEvent.click(timeRangePresetButton);
 
     const tenMinTR = screen.queryByText('Keyword ten min');
     await screen.findByText('5 minutes');

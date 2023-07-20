@@ -25,9 +25,10 @@ import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } fr
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon, IfPermitted } from 'components/common';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
-import TimeRangeAddToQuickListButton from 'views/components/searchbar/date-time-picker/TimeRangeAddToQuickListButton';
-import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/date-time-picker/TimeRangeDropdown';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+
+import type { TimeRangePickerFormValues } from './TimeRangePicker';
+import TimeRangeAddToQuickListButton from './TimeRangeAddToQuickListButton';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -104,7 +105,7 @@ export const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
-  const { isValid, errors } = useFormikContext<TimeRangeDropDownFormValues>();
+  const { isValid, errors } = useFormikContext<TimeRangePickerFormValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
 
@@ -136,9 +137,9 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
         <Date title={`Dates Formatted as [${DATE_TIME_FORMATS.complete}]`}>{until}</Date>
       </UntilWrapper>
       {showAddToQuickListButton && !!(timerange as TimeRange).type && (
-      <IfPermitted permissions="clusterconfigentry:edit">
-        <TimeRangeAddToQuickListButton timerange={timerange as TimeRange} isTimerangeValid={isTimerangeValid} />
-      </IfPermitted>
+        <IfPermitted permissions="clusterconfigentry:edit">
+          <TimeRangeAddToQuickListButton timerange={timerange as TimeRange} isTimerangeValid={isTimerangeValid} />
+        </IfPermitted>
       )}
     </PreviewWrapper>
   );

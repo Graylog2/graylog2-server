@@ -46,7 +46,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
   });
 });
 
-describe('TimeRangeDropdown', () => {
+describe('TimeRangeAddToQuickListButton', () => {
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchClusterConfig,

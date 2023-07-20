@@ -76,7 +76,7 @@ const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
-const RangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
+const TimeRangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { config } = useSearchConfiguration();
   const [filtratedByLimitOptions, setFiltratedByLimitOptions] = useState([]);
@@ -148,7 +148,7 @@ const RangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, c
   );
 };
 
-RangePresetDropdown.propTypes = {
+TimeRangePresetDropdown.propTypes = {
   bsSize: PropTypes.string,
   className: PropTypes.string,
   disabled: PropTypes.bool,
@@ -159,7 +159,7 @@ RangePresetDropdown.propTypes = {
   availableOptions: PropTypes.array,
 };
 
-RangePresetDropdown.defaultProps = {
+TimeRangePresetDropdown.defaultProps = {
   bsSize: 'small',
   className: undefined,
   disabled: false,
@@ -170,4 +170,4 @@ RangePresetDropdown.defaultProps = {
   availableOptions: [],
 };
 
-export default RangePresetDropdown;
+export default TimeRangePresetDropdown;

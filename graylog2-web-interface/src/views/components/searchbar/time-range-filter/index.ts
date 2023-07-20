@@ -14,19 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import TimeRangeFilter from './TimeRangeFilter';
 
-import { MenuItem } from 'components/bootstrap';
-import { availableTimeRangeTypes } from 'views/Constants';
-
-type ResultType = React.ReactElement<MenuItem>;
-
-const timeRangeTypeMenuItems = (currentType: string) => availableTimeRangeTypes.map<ResultType>(({ type, name }) => (
-  <MenuItem key={`time-range-type-selector-${type}`}
-            eventKey={type}
-            active={currentType === type}>
-    {name}
-  </MenuItem>
-));
-
-export default timeRangeTypeMenuItems;
+export default TimeRangeFilter;

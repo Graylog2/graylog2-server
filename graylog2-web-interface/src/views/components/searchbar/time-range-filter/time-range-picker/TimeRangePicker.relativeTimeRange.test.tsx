@@ -21,8 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 
-import type { TimeRangeDropdownProps } from './TimeRangeDropdown';
-import OriginalTimeRangeDropDown from './TimeRangeDropdown';
+import OriginalTimeRangePicker from './TimeRangePicker';
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -37,7 +36,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
-describe('TimeRangeDropdown relative time range', () => {
+describe('TimeRangePicker relative time range', () => {
   const defaultProps = {
     currentTimeRange: {
       type: 'relative',
@@ -50,14 +49,14 @@ describe('TimeRangeDropdown relative time range', () => {
     limitDuration: 259200,
   } as const;
 
-  const TimeRangeDropdown = (allProps: Partial<TimeRangeDropdownProps>) => (
-    <OriginalTimeRangeDropDown {...defaultProps} {...allProps} />
+  const TimeRangePicker = (allProps: Partial<React.ComponentProps<typeof TimeRangePicker>>) => (
+    <OriginalTimeRangePicker {...defaultProps} {...allProps} />
   );
 
   const getSubmitButton = () => screen.getByRole('button', { name: /Update time range/i });
 
   it('display warning when emptying from range value input', async () => {
-    render(<TimeRangeDropdown />);
+    render(<TimeRangePicker />);
 
     const fromRangeValueInput = screen.getByTitle('Set the from value');
 
@@ -75,7 +74,7 @@ describe('TimeRangeDropdown relative time range', () => {
       from: 300,
       to: 240,
     };
-    render(<TimeRangeDropdown currentTimeRange={currentTimeRange} />);
+    render(<TimeRangePicker currentTimeRange={currentTimeRange} />);
 
     const toRangeValueInput = screen.getByTitle('Set the to value');
     const submitButton = getSubmitButton();
@@ -94,7 +93,7 @@ describe('TimeRangeDropdown relative time range', () => {
       from: 300,
       to: 240,
     };
-    render(<TimeRangeDropdown currentTimeRange={currentTimeRange} setCurrentTimeRange={setCurrentTimeRangeStub} />);
+    render(<TimeRangePicker currentTimeRange={currentTimeRange} setCurrentTimeRange={setCurrentTimeRangeStub} />);
 
     const fromRangeValueInput = await screen.findByTitle('Set the from value');
     const toRangeValueInput = screen.getByTitle('Set the to value');

@@ -23,8 +23,9 @@ import type {
   KeywordTimeRange,
   NoTimeRangeOverride, TimeRange,
 } from 'views/logic/queries/Query';
-import type { RelativeTimeRangeClassified, RangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+
+import type { RelativeTimeRangeClassified, RangeClassified } from './types';
 
 const DEFAULT_CLASSIFIED_RANGE: RangeClassified = {
   value: 5,

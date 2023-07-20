@@ -24,7 +24,7 @@ import type {
   KeywordTimeRange,
   TimeRange,
 } from 'views/logic/queries/Query';
-import { dateOutput } from 'views/components/searchbar/TimeRangeDisplay';
+import { dateOutput } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
 
 type Props = { options : Array<QuickAccessTimeRange>};
 
