@@ -23,6 +23,8 @@ import { getSavedRuleSourceCode, removeSavedRuleSourceCode } from 'hooks/useRule
 
 let VALIDATE_TIMEOUT;
 
+export const DEFAULT_SIMULATOR_JSON_MESSAGE = '{\n    "message": "test"\n}';
+
 export const PipelineRulesContext = createContext(undefined);
 
 const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void = () => {}, onError: (error: object) => void = () => {}) => {
@@ -49,8 +51,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [ruleSource, setRuleSource] = useState(rule?.source);
   const [description, setDescription] = useState(rule?.description);
   const [startRuleSimulation, setStartRuleSimulation] = useState(true);
-  // eslint-disable-next-line quotes
-  const [rawMessageToSimulate, setRawMessageToSimulate] = useState(`{\n    "message": "test"\n}`);
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState(DEFAULT_SIMULATOR_JSON_MESSAGE);
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     RulesActions.parse(nextRule, callback);
   }, [rule, description]);
 
-  const simulateRule = useCallback((messageString: string, _rule: RuleType, callback: () => void) => {
+  const simulateRule = useCallback((messageString: string, _rule: RuleType, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
     RulesActions.simulate(messageString, _rule, callback);
   }, []);
 

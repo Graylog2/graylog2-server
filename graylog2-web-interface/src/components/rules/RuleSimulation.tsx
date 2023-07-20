@@ -25,7 +25,7 @@ import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 
-import { PipelineRulesContext } from './RuleContext';
+import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
 
 const RuleSimulationFormGroup = styled(FormGroup)`
@@ -117,8 +117,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
       <div>
         <Input id="message"
                type="textarea"
-               // eslint-disable-next-line quotes
-               placeholder={`{\n    "message": "test"\n}`}
+               placeholder={DEFAULT_SIMULATOR_JSON_MESSAGE}
                value={rawMessageToSimulate}
                onChange={handleRawMessageChange}
                title="Message string or JSON"

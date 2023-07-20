@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import ObjectID from 'bson-objectid';
 
@@ -42,6 +42,7 @@ import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 
 import RuleSimulation from '../RuleSimulation';
 import RuleHelper from '../rule-helper/RuleHelper';
+import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from '../RuleContext';
 
 const ActionsCol = styled(Col)`
   margin-top: 50px;
@@ -96,6 +97,11 @@ const RuleBuilder = () => {
     updateRule,
     fetchValidateRule,
   } = useRuleBuilder();
+
+  const {
+    simulateRule,
+    setRawMessageToSimulate,
+  } = useContext(PipelineRulesContext);
 
   const [rule, setRule] = useState<RuleBuilderRule>({
     description: '',
@@ -189,7 +195,11 @@ const RuleBuilder = () => {
       };
     }
 
-    validateAndSaveRuleBuilder(ruleToAdd);
+    await validateAndSaveRuleBuilder(ruleToAdd);
+
+    if (showSimulator) {
+      await simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, ruleToAdd);
+    }
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
@@ -219,7 +229,11 @@ const RuleBuilder = () => {
       };
     }
 
-    validateAndSaveRuleBuilder(ruleToUpdate);
+    await validateAndSaveRuleBuilder(ruleToUpdate);
+
+    if (showSimulator) {
+      await simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, ruleToUpdate);
+    }
   };
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
@@ -247,7 +261,11 @@ const RuleBuilder = () => {
       };
     }
 
-    validateAndSaveRuleBuilder(ruleToDelete);
+    await validateAndSaveRuleBuilder(ruleToDelete);
+
+    if (showSimulator) {
+      await simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, ruleToDelete);
+    }
   };
 
   const handleCancel = () => {
@@ -342,7 +360,14 @@ const RuleBuilder = () => {
           <SimulatorSwitchContaner>
             <Toggle>
               <input type="checkbox"
-                     onChange={() => setShowSimulator(!showSimulator)}
+                     onChange={() => {
+                       setShowSimulator(!showSimulator);
+
+                       if (!showSimulator) {
+                         setRawMessageToSimulate(DEFAULT_SIMULATOR_JSON_MESSAGE);
+                         simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, rule);
+                       }
+                     }}
                      checked={showSimulator} />
               <span className="slider" />
             </Toggle>
