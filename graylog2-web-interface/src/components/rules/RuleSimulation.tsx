@@ -45,8 +45,8 @@ const ActionOutputIndex = styled.b`
   color: #aaa;
 `;
 
-const ActionsOutputContainer = styled.div`
-  margin-top: 16px;
+const OutputContainer = styled.div`
+  margin-top: 8px;
 `;
 
 type Props = {
@@ -64,9 +64,11 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
 
-  const actionsOuputPrefix = 'gl2_simulator_output_actions';
-  const actionsOutputKeys = Object.keys(ruleSimulationResult?.fields || {}).filter((key) => key.includes(actionsOuputPrefix));
-  const getActionOutpuKey = (actionIndex: number) => `${actionsOuputPrefix}_${actionIndex}`;
+  const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {});
+  const getActionOutpuKey = (actionIndex: number) => `actions_${actionIndex}`;
+
+  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {});
+  const getConditionOutpuKey = (conditionIndex: number) => `${conditionIndex}`;
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -134,19 +136,27 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
           Reset
         </ResetButton>
         {ruleSimulationResult && (
-          <ActionsOutputContainer>
-            <label htmlFor="simulation_actions_output">Actions Output</label>
-            {actionsOutputKeys.map((actionsOutputKey, key) => (
-              <div key={actionsOutputKey}>
-                <ActionOutputIndex>Action {key + 1}</ActionOutputIndex>: {ruleSimulationResult?.fields[getActionOutpuKey(key + 1)]}
-              </div>
-            ))}
-          </ActionsOutputContainer>
-        )}
-        {ruleSimulationResult && (
-          <MessageShowContainer>
-            <MessageShow message={ruleSimulationResult} />
-          </MessageShowContainer>
+          <>
+            <MessageShowContainer>
+              <MessageShow message={ruleSimulationResult} />
+            </MessageShowContainer>
+            <OutputContainer>
+              <label htmlFor="simulation_conditions_output">Conditions Output</label>
+              {conditionsOutputKeys.map((conditionsOutputKey, key) => (
+                <div key={conditionsOutputKey}>
+                  <ActionOutputIndex>Condition {key + 1}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[getConditionOutpuKey(key + 1)])}
+                </div>
+              ))}
+            </OutputContainer>
+            <OutputContainer>
+              <label htmlFor="simulation_actions_output">Actions Output</label>
+              {actionsOutputKeys.map((actionsOutputKey, key) => (
+                <div key={actionsOutputKey}>
+                  <ActionOutputIndex>Action {key + 1}</ActionOutputIndex>: {ruleSimulationResult?.simulator_action_variables[getActionOutpuKey(key + 1)]}
+                </div>
+              ))}
+            </OutputContainer>
+          </>
         )}
       </div>
     </RuleSimulationFormGroup>
