@@ -34,6 +34,7 @@ export type TimeConfigType = {
 
 export type ValuesConfigType = {
   limit: number,
+  skip_empty_values: boolean,
 };
 
 export type PivotConfigType = TimeConfigType | ValuesConfigType;
@@ -55,10 +56,12 @@ type InternalState = {
   config: PivotConfigType,
 };
 
+const DEFAULT_PIVOT_CONFIG = { limit: DEFAULT_PIVOT_LIMIT, skip_empty_values: false };
+
 export default class Pivot {
   _value: InternalState;
 
-  constructor(fields: Array<string>, type: string, config: PivotConfigType = { limit: DEFAULT_PIVOT_LIMIT }) {
+  constructor(fields: Array<string>, type: string, config: PivotConfigType = DEFAULT_PIVOT_CONFIG) {
     this._value = { fields, type, config };
   }
 
@@ -74,12 +77,16 @@ export default class Pivot {
     return this._value.config;
   }
 
-  static create(fields: Array<string>, type: string, config: PivotConfigType = { limit: DEFAULT_PIVOT_LIMIT }) {
+  static create(fields: Array<string>, type: string, config: PivotConfigType = DEFAULT_PIVOT_CONFIG) {
     return new Pivot(fields, type, config);
   }
 
+  static createValues(fields: Array<string>, config: ValuesConfigType = DEFAULT_PIVOT_CONFIG) {
+    return Pivot.create(fields, ValuesType, config);
+  }
+
   static fromJSON(value: PivotJson) {
-    const { fields, type, config = { limit: DEFAULT_PIVOT_LIMIT } } = value;
+    const { fields, type, config = DEFAULT_PIVOT_CONFIG } = value;
 
     return new Pivot(fields, type, config);
   }
