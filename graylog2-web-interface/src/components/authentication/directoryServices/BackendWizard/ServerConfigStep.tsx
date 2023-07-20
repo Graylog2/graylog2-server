@@ -58,7 +58,7 @@ const ServerUrl = styled.div`
     min-height: 34px;
     flex-grow: 1;
 
-    :last-child {
+    &:last-child {
       flex: 0.8;
       min-width: 130px;
     }

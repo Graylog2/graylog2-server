@@ -45,7 +45,7 @@ const Section = styled.div`
   height: 100%;
   margin-bottom: 10px;
 
-  :last-child {
+  &:last-child {
     margin-bottom: 0;
   }
 `;

@@ -51,15 +51,15 @@ const SetTimeOption = styled.div`
 const StyledFormControl = styled(FormControl)`
   padding: 0 6px 0 9px;
 
-  :nth-of-type(1) {
+  &:nth-of-type(1) {
     grid-area: 2 / 2 / 2 / 2;
   }
   
-  :nth-of-type(2) {
+  &:nth-of-type(2) {
     grid-area: 2 / 4 / 2 / 4;
   }
   
-  :nth-of-type(3) {
+  &:nth-of-type(3) {
     grid-area: 2 / 6 / 2 / 6;
   }
 `;
@@ -78,19 +78,19 @@ const StyledInputAddon = styled(InputGroup.Addon)(({ theme }) => css`
     padding: 0 3px;
   }
 
-  :nth-of-type(1) {
+  &:nth-of-type(1) {
     grid-area: 2 / 1 / 2 / 1;
   }
   
-  :nth-of-type(2) {
+  &:nth-of-type(2) {
     grid-area: 2 / 3 / 2 / 3;
   }
   
-  :nth-of-type(3) {
+  &:nth-of-type(3) {
     grid-area: 2 / 5 / 2 / 5;
   }
   
-  :nth-of-type(4) {
+  &:nth-of-type(4) {
     grid-area: 2 / 7 / 2 / 7;
   }
 `);
@@ -109,15 +109,15 @@ const FormGroupGrid = styled(FormGroup)`
     padding-left: 6px;
     margin: 0;
     
-    :nth-child(1) {
+    &:nth-child(1) {
       grid-area: 1 / 2 / 1 / 2;
     }
 
-    :nth-child(2) {
+    &:nth-child(2) {
       grid-area: 1 / 4 / 1 / 4;
     }
 
-    :nth-child(3) {
+    &:nth-child(3) {
       grid-area: 1 / 6 / 1 / 6;
     }
   }

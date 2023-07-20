@@ -21,7 +21,7 @@ import { Col, Row, HelpBlock } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const StyledRow = styled(Row)`
-  :not(:last-child) {
+  &:not(:last-child) {
     margin-bottom: 7px;
   }
 `;

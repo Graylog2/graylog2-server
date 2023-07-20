@@ -23,7 +23,7 @@ const Wrapper = styled.div(({ theme }) => css`
   border-radius: 6px;
   margin-bottom: 6px;
 
-  :last-child {
+  &:last-child {
     margin-bottom: 0;
   }
 
