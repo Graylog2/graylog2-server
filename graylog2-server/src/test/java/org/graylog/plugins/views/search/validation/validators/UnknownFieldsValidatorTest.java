@@ -46,6 +46,15 @@ class UnknownFieldsValidatorTest {
     }
 
     @Test
+    void testDoesNotIdentifySpecialIdFieldAsUnknown() {
+        final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
+                Set.of("some_normal_field"),
+                List.of(ParsedTerm.create("_id", "buba"))
+        );
+        assertTrue(unknownFields.isEmpty());
+    }
+
+    @Test
     void testDoesNotIdentifyDefaultFieldAsUnknown() {
         final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
                 Set.of("some_normal_field"),
