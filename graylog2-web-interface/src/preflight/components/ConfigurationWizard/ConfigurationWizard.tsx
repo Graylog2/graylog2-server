@@ -23,9 +23,11 @@ import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Consta
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-import { List, Grid } from 'preflight/components/common';
+import { List, Grid, Button, Space } from 'preflight/components/common';
 import RenewalPolicyConfiguration from 'preflight/components/ConfigurationWizard/RenewalPolicyConfiguration';
 import type { ConfigurationStep } from 'preflight/types';
+import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
+import RestartConfigurationButton from 'preflight/components/RestartConfigurationButton';
 
 import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';
@@ -69,6 +71,10 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
   const { step: activeStepKey, isLoading: isLoadingConfigurationStep } = useConfigurationStep();
   const theme = useTheme();
 
+  const onRestartConfiguration = () => {
+
+  };
+
   if (isLoadingConfigurationStep) {
     return <Spinner />;
   }
@@ -90,6 +96,16 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
             );
           })}
         </List>
+        <Space h="md" />
+        You can always
+        {' '}
+        <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup}
+                             compact
+                             variant="light">
+          resume startup
+        </ResumeStartupButton>
+        {' '}
+        or <RestartConfigurationButton compact variant="light" color="red" /> the configuration
       </Grid.Col>
       <Grid.Col span={12} md={6} orderMd={1}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
