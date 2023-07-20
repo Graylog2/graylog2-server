@@ -73,7 +73,11 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Pro
 
   const formatParamValue = (value : string | number | boolean) => {
     if (paramValueIsVariable(value)) {
-      return 'Output of the previous step';
+      return (
+        <Label bsStyle="default">
+          {value}
+        </Label>
+      );
     }
 
     return (value.toString());
@@ -92,7 +96,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Pro
             {block?.outputvariable && (
             <OutputVariable>
               <OutputIcon name="level-up-alt" rotation={90} />
-              <Label bsStyle="default">
+              <Label bsStyle="primary">
                 {`$${block?.outputvariable}`}
               </Label>
             </OutputVariable>
