@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { MessageDetailsDefinitionList } from 'components/common';
@@ -33,7 +32,7 @@ type Props = {
   fields: FieldTypeMappingsList,
 };
 
-const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }: { theme: DefaultTheme }) => css`
+const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
 
   dd {

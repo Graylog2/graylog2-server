@@ -32,35 +32,35 @@ export type NavItemProps = {
 };
 
 type ContainerProps = {
-  isSelected: boolean,
-  sidebarIsPinned: boolean,
-  disabled: boolean,
+  $isSelected: boolean,
+  $sidebarIsPinned: boolean,
+  $disabled: boolean,
 };
 
-const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSelected, sidebarIsPinned, disabled }) => css`
+const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSelected, $sidebarIsPinned, $disabled }) => css`
   position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
   height: 40px;
   text-align: center;
-  cursor: ${disabled ? 'not-allowed' : 'pointer'};
+  cursor: ${$disabled ? 'not-allowed' : 'pointer'};
   font-size: ${fonts.size.h3};
   color: ${colors.variant.darkest.default};
-  background: ${isSelected ? colors.gray[90] : colors.global.contentBackground};
+  background: ${$isSelected ? colors.gray[90] : colors.global.contentBackground};
 
-  :hover {
-    color: ${isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
-    background: ${isSelected ? colors.gray[80] : colors.variant.lightest.default};
+  &:hover {
+    color: ${$isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
+    background: ${$isSelected ? colors.gray[80] : colors.variant.lightest.default};
   }
 
-  :active {
+  &:active {
     background: ${colors.variant.lighter.default};
   }
 
   /* stylelint-disable selector-max-empty-lines, indentation */
-  ${(isSelected && !sidebarIsPinned) && css`
-    ::before,
-    ::after {
+  ${($isSelected && !$sidebarIsPinned) && css`
+    &::before,
+    &::after {
       content: '';
       position: absolute;
       right: -5px;
@@ -69,12 +69,12 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSele
       background-color: ${colors.global.contentBackground};
     }
 
-    ::before {
+    &::before {
       transform: skewY(-45deg);
       top: calc(50% - 12px);
     }
     
-    ::after {
+    &::after {
       transform: skewY(45deg);
       bottom: calc(50% - 12px);
     }
@@ -83,12 +83,12 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSele
 `);
 
 type IconWrapProps = {
-  showTitleOnHover: boolean,
-  isSelected: boolean,
-  sidebarIsPinned: boolean,
+  $showTitleOnHover: boolean,
+  $isSelected: boolean,
+  $sidebarIsPinned: boolean,
   $disabled: boolean,
 }
-const IconWrap = styled.span<IconWrapProps>(({ showTitleOnHover, isSelected, $disabled, theme: { colors }, sidebarIsPinned }) => css`
+const IconWrap = styled.span<IconWrapProps>(({ $showTitleOnHover, $isSelected, $disabled, $sidebarIsPinned, theme: { colors } }) => css`
   display: flex;
   width: 100%;
   height: 100%;
@@ -97,21 +97,21 @@ const IconWrap = styled.span<IconWrapProps>(({ showTitleOnHover, isSelected, $di
   position: relative;
   opacity: ${$disabled ? 0.65 : 1};
 
-  :hover {
+  &:hover {
     + div {
-      display: ${(showTitleOnHover && !isSelected) ? 'flex' : 'none'};
+      display: ${($showTitleOnHover && !$isSelected) ? 'flex' : 'none'};
     }
 
-    ::after {
-      display: ${(showTitleOnHover) ? 'block' : 'none'};
+    &::after {
+      display: ${($showTitleOnHover) ? 'block' : 'none'};
     }
   }
 
-  ::after {
-    display: ${isSelected ? 'block' : 'none'};
-    box-shadow: ${(isSelected && !sidebarIsPinned) ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}` : 'none'};
-    background-color: ${isSelected ? colors.global.contentBackground : colors.variant.lightest.info};
-    border: ${isSelected ? 'none' : `1px solid ${colors.variant.light.info}`};
+  &::after {
+    display: ${$isSelected ? 'block' : 'none'};
+    box-shadow: ${($isSelected && !$sidebarIsPinned) ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}` : 'none'};
+    background-color: ${$isSelected ? colors.global.contentBackground : colors.variant.lightest.info};
+    border: ${$isSelected ? 'none' : `1px solid ${colors.variant.light.info}`};
     content: ' ';
     position: absolute;
     left: 82.5%;
@@ -147,14 +147,14 @@ const Title = styled.div(({ theme: { colors, fonts } }) => css`
 
 const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned, disabled }: NavItemProps) => (
   <Container aria-label={title}
-             isSelected={isSelected}
+             $isSelected={isSelected}
              onClick={!disabled ? onClick : undefined}
              title={showTitleOnHover ? '' : title}
-             sidebarIsPinned={sidebarIsPinned}
-             disabled={disabled}>
-    <IconWrap showTitleOnHover={showTitleOnHover}
-              isSelected={isSelected}
-              sidebarIsPinned={sidebarIsPinned}
+             $sidebarIsPinned={sidebarIsPinned}
+             $disabled={disabled}>
+    <IconWrap $showTitleOnHover={showTitleOnHover}
+              $isSelected={isSelected}
+              $sidebarIsPinned={sidebarIsPinned}
               $disabled={disabled}>
       <Icon name={icon} />
     </IconWrap>

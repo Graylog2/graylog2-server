@@ -43,12 +43,12 @@ const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeStat
   }
 };
 
-const Container = styled.li<{ currentState: CurrentGranteeState, theme: DefaultTheme }>(({ theme, currentState }) => css`
+const Container = styled.li<{ $currentState: CurrentGranteeState }>(({ theme, $currentState }) => css`
   display: flex;
   align-items: center;
   width: 100%;
   padding: 5px;
-  border-left: 5px solid ${currentStateColor(theme, currentState)};
+  border-left: 5px solid ${currentStateColor(theme, $currentState)};
 `);
 
 const GranteeInfo = styled.div`
@@ -105,7 +105,7 @@ const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee:
   return (
     <Formik initialValues={{ capabilityId }} onSubmit={() => {}}>
       <Form>
-        <Container currentState={currentGranteeState}>
+        <Container $currentState={currentGranteeState}>
           <GranteeInfo title={title}>
             <StyledGranteeIcon type={type} />
             <Title>{title}</Title>

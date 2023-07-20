@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -25,7 +24,7 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StyledButton = styled(Button)(({ theme, $dirty }: { theme: DefaultTheme, $dirty: boolean }) => css`
+const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
   position: relative;
   min-width: 63px;
 

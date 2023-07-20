@@ -48,7 +48,7 @@ const Sections = styled.div`
 `;
 
 const Section = styled.div`
-  :not(:last-child) {
+  &:not(:last-child) {
     margin-bottom: 10px;
   }
 `;

@@ -59,7 +59,7 @@ const Ago = styled.span(({ theme }) => css`
   grid-area: 2 / 7 / 3 / 8;
   font-size: ${theme.fonts.size.large};
 
-  ::after {
+  &::after {
     content: 'ago';
   }
 `);

@@ -65,7 +65,7 @@ const buttonStyles = ({ colors, utils }) => {
           border 150ms ease-in-out,
           color 150ms ease-in-out;
 
-        :hover {
+        &:hover {
           background-color: ${hoverBackground};
           border-color: ${hoverBorderColor};
           color: ${hoverColor};
@@ -76,7 +76,7 @@ const buttonStyles = ({ colors, utils }) => {
           border-color: ${activeBorder};
           color: ${activeColor};
 
-          :hover {
+          &:hover {
             background-color: ${isLink ? variants.link : activeHoverBackground};
             border-color: ${activeHoverBorderColor};
             color: ${activeHoverColor};
@@ -89,7 +89,7 @@ const buttonStyles = ({ colors, utils }) => {
           border-color: ${disabledBorder};
           color: ${disabledColor};
 
-          :hover {
+          &:hover {
             background-color: ${disabledBackground};
             border-color: ${disabledBorder};
             color: ${disabledColor};
