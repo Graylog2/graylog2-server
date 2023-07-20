@@ -23,7 +23,7 @@ const getDictForFunction = (dict: BlockDict[], functionName: string) : BlockDict
 const getActionOutputVariableName = (order : number) : string => {
   if (order === 0) return '';
 
-  return `output_actions_${order}`;
+  return `output_${order}`;
 };
 
 const paramValueExists = (paramValue: string | number | boolean | undefined) : boolean => (
