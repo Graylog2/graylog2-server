@@ -38,6 +38,7 @@ import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.HasOptionalField;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
@@ -273,7 +274,7 @@ public class LegacyAlertConditionMigratorTest {
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
                         assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isNull();
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -311,7 +312,7 @@ public class LegacyAlertConditionMigratorTest {
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
                         assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isNull();
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -524,7 +525,7 @@ public class LegacyAlertConditionMigratorTest {
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
                         assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isNull();
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -562,7 +563,7 @@ public class LegacyAlertConditionMigratorTest {
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
                         assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isNull();
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -600,7 +601,7 @@ public class LegacyAlertConditionMigratorTest {
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
                         assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isNull();
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
