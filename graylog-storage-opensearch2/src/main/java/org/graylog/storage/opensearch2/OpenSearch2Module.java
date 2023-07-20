@@ -27,7 +27,6 @@ import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
 import org.graylog.storage.opensearch2.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2;
-import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -42,18 +41,13 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
 
-import javax.inject.Inject;
-
-import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
-
 public class OpenSearch2Module extends VersionAwareModule {
     private final SearchVersion supportedVersion;
+    private final boolean useComposableIndexTemplates;
 
-    @Inject
-    private FeatureFlags featureFlags;
-
-    public OpenSearch2Module(final SearchVersion supportedVersion) {
+    public OpenSearch2Module(final SearchVersion supportedVersion, boolean useComposableIndexTemplates) {
         this.supportedVersion = supportedVersion;
+        this.useComposableIndexTemplates = useComposableIndexTemplates;
     }
 
     @Override
@@ -61,7 +55,7 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverOS2.class);
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
-        if (featureFlags.isOn(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+        if (useComposableIndexTemplates) {
             bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
         } else {
             bindForSupportedVersion(IndicesAdapter.class).to(LegacyIndicesAdapterOS2.class);
