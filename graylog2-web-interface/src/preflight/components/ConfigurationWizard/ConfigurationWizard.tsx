@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import useConfigurationStep from 'preflight/hooks/useConfigurationStep';
 import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Constants';
@@ -23,6 +24,8 @@ import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 import { List, Grid } from 'preflight/components/common';
+import RenewalPolicyConfiguration from 'preflight/components/ConfigurationWizard/RenewalPolicyConfiguration';
+import type { ConfigurationStep } from 'preflight/types';
 
 import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';
@@ -34,7 +37,7 @@ const StepIcon = styled(Icon)<{ $color: string }>(({ $color, theme }) => css`
   border-radius: 50%;
 `);
 
-const stepIcon = (stepKey, activeStepKey, theme): { name: IconName, color: string } => {
+const stepIcon = (stepKey: ConfigurationStep, activeStepKey: ConfigurationStep, theme: DefaultTheme): { name: IconName, color: string } => {
   const stepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === stepKey);
   const activeStepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === activeStepKey);
 
@@ -90,6 +93,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
       </Grid.Col>
       <Grid.Col span={12} md={6} orderMd={1}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
+        {activeStepKey === CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key && <RenewalPolicyConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning />}
         {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && <ConfigurationFinished setIsWaitingForStartup={setIsWaitingForStartup} />}
       </Grid.Col>

@@ -20,8 +20,6 @@ import type { Matcher } from 'wrappedTestingLibrary';
 import { render, within, screen, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
-import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -31,12 +29,11 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import DataTable from 'views/components/datatable/DataTable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import dataTable from 'views/components/datatable/bindings';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
-import viewsReducers from 'views/viewsReducers';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -50,8 +47,8 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-const pivot0 = Pivot.create([fieldTypeMapping1.name], 'values', { limit: 15 });
-const pivot1 = Pivot.create([fieldTypeMapping2.name], 'values', { limit: 15 });
+const pivot0 = Pivot.createValues([fieldTypeMapping1.name]);
+const pivot1 = Pivot.createValues([fieldTypeMapping2.name]);
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -61,8 +58,6 @@ const widgetConfig = AggregationWidgetConfig
   .build();
 
 const selectEventConfig = { container: document.body };
-
-const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable], 'views.reducers': viewsReducers } };
 
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
@@ -108,9 +103,7 @@ const renderSUT = (props = {}) => render((
 ));
 
 describe('AggregationWizard', () => {
-  beforeAll(() => PluginStore.register(plugin));
-
-  afterAll(() => PluginStore.unregister(plugin));
+  useViewsPlugin();
 
   it('should display sort element form with values from config', async () => {
     const config = widgetConfig

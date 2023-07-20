@@ -107,8 +107,8 @@ describe('QuickAccessTimeRangeForm', () => {
   it('edit timerange action trigger onUpdate', async () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
-    const timerangeInput = await within(timerangeItem).findByText('5 minutes ago');
-    await fireEvent.click(timerangeInput);
+    const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
+    await fireEvent.click(timerangeFilter);
     await screen.findByText(/search time range/i);
     const fromInput = await screen.findByTitle('Set the from value');
     await fireEvent.change(fromInput, { target: { value: 15 } });

@@ -15,15 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
-import bindings from 'views/components/visualizations/bindings';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
@@ -33,11 +30,10 @@ import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { createSearch } from 'fixtures/searches';
-import viewsReducers from 'views/viewsReducers';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 const testTimeout = applyTimeoutMultiplier(30000);
-const plugin: PluginRegistration = { exports: { visualizationTypes: bindings, 'views.reducers': viewsReducers } };
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -92,9 +88,7 @@ const selectOption = async (ariaLabel: string, option: string) => {
 };
 
 describe('AggregationWizard/Core Visualizations', () => {
-  beforeAll(() => PluginStore.register(plugin));
-
-  afterAll(() => PluginStore.unregister(plugin));
+  useViewsPlugin();
 
   it('shows all visualization types', async () => {
     render(<SimpleAggregationWizard />);
@@ -200,8 +194,8 @@ describe('AggregationWizard/Core Visualizations', () => {
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
     const heatMapConfig = widgetConfig.toBuilder()
-      .rowPivots([Pivot.create(['foo'], 'values')])
-      .columnPivots([Pivot.create(['bar'], 'values')])
+      .rowPivots([Pivot.createValues(['foo'])])
+      .columnPivots([Pivot.createValues(['bar'])])
       .series([Series.create('count')])
       .build();
 

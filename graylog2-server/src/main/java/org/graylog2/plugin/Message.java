@@ -65,6 +65,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ASSOCIATED_ASSETS;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -228,7 +229,8 @@ public class Message implements Messages, Indexable {
             FIELD_ILLUMINATE_GIM_EVENT_TYPE,
             FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE,
             FIELD_ILLUMINATE_GIM_TAGS,
-            FIELD_ILLUMINATE_GIM_VERSION
+            FIELD_ILLUMINATE_GIM_VERSION,
+            FIELD_ASSOCIATED_ASSETS
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -780,7 +782,7 @@ public class Message implements Messages, Indexable {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<String> getStreamIds() {
+    public Set<String> getStreamIds() {
         Collection<String> streamField;
         try {
             streamField = getFieldAs(Collection.class, FIELD_STREAMS);

@@ -22,3 +22,11 @@ const testViewsPlugin = new PluginManifest({}, viewsBindings);
 
 export const loadViewsPlugin = () => PluginStore.register(testViewsPlugin);
 export const unloadViewsPlugin = () => PluginStore.unregister(testViewsPlugin);
+
+const useViewsPlugin = () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+};
+
+export default useViewsPlugin;

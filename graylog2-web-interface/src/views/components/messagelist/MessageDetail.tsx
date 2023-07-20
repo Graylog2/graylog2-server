@@ -37,7 +37,9 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
+import FormatAssetList from 'views/components/messagelist/FormatAssetList';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -89,9 +91,16 @@ const MessageDetail = ({
   const { searchesClusterConfig } = useStore(SearchConfigStore);
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
-  const { gl2_source_node, gl2_source_input } = fields;
+  const { gl2_source_node, gl2_source_input, associated_assets } = fields;
   const { isLocalNode } = useIsLocalNode(gl2_source_node);
   const additionalContext = useMemo(() => ({ isLocalNode }), [isLocalNode]);
+  const pluggableAssetListComponent = usePluginEntities('views.components.assetInformationActions');
+
+  const assetsList = React.useMemo(() => pluggableAssetListComponent.map(
+    ({ component: PluggableAssetListItem }) => (
+      <PluggableAssetListItem identifiers={associated_assets} />
+    ),
+  ), [pluggableAssetListComponent, associated_assets]);
 
   const _toggleShowOriginal = () => {
     setShowOriginal(!showOriginal);
@@ -166,7 +175,10 @@ const MessageDetail = ({
                                                    sourceNodeId={gl2_source_node}
                                                    sourceInputId={gl2_source_input} />
                                )}
-                               streams={streamsListItems} />
+                               streams={streamsListItems}
+                               assets={associated_assets ? (
+                                 <FormatAssetList assets={assetsList} />
+                               ) : <div />} />
               <MessageAugmentations message={message} />
             </Col>
             <Col md={9}>
