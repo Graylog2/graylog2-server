@@ -17,6 +17,12 @@
 package org.graylog2.indexer.messages;
 
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -32,6 +38,8 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -40,10 +48,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -57,6 +67,8 @@ import static org.mockito.Mockito.verify;
 
 public abstract class MessagesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "messages_it_deflector";
+
+    private static final Logger LOG = LoggerFactory.getLogger(MessagesIT.class);
 
     protected Messages messages;
 
@@ -181,6 +193,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
+        waitForClusterBlockRelease();
 
         final Set<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
@@ -189,6 +202,22 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
         assertThat(succeeded.get()).isTrue();
+    }
+
+
+    private void waitForClusterBlockRelease() throws ExecutionException, RetryException {
+        RetryerBuilder.<String>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(20))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        LOG.info("Waiting for cluster block to be automatically released, attempt {}", attempt.getAttemptNumber());
+                    }
+                })
+                .retryIfResult(clusterBlockValue -> Objects.equals("true", clusterBlockValue))
+                .build()
+                .call(() -> client().getClusterSetting("cluster.blocks.create_index"));
     }
 
     private Messages.IndexingListener createIndexingListener(CountDownLatch retryLatch, AtomicBoolean successionFlag) {
