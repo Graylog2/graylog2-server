@@ -245,16 +245,14 @@ const ReviewItems = styled.ul`
   li {
     padding: 5px;
 
-    :nth-of-type(odd) {
+    &:nth-of-type(odd) {
       background-color: rgba(220, 225, 229, 0.4);
     }
   }
 
-  strong {
-    ::after {
-      content: ':';
-      margin-right: 5px;
-    }
+  strong::after {
+    content: ':';
+    margin-right: 5px;
   }
 `;
 
@@ -264,11 +262,11 @@ const EditAnchor = styled.a`
   font-style: italic;
   cursor: pointer;
 
-  ::before {
+  &::before {
     content: "(";
   }
 
-  ::after {
+  &::after {
     content: ")";
   }
 `;

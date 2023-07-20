@@ -17,6 +17,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 
@@ -65,7 +66,7 @@ const ToggleAdditionalFields = styled(Button)`
   display: block;
   font-size: 14px;
 
-  :hover {
+  &:hover {
     text-decoration: underline;
   }
 `;

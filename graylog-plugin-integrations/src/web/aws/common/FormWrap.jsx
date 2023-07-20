@@ -17,6 +17,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
+
 import { Button, Panel } from 'components/bootstrap';
 
 export const ErrorMessage = ({ fullMessage, niceMessage }) => {
@@ -159,7 +160,7 @@ const ErrorOutputStyle = createGlobalStyle`
         text-decoration: none;
         color: #AD0707;
 
-        :hover {
+        &:hover {
           text-decoration: none;
         }
       }
