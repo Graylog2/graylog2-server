@@ -148,7 +148,7 @@ const RuleBuilder = () => {
 
     const order = typeof index !== 'undefined' ? (index + 1) : (newActionBlockIndex + 1);
 
-    if ((RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict.return_type)) {
+    if ((RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict?.return_type)) {
       newBlock.outputvariable = getActionOutputVariableName(order);
     }
 
@@ -301,7 +301,7 @@ const RuleBuilder = () => {
   const outputVariableList = () : OutputVariables => (
     rule.rule_builder.actions.map((block: RuleBlock, index) => ({
       variableName: `$${block.outputvariable}`,
-      variableType: getDictForFunction(actionsDict, block.function).return_type,
+      variableType: getDictForFunction(actionsDict, block.function)?.return_type,
       stepOrder: index,
       blockId: block.id,
     }))

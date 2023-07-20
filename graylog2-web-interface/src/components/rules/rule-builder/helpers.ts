@@ -17,7 +17,7 @@
 import type { BlockDict } from './types';
 
 const getDictForFunction = (dict: BlockDict[], functionName: string) : BlockDict | undefined => (
-  dict.find((entry) => entry.name === functionName)
+  dict?.find((entry) => entry.name === functionName)
 );
 
 const getActionOutputVariableName = (order : number) : string => {
