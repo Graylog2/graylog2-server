@@ -46,7 +46,7 @@ import static java.util.Objects.isNull;
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
-    public static final String DEFAULT_HEAP_SIZE = "5g";
+    public static final String DEFAULT_HEAP_SIZE = "2g";
     public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
     private final OpenSearchClient openSearchClient;
@@ -147,6 +147,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("plugins.security.disabled", "true")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));

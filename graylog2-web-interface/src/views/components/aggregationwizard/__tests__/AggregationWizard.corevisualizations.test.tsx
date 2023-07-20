@@ -194,8 +194,8 @@ describe('AggregationWizard/Core Visualizations', () => {
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
     const heatMapConfig = widgetConfig.toBuilder()
-      .rowPivots([Pivot.create(['foo'], 'values')])
-      .columnPivots([Pivot.create(['bar'], 'values')])
+      .rowPivots([Pivot.createValues(['foo'])])
+      .columnPivots([Pivot.createValues(['bar'])])
       .series([Series.create('count')])
       .build();
 

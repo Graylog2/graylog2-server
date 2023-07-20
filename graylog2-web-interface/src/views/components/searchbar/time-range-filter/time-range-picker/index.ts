@@ -14,19 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+import TimeRangePicker from './TimeRangePicker';
 
-import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.messages.MessagesFloodStageTestIT;
-import org.junit.Rule;
-
-public class MessagesFloodStageTestES7IT extends MessagesFloodStageTestIT {
-    @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
-
-    @Override
-    protected SearchServerInstance searchServer() {
-        return this.elasticsearch;
-    }
-}
+export default TimeRangePicker;

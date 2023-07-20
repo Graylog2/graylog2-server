@@ -19,9 +19,9 @@ import moment from 'moment';
 
 import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
-import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import type { DateTime } from 'util/DateTime';
 
+import type { RelativeTimeRangeClassified } from './types';
 import {
   classifyFromRange,
   isTypeRelativeClassified,

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed query decoration in aggregation alerts."
+
+pulls = ["15793"]
+issues = ["15737"]

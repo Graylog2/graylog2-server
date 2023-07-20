@@ -17,10 +17,16 @@
 package org.graylog.events.processor.aggregation;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import org.assertj.core.api.Assertions;
 import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -39,6 +45,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,7 +98,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
@@ -189,7 +198,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -262,7 +273,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -363,5 +376,51 @@ public class PivotAggregationSearchTest {
                 DateRange.create(from.plusSeconds(processingHopSizeSec * 3), from.plusSeconds(processingHopSizeSec * 3).plusSeconds(processingWindowSizeSec)),
                 DateRange.create(from.plusSeconds(processingHopSizeSec * 4), to)
         );
+    }
+
+    @Test
+    public void testQueryParameterSubstitution() {
+
+        final long WINDOW_LENGTH = 30000;
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
+        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
+        final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
+                .query("source:$secret$")
+                .queryParameters(ImmutableSet.of(ValueParameter.builder().dataType("any").name("secret").build()))
+                .streams(Collections.emptySet())
+                .groupBy(Collections.emptyList())
+                .series(ImmutableList.of(seriesCount, seriesCard))
+                .conditions(null)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
+                .build();
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .streams(Collections.emptySet())
+                .timerange(timerange)
+                .batchSize(500)
+                .build();
+
+        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+                config,
+                parameters,
+                "test",
+                eventDefinition,
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                moreSearch,
+                new PermittedStreams(() -> Stream.of("00001")),
+                notificationService,
+                new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
+                    if (queryString.equals("source:$secret$") && parameterProvider.getParameter("secret").isPresent()) {
+                        return PositionTrackingQuery.of("source:example.org");
+                    } else {
+                        throw new IllegalArgumentException("Unexpected query decoration request!");
+                    }
+                }))
+        );
+        final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
+        Assertions.assertThat(query.query().queryString()).isEqualTo("source:example.org");
     }
 }

@@ -17,8 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import TimerangeSelector from 'views/components/searchbar/TimerangeSelector';
-import RangePresetDropdown from 'views/components/searchbar/RangePresetDropdown';
+import TimeRangePresetDropdown from 'views/components/searchbar/time-range-filter/TimeRangePresetDropdown';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
 
@@ -33,14 +32,12 @@ type Props = {
   onSetPreset: (timerange: TimeRange) => void,
   availableOptions: Array<QuickAccessTimeRange>,
 };
-const TabPresetDropdown = ({ onSetPreset, availableOptions, disabled }: Props) => (
+const TimeRangePresetRow = ({ onSetPreset, availableOptions, disabled }: Props) => (
   <ConfiguredWrapper>
-    <TimerangeSelector className="relative">
-      <RangePresetDropdown disabled={disabled}
-                           onChange={onSetPreset}
-                           availableOptions={availableOptions} />
-    </TimerangeSelector>
+    <TimeRangePresetDropdown disabled={disabled}
+                             onChange={onSetPreset}
+                             availableOptions={availableOptions} />
   </ConfiguredWrapper>
 );
 
-export default TabPresetDropdown;
+export default TimeRangePresetRow;

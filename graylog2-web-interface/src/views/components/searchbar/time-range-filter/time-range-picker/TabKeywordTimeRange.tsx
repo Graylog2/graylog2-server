@@ -30,8 +30,9 @@ import type { KeywordTimeRange, AbsoluteTimeRange } from 'views/logic/queries/Qu
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { TimeRangeDropDownFormValues } from 'views/components/searchbar/date-time-picker/TimeRangeDropdown';
-import TabPresetDropdown from 'views/components/searchbar/date-time-picker/TabPresetDropdown';
+
+import type { TimeRangePickerFormValues } from './TimeRangePicker';
+import TimeRangePresetRow from './TimeRangePresetRow';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -65,7 +66,7 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
-  const { setFieldValue } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
+  const { setFieldValue } = useFormikContext<TimeRangePickerFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const { formatTime, userTimezone } = useUserDateTime();
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const mounted = useRef(true);
@@ -162,8 +163,11 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
             </FormGroup>
           )}
         </Field>
-        {showKeywordPresetsButton
-          && (<TabPresetDropdown disabled={disabled} onSetPreset={onSetPreset} availableOptions={keywordOptions} />)}
+        {showKeywordPresetsButton && (
+          <TimeRangePresetRow disabled={disabled}
+                              onSetPreset={onSetPreset}
+                              availableOptions={keywordOptions} />
+        )}
       </Col>
 
       <Col sm={7}>

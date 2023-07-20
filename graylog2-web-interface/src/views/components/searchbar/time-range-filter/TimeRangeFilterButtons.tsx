@@ -23,8 +23,8 @@ import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
-import RangePresetDropdown from './RangePresetDropdown';
-import TimeRangeButton from './TimeRangeButton';
+import RangePresetDropdown from './TimeRangePresetDropdown';
+import TimeRangePickerButton from './time-range-picker/TimeRangePickerButton';
 
 type Props = {
   disabled?: boolean,
@@ -44,7 +44,7 @@ const StyledButtonGroup = styled(ButtonGroup)`
   align-items: start;
 `;
 
-const TimeRangeDropdownButton = ({
+const TimeRangeFilterButtons = ({
   disabled,
   hasErrorOnMount,
   onPresetSelectOpen,
@@ -77,27 +77,26 @@ const TimeRangeDropdownButton = ({
 
   return (
     <StyledButtonGroup>
-      <TimeRangeButton hasError={hasErrorOnMount}
-                       disabled={disabled}
-                       onClick={_onClick} />
-      {showPresetDropdown
-        && (
-          <StyledRangePresetDropdown disabled={disabled}
-                                     displayTitle={false}
-                                     onChange={selectRelativeTimeRangePreset}
-                                     onToggle={_onPresetSelectToggle}
-                                     header="Select time range"
-                                     bsSize={null}
-                                     availableOptions={availableOptions} />
-        )}
+      <TimeRangePickerButton hasError={hasErrorOnMount}
+                             disabled={disabled}
+                             onClick={_onClick} />
+      {showPresetDropdown && (
+        <StyledRangePresetDropdown disabled={disabled}
+                                   displayTitle={false}
+                                   onChange={selectRelativeTimeRangePreset}
+                                   onToggle={_onPresetSelectToggle}
+                                   header="Select time range"
+                                   bsSize={null}
+                                   availableOptions={availableOptions} />
+      )}
     </StyledButtonGroup>
   );
 };
 
-TimeRangeDropdownButton.defaultProps = {
+TimeRangeFilterButtons.defaultProps = {
   hasErrorOnMount: false,
   disabled: false,
   showPresetDropdown: true,
 };
 
-export default TimeRangeDropdownButton;
+export default TimeRangeFilterButtons;
