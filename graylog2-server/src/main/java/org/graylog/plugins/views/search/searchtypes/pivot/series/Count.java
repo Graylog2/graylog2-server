@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Strings;
-import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import javax.annotation.Nullable;
@@ -32,7 +30,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Count.NAME)
 @JsonDeserialize(builder = Count.Builder.class)
-public abstract class Count implements SeriesSpec, HasField {
+public abstract class Count implements SeriesSpec, HasOptionalField {
     public static final String NAME = "count";
 
     @Override
@@ -41,13 +39,12 @@ public abstract class Count implements SeriesSpec, HasField {
     @Override
     public abstract String id();
 
-    @Nullable
     @JsonProperty
-    public abstract String field();
+    public abstract Optional<String> field();
 
     @Override
     public String literal() {
-        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+        return type() + "(" + field().orElse("") + ")";
     }
 
     public abstract Builder toBuilder();
@@ -77,13 +74,15 @@ public abstract class Count implements SeriesSpec, HasField {
         public abstract Builder field(@Nullable String field);
 
         abstract Optional<String> id();
-        abstract String field();
+
+        abstract Optional<String> field();
+
         abstract Count autoBuild();
 
         @Override
         public Count build() {
             if (id().isEmpty()) {
-                id(NAME + "(" + Strings.nullToEmpty(field()) + ")");
+                id(NAME + "(" + field().orElse("") + ")");
             }
             return autoBuild();
         }
