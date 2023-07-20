@@ -43,7 +43,7 @@ const MatchIcon = styled(Icon)<{ $empty?: boolean, $matches?: boolean }>(({ them
   return css`
       color: ${$empty ? theme.colors.variant.info : matchColor};
       margin-right: 3px;
-  `;
+`;
 });
 
 const StyledSpinner = styled(Spinner)`

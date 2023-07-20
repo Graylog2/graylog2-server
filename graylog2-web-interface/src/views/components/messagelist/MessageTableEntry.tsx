@@ -51,11 +51,11 @@ export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: bool
 
     ${$expanded ? css`
       border-left: 7px solid ${theme.colors.variant.light.info};
-    ` : ''}
+` : ''}
 
     ${$highlighted ? css`
       border-left: 7px solid ${theme.colors.variant.light.success};
-    ` : ''}
+` : ''}
   }
 `);
 
