@@ -79,7 +79,7 @@ public class ConditionParser {
     }
 
     String generateCondition(RuleBuilderStep step, int level) {
-        String syntax = StringUtils.repeat(INDENT, level + 1);
+        String syntax = StringUtils.repeat(INDENT, level);
         if (step.negate()) {
             syntax += "! ";
         }
@@ -93,7 +93,7 @@ public class ConditionParser {
         if (ruleFragment.isFragment()) {
             syntax += ParserUtil.generateForFragment(step, freemarkerConfiguration);
         } else {
-            syntax += ParserUtil.generateForFunction(step, function);
+            syntax += ParserUtil.generateForFunction(step, function, level);
         }
         return syntax;
     }
