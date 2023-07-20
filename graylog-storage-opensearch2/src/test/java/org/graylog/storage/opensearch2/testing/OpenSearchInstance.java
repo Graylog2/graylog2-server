@@ -110,7 +110,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
         LOG.debug("Creating instance {}", image);
 
-        return new OpenSearchInstance(image, searchVersion, network, heapSize);
+        final OpenSearchInstance instance = new OpenSearchInstance(image, searchVersion, network, heapSize);
+        // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
+        Runtime.getRuntime().addShutdownHook(new Thread(instance::close));
+        return instance;
+
     }
 
     protected static String imageNameFrom(Version version) {
