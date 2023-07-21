@@ -56,12 +56,11 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     private final Adapters adapters;
 
     public OpenSearch13Instance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version()), version, network, heapSize, featureFlags);
-        LOG.debug("Creating instance {}", String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version()));
+        super(version, network, heapSize);
 
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
+        this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
@@ -70,6 +69,11 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     @Override
     public SearchServer searchServer() {
         return SearchServer.OS1;
+    }
+
+    @Override
+    protected String imageName() {
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version().version());
     }
 
     private RestHighLevelClient buildRestClient() {

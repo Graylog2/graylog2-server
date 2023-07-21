@@ -54,12 +54,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private final Adapters adapters;
 
     public OpenSearchInstance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version()), version, network, heapSize, featureFlags);
-        LOG.debug("Creating instance {}", String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version()));
+        super(version, network, heapSize);
 
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientOS2(this.openSearchClient);
+        this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
@@ -69,8 +68,9 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return OpenSearchInstanceBuilder.builder().instantiate();
     }
 
-    public static OpenSearchInstance create(final String heapSize) {
-        return (OpenSearchInstance) OpenSearchInstanceBuilder.builder().heapSize(heapSize).build();
+    @Override
+    protected String imageName() {
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version().version());
     }
 
     @Override

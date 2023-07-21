@@ -30,8 +30,6 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -45,9 +43,6 @@ import java.util.Locale;
 import static java.util.Objects.isNull;
 
 public class DatanodeInstance extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
-
-    public static final String DEFAULT_HEAP_SIZE = "2g";
     public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
 
     private final OpenSearchClient openSearchClient;
@@ -56,15 +51,19 @@ public class DatanodeInstance extends TestableSearchServerInstance {
     private final Adapters adapters;
 
     public DatanodeInstance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev"), version, network, heapSize, featureFlags);
-        LOG.debug("Creating instance {}", String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev"));
+        super(version, network, heapSize);
 
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientOS2(this.openSearchClient);
+        this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+    }
+
+    @Override
+    protected String imageName() {
+        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev");
     }
 
     @Override

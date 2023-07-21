@@ -30,8 +30,6 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -44,9 +42,6 @@ import java.util.List;
 import static java.util.Objects.isNull;
 
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
-    private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
-
     private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
@@ -54,12 +49,11 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private Adapters adapters;
 
     public ElasticsearchInstanceES7(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(DEFAULT_IMAGE_OSS + ":" + version.version(), version, network, heapSize, featureFlags);
-        LOG.debug("Creating instance {}", DEFAULT_IMAGE_OSS + ":" + version.version());
-        // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
+        super(version, network, heapSize);
+
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
+        this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
@@ -69,8 +63,9 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
         return Elasticsearch7InstanceBuilder.builder().build();
     }
 
-    public static ElasticsearchInstanceES7 create(final String heapSize) {
-        return (ElasticsearchInstanceES7) Elasticsearch7InstanceBuilder.builder().heapSize(heapSize).build();
+    @Override
+    protected String imageName() {
+        return "docker.elastic.co/elasticsearch/elasticsearch-oss:" + version().version();
     }
 
     @Override

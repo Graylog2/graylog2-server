@@ -39,21 +39,19 @@ import org.testcontainers.containers.Network;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(RunningElasticsearchInstanceES7.class);
-    private static final String ES_VERSION = "7.10.2";
-
     private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    public RunningElasticsearchInstanceES7() {
+    public RunningElasticsearchInstanceES7(final List<String> featureFlags) {
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
+        this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         adapters = new AdaptersES7(elasticsearchClient);
     }
@@ -95,7 +93,7 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     }
 
     @Override
-    public GenericContainer<?> createContainer(String image, SearchVersion version, Network network) {
+    public GenericContainer<?> createContainer(SearchVersion version, Network network) {
         return null;
     }
 
