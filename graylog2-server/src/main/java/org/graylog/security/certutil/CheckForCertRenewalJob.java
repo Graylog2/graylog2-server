@@ -1,7 +1,6 @@
 package org.graylog.security.certutil;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
 
 public class CheckForCertRenewalJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(CheckForCertRenewalJob.class);

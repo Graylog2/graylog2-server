@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.scheduler.JobScheduleStrategies;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.schedule.CronJobSchedule;
@@ -45,7 +46,8 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -60,6 +62,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
     private final DBJobDefinitionService jobDefinitionService;
+    private final JobScheduleStrategies jobScheduleStrategies;
     private final char[] passwordSecret;
 
     @Inject
@@ -70,6 +73,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
                                   final DBJobDefinitionService jobDefinitionService,
+                                  final JobScheduleStrategies jobScheduleStrategies,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
@@ -78,6 +82,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.notificationService = notificationService;
         this.jobTriggerService = jobTriggerService;
         this.jobDefinitionService = jobDefinitionService;
+        this.jobScheduleStrategies = jobScheduleStrategies;
         this.passwordSecret = passwordSecret.toCharArray();
     }
 
@@ -91,6 +96,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
         try {
             cert.checkValidity(threshold);
+            cert.checkValidity(nextRenewalJobRun());
         } catch (CertificateExpiredException e) {
             LOG.debug("Certificate about to expire.");
             return true;
@@ -100,16 +106,21 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return false;
     }
 
-    private Date convertToDateViaSqlDate(LocalDate dateToConvert) {
-        return java.sql.Date.valueOf(dateToConvert);
+    private Date convertToDateViaInstant(LocalDateTime dateToConvert) {
+        return java.util.Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    // TODO: min amount if you select 2 hrs lifetime and only check every 30min
-    // TODO: threshold as a config value?
     private Date calculateThreshold(String certificateLifetime) {
         final var lifetime = Duration.parse(certificateLifetime).dividedBy(10);
-        var validUntil = LocalDate.now().plus(lifetime);
-        return convertToDateViaSqlDate(validUntil);
+        var validUntil = LocalDateTime.now().plus(lifetime);
+        return convertToDateViaInstant(validUntil);
+    }
+
+    private Date nextRenewalJobRun() {
+// TODO: calculate nextTime from trigger
+        //        jobScheduleStrategies.nextTime()
+        var nextRenewalJobRun = LocalDateTime.now().plusMinutes(30);
+        return convertToDateViaInstant(nextRenewalJobRun);
     }
 
     @Override
