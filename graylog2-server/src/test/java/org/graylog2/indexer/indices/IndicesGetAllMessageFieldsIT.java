@@ -52,7 +52,6 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
     @Before
     public void setUp() throws Exception {
         final Node node = new Node(mock(NodeAdapter.class));
-        //noinspection UnstableApiUsage
         indices = new Indices(
                 new IndexMappingFactory(node,
                         ImmutableMap.of(MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider())),

@@ -39,6 +39,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.isNull;
@@ -54,16 +56,17 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
+    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize, List<String> featureFlags) {
         super(image, version, network, heapSize);
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientOS2(this.openSearchClient);
+        this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
     }
-    protected OpenSearchInstance(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+
+    protected OpenSearchInstance(String image, SearchVersion version, Network network, List<String> featureFlags) {
+        this(image, version, network, DEFAULT_HEAP_SIZE, featureFlags);
     }
 
     @Override
@@ -94,28 +97,31 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     public static OpenSearchInstance create() {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE, Collections.emptyList());
     }
 
-    public static OpenSearchInstance create(String heapSize) {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize);
+    public static OpenSearchInstance create(List<String> featureFlags) {
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE, featureFlags);
+    }
+
+    public static OpenSearchInstance create(String heapSize, List<String> featureFlags) {
+        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize, featureFlags);
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static OpenSearchInstance create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
+    public static OpenSearchInstance create(SearchVersion searchVersion, Network network, List<String> featureFlags) {
+        return create(searchVersion, network, DEFAULT_HEAP_SIZE, featureFlags);
     }
 
-    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
+    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize, List<String> featureFlags) {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
 
-        final OpenSearchInstance instance = new OpenSearchInstance(image, searchVersion, network, heapSize);
+        final OpenSearchInstance instance = new OpenSearchInstance(image, searchVersion, network, heapSize, featureFlags);
         // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
         Runtime.getRuntime().addShutdownHook(new Thread(instance::close));
         return instance;
-
     }
 
     protected static String imageNameFrom(Version version) {

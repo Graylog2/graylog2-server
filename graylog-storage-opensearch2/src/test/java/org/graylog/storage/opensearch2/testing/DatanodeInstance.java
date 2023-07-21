@@ -36,11 +36,11 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.ImagePullPolicy;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.isNull;
@@ -56,16 +56,17 @@ public class DatanodeInstance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected DatanodeInstance(String image, SearchVersion version, Network network, String heapSize) {
+    protected DatanodeInstance(String image, SearchVersion version, Network network, String heapSize, List<String> featureFlags) {
         super(image, version, network, heapSize);
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientOS2(this.openSearchClient);
+        this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
     }
-    protected DatanodeInstance(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+
+    protected DatanodeInstance(String image, SearchVersion version, Network network, List<String> featureFlags) {
+        this(image, version, network, DEFAULT_HEAP_SIZE, featureFlags);
     }
 
     @Override
@@ -96,16 +97,16 @@ public class DatanodeInstance extends TestableSearchServerInstance {
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static DatanodeInstance create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
+    public static DatanodeInstance create(SearchVersion searchVersion, Network network, List<String> featureFlags) {
+        return create(searchVersion, network, DEFAULT_HEAP_SIZE, featureFlags);
     }
 
-    private static DatanodeInstance create(SearchVersion searchVersion, Network network, String heapSize) {
+    private static DatanodeInstance create(SearchVersion searchVersion, Network network, String heapSize, List<String> featureFlags) {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
 
-        return new DatanodeInstance(image, searchVersion, network, heapSize);
+        return new DatanodeInstance(image, searchVersion, network, heapSize, featureFlags);
     }
 
     protected static String imageNameFrom(Version version) {

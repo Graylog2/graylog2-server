@@ -39,6 +39,7 @@ import org.testcontainers.containers.Network;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(RunningElasticsearchInstanceES7.class);
@@ -50,10 +51,10 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    public RunningElasticsearchInstanceES7() {
+    public RunningElasticsearchInstanceES7(List<String> featureFlags) {
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
+        this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         adapters = new AdaptersES7(elasticsearchClient);
     }

@@ -22,6 +22,7 @@ import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
@@ -36,25 +37,25 @@ public class SearchServerInstanceFactoryByVersion implements SearchServerInstanc
     }
 
     @Override
-    public SearchServerInstance create(Network network) {
+    public SearchServerInstance create(Network network, List<String> featureFlags) {
         if (version.satisfies(ELASTICSEARCH, "^7.0.0")) {
-            return doCreate("org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7", version, network);
+            return doCreate("org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7", version, network, featureFlags);
         } else if (version.satisfies(OPENSEARCH, "^1.0.0")) {
-            return doCreate("org.graylog.storage.elasticsearch7.testing.OpenSearch13Instance", version, network);
+            return doCreate("org.graylog.storage.elasticsearch7.testing.OpenSearch13Instance", version, network, featureFlags);
         } else if (version.satisfies(OPENSEARCH, "^2.0.0")) {
-            return doCreate("org.graylog.storage.opensearch2.testing.OpenSearchInstance", version, network);
+            return doCreate("org.graylog.storage.opensearch2.testing.OpenSearchInstance", version, network, featureFlags);
         } else if (version.satisfies(DATANODE, "^5.2.0")) {
-            return doCreate("org.graylog.storage.opensearch2.testing.DatanodeInstance", version, network);
+            return doCreate("org.graylog.storage.opensearch2.testing.DatanodeInstance", version, network, featureFlags);
         } else {
             throw new UnsupportedOperationException("Search version " + version + " not supported.");
         }
     }
 
-    private SearchServerInstance doCreate(final String cName, final SearchVersion version, final Network network) {
+    private SearchServerInstance doCreate(final String cName, final SearchVersion version, final Network network, List<String> featureFlags) {
         try {
             Class<?> clazz = Class.forName(cName);
-            Method method = clazz.getMethod("create", SearchVersion.class, Network.class);
-            return (SearchServerInstance) method.invoke(null, version, network);
+            Method method = clazz.getMethod("create", SearchVersion.class, Network.class, List.class);
+            return (SearchServerInstance) method.invoke(null, version, network, featureFlags);
         } catch (Exception ex) {
             throw new NotImplementedException("Could not create Search instance.", ex);
         }

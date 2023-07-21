@@ -14,17 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog2.indexer.indices;
 
+import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.storage.SearchVersion;
-import org.testcontainers.containers.Network;
 
-import java.util.List;
+import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
-public interface SearchServerInstanceFactory {
-
-    SearchServerInstance create(Network network, List<String> featureFlags);
-
-    SearchVersion getVersion();
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO5, enabledFeatureFlags = COMPOSABLE_INDEX_TEMPLATES_FEATURE)
+public class IndicesWithComposableIndexTemplatesIT extends IndicesIT {
+    public IndicesWithComposableIndexTemplatesIT(SearchServerInstance elasticsearch) {
+        super(elasticsearch);
+    }
 }

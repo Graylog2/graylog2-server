@@ -21,9 +21,11 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesBatchIT;
 import org.junit.Rule;
 
+import java.util.Collections;
+
 public class MessagesBatchOS2IT extends MessagesBatchIT {
     @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create("256m");
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create("256m", Collections.emptyList());
 
     @Override
     protected SearchServerInstance searchServer() {

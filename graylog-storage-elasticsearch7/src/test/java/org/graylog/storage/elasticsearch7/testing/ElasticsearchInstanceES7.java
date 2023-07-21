@@ -40,6 +40,8 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -55,16 +57,17 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private Adapters adapters;
 
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network, String heapSize) {
+    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network, String heapSize, List<String> featureFlags) {
         super(image, version, network, heapSize);
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
+        this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
     }
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+
+    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network, List<String> featureFlags) {
+        this(image, version, network, DEFAULT_HEAP_SIZE, featureFlags);
     }
 
     @Override
@@ -94,23 +97,27 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     }
 
     public static ElasticsearchInstanceES7 create() {
-        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
+        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE, Collections.emptyList());
     }
 
-    public static ElasticsearchInstanceES7 create(String heapSize) {
-        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), heapSize);
+    public static ElasticsearchInstanceES7 create(List<String> featureFlags) {
+        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE, featureFlags);
+    }
+
+    public static ElasticsearchInstanceES7 create(String heapSize, List<String> featureFlags) {
+        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), heapSize, featureFlags);
     }
 
     // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
+    public static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network, List<String> featureFlags) {
+        return create(searchVersion, network, DEFAULT_HEAP_SIZE, featureFlags);
     }
 
-    private static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network, String heapSize) {
+    private static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network, String heapSize, List<String> featureFlags) {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
-        final ElasticsearchInstanceES7 instance = new ElasticsearchInstanceES7(image, searchVersion, network, heapSize);
+        final ElasticsearchInstanceES7 instance = new ElasticsearchInstanceES7(image, searchVersion, network, heapSize, featureFlags);
         // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
         Runtime.getRuntime().addShutdownHook(new Thread(instance::close));
         return instance;

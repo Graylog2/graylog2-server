@@ -68,7 +68,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         Network network = Network.newNetwork();
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
-        Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network));
+        Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network, enabledFeatureFlags));
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
         if(withMailServerEnabled) {
             this.emailServerInstance = MailServerContainer.createStarted(network);

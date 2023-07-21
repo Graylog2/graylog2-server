@@ -14,64 +14,58 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.elasticsearch7;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.util.Strings;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.flush.FlushRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.forcemerge.ForceMergeRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchType;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.ComponentTemplatesExistRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.ComposableIndexTemplateExistRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComponentTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComponentTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
-import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filter;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-import org.graylog.storage.opensearch2.blocks.BlockSettingsParser;
-import org.graylog.storage.opensearch2.cat.CatApi;
-import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
-import org.graylog.storage.opensearch2.stats.StatsApi;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.flush.FlushRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchType;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Requests;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplatesExistRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch7.blocks.BlockSettingsParser;
+import org.graylog.storage.elasticsearch7.cat.CatApi;
+import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
+import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
@@ -90,7 +84,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -105,27 +98,24 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.graylog.storage.opensearch2.OpenSearchClient.withTimeout;
+import static org.graylog.storage.elasticsearch7.ElasticsearchClient.withTimeout;
 
-public class IndicesAdapterOS2 implements IndicesAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS2.class);
-    private final OpenSearchClient client;
+public class LegacyIndicesAdapterES7 implements IndicesAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyIndicesAdapterES7.class);
+    private final ElasticsearchClient client;
     private final StatsApi statsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
-    private final ObjectMapper objectMapper;
 
     @Inject
-    public IndicesAdapterOS2(OpenSearchClient client,
-                             StatsApi statsApi,
-                             CatApi catApi,
-                             ClusterStateApi clusterStateApi,
-                             ObjectMapper objectMapper) {
+    public LegacyIndicesAdapterES7(ElasticsearchClient client,
+                                   StatsApi statsApi,
+                                   CatApi catApi,
+                                   ClusterStateApi clusterStateApi) {
         this.client = client;
         this.statsApi = statsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -215,50 +205,25 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public boolean componentTemplateExists(String templateName) {
-        var request = new ComponentTemplatesExistRequest(templateName);
-        return client.execute((c, requestOptions) -> c.cluster().existsComponentTemplate(request, requestOptions));
-    }
+    public boolean ensureIndexTemplate(String templateName, Template template) {
+        final Map<String, Object> templateSource = Map.of(
+                "index_patterns", template.indexPatterns(),
+                "mappings", template.mappings(),
+                "settings", template.settings(),
+                "order", template.order()
+        );
+        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
+                .source(templateSource);
 
-    @Override
-    public boolean createComponentTemplate(String templateName, Template template) {
-        var serializedMapping = serialize(template.mappings());
-        var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
-        var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var componentTemplate = new ComponentTemplate(osTemplate, 1L, Map.of());
-        var request = new PutComponentTemplateRequest()
-                .name(templateName)
-                .componentTemplate(componentTemplate);
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.cluster().putComponentTemplate(request, requestOptions),
-                "Unable to create component template " + templateName);
-
-        return result.isAcknowledged();
-    }
-
-    @Override
-    public boolean createComposableIndexTemplate(String templateName, Template template, List<String> composedOf) {
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), null, composedOf, template.order(), null, null);
-        var request = new PutComposableIndexTemplateRequest()
-                .name(templateName)
-                .indexTemplate(indexTemplate);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
+        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
                 "Unable to create index template " + templateName);
 
         return result.isAcknowledged();
     }
 
-    private CompressedXContent serialize(Object obj) {
-        try {
-            return new CompressedXContent(objectMapper.writeValueAsString(obj));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsIndexTemplate(new ComposableIndexTemplateExistRequest(templateName),
+        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
                 requestOptions), "Unable to verify index template existence " + templateName);
     }
 
@@ -385,9 +350,9 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public boolean deleteIndexTemplate(String templateName) {
-        var request = new DeleteComposableIndexTemplateRequest(templateName);
+        final DeleteIndexTemplateRequest request = new DeleteIndexTemplateRequest(templateName);
 
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteIndexTemplate(request, requestOptions),
+        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteTemplate(request, requestOptions),
                 "Unable to delete index template " + templateName);
         return result.isAcknowledged();
     }
@@ -554,10 +519,10 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         }
 
         final Min minAgg = f.getAggregations().get("ts_min");
-        final long minUnixTime = new Double(minAgg.getValue()).longValue();
+        final long minUnixTime = Double.valueOf(minAgg.getValue()).longValue();
         final DateTime min = new DateTime(minUnixTime, DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
-        final long maxUnixTime = new Double(maxAgg.getValue()).longValue();
+        final long maxUnixTime = Double.valueOf(maxAgg.getValue()).longValue();
         final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.

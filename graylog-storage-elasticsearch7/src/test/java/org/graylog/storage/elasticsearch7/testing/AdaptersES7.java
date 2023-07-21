@@ -68,7 +68,8 @@ public class AdaptersES7 implements Adapters {
                 client,
                 new StatsApi(objectMapper, client),
                 new CatApi(objectMapper, client),
-                new ClusterStateApi(objectMapper, client)
+                new ClusterStateApi(objectMapper, client),
+                objectMapper
         );
     }
 

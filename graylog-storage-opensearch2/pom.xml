@@ -123,6 +123,12 @@
             <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>elasticsearch7</artifactId>
+            <version>7.9.1-0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
