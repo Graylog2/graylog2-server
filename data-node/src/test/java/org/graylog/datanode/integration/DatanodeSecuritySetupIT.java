@@ -23,6 +23,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.security.certutil.CertutilCa;
@@ -47,6 +48,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -56,7 +58,6 @@ import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_
 
 public class DatanodeSecuritySetupIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
-    public static final String HOSTNAME = "graylog-datanode-host";
 
     @TempDir
     static Path tempDir;
@@ -65,13 +66,15 @@ public class DatanodeSecuritySetupIT {
 
     @BeforeEach
     void setUp() {
+
+        String containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
         final Path ca = generateCa();
 
         // use the CA to generate transport certificate keystore
         final Path nodeCert = generateNodeCert(ca);
         // use the CA to generate HTTP certificate keystore
-        httpCert = generateHttpCert(ca);
+        httpCert = generateHttpCert(ca, containerHostname);
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
@@ -96,8 +99,8 @@ public class DatanodeSecuritySetupIT {
 
             // HOSTNAME is used to generate the SSL certificates and to communicate inside the
             // container and docker network, where we do the hostname validation.
-            datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(HOSTNAME));
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", HOSTNAME);
+            datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(containerHostname));
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
         }).start();
     }
 
@@ -187,13 +190,13 @@ public class DatanodeSecuritySetupIT {
         return nodePath;
     }
 
-    private Path generateHttpCert(Path caPath) {
+    private Path generateHttpCert(Path caPath, String containerHostname) {
         final Path httpPath = tempDir.resolve("test-http.p12");
         TestableConsole inputHttp = TestableConsole.empty().silent()
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", HOSTNAME)
+                .register("Enter alternative names (addresses) of this node [comma separated]", containerHostname)
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),
