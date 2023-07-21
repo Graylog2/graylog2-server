@@ -95,9 +95,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
               center>
           {CONFIGURATION_STEPS_ORDER.map((configurationStepKey) => {
             const { description } = CONFIGURATION_STEPS[configurationStepKey];
-
             const isStepSkipped = configurationStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && isSkippingProvisioning;
-            console.log({ isStepSkipped });
             const { name: iconName, color: iconColor } = stepIcon(configurationStepKey, activeStepKey, theme);
 
             return (

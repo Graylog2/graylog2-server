@@ -14,24 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { TextInput as MantineTextInput } from '@mantine/core';
 
-import { useQuery } from '@tanstack/react-query';
+const TextInput = (props: React.ComponentProps<typeof MantineTextInput>) => (
+  <MantineTextInput {...props} />
+);
 
-import { qualifyUrl } from 'util/URLUtils';
-import { Builder } from 'logic/rest/FetchProvider';
-
-const fetchServerAvailability = () => new Builder('GET', qualifyUrl('/api'))
-  .json()
-  .build();
-
-const useServerAvailability = () => {
-  const { data } = useQuery(
-    ['server-availability'],
-    fetchServerAvailability,
-    { refetchInterval: 2000 },
-  );
-
-  return { data: !!data };
-};
-
-export default useServerAvailability;
+export default TextInput;
