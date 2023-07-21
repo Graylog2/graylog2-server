@@ -64,8 +64,8 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
 
-  const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {});
-  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {});
+  const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {}).sort();
+  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort();
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -142,9 +142,9 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                 {conditionsOutputKeys.length > 0 && (
                   <OutputContainer>
                     <label htmlFor="simulation_conditions_output">Conditions Output</label>
-                    {conditionsOutputKeys.map((conditionsOutputKey, key) => (
+                    {conditionsOutputKeys.map((conditionsOutputKey) => (
                       <div key={conditionsOutputKey}>
-                        <ActionOutputIndex>Condition {key + 1}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[key + 1])}
+                        <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
                       </div>
                     ))}
                   </OutputContainer>
@@ -152,9 +152,9 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                 {actionsOutputKeys.length > 0 && (
                   <OutputContainer>
                     <label htmlFor="simulation_actions_output">Actions Output</label>
-                    {actionsOutputKeys.map((actionsOutputKey, key) => (
+                    {actionsOutputKeys.map((actionsOutputKey) => (
                       <div key={actionsOutputKey}>
-                        <ActionOutputIndex>Action {key + 1}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[key + 1])}
+                        <ActionOutputIndex>{actionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
                       </div>
                     ))}
                   </OutputContainer>
