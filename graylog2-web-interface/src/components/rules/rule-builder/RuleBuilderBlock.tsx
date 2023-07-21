@@ -68,7 +68,7 @@ const RuleBuilderBlock = ({
 
   useEffect(() => {
     if (block) {
-      setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
+      setCurrentBlockDict(getDictForFunction(blockDict, block.function));
     }
   },
   [block, blockDict]);
@@ -155,7 +155,7 @@ const RuleBuilderBlock = ({
   };
 
   const isBlockNegatable = (): boolean => (
-    getDictForFunction(blockDict, block.function)?.return_type === RuleBuilderTypes.Boolean
+    currentBlockDict?.return_type === RuleBuilderTypes.Boolean
   );
 
   const options = blockDict.map(({ name, description, rule_builder_name }) => ({ label: rule_builder_name, value: name, description: description }));
@@ -181,6 +181,7 @@ const RuleBuilderBlock = ({
                           onDelete={onDelete}
                           onEdit={onEdit}
                           onNegate={onNegate}
+                          returnType={currentBlockDict?.return_type}
                           negatable={isBlockNegatable()} />
       )}
     </BlockContainer>

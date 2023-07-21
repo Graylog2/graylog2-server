@@ -23,7 +23,7 @@ import { IconButton, Icon } from 'components/common';
 
 import Errors from './Errors';
 import type { RuleBlock } from './types';
-import { ruleBlockPropType } from './types';
+import { ruleBlockPropType, RuleBuilderTypes } from './types';
 
 type Props = {
   block: RuleBlock,
@@ -31,20 +31,21 @@ type Props = {
   onDelete: () => void,
   onEdit: () => void,
   onNegate: () => void,
+  returnType?: RuleBuilderTypes,
 }
-
-const BlockInfo = styled(Row)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
-`);
 
 const OutputVariable = styled.p(({ theme }) => css`
   margin-left: ${theme.spacings.xxs};
-  margin-top: ${theme.spacings.sm};
   margin-bottom: 0;
+  margin-top: ${theme.spacings.md};
 `);
 
 const OutputIcon = styled(Icon)(({ theme }) => css`
   margin-right: ${theme.spacings.sm};
+`);
+
+const TypeLabel = styled(Label)(({ theme }) => css`
+  margin-left: ${theme.spacings.xs};
 `);
 
 const NegationButton = styled(Button).attrs(({ negate }: { negate: boolean }) => ({
@@ -54,34 +55,69 @@ const NegationButton = styled(Button).attrs(({ negate }: { negate: boolean }) =>
   margin-right: ${theme.spacings.sm};
 `);
 
-const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Props) => (
-  <Row>
-    <Col xs={9} md={10}>
-      <BlockInfo>
-        <Col md={12}>
-          <h3>
-            {negatable
+const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, returnType } : Props) => {
+  const readableReturnType = (type: RuleBuilderTypes): string | undefined => {
+    switch (type) {
+      case RuleBuilderTypes.Boolean:
+        return 'boolean';
+      case RuleBuilderTypes.Message:
+        return 'message';
+      case RuleBuilderTypes.Number:
+        return 'number';
+      case RuleBuilderTypes.Object:
+        return 'object';
+      case RuleBuilderTypes.String:
+        return 'string';
+      case RuleBuilderTypes.Void:
+        return 'void';
+      case RuleBuilderTypes.DateTime:
+        return 'date_time';
+      case RuleBuilderTypes.DateTimeZone:
+        return 'date_time_zone';
+      case RuleBuilderTypes.DateTimeFormatter:
+        return 'date_time_formatter';
+      default:
+        return undefined;
+    }
+  };
+
+  const returnTypeLabel = readableReturnType(returnType);
+
+  return (
+    <Row>
+      <Col xs={9} md={10}>
+        <Row>
+          <Col md={12}>
+            <h3>
+              {negatable
               && <NegationButton bsStyle="primary" negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
-            {block?.step_title}
-          </h3>
-          {block?.outputvariable && (
+              {block?.step_title}
+            </h3>
+
+            {block?.outputvariable && (
             <OutputVariable>
               <OutputIcon name="level-up-alt" rotation={90} />
               <Label bsStyle="primary">
                 {`$${block?.outputvariable}`}
               </Label>
+              {returnTypeLabel && (
+              <TypeLabel bsStyle="default">
+                {returnTypeLabel}
+              </TypeLabel>
+              )}
             </OutputVariable>
-          )}
-        </Col>
-      </BlockInfo>
-      <Errors objectWithErrors={block} />
-    </Col>
-    <Col xs={3} md={2} className="text-right">
-      <IconButton name="edit" onClick={onEdit} title="Edit" />
-      <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
-    </Col>
-  </Row>
-);
+            )}
+          </Col>
+        </Row>
+        <Errors objectWithErrors={block} />
+      </Col>
+      <Col xs={3} md={2} className="text-right">
+        <IconButton name="edit" onClick={onEdit} title="Edit" />
+        <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+      </Col>
+    </Row>
+  );
+};
 
 RuleBlockDisplay.propTypes = {
   block: ruleBlockPropType,
@@ -94,6 +130,7 @@ RuleBlockDisplay.propTypes = {
 RuleBlockDisplay.defaultProps = {
   block: undefined,
   negatable: false,
+  returnType: undefined,
 };
 
 export default RuleBlockDisplay;
