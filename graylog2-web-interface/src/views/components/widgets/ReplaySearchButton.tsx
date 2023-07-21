@@ -17,7 +17,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { IconButton, Icon } from 'components/common';
+import IconButton from 'components/common/IconButton';
+import Icon from 'components/common/Icon';
 import SearchLink from 'components/search/SearchLink';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -37,7 +38,7 @@ const StyledIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
-const buildSearchLink = (
+export const buildSearchLink = (
   timerange: TimeRange,
   queryString: string,
   streams: Array<string>,
