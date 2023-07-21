@@ -241,6 +241,18 @@ const TimeRangeTabs = ({
   );
 };
 
+const normalizeIfKeywordTimerange = (timeRange: TimeRange | NoTimeRangeOverride) => {
+  if (isTypeKeyword(timeRange)) {
+    return {
+      type: timeRange.type,
+      timezone: timeRange.timezone,
+      keyword: timeRange.keyword,
+    };
+  }
+
+  return timeRange;
+};
+
 const TimeRangeDropdown = ({
   noOverride,
   toggleDropdownShow,
@@ -271,18 +283,6 @@ const TimeRangeDropdown = ({
       app_action_value: 'search-time-range-cancel-button',
     });
   }, [sendTelemetry, toggleDropdownShow]);
-
-  const normalizeIfKeywordTimerange = (timeRange: TimeRange | NoTimeRangeOverride) => {
-    if (isTypeKeyword(timeRange)) {
-      return {
-        type: timeRange.type,
-        timezone: timeRange.timezone,
-        keyword: timeRange.keyword,
-      };
-    }
-
-    return timeRange;
-  };
 
   const handleSubmit = useCallback(({ nextTimeRange }: {
     nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']
