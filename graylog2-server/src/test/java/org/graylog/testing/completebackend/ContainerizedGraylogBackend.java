@@ -65,7 +65,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                         PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
                         List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
 
-        final SearchServerInstanceFactory searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
+        final SearchServerInstanceFactoryByVersion searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
         Network network = Network.newNetwork();
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
         Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network));

@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch2.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -36,11 +35,11 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.ImagePullPolicy;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.isNull;
@@ -56,16 +55,16 @@ public class DatanodeInstance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected DatanodeInstance(String image, SearchVersion version, Network network, String heapSize) {
-        super(image, version, network, heapSize);
+    public DatanodeInstance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev"), version, network, heapSize, featureFlags);
+        LOG.debug("Creating instance {}", String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev"));
+
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
-    }
-    protected DatanodeInstance(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
 
     @Override
@@ -93,23 +92,6 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 new BasicCredentialsProvider(),
                 null)
                 .get();
-    }
-
-    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static DatanodeInstance create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
-    }
-
-    private static DatanodeInstance create(SearchVersion searchVersion, Network network, String heapSize) {
-        final String image = imageNameFrom(searchVersion.version());
-
-        LOG.debug("Creating instance {}", image);
-
-        return new DatanodeInstance(image, searchVersion, network, heapSize);
-    }
-
-    protected static String imageNameFrom(Version version) {
-        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev"); // TODO:use the requested version
     }
 
     @Override

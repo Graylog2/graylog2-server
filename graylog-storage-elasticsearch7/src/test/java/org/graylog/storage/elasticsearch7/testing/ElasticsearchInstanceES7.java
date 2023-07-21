@@ -17,7 +17,6 @@
 package org.graylog.storage.elasticsearch7.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
@@ -40,14 +39,13 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
-    protected static final String ES_VERSION = "7.10.2";
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
-    public static final String DEFAULT_HEAP_SIZE = "2g";
 
     private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
@@ -55,16 +53,24 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private Adapters adapters;
 
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network, String heapSize) {
-        super(image, version, network, heapSize);
+    public ElasticsearchInstanceES7(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(DEFAULT_IMAGE_OSS + ":" + version.version(), version, network, heapSize, featureFlags);
+        LOG.debug("Creating instance {}", DEFAULT_IMAGE_OSS + ":" + version.version());
+        // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
-    protected ElasticsearchInstanceES7(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+
+    public static ElasticsearchInstanceES7 create() {
+        return Elasticsearch7InstanceBuilder.builder().build();
+    }
+
+    public static ElasticsearchInstanceES7 create(final String heapSize) {
+        return (ElasticsearchInstanceES7) Elasticsearch7InstanceBuilder.builder().heapSize(heapSize).build();
     }
 
     @Override
@@ -91,33 +97,6 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 false,
                 new BasicCredentialsProvider())
                 .get();
-    }
-
-    public static ElasticsearchInstanceES7 create() {
-        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), DEFAULT_HEAP_SIZE);
-    }
-
-    public static ElasticsearchInstanceES7 create(String heapSize) {
-        return create(SearchVersion.elasticsearch(ES_VERSION), Network.newNetwork(), heapSize);
-    }
-
-    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
-    }
-
-    private static ElasticsearchInstanceES7 create(SearchVersion searchVersion, Network network, String heapSize) {
-        final String image = imageNameFrom(searchVersion.version());
-
-        LOG.debug("Creating instance {}", image);
-        final ElasticsearchInstanceES7 instance = new ElasticsearchInstanceES7(image, searchVersion, network, heapSize);
-        // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
-        Runtime.getRuntime().addShutdownHook(new Thread(instance::close));
-        return instance;
-    }
-
-    protected static String imageNameFrom(Version version) {
-        return DEFAULT_IMAGE_OSS + ":" + version.toString();
     }
 
     @Override

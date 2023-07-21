@@ -14,15 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.storage.elasticsearch7.testing;
 
-import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.completebackend.SearchServerBuilder;
+import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
 import org.graylog2.storage.SearchVersion;
-import org.testcontainers.containers.Network;
 
-public interface SearchServerInstanceFactory {
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
-    SearchServerInstance create(Network network);
-
-    SearchVersion getVersion();
+public class OpenSearch13InstanceProvider implements SearchServerInterfaceProvider {
+    @Override
+    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
+        if(version.satisfies(OPENSEARCH, "^1.0.0")) {
+            return new OpenSearch13InstanceBuilder(version);
+        }
+        return null;
+    }
 }

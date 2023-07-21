@@ -16,51 +16,38 @@
  */
 package org.graylog.testing.completebackend;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
-import java.lang.reflect.Method;
+import java.util.Optional;
+import java.util.ServiceLoader;
 
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
-import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
-import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
-
-public class SearchServerInstanceFactoryByVersion implements SearchServerInstanceFactory {
-
+public class SearchServerInstanceFactoryByVersion {
+    private static ServiceLoader<SearchServerInterfaceProvider> loader = ServiceLoader.load(SearchServerInterfaceProvider.class);
     private final SearchVersion version;
 
     public SearchServerInstanceFactoryByVersion(SearchVersion searchVersion) {
         this.version = searchVersion;
     }
 
-    @Override
-    public SearchServerInstance create(Network network) {
-        if (version.satisfies(ELASTICSEARCH, "^7.0.0")) {
-            return doCreate("org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7", version, network);
-        } else if (version.satisfies(OPENSEARCH, "^1.0.0")) {
-            return doCreate("org.graylog.storage.elasticsearch7.testing.OpenSearch13Instance", version, network);
-        } else if (version.satisfies(OPENSEARCH, "^2.0.0")) {
-            return doCreate("org.graylog.storage.opensearch2.testing.OpenSearchInstance", version, network);
-        } else if (version.satisfies(DATANODE, "^5.2.0")) {
-            return doCreate("org.graylog.storage.opensearch2.testing.DatanodeInstance", version, network);
-        } else {
-            throw new UnsupportedOperationException("Search version " + version + " not supported.");
+    public static Optional<SearchServerBuilder> getSearchServerInterfaceBuilder(SearchVersion searchVersion) {
+        for (SearchServerInterfaceProvider provider : loader) {
+            SearchServerBuilder builder = provider.getBuilderFor(searchVersion);
+            if (builder != null) {
+                return Optional.of(builder);
+            }
         }
+        return Optional.empty();
     }
 
-    private SearchServerInstance doCreate(final String cName, final SearchVersion version, final Network network) {
-        try {
-            Class<?> clazz = Class.forName(cName);
-            Method method = clazz.getMethod("create", SearchVersion.class, Network.class);
-            return (SearchServerInstance) method.invoke(null, version, network);
-        } catch (Exception ex) {
-            throw new NotImplementedException("Could not create Search instance.", ex);
-        }
+    public SearchServerInstance create(final Network network) {
+        return getSearchServerInterfaceBuilder(this.version)
+                .map(builder -> builder.network(network))
+                .map(SearchServerBuilder::build)
+                .orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
     }
 
-    @Override
     public SearchVersion getVersion() {
         return version;
     }
