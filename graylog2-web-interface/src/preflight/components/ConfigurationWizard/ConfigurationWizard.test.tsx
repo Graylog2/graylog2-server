@@ -57,6 +57,6 @@ describe('ConfigurationWizard', () => {
     asMock(useConfigurationStep).mockReturnValue({ step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key, isLoading: false });
     renderPreflight(<ConfigurationWizard setIsWaitingForStartup={() => {}} />);
 
-    await screen.findByText(/All data nodes are secured and reachable./);
+    await screen.findByText(/The provisioning has been successful and all data nodes are secured and reachable./);
   });
 });
