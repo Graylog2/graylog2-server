@@ -18,15 +18,23 @@
 import * as React from 'react';
 
 import MenuItem from 'components/bootstrap/MenuItem';
-import { buildSearchLink } from 'views/components/widgets/ReplaySearchButton';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import SearchLink from 'views/logic/search/SearchLink';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+
+const buildSearchLink = (streamIds: Array<string>) => SearchLink.builder()
+  .timerange(DEFAULT_TIMERANGE)
+  .query(createElasticsearchQueryString())
+  .streams(streamIds)
+  .build()
+  .toURL();
 
 type Props = {
   selectedStreamIds: Array<string>,
 }
 
 const SearchStreamsAction = ({ selectedStreamIds }: Props) => {
-  const link = buildSearchLink(DEFAULT_TIMERANGE, '', selectedStreamIds);
+  const link = buildSearchLink(selectedStreamIds);
 
   return (
     <MenuItem href={link} target="_blank">
