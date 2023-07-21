@@ -48,10 +48,10 @@ const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinit
         return ({ value: expression.value });
       case 'number-ref':
         // eslint-disable-next-line no-case-declarations
-        const selectedSeriesk = series.find((s) => s.id === expression.ref);
+        const numberRefSeries = series.find((s) => s.id === expression.ref);
 
-        return (selectedSeriesk && selectedSeriesk.function
-          ? { field: `${selectedSeriesk.function}(${selectedSeriesk.field || ''})` }
+        return (numberRefSeries?.type
+          ? { field: `${numberRefSeries.type}(${numberRefSeries.field || ''})` }
           : null);
       case '&&':
       case '||':
@@ -68,8 +68,8 @@ const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinit
         // eslint-disable-next-line no-case-declarations
         const selectedSeries = series.find((s) => s.id === ref);
         // eslint-disable-next-line no-case-declarations
-        const fnSeries = selectedSeries && selectedSeries?.function ? `${selectedSeries.function}(${selectedSeries.field || ''})` : undefined;
-        res.push({ expr: expression.expr, value: expression.right.value, function: selectedSeries?.function, fnSeries, field: selectedSeries.field });
+        const fnSeries = selectedSeries?.type ? `${selectedSeries.type}(${selectedSeries.field || ''})` : undefined;
+        res.push({ expr: expression.expr, value: expression.right.value, function: selectedSeries?.type, fnSeries, field: selectedSeries?.field });
 
         return [rec(expression.left), rec(expression.right)];
       default:

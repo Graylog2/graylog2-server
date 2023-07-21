@@ -29,6 +29,8 @@ import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -124,25 +126,24 @@ public class AggregationEventProcessorConfigTest {
 
     private AggregationConditions getConditions() {
         final Expression<Boolean> expression = Expr.Greater.create(Expr.NumberReference.create("foo"),
-            Expr.NumberValue.create(42.0));
+                Expr.NumberValue.create(42.0));
         return AggregationConditions.builder()
-            .expression(expression)
-            .build();
+                .expression(expression)
+                .build();
     }
 
-    private AggregationSeries getSeries() {
-        return AggregationSeries.builder()
-            .id("123")
-            .field("foo")
-            .function(AggregationFunction.AVG)
-            .build();
+    private SeriesSpec getSeries() {
+        return Average.builder()
+                .id("123")
+                .field("foo")
+                .build();
     }
 
     @Test
     public void testValidateWithInvalidTimeRange() {
         final AggregationEventProcessorConfig invalidConfig1 = getConfig().toBuilder()
-            .searchWithinMs(-1)
-            .build();
+                .searchWithinMs(-1)
+                .build();
 
         final ValidationResult validationResult1 = invalidConfig1.validate();
         assertThat(validationResult1.failed()).isTrue();

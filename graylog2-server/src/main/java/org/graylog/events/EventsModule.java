@@ -32,6 +32,7 @@ import org.graylog.events.indices.EventIndexer;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotification;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
+import org.graylog.events.migrations.V20230629140000_RenameFieldTypeOfEventDefinitionSeries;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationExecutionMetrics;
 import org.graylog.events.notifications.NotificationGracePeriodService;
@@ -170,5 +171,7 @@ public class EventsModule extends PluginModule {
 
         // Change this if another aggregation search implementation should be used
         install(new FactoryModuleBuilder().implement(AggregationSearch.class, PivotAggregationSearch.class).build(AggregationSearch.Factory.class));
+
+        addMigration(V20230629140000_RenameFieldTypeOfEventDefinitionSeries.class);
     }
 }

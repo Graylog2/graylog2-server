@@ -26,6 +26,7 @@ import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
+import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 
 import FieldSelect from '../FieldSelect';
 
@@ -36,12 +37,6 @@ type Props = {
 const Wrapper = styled.div``;
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
-
-const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
-const percentageStrategyOptions = [
-  { label: 'Document Count', value: 'COUNT' },
-  { label: 'Field Sum', value: 'SUM' },
-];
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);

@@ -124,9 +124,8 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.queryStringDecorators = queryStringDecorators;
     }
 
-    private String metricName(AggregationSeries series) {
-        return String.format(Locale.ROOT, "metric/%s/%s/%s",
-                series.function().toString().toLowerCase(Locale.ROOT), series.field().orElse("<no-field>"), series.id());
+    private String metricName(SeriesSpec series) {
+        return String.format(Locale.ROOT, "metric/%s", series.literal());
     }
 
     @Override
@@ -142,8 +141,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             final Set<SearchError> errors = aggregationErrors.isEmpty() ? streamErrors : aggregationErrors;
 
             errors.forEach(error -> {
-                if (error instanceof QueryError) {
-                    final QueryError queryError = (QueryError) error;
+                if (error instanceof final QueryError queryError) {
                     final String backtrace = queryError.backtrace() != null ? queryError.backtrace() : "";
                     if (error instanceof EmptyParameterError) {
                         LOG.debug("Aggregation search query <{}> with empty Parameter: {}\n{}",
@@ -185,7 +183,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final PivotResult streamsResult = (PivotResult) streamQueryResult.searchTypes().get(STREAMS_PIVOT_ID);
 
         return AggregationResult.builder()
-                .keyResults( extractValues(pivotResult))
+                .keyResults(extractValues(pivotResult))
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
@@ -323,7 +321,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                     continue;
                 }
 
-                for (final AggregationSeries series : config.series()) {
+                for (var series : config.series()) {
                     if (!value.key().isEmpty() && value.key().get(0).equals(metricName(series))) {
                         // Some Elasticsearch aggregations can return a "null" value. (e.g. avg on a non-existent field)
                         // We are using NaN in that case to make sure our conditions will work.
@@ -431,8 +429,9 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .id(PIVOT_ID)
                 .rollup(true);
 
-        final ImmutableList<SeriesSpec> series = config.series().stream()
-                .map(entry -> entry.function().toSeriesSpec(metricName(entry), entry.field().orElse(null)))
+        final ImmutableList<SeriesSpec> series = config.series()
+                .stream()
+                .map(s -> s.withId(metricName(s)))
                 .collect(ImmutableList.toImmutableList());
 
         if (!series.isEmpty()) {
@@ -472,7 +471,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                             .limit(Integer.MAX_VALUE)
                             .field(field)
                             .build())
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         // We always have row groups because of the date range buckets
