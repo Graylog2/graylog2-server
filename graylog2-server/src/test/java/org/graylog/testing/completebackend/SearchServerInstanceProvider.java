@@ -16,22 +16,15 @@
  */
 package org.graylog.testing.completebackend;
 
-import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
-import org.testcontainers.containers.Network;
 
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-public class SearchServerInstanceFactoryByVersion {
+public class SearchServerInstanceProvider {
     private static ServiceLoader<SearchServerInterfaceProvider> loader = ServiceLoader.load(SearchServerInterfaceProvider.class);
-    private final SearchVersion version;
 
-    public SearchServerInstanceFactoryByVersion(SearchVersion searchVersion) {
-        this.version = searchVersion;
-    }
-
-    public static Optional<SearchServerBuilder> getSearchServerInterfaceBuilder(SearchVersion searchVersion) {
+    public static Optional<SearchServerBuilder> getBuilderFor(SearchVersion searchVersion) {
         for (SearchServerInterfaceProvider provider : loader) {
             SearchServerBuilder builder = provider.getBuilderFor(searchVersion);
             if (builder != null) {
@@ -39,16 +32,5 @@ public class SearchServerInstanceFactoryByVersion {
             }
         }
         return Optional.empty();
-    }
-
-    public SearchServerInstance create(final Network network) {
-        return getSearchServerInterfaceBuilder(this.version)
-                .map(builder -> builder.network(network))
-                .map(SearchServerBuilder::build)
-                .orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
-    }
-
-    public SearchVersion getVersion() {
-        return version;
     }
 }

@@ -50,25 +50,26 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     private ContainerizedGraylogBackend() {
     }
 
-    public static ContainerizedGraylogBackend createStarted(SearchVersion esVersion, MongodbServer mongodbVersion,
+    public static ContainerizedGraylogBackend createStarted(SearchVersion version, MongodbServer mongodbVersion,
                                                             int[] extraPorts, List<URL> mongoDBFixtures,
                                                             PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
-                                                            List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
+                                                            final List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
 
         final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend();
-        backend.create(esVersion, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withMailServerEnabled);
+        backend.create(version, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withMailServerEnabled);
         return backend;
     }
 
-    private void create(SearchVersion esVersion, MongodbServer mongodbVersion,
+    private void create(final SearchVersion version, MongodbServer mongodbVersion,
                         int[] extraPorts, List<URL> mongoDBFixtures,
                         PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
                         List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
 
-        final SearchServerInstanceFactoryByVersion searchServerInstanceFactory = new SearchServerInstanceFactoryByVersion(esVersion);
-        Network network = Network.newNetwork();
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
-        Future<SearchServerInstance> esFuture = executor.submit(() -> searchServerInstanceFactory.create(network));
+        final var network = Network.newNetwork();
+        final var builder = SearchServerInstanceProvider.getBuilderFor(version).orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
+
+        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-indexer-container-for-api-it").build());
+        Future<SearchServerInstance> esFuture = executor.submit(() -> builder.network(network).featureFlags(enabledFeatureFlags).build());
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
         if(withMailServerEnabled) {
             this.emailServerInstance = MailServerContainer.createStarted(network);
