@@ -17,7 +17,6 @@
 package org.graylog.datanode.bootstrap.preflight;
 
 import org.bouncycastle.operator.OperatorException;
-import org.graylog.datanode.Configuration;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
@@ -58,7 +57,6 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final CsrGenerator csrGenerator;
     private final CertChainStorage certMongoStorage;
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
-    private final Configuration configuration;
     private final SmartKeystoreStorage keystoreStorage;
     private final char[] passwordSecret;
 
@@ -70,7 +68,6 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                                                final CsrGenerator csrGenerator,
                                                final CertChainMongoStorage certMongoStorage,
                                                final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
-                                               final Configuration configuration,
                                                final SmartKeystoreStorage keystoreStorage,
                                                final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
@@ -80,7 +77,6 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
         this.csrGenerator = csrGenerator;
         this.certMongoStorage = certMongoStorage;
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
-        this.configuration = configuration;
         this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage("privateKeyFilename.cert");
@@ -130,12 +126,6 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
                     LOG.error("Config entry in signed state, but wrong certificate data present in Mongo");
                 }
             }
-
-            // write certificate to local truststore
-            // configure SSL
-            // start DataNode
-            // set state to State.CONNECTED
-            // nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
         }
     }
 

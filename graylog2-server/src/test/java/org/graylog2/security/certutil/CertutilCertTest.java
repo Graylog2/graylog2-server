@@ -20,6 +20,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -79,11 +80,12 @@ class CertutilCertTest {
         Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS).verify(caKeyStore.getCertificate("ca").getPublicKey()))
                 .doesNotThrowAnyException();
 
+        var hostname = Tools.getLocalCanonicalHostname();
         final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(CertutilCert.DATANODE_KEY_ALIAS);
         Assertions.assertThat(certificateChain)
                 .hasSize(3)
                 .extracting(c ->(X509Certificate)c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=root", "CN=ca", "CN=localhost");
+                .contains("CN=root", "CN=ca", "CN=" + hostname);
     }
 }

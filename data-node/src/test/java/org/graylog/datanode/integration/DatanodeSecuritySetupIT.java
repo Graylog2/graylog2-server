@@ -29,10 +29,13 @@ import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog2.plugin.Tools;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,6 +55,8 @@ import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_
 
 
 public class DatanodeSecuritySetupIT {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
+    public static final String HOSTNAME = "graylog-datanode-host";
 
     @TempDir
     static Path tempDir;
@@ -84,6 +89,15 @@ public class DatanodeSecuritySetupIT {
             // configure initial admin username and password for Opensearch REST
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin");
+
+            // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
+            // to be able to reach opensearch from outside the container and docker network (true?)
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0");
+
+            // HOSTNAME is used to generate the SSL certificates and to communicate inside the
+            // container and docker network, where we do the hostname validation.
+            datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(HOSTNAME));
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", HOSTNAME);
         }).start();
     }
 
@@ -92,14 +106,18 @@ public class DatanodeSecuritySetupIT {
 
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort());
 
-        given()
+        try {
+            given()
                 .auth().basic("admin", "admin")
                 .trustStore(buildTruststore(httpCert, "password"))
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
                 .body("name", Matchers.equalTo("node1"))
                 .body("cluster_name", Matchers.equalTo("datanode-cluster"));
-
+        } catch (Exception ex) {
+            LOG.error("Error connecting to OpenSearch in the DataNode, showing logs:\n{}", backend.getLogs());
+            throw ex;
+        }
     }
 
     private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
@@ -111,9 +129,17 @@ public class DatanodeSecuritySetupIT {
                 .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
-        retryer.call(() -> RestAssured.given()
-                .get("http://localhost:" + datanodeRestPort)
-                .then());
+        try {
+            var hostname = Tools.getLocalCanonicalHostname();
+            var url = "http://" + hostname + ":" + datanodeRestPort;
+            LOG.info("Trying to connect to: {}", url);
+            retryer.call(() -> RestAssured.given()
+                    .get(url)
+                    .then());
+        } catch (Exception ex) {
+            LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
+            throw ex;
+        }
     }
 
     /**
@@ -167,7 +193,7 @@ public class DatanodeSecuritySetupIT {
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", "example.com")
+                .register("Enter alternative names (addresses) of this node [comma separated]", HOSTNAME)
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),

@@ -19,15 +19,14 @@ package org.graylog.datanode.management;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.OpensearchInfo;
-import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +88,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public URI getOpensearchBaseUrl() {
         final String baseUrl = configuration.map(OpensearchConfiguration::getRestBaseUrl)
-                .map(HttpHost::toURI)
+                .map(httpHost -> new URIBuilder()
+                        .setHost(httpHost.getHostName())
+                        .setPort(httpHost.getPort())
+                        .setScheme(httpHost.getSchemeName())
+                        .setUserInfo(configuration.get().authUsername(), configuration.get().authPassword()).toString())
                 .orElse(""); // TODO: will this cause problems in the nodeservice?
         return URI.create(baseUrl);
     }

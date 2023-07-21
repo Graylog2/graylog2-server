@@ -88,8 +88,9 @@ public class CertutilCert implements CliCommand {
 
             console.printLine("Generating private key and certificate for this datanode");
 
-            final CertRequest req = CertRequest.signed("localhost", intermediateCA)
+            final CertRequest req = CertRequest.signed(Tools.getLocalCanonicalHostname(), intermediateCA)
                     .withSubjectAlternativeName("localhost")
+                    .withSubjectAlternativeName("graylog-datanode-host")
                     .withSubjectAlternativeName(Tools.getLocalHostname())
                     .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
                     .withSubjectAlternativeName("127.0.0.1")

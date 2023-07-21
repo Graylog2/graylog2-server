@@ -14,13 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security.certutil;
+package org.graylog2.security;
 
 import org.assertj.core.api.Assertions;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
-import org.graylog.security.certutil.CertutilHttp;
+import org.graylog.security.certutil.ca.exceptions.CACreationException;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -28,30 +32,50 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
-class CertutilHttpTest {
-
+public class CustomCAX509TrustManagerTest {
     @TempDir
     static Path tempDir;
 
-    @Test
-    void testGenerateNodeCertificate() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, InvalidAlgorithmParameterException, CertPathValidatorException, SignatureException, InvalidKeyException, NoSuchProviderException {
+    static class DummyCaService implements CaService {
+        private final Optional<KeyStore> keyStore;
+        public DummyCaService(KeyStore keyStore) {
+            this.keyStore = Optional.ofNullable(keyStore);
+        }
 
+        @Override
+        public CA get() throws KeyStoreStorageException {
+            return null;
+        }
+
+        @Override
+        public void create(Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {}
+
+        @Override
+        public void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException {}
+
+        @Override
+        public void startOver() {}
+
+        @Override
+        public Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
+            return this.keyStore;
+        }
+    }
+
+    @Test
+    public void testCA() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        // create certs (root, ca, datanode) copy of CertUtilTest
         final Path caPath = tempDir.resolve("test-ca.p12");
         final Path nodePath = tempDir.resolve("test-node.p12");
 
@@ -62,17 +86,14 @@ class CertutilHttpTest {
 
         // now we have a ROOT + CA keypair in the keystore, let's use it to generate node keypair
 
-        TestableConsole inputHttp = TestableConsole.empty()
-                .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
+        TestableConsole inputCert = TestableConsole.empty()
                 .register("Enter CA password", "password")
-                .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", "example.com")
-                .register("Enter HTTP certificate password", "changeme");
+                .register("Enter datanode certificate password", "changeme");
 
-        CertutilHttp certutilCert = new CertutilHttp(
+        CertutilCert certutilCert = new CertutilCert(
                 caPath.toAbsolutePath().toString(),
                 nodePath.toAbsolutePath().toString(),
-                inputHttp);
+                inputCert);
         certutilCert.run();
 
         KeyStore caKeyStore = KeyStore.getInstance("PKCS12");
@@ -83,15 +104,8 @@ class CertutilHttpTest {
         final Key nodeKey = nodeKeyStore.getKey(CertutilCert.DATANODE_KEY_ALIAS, "changeme".toCharArray());
         Assertions.assertThat(nodeKey).isNotNull();
 
-        final Certificate nodeCertificate = nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS);
-        Assertions.assertThatCode(() -> nodeCertificate.verify(caKeyStore.getCertificate("ca").getPublicKey()))
+        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS).verify(caKeyStore.getCertificate("ca").getPublicKey()))
                 .doesNotThrowAnyException();
-
-        final Collection<List<?>> alternativeNames = ((X509Certificate) nodeCertificate).getSubjectAlternativeNames();
-        Assertions.assertThat(alternativeNames)
-                .isNotEmpty()
-                .extracting(item -> (String) item.get(1))
-                .contains("localhost", "example.com");
 
         var hostname = Tools.getLocalCanonicalHostname();
         final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(CertutilCert.DATANODE_KEY_ALIAS);
@@ -100,5 +114,30 @@ class CertutilHttpTest {
                 .extracting(c ->(X509Certificate)c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
                 .contains("CN=root", "CN=ca", "CN=" + hostname);
+
+        // additional Tests
+        final var noAdditionalKeystore = new DummyCaService(null);
+        final var additionalKeystore = new DummyCaService(caKeyStore);
+
+        final var defaultTM = new CustomCAX509TrustManager(noAdditionalKeystore);
+        final var customTM = new CustomCAX509TrustManager(additionalKeystore);
+
+        final var default_issuers = defaultTM.getAcceptedIssuers().length;
+        Assertions.assertThat(customTM.getAcceptedIssuers().length).isEqualTo(default_issuers + 2);
+
+        final var cert = (X509Certificate)nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS);
+
+        Assertions.assertThatCode(() -> {
+            try {
+                defaultTM.checkClientTrusted(new X509Certificate[]{cert}, "ANY");
+                throw new Exception("Should not get here");
+            } catch (CertificateException e) {
+                // expected
+            }
+        }).doesNotThrowAnyException();
+
+        Assertions.assertThatCode(() ->
+                customTM.checkClientTrusted(new X509Certificate[]{cert}, "ANY")
+        ).doesNotThrowAnyException();
     }
 }
