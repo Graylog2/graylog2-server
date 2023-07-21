@@ -36,7 +36,6 @@ import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
 import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
 import {
   getDictForFunction,
-  getActionOutputVariableName,
 } from './helpers';
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 
@@ -124,6 +123,12 @@ const RuleBuilder = () => {
 
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
+
+  const getActionOutputVariableName = (order : number) : string => {
+    if (order === 0) return '';
+
+    return `output_${order}`;
+  };
 
   const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });

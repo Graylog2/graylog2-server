@@ -20,16 +20,5 @@ const getDictForFunction = (dict: BlockDict[], functionName: string) : BlockDict
   dict?.find((entry) => entry.name === functionName)
 );
 
-const getActionOutputVariableName = (order : number) : string => {
-  if (order === 0) return '';
-
-  return `output_${order}`;
-};
-
-const paramValueExists = (paramValue: string | number | boolean | undefined) : boolean => (
-  typeof paramValue !== 'undefined' && paramValue !== null);
-
-const paramValueIsVariable = (paramValue: string | number | boolean | undefined) : boolean => (
-  typeof paramValue === 'string' && paramValue.startsWith('$'));
-
-export { getActionOutputVariableName, getDictForFunction, paramValueExists, paramValueIsVariable };
+export default getDictForFunction;
+export { getDictForFunction };

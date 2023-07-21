@@ -23,7 +23,6 @@ import { Button, ControlLabel } from 'components/bootstrap';
 
 import { RuleBuilderTypes, outputVariablesPropType } from './types';
 import type { OutputVariables, BlockFieldDict } from './types';
-import { paramValueExists, paramValueIsVariable } from './helpers';
 
 type Props = {
   param: BlockFieldDict,
@@ -42,6 +41,12 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
   useEffect(() => {
     setPrimaryInputToggle(undefined);
   }, [functionName]);
+
+  const paramValueExists = (paramValue: string | number | boolean | undefined) : boolean => (
+    typeof paramValue !== 'undefined' && paramValue !== null);
+
+  const paramValueIsVariable = (paramValue: string | number | boolean | undefined) : boolean => (
+    typeof paramValue === 'string' && paramValue.startsWith('$'));
 
   const shouldHandlePrimaryParam = () => {
     if (!param.primary) return false;
@@ -78,7 +83,7 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
   const primaryInputButtonAfter = () => {
     if (!shouldHandlePrimaryParam() || filteredOutputVariableList().length <= 0) return null;
 
-    return (<Button onClick={() => onPrimaryInputToggle('select')}>Choose output to use</Button>);
+    return (<Button onClick={() => onPrimaryInputToggle('select')}>Use output from previous steps</Button>);
   };
 
   const showOutputVariableSelect = () => {
@@ -111,9 +116,9 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
                        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
                        help={param.description}
                        {...field}>
-        <option key="placeholder" disabled value="">Select output from list</option>
+        <option key="placeholder" value="">Select output from list</option>
         {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-          <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)}`}</option>),
+          <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
         )}
       </FormikFormGroup>
     );

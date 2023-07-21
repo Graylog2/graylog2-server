@@ -24,7 +24,6 @@ import { IconButton, Icon } from 'components/common';
 import Errors from './Errors';
 import type { RuleBlock } from './types';
 import { ruleBlockPropType } from './types';
-import { paramValueExists, paramValueIsVariable } from './helpers';
 
 type Props = {
   block: RuleBlock,
@@ -35,22 +34,13 @@ type Props = {
 }
 
 const BlockInfo = styled(Row)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
+  margin-bottom: ${theme.spacings.xs};
 `);
-
-const ParamsCol = styled(Col)(({ theme }) => css`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${theme.spacings.sm};
-`);
-
-const Param = styled.p`
-  margin-bottom: 0;
-`;
 
 const OutputVariable = styled.p(({ theme }) => css`
   margin-left: ${theme.spacings.xxs};
   margin-top: ${theme.spacings.sm};
+  margin-bottom: 0;
 `);
 
 const OutputIcon = styled(Icon)(({ theme }) => css`
@@ -64,74 +54,34 @@ const NegationButton = styled(Button).attrs(({ negate }: { negate: boolean }) =>
   margin-right: ${theme.spacings.sm};
 `);
 
-const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Props) => {
-  const paramNames = Object.keys(block.params);
-
-  const anyParamsSet = () : boolean => (
-    paramNames.some((paramName) => paramValueExists(block.params[paramName]))
-  );
-
-  const formatParamValue = (value : string | number | boolean) => {
-    if (paramValueIsVariable(value)) {
-      return (
-        <Label bsStyle="default">
-          {value}
-        </Label>
-      );
-    }
-
-    return (value.toString());
-  };
-
-  return (
-    <Row>
-      <Col xs={9} md={10}>
-        <BlockInfo>
-          <Col md={12}>
-            <h3>
-              {negatable
+const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Props) => (
+  <Row>
+    <Col xs={9} md={10}>
+      <BlockInfo>
+        <Col md={12}>
+          <h3>
+            {negatable
               && <NegationButton bsStyle="primary" negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
-              {block?.step_title}
-            </h3>
-            {block?.outputvariable && (
+            {block?.step_title}
+          </h3>
+          {block?.outputvariable && (
             <OutputVariable>
               <OutputIcon name="level-up-alt" rotation={90} />
               <Label bsStyle="primary">
                 {`$${block?.outputvariable}`}
               </Label>
             </OutputVariable>
-            )}
-          </Col>
-        </BlockInfo>
-        {anyParamsSet
-        && (
-        <Row>
-          <ParamsCol sm={12} md={6}>
-            {paramNames.map((paramName) => {
-              const paramValue = block.params[paramName];
-
-              if (paramValueExists(paramValue)) {
-                return (
-                  <Col key={paramName}>
-                    <Param><strong>{paramName}:</strong> {formatParamValue(paramValue)}</Param>
-                  </Col>
-                );
-              }
-
-              return null;
-            })}
-          </ParamsCol>
-        </Row>
-        )}
-        <Errors objectWithErrors={block} />
-      </Col>
-      <Col xs={3} md={2} className="text-right">
-        <IconButton name="edit" onClick={onEdit} title="Edit" />
-        <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
-      </Col>
-    </Row>
-  );
-};
+          )}
+        </Col>
+      </BlockInfo>
+      <Errors objectWithErrors={block} />
+    </Col>
+    <Col xs={3} md={2} className="text-right">
+      <IconButton name="edit" onClick={onEdit} title="Edit" />
+      <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+    </Col>
+  </Row>
+);
 
 RuleBlockDisplay.propTypes = {
   block: ruleBlockPropType,
