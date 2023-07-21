@@ -39,10 +39,11 @@ const ResumeStartupButton = ({ variant, compact, color }: Props) => {
           setIsRestartingConfiguration(true);
         })
         .catch((error) => {
-          setIsRestartingConfiguration(false);
-
           UserNotification.error(`Resuming startup failed with error: ${error}`,
             'Could not resume startup');
+        })
+        .finally(() => {
+          setIsRestartingConfiguration(false);
         });
     }
   }, [setIsRestartingConfiguration]);

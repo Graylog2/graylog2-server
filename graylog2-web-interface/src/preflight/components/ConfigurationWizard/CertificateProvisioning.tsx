@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
-import { Button, Title, Space, Alert } from 'preflight/components/common';
+import { Button, Title, Space, Alert, Group } from 'preflight/components/common';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
@@ -30,7 +30,11 @@ const onProvisionCertificates = () => fetch(
   false,
 );
 
-const CertificateProvisioning = () => {
+type Props = {
+  onSkipProvisioning: () => void,
+}
+
+const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
   const queryClient = useQueryClient();
   const { data: dataNodes, isInitialLoading } = useDataNodes();
 
@@ -58,9 +62,14 @@ const CertificateProvisioning = () => {
           At least one Graylog data node needs to run before the certificate can be provisioned.
         </Alert>
       )}
-      <Button onClick={() => provisionCertificates()} disabled={!dataNodes.length}>
-        {isLoading ? 'Provisioning certificate...' : 'Provision certificate and continue'}
-      </Button>
+      <Group>
+        <Button onClick={() => provisionCertificates()} disabled={!dataNodes.length}>
+          {isLoading ? 'Provisioning certificate...' : 'Provision certificate and continue'}
+        </Button>
+        <Button onClick={() => onSkipProvisioning()} variant="light">
+          Skip provisioning
+        </Button>
+      </Group>
     </div>
   );
 };
