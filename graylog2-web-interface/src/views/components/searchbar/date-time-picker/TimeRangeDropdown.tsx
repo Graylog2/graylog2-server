@@ -215,6 +215,18 @@ const TimeRangeTabs = ({ handleActiveTab, currentTimeRange, limitDuration, valid
   );
 };
 
+const normalizeIfKeywordTimerange = (timeRange: TimeRange | NoTimeRangeOverride) => {
+  if (isTypeKeyword(timeRange)) {
+    return {
+      type: timeRange.type,
+      timezone: timeRange.timezone,
+      keyword: timeRange.keyword,
+    };
+  }
+
+  return timeRange;
+};
+
 const TimeRangeDropdown = ({
   noOverride,
   toggleDropdownShow,
@@ -238,18 +250,6 @@ const TimeRangeDropdown = ({
   const handleCancel = useCallback(() => {
     toggleDropdownShow();
   }, [toggleDropdownShow]);
-
-  const normalizeIfKeywordTimerange = (timeRange: TimeRange | NoTimeRangeOverride) => {
-    if (isTypeKeyword(timeRange)) {
-      return {
-        type: timeRange.type,
-        timezone: timeRange.timezone,
-        keyword: timeRange.keyword,
-      };
-    }
-
-    return timeRange;
-  };
 
   const handleSubmit = useCallback(({ nextTimeRange }: {
     nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']
