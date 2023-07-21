@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesBatchIT;
@@ -23,7 +24,7 @@ import org.junit.Rule;
 
 public class MessagesBatchOS2IT extends MessagesBatchIT {
     @Rule
-    public final SearchServerInstance openSearchInstance = OpenSearchInstanceBuilder.builder().heapSize("256m").build();
+    public final OpenSearchInstance openSearchInstance = (OpenSearchInstance)OpenSearchInstanceBuilder.builder().heapSize("256m").build();
 
     @Override
     protected SearchServerInstance searchServer() {

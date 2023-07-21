@@ -24,7 +24,7 @@ import org.junit.Rule;
 
 public class MessagesBatchES7IT extends MessagesBatchIT {
     @Rule
-    public final SearchServerInstance elasticsearch = Elasticsearch7InstanceBuilder.builder().heapSize("256m").build();
+    public final ElasticsearchInstanceES7 elasticsearch = (ElasticsearchInstanceES7)Elasticsearch7InstanceBuilder.builder().heapSize("256m").build();
 
     @Override
     protected SearchServerInstance searchServer() {
