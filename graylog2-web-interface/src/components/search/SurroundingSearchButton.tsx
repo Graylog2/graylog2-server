@@ -22,9 +22,9 @@ import moment from 'moment';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
+import SearchLink from 'views/logic/search/SearchLink';
 
 import type { SearchesConfig } from './SearchConfig';
-import SearchLink from './SearchLink';
 
 const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }: Pick<SearchesConfig, 'surrounding_timerange_options'>) => Object.fromEntries(
   Object.entries(surroundingTimerangeOptions).map(([key, value]) => [moment.duration(key).asSeconds(), value]),
