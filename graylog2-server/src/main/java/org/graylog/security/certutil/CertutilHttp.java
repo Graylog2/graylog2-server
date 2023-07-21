@@ -128,7 +128,6 @@ public class CertutilHttp implements CliCommand {
                 CertRequest certificateRequest = CertRequest.signed(cnName, caKeyPair)
                         .withSubjectAlternativeName("localhost")
                         .withSubjectAlternativeName(Tools.getLocalHostname())
-                        .withSubjectAlternativeName("graylog-datanode-host")
                         .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
                         .withSubjectAlternativeName("127.0.0.1")
                         .withSubjectAlternativeName("ip6-localhost")
