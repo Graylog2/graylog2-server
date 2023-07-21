@@ -15,19 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import type {
+  TimeRange as TimeRangeType,
+  NoTimeRangeOverride, AbsoluteTimeRange, RelativeTimeRange,
+} from 'views/logic/queries/Query';
+import {
+  isTypeKeyword,
+  isTypeRelativeWithStartOnly,
+  isTypeRelativeWithEnd,
+  isNoTimeRangeOverride,
+} from 'views/typeGuards/timeRange';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
-import ToolsStore from 'stores/tools/ToolsStore';
-import useUserDateTime from 'hooks/useUserDateTime';
-
-type Props = {
-  timerange: TimeRange | NoTimeRangeOverride | null | undefined,
-  toggleDropdownShow?: () => void,
-};
+import assertUnreachable from 'logic/assertUnreachable';
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
 export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
@@ -43,24 +44,20 @@ const TimeRangeWrapper = styled.div(({ theme }) => css`
   > span {
     flex: 1;
   }
-
-  code {
-    color: ${theme.colors.global.textDefault};
-    background: transparent;
-  }
 `);
 
-export const dateOutput = (timerange: TimeRange) => {
+export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | undefined) => {
   let from = EMPTY_RANGE;
   let to = EMPTY_RANGE;
 
-  if (!timerange) {
+  if (!timerange?.type) {
     return EMPTY_OUTPUT;
   }
 
-  switch (timerange.type) {
-    case 'relative':
+  const { type } = timerange;
 
+  switch (type) {
+    case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {
         from = readableRange(timerange, 'range');
       }
@@ -77,51 +74,39 @@ export const dateOutput = (timerange: TimeRange) => {
       };
 
     case 'absolute':
-    case 'keyword':
       return { from: timerange.from, until: timerange.to };
     default:
-      throw new Error('Invalid Time Range Type');
+      return assertUnreachable(type, 'Invalid time range type');
   }
 };
 
-const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
-  const { userTimezone } = useUserDateTime();
-  const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
-  const dateTested = useRef(false);
+const TimeRange = ({ timerange }: { timerange: TimeRangeType | null | undefined }) => {
+  if (isTypeKeyword(timerange)) {
+    return <span>Keyword: <b>{timerange.keyword}</b></span>;
+  }
 
-  useEffect(() => {
-    if (isTypeKeyword(timerange) && !timerange.from) {
-      if (!dateTested.current) {
-        ToolsStore.testNaturalDate(timerange.keyword, userTimezone)
-          .then((response) => {
-            dateTested.current = true;
-
-            setTimeOutput({
-              from: response.from,
-              until: response.to,
-            });
-          }, () => {
-            setTimeOutput(EMPTY_OUTPUT);
-          });
-      }
-    } else if (timerange && 'type' in timerange) {
-      setTimeOutput(dateOutput(timerange));
-    }
-  }, [dateTested, timerange, userTimezone]);
+  const { from, until } = range(timerange);
 
   return (
-    <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>
-      {!(timerange && 'type' in timerange)
-        ? <span>No Override</span>
-        : (
-          <>
-            <span data-testid="from">From: <strong>{from}</strong></span>
-            <span data-testid="to">Until: <strong>{until}</strong></span>
-          </>
-        )}
-    </TimeRangeWrapper>
+    <>
+      <span data-testid="from">From: <b>{from}</b></span>
+      <span data-testid="to">Until: <b>{until}</b></span>
+    </>
   );
 };
+
+type Props = {
+  timerange: TimeRangeType | NoTimeRangeOverride | null | undefined,
+  toggleDropdownShow?: () => void,
+};
+
+const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => (
+  <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>
+    {isNoTimeRangeOverride(timerange)
+      ? <span>No Override</span>
+      : <TimeRange timerange={timerange} />}
+  </TimeRangeWrapper>
+);
 
 TimeRangeDisplay.defaultProps = {
   toggleDropdownShow: undefined,

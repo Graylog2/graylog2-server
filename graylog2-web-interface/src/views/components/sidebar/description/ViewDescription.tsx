@@ -37,15 +37,14 @@ const ViewDescription = ({ results }: Props) => {
   const isAdHocSearch = !viewMetadata.id;
   const viewType = useViewType();
   const viewTypeLabel = viewType ? ViewTypeLabel({ type: viewType }) : '';
+
   const resultsSection = (
     <>
       <SectionSubheadline>
         Execution
       </SectionSubheadline>
-      <p>
 
-        <SearchResultOverview results={results} />
-      </p>
+      <SearchResultOverview results={results} />
     </>
   );
 

@@ -17,11 +17,15 @@
 import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
+// eslint-disable-next-line no-restricted-imports
+import type { DebouncedFunc } from 'lodash';
+import { Form, Formik } from 'formik';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import suppressConsole from 'helpers/suppressConsole';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import TimeRangeAddToQuickListButton from './TimeRangeAddToQuickListButton';
 
@@ -47,25 +51,31 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
 });
 
 describe('TimeRangeAddToQuickListButton', () => {
+  const SUT = ({ timeRange }: { timeRange: TimeRange }) => (
+    <Formik initialValues={{ nextTimeRange: timeRange }} onSubmit={() => {}}>
+      <Form>
+        <TimeRangeAddToQuickListButton />
+      </Form>
+    </Formik>
+  );
+
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchClusterConfig,
       refresh: jest.fn(),
     });
 
-    // @ts-ignore
-    asMock(debounce).mockImplementation((fn) => fn);
+    asMock(debounce as DebouncedFunc<(...args: any) => any>).mockImplementation((fn) => fn);
   });
 
   const getOpenButton = () => screen.findByTitle('Add time range to quick access time range list');
 
   it('shows popover on click', async () => {
     render(
-      <TimeRangeAddToQuickListButton timerange={{
+      <SUT timeRange={{
         type: 'relative',
         from: 300,
-      }}
-                                     isTimerangeValid />);
+      }} />);
 
     const buttonIcon = await getOpenButton();
 
@@ -76,11 +86,10 @@ describe('TimeRangeAddToQuickListButton', () => {
 
   it('dont shows alert about duplication when there is no similar time range', async () => {
     render(
-      <TimeRangeAddToQuickListButton timerange={{
+      <SUT timeRange={{
         type: 'relative',
         from: 50,
-      }}
-                                     isTimerangeValid />);
+      }} />);
 
     const buttonIcon = await getOpenButton();
 
@@ -91,11 +100,10 @@ describe('TimeRangeAddToQuickListButton', () => {
 
   it('shows alert about duplication when there is similar time range', async () => {
     render(
-      <TimeRangeAddToQuickListButton timerange={{
+      <SUT timeRange={{
         type: 'relative',
         from: 300,
-      }}
-                                     isTimerangeValid />);
+      }} />);
 
     const buttonIcon = await getOpenButton();
 
@@ -106,11 +114,10 @@ describe('TimeRangeAddToQuickListButton', () => {
 
   it('runs action to update config on submitting form', async () => {
     render(
-      <TimeRangeAddToQuickListButton timerange={{
+      <SUT timeRange={{
         type: 'relative',
         from: 500,
-      }}
-                                     isTimerangeValid />);
+      }} />);
 
     const buttonIcon = await getOpenButton();
 
@@ -147,11 +154,10 @@ describe('TimeRangeAddToQuickListButton', () => {
 
   it('not runs action to update config on submitting form when description is empty', async () => {
     render(
-      <TimeRangeAddToQuickListButton timerange={{
+      <SUT timeRange={{
         type: 'relative',
         from: 500,
-      }}
-                                     isTimerangeValid />);
+      }} />);
 
     const buttonIcon = await getOpenButton();
 
