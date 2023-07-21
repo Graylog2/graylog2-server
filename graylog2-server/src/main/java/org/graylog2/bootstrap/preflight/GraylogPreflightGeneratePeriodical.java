@@ -71,6 +71,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final CsrMongoStorage csrStorage;
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
+    private final CsrSigner csrSigner;
     private final String passwordSecret;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
@@ -81,6 +82,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                               final CaService caService,
                                               final Configuration configuration,
                                               final NodeService nodeService,
+                                              final CsrSigner csrSigner,
                                               final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
@@ -89,6 +91,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         this.passwordSecret = passwordSecret;
         this.configuration = configuration;
         this.nodeService = nodeService;
+        this.csrSigner = csrSigner;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -144,7 +147,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                         .errorMsg("Node in CSR state, but no CSR present")
                                         .build());
                             } else {
-                                var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                                var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
                                 //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
                                 final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
                                 certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());

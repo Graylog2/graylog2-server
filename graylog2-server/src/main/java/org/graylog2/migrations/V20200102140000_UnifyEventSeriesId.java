@@ -18,17 +18,15 @@ package org.graylog2.migrations;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.auto.value.AutoValue;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,21 +37,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 public class V20200102140000_UnifyEventSeriesId extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20200102140000_UnifyEventSeriesId.class);
 
     private final ClusterConfigService clusterConfigService;
-    private final DBEventDefinitionService eventDefinitionService;
-    private final ObjectMapperProvider objectMapperProvider;
+    private final MongoCollection<Document> eventDefinitions;
 
     @Inject
-    public V20200102140000_UnifyEventSeriesId(ClusterConfigService clusterConfigService, DBEventDefinitionService eventDefinitionService, ObjectMapperProvider objectMapperProvider) {
+    public V20200102140000_UnifyEventSeriesId(ClusterConfigService clusterConfigService,
+                                              MongoConnection mongoConnection) {
         this.clusterConfigService = clusterConfigService;
-        this.eventDefinitionService = eventDefinitionService;
-        this.objectMapperProvider = objectMapperProvider;
+        this.eventDefinitions = mongoConnection.getMongoDatabase().getCollection("event_definitions");
     }
 
     @Override
@@ -67,66 +64,64 @@ public class V20200102140000_UnifyEventSeriesId extends Migration {
             LOG.debug("Migration already completed.");
             return;
         }
-        final List<EventDefinitionDto> changedEventDefinitions;
-        try (final Stream<EventDefinitionDto> dtoStream = eventDefinitionService.streamAll()) {
-            changedEventDefinitions = dtoStream.map(this::unifySeriesId).filter(Objects::nonNull).collect(Collectors.toList());
-        }
-        for (final EventDefinitionDto changedDto : changedEventDefinitions) {
-            LOG.info("Unified series Id for EventDefinition <{}>", changedDto.id());
-            eventDefinitionService.save(changedDto);
+        var changedEventDefinitions = StreamSupport.stream(eventDefinitions.find().spliterator(), false)
+                .map(this::unifySeriesId)
+                .filter(Objects::nonNull)
+                .toList();
+
+        for (final Document changedEventDefinition : changedEventDefinitions) {
+            var id = changedEventDefinition.getObjectId("_id");
+            LOG.info("Unified series Id for EventDefinition <{}>", id);
+            eventDefinitions.replaceOne(Filters.eq("_id", id), changedEventDefinition);
         }
         clusterConfigService.write(MigrationCompleted.create());
     }
 
-    private EventDefinitionDto unifySeriesId(EventDefinitionDto dto) {
-        if (!dto.config().type().equals(AggregationEventProcessorConfig.TYPE_NAME)) {
+    private Document unifySeriesId(Document dto) {
+        final Document config = dto.get("config", Document.class);
+        if (!config.getString("type").equals(AggregationEventProcessorConfig.TYPE_NAME)) {
             return null;
         }
-        final AggregationEventProcessorConfig config = (AggregationEventProcessorConfig) dto.config();
-        if (config.series().isEmpty()) {
-            return null;
-        }
-        final ObjectMapper objectMapper = objectMapperProvider.get();
-        final AggregationEventProcessorConfig.Builder configBuilder = config.toBuilder();
-        final Map<String, String> refMap = new HashMap<>();
 
-        configBuilder.series(config.series().stream().map(s -> {
-            final String newId = s.function().toSeriesId(s.field());
-            refMap.put(s.id(), newId);
-            return s.toBuilder()
-                    .id(newId)
-                    .build();
-        }).collect(Collectors.toList()));
+        var series = config.getList("series", Document.class);
+        if (series.isEmpty()) {
+            return null;
+        }
+        final Map<String, String> refMap = new HashMap<>(series.size());
+
+        series.forEach(s -> {
+            var id = s.getString("id");
+            var name = s.getString("function");
+            var field = Optional.ofNullable(s.getString("field"));
+            var newId = toSeriesId(name, field);
+            s.put("id", newId);
+            refMap.put(id, newId);
+        });
 
         // convert conditions to json, fix them and convert back to POJO
-        final JsonNode conditionsJson = objectMapper.valueToTree(config.conditions());
-        convertConditions(dto.id(), refMap, conditionsJson);
-        final AggregationConditions convertedConditions = objectMapper.convertValue(conditionsJson, AggregationConditions.class);
-        configBuilder.conditions(convertedConditions);
+        final Document conditions = config.getEmbedded(List.of("conditions", "expression"), Document.class);
+        var id = config.getObjectId("_id");
+        convertConditions(id, refMap, conditions);
 
-        return dto.toBuilder().config(configBuilder.build()).build();
+        return dto;
     }
 
-    private void convertConditions(String eventId, Map<String, String> changedIds, final JsonNode jsonNode) {
-        if (jsonNode.isObject()) {
-            final ObjectNode objectNode = (ObjectNode) jsonNode;
-            if (objectNode.get("expr") != null && objectNode.get("expr").asText().equals("number-ref") ) {
-                final String newRef = changedIds.get(objectNode.get("ref").asText());
-                if (newRef == null) {
-                    throw new RuntimeException(String.format(Locale.US,
-                            "Could not resolve new ref for condition on EventDefinition <%s>. oldref <%s> refMap <%s>",
-                            eventId, objectNode.get("ref"), changedIds));
-                }
-                objectNode.put("ref", newRef);
-            }
-        }
-        // recurse into tree
-        jsonNode.fields().forEachRemaining(f -> {
-            final JsonNode value = f.getValue();
-            if (value.isContainerNode()) {
-                convertConditions(eventId, changedIds, value);
-            }
-        });
+    private String toSeriesId(String name, Optional<String> field) {
+        return String.format(Locale.US, "%s-%s", name.toLowerCase(Locale.US), field.orElse(""));
+    }
+
+    private void convertConditions(ObjectId eventId, Map<String, String> changedIds, Document conditions) {
+        Optional.ofNullable(conditions.getString("expr"))
+                .filter(expr -> expr.equals("number-ref"))
+                .map((expr) -> Optional.ofNullable(changedIds.get(conditions.getString("ref"))).orElseThrow(() -> new RuntimeException(String.format(Locale.US,
+                        "Could not resolve new ref for condition on EventDefinition <%s>. oldref <%s> refMap <%s>",
+                        eventId, conditions.getString("ref"), changedIds)))
+                ).ifPresent(newRef -> conditions.put("ref", newRef));
+
+        Optional.ofNullable(conditions.get("left", Document.class))
+                .ifPresent(left -> convertConditions(eventId, changedIds, left));
+        Optional.ofNullable(conditions.get("right", Document.class))
+                .ifPresent(right -> convertConditions(eventId, changedIds, right));
     }
 
     @JsonAutoDetect

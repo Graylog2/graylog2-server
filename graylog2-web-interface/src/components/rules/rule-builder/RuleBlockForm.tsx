@@ -182,7 +182,7 @@ const RuleBlockForm = ({
                   )}
 
                   <FormSubmit bsSize="small"
-                              submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
+                              submitButtonText={existingBlock ? 'Update' : 'Add'}
                               submitButtonType="button"
                               onSubmit={() => handleSubmit(values)}
                               onCancel={() => {

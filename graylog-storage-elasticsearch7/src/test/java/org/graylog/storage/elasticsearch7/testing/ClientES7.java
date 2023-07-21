@@ -250,14 +250,6 @@ public class ClientES7 implements Client {
                 .toArray(String[]::new);
     }
 
-
-    public String getSetting(String setting) {
-        final ClusterGetSettingsRequest req = new ClusterGetSettingsRequest();
-        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(req, requestOptions),
-                "Unable to read OS cluster setting: " + setting);
-        return response.getSetting(setting);
-    }
-
     @Override
     public void putSetting(String setting, String value) {
         final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
@@ -282,11 +274,6 @@ public class ClientES7 implements Client {
 
         client.execute((c, requestOptions) -> c.indices().putSettings(request, requestOptions),
                 "Unable to reset index block for " + index);
-    }
-
-    @Override
-    public void resetClusterBlock() {
-        // noop for ES7, needed for OS 2.x
     }
 
     @Override
@@ -346,5 +333,12 @@ public class ClientES7 implements Client {
                 .path("blocks")
                 .fields()
                 .hasNext();
+    }
+
+    public String getClusterSetting(String setting) {
+        final ClusterGetSettingsRequest req = new ClusterGetSettingsRequest();
+        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(req, requestOptions),
+                "Unable to read ES cluster setting: " + setting);
+        return response.getSetting(setting);
     }
 }

@@ -16,13 +16,12 @@
  */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import type { StyledComponent } from 'styled-components';
 import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
-const StyledForm: StyledComponent<'form', {}> = styled.form`
+const StyledForm = styled.form`
   margin-top: 10px;
 
   &.form-inline > .form-group {

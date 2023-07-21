@@ -17,6 +17,12 @@
 package org.graylog2.indexer.messages;
 
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -32,6 +38,8 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -40,9 +48,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -57,6 +68,8 @@ import static org.mockito.Mockito.verify;
 public abstract class MessagesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "messages_it_deflector";
 
+    private static final Logger LOG = LoggerFactory.getLogger(MessagesIT.class);
+
     protected Messages messages;
 
     protected static final IndexSet indexSet = new MessagesTestIndexSet();
@@ -69,7 +82,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        client().resetClusterBlock(); // the index may be blocked with delay from a previous test, if yes then reset it.
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
@@ -120,7 +132,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final int MESSAGECOUNT = 101;
         // Each Message is about 1 MB
         final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
-        final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
 
         assertThat(failedItems).isEmpty();
 
@@ -140,7 +152,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final int LARGE_MESSAGECOUNT = 20;
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
         messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
 
         assertThat(failedItems).isEmpty();
 
@@ -162,11 +174,50 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 entry(indexSet, message2)
         );
 
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
 
         assertThat(failedItems).hasSize(1);
 
         verify(failureSubmissionService).submitIndexingErrors(argThat(arg -> arg.size() == 1));
+    }
+
+    @Test
+    public void retryIndexingMessagesDuringFloodStage() throws Exception {
+        triggerFloodStage(INDEX_NAME);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final AtomicBoolean succeeded = new AtomicBoolean(false);
+        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
+
+        final Future<Set<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+
+        countDownLatch.await();
+
+        resetFloodStage(INDEX_NAME);
+        waitForClusterBlockRelease();
+
+        final Set<String> failedItems = result.get(3, TimeUnit.MINUTES);
+        assertThat(failedItems).isEmpty();
+
+        client().refreshNode();
+
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+        assertThat(succeeded.get()).isTrue();
+    }
+
+
+    private void waitForClusterBlockRelease() throws ExecutionException, RetryException {
+        RetryerBuilder.<String>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(20))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        LOG.info("Waiting for cluster block to be automatically released, attempt {}", attempt.getAttemptNumber());
+                    }
+                })
+                .retryIfResult(clusterBlockValue -> Objects.equals("true", clusterBlockValue))
+                .build()
+                .call(() -> client().getClusterSetting("cluster.blocks.create_index"));
     }
 
     private Messages.IndexingListener createIndexingListener(CountDownLatch retryLatch, AtomicBoolean successionFlag) {
@@ -199,13 +250,13 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
 
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<Set<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
         countDownLatch.await();
 
         client().removeAliasMapping(index2, INDEX_NAME);
 
-        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
+        final Set<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
 
         client().refreshNode();
@@ -222,7 +273,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 Maps.immutableEntry(indexSet, message)
         );
 
-        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
 
         assertThat(failedItems).isEmpty();
 
@@ -233,11 +284,27 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(resultMessage.getMessage().getField("custom_object")).isEqualTo("foo");
     }
 
-    private Future<List<String>> background(Callable<List<String>> task) {
+    private Future<Set<String>> background(Callable<Set<String>> task) {
         final ExecutorService executor = Executors.newFixedThreadPool(1,
                 new ThreadFactoryBuilder().setNameFormat("messages-it-%d").build());
 
         return executor.submit(task);
+    }
+
+    private void triggerFloodStage(String index) {
+        client().putSetting("cluster.routing.allocation.disk.watermark.low", "0%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.high", "0%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.flood_stage", "0%");
+
+        client().waitForIndexBlock(index);
+    }
+
+    private void resetFloodStage(String index) {
+        client().putSetting("cluster.routing.allocation.disk.watermark.flood_stage", "95%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.high", "90%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.low", "85%");
+
+        client().resetIndexBlock(index);
     }
 
     private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {

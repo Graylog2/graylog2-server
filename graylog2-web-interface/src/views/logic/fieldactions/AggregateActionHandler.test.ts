@@ -42,7 +42,7 @@ describe('AggregateActionHandler', () => {
     expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
       config: expect.objectContaining({
         rowPivots: [
-          Pivot.create(['foo'], 'values', { limit: 15 }),
+          Pivot.createValues(['foo']),
         ],
       }),
     }));

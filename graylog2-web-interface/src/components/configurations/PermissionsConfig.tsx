@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
 
@@ -32,9 +31,7 @@ import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StyledDefList = styled.dl.attrs({
-  className: 'deflist',
-})(({ theme }: { theme: DefaultTheme }) => css`
+const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
   &&.deflist {
     dd {
       padding-left: ${theme.spacings.md};
@@ -43,7 +40,7 @@ const StyledDefList = styled.dl.attrs({
   }
 `);
 
-const LabelSpan = styled.span(({ theme }: { theme: DefaultTheme }) => css`
+const LabelSpan = styled.span(({ theme }) => css`
   margin-left: ${theme.spacings.sm};
   font-weight: bold;
 `);

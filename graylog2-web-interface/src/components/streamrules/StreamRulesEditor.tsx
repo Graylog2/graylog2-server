@@ -37,16 +37,14 @@ const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
 `;
 
-const MatchIcon = styled(({ empty: _empty, matches: _matches, ...props }) => <Icon {...props} />)(
-  ({ empty, matches, theme }) => {
-    const matchColor = matches ? theme.colors.variant.success : theme.colors.variant.danger;
+const MatchIcon = styled(Icon)<{ $empty?: boolean, $matches?: boolean }>(({ theme, $empty, $matches }) => {
+  const matchColor = $matches ? theme.colors.variant.success : theme.colors.variant.danger;
 
-    return css`
-      color: ${empty ? theme.colors.variant.info : matchColor};
+  return css`
+      color: ${$empty ? theme.colors.variant.info : matchColor};
       margin-right: 3px;
 `;
-  },
-);
+});
 
 const StyledSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -141,7 +139,7 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
           <StreamAlertHeader>
             {matchData?.matches && (
               <>
-                <MatchIcon matches name="check" /> This message would be routed to this stream!
+                <MatchIcon $matches name="check" /> This message would be routed to this stream!
               </>
             )}
 
@@ -153,7 +151,7 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
 
             {!matchData && (
               <>
-                <MatchIcon empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
+                <MatchIcon $empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
               </>
             )}
           </StreamAlertHeader>

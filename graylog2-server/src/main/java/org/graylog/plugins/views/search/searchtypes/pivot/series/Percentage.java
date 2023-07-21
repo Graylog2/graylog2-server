@@ -31,7 +31,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Percentage.NAME)
 @JsonDeserialize(builder = Percentage.Builder.class)
-public abstract class Percentage implements SeriesSpec {
+public abstract class Percentage implements SeriesSpec, HasOptionalField {
     public static final String NAME = "percentage";
 
     public enum Strategy {
@@ -54,6 +54,13 @@ public abstract class Percentage implements SeriesSpec {
     @Override
     public String literal() {
         return type() + "(" + field().map(Strings::nullToEmpty).orElse("") + "," + strategy().orElse(Strategy.COUNT) + ")";
+    }
+
+    public abstract Builder toBuilder();
+
+    @Override
+    public Percentage withId(String id) {
+        return toBuilder().id(id).build();
     }
 
     public static Builder builder() {

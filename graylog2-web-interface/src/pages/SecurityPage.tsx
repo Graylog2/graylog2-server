@@ -25,9 +25,9 @@ import SecurityNoLicenseOverlayDark from 'assets/security-no-license-overlay-dar
 import ThemeModeContext from 'theme/ThemeModeContext';
 import type { ThemeMode } from 'theme/constants';
 
-const generateStyles = () => css`
+const generateStyles = () => css<{ backgroundImage: string }>`
   body {
-    background: url(${({ backgroundImage }: { backgroundImage: string }) => backgroundImage}) no-repeat center center fixed;
+    background: url(${({ backgroundImage }) => backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;

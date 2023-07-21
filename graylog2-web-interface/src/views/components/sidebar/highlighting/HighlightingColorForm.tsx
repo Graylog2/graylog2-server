@@ -74,7 +74,7 @@ const StaticColorPicker = () => (
 const OptionContainer = styled.div`
   display: flex;
 `;
-const createOption = (name) => ({ label: <OptionContainer><GradientColorPreview gradient={name} />{name}</OptionContainer>, value: name });
+const createOption = (name) => ({ label: <OptionContainer><GradientColorPreview $gradient={name} />{name}</OptionContainer>, value: name });
 
 const GRADIENTS = [...COLORSCALES].sort(defaultCompare).map(createOption);
 

@@ -113,11 +113,11 @@ describe('SearchBar', () => {
     asMock(SearchConfigStore.getInitialState).mockReturnValue({ searchesClusterConfig: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' } });
     render(<SearchBar />);
 
-    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).toContain('disabled'));
-    await waitFor(() => expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle'));
+    await waitFor(() => expect(timeRangePickerButton.firstChild).toHaveClass('fa-exclamation-triangle'));
   });
 
   it('should hide the save load controls if editing the widget', async () => {
