@@ -37,7 +37,7 @@ type Props = {
 const OutputVariable = styled.p(({ theme }) => css`
   margin-left: ${theme.spacings.xxs};
   margin-bottom: 0;
-  margin-top: ${theme.spacings.md};
+  margin-top: ${theme.spacings.sm};
 `);
 
 const OutputIcon = styled(Icon)(({ theme }) => css`
