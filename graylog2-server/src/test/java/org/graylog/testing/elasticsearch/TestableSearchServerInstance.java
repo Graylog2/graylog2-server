@@ -28,12 +28,9 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This rule starts a Datanode instance and provides a configured {@link Client}.
@@ -41,7 +38,7 @@ import java.util.stream.Collectors;
 public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
 
-    private static final Map<ContainerCacheKey, GenericContainer<?>> containersByVersion = new HashMap<>();
+    private static final Map<ContainerCacheKey, GenericContainer<?>> containersByVersion = new ConcurrentHashMap<>();
 
     protected static final int OPENSEARCH_PORT = 9200;
     protected static final String NETWORK_ALIAS = "elasticsearch";
