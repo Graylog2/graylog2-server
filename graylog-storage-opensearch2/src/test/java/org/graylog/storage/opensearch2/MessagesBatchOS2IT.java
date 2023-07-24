@@ -26,7 +26,7 @@ import java.util.Collections;
 
 public class MessagesBatchOS2IT extends MessagesBatchIT {
     @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder().heapSize("256m", Collections.emptyList()).build();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder().heapSize("256m").build();
 
     @Override
     protected SearchServerInstance searchServer() {

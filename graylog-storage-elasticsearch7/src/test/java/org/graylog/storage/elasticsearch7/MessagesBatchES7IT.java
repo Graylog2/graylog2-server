@@ -26,7 +26,7 @@ import java.util.Collections;
 
 public class MessagesBatchES7IT extends MessagesBatchIT {
     @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = (ElasticsearchInstanceES7)Elasticsearch7InstanceBuilder.builder().heapSize("256m", Collections.emptyList()).build();
+    public final ElasticsearchInstanceES7 elasticsearch = (ElasticsearchInstanceES7)Elasticsearch7InstanceBuilder.builder().heapSize("256m").build();
 
     @Override
     protected SearchServerInstance searchServer() {
