@@ -19,6 +19,7 @@ package org.graylog.datanode.management;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog.security.certutil.CaService;
 import org.graylog2.cluster.preflight.NodePreflightStateChangeEvent;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
@@ -38,16 +39,21 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
+    private final CaService caService;
 
     @Inject
-    public OpensearchProcessService(DatanodeConfiguration datanodeConfiguration, Provider<OpensearchConfiguration> configurationProvider, EventBus eventBus) {
+    public OpensearchProcessService(DatanodeConfiguration datanodeConfiguration,
+                                    Provider<OpensearchConfiguration> configurationProvider,
+                                    EventBus eventBus,
+                                    final CaService caService) {
         this.configurationProvider = configurationProvider;
+        this.caService = caService;
         this.process = createOpensearchProcess(datanodeConfiguration);
         eventBus.register(this);
     }
 
     private OpensearchProcess createOpensearchProcess(DatanodeConfiguration datanodeConfiguration) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize());
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), caService);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.setStateMachineTracer(watchdog);
         return process;
