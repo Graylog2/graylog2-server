@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+package org.graylog.storage.elasticsearch7.testing;
 
-import org.graylog.storage.elasticsearch7.testing.Elasticsearch7InstanceBuilder;
-import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
+import org.graylog.testing.completebackend.SearchServerBuilder;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.messages.MessagesBatchIT;
-import org.junit.Rule;
+import org.graylog2.storage.SearchVersion;
 
-public class MessagesBatchES7IT extends MessagesBatchIT {
-    @Rule
-    public final ElasticsearchInstanceES7 elasticsearch = (ElasticsearchInstanceES7)Elasticsearch7InstanceBuilder.builder().heapSize("256m").build();
+public class OpenSearch13InstanceBuilder  extends SearchServerBuilder {
+    public OpenSearch13InstanceBuilder(SearchVersion version) {
+        super(version);
+    }
 
     @Override
-    protected SearchServerInstance searchServer() {
-        return this.elasticsearch;
+    protected SearchServerInstance instantiate() {
+        return new OpenSearch13Instance(getVersion(), getNetwork(), getHeapSize(), getFeatureFlags());
     }
 }

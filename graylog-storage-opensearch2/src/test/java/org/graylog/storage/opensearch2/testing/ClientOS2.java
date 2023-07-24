@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -67,10 +68,12 @@ import java.util.stream.Stream;
 public class ClientOS2 implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientOS2.class);
     private final OpenSearchClient client;
+    private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
 
-    public ClientOS2(OpenSearchClient client) {
+    public ClientOS2(final OpenSearchClient client, final List<String> featureFlags) {
         this.client = client;
+        this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
     }
 
