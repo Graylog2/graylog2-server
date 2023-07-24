@@ -25,7 +25,7 @@ import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { sam } from 'fixtures/users';
+import { carol, sam } from 'fixtures/users';
 
 jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
   data: {
@@ -101,17 +101,25 @@ describe('Welcome', () => {
   });
 
   describe('Page header', () => {
-    it('Shows link to edit profile in case user has permission', async () => {
+    it('Shows link to edit profile in case user is not readOnly and has no defined starting page', async () => {
       render(<Welcome />);
+
+      await screen.findByText('This is your personal start page, allowing easy access to the content most relevant for you.');
       const linkToEditProfile = await screen.findByText('edit profile');
 
       expect(linkToEditProfile).toHaveAttribute('href', '/edit-profile-page');
     });
 
-    it('Shows ask administrator to edit profile in case user has not permission', async () => {
+    it('Shows appropriate message without link for readOnly users', async () => {
       asMock(useCurrentUser).mockReturnValue(sam);
       render(<Welcome />);
-      await screen.findByText('If you like, you can ask administrator to change your personal start page');
+      await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
+    });
+
+    it('Shows appropriate message without link for users with defined starting page', async () => {
+      asMock(useCurrentUser).mockReturnValue(carol);
+      render(<Welcome />);
+      await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
     });
   });
 
