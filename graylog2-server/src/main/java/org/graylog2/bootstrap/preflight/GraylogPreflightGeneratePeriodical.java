@@ -16,13 +16,12 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import okhttp3.Authenticator;
+import com.google.common.base.Splitter;
 import okhttp3.Call;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.Route;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.cert.CertificateChain;
@@ -36,6 +35,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
 import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,17 +44,20 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
 @Singleton
@@ -68,9 +71,9 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private final CsrMongoStorage csrStorage;
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
+    private final CsrSigner csrSigner;
     private final String passwordSecret;
-    private final OkHttpClient okHttpClient;
-    private OkHttpClient tmpClient;
+    private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
     @Inject
     public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
@@ -79,7 +82,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                               final CaService caService,
                                               final Configuration configuration,
                                               final NodeService nodeService,
-                                              final OkHttpClient okHttpClient,
+                                              final CsrSigner csrSigner,
                                               final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
@@ -88,47 +91,26 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         this.passwordSecret = passwordSecret;
         this.configuration = configuration;
         this.nodeService = nodeService;
-        this.okHttpClient = okHttpClient;
-        buildTempHttpClient();
+        this.csrSigner = csrSigner;
     }
 
-    // building a non checking httpclient
-    private void buildTempHttpClient() {
+    // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
+    private Optional<OkHttpClient> buildTempHttpClient() {
         try {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
-                        }
-
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
-                        }
-
-                        @Override
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new java.security.cert.X509Certificate[]{};
-                        }
-                    }
-            };
-
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-
-            OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
-            newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-            newBuilder.hostnameVerifier((hostname, session) -> true);
-            newBuilder.authenticator(new Authenticator() {
-                public Request authenticate(Route route, Response response) throws IOException {
-                    String credential = Credentials.basic("admin", "admin");
-                    return response.request().newBuilder().header("Authorization", credential).build();
-                }
-            });
-
-            tmpClient = newBuilder.build();
+            OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+            try {
+                var sslContext = SSLContext.getInstance("TLS");
+                var tm = new CustomCAX509TrustManager(caService);
+                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
+                clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
+            } catch (NoSuchAlgorithmException ex) {
+                LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
+            }
+            return Optional.of(clientBuilder.build());
         } catch (Exception ex) {
-            LOG.error("Could not create tmp okhttpclient " + ex.getMessage(), ex);
+            LOG.error("Could not create temporary okhttpclient " + ex.getMessage(), ex);
         }
+        return Optional.empty();
     }
 
     @Override
@@ -141,6 +123,10 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
             if(optKey.isEmpty()) {
                 LOG.warn("No keystore available.");
                 return;
+            }
+
+            if(okHttpClient.isEmpty()) {
+                okHttpClient = buildTempHttpClient();
             }
 
             KeyStore caKeystore = optKey.get();
@@ -161,7 +147,7 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
                                         .errorMsg("Node in CSR state, but no CSR present")
                                         .build());
                             } else {
-                                var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                                var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
                                 //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
                                 final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
                                 certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
@@ -194,11 +180,28 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private boolean checkConnectivity(final String nodeId) throws NodeNotFoundException, IOException {
         final var node = nodeService.byNodeId(nodeId);
         Request request = new Request.Builder().url(node.getTransportAddress()).build();
-        Call call = tmpClient.newCall(request);
-        try(Response response = call.execute()) {
-            return response.isSuccessful();
+        if(okHttpClient.isPresent()) {
+            OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
+            try {
+                URI uri = new URI(node.getTransportAddress());
+                if (!isNullOrEmpty(uri.getUserInfo())) {
+                    var list = Splitter.on(":").limit(2).splitToList(uri.getUserInfo());
+                    builder.authenticator((route, response) -> {
+                        String credential = Credentials.basic(list.get(0), list.get(1));
+                        return response.request().newBuilder().header("Authorization", credential).build();
+                    });
+                }
+            } catch (URISyntaxException ex) {
+                return false;
+            }
+            Call call = builder.build().newCall(request);
+            try(Response response = call.execute()) {
+                return response.isSuccessful();
+            }
+        } else {
+            return false;
         }
-    }
+     }
 
     @Override
     protected Logger getLogger() {

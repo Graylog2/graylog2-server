@@ -30,24 +30,29 @@ import type { KeywordTimeRange, AbsoluteTimeRange } from 'views/logic/queries/Qu
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import { InputDescription } from 'components/common';
 
 import type { TimeRangePickerFormValues } from './TimeRangePicker';
 import TimeRangePresetRow from './TimeRangePresetRow';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
+const Headline = styled.h3`
+  margin-bottom: 5px;
+`;
+
 const KeywordInput = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  display: block;
-`);
+const EffectiveTimeRangeTable = styled.table`
+  margin-bottom: 5px;
+
+  td:first-child {
+    padding-right: 10px;
+  }
+`;
 
 const _parseKeywordPreview = (data: Pick<KeywordTimeRange, 'from' | 'to' | 'timezone'>, formatTime: (dateTime: string, format: string) => string) => {
   const { timezone } = data;
@@ -141,13 +146,12 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   return (
     <Row className="no-bm">
       <Col sm={5}>
+        <Headline>Time range:</Headline>
         <Field name="nextTimeRange.keyword" validate={_validateKeyword}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
                        validationState={error ? 'error' : null}>
-
-              <p><strong>Specify the time frame for the search in natural language.</strong></p>
               <KeywordInput type="text"
                             className="input-sm mousetrap"
                             name={name}
@@ -159,10 +163,25 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
                             required
                             value={value || defaultValue} />
 
-              {error && (<ErrorMessage>{error}</ErrorMessage>)}
+              <InputDescription error={error} help="Specify the time frame for the search in natural language." />
             </FormGroup>
           )}
         </Field>
+
+        Preview
+        <EffectiveTimeRangeTable>
+          <tbody>
+            <tr>
+              <td>From</td>
+              <td>{keywordPreview.from}</td>
+            </tr>
+            <tr>
+              <td>To</td>
+              <td>{keywordPreview.to}</td>
+            </tr>
+          </tbody>
+        </EffectiveTimeRangeTable>
+
         {showKeywordPresetsButton && (
           <TimeRangePresetRow disabled={disabled}
                               onSetPreset={onSetPreset}

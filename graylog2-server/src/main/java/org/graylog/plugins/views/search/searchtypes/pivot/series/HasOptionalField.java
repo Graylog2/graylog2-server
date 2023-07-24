@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.plugins.views.search.searchtypes.pivot.series;
 
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.storage.SearchVersion;
-import org.testcontainers.containers.Network;
+import java.util.Optional;
 
-public interface SearchServerInstanceFactory {
-
-    SearchServerInstance create(Network network);
-
-    SearchVersion getVersion();
+public interface HasOptionalField {
+    Optional<String> field();
 }

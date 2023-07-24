@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -29,7 +30,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Cardinality.NAME)
 @JsonDeserialize(builder = Cardinality.Builder.class)
-public abstract class Cardinality implements SeriesSpec {
+public abstract class Cardinality implements SeriesSpec, HasField {
     public static final String NAME = "card";
 
     @Override
@@ -44,6 +45,13 @@ public abstract class Cardinality implements SeriesSpec {
     @Override
     public String literal() {
         return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
+
+    public abstract Builder toBuilder();
+
+    @Override
+    public Cardinality withId(String id) {
+        return toBuilder().id(id).build();
     }
 
     public static Builder builder() {
