@@ -28,9 +28,7 @@ import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
 import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
 import { getDictForFunction } from './helpers';
 
-const BlockContainer = styled.div.attrs<{ $hasErrors: boolean }>(({ $hasErrors }) => ({
-  $hasErrors,
-}))(({ $hasErrors, theme }) => css`
+const BlockContainer = styled.div<{ $hasErrors: boolean }>(({ theme, $hasErrors }) => css`
   border-radius: 4px;
   border-color: ${$hasErrors ? theme.colors.variant.lighter.danger : theme.colors.variant.lighter.default};
   padding: ${theme.spacings.md};

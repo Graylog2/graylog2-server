@@ -48,10 +48,8 @@ const TypeLabel = styled(Label)(({ theme }) => css`
   margin-left: ${theme.spacings.xs};
 `);
 
-const NegationButton = styled(Button).attrs(({ negate }: { negate: boolean }) => ({
-  negate,
-}))(({ negate, theme }) => css`
-  opacity: ${negate ? '1' : '0.3'};
+const NegationButton = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
+  opacity: ${$negate ? '1' : '0.3'};
   margin-right: ${theme.spacings.sm};
 `);
 
@@ -90,7 +88,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
           <Col md={12}>
             <h3>
               {negatable
-              && <NegationButton bsStyle="primary" negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
+              && <NegationButton bsStyle="primary" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
               {block?.step_title}
             </h3>
 

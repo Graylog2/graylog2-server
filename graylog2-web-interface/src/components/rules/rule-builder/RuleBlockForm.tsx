@@ -79,10 +79,8 @@ const OptionTitle = styled.p(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
 
-const OptionDescription = styled.p.attrs(({ isSelected }: { isSelected: boolean }) => ({
-  isSelected,
-}))(({ isSelected, theme }) => css`
-  color: ${isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
+const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelected }) => css`
+  color: ${$isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
   margin-bottom: ${theme.spacings.xxs};
 `);
 
@@ -169,7 +167,7 @@ const RuleBlockForm = ({
   const optionRenderer = (option: Option, isSelected: boolean) => (
     <>
       <OptionTitle>{option.label}</OptionTitle>
-      {option.description && (<OptionDescription isSelected={isSelected}>{option.description}</OptionDescription>)}
+      {option.description && (<OptionDescription $isSelected={isSelected}>{option.description}</OptionDescription>)}
     </>
   );
 
@@ -188,8 +186,7 @@ const RuleBlockForm = ({
                           options={options}
                           optionRenderer={optionRenderer}
                           clearable={false}
-                          matchProp="label
-                                     "
+                          matchProp="label"
                           onChange={(option: string) => handleChange(option, resetForm)}
                           value={selectedBlockDict?.name || ''} />
                 </Col>
