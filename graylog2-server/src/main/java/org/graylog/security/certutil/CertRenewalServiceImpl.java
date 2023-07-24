@@ -23,6 +23,7 @@ import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobScheduleStrategies;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
@@ -63,6 +64,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final DBJobTriggerService jobTriggerService;
     private final DBJobDefinitionService jobDefinitionService;
     private final JobScheduleStrategies jobScheduleStrategies;
+    private final JobSchedulerClock clock;
     private final char[] passwordSecret;
 
     @Inject
@@ -74,6 +76,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final DBJobTriggerService jobTriggerService,
                                   final DBJobDefinitionService jobDefinitionService,
                                   final JobScheduleStrategies jobScheduleStrategies,
+                                  final JobSchedulerClock clock,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
@@ -83,6 +86,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.jobTriggerService = jobTriggerService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobScheduleStrategies = jobScheduleStrategies;
+        this.clock = clock;
         this.passwordSecret = passwordSecret.toCharArray();
     }
 
@@ -112,14 +116,14 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     private Date calculateThreshold(String certificateLifetime) {
         final var lifetime = Duration.parse(certificateLifetime).dividedBy(10);
-        var validUntil = LocalDateTime.now().plus(lifetime);
+        var validUntil = clock.now(ZoneId.systemDefault()).plus(lifetime).toLocalDateTime();
         return convertToDateViaInstant(validUntil);
     }
 
     private Date nextRenewalJobRun() {
 // TODO: calculate nextTime from trigger
         //        jobScheduleStrategies.nextTime()
-        var nextRenewalJobRun = LocalDateTime.now().plusMinutes(30);
+        var nextRenewalJobRun = clock.now(ZoneId.systemDefault()).plusMinutes(30).toLocalDateTime();
         return convertToDateViaInstant(nextRenewalJobRun);
     }
 

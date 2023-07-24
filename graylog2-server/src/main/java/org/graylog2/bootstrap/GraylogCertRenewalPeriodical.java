@@ -55,6 +55,7 @@ public class GraylogCertRenewalPeriodical extends Periodical {
     private final CsrMongoStorage csrStorage;
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
+    private final CsrSigner csrSigner;
     private final String passwordSecret;
 
     @Inject
@@ -64,7 +65,8 @@ public class GraylogCertRenewalPeriodical extends Periodical {
                                               final CaService caService,
                                               final Configuration configuration,
                                               final NodeService nodeService,
-                                              final @Named("password_secret") String passwordSecret) {
+                                               final CsrSigner csrSigner,
+                                        final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -72,6 +74,7 @@ public class GraylogCertRenewalPeriodical extends Periodical {
         this.passwordSecret = passwordSecret;
         this.configuration = configuration;
         this.nodeService = nodeService;
+        this.csrSigner = csrSigner;
     }
 
     @Override
@@ -104,7 +107,7 @@ public class GraylogCertRenewalPeriodical extends Periodical {
                                         .errorMsg("Node in CSR state, but no CSR present")
                                         .build());
                             } else {
-                                var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                                var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
                                 //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
                                 final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
                                 certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
