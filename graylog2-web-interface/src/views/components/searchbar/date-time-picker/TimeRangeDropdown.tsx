@@ -31,7 +31,7 @@ import type {
   RelativeTimeRange,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
-import { isTypeRelative } from 'views/typeGuards/timeRange';
+import { isTypeKeyword, isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 import type { RelativeTimeRangeClassified } from 'views/components/searchbar/date-time-picker/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
@@ -215,6 +215,18 @@ const TimeRangeTabs = ({ handleActiveTab, currentTimeRange, limitDuration, valid
   );
 };
 
+const normalizeIfKeywordTimerange = (timeRange: TimeRange | NoTimeRangeOverride) => {
+  if (isTypeKeyword(timeRange)) {
+    return {
+      type: timeRange.type,
+      timezone: timeRange.timezone,
+      keyword: timeRange.keyword,
+    };
+  }
+
+  return timeRange;
+};
+
 const TimeRangeDropdown = ({
   noOverride,
   toggleDropdownShow,
@@ -239,8 +251,16 @@ const TimeRangeDropdown = ({
     toggleDropdownShow();
   }, [toggleDropdownShow]);
 
-  const handleSubmit = useCallback(({ nextTimeRange }: { nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange'] }) => {
-    setCurrentTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(nextTimeRange)));
+  const handleSubmit = useCallback(({ nextTimeRange }: {
+    nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']
+  }) => {
+    const normalizedTimeRange = normalizeIfKeywordTimerange(
+      normalizeIfAllMessagesRange(
+        normalizeIfClassifiedRelativeTimeRange(nextTimeRange),
+      ),
+    );
+
+    setCurrentTimeRange(normalizedTimeRange);
 
     toggleDropdownShow();
   }, [setCurrentTimeRange, toggleDropdownShow]);

@@ -17,6 +17,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import userEvent from '@testing-library/user-event';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
@@ -45,7 +46,7 @@ const defaultProps = {
     type: 'relative',
     from: 300,
   },
-  limitDuration: 259200,
+  limitDuration: 0,
   noOverride: false,
   setCurrentTimeRange: jest.fn(),
   toggleDropdownShow: jest.fn(),
@@ -88,7 +89,7 @@ describe('TimeRangeDropdown', () => {
   });
 
   it('Limit duration is shown when setup', async () => {
-    render(<TimeRangeDropdown {...defaultProps} />);
+    render(<TimeRangeDropdown {...defaultProps} limitDuration={259200} />);
 
     const limitDuration = await screen.findByText(/admin has limited searching to 3 days ago/i);
 
@@ -131,5 +132,23 @@ describe('TimeRangeDropdown', () => {
 
     expect(noOverrideButton).toBeInTheDocument();
     expect(noOverrideContent).toBeInTheDocument();
+  });
+
+  it('Should not change keyword time range after submitting without changes', async () => {
+    const setCurrentTimeRange = jest.fn();
+
+    render(<TimeRangeDropdown {...defaultProps}
+                              currentTimeRange={{ type: 'keyword', keyword: 'yesterday', timezone: 'Asia/Tokyo' }}
+                              setCurrentTimeRange={setCurrentTimeRange} />);
+
+    const submitButton = await screen.findByRole('button', {
+      name: /update time range/i,
+    });
+
+    userEvent.click(submitButton);
+
+    await waitFor(() => expect(setCurrentTimeRange).toHaveBeenCalledTimes(1));
+
+    expect(setCurrentTimeRange).toHaveBeenCalledWith({ type: 'keyword', keyword: 'yesterday', timezone: 'Asia/Tokyo' });
   });
 });
