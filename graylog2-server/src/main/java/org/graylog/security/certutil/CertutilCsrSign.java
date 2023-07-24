@@ -89,7 +89,7 @@ public class CertutilCsrSign implements CliCommand {
                 final var csr = csrStorage.readCsr();
                 final int validityDays = console.readInt("Enter certificate validity in days: ");
 
-                final var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, validityDays);
+                final var cert = new CsrSigner().sign(caPrivateKey, caCertificate, csr, validityDays);
 
                 final Path certPath = Path.of(certFilename);
                 writePem(certPath, cert);

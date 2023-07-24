@@ -31,7 +31,7 @@ const StyledPopover = styled(Popover)(({ theme }) => css`
   li {
     margin-bottom: 5px;
 
-    :last-child {
+    &:last-child {
       margin-bottom: 0;
     }
   }

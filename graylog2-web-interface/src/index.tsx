@@ -31,6 +31,7 @@ import AwsBindings from 'aws/bindings';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
+import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
@@ -44,7 +45,9 @@ function renderAppContainer(appContainer) {
       <TelemetryInit>
         <GraylogThemeProvider>
           <GlobalThemeStyles />
-          <AppFacade />
+          <LoginQueryClientProvider>
+            <AppFacade />
+          </LoginQueryClientProvider>
         </GraylogThemeProvider>
       </TelemetryInit>
     </CustomizationProvider>,

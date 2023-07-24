@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 @Path("/config.js")
-@CSP(value = CSP.CSP_DEFAULT)
+@CSP(group = CSP.DEFAULT)
 public class AppConfigResource {
     private final Configuration configuration;
     private final HttpConfiguration httpConfiguration;

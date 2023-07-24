@@ -22,17 +22,17 @@ import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 import type { RuleBlock, BlockType, BlockDict } from './types';
 import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
 import { getDictForFunction } from './helpers';
 
-const BlockContainer = styled.div.attrs(({ hasErrors }: { hasErrors: boolean }) => ({
-  hasErrors,
-}))(({ hasErrors, theme }) => css`
+const BlockContainer = styled.div.attrs<{ $hasErrors: boolean }>(({ $hasErrors }) => ({
+  $hasErrors,
+}))(({ $hasErrors, theme }) => css`
   border-radius: 4px;
-  border-color: ${hasErrors ? theme.colors.variant.lighter.danger : theme.colors.variant.lighter.default};
+  border-color: ${$hasErrors ? theme.colors.variant.lighter.danger : theme.colors.variant.lighter.default};
   padding: ${theme.spacings.md};
   margin-bottom: ${theme.spacings.md};
 `);
@@ -45,10 +45,19 @@ type Props = {
   previousOutputPresent?: boolean,
   addBlock: (type: string, block: RuleBlock) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
-  deleteBlock: (orderIndex: number, type: string,) => void,
+  deleteBlock: (orderIndex: number, type: string) => void,
 };
 
-const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent, addBlock, updateBlock, deleteBlock }: Props) => {
+const RuleBuilderBlock = ({
+  type,
+  blockDict,
+  block,
+  order,
+  previousOutputPresent,
+  addBlock,
+  updateBlock,
+  deleteBlock,
+}: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
 
@@ -56,12 +65,14 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
-    if (block) { setCurrentBlockDict(blockDict.find(((b) => b.name === block.function))); }
+    if (block) {
+      setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
+    }
   },
   [block, blockDict]);
 
   const buildBlockData = (
-    newData : {newFunctionName?: string, newParams?: object, toggleNegate?: boolean},
+    newData: { newFunctionName?: string, newParams?: object, toggleNegate?: boolean },
   ) => {
     const defaultParameters = { newFunctionName: currentBlockDict.name, newParams: {}, toggleNegate: false };
     const { newFunctionName, newParams, toggleNegate } = { ...defaultParameters, ...newData };
@@ -104,7 +115,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
 
   const onDelete = () => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `delete-${type}-button`,
     });
@@ -114,7 +125,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
 
   const onEdit = () => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `edit-${type}-button`,
     });
@@ -124,7 +135,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
 
   const onNegate = () => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `negate-${type}-button`,
     });
@@ -132,7 +143,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
     updateBlock(order, type, buildBlockData({ toggleNegate: true }));
   };
 
-  const onUpdate = (params: {[key: string]: any}, functionName: string) => {
+  const onUpdate = (params: { [key: string]: any }, functionName: string) => {
     updateBlock(order, type, buildBlockData({ newFunctionName: functionName, newParams: params }));
     setEditMode(false);
   };
@@ -141,7 +152,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
     setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
   };
 
-  const isBlockNegatable = () : boolean => (
+  const isBlockNegatable = (): boolean => (
     getDictForFunction(blockDict, block.function)?.return_type === RuleBuilderTypes.Boolean
   );
 
@@ -150,7 +161,7 @@ const RuleBuilderBlock = ({ type, blockDict, block, order, previousOutputPresent
   const showForm = !block || editMode;
 
   return (
-    <BlockContainer className="content" hasErrors={block?.errors?.length > 0}>
+    <BlockContainer className="content" $hasErrors={block?.errors?.length > 0}>
       {showForm ? (
         <RuleBlockForm existingBlock={block}
                        onAdd={onAdd}

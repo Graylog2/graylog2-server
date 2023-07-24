@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 import { FormSubmit, Select } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -33,10 +33,10 @@ import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
 
 type Props = {
   existingBlock?: RuleBlock,
-  onAdd: (values: {[key: string]: any}) => void,
+  onAdd: (values: { [key: string]: any }) => void,
   onCancel: () => void,
   onSelect: (option: string) => void,
-  onUpdate: (values: {[key: string]: any}, functionName: string) => void,
+  onUpdate: (values: { [key: string]: any }, functionName: string) => void,
   previousOutputPresent: boolean,
   options: Array<{ label: string, value: any }>,
   order: number,
@@ -111,7 +111,7 @@ const RuleBlockForm = ({
 
   const handleChange = (option: string, resetForm: () => void) => {
     sendTelemetry('select', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `select-${type}`,
       event_details: { option },
@@ -125,9 +125,9 @@ const RuleBlockForm = ({
     setFieldValue(fieldName, null);
   };
 
-  const handleSubmit = (values: {[key: string]: any}) => {
+  const handleSubmit = (values: { [key: string]: any }) => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `${existingBlock ? 'update' : 'add'}-${type}-button`,
     });
@@ -182,10 +182,13 @@ const RuleBlockForm = ({
                   )}
 
                   <FormSubmit bsSize="small"
-                              submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
+                              submitButtonText={existingBlock ? 'Update' : 'Add'}
                               submitButtonType="button"
                               onSubmit={() => handleSubmit(values)}
-                              onCancel={() => { resetForm(); onCancel(); }} />
+                              onCancel={() => {
+                                resetForm();
+                                onCancel();
+                              }} />
 
                 </SelectedBlock>
               )}

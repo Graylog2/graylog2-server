@@ -139,7 +139,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       border-color 150ms ease-in-out;
     position: relative;
 
-    :not(.collapsed) {
+    &:not(.collapsed) {
       .icon-bar:nth-last-child(1),
       .icon-bar:nth-last-child(3) {
         transition: transform 150ms ease-in 150ms,
@@ -172,7 +172,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
     &:hover,
     &:focus,
-    :not(.collapsed) {
+    &:not(.collapsed) {
       background-color: ${theme.colors.variant.lighter.default};
       border-color: ${theme.colors.variant.default};
       

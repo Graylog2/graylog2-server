@@ -32,7 +32,7 @@ import SectionSubheadline from '../SectionSubheadline';
 const Group = styled.div`
   margin-bottom: 20px;
 
-  :last-child {
+  &:last-child {
     margin-bottom: 0;
   }
 `;

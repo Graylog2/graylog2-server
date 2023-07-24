@@ -40,7 +40,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 }));
 
 describe('AggregationBuilder', () => {
-  const rowPivot = Pivot.create(['field'], 'string');
+  const rowPivot = Pivot.createValues(['field']);
 
   it('does render empty result widget when no documents were in result and is edit', () => {
     const wrapper = mount(<AggregationBuilder data={{ total: 0 }}

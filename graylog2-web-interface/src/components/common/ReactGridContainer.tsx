@@ -105,7 +105,11 @@ type Position = {
   width: number
 };
 
-const _onLayoutChange = (newLayout: Layout, callback: (newPositions: Position[]) => void) => {
+const _onLayoutChange = (newLayout: Layout, callback: ((newPositions: Position[]) => void) | undefined) => {
+  if (typeof callback !== 'function') {
+    return undefined;
+  }
+
   const newPositions: Position[] = [];
 
   newLayout
@@ -328,7 +332,7 @@ ReactGridContainer.defaultProps = {
   rowHeight: ROW_HEIGHT,
   draggableHandle: undefined,
   width: undefined,
-  onSyncLayout: () => {},
+  onSyncLayout: undefined,
 };
 
 export default withTheme(ReactGridContainer);

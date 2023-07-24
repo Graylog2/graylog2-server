@@ -18,7 +18,6 @@ import * as React from 'react';
 import ReactSlider from 'react-slider';
 import type { ReactSliderProps } from 'react-slider';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
 import { Input, Tooltip } from 'components/bootstrap';
 import OverlayTrigger from 'components/common/OverlayTrigger';
@@ -33,13 +32,13 @@ type Props = {
   wrapperClassName?: string,
 } & ReactSliderProps<Array<number> | number>;
 
-const StyledSlider = styled(ReactSlider)(({ theme }: { theme: DefaultTheme }) => css`
+const StyledSlider = styled(ReactSlider)(({ theme }) => css`
   width: 100%;
   height: 10px;
   margin: ${theme.spacings.md} 0;
 `);
 
-const StyledThumb = styled.div(({ theme }: { theme: DefaultTheme }) => css`
+const StyledThumb = styled.div(({ theme }) => css`
   height: auto;
   min-height: 25px;
   line-height: 25px;
@@ -65,7 +64,7 @@ const Thumb = (props, state) => {
   );
 };
 
-const StyledTrack = styled.div(({ theme }: { theme: DefaultTheme }) => css`
+const StyledTrack = styled.div(({ theme }) => css`
   top: ${theme.spacings.xxs};
   bottom: 0;
   background: ${(props: any) => (props.index === 1 ? '#5082bc' : theme.colors.variant.default)};

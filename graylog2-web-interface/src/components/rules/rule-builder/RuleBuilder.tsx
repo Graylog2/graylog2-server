@@ -23,7 +23,7 @@ import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import { ConfirmDialog, FormSubmit } from 'components/common';
-import { getBasePathname } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -260,7 +260,7 @@ const RuleBuilder = () => {
 
   const handleCancel = () => {
     sendTelemetry('click', {
-      app_pathname: getBasePathname(pathname),
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rules',
       app_action_value: 'cancel-button',
     });
@@ -273,7 +273,7 @@ const RuleBuilder = () => {
 
     if (initialRule) {
       sendTelemetry('click', {
-        app_pathname: getBasePathname(pathname),
+        app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rules',
         app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
       });
@@ -282,7 +282,7 @@ const RuleBuilder = () => {
       if (closeAfter) handleCancel();
     } else {
       sendTelemetry('click', {
-        app_pathname: getBasePathname(pathname),
+        app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rules',
         app_action_value: 'add-rule-button',
       });
@@ -319,7 +319,7 @@ const RuleBuilder = () => {
                          disabled={!initialRule}
                          onClick={() => {
                            sendTelemetry('click', {
-                             app_pathname: getBasePathname(pathname),
+                             app_pathname: getPathnameWithoutId(pathname),
                              app_section: 'pipeline-rules',
                              app_action_value: 'convert-rule-builder-to-source-code-button',
                            });
@@ -382,7 +382,7 @@ const RuleBuilder = () => {
         </Col>
         <ActionsCol md={12}>
           <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
-                      submitButtonText={`${!initialRule ? 'Create rule' : 'Update rule & close'}`}
+                      submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
                       centerCol={initialRule && (
                         <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
                           Update rule

@@ -63,7 +63,6 @@ public abstract class DateRangeBucket implements BucketSpec {
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder extends TypedBuilder<DateRangeBucket, Builder> {
-
         @JsonCreator
         public static Builder create() {
             return DateRangeBucket.builder();
@@ -83,6 +82,5 @@ public abstract class DateRangeBucket implements BucketSpec {
         @JsonProperty
         public abstract Builder bucketKey(BucketKey key);
     }
-
 }
 

@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/common';
 
-const Wrapper = styled.div<{ active: boolean }>(({ theme, active }) => `
-  color: ${active ? theme.colors.variant.success : theme.colors.variant.default};
+const Wrapper = styled.div<{ $active: boolean }>(({ theme, $active }) => css`
+  color: ${$active ? theme.colors.variant.success : theme.colors.variant.default};
 `);
 
 const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
-  <Wrapper active={active}>
+  <Wrapper $active={active}>
     <Icon {...rest} name={active ? 'check-circle' : 'times-circle'} />
   </Wrapper>
 );

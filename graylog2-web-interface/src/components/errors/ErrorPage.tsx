@@ -23,9 +23,9 @@ import PageContentLayout from 'components/layout/PageContentLayout';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
-const generateStyles = () => css`
+const generateStyles = () => css<{ backgroundImage: string }>`
   body {
-    background: url(${({ backgroundImage }: { backgroundImage: string }) => backgroundImage}) no-repeat center center fixed;
+    background: url(${({ backgroundImage }) => backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;

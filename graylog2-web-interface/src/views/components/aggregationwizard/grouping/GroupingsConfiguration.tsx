@@ -18,9 +18,11 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled, { css } from 'styled-components';
+import isString from 'lodash/isString';
 
 import { HoverForHelp, SortableList } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
+import FormErrors from 'components/common/FormErrors';
 
 import GroupingConfiguration from './GroupingConfiguration';
 import GroupingElement from './GroupingElement';
@@ -63,7 +65,7 @@ const SettingsSeparator = styled.hr(({ theme }) => css`
 `);
 
 const GroupingsConfiguration = () => {
-  const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { groupBy }, values, errors, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => () => {
     setValues(GroupingElement.onRemove(index, values));
@@ -83,6 +85,8 @@ const GroupingsConfiguration = () => {
       <GroupingConfiguration index={index} />
     </ElementConfigurationContainer>
   ), [removeGrouping]);
+
+  const hasGroupByError = isString(errors?.groupBy);
 
   return (
     <>
@@ -114,6 +118,7 @@ const GroupingsConfiguration = () => {
           </ElementConfigurationContainer>
         </>
       )}
+      {hasGroupByError && <FormErrors errors={{ groupBy: errors?.groupBy as string }} />}
     </>
   );
 };
