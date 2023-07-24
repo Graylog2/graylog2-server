@@ -23,6 +23,7 @@ enum ConfigurationType {
   URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist',
   PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig',
   USER_CONFIG = 'org.graylog2.users.UserConfiguration',
+  CERTIFICATE_RENEWAL_POLICY_CONFIG = 'org.graylog2.plugin.certificates.RenewalPolicy',
 }
 
 enum PluginConfigurationType {

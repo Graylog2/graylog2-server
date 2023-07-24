@@ -110,8 +110,10 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
         final String image = imageNameFrom(searchVersion.version());
 
         LOG.debug("Creating instance {}", image);
-
-        return new ElasticsearchInstanceES7(image, searchVersion, network, heapSize);
+        final ElasticsearchInstanceES7 instance = new ElasticsearchInstanceES7(image, searchVersion, network, heapSize);
+        // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
+        Runtime.getRuntime().addShutdownHook(new Thread(instance::close));
+        return instance;
     }
 
     protected static String imageNameFrom(Version version) {

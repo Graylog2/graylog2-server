@@ -26,6 +26,8 @@ import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Filter;
+import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -33,7 +35,10 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -92,6 +97,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final MoreSearch moreSearch;
     private final PermittedStreams permittedStreams;
     private final NotificationService notificationService;
+    private final QueryStringDecorators queryStringDecorators;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -103,7 +109,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   EventsConfigurationProvider configProvider,
                                   MoreSearch moreSearch,
                                   PermittedStreams permittedStreams,
-                                  NotificationService notificationService) {
+                                  NotificationService notificationService,
+                                  QueryStringDecorators queryStringDecorators) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -114,11 +121,11 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.moreSearch = moreSearch;
         this.permittedStreams = permittedStreams;
         this.notificationService = notificationService;
+        this.queryStringDecorators = queryStringDecorators;
     }
 
-    private String metricName(AggregationSeries series) {
-        return String.format(Locale.ROOT, "metric/%s/%s/%s",
-                series.function().toString().toLowerCase(Locale.ROOT), series.field().orElse("<no-field>"), series.id());
+    private String metricName(SeriesSpec series) {
+        return String.format(Locale.ROOT, "metric/%s", series.literal());
     }
 
     @Override
@@ -134,8 +141,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             final Set<SearchError> errors = aggregationErrors.isEmpty() ? streamErrors : aggregationErrors;
 
             errors.forEach(error -> {
-                if (error instanceof QueryError) {
-                    final QueryError queryError = (QueryError) error;
+                if (error instanceof final QueryError queryError) {
                     final String backtrace = queryError.backtrace() != null ? queryError.backtrace() : "";
                     if (error instanceof EmptyParameterError) {
                         LOG.debug("Aggregation search query <{}> with empty Parameter: {}\n{}",
@@ -177,7 +183,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final PivotResult streamsResult = (PivotResult) streamQueryResult.searchTypes().get(STREAMS_PIVOT_ID);
 
         return AggregationResult.builder()
-                .keyResults( extractValues(pivotResult))
+                .keyResults(extractValues(pivotResult))
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
@@ -315,7 +321,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                     continue;
                 }
 
-                for (final AggregationSeries series : config.series()) {
+                for (var series : config.series()) {
                     if (!value.key().isEmpty() && value.key().get(0).equals(metricName(series))) {
                         // Some Elasticsearch aggregations can return a "null" value. (e.g. avg on a non-existent field)
                         // We are using NaN in that case to make sure our conditions will work.
@@ -418,13 +424,14 @@ public class PivotAggregationSearch implements AggregationSearch {
      * @param executeEveryMs
      * @return aggregation query
      */
-    private Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
+     protected Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(true);
 
-        final ImmutableList<SeriesSpec> series = config.series().stream()
-                .map(entry -> entry.function().toSeriesSpec(metricName(entry), entry.field().orElse(null)))
+        final ImmutableList<SeriesSpec> series = config.series()
+                .stream()
+                .map(s -> s.withId(metricName(s)))
                 .collect(ImmutableList.toImmutableList());
 
         if (!series.isEmpty()) {
@@ -464,7 +471,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                             .limit(Integer.MAX_VALUE)
                             .field(field)
                             .build())
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         // We always have row groups because of the date range buckets
@@ -475,7 +482,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final Query.Builder queryBuilder = Query.builder()
                 .id(QUERY_ID)
                 .searchTypes(searchTypes)
-                .query(ElasticsearchQueryString.of(config.query()))
+                .query(decorateQuery(config))
                 .timerange(parameters.timerange());
 
         final Set<String> streams = getStreams(parameters);
@@ -484,6 +491,11 @@ public class PivotAggregationSearch implements AggregationSearch {
         }
 
         return queryBuilder.build();
+    }
+
+    private BackendQuery decorateQuery(AggregationEventProcessorConfig config) {
+        final String decorated = queryStringDecorators.decorate(config.query(), ParameterProvider.of(config.queryParameters()));
+        return ElasticsearchQueryString.of(decorated);
     }
 
     private Filter filteringForStreamIds(Set<String> streamIds) {

@@ -16,16 +16,16 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { HelpBlock } from 'components/bootstrap';
 
-const ErrorMessage = styled.span(({ theme }) => `
+const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.danger};
 `);
 
-const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => `
-  color: ${hasError ? theme.colors.gray[50] : 'inherit'};
+const HelpMessage = styled.span<{ $hasError: boolean }>(({ theme, $hasError }) => css`
+  color: ${$hasError ? theme.colors.gray[50] : 'inherit'};
 `);
 
 type Props = {
@@ -52,7 +52,7 @@ const InputDescription = ({ className, error, help }: Props) => {
       )}
       {(!!error && !!help) && <br />}
       {help && (
-        <HelpMessage hasError={!!error}>
+        <HelpMessage $hasError={!!error}>
           {help}
         </HelpMessage>
       )}

@@ -16,7 +16,6 @@
  */
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { IfPermitted, ShareButton } from 'components/common';
@@ -38,7 +37,7 @@ type Props = {
   refetchDashboards: () => void,
 }
 
-const DeleteItem = styled.span(({ theme }: { theme: DefaultTheme }) => css`
+const DeleteItem = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.danger};
 `);
 

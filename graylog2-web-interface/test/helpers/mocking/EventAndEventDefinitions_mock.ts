@@ -90,12 +90,12 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
     series: [
       {
         id: 'count-field1',
-        function: 'count',
+        type: 'count',
         field: 'field1',
       },
       {
         id: 'count-field2',
-        function: 'count',
+        type: 'count',
         field: 'field2',
       },
     ],
@@ -159,7 +159,7 @@ export const mockEventDefinitionOneAggregation = {
     series: [
       {
         id: 'count-field1',
-        function: 'count',
+        type: 'count',
         field: 'field1',
       },
     ],
@@ -225,7 +225,7 @@ const field1Widget = AggregationWidget.builder()
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
-      .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+      .rowPivots([Pivot.createValues(['field1', 'field2'])])
       .series([Series.forFunction('count(field1)')])
       .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field1)', Direction.Descending)])
       .visualization('table')
@@ -255,7 +255,7 @@ const field2Widget = AggregationWidget.builder()
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
-      .rowPivots([Pivot.create(['field2', 'field1'], 'values', { limit: 15 })])
+      .rowPivots([Pivot.createValues(['field2', 'field1'])])
       .series([Series.forFunction('count(field2)')])
       .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field2)', Direction.Ascending)])
       .visualization('table')
@@ -270,7 +270,7 @@ const summaryWidget = AggregationWidget.builder()
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
-      .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+      .rowPivots([Pivot.createValues(['field1', 'field2'])])
       .series([Series.forFunction('count(field1)'), Series.forFunction('count(field2)')])
       .sort([])
       .visualization('table')

@@ -16,13 +16,12 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
 
-const Wrapper = styled.button(({ theme, disabled }: {theme: DefaultTheme, disabled: boolean}) => css`
+const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -34,11 +33,11 @@ const Wrapper = styled.button(({ theme, disabled }: {theme: DefaultTheme, disabl
   color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
   font-size: ${theme.fonts.size.large};
 
-  :hover {
+  &:hover {
     background-color: ${theme.colors.gray[80]};
   }
 
-  :active {
+  &:active {
     background-color: ${theme.colors.gray[70]};
   }
 `);

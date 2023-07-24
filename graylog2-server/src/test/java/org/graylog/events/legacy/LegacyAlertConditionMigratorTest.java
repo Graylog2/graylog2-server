@@ -34,8 +34,15 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
-import org.graylog.events.processor.aggregation.AggregationFunction;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.HasOptionalField;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
@@ -48,7 +55,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
@@ -112,6 +118,13 @@ public class LegacyAlertConditionMigratorTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(LegacyAlarmCallbackEventNotificationConfig.class, LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(EventNotificationExecutionJob.Config.class, EventNotificationExecutionJob.TYPE_NAME));
+
+        objectMapper.registerSubtypes(new NamedType(Average.class, Average.NAME));
+        objectMapper.registerSubtypes(new NamedType(Count.class, Count.NAME));
+        objectMapper.registerSubtypes(new NamedType(Max.class, Max.NAME));
+        objectMapper.registerSubtypes(new NamedType(Min.class, Min.NAME));
+        objectMapper.registerSubtypes(new NamedType(StdDev.class, StdDev.NAME));
+        objectMapper.registerSubtypes(new NamedType(Sum.class, Sum.NAME));
 
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final MongoConnection mongoConnection = mongodb.mongoConnection();
@@ -260,8 +273,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.COUNT);
-                        assertThat(config.series().get(0).field()).isNotPresent();
+                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -298,8 +311,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.COUNT);
-                        assertThat(config.series().get(0).field()).isNotPresent();
+                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -333,8 +346,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.AVG);
-                        assertThat(config.series().get(0).field()).get().isEqualTo("test_field_1");
+                        assertThat(config.series().get(0).type()).isEqualTo(Average.NAME);
+                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -368,8 +381,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.SUM);
-                        assertThat(config.series().get(0).field()).get().isEqualTo("test_field_1");
+                        assertThat(config.series().get(0).type()).isEqualTo(Sum.NAME);
+                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -403,8 +416,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.MIN);
-                        assertThat(config.series().get(0).field()).get().isEqualTo("test_field_1");
+                        assertThat(config.series().get(0).type()).isEqualTo(Min.NAME);
+                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -438,8 +451,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.MAX);
-                        assertThat(config.series().get(0).field()).get().isEqualTo("test_field_1");
+                        assertThat(config.series().get(0).type()).isEqualTo(Max.NAME);
+                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -473,8 +486,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.STDDEV);
-                        assertThat(config.series().get(0).field()).get().isEqualTo("test_field_1");
+                        assertThat(config.series().get(0).type()).isEqualTo(StdDev.NAME);
+                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -511,8 +524,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.COUNT);
-                        assertThat(config.series().get(0).field()).isNotPresent();
+                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -549,8 +562,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.COUNT);
-                        assertThat(config.series().get(0).field()).isNotPresent();
+                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {
@@ -587,8 +600,8 @@ public class LegacyAlertConditionMigratorTest {
 
                         assertThat(config.series()).hasSize(1);
                         assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.COUNT);
-                        assertThat(config.series().get(0).field()).isNotPresent();
+                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
                         assertThat(config.conditions()).get().satisfies(conditions -> {
                             assertThat(conditions.expression()).get().satisfies(expression -> {

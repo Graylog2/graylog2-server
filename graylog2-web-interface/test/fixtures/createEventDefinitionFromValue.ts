@@ -40,8 +40,8 @@ export const valuePath = [
 ];
 
 export const pivots = [
-  Pivot.create(['http_method', 'index'], 'values', { limit: 15 }),
-  Pivot.create(['resources', 'index'], 'values', { limit: 15 }),
+  Pivot.createValues(['http_method', 'index']),
+  Pivot.createValues(['resources', 'index']),
 ];
 
 export const testAggregationWidget = AggregationWidget.builder()
@@ -49,8 +49,8 @@ export const testAggregationWidget = AggregationWidget.builder()
   .type('pivot')
   .config(
     AggregationWidgetConfig.builder()
-      .columnPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
-      .rowPivots([Pivot.create(['field3', 'field4'], 'values', { limit: 15 })])
+      .columnPivots([Pivot.createValues(['field1', 'field2'])])
+      .rowPivots([Pivot.createValues(['field3', 'field4'])])
       .series([Series.forFunction('count(field5)'), Series.forFunction('count(field6)')])
       .sort([])
       .visualization('table')

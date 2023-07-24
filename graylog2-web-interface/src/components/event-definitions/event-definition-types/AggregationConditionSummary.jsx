@@ -17,52 +17,55 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const AggregationConditionSummary = ({ conditions, series }) => {
-  const renderExpression = (expression) => {
-    if (!expression) {
+const Expression = ({ expression, series }) => {
+  if (!expression) {
+    return 'No condition configured';
+  }
+
+  switch (expression.expr) {
+    case 'number':
+      return expression.value;
+    case 'number-ref':
+      // eslint-disable-next-line no-case-declarations
+      const selectedSeries = series.find((s) => s.id === expression.ref);
+
+      return (selectedSeries && selectedSeries.type
+        ? <var>{selectedSeries.type}({selectedSeries.strategy ? `${selectedSeries.strategy}, ` : null}{selectedSeries.field}{selectedSeries.percentile ? `, ${selectedSeries.percentile}` : null})</var>
+        : <span>No series selected</span>);
+    case '&&':
+    case '||':
+      return (
+        <>
+          <Expression expression={expression.left} series={series} />{' '}
+          <strong className="text-info">{expression.expr === '&&' ? 'AND' : 'OR'}</strong>{' '}
+          <Expression expression={expression.right} series={series} />
+        </>
+      );
+    case 'group':
+      return <span>[<Expression expression={expression.child} series={series} />]</span>;
+    case '<':
+    case '<=':
+    case '>':
+    case '>=':
+    case '==':
+      return (
+        <>
+          <Expression expression={expression.left} series={series} />{' '}
+          <strong className="text-primary">{expression.expr}{' '}</strong>
+          <Expression expression={expression.right} series={series} />
+        </>
+      );
+    default:
       return 'No condition configured';
-    }
-
-    switch (expression.expr) {
-      case 'number':
-        return expression.value;
-      case 'number-ref':
-        // eslint-disable-next-line no-case-declarations
-        const selectedSeries = series.find((s) => s.id === expression.ref);
-
-        return (selectedSeries && selectedSeries.function
-          ? <var>{selectedSeries.function}({selectedSeries.field})</var>
-          : <span>No series selected</span>);
-      case '&&':
-      case '||':
-        return (
-          <>
-            {renderExpression(expression.left)}{' '}
-            <strong className="text-info">{expression.expr === '&&' ? 'AND' : 'OR'}</strong>{' '}
-            {renderExpression(expression.right)}
-          </>
-        );
-      case 'group':
-        return <span>[{renderExpression(expression.child)}]</span>;
-      case '<':
-      case '<=':
-      case '>':
-      case '>=':
-      case '==':
-        return (
-          <>
-            {renderExpression(expression.left)}{' '}
-            <strong className="text-primary">{expression.expr}{' '}</strong>
-            {renderExpression(expression.right)}
-          </>
-        );
-      default:
-        return 'No condition configured';
-    }
-  };
-
-  return renderExpression(conditions.expression);
+  }
 };
+
+Expression.propTypes = {
+  expression: PropTypes.object.isRequired,
+  series: PropTypes.array.isRequired,
+};
+
+const AggregationConditionSummary = ({ conditions, series }) => <Expression expression={conditions.expression} series={series} />;
 
 AggregationConditionSummary.propTypes = {
   conditions: PropTypes.object.isRequired,

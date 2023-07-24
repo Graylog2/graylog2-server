@@ -17,25 +17,70 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import numeral from 'numeral';
+import isEmpty from 'lodash/isEmpty';
+import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import useViewType from 'views/hooks/useViewType';
+import View from 'views/logic/views/View';
+
+const EffectiveTimeRange = styled.div`
+  margin-bottom: 10px;
+`;
+
+const EffectiveTimeRangeTable = styled.table`
+  margin-bottom: 5px;
+
+  td:first-child {
+    padding-right: 10px;
+  }
+`;
 
 type Props = {
   results: {
     timestamp?: string,
     duration?: number,
+    effectiveTimerange: AbsoluteTimeRange
   },
 };
 
-const SearchResultOverview = ({ results: { timestamp, duration } }: Props) => {
-  if (!timestamp || !duration) {
+const SearchResultOverview = ({ results }: Props) => {
+  const { timerange: globalOverrideTimeRange } = useGlobalOverride() ?? {};
+  const viewType = useViewType();
+
+  if (isEmpty(results)) {
     return <i>No query executed yet.</i>;
   }
 
+  const { timestamp, duration, effectiveTimerange } = results;
+
   return (
-    <span>
-      Query executed in {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />.
-    </span>
+    <>
+      <p>
+        Query executed in <br />
+        {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />
+      </p>
+      <EffectiveTimeRange>
+        Effective time range<br />
+        {(viewType === View.Type.Dashboard && !globalOverrideTimeRange) ? <i>Varies per widget</i>
+          : (
+            <EffectiveTimeRangeTable>
+              <tbody>
+                <tr>
+                  <td>From</td>
+                  <td><Timestamp dateTime={effectiveTimerange.from} format="complete" /></td>
+                </tr>
+                <tr>
+                  <td>To</td>
+                  <td><Timestamp dateTime={effectiveTimerange.to} format="complete" /></td>
+                </tr>
+              </tbody>
+            </EffectiveTimeRangeTable>
+          )}
+      </EffectiveTimeRange>
+    </>
   );
 };
 

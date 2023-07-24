@@ -62,7 +62,7 @@ const DashboardWrap = styled(ElementDimensions)(({ theme }) => css`
   height: 100%;
 `);
 
-const StyledReactGridContainer = styled(ReactGridContainer)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
+const StyledReactGridContainer = styled(ReactGridContainer)<{ $hasFocusedWidget: boolean }>(({ $hasFocusedWidget }) => css`
   height: ${$hasFocusedWidget ? '100% !important' : '100%'};
   max-height: ${$hasFocusedWidget ? '100%' : 'auto'};
   overflow: ${$hasFocusedWidget ? 'hidden' : 'visible'};
@@ -143,7 +143,7 @@ const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, wi
 };
 
 Grid.defaultProps = {
-  onSyncLayout: () => {},
+  onSyncLayout: undefined,
 };
 
 const MAXIMUM_GRID_SIZE = 12;

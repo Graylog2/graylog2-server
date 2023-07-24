@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
 import get from 'lodash/get';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
@@ -35,9 +34,9 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
-const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`
-  ${isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
-  ${isNumeric ? 'text-align: right' : ''}
+const StyledTd = styled.td<{ $isNumeric: boolean }>(({ $isNumeric, theme }) => css`
+  ${$isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
+  ${$isNumeric ? 'text-align: right' : ''}
 `);
 
 type Field = {
@@ -66,7 +65,7 @@ const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
+    <StyledTd $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined

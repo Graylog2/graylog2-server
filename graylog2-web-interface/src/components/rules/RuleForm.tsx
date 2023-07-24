@@ -123,7 +123,7 @@ const RuleForm = ({ create }: Props) => {
 
       <Row>
         <Col md={12}>
-          <FormSubmit submitButtonText={`${create ? 'Create rule' : 'Update rule & close'}`}
+          <FormSubmit submitButtonText={create ? 'Create rule' : 'Update rule & close'}
                       centerCol={!create && (
                         <Button type="button" bsStyle="info" onClick={handleApply}>
                           Update rule

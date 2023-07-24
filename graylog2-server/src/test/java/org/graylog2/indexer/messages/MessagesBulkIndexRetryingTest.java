@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,7 +61,7 @@ class MessagesBulkIndexRetryingTest {
 
     @Test
     public void bulkIndexingShouldNotDoAnythingForEmptyList() throws Exception {
-        final List<String> result = messages.bulkIndex(Collections.emptyList());
+        final Set<String> result = messages.bulkIndex(Collections.emptyList());
 
         assertThat(result).isNotNull()
                 .isEmpty();
@@ -86,7 +87,7 @@ class MessagesBulkIndexRetryingTest {
 
         final List<Map.Entry<IndexSet, Message>> messageList = messageListWith(mockedMessage);
 
-        final List<String> result = messages.bulkIndex(messageList);
+        final Set<String> result = messages.bulkIndex(messageList);
 
         assertThat(result).hasSize(1);
 
@@ -101,7 +102,7 @@ class MessagesBulkIndexRetryingTest {
 
         final List<Map.Entry<IndexSet, Message>> messageList = messageListWith(mock(Message.class));
 
-        final List<String> result = messages.bulkIndex(messageList);
+        final Set<String> result = messages.bulkIndex(messageList);
 
         assertThat(result).isNotNull().isEmpty();
 
@@ -119,7 +120,7 @@ class MessagesBulkIndexRetryingTest {
                 .thenReturn(errorResult)
                 .thenReturn(successResult);
 
-        final List<String> result = messages.bulkIndex(messagesWithIds("blocked-id"));
+        final Set<String> result = messages.bulkIndex(messagesWithIds("blocked-id"));
 
         verify(messagesAdapter, times(2)).bulkIndex(any());
         assertThat(result).isNotNull().isEmpty();
@@ -137,7 +138,7 @@ class MessagesBulkIndexRetryingTest {
                 .thenReturn(errorResult)
                 .thenReturn(successResult);
 
-        final List<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+        final Set<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(messagesAdapter, times(2)).bulkIndex(any());
         assertThat(result).containsOnly("other-error-id");
@@ -157,7 +158,7 @@ class MessagesBulkIndexRetryingTest {
                 .thenReturn(errorResult)
                 .thenReturn(secondErrorResult);
 
-        final List<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+        final Set<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(messagesAdapter, times(2)).bulkIndex(any());
         assertThat(result).containsOnly("other-error-id");

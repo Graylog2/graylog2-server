@@ -43,7 +43,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -116,21 +115,21 @@ public class Messages {
         return messagesAdapter.analyze(toAnalyze, index, analyzer);
     }
 
-    public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
+    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
         return bulkIndex(messageList, false, null);
     }
 
-    public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, IndexingListener indexingListener) {
+    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, IndexingListener indexingListener) {
         return bulkIndex(messageList, false, indexingListener);
     }
 
-    public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic) {
+    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic) {
         return bulkIndex(messageList, isSystemTraffic, null);
     }
 
-    public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic, IndexingListener indexingListener) {
+    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic, IndexingListener indexingListener) {
         if (messageList.isEmpty()) {
-            return Collections.emptyList();
+            return Set.of();
         }
 
         final List<IndexingRequest> indexingRequestList = messageList.stream()
@@ -140,11 +139,11 @@ public class Messages {
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, indexingListener);
     }
 
-    public List<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic) {
+    public Set<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic) {
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, null);
     }
 
-    public List<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic, IndexingListener indexingListener) {
+    public Set<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic, IndexingListener indexingListener) {
         final List<IndexingError> indexingErrors = runBulkRequest(indexingRequestList, indexingRequestList.size(), indexingListener);
 
         final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingErrors, indexingListener);
@@ -268,16 +267,16 @@ public class Messages {
         }
     }
 
-    private List<String> propagateFailure(Collection<IndexingError> indexingErrors) {
+    private Set<String> propagateFailure(Collection<IndexingError> indexingErrors) {
         if (indexingErrors.isEmpty()) {
-            return Collections.emptyList();
+            return Set.of();
         }
 
         failureSubmissionService.submitIndexingErrors(indexingErrors);
 
         return indexingErrors.stream()
                 .map(IndexingError::message).map(Indexable::getId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @AutoValue

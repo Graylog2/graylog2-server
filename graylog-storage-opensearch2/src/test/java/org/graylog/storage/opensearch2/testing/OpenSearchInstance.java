@@ -88,7 +88,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 "http",
                 false,
                 false,
-                new BasicCredentialsProvider())
+                new BasicCredentialsProvider(),
+                null)
                 .get();
     }
 
@@ -110,7 +111,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
         LOG.debug("Creating instance {}", image);
 
-        return new OpenSearchInstance(image, searchVersion, network, heapSize);
+        final OpenSearchInstance instance = new OpenSearchInstance(image, searchVersion, network, heapSize);
+        // stop the instance when the JVM shuts down. Otherwise, they will keep running forever and slowly eat the whole machine
+        Runtime.getRuntime().addShutdownHook(new Thread(instance::close));
+        return instance;
+
     }
 
     protected static String imageNameFrom(Version version) {
@@ -143,6 +148,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("plugins.security.disabled", "true")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));

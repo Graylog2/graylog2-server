@@ -24,11 +24,6 @@ import { Label } from 'components/bootstrap';
 
 type Size = 'normal' | 'small' | 'xsmall';
 
-interface ColorLabelWrapProps {
-  size: Size,
-  theme: DefaultTheme
-}
-
 interface ColorLabelProps {
   color: string,
   size?: Size,
@@ -36,13 +31,13 @@ interface ColorLabelProps {
   theme: DefaultTheme,
 }
 
-const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
+const ColorLabelWrap = styled.span<{ $size: Size }>(({ $size, theme }) => {
   const { body, small, tiny } = theme.fonts.size;
-  const fontSize = size === 'small' ? small : body;
+  const fontSize = $size === 'small' ? small : body;
 
   return css`
     vertical-align: middle;
-    font-size: ${size === 'xsmall' ? tiny : fontSize};
+    font-size: ${$size === 'xsmall' ? tiny : fontSize};
 `;
 });
 
@@ -51,7 +46,7 @@ const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {
   const textColor = theme.utils.contrastingColor(color);
 
   return (
-    <ColorLabelWrap size={size} className="color-label-wrapper">
+    <ColorLabelWrap $size={size} className="color-label-wrapper">
       <Label style={{
         backgroundColor: color,
         border: `1px solid ${borderColor}`,

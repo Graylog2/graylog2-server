@@ -27,7 +27,7 @@ const Errors = styled.div(({ theme }) => css`
   > * {
     margin-right: 5px;
 
-    :last-child {
+    &:last-child {
       margin-right: 0;
     }
   }

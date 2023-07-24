@@ -27,7 +27,6 @@ import TypeSpecificValue from './TypeSpecificValue';
 import InteractiveContext from './contexts/InteractiveContext';
 
 type Props = {
-  children?: React.ReactNode,
   field: string,
   value: any,
   render?: ValueRenderer,
@@ -40,14 +39,14 @@ const ValueActionTitle = styled.span`
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ children, field, value, render, type }: Props) => {
+const InteractiveValue = ({ field, value, render, type }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
-    <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
       <ValueActionTitle data-testid="value-actions-title">
         {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
       </ValueActionTitle>
@@ -56,21 +55,19 @@ const InteractiveValue = ({ children, field, value, render, type }: Props) => {
 };
 
 InteractiveValue.defaultProps = {
-  children: null,
   render: defaultRenderer,
 };
 
-const Value = ({ children, field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
+const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) => ((interactive)
-      ? <InteractiveValue field={field} value={value} render={render} type={type}>{children}</InteractiveValue>
-      : <span><TypeSpecificValue field={field} value={value} type={type} /></span>)}
+      ? <InteractiveValue field={field} value={value} render={render} type={type} />
+      : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
   </InteractiveContext.Consumer>
 );
 
 Value.defaultProps = {
   render: defaultRenderer,
-  children: null,
 };
 
 export default Value;

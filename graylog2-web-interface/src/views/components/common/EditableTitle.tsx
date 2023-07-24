@@ -36,7 +36,7 @@ const StyledInput = styled.input(({ theme }) => css`
   padding: 2px 3px;
   font-size: ${theme.fonts.size.large};
   
-  :focus {
+  &:focus {
     border-color: ${theme.colors.input.borderFocus};
     outline: none;
   }
