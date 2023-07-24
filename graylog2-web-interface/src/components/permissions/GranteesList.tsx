@@ -64,7 +64,7 @@ const StyledPagination = styled(Pagination)`
 const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => css`
   label {
     font-weight: normal;
-    font-size: ${theme.fonts.size.body}
+    font-size: ${theme.fonts.size.body};
   }
 `);
 

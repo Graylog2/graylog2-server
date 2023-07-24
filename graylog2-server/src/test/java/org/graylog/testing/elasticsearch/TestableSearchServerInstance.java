@@ -55,15 +55,19 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public abstract FixtureImporter fixtureImporter();
 
-    protected TestableSearchServerInstance(String image, SearchVersion version, Network network, String heapSize) {
+    protected TestableSearchServerInstance(final SearchVersion version, final Network network, final String heapSize) {
         this.version = version;
         this.heapSize = heapSize;
-        this.container = createContainer(image, version, network);
+        this.container = createContainer(version, network);
     }
 
+    protected abstract String imageName();
+
     @Override
-    public GenericContainer<?> createContainer(String image, SearchVersion version, Network network) {
+    public GenericContainer<?> createContainer(SearchVersion version, Network network) {
+        final var image = imageName();
         if (!containersByVersion.containsKey(version)) {
+            LOG.debug("Creating instance {}", image);
             GenericContainer<?> container = buildContainer(image, network);
             container.start();
             if (LOG.isDebugEnabled()) {
@@ -87,7 +91,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public void close() {
         container.close();
-        final List<SearchVersion> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).collect(Collectors.toList());
+        final List<SearchVersion> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).toList();
         version.forEach(containersByVersion::remove);
     }
 

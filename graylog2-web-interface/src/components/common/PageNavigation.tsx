@@ -42,7 +42,8 @@ const StyledButton = styled(Button)(({ theme }) => css`
     }
 
     > div {
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: ${theme.colors.variant.darker.default};
       }
     }
@@ -56,7 +57,8 @@ const StyledButton = styled(Button)(({ theme }) => css`
 
       ${activeIndicatorStyles(theme)}
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         ${activeIndicatorStyles(theme)}
       }
     }

@@ -188,7 +188,8 @@ const RuleBlockForm = ({
                           options={options}
                           optionRenderer={optionRenderer}
                           clearable={false}
-                          matchProp="label"
+                          matchProp="label
+                                     "
                           onChange={(option: string) => handleChange(option, resetForm)}
                           value={selectedBlockDict?.name || ''} />
                 </Col>
@@ -225,7 +226,7 @@ const RuleBlockForm = ({
 
                   <FormSubmit bsSize="small"
                               disabledSubmit={!isValid}
-                              submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
+                              submitButtonText={existingBlock ? 'Update' : 'Add'}
                               submitButtonType="submit"
                               onCancel={() => {
                                 resetForm();
