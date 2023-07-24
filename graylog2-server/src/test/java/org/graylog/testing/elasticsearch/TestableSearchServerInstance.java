@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
 
-    private static final Map<SearchVersion, GenericContainer<?>> containersByVersion = new HashMap<>();
+    private static final Map<ContainerCacheKey, GenericContainer<?>> containersByVersion = new HashMap<>();
 
     protected static final int OPENSEARCH_PORT = 9200;
     protected static final String NETWORK_ALIAS = "elasticsearch";
@@ -58,24 +59,25 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected TestableSearchServerInstance(final SearchVersion version, final Network network, final String heapSize) {
         this.version = version;
         this.heapSize = heapSize;
-        this.container = createContainer(version, network);
+        this.container = createContainer(version, network, heapSize);
     }
 
     protected abstract String imageName();
 
     @Override
-    public GenericContainer<?> createContainer(SearchVersion version, Network network) {
+    public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize) {
         final var image = imageName();
-        if (!containersByVersion.containsKey(version)) {
+        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize);
+        if (!containersByVersion.containsKey(cacheKey)) {
             LOG.debug("Creating instance {}", image);
             GenericContainer<?> container = buildContainer(image, network);
             container.start();
             if (LOG.isDebugEnabled()) {
                 container.followOutput(new Slf4jLogConsumer(LOG));
             }
-            containersByVersion.put(version, container);
+            containersByVersion.put(cacheKey, container);
         }
-        return containersByVersion.get(version);
+        return containersByVersion.get(cacheKey);
     }
 
     @Override
@@ -91,8 +93,11 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public void close() {
         container.close();
-        final List<SearchVersion> version = containersByVersion.keySet().stream().filter(k -> container == containersByVersion.get(k)).toList();
-        version.forEach(containersByVersion::remove);
+        containersByVersion.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(container))
+                .map(Map.Entry::getKey)
+                .distinct()
+                .forEach(containersByVersion::remove);
     }
 
     @Override
