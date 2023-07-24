@@ -85,7 +85,7 @@ describe('RuleBlockForm', () => {
     render(comp({ selectedBlockDict: actionsBlockDict[0] }));
 
     expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'has_field' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'has field' })).toBeInTheDocument();
 
     const submitButton = await screen.findByRole('button', { name: 'Add' });
 
@@ -95,6 +95,48 @@ describe('RuleBlockForm', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(mockAdd).toHaveBeenCalledWith({ field: 'bar', message: undefined }));
+  });
+
+  it('continues to show function form and does not add the block when a required field is missing', async () => {
+    render(comp({ selectedBlockDict: actionsBlockDict[0] }));
+
+    expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'has field' })).toBeInTheDocument();
+
+    const submitButton = await screen.findByRole('button', { name: 'Add' });
+
+    const requiredField = screen.getByLabelText('field');
+
+    fireEvent.click(submitButton);
+
+    expect(mockAdd).not.toHaveBeenCalled();
+
+    expect(requiredField).toBeInTheDocument();
+  });
+
+  it('marks optional fields', async () => {
+    render(comp({ selectedBlockDict: actionsBlockDict[4] }));
+
+    expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'get substring' })).toBeInTheDocument();
+
+    const optionalField = screen.getByText('indexEnd');
+
+    expect(optionalField).toBeInTheDocument();
+    expect(screen.getByText(/\(Opt\.\)/i)).toBeInTheDocument();
+  });
+
+  it('shows a help icon with function syntax help', async () => {
+    render(comp({ selectedBlockDict: actionsBlockDict[4] }));
+
+    expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'get substring' })).toBeInTheDocument();
+
+    const helpIcon = screen.getByTestId('funcSyntaxHelpIcon');
+
+    fireEvent.click(helpIcon);
+
+    expect(screen.getByText('Function Syntax Help')).toBeInTheDocument();
   });
 
   it('does not add a new block and calls onCancel handler when clicking cancel button', async () => {

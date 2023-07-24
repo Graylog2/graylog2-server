@@ -202,7 +202,7 @@ const RuleBlockForm = ({
                         {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
                         <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover(selectedBlockDict)}>
                           <Button bsStyle="link">
-                            <Icon name="question-circle" fixedWidth />
+                            <Icon name="question-circle" fixedWidth title="Function Syntax Help" data-testid="funcSyntaxHelpIcon" />
                           </Button>
                         </OverlayTrigger>
                       </BlockTitle>
