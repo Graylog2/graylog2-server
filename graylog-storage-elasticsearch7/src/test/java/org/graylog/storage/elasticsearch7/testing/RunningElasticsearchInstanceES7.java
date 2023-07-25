@@ -31,8 +31,6 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
@@ -93,7 +91,7 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
     }
 
     @Override
-    public GenericContainer<?> createContainer(SearchVersion version, Network network) {
+    public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize) {
         return null;
     }
 
