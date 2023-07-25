@@ -21,10 +21,27 @@
         <!-- empty directories -->
         <fileSet>
             <directory>./</directory>
-            <outputDirectory>log</outputDirectory>
+            <outputDirectory>etc/graylog/server</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
+            <directoryMode>0775</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>./</directory>
+            <outputDirectory>var/log/graylog</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <directoryMode>0775</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>./</directory>
+            <outputDirectory>var/lib/graylog-server</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <directoryMode>0775</directoryMode>
         </fileSet>
         <fileSet>
             <directory>./</directory>
