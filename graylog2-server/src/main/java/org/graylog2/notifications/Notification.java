@@ -89,7 +89,8 @@ public interface Notification extends Persisted {
         MULTI_LEADER,
         NO_LEADER,
         ARCHIVING_SUMMARY,
-        SEARCH_ERROR
+        SEARCH_ERROR,
+        EVENT_LIMIT_REACHED
     }
 
     enum Severity {
