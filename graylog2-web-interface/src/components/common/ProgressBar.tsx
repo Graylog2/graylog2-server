@@ -70,7 +70,7 @@ const progressBarVariants = css<StyledBarProps>(({ $bsStyle, theme }) => {
   return css`
     background-color: ${theme.colors.variant[$bsStyle]};
     color: ${theme.utils.readableColor(theme.colors.variant[$bsStyle])};
-  `;
+`;
 });
 
 const ProgressWrap = styled.div(({ theme }) => css`

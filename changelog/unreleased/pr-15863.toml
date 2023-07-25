@@ -1,0 +1,5 @@
+type = "a"
+message = "Enabling `percentage`/`percentile` metrics in event definitions."
+
+pulls = ["15863"]
+issues = ["10082"]

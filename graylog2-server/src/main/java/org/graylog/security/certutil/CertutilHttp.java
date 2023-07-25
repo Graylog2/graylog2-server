@@ -123,10 +123,10 @@ public class CertutilHttp implements CliCommand {
 
                 final int validityDays = console.readInt("Enter certificate validity in days: ");
 
-                final String cnName = "localhost";
+                final String cnName = Tools.getLocalCanonicalHostname();
 
                 CertRequest certificateRequest = CertRequest.signed(cnName, caKeyPair)
-                        .withSubjectAlternativeName(cnName)
+                        .withSubjectAlternativeName("localhost")
                         .withSubjectAlternativeName(Tools.getLocalHostname())
                         .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
                         .withSubjectAlternativeName("127.0.0.1")

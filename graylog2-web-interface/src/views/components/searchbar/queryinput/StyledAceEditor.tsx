@@ -29,7 +29,7 @@ type Props = {
 
 const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled, value }) => css`
   &.ace-queryinput {
-    ${$height ? `height: ${$height}px !important` : ''};
+    ${$height ? `height: ${$height}px !important` : ''}
     min-height: 34px;
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};

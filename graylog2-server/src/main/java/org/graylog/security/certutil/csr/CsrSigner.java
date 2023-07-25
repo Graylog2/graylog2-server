@@ -16,7 +16,13 @@
  */
 package org.graylog.security.certutil.csr;
 
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -29,12 +35,24 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
+import static org.bouncycastle.asn1.x509.GeneralName.dNSName;
+import static org.bouncycastle.asn1.x509.GeneralName.iPAddress;
+import static org.bouncycastle.asn1.x509.GeneralName.rfc822Name;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrSigner {
-    public static X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
+    private boolean isValidName(final int name) {
+        return switch (name) {
+            case dNSName, iPAddress, rfc822Name -> true;
+            default -> false;
+        };
+    }
+
+    public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
         // TODO: cert serial number?
         BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
         Instant validFrom = Instant.now();
@@ -49,6 +67,23 @@ public class CsrSigner {
                 serialNumber,
                 Date.from(validFrom), Date.from(validUntil),
                 csr.getSubject(), csr.getSubjectPublicKeyInfo());
+
+        var certAttributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
+        if (certAttributes != null && certAttributes.length > 0) {
+            ArrayList<GeneralName> altNames = new ArrayList<>();
+
+            for (Attribute attribute : certAttributes) {
+                Extensions extensions = Extensions.getInstance(attribute.getAttrValues().getObjectAt(0));
+                GeneralNames gns = GeneralNames.fromExtensions(extensions, Extension.subjectAlternativeName);
+                if (gns != null && gns.getNames() != null) {
+                    Arrays.stream(gns.getNames()).filter(n -> isValidName(n.getTagNo())).forEach(altNames::add);
+                }
+            }
+            if (!altNames.isEmpty()) {
+                builder.addExtension(Extension.subjectAlternativeName, false,
+                        new GeneralNames(altNames.toArray(new GeneralName[altNames.size()])));
+            }
+        }
 
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(issuerKey);
         X509CertificateHolder certHolder = builder.build(signer);

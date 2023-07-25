@@ -23,6 +23,7 @@ import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.plugin.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -79,6 +80,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistribution().directory(),
                     Path.of(opensearchConfigLocation),
+                    localConfiguration.getHttpBindAddress().getHost(),
+                    localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getRestApiUsername(),

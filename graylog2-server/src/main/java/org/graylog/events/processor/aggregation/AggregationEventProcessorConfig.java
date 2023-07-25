@@ -25,11 +25,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
+import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -79,7 +81,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     public abstract List<String> groupBy();
 
     @JsonProperty(FIELD_SERIES)
-    public abstract List<AggregationSeries> series();
+    public abstract List<SeriesSpec> series();
 
     @JsonProperty(FIELD_CONDITIONS)
     public abstract Optional<AggregationConditions> conditions();
@@ -158,7 +160,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         public abstract Builder groupBy(List<String> groupBy);
 
         @JsonProperty(FIELD_SERIES)
-        public abstract Builder series(List<AggregationSeries> series);
+        public abstract Builder series(List<SeriesSpec> series);
 
         @JsonProperty(FIELD_CONDITIONS)
         public abstract Builder conditions(@Nullable AggregationConditions conditions);
@@ -220,7 +222,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 .query(ValueReference.of(query()))
                 .streams(streamRefs)
                 .groupBy(groupBy())
-                .series(series())
+                .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(conditions().orElse(null))
                 .executeEveryMs(executeEveryMs())
                 .searchWithinMs(searchWithinMs())

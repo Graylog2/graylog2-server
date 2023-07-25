@@ -90,12 +90,12 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
     series: [
       {
         id: 'count-field1',
-        function: 'count',
+        type: 'count',
         field: 'field1',
       },
       {
         id: 'count-field2',
-        function: 'count',
+        type: 'count',
         field: 'field2',
       },
     ],
@@ -159,7 +159,7 @@ export const mockEventDefinitionOneAggregation = {
     series: [
       {
         id: 'count-field1',
-        function: 'count',
+        type: 'count',
         field: 'field1',
       },
     ],

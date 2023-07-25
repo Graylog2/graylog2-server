@@ -39,7 +39,7 @@ type FieldElementProps = {
 };
 
 const FieldElement = styled.span.attrs({
-  className: 'field-element', /* stylelint-disable-line property-no-unknown */
+  className: 'field-element' /* stylelint-disable-line property-no-unknown*/
 })<FieldElementProps>(({ $active, $disabled, theme }) => css`
   color: ${$active ? theme.colors.variant.info : 'currentColor'};
   opacity: ${$disabled ? '0.3' : '1'};

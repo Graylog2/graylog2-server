@@ -30,7 +30,7 @@ export type EventDefinition = {
     query_parameters: ParameterJson[],
     streams: string[],
     group_by: string[],
-    series: Array<{field: string, id: string, function: string}>,
+    series: Array<{field: string, id: string, type: string}>,
     conditions: {
       expression: string | null | {},
     },
