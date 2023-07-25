@@ -72,7 +72,7 @@ public class LookupHasValue extends AbstractFunction<Object> {
                 .returnType(Boolean.class)
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Lookup value check")
-                .ruleBuilderTitle("Check if lookup table '${lookup_table}' contains value")
+                .ruleBuilderTitle("Check if lookup table '${lookup_table}' contains '${value}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }

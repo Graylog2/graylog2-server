@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversi
 import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.IsPeriod;
+import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
@@ -98,6 +99,7 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(IsUrl.NAME, new IsUrl());
         functions.put(UrlConversion.NAME, new UrlConversion());
+        functions.put(CidrMatch.NAME, new CidrMatch());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -335,6 +337,21 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         message.addField("string", "iamastring");
         testRule = createFragmentSource(fragment, Map.of("field", "string"));
         evaluateCondition(testRule, message, false);
+    }
+
+    @Test
+    public void testFieldCidr() throws MalformedURLException {
+        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+        final RuleFragment fragment = migration.createCIDRMatchField();
+
+        message.addField("ip", "192.168.1.42");
+        Rule testRule = createFragmentSource(fragment, Map.of("field", "ip", "cidr", "192.168.1.15/24"));
+        evaluateCondition(testRule, message, true);
+
+        message.addField("noip", "somestring");
+        testRule = createFragmentSource(fragment, Map.of("field", "noip", "cidr", "192.168.1.15/24"));
+        evaluateCondition(testRule, message, false);
+
     }
 
 }

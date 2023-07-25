@@ -64,11 +64,11 @@ public class V20230724092100_AddFieldConditions extends Migration {
         String[] conversionTypes = {"bool", "double", "long", "map", "string", "url"};
         Arrays.stream(conversionTypes).forEach(type -> addFragment(createCheckFieldType(type)));
         addFragment(createCheckDateField());
+        addFragment(createCIDRMatchField());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("field condition fragments were successfully added");
     }
-
 
     RuleFragment createCheckFieldTypeNoConversion(String type) {
         return RuleFragment.builder()
@@ -83,7 +83,7 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .returnType(Void.class)
                         .description("Checks whether the value in the given field is a " + type)
                         .ruleBuilderEnabled()
-                        .ruleBuilderName("Check if field is " + type)
+                        .ruleBuilderName("Field is " + type)
                         .ruleBuilderTitle("Check if value in '${field}' is a " + type)
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                         .build())
@@ -105,7 +105,7 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .returnType(Void.class)
                         .description("Checks whether the value in the given field is a " + type)
                         .ruleBuilderEnabled()
-                        .ruleBuilderName("Check if field is " + type)
+                        .ruleBuilderName("Field is " + type)
                         .ruleBuilderTitle("Check if value in '${field}' is a " + type)
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                         .build())
@@ -132,8 +132,35 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .returnType(Void.class)
                         .description("Checks whether the value in the given field is a date, optionally by first trying to parse it.")
                         .ruleBuilderEnabled()
-                        .ruleBuilderName("Check if field is date")
+                        .ruleBuilderName("Field is date")
                         .ruleBuilderTitle("Check if value in '${field}' is a date")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
+                        .build())
+                .isCondition()
+                .build();
+    }
+
+    RuleFragment createCIDRMatchField() {
+        return RuleFragment.builder()
+                .fragment("""
+                        (
+                        is_ip(to_ip($message.${field})) &&
+                        cidr_match(
+                          ip: to_ip($message.${field}),
+                          cidr: ${cidr}
+                        )
+                        )""")
+                .descriptor(FunctionDescriptor.builder()
+                        .name("field_cidr")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to check").build(),
+                                string("cidr").description("Date pattern (see parse_date)").build()
+                        ))
+                        .returnType(Void.class)
+                        .description("Checks whether the value in the given field is an IP and matches the given cidr subnet mask.")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Field matches CIDR")
+                        .ruleBuilderTitle("Check if value in '${field}' is an IP and matches '${cidr}' subnet mask")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                         .build())
                 .isCondition()

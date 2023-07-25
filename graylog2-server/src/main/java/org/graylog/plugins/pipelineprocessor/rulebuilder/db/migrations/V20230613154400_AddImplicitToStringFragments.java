@@ -84,7 +84,7 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                         ))
                         .returnType(String.class)
                         .description("Get substring of value")
-                        .ruleBuilderEnabled()
+                        .ruleBuilderEnabled(false)
                         .ruleBuilderName("Substring")
                         .ruleBuilderTitle("Get substring from '${start}' to '${end!\"end\"}' of value")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
@@ -100,7 +100,7 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                           value: to_string(${value}),
                           pattern: ${pattern}<#if locale??>,
                           locale: ${locale}</#if><#if timezone??>,
-                          locale: ${timezone}</#if>
+                          timezone: ${timezone}</#if>
                         );""")
                 .descriptor(FunctionDescriptor.builder()
                         .name("get_date")

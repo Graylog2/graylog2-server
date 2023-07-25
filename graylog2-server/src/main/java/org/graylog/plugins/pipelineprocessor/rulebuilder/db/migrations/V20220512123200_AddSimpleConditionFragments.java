@@ -31,6 +31,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
@@ -114,18 +115,27 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 
     private RuleFragment createHasFieldEqualsFragment() {
         return RuleFragment.builder()
-                .fragment("( has_field(${field}) && to_string($message.${field}) == ${fieldValue} )")
+                .fragment("""
+                        ( has_field(${field}) &&
+                        <#if caseInsensitive!false>
+                        lower(to_string($message.${field})) == lower(${fieldValue})
+                        <#else>
+                        to_string($message.${field}) == ${fieldValue}
+                        </#if>
+                        )
+                        """)
                 .descriptor(FunctionDescriptor.builder()
                         .name("has_field_equals")
                         .params(ImmutableList.of(
                                 string("field").description("Message field to check against").build(),
-                                string("fieldValue").description("Field value to check for").build()
+                                string("fieldValue").description("Field value to check for").build(),
+                                bool("caseInsensitive").optional().description("Ignore case").build()
                         ))
                         .returnType(Boolean.class)
                         .description("Checks if the message has a field and if this field's string value is equal to the given fieldValue")
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Field equals")
-                        .ruleBuilderTitle("Field '${field}' equals '${fieldValue}'")
+                        .ruleBuilderTitle("Field '${field}' equals '${fieldValue}' <#if caseInsensitive??>(case insensitive: ${caseInsensitive})</#if>")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                         .build())
                 .isCondition()
