@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * This rule starts a Datanode instance and provides a configured {@link Client}.
@@ -93,7 +94,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         containersByVersion.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(container))
                 .map(Map.Entry::getKey)
-                .distinct()
+                .collect(Collectors.toSet()) // intermediate collect to avoid modifying the containersByVersion while we iterate over it
                 .forEach(containersByVersion::remove);
     }
 
