@@ -373,6 +373,7 @@ const RuleBuilder = () => {
                          simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, rule);
                        }
                      }}
+                     title="Show Simulator"
                      checked={showSimulator} />
               <span className="slider" />
             </Toggle>

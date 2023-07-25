@@ -126,4 +126,78 @@ describe('RuleBuilder', () => {
     expect(createRuleFromCodeButton).toBeInTheDocument();
     expect(copyCloseButton).toBeInTheDocument();
   });
+
+  it('should show simulator', () => {
+    const title = 'title';
+    const description = 'description';
+    const rule_builder = { actions: [], conditions: [] };
+
+    asMock(useRuleBuilder).mockReturnValue({
+      rule: { title, description, rule_builder },
+    } as any);
+
+    const { getByTitle, getByText, getByRole } = renderWithDataRouter((
+      <PipelineRulesContext.Provider value={{
+        simulateRule: () => {},
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
+      }}>
+        <RuleBuilder />
+      </PipelineRulesContext.Provider>
+    ));
+
+    const showSimulatorSwitch = getByTitle('Show Simulator');
+    userEvent.click(showSimulatorSwitch);
+
+    const ruleSimulationLabel = getByText('Rule Simulation');
+    const runRuleSimulation = getByRole('button', { name: 'Run rule simulation' });
+
+    expect(ruleSimulationLabel).toBeInTheDocument();
+    expect(runRuleSimulation).toBeInTheDocument();
+  });
+
+  it('should show simulator with conditions and actions output', () => {
+    const title = 'title';
+    const description = 'description';
+    const rule_builder = {
+      actions: [{
+        function: 'get_field',
+        params: { field: 'message' },
+      }, {
+        function: 'get_substring',
+        params: { value: '$output_1', start: 1 },
+      }],
+      conditions: [{
+        function: 'has_field',
+        params: { field: 'message' },
+      }],
+    };
+
+    asMock(useRuleBuilder).mockReturnValue({
+      rule: { title, description, rule_builder },
+    } as any);
+
+    const { getByTitle, getByText, getByRole } = renderWithDataRouter((
+      <PipelineRulesContext.Provider value={{
+        simulateRule: () => {},
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
+      }}>
+        <RuleBuilder />
+      </PipelineRulesContext.Provider>
+    ));
+
+    const showSimulatorSwitch = getByTitle('Show Simulator');
+    userEvent.click(showSimulatorSwitch);
+
+    const ruleSimulationLabel = getByText('Rule Simulation');
+    const runRuleSimulation = getByRole('button', { name: 'Run rule simulation' });
+    const resetRuleSimulation = getByRole('button', { name: 'Reset' });
+
+    expect(ruleSimulationLabel).toBeInTheDocument();
+    expect(runRuleSimulation).toBeInTheDocument();
+    expect(resetRuleSimulation).toBeInTheDocument();
+  });
 });
