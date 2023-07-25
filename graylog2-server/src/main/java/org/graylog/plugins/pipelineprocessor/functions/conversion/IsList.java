@@ -49,9 +49,9 @@ public class IsList extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a list")
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if list")
-                .ruleBuilderTitle("Check if value is a list")
+                .ruleBuilderTitle("Check if '${value}' is a list")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

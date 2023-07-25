@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.joda.time.Period;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -47,6 +48,10 @@ public class IsPeriod extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a time period")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Check if period")
+                .ruleBuilderTitle("Check if '${value}' is a time period")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
 }

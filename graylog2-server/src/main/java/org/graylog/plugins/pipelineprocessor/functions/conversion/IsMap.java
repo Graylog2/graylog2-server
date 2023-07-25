@@ -49,9 +49,9 @@ public class IsMap extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a map")
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if map")
-                .ruleBuilderTitle("Check if value is a map")
+                .ruleBuilderTitle("Check if '${value}' is a map")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

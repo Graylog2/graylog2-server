@@ -47,9 +47,9 @@ public class IsString extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a string")
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if string")
-                .ruleBuilderTitle("Check if value is a string")
+                .ruleBuilderTitle("Check if '${value}' is a string")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

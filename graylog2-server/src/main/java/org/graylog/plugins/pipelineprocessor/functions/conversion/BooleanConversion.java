@@ -57,7 +57,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
                 .description("Converts a value to a boolean value using its string representation")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to boolean")
-                .ruleBuilderTitle("Convert value to boolean")
+                .ruleBuilderTitle("Convert '${value}' to boolean")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }

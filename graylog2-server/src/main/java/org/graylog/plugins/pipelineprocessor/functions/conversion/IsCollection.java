@@ -48,10 +48,10 @@ public class IsCollection extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(valueParam)
-                .description("Checks whether a value is a collection")
-                .ruleBuilderEnabled()
+                .description("Checks whether a value is an iterable collection")
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if collection")
-                .ruleBuilderTitle("Check if value is a collection")
+                .ruleBuilderTitle("Check if '${value}' is a collection")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

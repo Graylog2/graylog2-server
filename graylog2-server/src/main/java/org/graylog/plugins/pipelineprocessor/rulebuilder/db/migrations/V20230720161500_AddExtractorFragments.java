@@ -52,8 +52,8 @@ public class V20230720161500_AddExtractorFragments extends Migration {
 
     @Override
     public void upgrade() {
-        log.debug("Adding implicit to_string fragments via migration");
-        if (Objects.nonNull(clusterConfigService.get(V20230613154400_AddImplicitToStringFragments.MigrationCompleted.class))) {
+        log.debug("Adding extractor fragments via migration");
+        if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
 //            return;
         }
@@ -61,8 +61,8 @@ public class V20230720161500_AddExtractorFragments extends Migration {
         addFragment(createCopyFieldExtractor());
         addFragment(createRegexExtractor());
 
-        clusterConfigService.write(new V20230613154400_AddImplicitToStringFragments.MigrationCompleted());
-        log.debug("implicit to_string fragments were successfully added");
+        clusterConfigService.write(new MigrationCompleted());
+        log.debug("extractor fragments were successfully added");
     }
 
 
@@ -125,5 +125,7 @@ public class V20230720161500_AddExtractorFragments extends Migration {
         existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
         ruleFragmentService.save(ruleFragment);
     }
+
+    public record MigrationCompleted() {}
 
 }

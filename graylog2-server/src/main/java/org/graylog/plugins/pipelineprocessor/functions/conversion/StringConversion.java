@@ -106,7 +106,7 @@ public class StringConversion extends AbstractFunction<String> {
                 .description("Converts a value to its string representation")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to string")
-                .ruleBuilderTitle("Convert value to string")
+                .ruleBuilderTitle("Convert '${value}' to string")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }

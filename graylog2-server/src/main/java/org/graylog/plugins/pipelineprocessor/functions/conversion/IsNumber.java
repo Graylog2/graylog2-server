@@ -47,9 +47,9 @@ public class IsNumber extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a number")
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if number")
-                .ruleBuilderTitle("Check if value is a number")
+                .ruleBuilderTitle("Check if '${value}' is a number")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

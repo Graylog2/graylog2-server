@@ -24,10 +24,9 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
+import org.graylog2.plugin.Message;
 import org.graylog2.shared.utilities.StringUtils;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class BaseFragmentTest extends BaseParserTest {
 
     private static final Logger log = LoggerFactory.getLogger(BaseFragmentTest.class);
@@ -51,10 +49,14 @@ public class BaseFragmentTest extends BaseParserTest {
         configuration.setLogTemplateExceptions(false);
     }
 
-    protected Rule buildRule(RuleFragment ruleFragment, Map<String, Object> parameters) {
+    protected Rule createFragmentSource(RuleFragment ruleFragment, Map<String, Object> parameters) {
         assertThat(ruleFragment.isFragment());
         final FunctionDescriptor descriptor = ruleFragment.descriptor();
-        // TODO: Test rule builder params
+        assertThat(descriptor.ruleBuilderEnabled());
+        assertThat(Objects.nonNull(descriptor.name()));
+        assertThat(Objects.nonNull(descriptor.ruleBuilderName()));
+        assertThat(Objects.nonNull(descriptor.ruleBuilderTitle()));
+        assertThat(Objects.nonNull(descriptor.ruleBuilderFunctionGroup()));
         if (descriptor.returnType() != Void.class) {
             assertThat(Objects.nonNull(ruleFragment.fragmentOutputVariable()));
         }
@@ -70,17 +72,37 @@ public class BaseFragmentTest extends BaseParserTest {
         when(step.parameters()).thenReturn(parameters);
         final String fragment = ParserUtil.generateForFragment(step, configuration);
 
-        String rule = """
-                rule "testfragment"
-                when true
-                then
-                %s
-                end
-                """;
+        String rule = (ruleFragment.isCondition()) ?
+                """
+                        rule "testfragment"
+                        when
+                          %s
+                        then
+                          set_field("testsuccess", true);
+                        end
+                        """
+                :
+                """
+                        rule "testfragment"
+                        when true
+                        then
+                          %s
+                        end
+                        """;
+
+
         rule = StringUtils.f(rule, fragment);
         log.debug(rule);
         return parser.parseRule(rule, true);
     }
 
+    protected void evaluateCondition(Rule rule, Message message, boolean expectedResult) {
+        Message result = evaluateRule(rule, message);
+        if (expectedResult == true) {
+            assertThat(result.hasField("testsuccess"));
+        } else {
+            assertThat(Objects.isNull(result));
+        }
+    }
 
 }

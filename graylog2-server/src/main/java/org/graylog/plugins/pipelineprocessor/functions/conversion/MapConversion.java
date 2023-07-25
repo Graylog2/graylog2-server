@@ -69,7 +69,7 @@ public class MapConversion extends AbstractFunction<Map> {
                 .description("Converts a map-like value into a map usable by set_fields()")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to map")
-                .ruleBuilderTitle("Convert value to map")
+                .ruleBuilderTitle("Convert '${value}' to map")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }

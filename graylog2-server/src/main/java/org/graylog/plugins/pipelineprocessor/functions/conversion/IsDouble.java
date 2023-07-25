@@ -46,10 +46,10 @@ public class IsDouble extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(valueParam)
-                .description("Checks whether a value is a double")
-                .ruleBuilderEnabled()
+                .description("Checks whether a value is a floating point value (of type double)")
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if double")
-                .ruleBuilderTitle("Check if value is a double")
+                .ruleBuilderTitle("Check if '${value}' is a double")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

@@ -71,7 +71,7 @@ public class LongConversion extends AbstractFunction<Long> {
                 .description("Converts a value to a long value using its string representation")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to long")
-                .ruleBuilderTitle("Convert value to long integer")
+                .ruleBuilderTitle("Convert '${value}' to long integer")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }

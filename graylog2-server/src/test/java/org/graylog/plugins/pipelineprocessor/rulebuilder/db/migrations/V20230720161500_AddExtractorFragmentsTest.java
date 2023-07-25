@@ -53,7 +53,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     public void testCopyField() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createCopyFieldExtractor();
         Map<String, Object> params = Map.of("field", "message", "newField", "copyfield");
-        Rule rule = super.buildRule(fragment, params);
+        Rule rule = super.createFragmentSource(fragment, params);
         final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("Dummy Message");
     }
@@ -62,7 +62,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     public void testRegex() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createRegexExtractor();
         Map<String, Object> params = Map.of("field", "message", "pattern", "^.*(doo...).*$", "newField", "copyfield");
-        Rule rule = super.buildRule(fragment, params);
+        Rule rule = super.createFragmentSource(fragment, params);
         final Message message = evaluateRule(rule, new Message("bippitysnickerdoodledoobadoo", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("doobad");
     }

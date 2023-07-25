@@ -47,9 +47,9 @@ public class IsLong extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a long integer")
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if long")
-                .ruleBuilderTitle("Check if value is a long integer")
+                .ruleBuilderTitle("Check if '${value}' is a long integer")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

@@ -46,10 +46,10 @@ public class IsBoolean extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(valueParam)
-                .description("Checks whether a value is a boolean")
-                .ruleBuilderEnabled()
+                .description("Checks whether a value is a boolean value (true or false)")
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if boolean")
-                .ruleBuilderTitle("Check if value is a boolean")
+                .ruleBuilderTitle("Check if '${value}' is a boolean")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
