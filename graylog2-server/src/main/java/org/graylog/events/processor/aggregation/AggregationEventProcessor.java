@@ -63,6 +63,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -213,9 +214,11 @@ public class AggregationEventProcessor implements EventProcessor {
                               EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
         final Set<String> streams = getStreams(parameters);
 
+        final AtomicInteger messageCount = new AtomicInteger(0);
         final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
             final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
 
+            boolean eventLimitReached = false;
             for (final ResultMessage resultMessage : messages) {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
@@ -233,12 +236,24 @@ public class AggregationEventProcessor implements EventProcessor {
                         .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
+                if (config.eventLimit() != 0) {
+                    if (messageCount.incrementAndGet() >= config.eventLimit()) {
+                        eventLimitReached = true;
+                        break;
+                    }
+                }
             }
-
             eventsConsumer.accept(eventsWithContext.build());
+            if (eventLimitReached) {
+                throw new EventLimitReachedException();
+            }
         };
 
-        moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+        try {
+            moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+        } catch (EventLimitReachedException e) {
+            LOG.info("Event limit reached at {} for '{}' event definition.", config.eventLimit(), eventDefinition.title());
+        }
     }
 
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
@@ -395,4 +410,8 @@ public class AggregationEventProcessor implements EventProcessor {
                 .map(seriesValue -> String.format(Locale.ROOT, "%s(%s)=%s", seriesValue.series().function().toString().toLowerCase(Locale.ROOT), seriesValue.series().field().orElse(""), seriesValue.value()))
                 .collect(Collectors.joining(" "));
     }
+
+    private static class EventLimitReachedException extends RuntimeException {
+    }
+
 }
