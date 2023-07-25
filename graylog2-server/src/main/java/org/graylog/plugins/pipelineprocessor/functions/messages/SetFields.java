@@ -75,10 +75,10 @@ public class SetFields extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(fieldsParam, prefixParam, suffixParam, messageParam))
-                .description("Sets new fields in a message")
+                .description("Sets new fields in a message. If no specific message is provided, it sets the fields in the currently processed message")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Set fields")
-                .ruleBuilderTitle("Set fields from map")
+                .ruleBuilderTitle("Set fields from map '${fields}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }

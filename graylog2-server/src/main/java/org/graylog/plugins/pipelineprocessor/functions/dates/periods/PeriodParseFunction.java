@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.joda.time.Period;
 
 public class PeriodParseFunction extends AbstractFunction<Period> {
@@ -42,10 +43,14 @@ public class PeriodParseFunction extends AbstractFunction<Period> {
     public FunctionDescriptor<Period> descriptor() {
         return FunctionDescriptor.<Period>builder()
                 .name(NAME)
-                .description("Parses a ISO 8601 period from the specified string.")
+                .description("Parses an ISO 8601 period from the specified string.")
                 .pure(true)
                 .returnType(Period.class)
                 .params(value)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Parse period")
+                .ruleBuilderTitle("Parse period from '${value}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)
                 .build();
     }
 }

@@ -116,7 +116,7 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
 
         message.addField("boolfalse", false);
         testRule = createFragmentSource(fragment, Map.of("field", "boolfalse"));
-        evaluateCondition(testRule, message, false);
+        evaluateCondition(testRule, message, true);
 
         message.addField("boolstring", "true");
         testRule = createFragmentSource(fragment, Map.of("field", "boolstring"));
@@ -258,7 +258,6 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         Rule testRule = createFragmentSource(fragment, Map.of("field", "notnull"));
         evaluateCondition(testRule, message, true);
 
-        message.addField("string", "iamastring");
         testRule = createFragmentSource(fragment, Map.of("field", "string"));
         evaluateCondition(testRule, message, false);
     }

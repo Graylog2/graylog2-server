@@ -96,7 +96,7 @@ public class CloneMessage extends AbstractFunction<Message> {
                 .name(NAME)
                 .params(ImmutableList.of(messageParam, loopDetectionParam))
                 .returnType(Message.class)
-                .description("Clones a message")
+                .description("Clones a message. If no specific message is provided, it clones the currently processed message")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Clone message")
                 .ruleBuilderTitle("Clone message")

@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -50,15 +49,15 @@ public class BaseFragmentTest extends BaseParserTest {
     }
 
     protected Rule createFragmentSource(RuleFragment ruleFragment, Map<String, Object> parameters) {
-        assertThat(ruleFragment.isFragment());
-        final FunctionDescriptor descriptor = ruleFragment.descriptor();
-        assertThat(descriptor.ruleBuilderEnabled());
-        assertThat(Objects.nonNull(descriptor.name()));
-        assertThat(Objects.nonNull(descriptor.ruleBuilderName()));
-        assertThat(Objects.nonNull(descriptor.ruleBuilderTitle()));
-        assertThat(Objects.nonNull(descriptor.ruleBuilderFunctionGroup()));
+        assertThat(ruleFragment.isFragment()).isTrue();
+        final FunctionDescriptor<?> descriptor = ruleFragment.descriptor();
+        assertThat(descriptor.ruleBuilderEnabled()).isTrue();
+        assertThat(descriptor.name()).isNotNull();
+        assertThat(descriptor.ruleBuilderName()).isNotNull();
+        assertThat(descriptor.ruleBuilderTitle()).isNotNull();
+        assertThat(descriptor.ruleBuilderFunctionGroup()).isNotNull();
         if (descriptor.returnType() != Void.class) {
-            assertThat(Objects.nonNull(ruleFragment.fragmentOutputVariable()));
+            assertThat(ruleFragment.fragmentOutputVariable()).isNotNull();
         }
 
         // initialize freemarker
@@ -96,12 +95,12 @@ public class BaseFragmentTest extends BaseParserTest {
         return parser.parseRule(rule, true);
     }
 
-    protected void evaluateCondition(Rule rule, Message message, boolean expectedResult) {
+    protected void evaluateCondition(Rule rule, Message message, boolean expectResult) {
         Message result = evaluateRule(rule, message);
-        if (expectedResult == true) {
-            assertThat(result.hasField("testsuccess"));
+        if (expectResult) {
+            assertThat(result.hasField("testsuccess")).isTrue();
         } else {
-            assertThat(Objects.isNull(result));
+            assertThat(result).isNull();
         }
     }
 

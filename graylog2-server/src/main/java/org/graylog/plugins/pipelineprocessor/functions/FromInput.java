@@ -86,7 +86,7 @@ public class FromInput extends AbstractFunction<Boolean> {
                         nameParam))
                 .description("Checks if a message arrived on a given input")
                 .ruleBuilderEnabled()
-                .ruleBuilderName("Check if from input")
+                .ruleBuilderName("Check source input")
                 .ruleBuilderTitle("Check if message arrived on input<#if name??> '${name}'</#if><#if id??> '${id}'</#if>")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();

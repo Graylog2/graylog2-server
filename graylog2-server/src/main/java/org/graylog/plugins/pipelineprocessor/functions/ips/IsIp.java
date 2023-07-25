@@ -48,7 +48,7 @@ public class IsIp extends AbstractFunction<Boolean> {
                 .params(valueParam)
                 .description("Checks whether a value is an IP address")
                 .ruleBuilderEnabled(false)
-                .ruleBuilderTitle("Check if IP")
+                .ruleBuilderName("Check if IP")
                 .ruleBuilderTitle("Check if '${value}' is an IP address")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();

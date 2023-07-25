@@ -104,7 +104,7 @@ public class RouteToStream extends AbstractFunction<Void> {
                         idParam,
                         messageParam,
                         removeFromDefault))
-                .description("Routes a message to a stream")
+                .description("Routes a message to a stream. If no specific message is provided, it assigns the stream to the currently processed message")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Route to stream")
                 .ruleBuilderTitle("Route message to stream<#if name??> '${name}'</#if><#if id??> '${id}'</#if>")

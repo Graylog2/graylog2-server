@@ -66,10 +66,10 @@ public class RenameField extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(oldFieldParam, newFieldParam, messageParam)
-                .description("Rename a message field")
+                .description("Rename a message field. If no specific message is provided, it performs the renaming operation on the currently processed message.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Rename field")
-                .ruleBuilderTitle("Rename field '${old_field}' to '${new_field}'")
+                .ruleBuilderTitle("Rename field '${old_field}' to '${new_field}' in the message")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
