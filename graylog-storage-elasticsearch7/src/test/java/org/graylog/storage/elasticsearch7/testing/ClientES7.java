@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -67,10 +68,12 @@ import java.util.stream.Stream;
 public class ClientES7 implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientES7.class);
     private final ElasticsearchClient client;
+    private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
 
-    public ClientES7(ElasticsearchClient client) {
+    public ClientES7(final ElasticsearchClient client, final List<String> featureFlags) {
         this.client = client;
+        this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
     }
 
