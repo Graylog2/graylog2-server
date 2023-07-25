@@ -26,7 +26,7 @@ import useAppSelector from 'stores/useAppSelector';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSelectors';
 
-const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
+const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult, currentQueryErrors) => {
   const { searchTypes } = results;
   const widgetType = widgetDefinition(widget.type);
   const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
@@ -57,6 +57,16 @@ type WidgetResults = {
   error: SearchError[],
 };
 
+const _getErrorsForQuery = (currentQueryId: string, currentQueryErrors: SearchError[] | undefined) => {
+  const queryError = currentQueryErrors?.find(({ query_id }) => query_id === currentQueryId);
+
+  if (queryError) {
+    return { widgetData: undefined, error: [queryError] };
+  }
+
+  return { widgetData: undefined, error: [] };
+};
+
 const selectWidgetResults = (widgetId: string) => createSelector(
   selectSearchExecutionResult,
   selectActiveQuery,
@@ -64,10 +74,11 @@ const selectWidgetResults = (widgetId: string) => createSelector(
   (searchExecutionResult, currentQueryId, widget) => {
     const { result, widgetMapping } = searchExecutionResult ?? {};
     const currentQueryResults = result?.results?.[currentQueryId];
+    const currentQueryErrors = result?.errors;
 
     return (currentQueryResults
-      ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
-      : { widgetData: undefined, error: [] }) as WidgetResults;
+      ? _getDataAndErrors(widget, widgetMapping, currentQueryResults, currentQueryErrors)
+      : _getErrorsForQuery(currentQueryId, currentQueryErrors)) as WidgetResults;
   },
 );
 
