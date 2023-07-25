@@ -34,6 +34,7 @@ import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitio
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -173,7 +174,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                      entityType="event_definition"
                      onClick={() => setShowEntityShareModal(true)}
                      bsSize="xsmall" />
-        <OverlayDropdownButton title="More"
+        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
           {showActions() && (
