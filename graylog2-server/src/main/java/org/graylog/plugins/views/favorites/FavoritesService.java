@@ -66,7 +66,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
                 .items()
                 .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
                 .map(i -> startPageItemTitleRetriever
-                        .retrieveTitle(i)
+                        .retrieveTitle(i, searchUser)
                         .map(title -> new Favorite(i, title))
                 )
                 .flatMap(Optional::stream)
