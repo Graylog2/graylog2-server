@@ -68,6 +68,18 @@
             <outputDirectory>.</outputDirectory>
         </file>
         <file>
+            <source>${project.basedir}/../misc/.env</source>
+            <destName>.env</destName>
+            <outputDirectory>.</outputDirectory>
+            <fileMode>0640</fileMode>
+        </file>
+        <file>
+            <source>${project.basedir}/../misc/graylog-server.service</source>
+            <destName>graylog-server.service.example</destName>
+            <outputDirectory>.</outputDirectory>
+            <fileMode>0640</fileMode>
+        </file>
+        <file>
             <source>${project.basedir}/../graylog-storage-elasticsearch7/target/graylog-storage-elasticsearch7-${project.version}.jar</source>
             <outputDirectory>plugin/</outputDirectory>
         </file>
