@@ -1,0 +1,29 @@
+[Unit]
+Description=Graylog server
+Documentation=http://docs.graylog.org/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10
+User=graylog
+Group=graylog
+LimitNOFILE=64000
+
+# Replace ${GRAYLOG_INSTALL_DIR} with your Graylog installation path below:
+EnvironmentFile=${GRAYLOG_INSTALL_DIR}/.env
+ExecStart=${GRAYLOG_INSTALL_DIR}/bin/graylogctl start
+ExecStop=${GRAYLOG_INSTALL_DIR}/bin/graylogctl stop
+
+# When a JVM receives a SIGTERM signal it exits with 143.
+SuccessExitStatus=143
+
+# Make sure stderr/stdout is captured in the systemd journal.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
