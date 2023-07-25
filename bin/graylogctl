@@ -48,9 +48,9 @@ done
 GRAYLOGCTL_DIR=${GRAYLOGCTL_DIR:=$(dirname "$GRAYLOGCTL")}
 GRAYLOG_JVM_DIR="$(dirname "$GRAYLOGCTL_DIR")/jvm"
 GRAYLOG_SERVER_JAR=${GRAYLOG_SERVER_JAR:=graylog.jar}
-GRAYLOG_CONF=${GRAYLOG_CONF:=/etc/graylog/server/server.conf}
+GRAYLOG_CONF=${GRAYLOG_CONF:=etc/graylog/server/server.conf}
 GRAYLOG_PID=${GRAYLOG_PID:=/tmp/graylog.pid}
-LOG_FILE=${LOG_FILE:=log/graylog-server.log}
+GRAYLOG_LOG_FILE=${GRAYLOG_LOG_FILE:=var/log/graylog/server.log}
 LOG4J=${LOG4J:=}
 DEFAULT_JAVA_OPTS="-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -Xms1g -Xmx1g -XX:+UseG1GC -server -XX:-OmitStackTraceInFastThrow"
 
@@ -65,7 +65,7 @@ JAVA_OPTS="${JAVA_OPTS:="$DEFAULT_JAVA_OPTS"}"
 start() {
     echo "Starting graylog-server ..."
     cd "$GRAYLOGCTL_DIR/.."
-    "${NOHUP}" "${JAVA_CMD}" ${JAVA_OPTS} ${LOG4J} -jar "${GRAYLOG_SERVER_JAR}" server -f "${GRAYLOG_CONF}" -p "${GRAYLOG_PID}" >> "${LOG_FILE}" 2>> "${LOG_FILE}" &
+    "${NOHUP}" "${JAVA_CMD}" ${JAVA_OPTS} ${LOG4J} -jar "${GRAYLOG_SERVER_JAR}" server -f "${GRAYLOG_CONF}" -p "${GRAYLOG_PID}" >> "${GRAYLOG_LOG_FILE}" 2>> "${GRAYLOG_LOG_FILE}" &
 }
 
 run() {
