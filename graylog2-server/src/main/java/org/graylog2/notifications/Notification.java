@@ -89,8 +89,9 @@ public interface Notification extends Persisted {
         MULTI_LEADER,
         NO_LEADER,
         ARCHIVING_SUMMARY,
-        SEARCH_ERROR
-    }
+        SEARCH_ERROR,
+        CERT_NEEDS_RENEWAL
+        }
 
     enum Severity {
         NORMAL, URGENT

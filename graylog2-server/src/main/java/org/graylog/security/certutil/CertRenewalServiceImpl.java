@@ -16,8 +16,16 @@
  */
 package org.graylog.security.certutil;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.tuple.Pair;
+import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.scheduler.DBJobTriggerService;
+import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.scheduler.JobScheduleStrategies;
+import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
@@ -26,6 +34,8 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
@@ -51,6 +61,10 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final KeystoreMongoStorage keystoreMongoStorage;
     private final NodeService nodeService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
+    private final NotificationService notificationService;
+    private final DBJobTriggerService jobTriggerService;
+    private final DBJobDefinitionService jobDefinitionService;
+    private final JobScheduleStrategies jobScheduleStrategies;
     private final JobSchedulerClock clock;
     private final char[] passwordSecret;
 
@@ -63,14 +77,27 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final KeystoreMongoStorage keystoreMongoStorage,
                                   final NodeService nodeService,
                                   final DataNodeProvisioningService dataNodeProvisioningService,
+                                  final NotificationService notificationService,
+                                  final DBJobTriggerService jobTriggerService,
+                                  final DBJobDefinitionService jobDefinitionService,
+                                  final JobScheduleStrategies jobScheduleStrategies,
                                   final JobSchedulerClock clock,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeService = nodeService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
+        this.notificationService = notificationService;
+        this.jobTriggerService = jobTriggerService;
+        this.jobDefinitionService = jobDefinitionService;
+        this.jobScheduleStrategies = jobScheduleStrategies;
         this.clock = clock;
         this.passwordSecret = passwordSecret.toCharArray();
+    }
+
+    @VisibleForTesting
+    CertRenewalServiceImpl(final JobSchedulerClock clock) {
+        this(null, null, null, null, null, null, null, null, clock, "dummy");
     }
 
     RenewalPolicy getRenewalPolicy() {
@@ -112,7 +139,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     @Override
     public void checkAllDataNodes() {
-        var renewalPolicy = getRenewalPolicy();
+        final var renewalPolicy = getRenewalPolicy();
 
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         activeDataNodes.values().stream()
@@ -143,11 +170,29 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                         dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
                     } else {
                         // TODO: send notification - don't send one out, if there is one still open
+                        notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, pair.getLeft());
                     }
                 });
     }
 
     @Override
     public void addCheckForRenewalJob() {
+        // TODO: check, if the two more fields are needed (see CronJobSchedule Tests)
+        final var cronJobSchedule = CronJobSchedule.builder().cronExpression("0,30 * * * *").timezone(null).build();
+
+        final var jobDefinition = JobDefinitionDto.builder().id("cert-renewal-check")
+                .title("Certificat Renewal Check")
+                .description("Runs periodically to check for certificates that are about to expire and notifies/triggers renewal")
+                .build();
+
+        final var trigger = JobTriggerDto.builder()
+                .jobDefinitionId("cert-renewal-check")
+                .jobDefinitionType(CheckForCertRenewalJob.TYPE_NAME)
+                .schedule(cronJobSchedule)
+                .status(JobTriggerStatus.RUNNABLE)
+                .build();
+
+        jobDefinitionService.save(jobDefinition);
+        jobTriggerService.create(trigger);
     }
 }
