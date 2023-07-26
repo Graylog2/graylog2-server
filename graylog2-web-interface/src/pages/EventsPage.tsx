@@ -21,11 +21,10 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import { useLocation } from "react-router-dom";
+import useQuery from 'routing/useQuery';
 
 const EventsPage = () => {
-  const location = useLocation()
-  const filteredSourceStream = location.query.stream_id;
+  const { stream_id: streamId } = useQuery();
 
   return (
     <DocumentTitle title="Alerts &amp; Events">
@@ -43,7 +42,7 @@ const EventsPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <EventsContainer key={filteredSourceStream} streamId={filteredSourceStream} />
+          <EventsContainer key={streamId} streamId={streamId} />
         </Col>
       </Row>
     </DocumentTitle>
