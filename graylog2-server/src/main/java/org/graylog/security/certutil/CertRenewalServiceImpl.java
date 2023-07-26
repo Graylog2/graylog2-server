@@ -17,14 +17,7 @@
 package org.graylog.security.certutil;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.graylog.scheduler.DBJobDefinitionService;
-import org.graylog.scheduler.DBJobTriggerService;
-import org.graylog.scheduler.JobDefinitionDto;
-import org.graylog.scheduler.JobScheduleStrategies;
-import org.graylog.scheduler.JobTriggerDto;
-import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
@@ -32,9 +25,7 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLoca
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
-import org.graylog2.cluster.preflight.NodePreflightConfigService;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
@@ -59,7 +50,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final ClusterConfigService clusterConfigService;
     private final KeystoreMongoStorage keystoreMongoStorage;
     private final NodeService nodeService;
-    private final NodePreflightConfigService nodePreflightConfigService;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final JobSchedulerClock clock;
     private final char[] passwordSecret;
 
@@ -71,13 +62,13 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     public CertRenewalServiceImpl(final ClusterConfigService clusterConfigService,
                                   final KeystoreMongoStorage keystoreMongoStorage,
                                   final NodeService nodeService,
-                                  final NodePreflightConfigService nodePreflightConfigService,
+                                  final DataNodeProvisioningService dataNodeProvisioningService,
                                   final JobSchedulerClock clock,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeService = nodeService;
-        this.nodePreflightConfigService = nodePreflightConfigService;
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.clock = clock;
         this.passwordSecret = passwordSecret.toCharArray();
     }
@@ -148,8 +139,8 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                 .forEach(pair -> {
                     if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
                         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
-                        var config = nodePreflightConfigService.getPreflightConfigFor(pair.getLeft().getNodeId());
-                        nodePreflightConfigService.save(config.toBuilder().state(NodePreflightConfig.State.CONFIGURED).build());
+                        var config = dataNodeProvisioningService.getPreflightConfigFor(pair.getLeft().getNodeId());
+                        dataNodeProvisioningService.save(config.toBuilder().state(NodePreflightConfig.State.CONFIGURED).build());
                     } else {
                         // TODO: send notification - don't send one out, if there is one still open
                     }

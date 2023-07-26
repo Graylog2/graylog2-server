@@ -16,26 +16,17 @@
  */
 package org.graylog2.cluster.preflight;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
-public interface NodePreflightConfigService {
-    NodePreflightConfig getPreflightConfigFor(String nodeId);
-    List<NodePreflightConfig> findAllNodesThatNeedAttention();
+public class DataNodeProvisioningBindings extends AbstractModule {
 
-    void writeCsr(String nodeId, String csr);
+    @Override
+    protected void configure() {
+        // this wires the NodePreflightConfigServiceImpl delegate into the NodePreflightConfigBusEvents from above
+        bind(DataNodeProvisioningService.class).annotatedWith(Names.named(DataNodeProvisioningBusEvents.DELEGATE_NAME)).to(DataNodeProvisioningServiceImpl.class);
 
-    void writeCert(String nodeId, String cert);
-
-    Optional<String> readCert(String nodeId);
-
-    void changeState(String nodeId, NodePreflightConfig.State state);
-
-    NodePreflightConfig save(NodePreflightConfig config);
-
-    Stream<NodePreflightConfig> streamAll();
-
-    int delete(String id);
-    void deleteAll();
+        // this is the generic dependency used by callers
+        bind(DataNodeProvisioningService.class).to(DataNodeProvisioningBusEvents.class);
+    }
 }

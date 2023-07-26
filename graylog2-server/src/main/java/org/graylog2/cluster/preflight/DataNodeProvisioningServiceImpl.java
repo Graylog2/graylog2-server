@@ -37,14 +37,14 @@ import static org.graylog2.cluster.preflight.NodePreflightConfig.FIELD_STATE;
 import static org.graylog2.cluster.preflight.NodePreflightConfig.State.CSR;
 import static org.graylog2.cluster.preflight.NodePreflightConfig.State.SIGNED;
 
-public class NodePreflightConfigServiceImpl extends PaginatedDbService<NodePreflightConfig> implements NodePreflightConfigService {
+public class DataNodeProvisioningServiceImpl extends PaginatedDbService<NodePreflightConfig> implements DataNodeProvisioningService {
     public static final String COLLECTION_NAME = "node_preflight_config";
 
     private final JacksonDBCollection<NodePreflightConfig, String> dbCollection;
 
     @Inject
-    public NodePreflightConfigServiceImpl(final MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                          final MongoConnection mongoConnection) {
+    public DataNodeProvisioningServiceImpl(final MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                                           final MongoConnection mongoConnection) {
         super(mongoConnection, mongoJackObjectMapperProvider, NodePreflightConfig.class, COLLECTION_NAME);
         this.dbCollection = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME), NodePreflightConfig.class, String.class, mongoJackObjectMapperProvider.get());
         new MongoDbIndexTools(db).createUniqueIndex(FIELD_NODEID);

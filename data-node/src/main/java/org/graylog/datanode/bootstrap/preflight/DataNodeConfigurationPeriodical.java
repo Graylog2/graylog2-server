@@ -32,7 +32,7 @@ import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
-import org.graylog2.cluster.preflight.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ import java.util.Optional;
 public class DataNodeConfigurationPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeConfigurationPeriodical.class);
 
-    private final NodePreflightConfigService nodePreflightConfigService;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService nodeService;
     private final NodeId nodeId;
     private final PrivateKeyEncryptedFileStorage privateKeyEncryptedStorage;
@@ -61,7 +61,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
     private final char[] passwordSecret;
 
     @Inject
-    public DataNodeConfigurationPeriodical(final NodePreflightConfigService nodePreflightConfigService,
+    public DataNodeConfigurationPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
                                            final NodeService nodeService,
                                            final NodeId nodeId,
                                            final CsrMongoStorage csrStorage,
@@ -70,7 +70,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                                            final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
                                            final SmartKeystoreStorage keystoreStorage,
                                            final @Named("password_secret") String passwordSecret) {
-        this.nodePreflightConfigService = nodePreflightConfigService;
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.csrStorage = csrStorage;
@@ -86,10 +86,10 @@ public class DataNodeConfigurationPeriodical extends Periodical {
     @Override
     public void doRun() {
         LOG.debug("checking if this DataNode is supposed to take configuration steps.");
-        var cfg = nodePreflightConfigService.getPreflightConfigFor(nodeId.getNodeId());
+        var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId());
         if (cfg == null) {
             // write default config if none exists for this node
-            nodePreflightConfigService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
+            dataNodeProvisioningService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
         } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
@@ -98,7 +98,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
                 LOG.error("error generating a CSR: " + ex.getMessage(), ex);
-                nodePreflightConfigService.save(cfg.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(ex.getMessage()).build());
+                dataNodeProvisioningService.save(cfg.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(ex.getMessage()).build());
             }
         } else if (NodePreflightConfig.State.SIGNED.equals(cfg.state())) {
             if (cfg.certificate() == null) {
@@ -120,7 +120,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                         keystoreStorage.writeKeyStore(location, nodeKeystore, secret, secret);
 
                         //should be in one transaction, but we miss transactions...
-                        nodePreflightConfigService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
+                        dataNodeProvisioningService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
                     }
                 } catch (Exception ex) {
                     LOG.error("Config entry in signed state, but wrong certificate data present in Mongo");

@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class NodePreflightConfigBusEvents implements NodePreflightConfigService {
+public class DataNodeProvisioningBusEvents implements DataNodeProvisioningService {
 
     public static final String DELEGATE_NAME = "impl";
 
-    private final NodePreflightConfigService delegate;
+    private final DataNodeProvisioningService delegate;
     private final EventBus eventBus;
 
     @Inject
-    public NodePreflightConfigBusEvents(@Named(DELEGATE_NAME) NodePreflightConfigService delegate, EventBus eventBus) {
+    public DataNodeProvisioningBusEvents(@Named(DELEGATE_NAME) DataNodeProvisioningService delegate, EventBus eventBus) {
         this.delegate = delegate;
         this.eventBus = eventBus;
     }
