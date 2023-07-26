@@ -140,7 +140,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
             {is_rule_builder && (
               <>
                 {conditionsOutputKeys.length > 0 && (
-                  <OutputContainer>
+                  <OutputContainer data-testid="conditions-output">
                     <label htmlFor="simulation_conditions_output">Conditions Output</label>
                     {conditionsOutputKeys.map((conditionsOutputKey) => (
                       <div key={conditionsOutputKey}>
@@ -150,7 +150,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                   </OutputContainer>
                 )}
                 {actionsOutputKeys.length > 0 && (
-                  <OutputContainer>
+                  <OutputContainer data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
                     {actionsOutputKeys.map((actionsOutputKey) => (
                       <div key={actionsOutputKey}>

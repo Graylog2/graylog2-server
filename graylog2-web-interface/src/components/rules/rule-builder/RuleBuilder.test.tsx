@@ -160,26 +160,22 @@ describe('RuleBuilder', () => {
   it('should show simulator with conditions and actions output', () => {
     const title = 'title';
     const description = 'description';
-    const rule_builder = {
-      actions: [{
-        function: 'get_field',
-        params: { field: 'message' },
-      }, {
-        function: 'get_substring',
-        params: { value: '$output_1', start: 1 },
-      }],
-      conditions: [{
-        function: 'has_field',
-        params: { field: 'message' },
-      }],
-    };
+    const rule_builder = { actions: [], conditions: [] };
+    const conditionOutput1 = 'condition_output_1';
+    const actionOutput1 = 'action_output_1';
+    const actionOutput2 = 'action_output_2';
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByTitle, getByText, getByRole } = renderWithDataRouter((
+    const { getByTitle, getByText, getByTestId } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
+        ruleSimulationResult: {
+          fields: { message: 'test' },
+          simulator_condition_variables: { 1: conditionOutput1 },
+          simulator_action_variables: { 1: actionOutput1, 2: actionOutput2 },
+        },
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
@@ -192,12 +188,15 @@ describe('RuleBuilder', () => {
     const showSimulatorSwitch = getByTitle('Show Simulator');
     userEvent.click(showSimulatorSwitch);
 
-    const ruleSimulationLabel = getByText('Rule Simulation');
-    const runRuleSimulation = getByRole('button', { name: 'Run rule simulation' });
-    const resetRuleSimulation = getByRole('button', { name: 'Reset' });
+    const conditionOutputs = getByText('Conditions Output');
+    const actionOutputs = getByText('Actions Output');
+    const conditionOutputContainer = getByTestId('conditions-output');
+    const actionOutputContainer = getByTestId('actions-output');
 
-    expect(ruleSimulationLabel).toBeInTheDocument();
-    expect(runRuleSimulation).toBeInTheDocument();
-    expect(resetRuleSimulation).toBeInTheDocument();
+    expect(conditionOutputs).toBeInTheDocument();
+    expect(actionOutputs).toBeInTheDocument();
+    expect(conditionOutputContainer).toContainHTML(conditionOutput1);
+    expect(actionOutputContainer).toContainHTML(actionOutput1);
+    expect(actionOutputContainer).toContainHTML(actionOutput2);
   });
 });
