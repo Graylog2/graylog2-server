@@ -20,19 +20,20 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
 import DocsHelper from 'util/DocsHelper';
+import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 
 const SimulatorPage = () => {
-  const [streams, setStreams] = useState()
+  const [streams, setStreams] = useState<Array<Stream> | undefined>();
 
   useEffect(() => {
-    StreamsStore.listStreams().then((streams) => {
-      const filteredStreams = streams.filter((s) => s.is_editable);
+    StreamsStore.listStreams().then((result) => {
+      const filteredStreams = result.filter((s) => s.is_editable);
 
       setStreams(filteredStreams);
     });
-  }, [])
+  }, []);
 
   const content = !streams ? <Spinner /> : <ProcessorSimulator streams={streams} />;
 
@@ -56,7 +57,7 @@ const SimulatorPage = () => {
         </Col>
       </Row>
     </DocumentTitle>
-  )
-}
+  );
+};
 
 export default SimulatorPage;
