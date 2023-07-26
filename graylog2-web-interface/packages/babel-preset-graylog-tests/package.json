@@ -1,7 +1,7 @@
 {
-  "name": "babel-preset-graylog",
+  "name": "babel-preset-graylog-tests",
   "version": "1.0.0",
-  "description": "Babel preset for the Graylog project",
+  "description": "Babel preset for tests in the Graylog project",
   "main": "index.js",
   "repository": "https://github.com/Graylog2/graylog2-server",
   "author": "Graylog, Inc. <hello@graylog.com>",
