@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
 
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
 import Routes from 'routing/Routes';
 import useQuery from 'routing/useQuery';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
-import withParams from 'routing/withParams';
 import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
@@ -37,22 +36,25 @@ function filterPipelines(pipelines = [], title = '') {
   return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));
 }
 
-const RuleDetailsPage = ({ params, rule, pipelines }) => {
+const RuleDetailsPage = () => {
+  const { ruleId } = useParams<{ ruleId: string }>();
+  const rule = useStore(RulesStore);
+  const pipelines = useStore(PipelinesStore, ({ pipelines: state }) => state);
   const [isLoading, setIsLoading] = useState(true);
   const [filteredRule, setFilteredRule] = useState(undefined);
   const history = useHistory();
   const { rule_builder } = useQuery();
 
   const isRuleBuilder = rule_builder === 'true';
-  const isNewRule = params.ruleId === 'new';
+  const isNewRule = ruleId === 'new';
   const title = filteredRule?.title || '';
   const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
 
   const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
 
   useEffect(() => {
-    setFilteredRule(filterRules(rule, params.ruleId));
-  }, [params, rule]);
+    setFilteredRule(filterRules(rule, ruleId));
+  }, [ruleId, rule]);
 
   useEffect(() => {
     if (isNewRule) {
@@ -60,7 +62,7 @@ const RuleDetailsPage = ({ params, rule, pipelines }) => {
     } else {
       PipelinesActions.list();
 
-      RulesActions.get(params.ruleId).then(() => {}, (error) => {
+      RulesActions.get(ruleId).then(() => {}, (error) => {
         if (error.status === 404) {
           history.push(Routes.SYSTEM.PIPELINES.RULES);
         }
@@ -68,7 +70,7 @@ const RuleDetailsPage = ({ params, rule, pipelines }) => {
 
       setIsLoading(!(filteredRule && pipelines));
     }
-  }, [filteredRule, history, isNewRule, params.ruleId, pipelines]);
+  }, [filteredRule, history, isNewRule, ruleId, pipelines]);
 
   if (isLoading) {
     return <Spinner text="Loading Rule Details..." />;
@@ -83,29 +85,4 @@ const RuleDetailsPage = ({ params, rule, pipelines }) => {
   );
 };
 
-RuleDetailsPage.propTypes = {
-  params: PropTypes.shape({
-    ruleId: PropTypes.string,
-  }).isRequired,
-  rule: PropTypes.shape({
-    id: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    source: PropTypes.string,
-    value: PropTypes.string,
-  }),
-  pipelines: PropTypes.any,
-};
-
-RuleDetailsPage.defaultProps = {
-  rule: undefined,
-  pipelines: undefined,
-};
-
-export default connect(withParams(RuleDetailsPage), {
-  rule: RulesStore,
-  pipelines: PipelinesStore,
-}, ({ pipelines, ...restProps }) => ({
-  pipelines: pipelines.pipelines || [],
-  ...restProps,
-}));
+export default RuleDetailsPage;
