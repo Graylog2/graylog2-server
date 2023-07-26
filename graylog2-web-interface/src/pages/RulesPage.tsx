@@ -28,10 +28,11 @@ import type { Pagination } from 'stores/PaginationTypes';
 import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import CreateRuleModal from 'components/rules/CreateRuleModal';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import useHistory from 'routing/useHistory';
+import Routes from 'routing/Routes';
 
 const Flex = styled.div`
   display: flex;
@@ -60,9 +61,9 @@ const _loadRuleMetricData = (setMetricsConfig) => {
 const RulesPage = () => {
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const { pathname } = useLocation();
+  const history = useHistory();
   const sendTelemetry = useSendTelemetry();
   const [query, setQuery] = useState('');
-  const [openCreateRuleModal, setOpenCreateRuleModal] = useState<boolean>(false);
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
   const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
@@ -122,7 +123,7 @@ const RulesPage = () => {
                   app_action_value: 'create-rule-button',
                 });
 
-                setOpenCreateRuleModal(true);
+                history.replace(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
               }}>
         Create Rule
       </Button>
@@ -178,8 +179,6 @@ const RulesPage = () => {
           )}
         </Col>
       </Row>
-
-      <CreateRuleModal showModal={openCreateRuleModal} onClose={() => setOpenCreateRuleModal(false)} />
     </DocumentTitle>
   );
 };
