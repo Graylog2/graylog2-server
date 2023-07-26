@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -29,74 +29,64 @@ const ToggleDetails = styled.div`
   font-weight: normal;
 `;
 
+const description = (
+  <>
+    <p>It seems like the page you navigated to contained an error.</p>
+    <p>You can use the navigation to reach other parts of the product, refresh the page or submit an error report.</p>
+  </>
+);
+
 type Props = {
   error: Error,
   componentStack: string,
 }
 
-class RuntimeErrorPage extends React.Component<Props, { showDetails: boolean }> {
-  static propTypes = {
-    error: PropTypes.shape({
-      message: PropTypes.string.isRequired,
-      stack: PropTypes.string,
-    }).isRequired,
-    componentStack: PropTypes.string.isRequired,
-  };
+const RuntimeErrorPage = ({ error, componentStack }: Props) => {
+  const [showDetails, setShowDetails] = useState(AppConfig.gl2DevMode());
+  const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${componentStack}`;
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showDetails: AppConfig.gl2DevMode(),
-    };
-  }
-
-  _toggleDetails = (e) => {
+  const _toggleDetails = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    this.setState(({ showDetails }) => ({ showDetails: !showDetails }));
-  };
+    setShowDetails((cur) => !cur);
+  }, []);
 
-  render() {
-    const { error, componentStack } = this.props;
-    const { showDetails } = this.state;
-    const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${componentStack}`;
-    const description = (
-      <>
-        <p>It seems like the page you navigated to contained an error.</p>
-        <p>You can use the navigation to reach other parts of the product, refresh the page or submit an error report.</p>
-      </>
-    );
+  return (
+    <ErrorPage title="Something went wrong." description={description}>
+      <div className="content" style={{ padding: '2em' }}>
+        <SupportSources />
+      </div>
+      <dl>
+        <dt>
+          Error:
+          <ToggleDetails className="pull-right">
+            <Button bsStyle="link" tabIndex={0} onClick={_toggleDetails}>
+              {showDetails ? 'Show less' : 'Show more'}
+            </Button>
+          </ToggleDetails>
+        </dt>
+        <dt>
+          <pre className="content" id="render-error">
+            <div className="pull-right">
+              <ClipboardButton title={<Icon name="copy" fixedWidth />}
+                               bsSize="sm"
+                               text={`${error.message}\n${errorDetails}`}
+                               buttonTitle="Copy error details to clipboard" />
+            </div>
+            {error.message}
+            {showDetails && errorDetails}
+          </pre>
+        </dt>
+      </dl>
+    </ErrorPage>
+  );
+};
 
-    return (
-      <ErrorPage title="Something went wrong." description={description}>
-        <div className="content" style={{ padding: '2em' }}>
-          <SupportSources />
-        </div>
-        <dl>
-          <dt>
-            Error:
-            <ToggleDetails className="pull-right">
-              <Button bsStyle="link" tabIndex={0} onClick={this._toggleDetails}>
-                {showDetails ? 'Show less' : 'Show more'}
-              </Button>
-            </ToggleDetails>
-          </dt>
-          <dt>
-            <pre className="content" id="render-error">
-              <div className="pull-right">
-                <ClipboardButton title={<Icon name="copy" fixedWidth />}
-                                 bsSize="sm"
-                                 text={`${error.message}\n${errorDetails}`}
-                                 buttonTitle="Copy error details to clipboard" />
-              </div>
-              {error.message}
-              {showDetails && errorDetails}
-            </pre>
-          </dt>
-        </dl>
-      </ErrorPage>
-    );
-  }
-}
+RuntimeErrorPage.propTypes = {
+  error: PropTypes.shape({
+    message: PropTypes.string.isRequired,
+    stack: PropTypes.string,
+  }).isRequired,
+  componentStack: PropTypes.string.isRequired,
+};
 
 export default RuntimeErrorPage;
