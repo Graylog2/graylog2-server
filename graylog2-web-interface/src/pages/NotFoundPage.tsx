@@ -19,7 +19,11 @@ import PropTypes from 'prop-types';
 
 import ErrorPage from 'components/errors/ErrorPage';
 
-const NotFoundPage = ({ displayPageLayout }) => {
+type Props = {
+  displayPageLayout?: boolean,
+}
+
+const NotFoundPage = ({ displayPageLayout }: Props) => {
   const description = (
     <>
       <p>The party gorilla was just here, but had another party to rock.</p>
