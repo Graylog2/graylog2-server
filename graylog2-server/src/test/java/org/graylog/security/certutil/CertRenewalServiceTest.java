@@ -12,6 +12,7 @@ import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
@@ -50,7 +51,7 @@ public class CertRenewalServiceTest {
 
     @Test
     public void testCertRenewalCalculation() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
-        final var now = DateTime.now();
+        final var now = DateTime.now(DateTimeZone.UTC);
         final JobSchedulerClock clock = new JobSchedulerTestClock(now);
         final var service = new CertRenewalServiceImpl(null, null, null, null, clock, "dummy");
         // 2 hours is our smalles interval in the FE, so I'm testing only small intervals and expect larger intervals to work accordingly

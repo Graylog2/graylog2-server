@@ -16,5 +16,5 @@
  */
 package org.graylog2.cluster.preflight;
 
-public record NodePreflightStateChangeEvent(String nodeId, NodePreflightConfig.State state) {
+public record DataNodeProvisioningStateChangeEvent(String nodeId, DataNodeProvisioningConfig.State state) {
 }

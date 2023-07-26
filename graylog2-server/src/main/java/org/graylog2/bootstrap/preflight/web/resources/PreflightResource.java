@@ -28,7 +28,7 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 
 import javax.inject.Inject;
@@ -69,13 +69,13 @@ public class PreflightResource {
         this.passwordSecret = passwordSecret;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, NodePreflightConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
+    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
 
     @GET
     @Path("/data_nodes")
     public List<DataNode> listDataNodes() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        final var preflightDataNodes = dataNodeProvisioningService.streamAll().collect(Collectors.toMap(NodePreflightConfig::nodeId, Function.identity()));
+        final var preflightDataNodes = dataNodeProvisioningService.streamAll().collect(Collectors.toMap(DataNodeProvisioningConfig::nodeId, Function.identity()));
 
         return activeDataNodes.values().stream().map(n -> {
             final var preflight = preflightDataNodes.get(n.getNodeId());
@@ -136,7 +136,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void generate() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), NodePreflightConfig.State.CONFIGURED));
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 
     @POST
@@ -146,7 +146,7 @@ public class PreflightResource {
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
         var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeID);
-        var builder = cfg != null ? cfg.toBuilder() : NodePreflightConfig.builder().nodeId(nodeID);
+        var builder = cfg != null ? cfg.toBuilder() : DataNodeProvisioningConfig.builder().nodeId(nodeID);
         builder.altNames(params.altNames()).validFor(params.validFor());
         dataNodeProvisioningService.save(builder.build());
 

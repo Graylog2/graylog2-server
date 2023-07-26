@@ -32,7 +32,7 @@ import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -140,14 +140,14 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
                 nodes.stream()
-                        .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
+                        .filter(c -> DataNodeProvisioningConfig.State.CSR.equals(c.state()))
                         .forEach(c -> {
                             try {
                                 var csr = csrStorage.readCsr(c.nodeId());
                                 if (csr.isEmpty()) {
                                     LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
                                     dataNodeProvisioningService.save(c.toBuilder()
-                                            .state(NodePreflightConfig.State.ERROR)
+                                            .state(DataNodeProvisioningConfig.State.ERROR)
                                             .errorMsg("Node in CSR state, but no CSR present")
                                             .build());
                                 } else {
@@ -158,16 +158,16 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                 }
                             } catch (Exception e) {
                                 LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                                dataNodeProvisioningService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                                dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
                             }
                         });
 
                 nodes.stream()
-                        .filter(c -> NodePreflightConfig.State.STORED.equals(c.state()))
+                        .filter(c -> DataNodeProvisioningConfig.State.STORED.equals(c.state()))
                         .forEach(c -> {
                             try {
                                 if (checkConnectivity(c.nodeId())) {
-                                    dataNodeProvisioningService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
+                                    dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
                                 }
                             } catch (Exception e) {
                                 LOG.warn("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage() + ", retrying", e);

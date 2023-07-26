@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface DataNodeProvisioningService {
-    NodePreflightConfig getPreflightConfigFor(String nodeId);
-    List<NodePreflightConfig> findAllNodesThatNeedAttention();
+    DataNodeProvisioningConfig getPreflightConfigFor(String nodeId);
+    List<DataNodeProvisioningConfig> findAllNodesThatNeedAttention();
 
     void writeCsr(String nodeId, String csr);
 
@@ -30,11 +30,11 @@ public interface DataNodeProvisioningService {
 
     Optional<String> readCert(String nodeId);
 
-    void changeState(String nodeId, NodePreflightConfig.State state);
+    void changeState(String nodeId, DataNodeProvisioningConfig.State state);
 
-    NodePreflightConfig save(NodePreflightConfig config);
+    DataNodeProvisioningConfig save(DataNodeProvisioningConfig config);
 
-    Stream<NodePreflightConfig> streamAll();
+    Stream<DataNodeProvisioningConfig> streamAll();
 
     int delete(String id);
     void deleteAll();

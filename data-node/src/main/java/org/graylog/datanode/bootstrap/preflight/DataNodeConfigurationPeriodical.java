@@ -31,7 +31,7 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLoca
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
@@ -89,8 +89,8 @@ public class DataNodeConfigurationPeriodical extends Periodical {
         var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId());
         if (cfg == null) {
             // write default config if none exists for this node
-            dataNodeProvisioningService.save(NodePreflightConfig.builder().nodeId(nodeId.getNodeId()).state(NodePreflightConfig.State.UNCONFIGURED).build());
-        } else if (NodePreflightConfig.State.CONFIGURED.equals(cfg.state())) {
+            dataNodeProvisioningService.save(DataNodeProvisioningConfig.builder().nodeId(nodeId.getNodeId()).state(DataNodeProvisioningConfig.State.UNCONFIGURED).build());
+        } else if (DataNodeProvisioningConfig.State.CONFIGURED.equals(cfg.state())) {
             try {
                 var node = nodeService.byNodeId(nodeId);
                 var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), cfg.altNames(), privateKeyEncryptedStorage);
@@ -98,9 +98,9 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                 LOG.info("created CSR for this node");
             } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
                 LOG.error("error generating a CSR: " + ex.getMessage(), ex);
-                dataNodeProvisioningService.save(cfg.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(ex.getMessage()).build());
+                dataNodeProvisioningService.save(cfg.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(ex.getMessage()).build());
             }
-        } else if (NodePreflightConfig.State.SIGNED.equals(cfg.state())) {
+        } else if (DataNodeProvisioningConfig.State.SIGNED.equals(cfg.state())) {
             if (cfg.certificate() == null) {
                 LOG.error("Config entry in signed state, but no certificate data present in Mongo");
             } else {
@@ -120,7 +120,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                         keystoreStorage.writeKeyStore(location, nodeKeystore, secret, secret);
 
                         //should be in one transaction, but we miss transactions...
-                        dataNodeProvisioningService.changeState(nodeId.getNodeId(), NodePreflightConfig.State.STORED);
+                        dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);
                     }
                 } catch (Exception ex) {
                     LOG.error("Config entry in signed state, but wrong certificate data present in Mongo");

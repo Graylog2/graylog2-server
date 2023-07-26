@@ -38,25 +38,25 @@ public class DataNodeProvisioningBusEvents implements DataNodeProvisioningServic
     }
 
     @Override
-    public void changeState(String nodeId, NodePreflightConfig.State state) {
+    public void changeState(String nodeId, DataNodeProvisioningConfig.State state) {
         delegate.changeState(nodeId, state);
-        eventBus.post(new NodePreflightStateChangeEvent(nodeId, state));
+        eventBus.post(new DataNodeProvisioningStateChangeEvent(nodeId, state));
     }
 
     @Override
-    public NodePreflightConfig save(NodePreflightConfig config) {
-        final NodePreflightConfig saved = delegate.save(config);
-        eventBus.post(new NodePreflightStateChangeEvent(config.nodeId(), config.state()));
+    public DataNodeProvisioningConfig save(DataNodeProvisioningConfig config) {
+        final DataNodeProvisioningConfig saved = delegate.save(config);
+        eventBus.post(new DataNodeProvisioningStateChangeEvent(config.nodeId(), config.state()));
         return saved;
     }
 
     @Override
-    public NodePreflightConfig getPreflightConfigFor(String nodeId) {
+    public DataNodeProvisioningConfig getPreflightConfigFor(String nodeId) {
         return delegate.getPreflightConfigFor(nodeId);
     }
 
     @Override
-    public List<NodePreflightConfig> findAllNodesThatNeedAttention() {
+    public List<DataNodeProvisioningConfig> findAllNodesThatNeedAttention() {
         return delegate.findAllNodesThatNeedAttention();
     }
 
@@ -76,7 +76,7 @@ public class DataNodeProvisioningBusEvents implements DataNodeProvisioningServic
     }
 
     @Override
-    public Stream<NodePreflightConfig> streamAll() {
+    public Stream<DataNodeProvisioningConfig> streamAll() {
         return delegate.streamAll();
     }
 

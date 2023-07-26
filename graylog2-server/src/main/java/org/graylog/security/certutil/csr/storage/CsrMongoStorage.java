@@ -20,7 +20,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 
 import javax.inject.Inject;
@@ -51,7 +51,7 @@ public class CsrMongoStorage {
 
 
     public Optional<PKCS10CertificationRequest> readCsr(String nodeId) throws IOException, OperatorException {
-        final NodePreflightConfig preflightConfig = mongoService.getPreflightConfigFor(nodeId);
+        final DataNodeProvisioningConfig preflightConfig = mongoService.getPreflightConfigFor(nodeId);
         if (preflightConfig != null) {
             final String csr = preflightConfig.csr();
 

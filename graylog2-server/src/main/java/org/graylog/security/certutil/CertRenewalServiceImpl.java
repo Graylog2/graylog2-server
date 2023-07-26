@@ -24,7 +24,7 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoColl
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -140,7 +140,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                     if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
                         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
                         var config = dataNodeProvisioningService.getPreflightConfigFor(pair.getLeft().getNodeId());
-                        dataNodeProvisioningService.save(config.toBuilder().state(NodePreflightConfig.State.CONFIGURED).build());
+                        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
                     } else {
                         // TODO: send notification - don't send one out, if there is one still open
                     }

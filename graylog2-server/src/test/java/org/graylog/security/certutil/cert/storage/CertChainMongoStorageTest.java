@@ -20,7 +20,7 @@ import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningServiceImpl;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -55,7 +55,7 @@ public class CertChainMongoStorageTest {
                 mongodb.mongoConnection()
         );
         CertChainMongoStorage toTest = new CertChainMongoStorage(mongoService);
-        mongoService.save(NodePreflightConfig.builder().nodeId(nodeId).state(NodePreflightConfig.State.UNCONFIGURED).build());
+        mongoService.save(DataNodeProvisioningConfig.builder().nodeId(nodeId).state(DataNodeProvisioningConfig.State.UNCONFIGURED).build());
 
         KeyStore testKeystore = KeyStore.getInstance(CertConstants.PKCS12);
         testKeystore.load(new FileInputStream("src/test/resources/org/graylog/security/certutil/keystore/storage/sample_certificate_keystore.p12"), "password".toCharArray());
