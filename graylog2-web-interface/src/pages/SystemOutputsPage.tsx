@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
