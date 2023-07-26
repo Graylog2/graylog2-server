@@ -14,7 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  // eslint-disable-next-line global-require
-  presets: [require('babel-preset-graylog-tests')],
-};
+package org.graylog.storage.opensearch2.testing;
+
+import org.graylog.testing.completebackend.SearchServerBuilder;
+import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
+import org.graylog2.storage.SearchVersion;
+
+import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
+
+public class OpenSearchInstanceProvider implements SearchServerInterfaceProvider {
+    @Override
+    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
+        if(version.satisfies(OPENSEARCH, "^2.0.0")) {
+            return new OpenSearchInstanceBuilder(version);
+        }
+        return null;
+    }
+}

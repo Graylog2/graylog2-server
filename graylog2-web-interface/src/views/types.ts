@@ -263,6 +263,7 @@ type DashboardActionModalProps = {
 
 type AssetInformationComponentProps = {
   identifiers: unknown,
+  addToQuery: (id: string) => void;
 }
 
 type DashboardAction = {
