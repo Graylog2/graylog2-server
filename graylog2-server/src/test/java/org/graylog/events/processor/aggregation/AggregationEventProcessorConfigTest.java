@@ -199,7 +199,14 @@ public class AggregationEventProcessorConfigTest {
 
     @Test
     public void testEventLimitDefaultValue() {
-        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder().build();
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
+                .query("")
+                .streams(new HashSet<>())
+                .groupBy(new ArrayList<>())
+                .series(new ArrayList<>())
+                .searchWithinMs(1)
+                .executeEveryMs(1)
+                .build();
 
         assertThat(config.eventLimit()).isEqualTo(0);
     }
