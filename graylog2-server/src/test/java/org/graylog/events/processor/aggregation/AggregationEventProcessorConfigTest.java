@@ -115,13 +115,14 @@ public class AggregationEventProcessorConfigTest {
 
     private AggregationEventProcessorConfig getConfig() {
         return AggregationEventProcessorConfig.builder()
-            .query("")
-            .streams(new HashSet<>())
-            .groupBy(new ArrayList<>())
-            .series(new ArrayList<>())
-            .searchWithinMs(1)
-            .executeEveryMs(1)
-            .build();
+                .query("")
+                .streams(new HashSet<>())
+                .groupBy(new ArrayList<>())
+                .series(new ArrayList<>())
+                .searchWithinMs(1)
+                .executeEveryMs(1)
+                .eventLimit(1)
+                .build();
     }
 
     private AggregationConditions getConditions() {
@@ -150,8 +151,8 @@ public class AggregationEventProcessorConfigTest {
         assertThat(validationResult1.getErrors()).containsOnlyKeys("search_within_ms");
 
         final AggregationEventProcessorConfig invalidConfig2 = invalidConfig1.toBuilder()
-            .searchWithinMs(0)
-            .build();
+                .searchWithinMs(0)
+                .build();
 
         final ValidationResult validationResult2 = invalidConfig2.validate();
         assertThat(validationResult2.failed()).isTrue();
@@ -161,16 +162,16 @@ public class AggregationEventProcessorConfigTest {
     @Test
     public void testValidateWithInvalidExecutionTime() {
         final AggregationEventProcessorConfig invalidConfig1 = getConfig().toBuilder()
-            .executeEveryMs(-1)
-            .build();
+                .executeEveryMs(-1)
+                .build();
 
         final ValidationResult validationResult1 = invalidConfig1.validate();
         assertThat(validationResult1.failed()).isTrue();
         assertThat(validationResult1.getErrors()).containsOnlyKeys("execute_every_ms");
 
         final AggregationEventProcessorConfig invalidConfig2 = invalidConfig1.toBuilder()
-            .executeEveryMs(0)
-            .build();
+                .executeEveryMs(0)
+                .build();
 
         final ValidationResult validationResult2 = invalidConfig2.validate();
         assertThat(validationResult2.failed()).isTrue();
@@ -178,26 +179,52 @@ public class AggregationEventProcessorConfigTest {
     }
 
     @Test
+    public void testValidateWithInvalidEventLimit() {
+        final AggregationEventProcessorConfig invalidConfig1 = getConfig().toBuilder()
+                .eventLimit(-1)
+                .build();
+
+        final ValidationResult validationResult1 = invalidConfig1.validate();
+        assertThat(validationResult1.failed()).isTrue();
+        assertThat(validationResult1.getErrors()).containsOnlyKeys("event_limit");
+
+        final AggregationEventProcessorConfig invalidConfig2 = invalidConfig1.toBuilder()
+                .eventLimit(0)
+                .build();
+
+        final ValidationResult validationResult2 = invalidConfig2.validate();
+        assertThat(validationResult2.failed()).isTrue();
+        assertThat(validationResult2.getErrors()).containsOnlyKeys("event_limit");
+    }
+
+    @Test
+    public void testEventLimitDefaultValue() {
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder().build();
+
+        assertThat(config.eventLimit()).isEqualTo(0);
+    }
+
+    @Test
     public void testValidateWithIncompleteAggregationOptions() {
         AggregationEventProcessorConfig invalidConfig = getConfig().toBuilder()
-            .groupBy(ImmutableList.of("foo"))
-            .build();
+                .groupBy(ImmutableList.of("foo"))
+                .build();
 
         ValidationResult validationResult = invalidConfig.validate();
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("series", "conditions");
 
         invalidConfig = getConfig().toBuilder()
-            .series(ImmutableList.of(this.getSeries()))
-            .build();
+                .series(ImmutableList.of(this.getSeries()))
+                .build();
 
         validationResult = invalidConfig.validate();
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("conditions");
 
         invalidConfig = getConfig().toBuilder()
-            .conditions(this.getConditions())
-            .build();
+                .conditions(this.getConditions())
+                .build();
 
         validationResult = invalidConfig.validate();
         assertThat(validationResult.failed()).isTrue();
@@ -214,9 +241,9 @@ public class AggregationEventProcessorConfigTest {
     @Test
     public void testValidFilterConfiguration() {
         final AggregationEventProcessorConfig config = getConfig().toBuilder()
-            .query("foo")
-            .streams(ImmutableSet.of("1", "2"))
-            .build();
+                .query("foo")
+                .streams(ImmutableSet.of("1", "2"))
+                .build();
 
         final ValidationResult validationResult = config.validate();
         assertThat(validationResult.failed()).isFalse();
@@ -226,10 +253,10 @@ public class AggregationEventProcessorConfigTest {
     @Test
     public void testValidAggregationConfiguration() {
         final AggregationEventProcessorConfig config = getConfig().toBuilder()
-            .groupBy(ImmutableList.of("bar"))
-            .series(ImmutableList.of(this.getSeries()))
-            .conditions(this.getConditions())
-            .build();
+                .groupBy(ImmutableList.of("bar"))
+                .series(ImmutableList.of(this.getSeries()))
+                .conditions(this.getConditions())
+                .build();
 
         final ValidationResult validationResult = config.validate();
         assertThat(validationResult.failed()).isFalse();
@@ -239,16 +266,14 @@ public class AggregationEventProcessorConfigTest {
     @Test
     @MongoDBFixtures("aggregation-processors.json")
     public void requiredPermissions() {
-        assertThat(dbService.get("54e3deadbeefdeadbeefaffe")).get().satisfies(definition -> {
-            assertThat(definition.config().requiredPermissions()).containsOnly("streams:read:stream-a", "streams:read:stream-b");
-        });
+        assertThat(dbService.get("54e3deadbeefdeadbeefaffe")).get().satisfies(definition ->
+                assertThat(definition.config().requiredPermissions()).containsOnly("streams:read:stream-a", "streams:read:stream-b"));
     }
 
     @Test
     @MongoDBFixtures("aggregation-processors.json")
     public void requiredPermissionsWithEmptyStreams() {
-        assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition -> {
-            assertThat(definition.config().requiredPermissions()).containsOnly("streams:read");
-        });
+        assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition ->
+                assertThat(definition.config().requiredPermissions()).containsOnly("streams:read"));
     }
 }
