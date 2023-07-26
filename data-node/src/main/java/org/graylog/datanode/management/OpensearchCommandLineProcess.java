@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,7 +54,7 @@ public class OpensearchCommandLineProcess implements Closeable {
             builder.redirectErrorStream(true);
             try {
                 final Process process = builder.start();
-                final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()));
                 var line = reader.readLine();
                 if(line != null && Files.exists(Path.of(line))) {
                     final var target = Path.of(line);
