@@ -29,7 +29,12 @@ const ToggleDetails = styled.div`
   font-weight: normal;
 `;
 
-class RuntimeErrorPage extends React.Component {
+type Props = {
+  error: Error,
+  componentStack: string,
+}
+
+class RuntimeErrorPage extends React.Component<Props, { showDetails: boolean }> {
   static propTypes = {
     error: PropTypes.shape({
       message: PropTypes.string.isRequired,
