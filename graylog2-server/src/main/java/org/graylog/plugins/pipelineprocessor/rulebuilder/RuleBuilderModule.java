@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations.V20220512
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations.V20220522125200_AddSetGrokToFieldsExtractorFragments;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations.V20230613154400_AddImplicitToStringFragments;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations.V20230720161500_AddExtractorFragments;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations.V20230724092100_AddFieldConditions;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.action.ValidAction;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.action.ValidNewMessageField;
@@ -47,6 +48,7 @@ public class RuleBuilderModule extends PluginModule {
         migrationBinder.addBinding().to(V20220522125200_AddSetGrokToFieldsExtractorFragments.class);
         migrationBinder.addBinding().to(V20230613154400_AddImplicitToStringFragments.class);
         migrationBinder.addBinding().to(V20230720161500_AddExtractorFragments.class);
+        migrationBinder.addBinding().to(V20230724092100_AddFieldConditions.class);
 
         final Multibinder<Validator> condition = Multibinder.newSetBinder(binder(), Validator.class, Names.named("conditionValidators"));
         condition.addBinding().to(ValidCondition.class);
