@@ -28,6 +28,10 @@ import { PipelineRulesContext } from '../RuleContext';
 jest.mock('hooks/useRuleBuilder');
 
 describe('RuleBuilder', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
   it('should save Title and Description', () => {
     const createRule = jest.fn();
     const title = 'title';
