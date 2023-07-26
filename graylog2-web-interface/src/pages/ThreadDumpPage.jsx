@@ -14,70 +14,51 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
-
+import React, {useEffect, useState} from 'react';
+import { useParams } from 'react-router-dom';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
-import withParams from 'routing/withParams';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import {useStore} from "../stores/connect";
 
-function nodeFilter(state) {
-  return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
-}
+const ThreadDumpPage = () => {
+  const { nodeId } = useParams();
+  const { nodes } = useStore(NodesStore);
+  const [threadDump, setThreadDump] = useState();
+  const node = nodes?.[nodeId];
 
-const ThreadDumpPage = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  displayName: 'ThreadDumpPage',
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    params: PropTypes.object.isRequired,
-  },
-
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
-
-  componentDidMount() {
-    ClusterOverviewStore.threadDump(this.props.params.nodeId).then((threadDump) => this.setState({ threadDump: threadDump }));
-  },
-
-  _isLoading() {
-    return !this.state.node;
-  },
-
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
+  useEffect(() => {
+    if (nodeId) {
+        ClusterOverviewStore.threadDump(nodeId).then((threadDump) => setThreadDump(threadDump));
     }
+  }, [nodeId])
 
-    const title = (
-      <span>
-        Thread dump of node {this.state.node.short_node_id} / {this.state.node.hostname}
-        &nbsp;
-        <small>Taken at <Timestamp dateTime={new Date()} /></small>
-      </span>
-    );
+  if (!node) {
+    return <Spinner />;
+  }
 
-    const threadDump = this.state.threadDump ? <pre className="threaddump">{this.state.threadDump}</pre> : <Spinner />;
+  return (
+    <DocumentTitle title={`Thread dump of node ${node.short_node_id} / ${node.hostname}`}>
+      <div>
+        <PageHeader title={
+          <span>
+             Thread dump of node {node.short_node_id} / {node.hostname}
+            &nbsp;
+            <small>Taken at <Timestamp dateTime={new Date()} /></small>
+          </span>
+          }/>
+        <Row className="content">
+          <Col md={12}>
+            {threadDump
+              ? <pre className="threaddump">{threadDump}</pre>
+              : <Spinner />}
+          </Col>
+        </Row>
+      </div>
+    </DocumentTitle>
+  )
+};
 
-    return (
-      <DocumentTitle title={`Thread dump of node ${this.state.node.short_node_id} / ${this.state.node.hostname}`}>
-        <div>
-          <PageHeader title={title} />
-          <Row className="content">
-            <Col md={12}>
-              {threadDump}
-            </Col>
-          </Row>
-        </div>
-      </DocumentTitle>
-    );
-  },
-});
 
-export default withParams(ThreadDumpPage);
+export default ThreadDumpPage;
