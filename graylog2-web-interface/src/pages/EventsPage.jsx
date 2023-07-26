@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
-import withLocation from 'routing/withLocation';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import { useLocation } from "react-router-dom";
 
-const EventsPage = ({ location }) => {
+const EventsPage = () => {
+  const location = useLocation()
   const filteredSourceStream = location.query.stream_id;
 
   return (
@@ -50,8 +50,4 @@ const EventsPage = ({ location }) => {
   );
 };
 
-EventsPage.propTypes = {
-  location: PropTypes.object.isRequired,
-};
-
-export default withLocation(EventsPage);
+export default EventsPage;
