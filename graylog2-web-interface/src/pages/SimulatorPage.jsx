@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -23,56 +23,40 @@ import DocsHelper from 'util/DocsHelper';
 import StreamsStore from 'stores/streams/StreamsStore';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 
-class SimulatorPage extends React.Component {
-  constructor(props) {
-    super(props);
+const SimulatorPage = () => {
+  const [streams, setStreams] = useState()
 
-    this.state = {
-      streams: undefined,
-    };
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     StreamsStore.listStreams().then((streams) => {
       const filteredStreams = streams.filter((s) => s.is_editable);
 
-      this.setState({ streams: filteredStreams });
+      setStreams(filteredStreams);
     });
-  }
+  }, [])
 
-  _isLoading = () => {
-    const { streams } = this.state;
+  const content = !streams ? <Spinner /> : <ProcessorSimulator streams={streams} />;
 
-    return !streams;
-  };
+  return (
+    <DocumentTitle title="Simulate processing">
+      <PipelinesPageNavigation />
+      <PageHeader title="Simulate processing"
+                  documentationLink={{
+                    title: 'Pipelines documentation',
+                    path: DocsHelper.PAGES.PIPELINE_RULES,
+                  }}>
+        <span>
+          Processing messages can be complex. Use this page to simulate the result of processing an incoming
+          message using your current set of pipelines and rules.
+        </span>
+      </PageHeader>
 
-  render() {
-    const { streams } = this.state;
-
-    const content = this._isLoading() ? <Spinner /> : <ProcessorSimulator streams={streams} />;
-
-    return (
-      <DocumentTitle title="Simulate processing">
-        <PipelinesPageNavigation />
-        <PageHeader title="Simulate processing"
-                    documentationLink={{
-                      title: 'Pipelines documentation',
-                      path: DocsHelper.PAGES.PIPELINE_RULES,
-                    }}>
-          <span>
-            Processing messages can be complex. Use this page to simulate the result of processing an incoming
-            message using your current set of pipelines and rules.
-          </span>
-        </PageHeader>
-
-        <Row className="content">
-          <Col md={12}>
-            {content}
-          </Col>
-        </Row>
-      </DocumentTitle>
-    );
-  }
+      <Row className="content">
+        <Col md={12}>
+          {content}
+        </Col>
+      </Row>
+    </DocumentTitle>
+  )
 }
 
 export default SimulatorPage;
