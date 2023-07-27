@@ -27,15 +27,15 @@ public class TransportAddressSanitizer {
 
     static final String INVALID_URI = "Invalid URI";
 
-    public String withRemovedCredentials(final String orig) {
+    public String withRemovedCredentials(final String originalTransportAddress) {
         try {
-            final URI uri = new URI(orig);
+            final URI uri = new URI(originalTransportAddress);
             if (uri.getUserInfo() != null) {
                 return new URIBuilder(uri)
                         .setUserInfo(null)
                         .toString();
             } else {
-                return orig;
+                return originalTransportAddress;
             }
         } catch (URISyntaxException ex) {
             return INVALID_URI;
