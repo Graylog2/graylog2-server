@@ -28,37 +28,30 @@ import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import useParams from "routing/useParams";
+import useCurrentUser from "../hooks/useCurrentUser";
+import {useStore} from "stores/connect";
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
 }
 
-const NodeInputsPage = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  displayName: 'NodeInputsPage',
+const NodeInputsPage = () => {
+  const { nodeId } = useParams();
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    // eslint-disable-next-line react/no-unused-prop-types
-    params: PropTypes.object.isRequired,
-  },
+  const currentUser = useCurrentUser();
+  const {nodes} = useStore(NodesStore)
+  const node = nodes?.[nodeId];
 
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
+  useEffect(() => {
+    const interval = setInterval(InputStatesStore.list, 2000);
 
-  componentDidMount() {
-    this.interval = setInterval(InputStatesStore.list, 2000);
-  },
+    return () => {
+      clearInterval(this.interval);
+    }
+  }, [])
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  },
-
-  _isLoading() {
-    return !this.state.node;
-  },
-
-  render() {
-    if (this._isLoading()) {
+    if (!node) {
       return <Spinner />;
     }
 
@@ -73,11 +66,10 @@ const NodeInputsPage = createReactClass({
               You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
             </span>
           </PageHeader>
-          <InputsList permissions={this.state.currentUser.permissions} node={this.state.node} />
+          <InputsList permissions={currentUser.permissions} node={node} />
         </div>
       </DocumentTitle>
     );
-  },
-});
+};
 
 export default withParams(NodeInputsPage);
