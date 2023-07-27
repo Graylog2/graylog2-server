@@ -69,6 +69,7 @@ public class CertRenewalServiceTest {
     public void testCertRenewalCalculation() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException {
         final var now = DateTime.now(DateTimeZone.UTC);
         final JobSchedulerClock clock = new JobSchedulerTestClock(now);
+        final var nextRun = clock.nowUTC().plusMinutes(30);
         final var service = new CertRenewalServiceImpl(clock);
         // 2 hours is our smalles interval in the FE, so I'm testing only small intervals and expect larger intervals to work accordingly
         // with a threshold of 10%, a cert should either be invalid if it's no longer valid in 12min (10% of 120min) or if it get's invalid until the next run of the cert checker
@@ -76,18 +77,18 @@ public class CertRenewalServiceTest {
 
         // renewal check every 30min, so the following should be still valid
         final var cert1 = generate(now, 0, 35);
-        assertFalse(service.needsRenewal(policy, cert1));
+        assertFalse(service.needsRenewal(nextRun, policy, cert1));
 
         // renewal check every 30min, threshold also takes it, so the following should be no longer valid
         final var cert2 = generate(now, 0, 5);
-        assertTrue(service.needsRenewal(policy, cert2));
+        assertTrue(service.needsRenewal(nextRun, policy, cert2));
 
         // renewal check every 30min, threshold is smaller, but the following should be no longer valid
         final var cert3 = generate(now, 0, 15);
-        assertTrue(service.needsRenewal(policy, cert3));
+        assertTrue(service.needsRenewal(nextRun, policy, cert3));
 
         // renewal check every 30min, threshold is smaller, but the following should be no longer valid
         final var cert4 = generate(now, 24*60, 25);
-        assertTrue(service.needsRenewal(policy, cert4));
+        assertTrue(service.needsRenewal(nextRun, policy, cert4));
     }
 }

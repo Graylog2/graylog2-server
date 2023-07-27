@@ -18,8 +18,10 @@ package org.graylog.security.certutil;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.tuple.Pair;
+import org.graylog.scheduler.DBCustomJobDefinitionService;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
+import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobScheduleStrategies;
 import org.graylog.scheduler.JobTriggerDto;
@@ -38,6 +40,8 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +68,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
     private final DBJobDefinitionService jobDefinitionService;
+    private final DBCustomJobDefinitionService customJobDefinitionService;
     private final JobScheduleStrategies jobScheduleStrategies;
     private final JobSchedulerClock clock;
     private final char[] passwordSecret;
@@ -71,6 +76,14 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     // TODO: convert to config?
     private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
 
+    public static final String RENEWAL_JOB_ID = "cert-renewal-check";
+
+    public static final JobDefinitionDto DEFINITION_INSTANCE = JobDefinitionDto.builder()
+            .id(RENEWAL_JOB_ID) // This is a system entity and the ID MUST NOT change!
+            .title("Certificat Renewal Check")
+            .description("Runs periodically to check for certificates that are about to expire and notifies/triggers renewal")
+            .config(CheckForCertRenewalJob.Config.builder().build())
+            .build();
 
     @Inject
     public CertRenewalServiceImpl(final ClusterConfigService clusterConfigService,
@@ -80,6 +93,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
                                   final DBJobDefinitionService jobDefinitionService,
+                                  final DBCustomJobDefinitionService customJobDefinitionService,
                                   final JobScheduleStrategies jobScheduleStrategies,
                                   final JobSchedulerClock clock,
                                   final @Named("password_secret") String passwordSecret) {
@@ -90,6 +104,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.notificationService = notificationService;
         this.jobTriggerService = jobTriggerService;
         this.jobDefinitionService = jobDefinitionService;
+        this.customJobDefinitionService = customJobDefinitionService;
         this.jobScheduleStrategies = jobScheduleStrategies;
         this.clock = clock;
         this.passwordSecret = passwordSecret.toCharArray();
@@ -97,20 +112,20 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     @VisibleForTesting
     CertRenewalServiceImpl(final JobSchedulerClock clock) {
-        this(null, null, null, null, null, null, null, null, clock, "dummy");
+        this(null, null, null, null, null, null, null, null, null, clock, "dummy");
     }
 
     RenewalPolicy getRenewalPolicy() {
         return this.clusterConfigService.get(RenewalPolicy.class);
     }
 
-    boolean needsRenewal(final RenewalPolicy renewalPolicy, final X509Certificate cert) {
+    boolean needsRenewal(final DateTime nextRenewal, final RenewalPolicy renewalPolicy, final X509Certificate cert) {
         // calculate renewal threshold
         var threshold = calculateThreshold(renewalPolicy.certificateLifetime());
 
         try {
             cert.checkValidity(threshold);
-            cert.checkValidity(nextRenewalJobRun());
+            cert.checkValidity(nextRenewal.toDate());
         } catch (CertificateExpiredException e) {
             LOG.debug("Certificate about to expire.");
             return true;
@@ -128,13 +143,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         final var lifetime = Duration.parse(certificateLifetime).dividedBy(CERT_RENEWAL_THRESHOLD_PERCENTAGE);
         var validUntil = clock.now(ZoneId.systemDefault()).plus(lifetime).toLocalDateTime();
         return convertToDateViaInstant(validUntil);
-    }
-
-    Date nextRenewalJobRun() {
-        // TODO: calculate nextTime from trigger
-        //        jobScheduleStrategies.nextTime()
-        var nextRenewalJobRun = clock.now(ZoneId.systemDefault()).plusMinutes(30).toLocalDateTime();
-        return convertToDateViaInstant(nextRenewalJobRun);
     }
 
     @Override
@@ -162,7 +170,10 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                     }
                 })
                 .filter(Objects::nonNull)
-                .filter(p -> needsRenewal(renewalPolicy, p.getRight()))
+                .filter(p -> {
+                    var nextRenewal = jobTriggerService.getOneForJob(RENEWAL_JOB_ID).map(JobTriggerDto::nextTime).orElse(DateTime.now(DateTimeZone.UTC).plusMinutes(30));
+                    return needsRenewal(nextRenewal, renewalPolicy, p.getRight());
+                })
                 .forEach(pair -> {
                     if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
                         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
@@ -176,23 +187,25 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     @Override
-    public void addCheckForRenewalJob() {
+    public void scheduleJob() {
         // TODO: check, if the two more fields are needed (see CronJobSchedule Tests)
         final var cronJobSchedule = CronJobSchedule.builder().cronExpression("0,30 * * * *").timezone(null).build();
 
-        final var jobDefinition = JobDefinitionDto.builder().id("cert-renewal-check")
-                .title("Certificat Renewal Check")
-                .description("Runs periodically to check for certificates that are about to expire and notifies/triggers renewal")
-                .build();
+        final var jobDefinition = customJobDefinitionService.findOrCreate(DEFINITION_INSTANCE);
 
         final var trigger = JobTriggerDto.builder()
-                .jobDefinitionId("cert-renewal-check")
+                .jobDefinitionId(jobDefinition.id())
                 .jobDefinitionType(CheckForCertRenewalJob.TYPE_NAME)
                 .schedule(cronJobSchedule)
                 .status(JobTriggerStatus.RUNNABLE)
                 .build();
 
-        jobDefinitionService.save(jobDefinition);
         jobTriggerService.create(trigger);
+    }
+
+    @Override
+    public void upsertRenewalPolicy(RenewalPolicy renewalPolicy) {
+        this.clusterConfigService.write(renewalPolicy);
+        scheduleJob();
     }
 }
