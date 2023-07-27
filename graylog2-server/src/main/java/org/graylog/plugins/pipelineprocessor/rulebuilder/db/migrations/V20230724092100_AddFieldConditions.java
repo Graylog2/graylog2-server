@@ -65,6 +65,9 @@ public class V20230724092100_AddFieldConditions extends Migration {
         Arrays.stream(conversionTypes).forEach(type -> addFragment(createCheckFieldType(type)));
         addFragment(createCheckDateField());
         addFragment(createCIDRMatchField());
+        addFragment(createStringContainsField());
+        addFragment(createStringEndsWithField());
+        addFragment(createStringStartsWithField());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("field condition fragments were successfully added");
@@ -161,6 +164,84 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Field matches CIDR")
                         .ruleBuilderTitle("Check if value in '${field}' is an IP and matches '${cidr}' subnet mask")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
+                        .build())
+                .isCondition()
+                .build();
+    }
+
+    RuleFragment createStringContainsField() {
+        return RuleFragment.builder()
+                .fragment("""
+                        contains(
+                          value: to_string($message.${field}),
+                          search: ${search}<#if ignoreCase??>,
+                          ignore_case: ${ignoreCase?c}</#if>
+                        )""")
+                .descriptor(FunctionDescriptor.builder()
+                        .name("field_contains")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to check").build(),
+                                string("search").description("The substring to find").build(),
+                                bool("ignoreCase").optional().description("Whether to search case insensitive, defaults to false").build()
+                        ))
+                        .returnType(Void.class)
+                        .description("Checks if the field value's string representation contains the given substring.")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Field contains")
+                        .ruleBuilderTitle("Check if string value in '${field}' contains '${search}' <#if ignoreCase??>(ignore case: ${ignoreCase})</#if>")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
+                        .build())
+                .isCondition()
+                .build();
+    }
+
+    RuleFragment createStringStartsWithField() {
+        return RuleFragment.builder()
+                .fragment("""
+                        starts_with(
+                          value: to_string($message.${field}),
+                          prefix: ${search}<#if ignoreCase??>,
+                          ignore_case: ${ignoreCase?c}</#if>
+                        )""")
+                .descriptor(FunctionDescriptor.builder()
+                        .name("field_starts_with")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to check").build(),
+                                string("search").description("The substring to find").build(),
+                                bool("ignoreCase").optional().description("Whether to search case insensitive, defaults to false").build()
+                        ))
+                        .returnType(Void.class)
+                        .description("Checks if the field value's string representation starts with the given substring.")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Field starts with")
+                        .ruleBuilderTitle("Check if string value in '${field}' starts with '${search}' <#if ignoreCase??>(ignore case: ${ignoreCase})</#if>")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
+                        .build())
+                .isCondition()
+                .build();
+    }
+
+    RuleFragment createStringEndsWithField() {
+        return RuleFragment.builder()
+                .fragment("""
+                        ends_with(
+                          value: to_string($message.${field}),
+                          suffix: ${search}<#if ignoreCase??>,
+                          ignore_case: ${ignoreCase?c}</#if>
+                        )""")
+                .descriptor(FunctionDescriptor.builder()
+                        .name("field_ends_with")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to check").build(),
+                                string("search").description("The substring to find").build(),
+                                bool("ignoreCase").optional().description("Whether to search case insensitive, defaults to false").build()
+                        ))
+                        .returnType(Void.class)
+                        .description("Checks if the field value's string representation ends with the given substring.")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Field ends with")
+                        .ruleBuilderTitle("Check if string value in '${field}' ends with '${search}' <#if ignoreCase??>(ignore case: ${ignoreCase})</#if>")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                         .build())
                 .isCondition()

@@ -41,6 +41,9 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
+import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
@@ -100,6 +103,9 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         functions.put(IsUrl.NAME, new IsUrl());
         functions.put(UrlConversion.NAME, new UrlConversion());
         functions.put(CidrMatch.NAME, new CidrMatch());
+        functions.put(Contains.NAME, new Contains());
+        functions.put(StartsWith.NAME, new StartsWith());
+        functions.put(EndsWith.NAME, new EndsWith());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -352,6 +358,54 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         testRule = createFragmentSource(fragment, Map.of("field", "noip", "cidr", "192.168.1.15/24"));
         evaluateCondition(testRule, message, false);
 
+    }
+
+    @Test
+    public void testFieldContains() {
+        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+        final RuleFragment fragment = migration.createStringContainsField();
+
+        message.addField("string", "snickerdoodledoo");
+        Rule testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "doodle"));
+        evaluateCondition(testRule, message, true);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "noodle"));
+        evaluateCondition(testRule, message, false);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "DOODLE"));
+        evaluateCondition(testRule, message, false);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "DOODLE", "ignoreCase", true));
+        evaluateCondition(testRule, message, true);
+    }
+
+    @Test
+    public void testFieldStartsWith() {
+        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+        final RuleFragment fragment = migration.createStringStartsWithField();
+
+        message.addField("string", "snickerdoodledoo");
+        Rule testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "snicker"));
+        evaluateCondition(testRule, message, true);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "doodle"));
+        evaluateCondition(testRule, message, false);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "SNICKER"));
+        evaluateCondition(testRule, message, false);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "SNICKER", "ignoreCase", true));
+        evaluateCondition(testRule, message, true);
+    }
+
+    @Test
+    public void testFieldEndsWith() {
+        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+        final RuleFragment fragment = migration.createStringEndsWithField();
+
+        message.addField("string", "snickerdoodledoo");
+        Rule testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "doo"));
+        evaluateCondition(testRule, message, true);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "doodle"));
+        evaluateCondition(testRule, message, false);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "DOO"));
+        evaluateCondition(testRule, message, false);
+        testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "DOO", "ignoreCase", true));
+        evaluateCondition(testRule, message, true);
     }
 
 }
