@@ -47,6 +47,10 @@ public class ConditionParser {
         freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, conditions);
     }
 
+    public Map<String, RuleFragment> getConditions() {
+        return conditions;
+    }
+
     public String generate(List<RuleBuilderStep> ruleConditions, RuleBuilderStep.Operator operator, int level) {
         if (ruleConditions.isEmpty()) {
             if (level == 1) {
