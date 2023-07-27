@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "When entity was added to the favorites, it was added to the end of the list. It meant that top of the favorites' list contained entities that had been added first to the list. It seemed wrong. From now on, the newly added entity will be shown on the top of the favorites' list."
+
+issues = [""]
+pulls = ["16050"]
