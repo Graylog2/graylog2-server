@@ -23,6 +23,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreLocation;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollection;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
@@ -127,4 +128,14 @@ public class CertificatesService {
         return Optional.empty();
     }
 
+    public void removeCert(final KeystoreMongoLocation keystoreMongoLocation) {
+        final KeystoreMongoCollection collection = keystoreMongoLocation.collection();
+        MongoCollection<Document> dbCollection = mongoDatabase.getCollection(collection.collectionName());
+        dbCollection.deleteOne(
+                eq(
+                        collection.identifierField(),
+                        keystoreMongoLocation.nodeId()
+                )
+        );
+    }
 }

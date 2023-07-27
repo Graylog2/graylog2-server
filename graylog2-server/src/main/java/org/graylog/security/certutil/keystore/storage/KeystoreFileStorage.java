@@ -19,6 +19,7 @@ package org.graylog.security.certutil.keystore.storage;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreLocation;
 
 import javax.inject.Inject;
 import java.io.FileOutputStream;
@@ -65,6 +66,11 @@ public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLo
         } catch (IOException | GeneralSecurityException ex) {
             throw new KeyStoreStorageException("Could not read keystore: " + ex.getMessage(), ex);
         }
+    }
+
+    @Override
+    public void removeKeyStore(final KeystoreFileLocation location) {
+        // noop, we don't remove files from the filesystem
     }
 
 }

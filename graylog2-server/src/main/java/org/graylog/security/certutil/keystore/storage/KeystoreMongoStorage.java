@@ -17,6 +17,7 @@
 package org.graylog.security.certutil.keystore.storage;
 
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreLocation;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.cluster.certificates.CertificatesService;
 
@@ -73,6 +74,11 @@ public final class KeystoreMongoStorage implements KeystoreStorage<KeystoreMongo
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void removeKeyStore(final KeystoreMongoLocation location) {
+        certificatesService.removeCert(location);
     }
 
 }

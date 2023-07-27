@@ -126,7 +126,7 @@ public class CaServiceImpl implements CaService {
 
     @Override
     public void startOver() {
-
+        keystoreStorage.removeKeyStore(mongoDbCaLocation);
     }
 
     @Override
