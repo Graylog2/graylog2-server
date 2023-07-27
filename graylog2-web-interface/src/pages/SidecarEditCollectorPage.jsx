@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
@@ -24,49 +24,33 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
-import withParams from 'routing/withParams';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import DocsHelper from 'util/DocsHelper';
-import withHistory from 'routing/withHistory';
+import useParams from "routing/useParams";
+import useHistory from "routing/useHistory";
 
-const SidecarEditCollectorPage = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  displayName: 'SidecarEditCollectorPage',
+const SidecarEditCollectorPage = () => {
+  const history = useHistory();
+  const { collectorId } = useParams();
+  const [collector, setCollector] = useState()
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    history: PropTypes.object.isRequired,
-    params: PropTypes.object.isRequired,
-  },
-
-  getInitialState() {
-    return {
-      collector: undefined,
-    };
-  },
-
-  componentDidMount() {
-    this._reloadCollector();
-  },
-
-  _reloadCollector() {
-    CollectorsActions.getCollector(this.props.params.collectorId).then(
-      (collector) => this.setState({ collector }),
+  const _reloadCollector = () => {
+    CollectorsActions.getCollector(collectorId).then(
+      (collector) => setCollector(collector),
       (error) => {
         if (error.status === 404) {
-          const { history } = this.props;
           history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION);
         }
       },
     );
-  },
+  }
 
-  _isLoading() {
-    return !(this.state.collector);
-  },
+  useEffect(() => {
+    _reloadCollector();
+  }, [])
 
-  render() {
-    if (this._isLoading()) {
+
+    if (!collector) {
       return <Spinner />;
     }
 
@@ -85,12 +69,11 @@ const SidecarEditCollectorPage = createReactClass({
 
         <Row className="content">
           <Col md={6}>
-            <CollectorForm action="edit" collector={this.state.collector} />
+            <CollectorForm action="edit" collector={collector} />
           </Col>
         </Row>
       </DocumentTitle>
     );
-  },
-});
+  };
 
-export default withHistory(withParams(SidecarEditCollectorPage));
+export default SidecarEditCollectorPage;
