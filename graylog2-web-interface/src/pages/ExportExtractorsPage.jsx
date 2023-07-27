@@ -15,40 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, {useEffect} from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ExportExtractors from 'components/extractors/ExportExtractors';
-import withParams from 'routing/withParams';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import useParams from "routing/useParams";
+import {useStore} from "stores/connect";
 
-const ExportExtractorsPage = createReactClass({
-  displayName: 'ExportExtractorsPage',
+const ExportExtractorsPage = () => {
+  const params = useParams();
+  const { input } = useStore(InputsStore)
 
-  propTypes: {
-    params: PropTypes.object.isRequired,
-  },
-
-  mixins: [Reflux.connect(InputsStore)],
-
-  componentDidMount() {
-    const { params } = this.props;
-
+  useEffect(() => {
     InputsActions.get.triggerPromise(params.inputId);
-  },
+  }, [])
 
-  _isLoading() {
-    return !this.state.input;
-  },
 
-  render() {
-    if (this._isLoading()) {
+    if (!input) {
       return <Spinner />;
     }
 
-    const { input } = this.state;
 
     return (
       <DocumentTitle title={`Export extractors of ${input.title}`}>
@@ -63,7 +50,6 @@ const ExportExtractorsPage = createReactClass({
         </div>
       </DocumentTitle>
     );
-  },
-});
+  }
 
-export default withParams(ExportExtractorsPage);
+export default ExportExtractorsPage;
