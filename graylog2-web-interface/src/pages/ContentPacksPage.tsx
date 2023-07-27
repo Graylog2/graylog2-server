@@ -14,27 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useEffect} from 'react';
-import styled, {css} from 'styled-components';
+import React, { useEffect } from 'react';
+import styled, { css } from 'styled-components';
 
-import {LinkContainer} from 'components/common/router';
-import {Row, Col, ButtonToolbar, Button} from 'components/bootstrap';
+import { LinkContainer } from 'components/common/router';
+import { Row, Col, ButtonToolbar, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import Spinner from 'components/common/Spinner';
 import UserNotification from 'util/UserNotification';
-import {DocumentTitle, PageHeader} from 'components/common';
+import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
-import {ContentPacksActions, ContentPacksStore} from 'stores/content-packs/ContentPacksStore';
-import {useStore} from "stores/connect";
+import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
+import { useStore } from 'stores/connect';
 
-const ConfigurationBundles = styled.div(({theme}) => css`
+const ConfigurationBundles = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   font-weight: normal;
   margin-top: 15px;
 `);
 
-const _deleteContentPack = (contentPackId) => {
+const _deleteContentPack = (contentPackId: string) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
     ContentPacksActions.delete(contentPackId).then(() => {
@@ -51,9 +51,9 @@ const _deleteContentPack = (contentPackId) => {
       UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
     });
   }
-}
+};
 
-const _installContentPack = (contentPackId, contentPackRev, parameters) => {
+const _installContentPack = (contentPackId: string, contentPackRev: string, parameters: unknown) => {
   ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
     UserNotification.success('Content Pack installed successfully.', 'Success');
     ContentPacksActions.list();
@@ -61,52 +61,51 @@ const _installContentPack = (contentPackId, contentPackRev, parameters) => {
     UserNotification.error(`Installing content pack failed with status: ${error}.
          Could not install Content Pack with ID: ${contentPackId}`);
   });
-}
+};
 
 const ContentPacksPage = () => {
-  const {contentPacks, contentPackMetadata} = useStore(ContentPacksStore);
+  const { contentPacks, contentPackMetadata } = useStore<{ contentPacks: unknown, contentPackMetadata: unknown }>(ContentPacksStore);
 
   useEffect(() => {
     ContentPacksActions.list();
   }, []);
 
   if (!contentPacks) {
-    return (<Spinner/>);
+    return (<Spinner />);
   }
 
   return (
     <DocumentTitle title="Content Packs">
-        <span>
-          <PageHeader title="Content Packs"
-                      topActions={<Button bsStyle="info" active>Content Packs</Button>}
-                      actions={(
-                        <ButtonToolbar>
-                          <ContentPackUploadControls/>
-                          <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
-                            <Button bsStyle="success">Create a content pack</Button>
-                          </LinkContainer>
-                        </ButtonToolbar>
+      <span>
+        <PageHeader title="Content Packs"
+                    topActions={<Button bsStyle="info" active>Content Packs</Button>}
+                    actions={(
+                      <ButtonToolbar>
+                        <ContentPackUploadControls />
+                        <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
+                          <Button bsStyle="success">Create a content pack</Button>
+                        </LinkContainer>
+                      </ButtonToolbar>
                       )}>
-            <span>
-              Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.
-              <br/>
-              Find more Content Packs in {' '}
-              <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
-            </span>
-          </PageHeader>
+          <span>
+            Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.
+            <br />
+            Find more Content Packs in {' '}
+            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
+          </span>
+        </PageHeader>
 
-
-          <Row className="content">
-            <Col md={12}>
-              <ConfigurationBundles>
-                <ContentPacksList contentPacks={contentPacks}
-                                  contentPackMetadata={contentPackMetadata}
-                                  onDeletePack={_deleteContentPack}
-                                  onInstall={_installContentPack}/>
-              </ConfigurationBundles>
-            </Col>
-          </Row>
-        </span>
+        <Row className="content">
+          <Col md={12}>
+            <ConfigurationBundles>
+              <ContentPacksList contentPacks={contentPacks}
+                                contentPackMetadata={contentPackMetadata}
+                                onDeletePack={_deleteContentPack}
+                                onInstall={_installContentPack} />
+            </ConfigurationBundles>
+          </Col>
+        </Row>
+      </span>
     </DocumentTitle>
   );
 };
