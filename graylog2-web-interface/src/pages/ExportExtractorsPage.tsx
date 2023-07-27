@@ -14,42 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ExportExtractors from 'components/extractors/ExportExtractors';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import useParams from "routing/useParams";
-import {useStore} from "stores/connect";
+import useParams from 'routing/useParams';
+import { useStore } from 'stores/connect';
 
 const ExportExtractorsPage = () => {
-  const params = useParams();
-  const { input } = useStore(InputsStore)
+  const { inputId } = useParams();
+  const { input } = useStore(InputsStore);
 
   useEffect(() => {
-    InputsActions.get.triggerPromise(params.inputId);
-  }, [])
+    InputsActions.get.triggerPromise(inputId);
+  }, [inputId]);
 
-
-    if (!input) {
-      return <Spinner />;
-    }
-
-
-    return (
-      <DocumentTitle title={`Export extractors of ${input.title}`}>
-        <div>
-          <PageHeader title={<span>Export extractors of <em>{input.title}</em></span>}>
-            <span>
-              The extractors of an input can be exported to JSON for importing into other setups
-              or sharing in <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
-            </span>
-          </PageHeader>
-          <ExportExtractors input={input} />
-        </div>
-      </DocumentTitle>
-    );
+  if (!input) {
+    return <Spinner />;
   }
+
+  return (
+    <DocumentTitle title={`Export extractors of ${input.title}`}>
+      <div>
+        <PageHeader title={<span>Export extractors of <em>{input.title}</em></span>}>
+          <span>
+            The extractors of an input can be exported to JSON for importing into other setups
+            or sharing in <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
+          </span>
+        </PageHeader>
+        <ExportExtractors input={input} />
+      </div>
+    </DocumentTitle>
+  );
+};
 
 export default ExportExtractorsPage;
