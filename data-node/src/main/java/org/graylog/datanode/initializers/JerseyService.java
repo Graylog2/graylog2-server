@@ -23,12 +23,15 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -36,6 +39,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
+import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -43,16 +50,23 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
+import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -62,6 +76,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
@@ -92,11 +107,11 @@ public class JerseyService extends AbstractIdleService {
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
 //                         @Named("additionalJerseyComponents") final Set<Class> additionalComponents,
                          @Named(Graylog2Module.SYSTEM_REST_RESOURCES) final Set<Class<?>> systemRestResources,
-   //                      final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
+                         //                      final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
 //                         ErrorPageGenerator errorPageGenerator,
-                         TLSProtocolsConfiguration tlsConfiguration) {
+                         TLSProtocolsConfiguration tlsConfiguration,  EventBus eventBus) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
  //       this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -108,14 +123,47 @@ public class JerseyService extends AbstractIdleService {
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
 //        this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
+        eventBus.register(this);
+    }
+
+    @Subscribe
+    public synchronized void handleOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) throws Exception {
+        System.out.println("Received config change event!");
+        LOG.info("Opensearch config changed");
+        shutDown();
+        doStartup(extractSslConfiguration(event.config()));
+    }
+
+    private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
+
+        System.out.println(config);
+
+        final Map<String, String> cfgMap = config.asMap();
+        if(!Boolean.valueOf(cfgMap.get("plugins.security.disabled"))) {
+            // caution, this path is relative to the opensearch config directory!
+
+
+            final String keystore = cfgMap.get("plugins.security.ssl.http.keystore_filepath");
+            final Path keystorePath = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch").resolve(keystore);
+            final String keystoreOTP = cfgMap.get("plugins.security.ssl.http.keystore_password");
+
+            return buildSslEngineConfigurator(keystorePath, keystoreOTP);
+        } else {
+            return null;
+        }
+
     }
 
     @Override
-    protected void startUp() throws Exception {
+    protected void startUp() {
+        //doStartup();
+    }
+
+    private void doStartup(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
         // we need to work around the change introduced in https://github.com/GrizzlyNIO/grizzly-mirror/commit/ba9beb2d137e708e00caf7c22603532f753ec850
         // because the PooledMemoryManager which is default now uses 10% of the heap no matter what
         System.setProperty("org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER", "org.glassfish.grizzly.memory.HeapMemoryManager");
-        startUpApi();
+        startUpApi(sslEngineConfigurator);
     }
 
     @Override
@@ -130,17 +178,7 @@ public class JerseyService extends AbstractIdleService {
         }
     }
 
-    private void startUpApi() throws Exception {
-//        final Set<Resource> pluginResources = prefixPluginResources(PLUGIN_PREFIX, pluginRestResources);
-
- /*       final SSLEngineConfigurator sslEngineConfigurator = configuration.isHttpEnableTls() ?
-                buildSslEngineConfigurator(
-                        configuration.getHttpTlsCertFile(),
-                        configuration.getHttpTlsKeyFile(),
-                        configuration.getHttpTlsKeyPassword()) : null;
-*/
-        final SSLEngineConfigurator sslEngineConfigurator = null;
-
+    private void startUpApi(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
         final HostAndPort bindAddress = configuration.getHttpBindAddress();
         final String contextPath = configuration.getHttpPublishUri().getPath();
         final URI listenUri = new URI(
@@ -304,20 +342,19 @@ public class JerseyService extends AbstractIdleService {
 
         return httpServer;
     }
-/*
-    private SSLEngineConfigurator buildSslEngineConfigurator(Path certFile, Path keyFile, String keyPassword)
+
+    private SSLEngineConfigurator buildSslEngineConfigurator(Path keystoreFile, String keyPassword)
             throws GeneralSecurityException, IOException {
-        if (keyFile == null || !Files.isRegularFile(keyFile) || !Files.isReadable(keyFile)) {
-            throw new InvalidKeyException("Unreadable or missing private key: " + keyFile);
+        if (keystoreFile == null || !Files.isRegularFile(keystoreFile) || !Files.isReadable(keystoreFile)) {
+            throw new IllegalArgumentException("Unreadable or missing private key: " + keystoreFile);
         }
 
-        if (certFile == null || !Files.isRegularFile(certFile) || !Files.isReadable(certFile)) {
-            throw new CertificateException("Unreadable or missing X.509 certificate: " + certFile);
-        }
 
         final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
         final char[] password = firstNonNull(keyPassword, "").toCharArray();
-        final KeyStore keyStore = PemKeyStore.buildKeyStore(certFile, keyFile, password);
+
+        final KeyStore keyStore = readKeystore(keystoreFile, password);
+
         sslContextConfigurator.setKeyStorePass(password);
         sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
 
@@ -326,7 +363,17 @@ public class JerseyService extends AbstractIdleService {
         sslEngineConfigurator.setEnabledProtocols(tlsConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
         return sslEngineConfigurator;
     }
-*/
+
+    private static KeyStore readKeystore(Path keystoreFile, char[] password) {
+        try (var in = Files.newInputStream(keystoreFile)) {
+            KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
+            caKeystore.load(in, password);
+            return caKeystore;
+        } catch (IOException | GeneralSecurityException ex) {
+            throw new RuntimeException("Could not read keystore: " + ex.getMessage(), ex);
+        }
+    }
+
     private ExecutorService instrumentedExecutor(final String executorName,
                                                  final String threadNameFormat,
                                                  int poolSize) {
@@ -339,5 +386,9 @@ public class JerseyService extends AbstractIdleService {
                 Executors.newFixedThreadPool(poolSize, threadFactory),
                 metricRegistry,
                 name(JerseyService.class, executorName));
+    }
+
+    public void restartWithConfig(OpensearchConfiguration config) {
+
     }
 }

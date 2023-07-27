@@ -40,7 +40,7 @@ public class GenericInitializerBindings extends AbstractModule {
         bind(OpensearchProcess.class).toProvider(OpensearchProcessService.class);
 
         serviceBinder.addBinding().to(PeriodicalsService.class);
-        serviceBinder.addBinding().to(JerseyService.class);
+        //serviceBinder.addBinding().to(JerseyService.class);
         serviceBinder.addBinding().to(GracefulShutdownService.class).asEagerSingleton();
 
 //        serviceBinder.addBinding().to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
