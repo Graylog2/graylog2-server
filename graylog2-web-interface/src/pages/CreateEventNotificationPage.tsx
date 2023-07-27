@@ -15,21 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useHistory from 'routing/useHistory';
 
-import useHistory from '../routing/useHistory';
-
-const CreateEventDefinitionPage = ({ currentUser }) => {
+const CreateEventDefinitionPage = () => {
+  const currentUser = useCurrentUser();
   const history = useHistory();
 
   if (!isPermitted(currentUser.permissions, 'eventnotifications:create')) {
@@ -59,10 +57,4 @@ const CreateEventDefinitionPage = ({ currentUser }) => {
   );
 };
 
-CreateEventDefinitionPage.propTypes = {
-  currentUser: PropTypes.object.isRequired,
-};
-
-export default connect(CreateEventDefinitionPage, {
-  currentUser: CurrentUserStore,
-}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+export default CreateEventDefinitionPage;
