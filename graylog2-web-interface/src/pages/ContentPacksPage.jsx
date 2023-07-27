@@ -14,79 +14,74 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import Reflux from 'reflux';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import styled, { css } from 'styled-components';
+import React, {useEffect} from 'react';
+import styled, {css} from 'styled-components';
 
-import { LinkContainer } from 'components/common/router';
-import { Row, Col, ButtonToolbar, Button } from 'components/bootstrap';
+import {LinkContainer} from 'components/common/router';
+import {Row, Col, ButtonToolbar, Button} from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import Spinner from 'components/common/Spinner';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
+import {DocumentTitle, PageHeader} from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
-import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
+import {ContentPacksActions, ContentPacksStore} from 'stores/content-packs/ContentPacksStore';
+import {useStore} from "stores/connect";
 
-const ConfigurationBundles = styled.div(({ theme }) => css`
+const ConfigurationBundles = styled.div(({theme}) => css`
   font-size: ${theme.fonts.size.body};
   font-weight: normal;
   margin-top: 15px;
 `);
 
-const ContentPacksPage = createReactClass({
-  mixins: [Reflux.connect(ContentPacksStore)],
-
-  componentDidMount() {
-    ContentPacksActions.list();
-  },
-
-  _deleteContentPack(contentPackId) {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
-      ContentPacksActions.delete(contentPackId).then(() => {
-        UserNotification.success('Content Pack deleted successfully.', 'Success');
-        ContentPacksActions.list();
-      }, (error) => {
-        let err_message = error.message;
-        const err_body = error.additional.body;
-
-        if (err_body && err_body.message) {
-          err_message = error.additional.body.message;
-        }
-
-        UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
-      });
-    }
-  },
-
-  _installContentPack(contentPackId, contentPackRev, parameters) {
-    ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
-      UserNotification.success('Content Pack installed successfully.', 'Success');
+const _deleteContentPack = (contentPackId) => {
+  // eslint-disable-next-line no-alert
+  if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
+    ContentPacksActions.delete(contentPackId).then(() => {
+      UserNotification.success('Content Pack deleted successfully.', 'Success');
       ContentPacksActions.list();
     }, (error) => {
-      UserNotification.error(`Installing content pack failed with status: ${error}.
-         Could not install Content Pack with ID: ${contentPackId}`);
+      let err_message = error.message;
+      const err_body = error.additional.body;
+
+      if (err_body && err_body.message) {
+        err_message = error.additional.body.message;
+      }
+
+      UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
     });
-  },
+  }
+}
 
-  render() {
-    const { contentPacks, contentPackMetadata } = this.state;
+const _installContentPack = (contentPackId, contentPackRev, parameters) => {
+  ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
+    UserNotification.success('Content Pack installed successfully.', 'Success');
+    ContentPacksActions.list();
+  }, (error) => {
+    UserNotification.error(`Installing content pack failed with status: ${error}.
+         Could not install Content Pack with ID: ${contentPackId}`);
+  });
+}
 
-    if (!contentPacks) {
-      return (<Spinner />);
-    }
+const ContentPacksPage = () => {
+  const {contentPacks, contentPackMetadata} = useStore(ContentPacksStore);
 
-    return (
-      <DocumentTitle title="Content Packs">
+  useEffect(() => {
+    ContentPacksActions.list();
+  }, []);
+
+  if (!contentPacks) {
+    return (<Spinner/>);
+  }
+
+  return (
+    <DocumentTitle title="Content Packs">
         <span>
           <PageHeader title="Content Packs"
                       topActions={<Button bsStyle="info" active>Content Packs</Button>}
                       actions={(
                         <ButtonToolbar>
-                          <ContentPackUploadControls />
+                          <ContentPackUploadControls/>
                           <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
                             <Button bsStyle="success">Create a content pack</Button>
                           </LinkContainer>
@@ -94,26 +89,26 @@ const ContentPacksPage = createReactClass({
                       )}>
             <span>
               Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.
-              <br />
+              <br/>
               Find more Content Packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
           </PageHeader>
+
 
           <Row className="content">
             <Col md={12}>
               <ConfigurationBundles>
                 <ContentPacksList contentPacks={contentPacks}
                                   contentPackMetadata={contentPackMetadata}
-                                  onDeletePack={this._deleteContentPack}
-                                  onInstall={this._installContentPack} />
+                                  onDeletePack={_deleteContentPack}
+                                  onInstall={_installContentPack}/>
               </ConfigurationBundles>
             </Col>
           </Row>
         </span>
-      </DocumentTitle>
-    );
-  },
-});
+    </DocumentTitle>
+  );
+};
 
 export default ContentPacksPage;
