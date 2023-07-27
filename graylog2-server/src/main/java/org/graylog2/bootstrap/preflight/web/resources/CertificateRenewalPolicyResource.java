@@ -16,7 +16,6 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
-import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.plugin.certificates.RenewalPolicy;
@@ -34,13 +33,10 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class CertificateRenewalPolicyResource {
     private final ClusterConfigService clusterConfigService;
-    private final CertRenewalService certRenewalService;
 
     @Inject
-    public CertificateRenewalPolicyResource(final ClusterConfigService clusterConfigService,
-                                            final CertRenewalService certRenewalService) {
+    public CertificateRenewalPolicyResource(final ClusterConfigService clusterConfigService) {
         this.clusterConfigService = clusterConfigService;
-        this.certRenewalService = certRenewalService;
     }
 
     @GET
@@ -51,6 +47,6 @@ public class CertificateRenewalPolicyResource {
     @POST
     @NoAuditEvent("No Audit Event needed")
     public void set(@NotNull RenewalPolicy renewalPolicy) {
-        this.certRenewalService.upsertRenewalPolicy(renewalPolicy);
+        this.clusterConfigService.write(renewalPolicy);
     }
 }

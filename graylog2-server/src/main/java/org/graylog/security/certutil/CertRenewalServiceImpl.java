@@ -21,7 +21,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.scheduler.DBCustomJobDefinitionService;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
-import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobScheduleStrategies;
 import org.graylog.scheduler.JobTriggerDto;
@@ -115,7 +114,8 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this(null, null, null, null, null, null, null, null, null, clock, "dummy");
     }
 
-    RenewalPolicy getRenewalPolicy() {
+    @Override
+    public RenewalPolicy getRenewalPolicy() {
         return this.clusterConfigService.get(RenewalPolicy.class);
     }
 
@@ -148,6 +148,11 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     @Override
     public void checkAllDataNodes() {
         final var renewalPolicy = getRenewalPolicy();
+
+        // a renewal policy has to be present to check for outdated certificates
+        if(renewalPolicy == null) {
+            return;
+        }
 
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         activeDataNodes.values().stream()
@@ -201,11 +206,5 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                 .build();
 
         jobTriggerService.create(trigger);
-    }
-
-    @Override
-    public void upsertRenewalPolicy(RenewalPolicy renewalPolicy) {
-        this.clusterConfigService.write(renewalPolicy);
-        scheduleJob();
     }
 }

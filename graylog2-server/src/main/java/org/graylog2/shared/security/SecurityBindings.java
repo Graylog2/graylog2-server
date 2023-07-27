@@ -23,6 +23,7 @@ import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog.security.certutil.CertRenewalServiceImpl;
+import org.graylog.security.certutil.CheckForCertRenewalJob;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.plugin.PluginModule;
@@ -53,6 +54,11 @@ public class SecurityBindings extends PluginModule {
         bind(CustomCAX509TrustManager.class).asEagerSingleton();
         bind(CaService.class).to(CaServiceImpl.class);
         bind(CertRenewalService.class).to(CertRenewalServiceImpl.class);
+
+        addSchedulerJob(CheckForCertRenewalJob.TYPE_NAME,
+                CheckForCertRenewalJob.class,
+                CheckForCertRenewalJob.Factory.class,
+                CheckForCertRenewalJob.Config.class);
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                 .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);
