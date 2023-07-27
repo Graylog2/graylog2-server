@@ -14,12 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import Reflux from 'reflux';
-import PropTypes from 'prop-types';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-
+import React, {useEffect} from 'react';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
@@ -30,45 +25,34 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
-import withHistory from 'routing/withHistory';
+import useHistory from 'routing/useHistory';
 
-const CreateContentPackPage = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  displayName: 'CreateContentPackPage',
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    history: PropTypes.object.isRequired,
-  },
+const CreateContentPackPage = () => {
+  const history = useHistory()
+  const { entityIndex } = useStore(CatalogStore)
+  const [contentPackState, setContentPackState] = useState({
+    contentPack: ContentPack.builder().build(),
+    appliedParameter: {},
+    selectedEntities: {},
+  })
 
-  mixins: [Reflux.connect(CatalogStore)],
-
-  getInitialState() {
-    return {
-      contentPack: ContentPack.builder().build(),
-      appliedParameter: {},
-      selectedEntities: {},
-      entityIndex: undefined,
-    };
-  },
-
-  componentDidMount() {
+  useEffect(() => {
     CatalogActions.showEntityIndex();
-  },
+  }, [])
 
-  _onStateChanged(newState) {
-    const { contentPack, selectedEntities, appliedParameter } = this.state;
+  const _onStateChanged = (newState) => {
+    const { contentPack, selectedEntities, appliedParameter } = contentPackState;
 
-    this.setState({
-      contentPack: newState.contentPack || contentPack,
-      selectedEntities: newState.selectedEntities || selectedEntities,
-      appliedParameter: newState.appliedParameter || appliedParameter,
+    setContentPackState(cur => ({
+      contentPack: cur.contentPack || contentPack,
+      selectedEntities: cur.selectedEntities || selectedEntities,
+      appliedParameter: cur.appliedParameter || appliedParameter,
     });
-  },
+  }
 
-  _onSave() {
-    const { contentPack } = this.state;
-    const { history } = this.props;
+  const _onSave = () => {
+    const { contentPack } = contentPackState;
 
     ContentPacksActions.create.triggerPromise(contentPack.toJSON())
       .then(
@@ -89,10 +73,10 @@ const CreateContentPackPage = createReactClass({
           UserNotification.error(message + smallMessage, title);
         },
       );
-  },
+  }
 
-  _getEntities(selectedEntities) {
-    const { contentPack } = this.state;
+  const _getEntities = (selectedEntities) => {
+    const { contentPack } = contentPackState;
 
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
       const newContentPack = contentPack.toBuilder()
@@ -101,12 +85,11 @@ const CreateContentPackPage = createReactClass({
         .build();
       const fetchedEntities = result.entities.map((e) => Entity.fromJSON(e, false, contentPack.parameters));
 
-      this.setState({ contentPack: newContentPack, fetchedEntities });
+      setContentPackState(cur => ({ ...cur, contentPack: newContentPack, fetchedEntities }))
     });
-  },
+  }
 
-  render() {
-    const { contentPack, fetchedEntities, selectedEntities, appliedParameter, entityIndex } = this.state;
+
 
     return (
       <DocumentTitle title="Content packs">
@@ -124,17 +107,16 @@ const CreateContentPackPage = createReactClass({
             </span>
           </PageHeader>
           <ContentPackEdit contentPack={contentPack}
-                           onGetEntities={this._getEntities}
-                           onStateChange={this._onStateChanged}
+                           onGetEntities={_getEntities}
+                           onStateChange={_onStateChanged}
                            fetchedEntities={fetchedEntities}
                            selectedEntities={selectedEntities}
                            appliedParameter={appliedParameter}
                            entityIndex={entityIndex}
-                           onSave={this._onSave} />
+                           onSave={_onSave} />
         </span>
       </DocumentTitle>
     );
-  },
-});
+};
 
-export default withHistory(CreateContentPackPage);
+export default CreateContentPackPage;
