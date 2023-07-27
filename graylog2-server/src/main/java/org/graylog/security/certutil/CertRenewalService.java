@@ -16,11 +16,6 @@
  */
 package org.graylog.security.certutil;
 
-import org.graylog2.plugin.certificates.RenewalPolicy;
-
 public interface CertRenewalService {
-    RenewalPolicy getRenewalPolicy();
-
     void checkAllDataNodes();
-    void scheduleJob();
 }

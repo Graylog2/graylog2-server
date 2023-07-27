@@ -57,6 +57,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
+
 public class CertRenewalServiceImpl implements CertRenewalService {
     private static final Logger LOG = LoggerFactory.getLogger(CertRenewalServiceImpl.class);
 
@@ -74,15 +76,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     // TODO: convert to config?
     private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
-
-    public static final String RENEWAL_JOB_ID = "cert-renewal-check";
-
-    public static final JobDefinitionDto DEFINITION_INSTANCE = JobDefinitionDto.builder()
-            .id(RENEWAL_JOB_ID) // This is a system entity and the ID MUST NOT change!
-            .title("Certificat Renewal Check")
-            .description("Runs periodically to check for certificates that are about to expire and notifies/triggers renewal")
-            .config(CheckForCertRenewalJob.Config.builder().build())
-            .build();
 
     @Inject
     public CertRenewalServiceImpl(final ClusterConfigService clusterConfigService,
@@ -114,8 +107,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this(null, null, null, null, null, null, null, null, null, clock, "dummy");
     }
 
-    @Override
-    public RenewalPolicy getRenewalPolicy() {
+    private RenewalPolicy getRenewalPolicy() {
         return this.clusterConfigService.get(RenewalPolicy.class);
     }
 
@@ -189,22 +181,5 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                         notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, pair.getLeft());
                     }
                 });
-    }
-
-    @Override
-    public void scheduleJob() {
-        // TODO: check, if the two more fields are needed (see CronJobSchedule Tests)
-        final var cronJobSchedule = CronJobSchedule.builder().cronExpression("0,30 * * * *").timezone(null).build();
-
-        final var jobDefinition = customJobDefinitionService.findOrCreate(DEFINITION_INSTANCE);
-
-        final var trigger = JobTriggerDto.builder()
-                .jobDefinitionId(jobDefinition.id())
-                .jobDefinitionType(CheckForCertRenewalJob.TYPE_NAME)
-                .schedule(cronJobSchedule)
-                .status(JobTriggerStatus.RUNNABLE)
-                .build();
-
-        jobTriggerService.create(trigger);
     }
 }
