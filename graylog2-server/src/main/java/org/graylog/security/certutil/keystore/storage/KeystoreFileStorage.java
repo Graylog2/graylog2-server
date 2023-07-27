@@ -19,7 +19,6 @@ package org.graylog.security.certutil.keystore.storage;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreLocation;
 
 import javax.inject.Inject;
 import java.io.FileOutputStream;
