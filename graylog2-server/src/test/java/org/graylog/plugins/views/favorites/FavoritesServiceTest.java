@@ -42,7 +42,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
 @ExtendWith(TestUserServiceExtension.class)
-public class FavoriteServiceTest {
+public class FavoritesServiceTest {
     FavoritesService favoritesService;
     TestUserService testUserService;
     GRNRegistry grnRegistry;
