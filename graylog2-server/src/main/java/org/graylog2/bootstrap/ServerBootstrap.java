@@ -63,6 +63,7 @@ import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.shared.security.CertificateRenewalBindings;
 import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -399,6 +400,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());
+        result.add(new CertificateRenewalBindings());
         result.add(new DataNodeProvisioningBindings());
 
         return result;
