@@ -54,7 +54,7 @@ const relativeStartTimeForTimeRange = (timeRange: TimeRange) => {
 
       return timeRange.range;
     case 'absolute':
-      return moment().diff((timeRange.from, 'seconds'));
+      return moment().diff(timeRange.from, 'seconds');
     case 'keyword':
       return ToolsStore.testNaturalDate(timeRange.keyword, timeRange.timezone).then(
         ({ from }) => moment().diff(from, 'seconds'),
@@ -66,7 +66,11 @@ const relativeStartTimeForTimeRange = (timeRange: TimeRange) => {
 
 const filterOptionsByLimit = async (presets: SearchesConfig['quick_access_timerange_presets'], timeRangeLimit: number) => {
   const filteredOptions = await Promise.all(presets?.map(
-    (preset) => (relativeStartTimeForTimeRange(preset.timerange) <= timeRangeLimit ? preset : null),
+    async (preset) => {
+      const relativeStartTime = await relativeStartTimeForTimeRange(preset.timerange);
+
+      return ((relativeStartTime && relativeStartTime <= timeRangeLimit) ? preset : null);
+    },
   ));
 
   return filteredOptions.filter((opt) => !!opt);

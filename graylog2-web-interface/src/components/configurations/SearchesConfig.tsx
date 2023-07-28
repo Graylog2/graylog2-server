@@ -35,9 +35,10 @@ import type { QuickAccessTimeRange } from 'components/configurations/QuickAccess
 import QuickAccessTimeRangeForm from 'components/configurations/QuickAccessTimeRangeForm';
 import generateId from 'logic/generateId';
 import QuickAccessTimeRangeOptionsSummary from 'components/configurations/QuickAccessTimeRangeOptionsSummary';
-import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
@@ -169,7 +170,7 @@ const SearchesConfig = () => {
 
     if (quickAccessTimeRangePresetsUpdated) {
       update.quick_access_timerange_presets = quickAccessTimeRangePresetsUpdated.toArray().map(({ description, timerange, id }) => ({
-        description, timerange: onSubmittingTimerange(timerange, userTimezone), id,
+        description, timerange: normalizeFromSearchBarForBackend(timerange, userTimezone), id,
       }));
 
       setQuickAccessTimeRangePresetsUpdated(undefined);
