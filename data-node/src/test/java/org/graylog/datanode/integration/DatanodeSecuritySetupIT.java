@@ -135,7 +135,7 @@ public class DatanodeSecuritySetupIT {
 
         try {
             var hostname = Tools.getLocalCanonicalHostname();
-            var url = "https://" + hostname + ":" + datanodeRestPort;
+            var url = "https://localhost:" + datanodeRestPort;
             LOG.info("Trying to connect to: {}", url);
             retryer.call(() -> RestAssured.given()
                     .trustStore(trustStore)
