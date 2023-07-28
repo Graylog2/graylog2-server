@@ -104,7 +104,6 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Pro
     <Container>
       <SidebarNavigation activeSection={activeSection}
                          selectSidebarSection={selectSidebarSection}
-                         toggleSidebar={toggleSidebar}
                          sections={sections}
                          sidebarIsPinned={sidebarIsPinned}
                          actions={actions} />

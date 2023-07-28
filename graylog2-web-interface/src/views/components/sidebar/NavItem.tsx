@@ -37,7 +37,7 @@ type ContainerProps = {
   $disabled: boolean,
 };
 
-const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSelected, $sidebarIsPinned, $disabled }) => css`
+const Container = styled.button<ContainerProps>(({ theme: { colors, fonts }, $isSelected, $sidebarIsPinned, $disabled }) => css`
   position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
@@ -47,6 +47,8 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSel
   font-size: ${fonts.size.h3};
   color: ${colors.variant.darkest.default};
   background: ${$isSelected ? colors.gray[90] : colors.global.contentBackground};
+  border: 0;
+  padding: 0;
 
   &:hover {
     color: ${$isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
