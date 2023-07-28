@@ -18,6 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
 import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.hamcrest.Matchers;
@@ -28,7 +29,7 @@ import java.util.Arrays;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration
+@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.OS2)
 public class MessagesResourceIT {
     private final GraylogApis api;
 
@@ -79,6 +80,43 @@ public class MessagesResourceIT {
                 "\"2015-01-01T03:00:00.000Z\",\"source-1\",\"Hi\"",
                 "\"2015-01-01T02:00:00.000Z\",\"source-2\",\"He\"",
                 "\"2015-01-01T01:00:00.000Z\",\"source-1\",\"Ha\""
+        );
+    }
+
+    /**
+     * Tests, if setting a time zone on the request results in a response containing results in the timezone
+     */
+    @ContainerMatrixTest
+    void testTimeZone() {
+        this.api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
+
+        String allMessagesTimeRange = """
+                {"timerange": {
+                   "type": "absolute",
+                   "from": "2015-01-01T00:00:00",
+                   "to": "2015-01-01T23:59:59"
+                },
+                "time_zone": "Antarctica/Casey"
+                }
+                """;
+
+        Response r = given()
+                .spec(api.requestSpecification())
+                .accept("text/csv")
+                .body(allMessagesTimeRange)
+                .post("/views/search/messages");
+
+        String[] resultLines = r.asString().split("\n");
+
+        assertThat(resultLines)
+                .startsWith("\"timestamp\",\"source\",\"message\"")
+                .as("should contain header");
+
+        assertThat(Arrays.copyOfRange(resultLines, 1, 5)).containsExactlyInAnyOrder(
+                "\"2015-01-01T09:00:00.000+08:00\",\"source-1\",\"Ha\"",
+                "\"2015-01-01T10:00:00.000+08:00\",\"source-2\",\"He\"",
+                "\"2015-01-01T11:00:00.000+08:00\",\"source-1\",\"Hi\"",
+                "\"2015-01-01T12:00:00.000+08:00\",\"source-2\",\"Ho\""
         );
     }
 }

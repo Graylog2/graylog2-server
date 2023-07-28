@@ -127,6 +127,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
+                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
