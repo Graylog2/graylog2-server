@@ -31,9 +31,9 @@ const viewHandler = (state: ViewState, { hasToPushRevision, dispatch, currentVie
   dispatch: AppDispatch,
   currentView: View,
 }): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => {
-  const isDirty = !isViewWidgetsEqualForSearch(state.view, currentView) || !isViewSearchEqual(state.view.search, currentView.search);
+  const shouldRecreateSearch = !isViewWidgetsEqualForSearch(state.view, currentView) || !isViewSearchEqual(state.view.search, currentView.search);
 
-  return dispatch(updateView(state.view, isDirty, { hasToPushRevision }));
+  return dispatch(updateView(state.view, shouldRecreateSearch, { hasToPushRevision }));
 });
 
 export const undo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
