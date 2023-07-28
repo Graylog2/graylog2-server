@@ -17,6 +17,7 @@
 package org.graylog.security.certutil;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.AbstractIdleService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.scheduler.DBCustomJobDefinitionService;
 import org.graylog.scheduler.DBJobDefinitionService;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -57,8 +59,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.graylog.security.certutil.CheckForCertRenewalJob.DEFINITION_INSTANCE;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
+@Singleton
 public class CertRenewalServiceImpl implements CertRenewalService {
     private static final Logger LOG = LoggerFactory.getLogger(CertRenewalServiceImpl.class);
 
@@ -68,9 +72,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
-    private final DBJobDefinitionService jobDefinitionService;
-    private final DBCustomJobDefinitionService customJobDefinitionService;
-    private final JobScheduleStrategies jobScheduleStrategies;
     private final JobSchedulerClock clock;
     private final char[] passwordSecret;
 
@@ -84,9 +85,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final DataNodeProvisioningService dataNodeProvisioningService,
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
-                                  final DBJobDefinitionService jobDefinitionService,
-                                  final DBCustomJobDefinitionService customJobDefinitionService,
-                                  final JobScheduleStrategies jobScheduleStrategies,
                                   final JobSchedulerClock clock,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
@@ -95,16 +93,13 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.notificationService = notificationService;
         this.jobTriggerService = jobTriggerService;
-        this.jobDefinitionService = jobDefinitionService;
-        this.customJobDefinitionService = customJobDefinitionService;
-        this.jobScheduleStrategies = jobScheduleStrategies;
         this.clock = clock;
         this.passwordSecret = passwordSecret.toCharArray();
     }
 
     @VisibleForTesting
     CertRenewalServiceImpl(final JobSchedulerClock clock) {
-        this(null, null, null, null, null, null, null, null, null, clock, "dummy");
+        this(null, null, null, null, null, null, clock, "dummy");
     }
 
     private RenewalPolicy getRenewalPolicy() {

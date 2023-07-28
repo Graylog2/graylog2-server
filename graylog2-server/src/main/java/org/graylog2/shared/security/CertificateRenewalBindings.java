@@ -28,7 +28,7 @@ public class CertificateRenewalBindings  extends PluginModule {
     @Override
     protected void configure() {
         bind(CaService.class).to(CaServiceImpl.class);
-        bind(CertRenewalService.class).to(CertRenewalServiceImpl.class);
+        bind(CertRenewalService.class).to(CertRenewalServiceImpl.class).asEagerSingleton();
 
         addJobSchedulerSchedule(CronJobSchedule.TYPE_NAME, CronJobSchedule.class);
         addSchedulerJob(CheckForCertRenewalJob.TYPE_NAME,

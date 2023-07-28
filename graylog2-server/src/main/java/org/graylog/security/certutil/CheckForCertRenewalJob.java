@@ -20,18 +20,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.scheduler.DBCustomJobDefinitionService;
-import org.graylog.scheduler.DBJobDefinitionService;
-import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobExecutionContext;
 import org.graylog.scheduler.JobExecutionException;
-import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.JobTriggerUpdate;
-import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +36,7 @@ public class CheckForCertRenewalJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(CheckForCertRenewalJob.class);
 
     public static final String TYPE_NAME = "check-for-cert-renewal-execution-v1";
-    public static final String RENEWAL_JOB_ID = "cert-renewal-check";
+    public static final String RENEWAL_JOB_ID = "64a66741cb3275652764c937";
 
     public static final JobDefinitionDto DEFINITION_INSTANCE = JobDefinitionDto.builder()
             .id(RENEWAL_JOB_ID) // This is a system entity and the ID MUST NOT change!
@@ -86,27 +81,8 @@ public class CheckForCertRenewalJob implements Job {
     }
 
     @Inject
-    public CheckForCertRenewalJob(final CertRenewalService certRenewalService,
-                                  final DBJobTriggerService jobTriggerService,
-                                  final DBJobDefinitionService jobDefinitionService,
-                                  final DBCustomJobDefinitionService customJobDefinitionService) {
+    public CheckForCertRenewalJob(final CertRenewalService certRenewalService) {
         this.certRenewalService = certRenewalService;
-
-        // create the trigger etc. if the job definition does not exist
-        if(jobDefinitionService.get(RENEWAL_JOB_ID) == null) {
-            final var jobDefinition = customJobDefinitionService.findOrCreate(DEFINITION_INSTANCE);
-
-            final var cronJobSchedule = CronJobSchedule.builder().cronExpression("0,30 * * * *").timezone(null).build();
-
-            final var trigger = JobTriggerDto.builder()
-                    .jobDefinitionId(jobDefinition.id())
-                    .jobDefinitionType(CheckForCertRenewalJob.TYPE_NAME)
-                    .schedule(cronJobSchedule)
-                    .status(JobTriggerStatus.RUNNABLE)
-                    .build();
-
-            jobTriggerService.create(trigger);
-        }
     }
 
     @Override
