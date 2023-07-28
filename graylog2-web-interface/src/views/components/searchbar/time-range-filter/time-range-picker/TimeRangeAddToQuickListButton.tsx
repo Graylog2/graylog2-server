@@ -28,7 +28,6 @@ import type { TimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -38,6 +37,10 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type {
   TimeRangePickerFormValues,
 } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import {
+  normalizeFromPickerForSearchBar,
+  normalizeFromSearchBarForBackend,
+} from 'views/logic/queries/NormalizeTimeRange';
 
 const StyledModalSubmit = styled(ModalSubmit)`
   margin-top: 15px;
@@ -83,8 +86,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
           {!!equalTimerange && (
             <p>
               <Icon name="exclamation-triangle" />
-              You already have similar time range in
-                {' '}
+              You already have similar time range in{' '}
               <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
               <br />
               <i>f.e. ({equalTimerange.description})</i>
@@ -121,7 +123,7 @@ const TimeRangeAddToQuickListButton = () => {
   const addTimerange = useCallback((description: string) => {
     const quickAccessTimerangePreset = {
       description,
-      timerange: onSubmittingTimerange(values.nextTimeRange as TimeRange, userTimezone),
+      timerange: normalizeFromSearchBarForBackend(normalizeFromPickerForSearchBar(values.nextTimeRange) as TimeRange, userTimezone),
       id: generateId(),
     };
 
@@ -153,7 +155,7 @@ const TimeRangeAddToQuickListButton = () => {
     ?.quick_access_timerange_presets
     ?.find((existingTimerange) => isTimerangeEqual(
       existingTimerange.timerange,
-      onSubmittingTimerange(values.nextTimeRange as TimeRange, userTimezone),
+      normalizeFromSearchBarForBackend(values.nextTimeRange as TimeRange, userTimezone),
     )), [config, values.nextTimeRange, userTimezone]);
 
   return (

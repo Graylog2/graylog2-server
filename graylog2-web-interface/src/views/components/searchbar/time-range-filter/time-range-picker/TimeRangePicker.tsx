@@ -26,11 +26,12 @@ import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
   NoTimeRangeOverride,
-  TimeRange,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
-import { isTypeKeyword, isTypeRelative } from 'views/typeGuards/timeRange';
-import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
+import { isTypeRelative } from 'views/typeGuards/timeRange';
+import {
+  normalizeFromPickerForSearchBar,
+} from 'views/logic/queries/NormalizeTimeRange';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
@@ -110,18 +111,6 @@ const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['time
   return currentTimeRange;
 };
 
-const normalizeIfKeywordTimeRange = (timeRange: TimeRange | NoTimeRangeOverride) => {
-  if (isTypeKeyword(timeRange)) {
-    return {
-      type: timeRange.type,
-      timezone: timeRange.timezone,
-      keyword: timeRange.keyword,
-    };
-  }
-
-  return timeRange;
-};
-
 type Props = {
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
   limitDuration: number,
@@ -166,11 +155,7 @@ const TimeRangePicker = ({
   const handleSubmit = useCallback(({ nextTimeRange }: {
     nextTimeRange: TimeRangePickerFormValues['nextTimeRange']
   }) => {
-    const normalizedTimeRange = normalizeIfKeywordTimeRange(
-      normalizeIfAllMessagesRange(
-        normalizeIfClassifiedRelativeTimeRange(nextTimeRange),
-      ),
-    );
+    const normalizedTimeRange = normalizeFromPickerForSearchBar(nextTimeRange);
 
     setCurrentTimeRange(normalizedTimeRange);
 
