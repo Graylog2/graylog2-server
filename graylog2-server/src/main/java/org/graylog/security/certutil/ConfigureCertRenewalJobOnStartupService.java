@@ -51,7 +51,7 @@ public class ConfigureCertRenewalJobOnStartupService extends AbstractIdleService
         if (jobDefinitionService.get(RENEWAL_JOB_ID).isEmpty()) {
             final var jobDefinition = customJobDefinitionService.findOrCreate(DEFINITION_INSTANCE);
 
-            final var cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0,30 * * * ? *").timezone(null).build();
+            final var cronJobSchedule = CronJobSchedule.builder().cronExpression("0 0,30 * * * ? *").build();
 
             final var trigger = JobTriggerDto.builder()
                     .jobDefinitionId(jobDefinition.id())

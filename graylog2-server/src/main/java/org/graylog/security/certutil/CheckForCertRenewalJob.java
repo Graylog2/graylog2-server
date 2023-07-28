@@ -89,7 +89,7 @@ public class CheckForCertRenewalJob implements Job {
     public JobTriggerUpdate execute(JobExecutionContext ctx) throws JobExecutionException {
         LOG.debug("Job execute called {}", ctx);
 
-        certRenewalService.checkAllDataNodes();
+        certRenewalService.checkCertificatesForRenewal();
 
         return ctx.jobTriggerUpdates()
                 .scheduleNextExecution()

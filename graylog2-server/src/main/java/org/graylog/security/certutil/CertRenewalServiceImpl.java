@@ -49,6 +49,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -73,6 +74,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
     private final JobSchedulerClock clock;
+    private final CaService caService;
     private final char[] passwordSecret;
 
     // TODO: convert to config?
@@ -85,6 +87,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final DataNodeProvisioningService dataNodeProvisioningService,
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
+                                  final CaService caService,
                                   final JobSchedulerClock clock,
                                   final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
@@ -94,12 +97,13 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.notificationService = notificationService;
         this.jobTriggerService = jobTriggerService;
         this.clock = clock;
+        this.caService = caService;
         this.passwordSecret = passwordSecret.toCharArray();
     }
 
     @VisibleForTesting
     CertRenewalServiceImpl(final JobSchedulerClock clock) {
-        this(null, null, null, null, null, null, clock, "dummy");
+        this(null, null, null, null, null, null, null, clock, "dummy");
     }
 
     private RenewalPolicy getRenewalPolicy() {
@@ -133,15 +137,43 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     @Override
-    public void checkAllDataNodes() {
+    public void checkCertificatesForRenewal() {
         final var renewalPolicy = getRenewalPolicy();
 
         // a renewal policy has to be present to check for outdated certificates
-        if(renewalPolicy == null) {
-            return;
+        if (renewalPolicy != null) {
+            checkDataNodesCertificatesForRenewal(renewalPolicy);
+            checkCaCertificatesForRenewal(renewalPolicy);
         }
+    }
 
+    private DateTime getNextRenewal() {
+        return jobTriggerService.getOneForJob(RENEWAL_JOB_ID).map(JobTriggerDto::nextTime).orElse(DateTime.now(DateTimeZone.UTC).plusMinutes(30));
+    }
+
+    protected void checkCaCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
+        try {
+            final var keystore = caService.loadKeyStore();
+            if(keystore.isPresent()) {
+                final var ks = keystore.get();
+                final var nextRenewal = getNextRenewal();
+                final var rootCert = ks.getCertificate("root");
+                if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) rootCert)) {
+                    notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, "root cert");
+                }
+                final var caCert = ks.getCertificate("ca");
+                if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
+                    notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, "ca cert");
+                }
+            }
+        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException e) {
+            LOG.error("Could not read CA keystore: {}", e.getMessage());
+        }
+    }
+
+    protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        final var nextRenewal = getNextRenewal();
         activeDataNodes.values().stream()
                 .map(node -> {
                     try {
@@ -162,10 +194,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                     }
                 })
                 .filter(Objects::nonNull)
-                .filter(p -> {
-                    var nextRenewal = jobTriggerService.getOneForJob(RENEWAL_JOB_ID).map(JobTriggerDto::nextTime).orElse(DateTime.now(DateTimeZone.UTC).plusMinutes(30));
-                    return needsRenewal(nextRenewal, renewalPolicy, p.getRight());
-                })
+                .filter(p -> needsRenewal(nextRenewal, renewalPolicy, p.getRight()))
                 .forEach(pair -> {
                     if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
                         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request

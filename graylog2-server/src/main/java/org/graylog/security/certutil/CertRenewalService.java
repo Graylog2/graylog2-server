@@ -17,5 +17,5 @@
 package org.graylog.security.certutil;
 
 public interface CertRenewalService {
-    void checkAllDataNodes();
+    void checkCertificatesForRenewal();
 }
