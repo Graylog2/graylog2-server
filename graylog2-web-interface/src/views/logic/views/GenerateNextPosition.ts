@@ -27,21 +27,21 @@ export const ConcatPositions = (
 ) => {
   let rowIncrement = 0;
 
-  const newUpdatedPositions: Immutable.Map<string, WidgetPosition> = newPositions.map((initialPosition) => {
+  const newUpdatedPositions = newPositions.map((initialPosition) => {
     const defaultHeight = initialPosition.height;
     const row: number = rowIncrement + initialPosition.row;
     const widgetPosition = initialPosition.toBuilder().row(row).build();
     rowIncrement += defaultHeight;
 
     return widgetPosition;
-  });
+  }) as Immutable.Map<string, WidgetPosition>;
 
-  const curUpdatedPositions: Immutable.Map<string, WidgetPosition> = curPositions.map((initialPosition) => {
+  const curUpdatedPositions = curPositions.map((initialPosition) => {
     const row: number = rowIncrement + initialPosition.row;
     const widgetPosition = initialPosition.toBuilder().row(row).build();
 
     return widgetPosition;
-  });
+  }) as Immutable.Map<string, WidgetPosition>;
 
   return newUpdatedPositions.merge(curUpdatedPositions);
 };
