@@ -27,6 +27,7 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 
 import static org.graylog2.cluster.preflight.NodePreflightConfig.FIELD_CERTIFICATE;
@@ -52,6 +53,11 @@ public class NodePreflightConfigServiceImpl extends PaginatedDbService<NodePrefl
     @Override
     public NodePreflightConfig getPreflightConfigFor(String nodeId) {
         return dbCollection.findOne(DBQuery.is(FIELD_NODEID, nodeId));
+    }
+
+    @Override
+    public List<NodePreflightConfig> findAllNodesThatNeedAttention() {
+        return this.streamQuery(DBQuery.notIn(FIELD_STATE, NodePreflightConfig.State.CONNECTED)).toList();
     }
 
     @Override
