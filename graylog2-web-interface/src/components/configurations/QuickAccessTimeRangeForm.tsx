@@ -68,9 +68,7 @@ type ItemProps = {
 
 const contextSettings = {
   showDropdownButton: false,
-  showRelativePresetsButton: false,
-  showAbsolutePresetsButton: false,
-  showKeywordPresetsButton: false,
+  showPresetsButton: false,
   showAddToQuickListButton: false,
   ignoreLimitDurationInTimeRangeDropdown: true,
 };

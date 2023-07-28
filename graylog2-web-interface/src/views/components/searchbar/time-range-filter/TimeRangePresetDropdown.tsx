@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -25,48 +25,17 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { onInitializingTimerange } from 'views/components/TimerangeForForm';
-import type {
-  TimeRange,
-  KeywordTimeRange,
-  RelativeTimeRangeWithEnd,
-  AbsoluteTimeRange,
-  RelativeTimeRangeStartOnly,
-} from 'views/logic/queries/Query';
-import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import type { TimeRange } from 'views/logic/queries/Query';
 import ToolsStore from 'stores/tools/ToolsStore';
+import type { SearchesConfig } from 'components/search/SearchConfig';
+import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
-type Props = {
-  onToggle?: (open: boolean) => void,
-  className?: string,
-  displayTitle?: boolean,
-  bsSize?: string,
-  header: string,
-  disabled?: boolean,
-  onChange?: (timerange: TimeRange) => void,
-  availableOptions?: Array<QuickAccessTimeRange>,
-};
-
-const getPassedByLimit = async (quickAccessTimeRange: QuickAccessTimeRange, limit: number) => {
-  const { timerange } = quickAccessTimeRange;
-
-  const checkIsPassed = async () => {
-    switch (timerange.type) {
-      case 'relative':
-        return ((timerange as RelativeTimeRangeWithEnd).from || (timerange as RelativeTimeRangeStartOnly).range) <= limit;
-      case 'absolute':
-        return moment().diff((timerange as AbsoluteTimeRange).from, 'seconds') <= limit;
-      case 'keyword':
-        return ToolsStore.testNaturalDate((timerange as KeywordTimeRange).keyword, (timerange as KeywordTimeRange).timezone)
-          .then((response) => moment().diff(response.from, 'seconds') <= limit);
-      default:
-        throw Error('Time range type doesn\'t not exist');
-    }
-  };
-
-  const isPassed = await checkIsPassed();
-
-  return isPassed ? quickAccessTimeRange : null;
-};
+type PresetOption = {
+  eventKey?: TimeRange,
+  key?: string,
+  disabled: boolean,
+  label: string,
+}
 
 const ExternalIcon = styled(Icon)`
   margin-left: 6px;
@@ -76,45 +45,89 @@ const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
-const TimeRangePresetDropdown = ({ availableOptions, disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
-  const sendTelemetry = useSendTelemetry();
-  const { config } = useSearchConfiguration();
-  const [filtratedByLimitOptions, setFiltratedByLimitOptions] = useState([]);
-
-  const timeRangeLimit = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds(), [config?.query_time_range_limit]);
-  const title = displayTitle && (availableOptions ? 'Preset Times' : 'No available presets');
-
-  useEffect(() => {
-    const filtrateOptions = async () => {
-      const res = !timeRangeLimit ? availableOptions : await Promise
-        .all(availableOptions?.map((quickAccessTimeRange) => getPassedByLimit(quickAccessTimeRange, timeRangeLimit)));
-
-      if (res) {
-        setFiltratedByLimitOptions(res.filter((item) => item !== null));
+const relativeStartTimeForTimeRange = (timeRange: TimeRange) => {
+  switch (timeRange.type) {
+    case 'relative':
+      if (isTypeRelativeWithEnd(timeRange)) {
+        return timeRange.from;
       }
-    };
 
-    filtrateOptions();
-  }, [availableOptions, timeRangeLimit]);
+      return timeRange.range;
+    case 'absolute':
+      return moment().diff((timeRange.from, 'seconds'));
+    case 'keyword':
+      return ToolsStore.testNaturalDate(timeRange.keyword, timeRange.timezone).then(
+        ({ from }) => moment().diff(from, 'seconds'),
+      );
+    default:
+      throw Error('Time range type doesn\'t not exist');
+  }
+};
 
-  let options;
+const filterOptionsByLimit = async (presets: SearchesConfig['quick_access_timerange_presets'], timeRangeLimit: number) => {
+  const filteredOptions = await Promise.all(presets?.map(
+    (preset) => (relativeStartTimeForTimeRange(preset.timerange) <= timeRangeLimit ? preset : null),
+  ));
 
-  if (filtratedByLimitOptions?.length) {
-    options = filtratedByLimitOptions.map(({ description, timerange, id }) => {
-      const optionLabel = description.replace(/Search\sin(\sthe\slast)?\s/, '');
+  return filteredOptions.filter((opt) => !!opt);
+};
 
-      const option = (
-        <MenuItem eventKey={timerange} key={`timerange-option-${id}`} disabled={disabled}>{optionLabel}</MenuItem>);
+const preparePresetOptions = async (presets: SearchesConfig['quick_access_timerange_presets'], timeRangeLimit: number, disabled: boolean) => {
+  const availableOptions = timeRangeLimit ? await filterOptionsByLimit(presets, timeRangeLimit) : presets;
 
-      return option;
-    });
-  } else {
-    options = (<MenuItem eventKey="300" disabled>No available presets</MenuItem>);
+  if (availableOptions?.length) {
+    return availableOptions.map(({ description, timerange, id }) => ({
+      eventKey: timerange,
+      key: `timerange-option-${id}`,
+      disabled,
+      label: description.replace(/Search\sin(\sthe\slast)?\s/, ''),
+    }));
   }
 
-  const { formatTime } = useUserDateTime();
+  return [{
+    disabled: true,
+    label: 'No available presets',
+  }];
+};
 
-  const _onChange = (timerange) => {
+const usePresetOptions = (disabled: boolean) => {
+  const { config } = useSearchConfiguration();
+  const [presetOptions, setPresetOptions] = useState<Array<PresetOption> | undefined>();
+  const timeRangeLimit = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds(), [config?.query_time_range_limit]);
+
+  useEffect(() => {
+    const updateOptions = async () => {
+      setPresetOptions(
+        await preparePresetOptions(
+          config?.quick_access_timerange_presets,
+          timeRangeLimit,
+          disabled,
+        ),
+      );
+    };
+
+    updateOptions();
+  }, [config?.quick_access_timerange_presets, disabled, timeRangeLimit]);
+
+  return presetOptions;
+};
+
+type Props = {
+  onToggle?: (open: boolean) => void,
+  className?: string,
+  displayTitle?: boolean,
+  bsSize?: string,
+  header: string,
+  disabled?: boolean,
+  onChange?: (timerange: TimeRange) => void,
+};
+
+const TimeRangePresetDropdown = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
+  const sendTelemetry = useSendTelemetry();
+  const { formatTime } = useUserDateTime();
+  const options = usePresetOptions(disabled);
+
+  const _onChange = useCallback((timerange: TimeRange) => {
     if (timerange !== null && timerange !== undefined) {
       sendTelemetry('input_value_change', {
         app_pathname: 'search',
@@ -125,10 +138,10 @@ const TimeRangePresetDropdown = ({ availableOptions, disabled, onChange, onToggl
 
       onChange(onInitializingTimerange(timerange, formatTime));
     }
-  };
+  }, [formatTime, onChange, sendTelemetry]);
 
   return (
-    <DropdownButton title={title}
+    <DropdownButton title={displayTitle && 'Load Preset'}
                     id="relative-timerange-selector"
                     aria-label="Open time range preset select"
                     bsSize={bsSize}
@@ -138,10 +151,15 @@ const TimeRangePresetDropdown = ({ availableOptions, disabled, onChange, onToggl
       {header && (
         <MenuItem header>{header}</MenuItem>
       )}
-      {options}
+      {options ? options?.map(({ eventKey, key, disabled: isDisabled, label }) => (
+        <MenuItem eventKey={eventKey} key={key} disabled={isDisabled}>
+          {label}
+        </MenuItem>
+      )) : 'Loading...'}
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
-        <AdminMenuItem href="/system/configurations" target="_blank">Configure Ranges <ExternalIcon name="external-link-alt" />
+        <AdminMenuItem href="/system/configurations" target="_blank">
+          Configure Ranges <ExternalIcon name="external-link-alt" />
         </AdminMenuItem>
       </IfPermitted>
     </DropdownButton>
@@ -156,7 +174,6 @@ TimeRangePresetDropdown.propTypes = {
   header: PropTypes.string,
   onChange: PropTypes.func,
   onToggle: PropTypes.func,
-  availableOptions: PropTypes.array,
 };
 
 TimeRangePresetDropdown.defaultProps = {
@@ -167,7 +184,6 @@ TimeRangePresetDropdown.defaultProps = {
   onToggle: undefined,
   header: undefined,
   displayTitle: true,
-  availableOptions: [],
 };
 
 export default TimeRangePresetDropdown;

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -24,10 +24,7 @@ import { useFormikContext } from 'formik';
 import { Icon, Accordion, AccordionItem } from 'components/common';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
-import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
-import TimeRangePresetRow from './TimeRangePresetRow';
 import AbsoluteCalendar from './AbsoluteCalendar';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
 import type { TimeRangePickerFormValues } from './TimeRangePicker';
@@ -79,80 +76,67 @@ const FlexWrap = styled.div`
 `;
 
 const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangePickerFormValues & { nextTimeRange: AbsoluteTimeRange }>();
+  const { values: { nextTimeRange } } = useFormikContext<TimeRangePickerFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const { toUserTimezone } = useUserDateTime();
   const [activeAccordion, setActiveAccordion] = useState<'Timestamp' | 'Calendar' | undefined>();
   const toStartDate = moment(nextTimeRange.from).toDate();
   const fromStartDate = limitDuration ? toUserTimezone(new Date()).seconds(-limitDuration).toDate() : undefined;
-  const { config } = useSearchConfiguration();
-  const { showAbsolutePresetsButton } = useContext(TimeRangeInputSettingsContext);
-  const absoluteOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'absolute'), [config?.quick_access_timerange_presets]);
-  const onSetPreset = useCallback((range: AbsoluteTimeRange) => {
-    setFieldValue('nextTimeRange', range);
-  }, [setFieldValue]);
 
   const handleSelect = (nextKey: 'Timestamp' | 'Calendar' | undefined) => {
     setActiveAccordion(nextKey ?? activeAccordion);
   };
 
   return (
-    <>
-      <AbsoluteWrapper>
-        <StyledAccordion defaultActiveKey="calendar"
-                         onSelect={handleSelect}
-                         id="absolute-time-ranges"
-                         data-testid="absolute-time-ranges"
-                         activeKey={activeAccordion}>
+    <AbsoluteWrapper>
+      <StyledAccordion defaultActiveKey="calendar"
+                       onSelect={handleSelect}
+                       id="absolute-time-ranges"
+                       data-testid="absolute-time-ranges"
+                       activeKey={activeAccordion}>
 
-          <AccordionItem name="Calendar">
-            <RangeWrapper>
-              <AbsoluteCalendar startDate={fromStartDate}
-                                nextTimeRange={nextTimeRange}
-                                range="from" />
+        <AccordionItem name="Calendar">
+          <RangeWrapper>
+            <AbsoluteCalendar startDate={fromStartDate}
+                              nextTimeRange={nextTimeRange}
+                              range="from" />
 
-            </RangeWrapper>
+          </RangeWrapper>
 
-            <IconWrap>
-              <Icon name="arrow-right" />
-            </IconWrap>
+          <IconWrap>
+            <Icon name="arrow-right" />
+          </IconWrap>
 
-            <RangeWrapper>
-              <AbsoluteCalendar startDate={toStartDate}
-                                nextTimeRange={nextTimeRange}
-                                range="to" />
-            </RangeWrapper>
-          </AccordionItem>
+          <RangeWrapper>
+            <AbsoluteCalendar startDate={toStartDate}
+                              nextTimeRange={nextTimeRange}
+                              range="to" />
+          </RangeWrapper>
+        </AccordionItem>
 
-          <AccordionItem name="Timestamp">
-            <TimestampContent>
-              <p>Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.</p>
-              <FlexWrap>
-                <RangeWrapper>
-                  <AbsoluteTimestamp disabled={disabled}
-                                     nextTimeRange={nextTimeRange}
-                                     range="from" />
-                </RangeWrapper>
+        <AccordionItem name="Timestamp">
+          <TimestampContent>
+            <p>Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.</p>
+            <FlexWrap>
+              <RangeWrapper>
+                <AbsoluteTimestamp disabled={disabled}
+                                   nextTimeRange={nextTimeRange}
+                                   range="from" />
+              </RangeWrapper>
 
-                <IconWrap>
-                  <Icon name="arrow-right" />
-                </IconWrap>
+              <IconWrap>
+                <Icon name="arrow-right" />
+              </IconWrap>
 
-                <RangeWrapper>
-                  <AbsoluteTimestamp disabled={disabled}
-                                     nextTimeRange={nextTimeRange}
-                                     range="to" />
-                </RangeWrapper>
-              </FlexWrap>
-            </TimestampContent>
-          </AccordionItem>
-        </StyledAccordion>
-      </AbsoluteWrapper>
-      {showAbsolutePresetsButton && (
-        <TimeRangePresetRow disabled={disabled}
-                            onSetPreset={onSetPreset}
-                            availableOptions={absoluteOptions} />
-      )}
-    </>
+              <RangeWrapper>
+                <AbsoluteTimestamp disabled={disabled}
+                                   nextTimeRange={nextTimeRange}
+                                   range="to" />
+              </RangeWrapper>
+            </FlexWrap>
+          </TimestampContent>
+        </AccordionItem>
+      </StyledAccordion>
+    </AbsoluteWrapper>
   );
 };
 

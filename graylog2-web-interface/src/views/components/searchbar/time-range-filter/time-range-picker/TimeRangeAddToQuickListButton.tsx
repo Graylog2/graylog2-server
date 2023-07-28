@@ -43,16 +43,6 @@ const StyledModalSubmit = styled(ModalSubmit)`
   margin-top: 15px;
 `;
 
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  float: right;
-  transform: translateY(-3px);
-  gap: 5px;
-  margin-top: 6px;
-`;
-
 type Props = {
   addTimerange: (title: string) => void,
   toggleModal: () => void,
@@ -167,12 +157,13 @@ const TimeRangeAddToQuickListButton = () => {
     )), [config, values.nextTimeRange, userTimezone]);
 
   return (
-    <Container>
+    <>
       <Button disabled={!isValidTimeRange}
               title="Add time range to quick access time range list"
               ref={formTarget}
+              bsSize="small"
               onClick={toggleModal}>
-        <Icon name="floppy-disk" type="regular" />
+        Save as preset
       </Button>
       {showForm && (
         <TimeRangeAddToQuickListForm addTimerange={addTimerange}
@@ -180,7 +171,7 @@ const TimeRangeAddToQuickListButton = () => {
                                      target={formTarget.current}
                                      equalTimerange={equalTimerange} />
       )}
-    </Container>
+    </>
   );
 };
 
