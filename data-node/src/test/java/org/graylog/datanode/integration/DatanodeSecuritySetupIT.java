@@ -48,7 +48,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -107,12 +106,14 @@ public class DatanodeSecuritySetupIT {
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort());
+        final KeyStore trustStore = buildTruststore(httpCert, "password");
+
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
             given()
                 .auth().basic("admin", "admin")
-                .trustStore(buildTruststore(httpCert, "password"))
+                .trustStore(trustStore)
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
                 .body("name", Matchers.equalTo("node1"))
@@ -123,7 +124,7 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort, KeyStore trustStore) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
@@ -134,9 +135,10 @@ public class DatanodeSecuritySetupIT {
 
         try {
             var hostname = Tools.getLocalCanonicalHostname();
-            var url = "http://" + hostname + ":" + datanodeRestPort;
+            var url = "https://" + hostname + ":" + datanodeRestPort;
             LOG.info("Trying to connect to: {}", url);
             retryer.call(() -> RestAssured.given()
+                    .trustStore(trustStore)
                     .get(url)
                     .then());
         } catch (Exception ex) {
