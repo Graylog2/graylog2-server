@@ -34,6 +34,7 @@ import org.graylog.events.event.EventWithContext;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventConsumer;
 import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorDependencyCheck;
 import org.graylog.events.processor.EventProcessorException;
@@ -87,6 +88,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final DBEventProcessorStateService stateService;
     private final MoreSearch moreSearch;
     private final EventStreamService eventStreamService;
+    private final EventDefinitionHandler eventDefinitionHandler;
     private final Messages messages;
 
     @Inject
@@ -96,6 +98,7 @@ public class AggregationEventProcessor implements EventProcessor {
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
+                                     EventDefinitionHandler eventDefinitionHandler,
                                      Messages messages) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
@@ -104,6 +107,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.stateService = stateService;
         this.moreSearch = moreSearch;
         this.eventStreamService = eventStreamService;
+        this.eventDefinitionHandler = eventDefinitionHandler;
         this.messages = messages;
     }
 
@@ -237,6 +241,10 @@ public class AggregationEventProcessor implements EventProcessor {
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
+
+            List<EventWithContext> eventsList = eventsWithContext.build();
+            EventWithContext lastEventWithContext = eventsList.get(eventsList.size() - 1);
+            eventDefinitionHandler.updateLastMatched(lastEventWithContext);
 
             eventsConsumer.accept(eventsWithContext.build());
         };

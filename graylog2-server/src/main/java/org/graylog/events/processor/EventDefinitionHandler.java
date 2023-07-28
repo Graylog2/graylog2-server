@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor;
 
+import org.graylog.events.event.EventWithContext;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.scheduler.DBJobDefinitionService;
@@ -127,6 +128,23 @@ public class EventDefinitionHandler {
         }
 
         return eventDefinition;
+    }
+
+    /**
+     * Update the timestamp of last match
+     *
+     * @param eventDefinition
+     * @param lastMatched
+     */
+    public void updateLastMatched(EventWithContext eventWithContext) {
+        final Optional<EventDefinitionDto> eventDefinitionDto =
+                eventDefinitionService.get(eventWithContext.event().getEventDefinitionId());
+        if (eventDefinitionDto.isPresent()) {
+            final EventDefinitionDto newDto = eventDefinitionDto.get().toBuilder()
+                    .matchedAt(eventWithContext.event().getEventTimestamp())
+                    .build();
+            updateEventDefinition(newDto);
+        }
     }
 
     /**
