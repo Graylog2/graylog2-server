@@ -116,7 +116,7 @@ public class CertificatesServiceTest {
         ));
 
         result = certificatesService.removeCert(new KeystoreMongoLocation("node_id_6", DATA_NODE_KEYSTORE_COLLECTION));
-        assertFalse("Removal of non existing cert should result in 'true'", result);
+        assertFalse("Removal of non existing cert should result in 'false'", result);
     }
 
 }
