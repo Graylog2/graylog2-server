@@ -74,10 +74,4 @@ public final class KeystoreMongoStorage implements KeystoreStorage<KeystoreMongo
         }
         return Optional.empty();
     }
-
-    @Override
-    public void removeKeyStore(final KeystoreMongoLocation location) {
-        certificatesService.removeCert(location);
-    }
-
 }

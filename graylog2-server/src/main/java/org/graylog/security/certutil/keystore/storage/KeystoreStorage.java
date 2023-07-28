@@ -31,6 +31,4 @@ public sealed interface KeystoreStorage<T extends KeystoreLocation> permits Keys
     ) throws KeyStoreStorageException;
 
     Optional<KeyStore> readKeyStore(final T location, char[] password) throws KeyStoreStorageException;
-
-    void removeKeyStore(final T location);
 }

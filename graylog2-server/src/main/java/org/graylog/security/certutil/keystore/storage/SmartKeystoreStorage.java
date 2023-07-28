@@ -61,11 +61,4 @@ public final class SmartKeystoreStorage implements KeystoreStorage<KeystoreLocat
             return Optional.empty();
         }
     }
-
-    @Override
-    public void removeKeyStore(final KeystoreLocation location) {
-        if (location instanceof final KeystoreMongoLocation mongoLocation) {
-            keystoreMongoStorage.removeKeyStore(mongoLocation);
-        }
-    }
 }

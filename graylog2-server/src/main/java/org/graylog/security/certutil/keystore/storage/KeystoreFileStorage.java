@@ -66,10 +66,4 @@ public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLo
             throw new KeyStoreStorageException("Could not read keystore: " + ex.getMessage(), ex);
         }
     }
-
-    @Override
-    public void removeKeyStore(final KeystoreFileLocation location) {
-        // noop, we don't remove files from the filesystem
-    }
-
 }
