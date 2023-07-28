@@ -91,5 +91,32 @@ public class CertificatesServiceTest {
         ));
     }
 
+    @Test
+    public void testCertRemoval() {
+        certificatesService.writeCert(new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION), "Certificate string representation 1");
+        certificatesService.writeCert(new KeystoreMongoLocation("node_id_5", DATA_NODE_KEYSTORE_COLLECTION), "Certificate string representation 2");
+
+        assertTrue(certificatesService.hasCert(
+                new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION)
+        ));
+
+        assertTrue(certificatesService.hasCert(
+                new KeystoreMongoLocation("node_id_5", DATA_NODE_KEYSTORE_COLLECTION)
+        ));
+
+        var result = certificatesService.removeCert(new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION));
+        assertTrue("Removal of an existing cert should result in 'true'", result);
+
+        assertFalse(certificatesService.hasCert(
+                new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION)
+        ));
+
+        assertTrue(certificatesService.hasCert(
+                new KeystoreMongoLocation("node_id_5", DATA_NODE_KEYSTORE_COLLECTION)
+        ));
+
+        result = certificatesService.removeCert(new KeystoreMongoLocation("node_id_6", DATA_NODE_KEYSTORE_COLLECTION));
+        assertFalse("Removal of non existing cert should result in 'false'", result);
+    }
 
 }
