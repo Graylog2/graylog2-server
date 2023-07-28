@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { Field } from 'formik';
 
-import Input from 'preflight/components/common/Input';
+import TextInput from 'preflight/components/common/TextInput';
 
 type Props = {
   name: string,
@@ -27,24 +27,24 @@ type Props = {
   type?: string
 }
 
-const FormikInput = ({ name, placeholder, label, type }: Props) => (
+const FormikTextInput = ({ name, placeholder, label, type }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange, onBlur }, meta: { error: validationError } }) => (
-      <Input onBlur={onBlur}
-             id={name}
-             label={label}
-             type={type}
-             placeholder={placeholder}
-             value={value}
-             error={validationError}
-             onChange={onChange} />
+      <TextInput onBlur={onBlur}
+                 id={name}
+                 label={label}
+                 type={type}
+                 placeholder={placeholder}
+                 value={value}
+                 error={validationError}
+                 onChange={onChange} />
     )}
   </Field>
 );
 
-FormikInput.defaultProps = {
+FormikTextInput.defaultProps = {
   placeholder: undefined,
   type: undefined,
 };
 
-export default FormikInput;
+export default FormikTextInput;
