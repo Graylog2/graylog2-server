@@ -29,7 +29,7 @@ import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
 
 const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => (
   <ErrorPage title="Something went wrong"
-             description={<p>An unkown error has occured. Please have a look at the following message and the graylog server log for more information.</p>}>
+             description={<p>An unknown error has occurred. Please have a look at the following message and the graylog server log for more information.</p>}>
     <pre>
       {JSON.stringify(reportedError)}
     </pre>
@@ -82,6 +82,7 @@ const ReportedErrorBoundary = ({ children }: Props) => {
     return <ReportedErrorPage reportedError={reportedError} />;
   }
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 
