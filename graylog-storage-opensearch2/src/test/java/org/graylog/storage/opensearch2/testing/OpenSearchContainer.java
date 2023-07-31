@@ -16,20 +16,15 @@
  */
 package org.graylog.storage.opensearch2.testing;
 
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.utility.Base58;
+import org.opensearch.testcontainers.OpensearchContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 
-public class OpenSearchContainer extends GenericContainer<OpenSearchContainer> {
+public class OpenSearchContainer extends OpensearchContainer {
     public OpenSearchContainer(DockerImageName dockerImageName) {
         super(dockerImageName);
         this.logger().info("Starting an OpenSearch container using [{}]", dockerImageName);
-        this.withNetworkAliases("opensearch-" + Base58.randomString(6));
-        this.withEnv("discovery.type", "single-node");
         this.addExposedPorts(9200, 9300);
-        this.setWaitStrategy((new HttpWaitStrategy()).forPort(9200).forStatusCodeMatching((response) -> response == 200 || response == 401).withStartupTimeout(Duration.ofMinutes(2L)));
     }
 }
