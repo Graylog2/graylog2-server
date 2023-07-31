@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -52,6 +53,11 @@ public class NodePreflightConfigBusEvents implements NodePreflightConfigService 
     @Override
     public NodePreflightConfig getPreflightConfigFor(String nodeId) {
         return delegate.getPreflightConfigFor(nodeId);
+    }
+
+    @Override
+    public List<NodePreflightConfig> findAllNodesThatNeedAttention() {
+        return delegate.findAllNodesThatNeedAttention();
     }
 
     @Override

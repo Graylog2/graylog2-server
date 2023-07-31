@@ -399,6 +399,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());
+        result.add(new PreflightConfigBindings());
 
         return result;
     }
