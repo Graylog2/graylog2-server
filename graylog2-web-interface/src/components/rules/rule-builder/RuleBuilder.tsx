@@ -70,8 +70,9 @@ const ReferenceRuleCol = styled(Col)`
   }
 `;
 
-const ConvertButton = styled(Button)`
-  margin-left: 16px; 
+const RuleBuilderCol = styled(Col)`
+  display: flex;
+  justify-content: space-between;
 `;
 
 const SubTitle = styled.label`
@@ -82,7 +83,7 @@ const SimulatorSwitchContaner = styled.div`
   display: flex;
   align-items: center;
   position: absolute;
-  top: 0;
+  top: 4px;
   right: 16px;
   z-index: 1;
 `;
@@ -340,28 +341,28 @@ const RuleBuilder = () => {
         <ReferenceRuleCol xs={6}>
           <RuleHelper hideExampleTab />
         </ReferenceRuleCol>
-        <Col xs={12}>
+        <RuleBuilderCol xs={showSimulator ? 4 : 6}>
           <label htmlFor="rule_builder">Rule Builder</label>
-          <ConvertButton bsStyle="info"
-                         bsSize="xsmall"
-                         title={initialRule ? 'Convert Rule Builder to Source Code' : 'Use Source Code Editor'}
-                         onClick={() => {
-                           sendTelemetry('click', {
-                             app_pathname: getPathnameWithoutId(pathname),
-                             app_section: 'pipeline-rules',
-                             app_action_value: initialRule ? 'convert-rule-builder-to-source-code-button' : 'source-code-editor-button',
-                           });
+          <Button bsStyle="info"
+                  bsSize="small"
+                  title={initialRule ? 'Convert Rule Builder to Source Code' : 'Use Source Code Editor'}
+                  onClick={() => {
+                    sendTelemetry('click', {
+                      app_pathname: getPathnameWithoutId(pathname),
+                      app_section: 'pipeline-rules',
+                      app_action_value: initialRule ? 'convert-rule-builder-to-source-code-button' : 'source-code-editor-button',
+                    });
 
-                           if (initialRule) {
-                             setRuleSourceCodeToShow(rule);
-                           } else {
-                             history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
-                           }
-                         }}>
+                    if (initialRule) {
+                      setRuleSourceCodeToShow(rule);
+                    } else {
+                      history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                    }
+                  }}>
             {initialRule ? 'Convert to Source Code' : 'Source Code Editor'}
-          </ConvertButton>
-        </Col>
-        <Col xs={12}>
+          </Button>
+        </RuleBuilderCol>
+        <Col xs={showSimulator ? 8 : 6}>
           <SimulatorSwitchContaner>
             <Toggle>
               <input type="checkbox"
@@ -379,6 +380,8 @@ const RuleBuilder = () => {
             </Toggle>
             Show Simulator
           </SimulatorSwitchContaner>
+        </Col>
+        <Col xs={12}>
           <Row>
             <Col xs={showSimulator ? 4 : 6}>
               <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
