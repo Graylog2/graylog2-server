@@ -26,7 +26,7 @@ import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
-import QuickAccessTimeRangeForm from './QuickAccessTimeRangeForm';
+import TimeRangePresetForm from './TimeRangePresetForm';
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
@@ -43,14 +43,14 @@ const mockOnUpdate = jest.fn();
 
 const renderForm = () => render(
   <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
-    <QuickAccessTimeRangeForm options={Immutable.List([
+    <TimeRangePresetForm options={Immutable.List([
       { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
       { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
     ])}
-                              onUpdate={mockOnUpdate} />
+                         onUpdate={mockOnUpdate} />
   </Formik>);
 
-describe('QuickAccessTimeRangeForm', () => {
+describe('TimeRangePresetForm', () => {
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchesClusterConfig,

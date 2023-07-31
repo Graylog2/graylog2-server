@@ -31,7 +31,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import type { TimeRangePreset } from 'components/configurations/TimeRangePresetForm';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type {
@@ -50,7 +50,7 @@ type Props = {
   addTimerange: (title: string) => void,
   toggleModal: () => void,
   target: Button | undefined | null,
-  equalTimerange: QuickAccessTimeRange
+  equalTimerange: TimeRangePreset
 };
 
 const isTimerangeEqual = (firstTimerange: TimeRange, secondTimerange: TimeRange) => {
@@ -121,7 +121,7 @@ const TimeRangeAddToQuickListButton = () => {
   }, []);
 
   const addTimerange = useCallback((description: string) => {
-    const quickAccessTimerangePreset = {
+    const timeRangePreset = {
       description,
       timerange: normalizeFromSearchBarForBackend(normalizeFromPickerForSearchBar(values.nextTimeRange) as TimeRange, userTimezone),
       id: generateId(),
@@ -132,20 +132,20 @@ const TimeRangeAddToQuickListButton = () => {
         ...config,
         quick_access_timerange_presets: [
           ...config.quick_access_timerange_presets,
-          quickAccessTimerangePreset],
+          timeRangePreset],
       }).then(() => {
       refresh();
       toggleModal();
     });
 
-    if (quickAccessTimerangePreset) {
+    if (timeRangePreset) {
       sendTelemetry('form_submit', {
         app_pathname: 'search',
         app_section: 'search-bar',
         app_action_value: 'add_to_quick_access_timerange_presets',
         event_details: {
-          timerange: quickAccessTimerangePreset.timerange,
-          id: quickAccessTimerangePreset.id,
+          timerange: timeRangePreset.timerange,
+          id: timeRangePreset.id,
         },
       });
     }
