@@ -74,7 +74,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private void startWithConfig() {
         final OpensearchConfiguration config = configurationProvider.get();
         this.process.startWithConfig(config);
-        System.out.println("Triggering config change event!");
         eventBus.post(new OpensearchConfigurationChangeEvent(config));
     }
 

@@ -31,6 +31,7 @@ import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,7 +136,7 @@ public class DatanodeSecuritySetupIT {
 
         try {
             var hostname = Tools.getLocalCanonicalHostname();
-            var url = "https://localhost:" + datanodeRestPort;
+            var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
             LOG.info("Trying to connect to: {}", url);
             retryer.call(() -> RestAssured.given()
                     .trustStore(trustStore)

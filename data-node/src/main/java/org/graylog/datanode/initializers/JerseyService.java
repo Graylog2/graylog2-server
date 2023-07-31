@@ -128,7 +128,6 @@ public class JerseyService extends AbstractIdleService {
 
     @Subscribe
     public synchronized void handleOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) throws Exception {
-        System.out.println("Received config change event!");
         LOG.info("Opensearch config changed");
         shutDown();
         doStartup(extractSslConfiguration(event.config()));
