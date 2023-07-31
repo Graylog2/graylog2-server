@@ -25,7 +25,9 @@ import Footer from 'components/layout/Footer';
 
 type Props = {
   children?: React.ReactNode,
-  className?: string
+  className?: string,
+  withFooter?: boolean,
+  NotificationsComponent?: React.ComponentType,
 };
 
 const Container = styled.div(({ theme }) => `
@@ -45,18 +47,20 @@ const StyledGrid = styled(Grid)`
   margin-bottom: 10px;
 `;
 
+const StyledWithGlobalAppNotifications = styled(WithGlobalAppNotifications)``;
+
 /*
  * Provides the basic layout for the page content section.
  * The section includes all page specific components, but not elements like the navigation or sidebar.
  */
-const PageContentLayout = ({ children, className }: Props) => (
+const PageContentLayout = ({ children, className, withFooter, NotificationsComponent }: Props) => (
   <Container className={className}>
-    <WithGlobalAppNotifications>
+    <StyledWithGlobalAppNotifications as={NotificationsComponent}>
       <StyledGrid fluid className="page-content-grid">
         {children || <Outlet />}
       </StyledGrid>
-      <Footer />
-    </WithGlobalAppNotifications>
+      {withFooter && <Footer />}
+    </StyledWithGlobalAppNotifications>
   </Container>
 );
 
@@ -68,6 +72,8 @@ PageContentLayout.propTypes = {
 PageContentLayout.defaultProps = {
   children: undefined,
   className: undefined,
+  withFooter: true,
+  NotificationsComponent: undefined,
 };
 
 export default PageContentLayout;
