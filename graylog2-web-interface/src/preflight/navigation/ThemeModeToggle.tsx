@@ -17,36 +17,30 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type { SyntheticEvent } from 'react';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
-import ThemePropTypes from 'preflight/theme/types';
 import { Icon } from 'preflight/components/common';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
 } from 'theme/constants';
 
-type Props = {
-  theme: DefaultTheme,
-};
-
 const ThemeModeToggleWrap = styled.div`
   display: flex;
   align-items: center;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ModeIcon = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
-  opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
-  color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default)};
-`;
+const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(({ theme, $currentMode }) => css`
+  opacity: ${$currentMode ? '1' : '0.5'};
+  color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
+`);
 
 const Toggle = styled.label(({ theme }) => css`
   display: flex;
   align-items: center;
   margin: 0;
+
   input {
     border: 0;
     clip: rect(0 0 0 0);
@@ -58,20 +52,25 @@ const Toggle = styled.label(({ theme }) => css`
     position: absolute;
     width: 1px;
     white-space: nowrap;
+
     &:checked + .slider {
       background-color: ${theme.colors.variant.dark.default};
+
       &::before {
         transform: translate(16px, -50%);
       }
     }
+
     &:disabled + .slider {
       opacity: 0.5;
       cursor: not-allowed;
+
       &::before {
         background-color: ${theme.colors.variant.light.default};
       }
     }
   }
+
   .slider {
     box-sizing: border-box;
     margin: 0 9px;
@@ -79,10 +78,11 @@ const Toggle = styled.label(({ theme }) => css`
     height: 22px;
     border-radius: 30px;
     background-color: ${theme.colors.gray[80]};
-    box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 20%);
     display: inline-block;
     position: relative;
     cursor: pointer;
+
     &::before {
       transition: transform 75ms ease-in-out;
       content: '';
@@ -90,7 +90,7 @@ const Toggle = styled.label(({ theme }) => css`
       width: 18px;
       height: 18px;
       background-color: ${theme.colors.brand.secondary};
-      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.25), 0 2px 8px 0 rgba(32, 37, 50, 0.16);
+      box-shadow: 0 2px 3px 0 rgb(0 0 0 / 25%), 0 2px 8px 0 rgb(32 37 50 / 16%);
       position: absolute;
       border-radius: 100%;
       top: 11px;
@@ -99,7 +99,8 @@ const Toggle = styled.label(({ theme }) => css`
   }
 `);
 
-const ThemeModeToggle = ({ theme }: Props) => {
+const ThemeModeToggle = () => {
+  const theme = useTheme();
   const currentMode = theme.mode;
   const [loadingTheme, setLoadingTheme] = useState(false);
 
@@ -122,7 +123,9 @@ const ThemeModeToggle = ({ theme }: Props) => {
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'} spin={loadingLightMode} currentMode={currentMode === THEME_MODE_LIGHT} />
+      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
+                spin={loadingLightMode}
+                $currentMode={currentMode === THEME_MODE_LIGHT} />
       <Toggle>
         <input value={THEME_MODE_DARK}
                type="checkbox"
@@ -131,13 +134,11 @@ const ThemeModeToggle = ({ theme }: Props) => {
                disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'} spin={loadingDarkMode} currentMode={currentMode === THEME_MODE_DARK} />
+      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
+                spin={loadingDarkMode}
+                $currentMode={currentMode === THEME_MODE_DARK} />
     </ThemeModeToggleWrap>
   );
 };
 
-ThemeModeToggle.propTypes = {
-  theme: ThemePropTypes.isRequired,
-};
-
-export default withTheme(ThemeModeToggle);
+export default ThemeModeToggle;

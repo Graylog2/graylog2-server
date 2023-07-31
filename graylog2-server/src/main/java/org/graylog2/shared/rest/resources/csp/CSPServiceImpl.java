@@ -29,28 +29,30 @@ public class CSPServiceImpl implements CSPService {
     private static final Logger LOG = LoggerFactory.getLogger(CSPServiceImpl.class);
     private final String telemetryApiHost;
     private final DBAuthServiceBackendService dbService;
-    private volatile String connectSrcValue;
+    private final CSPResources cspResources;
 
     @Inject
     protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, DBAuthServiceBackendService dbService) {
         this.telemetryApiHost = telemetryConfiguration.getTelemetryApiHost();
         this.dbService = dbService;
-        buildConnectSrc();
+        this.cspResources = new CSPResources();
+        updateConnectSrc();
     }
 
     @Override
-    public synchronized void buildConnectSrc() {
+    public synchronized void updateConnectSrc() {
         final String hostList = dbService.findPaginated(new PaginationParameters(), x -> true).stream()
                 .map(dto -> dto.config().externalHTTPHosts())
-                .filter(optList -> optList.isPresent())
+                .filter(java.util.Optional::isPresent)
                 .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));
-        connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
+        String connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
+        cspResources.updateAll("connect-src", connectSrcValue);
         LOG.debug("Updated CSP: {}", connectSrcValue);
     }
 
     @Override
-    public String connectSrcValue() {
-        return connectSrcValue;
+    public String cspString(String group) {
+        return cspResources.cspString(group);
     }
 }

@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
+
+export type DataNodeStatus = typeof DATA_NODES_STATUS[keyof typeof DATA_NODES_STATUS]['key']
 
 export type DataNode = {
   hostname: string,
@@ -25,6 +28,19 @@ export type DataNode = {
   short_node_id: string,
   transport_address: string,
   type: string,
+  status: DataNodeStatus
 }
 
 export type DataNodes = Array<DataNode>;
+
+export type DataNodesCA = {
+  id: string,
+  type: string,
+}
+
+export type RenewalPolicy = {
+  mode: 'AUTOMATIC' | 'MANUAL',
+  certificate_lifetime: string,
+}
+
+export type ConfigurationStep = typeof CONFIGURATION_STEPS[keyof typeof CONFIGURATION_STEPS]['key']

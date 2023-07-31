@@ -20,13 +20,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.List;
 
 @AutoValue
 @JsonDeserialize(builder = AggregationSeriesValue.Builder.class)
 public abstract class AggregationSeriesValue {
-    public abstract AggregationSeries series();
+    public abstract SeriesSpec series();
 
     public abstract ImmutableList<String> key();
 
@@ -45,7 +46,7 @@ public abstract class AggregationSeriesValue {
             return new AutoValue_AggregationSeriesValue.Builder();
         }
 
-        public abstract Builder series(AggregationSeries series);
+        public abstract Builder series(SeriesSpec series);
 
         public abstract Builder key(List<String> key);
 

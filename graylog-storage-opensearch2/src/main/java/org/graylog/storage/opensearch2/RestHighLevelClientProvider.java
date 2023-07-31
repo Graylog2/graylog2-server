@@ -23,10 +23,12 @@ import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.Sniffer;
+import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -41,13 +43,15 @@ import java.util.function.Supplier;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
+    private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
     private final Supplier<RestHighLevelClient> clientSupplier;
+    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
 
     @SuppressWarnings("unused")
     @Inject
     public RestHighLevelClientProvider(
             GracefulShutdownService shutdownService,
-            @Named("elasticsearch_hosts") List<URI> hosts,
+            @IndexerHosts List<URI> hosts,
             @Named("elasticsearch_connect_timeout") Duration connectTimeout,
             @Named("elasticsearch_socket_timeout") Duration socketTimeout,
             @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,
@@ -55,12 +59,17 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_max_total_connections_per_route") int maxTotalConnectionsPerRoute,
             @Named("elasticsearch_max_retries") int elasticsearchMaxRetries,
             @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled,
+            @Named("elasticsearch_node_activity_logger_enabled") boolean nodeActivity,
             @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
-            CredentialsProvider credentialsProvider) {
+            CredentialsProvider credentialsProvider,
+            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
+
+        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
+
         clientSupplier = Suppliers.memoize(() -> {
             final RestHighLevelClient client = buildClient(hosts,
                     connectTimeout,
@@ -71,26 +80,24 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     muteOpenSearchDeprecationWarnings,
                 credentialsProvider);
 
+            var sniffer = SnifferWrapper.create(
+                    client.getLowLevelClient(),
+                    TimeUnit.SECONDS.toMillis(5),
+                    discoveryFrequency,
+                    mapDefaultScheme(defaultSchemeForDiscoveredNodes)
+            );
+
             if (discoveryEnabled) {
-                final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
-                shutdownService.register(sniffer::close);
+                sniffer.add(FilteredOpenSearchNodesSniffer.create(discoveryFilter));
             }
+            if(nodeActivity) {
+                sniffer.add(NodeListSniffer.create());
+            }
+
+            sniffer.build().ifPresent(s -> shutdownService.register(s::close));
 
             return client;
         });
-    }
-
-    private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
-        final NodesSniffer nodesSniffer = FilteredOpenSearchNodesSniffer.create(
-                restClient,
-                TimeUnit.SECONDS.toMillis(5),
-                mapDefaultScheme(defaultSchemeForDiscoveredNodes),
-                discoveryFilter
-        );
-        return Sniffer.builder(restClient)
-                .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
-                .setNodesSniffer(nodesSniffer)
-                .build();
     }
 
     private OpenSearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
@@ -116,7 +123,6 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
-
         final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
                 .setRequestConfigCallback(requestConfig -> requestConfig
                         .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
@@ -132,6 +138,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
                     if(muteElasticsearchDeprecationWarnings) {
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
+                    }
+
+                    if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
+                        httpClientConfig.setSSLContext(trustManagerAndSocketFactoryProvider.getSslContext());
                     }
 
                     return httpClientConfig;

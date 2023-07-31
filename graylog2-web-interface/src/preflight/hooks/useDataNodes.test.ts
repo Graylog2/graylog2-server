@@ -19,6 +19,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import suppressConsole from 'helpers/suppressConsole';
+import { dataNodes } from 'fixtures/dataNodes';
 
 import useDataNodes from './useDataNodes';
 
@@ -29,32 +30,8 @@ jest.mock('preflight/util/UserNotification', () => ({
 }));
 
 describe('useDataNodes', () => {
-  const availableDataNodes = [
-    {
-      id: 'data-node-id-1',
-      name: 'data-node-name',
-      transportAddress: 'transport.address1',
-      altNames: [],
-      status: 'UNCONFIGURED',
-    },
-    {
-      id: 'data-node-id-2',
-      name: 'data-node-name',
-      altNames: [],
-      transportAddress: 'transport.address2',
-      status: 'UNCONFIGURED',
-    },
-    {
-      id: 'data-node-id-3',
-      name: 'data-node-name',
-      altNames: [],
-      transportAddress: 'transport.address3',
-      status: 'UNCONFIGURED',
-    },
-  ];
-
   beforeEach(() => {
-    asMock(fetch).mockReturnValue(Promise.resolve(availableDataNodes));
+    asMock(fetch).mockReturnValue(Promise.resolve(dataNodes));
   });
 
   it('should return data nodes CA status', async () => {
@@ -67,7 +44,7 @@ describe('useDataNodes', () => {
 
     expect(fetch).toHaveBeenCalledWith('GET', expect.stringContaining('/api/data_nodes'), undefined, false);
 
-    await waitFor(() => expect(result.current.data).toEqual(availableDataNodes));
+    await waitFor(() => expect(result.current.data).toEqual(dataNodes));
   });
 
   it('should return fetch error', async () => {

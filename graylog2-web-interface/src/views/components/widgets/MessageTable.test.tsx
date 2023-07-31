@@ -123,7 +123,7 @@ describe('MessageTable', () => {
 
     const highlightedMessage = wrapper.find(TableBody);
 
-    expect(highlightedMessage).toHaveProp('highlighted', true);
+    expect(highlightedMessage).toHaveProp('$highlighted', true);
   });
 
   it('does not highlight non-existing message id', () => {
@@ -135,7 +135,7 @@ describe('MessageTable', () => {
 
     const highlightedMessage = wrapper.find(TableBody);
 
-    expect(highlightedMessage).toHaveProp('highlighted', false);
+    expect(highlightedMessage).toHaveProp('$highlighted', false);
   });
 
   it('shows sort icons next to table headers', () => {

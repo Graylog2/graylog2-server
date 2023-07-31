@@ -33,6 +33,7 @@ import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
+import CertificateRenewalPolicyConfig from 'components/configurations/CertificateRenewalPolicyConfig';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -138,6 +139,14 @@ const ConfigurationsPage = () => {
       props: {
         ConfigurationComponent: UserConfig,
         title: 'Index Set Defaults',
+      },
+    },
+    {
+      name: 'Certificate Renewal',
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: CertificateRenewalPolicyConfig,
+        title: 'Certificate Renewal Policy',
       },
     },
     {

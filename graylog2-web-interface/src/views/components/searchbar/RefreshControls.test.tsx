@@ -55,6 +55,7 @@ describe('RefreshControls', () => {
         auto_refresh_timerange_options: autoRefreshOptions,
         default_auto_refresh_option: 'PT5S',
       } as unknown as SearchesConfig,
+      refresh: jest.fn(),
     });
   });
 

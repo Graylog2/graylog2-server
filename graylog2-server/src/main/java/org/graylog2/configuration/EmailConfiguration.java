@@ -21,7 +21,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
-import joptsimple.internal.Strings;
+import com.google.common.base.Strings;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import java.net.URI;

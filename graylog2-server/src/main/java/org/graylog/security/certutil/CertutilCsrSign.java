@@ -39,6 +39,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import static org.graylog.security.certutil.CertConstants.PKCS12;
+
+
 @Command(name = "csrsign", description = "Signs a CSR using the given CA", groupNames = {"certutil"})
 public class CertutilCsrSign implements CliCommand {
     @Option(name = "--ca", description = "Filename for the CA keystore")
@@ -78,7 +81,7 @@ public class CertutilCsrSign implements CliCommand {
 
             try {
                 char[] password = console.readPassword("Enter CA password: ");
-                KeyStore caKeystore = KeyStore.getInstance("PKCS12");
+                KeyStore caKeystore = KeyStore.getInstance(PKCS12);
                 caKeystore.load(new FileInputStream(caKeystoreFilename), password);
 
                 final PrivateKey caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
@@ -86,7 +89,7 @@ public class CertutilCsrSign implements CliCommand {
                 final var csr = csrStorage.readCsr();
                 final int validityDays = console.readInt("Enter certificate validity in days: ");
 
-                final var cert = CsrSigner.sign(caPrivateKey, caCertificate, csr, validityDays);
+                final var cert = new CsrSigner().sign(caPrivateKey, caCertificate, csr, validityDays);
 
                 final Path certPath = Path.of(certFilename);
                 writePem(certPath, cert);

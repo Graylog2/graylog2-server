@@ -16,7 +16,9 @@
  */
 import React, { useMemo, useEffect, useState } from 'react';
 import { usePostHog } from 'posthog-js/react';
+import { useTheme } from 'styled-components';
 
+import { getPathnameWithoutId } from 'util/URLUtils';
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
@@ -30,10 +32,11 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
       cluster_id,
       cluster_creation_date,
       nodes_count,
-      average_last_month_traffic,
+      traffic_last_month,
       users_count,
       license_count,
-      'node_leader.app_version': node_leader_app_version,
+      node_leader_app_version,
+      installation_source,
     },
     license,
     current_user,
@@ -42,8 +45,9 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
   return {
     cluster_id,
     cluster_creation_date,
+    installation_source,
     nodes_count,
-    average_last_month_traffic,
+    traffic_last_month,
     users_count,
     license_count,
     node_leader_app_version,
@@ -54,11 +58,15 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
 
 const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
+  const theme = useTheme();
+
   const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
   const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
-  const [globalProps, setGlobalProps] = useState({});
+  const [globalProps, setGlobalProps] = useState(undefined);
 
   useEffect(() => {
+    const app_pathname = getPathnameWithoutId(window.location.pathname);
+
     const setGroup = () => {
       if (isTelemetryDataLoaded
         && telemetryData
@@ -74,6 +82,8 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
         setGlobalProps(getGlobalProps(telemetryData));
 
         posthog.group('cluster', clusterId, {
+          app_pathname,
+          app_theme: theme.mode,
           ...clusterDetails,
           ...license,
           ...plugin,
@@ -88,15 +98,16 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
     if (posthog) {
       setGroup();
     }
-  }, [posthog, isTelemetryDataLoaded, telemetryData]);
+  }, [posthog, isTelemetryDataLoaded, telemetryData, theme.mode]);
 
   const TelemetryContextValue = useMemo(() => {
     const sendTelemetry = (eventType: TelemetryEventType, event: TelemetryEvent) => {
-      if (posthog) {
+      if (posthog && globalProps) {
         try {
           posthog.capture(eventType, {
             ...event,
             ...globalProps,
+            app_theme: theme.mode,
           });
         } catch {
           // eslint-disable-next-line no-console
@@ -108,7 +119,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
     return ({
       sendTelemetry,
     });
-  }, [globalProps, posthog]);
+  }, [globalProps, posthog, theme.mode]);
 
   const handleConfirmTelemetryDialog = () => {
     TelemetrySettingsActions.update({ telemetry_permission_asked: true, telemetry_enabled: true }).then(() => {

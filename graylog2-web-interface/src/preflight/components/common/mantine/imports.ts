@@ -22,6 +22,7 @@ export {
   Divider,
   Group,
   Header,
+  NumberInput,
   Text,
   UnstyledButton,
   Collapse,

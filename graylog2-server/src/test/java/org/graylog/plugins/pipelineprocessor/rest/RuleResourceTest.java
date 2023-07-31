@@ -34,10 +34,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -85,27 +84,27 @@ public class RuleResourceTest {
 
     @Test
     public void prepareContextForPaginatedResponse_returnsEmptyMapOnEmptyListOfRules() {
-        assertThat(underTest.prepareContextForPaginatedResponse(ImmutableList.of()))
-                .isEqualTo(ImmutableMap.of("used_in_pipelines", ImmutableMap.of()));
+        assertThat(underTest.prepareContextForPaginatedResponse(List.of()))
+                .isEqualTo(Map.of("used_in_pipelines", Map.of()));
     }
 
     @Test
     public void prepareContextForPaginatedResponse_returnsEmptyRuleMapIfRulesNotUsedByPipelines() {
-        final List<RuleDao> rules = ImmutableList.of(
+        final List<RuleDao> rules = List.of(
                 ruleDao("rule-1", "Rule 1"),
                 ruleDao("rule-2", "Rule 2")
         );
 
         assertThat(underTest.prepareContextForPaginatedResponse(rules))
-                .isEqualTo(ImmutableMap.of("used_in_pipelines", ImmutableMap.of(
-                        "rule-1", ImmutableList.of(),
-                        "rule-2", ImmutableList.of()
+                .isEqualTo(Map.of("used_in_pipelines", Map.of(
+                        "rule-1", List.of(),
+                        "rule-2", List.of()
                 )));
     }
 
     @Test
     public void prepareContextForPaginatedResponse_returnsRuleUsageMapIfRulesUsedByPipelines() {
-        final List<RuleDao> rules = ImmutableList.of(
+        final List<RuleDao> rules = List.of(
                 ruleDao("rule-1", "Rule 1"),
                 ruleDao("rule-2", "Rule 2"),
                 ruleDao("rule-3", "Rule 3"),
@@ -113,27 +112,27 @@ public class RuleResourceTest {
         );
 
         when(pipelineServiceHelper.groupByRuleName(any(), eq(ImmutableSet.of("Rule 1", "Rule 2", "Rule 3", "Rule 4"))))
-                .thenReturn(ImmutableMap.of(
-                        "Rule 1", ImmutableList.of(pipelineDao("pipeline-1", "Pipeline 1")),
-                        "Rule 2", ImmutableList.of(pipelineDao("pipeline-2", "Pipeline 2")),
-                        "Rule 3", ImmutableList.of(
+                .thenReturn(Map.of(
+                        "Rule 1", List.of(pipelineDao("pipeline-1", "Pipeline 1")),
+                        "Rule 2", List.of(pipelineDao("pipeline-2", "Pipeline 2")),
+                        "Rule 3", List.of(
                                 pipelineDao("pipeline-1", "Pipeline 1"),
                                 pipelineDao("pipeline-2", "Pipeline 2"),
                                 pipelineDao("pipeline-3", "Pipeline 3")
                         ),
-                        "Rule 4", ImmutableList.of()
+                        "Rule 4", List.of()
                 ));
 
         assertThat(underTest.prepareContextForPaginatedResponse(rules))
-                .isEqualTo(ImmutableMap.of("used_in_pipelines", ImmutableMap.of(
-                        "rule-1", ImmutableList.of(PipelineCompactSource.create("pipeline-1", "Pipeline 1")),
-                        "rule-2", ImmutableList.of(PipelineCompactSource.create("pipeline-2", "Pipeline 2")),
-                        "rule-3", ImmutableList.of(
+                .isEqualTo(Map.of("used_in_pipelines", Map.of(
+                        "rule-1", List.of(PipelineCompactSource.create("pipeline-1", "Pipeline 1")),
+                        "rule-2", List.of(PipelineCompactSource.create("pipeline-2", "Pipeline 2")),
+                        "rule-3", List.of(
                                 PipelineCompactSource.create("pipeline-1", "Pipeline 1"),
                                 PipelineCompactSource.create("pipeline-2", "Pipeline 2"),
                                 PipelineCompactSource.create("pipeline-3", "Pipeline 3")
                         ),
-                        "rule-4", ImmutableList.of()
+                        "rule-4", List.of()
                 )));
     }
 
@@ -143,7 +142,7 @@ public class RuleResourceTest {
                 when true
                 then
                    debug("OK");
-                end""", title), null, null);
+                end""", title), null, null, null);
     }
 
     private PipelineDao pipelineDao(String id, String title) {

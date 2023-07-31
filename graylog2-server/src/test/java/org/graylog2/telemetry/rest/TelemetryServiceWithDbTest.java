@@ -92,8 +92,7 @@ public class TelemetryServiceWithDbTest {
 
     @Before
     public void setUp() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
         TelemetryClusterService telemetryClusterService = new TelemetryClusterService(
                 serverStatus,
                 clusterConfigService,
@@ -108,10 +107,11 @@ public class TelemetryServiceWithDbTest {
                 pluginMetaDataSet,
                 elasticClusterAdapter,
                 elasticsearchVersion,
-                new TelemetryResponseFactory(objectMapper),
+                new TelemetryResponseFactory(),
                 new DBTelemetryUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
                 eventBus,
-                telemetryClusterService);
+                telemetryClusterService,
+                "unknown");
     }
 
     @Test

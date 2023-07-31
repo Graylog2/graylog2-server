@@ -62,10 +62,10 @@ const ContentWrap = styled.strong`
   }
 `;
 
-const ThroughputData = styled.span(({ dataIn, theme }) => css`
+const ThroughputData = styled.span(({ $dataIn, theme }) => css`
   font-size: ${theme.fonts.size.small};
   line-height: 1;
-  grid-area: ${dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};
+  grid-area: ${$dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};
   display: grid;
   grid-template-columns: 1fr 1.75em;
   grid-template-rows: 1fr 1px;
@@ -85,7 +85,7 @@ const ThroughputData = styled.span(({ dataIn, theme }) => css`
   }
 
   &::after {
-    ${dataIn && `
+    ${$dataIn && `
       content: ' ';
       min-height: 1px;
       background-color: ${theme.colors.variant.light.default};
@@ -105,7 +105,7 @@ const GlobalThroughput = (props) => {
 
     output = (
       <ContentWrap aria-label={`In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
-        <ThroughputData dataIn>
+        <ThroughputData $dataIn>
           <span>{inputNumeral}</span> <i>in</i>
         </ThroughputData>
         <ThroughputData>

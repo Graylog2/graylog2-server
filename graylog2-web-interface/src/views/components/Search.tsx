@@ -53,7 +53,7 @@ import useAppSelector from 'stores/useAppSelector';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import useParameters from 'views/hooks/useParameters';
 
-const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => (interactive ? css`
+const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) => ($interactive ? css`
     display: flex;
     overflow: auto;
     height: 100%;
@@ -161,7 +161,7 @@ const Search = ({ InfoBarSlot }: Props) => {
                     <DefaultFieldTypesProvider>
                       <ViewAdditionalContextProvider>
                         <HighlightingRulesProvider>
-                          <GridContainer id="main-row" interactive={interactive}>
+                          <GridContainer id="main-row" $interactive={interactive}>
                             <IfInteractive>
                               {showSidebar && (
                               <ConnectedSidebar>

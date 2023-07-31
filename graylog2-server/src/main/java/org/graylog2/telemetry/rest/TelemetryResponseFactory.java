@@ -16,14 +16,10 @@
  */
 package org.graylog2.telemetry.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.wnameless.json.flattener.JsonFlattener;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -37,17 +33,12 @@ import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_VER
 
 class TelemetryResponseFactory {
     private static final String CURRENT_USER = "current_user";
+    private static final String PREFIX_USER = "user";
     private static final String USER_TELEMETRY_SETTINGS = "user_telemetry_settings";
     private static final String CLUSTER = "cluster";
     private static final String LICENSE = "license";
     private static final String PLUGIN = "plugin";
     private static final String SEARCH_CLUSTER = "search_cluster";
-    private final ObjectMapper objectMapper;
-
-    @Inject
-    public TelemetryResponseFactory(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     private static boolean isLeader(Map<String, Object> n) {
         if (n.get(FIELD_IS_LEADER) instanceof Boolean isLeader) {
@@ -82,12 +73,9 @@ class TelemetryResponseFactory {
                                        int teamsCount) {
         Map<String, Object> userInfo = new LinkedHashMap<>();
         userInfo.put("user", userHash);
-        userInfo.putAll(flatten(Map.of(CURRENT_USER, Map.of(
-                "is_local_admin", isLocalAdmin,
-                "roles_count", rolesCount,
-                "teams_count", teamsCount
-
-        ))));
+        userInfo.put(f("%s_is_local_admin", PREFIX_USER), isLocalAdmin);
+        userInfo.put(f("%s_role_count", PREFIX_USER), rolesCount);
+        userInfo.put(f("%s_team_count", PREFIX_USER), teamsCount);
         return userInfo;
     }
 
@@ -96,15 +84,18 @@ class TelemetryResponseFactory {
                                           Map<String, Map<String, Object>> nodes,
                                           long averageLastMonthTraffic,
                                           long usersCount,
-                                          int licenseCount) {
+                                          int licenseCount,
+                                          String installationSource
+    ) {
         Map<String, Object> clusterInfo = new LinkedHashMap<>();
         clusterInfo.put("cluster_id", clusterId);
         clusterInfo.put("cluster_creation_date", clusterCreationDate);
         clusterInfo.put("nodes_count", nodes.size());
-        clusterInfo.put("average_last_month_traffic", averageLastMonthTraffic);
+        clusterInfo.put("traffic_last_month", averageLastMonthTraffic);
         clusterInfo.put("users_count", usersCount);
         clusterInfo.put("license_count", licenseCount);
-        clusterInfo.put("node_leader.app_version", leaderNodeVersion(nodes));
+        clusterInfo.put("node_leader_app_version", leaderNodeVersion(nodes));
+        clusterInfo.put("installation_source", installationSource);
         clusterInfo.put("nodes", nodes);
         return clusterInfo;
 
@@ -121,8 +112,8 @@ class TelemetryResponseFactory {
     Map<String, Object> createPluginInfo(boolean isEnterprisePluginInstalled,
                                          List<String> plugins) {
         Map<String, Object> userInfo = new LinkedHashMap<>();
-        userInfo.put(f("%s.is_enterprise_plugin_installed", PLUGIN), isEnterprisePluginInstalled);
-        userInfo.putAll(flatten(Map.of(PLUGIN, Map.of("installed_plugins", plugins))));
+        userInfo.put(f("%s_is_enterprise_plugin_installed", PLUGIN), isEnterprisePluginInstalled);
+        userInfo.put("plugins", plugins);
         return userInfo;
     }
 
@@ -130,9 +121,9 @@ class TelemetryResponseFactory {
                                                 String version,
                                                 Map<String, NodeInfo> nodes) {
         Map<String, Object> userInfo = new LinkedHashMap<>();
-        userInfo.put(f("%s.nodes_count", SEARCH_CLUSTER), nodesCount);
-        userInfo.put(f("%s.version", SEARCH_CLUSTER), version);
-        userInfo.putAll(flatten(Map.of(SEARCH_CLUSTER, Map.of("nodes", nodes))));
+        userInfo.put(f("%s_nodes_count", SEARCH_CLUSTER), nodesCount);
+        userInfo.put(f("%s_version", SEARCH_CLUSTER), version);
+        userInfo.put("nodes", nodes);
         return userInfo;
     }
 
@@ -145,11 +136,11 @@ class TelemetryResponseFactory {
         Map<String, Object> licenses = new LinkedHashMap<>();
         for (TelemetryLicenseStatus l : uniqueLicenses) {
             String licenseString = formatLicenseString(l);
-            licenses.put(f("%s.expired", licenseString), l.expired());
-            licenses.put(f("%s.valid", licenseString), l.valid());
-            licenses.put(f("%s.violated", licenseString), l.violated());
-            licenses.put(f("%s.expiration_date", licenseString), l.expirationDate());
-            licenses.put(f("%s.traffic_limit", licenseString), l.trafficLimit());
+            licenses.put(f("%s_expired", licenseString), l.expired());
+            licenses.put(f("%s_valid", licenseString), l.valid());
+            licenses.put(f("%s_violated", licenseString), l.violated());
+            licenses.put(f("%s_expiration_date", licenseString), l.expirationDate());
+            licenses.put(f("%s_traffic_limit", licenseString), l.trafficLimit());
         }
         return licenses;
     }
@@ -166,14 +157,6 @@ class TelemetryResponseFactory {
     }
 
     private String formatLicenseString(TelemetryLicenseStatus telemetryLicenseStatus) {
-        return telemetryLicenseStatus.subject().replace("/", ".").substring(1);
-    }
-
-    private Map<String, Object> flatten(Object o) {
-        try {
-            return JsonFlattener.flattenAsMap(objectMapper.writeValueAsString(o));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(f("Couldn't serialize %s!", o), e);
-        }
+        return telemetryLicenseStatus.subject().replace("/", "_").substring(1);
     }
 }

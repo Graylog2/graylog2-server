@@ -34,6 +34,7 @@ import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitio
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -164,7 +165,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     }
   };
 
-  const isScheduled = eventDefinition?.scheduler?.is_scheduled;
+  const isEnabled = eventDefinition?.state === 'ENABLED';
 
   return (
     <>
@@ -173,7 +174,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                      entityType="event_definition"
                      onClick={() => setShowEntityShareModal(true)}
                      bsSize="xsmall" />
-        <OverlayDropdownButton title="More"
+        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
           {showActions() && (
@@ -189,8 +191,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             <>
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
               <MenuItem divider />
-              <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-                {isScheduled ? 'Disable' : 'Enable'}
+              <MenuItem onClick={() => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+                {isEnabled ? 'Disable' : 'Enable'}
               </MenuItem>
 
               {showActions() && (

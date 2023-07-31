@@ -189,14 +189,11 @@ describe('Aggregation Widget', () => {
       render(<AggregationWidget editing />);
 
       // Change widget time range
-      const timeRangeDropdownButton = await screen.findByLabelText('Open Time Range Selector');
-      userEvent.click(timeRangeDropdownButton);
+      const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+      userEvent.click(timeRangePickerButton);
 
       const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
       userEvent.click(absoluteTabButton);
-
-      const timeRangeLivePreview = await screen.findByTestId('time-range-live-preview');
-      await within(timeRangeLivePreview).findByText('2020-01-01 00:55:00.000');
 
       const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
       userEvent.click(applyTimeRangeChangesButton);

@@ -61,6 +61,12 @@ export const DEFAULT_INTERPOLATION = 'linear';
 export const interpolationTypes = ['linear', 'step-after', 'spline'] as const;
 export type InterpolationType = ArrayElement<typeof interpolationTypes>;
 
+export const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
+export const percentageStrategyOptions = [
+  { label: 'Document Count', value: 'COUNT' },
+  { label: 'Field Sum', value: 'SUM' },
+];
+
 export const TimeUnits = {
   seconds: 'Seconds',
   minutes: 'Minutes',

@@ -20,8 +20,8 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog2.cluster.NodePreflightConfig;
-import org.graylog2.cluster.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.NodePreflightConfig;
+import org.graylog2.cluster.preflight.NodePreflightConfigService;
 
 import javax.inject.Inject;
 import java.io.BufferedReader;

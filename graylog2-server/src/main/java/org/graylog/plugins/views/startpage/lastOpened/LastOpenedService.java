@@ -40,15 +40,12 @@ import java.util.Optional;
 public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> {
     public static final String COLLECTION_NAME = "last_opened";
 
-    private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
     public LastOpenedService(MongoConnection mongoConnection,
                              MongoJackObjectMapperProvider mapper,
-                             EventBus eventBus,
-                             final EntityOwnershipService entityOwnerShipService) {
+                             EventBus eventBus) {
         super(mongoConnection, mapper, LastOpenedForUserDTO.class, COLLECTION_NAME);
-        this.entityOwnerShipService = entityOwnerShipService;
         eventBus.register(this);
 
         db.createIndex(new BasicDBObject(LastOpenedForUserDTO.FIELD_USER_ID, 1));
@@ -67,9 +64,6 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> 
         try {
             final WriteResult<LastOpenedForUserDTO, ObjectId> result = db.insert(lastOpenedItems);
             final LastOpenedForUserDTO savedObject = result.getSavedObject();
-            if (savedObject != null) {
-                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.LAST_OPENED);
-            }
             return Optional.ofNullable(savedObject);
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to create a last opened collection, collection with this id already exists : " + lastOpenedItems.id());

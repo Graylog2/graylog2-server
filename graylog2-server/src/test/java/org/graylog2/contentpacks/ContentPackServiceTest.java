@@ -27,6 +27,7 @@ import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
+import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.fields.FieldValueType;
@@ -36,11 +37,11 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.aggregation.AggregationConditions;
-import org.graylog.events.processor.aggregation.AggregationFunction;
-import org.graylog.events.processor.aggregation.AggregationSeries;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.views.DisplayModeSettings;
 import org.graylog.plugins.views.search.views.FormattingSettings;
 import org.graylog.plugins.views.search.views.Titles;
@@ -373,7 +374,7 @@ public class ContentPackServiceTest {
                 .providers(ImmutableList.of())
                 .build();
         final Expr.Greater trueExpr = Expr.Greater.create(Expr.NumberValue.create(2), Expr.NumberValue.create(1));
-        final AggregationSeries series = AggregationSeries.create("id-deef", AggregationFunction.COUNT, "field");
+        final SeriesSpec series = Count.builder().id("id-deef").field("field").build();
         final AggregationConditions condition = AggregationConditions.builder()
                 .expression(Expr.And.create(trueExpr, trueExpr))
                 .build();
@@ -381,7 +382,7 @@ public class ContentPackServiceTest {
                 .query(ValueReference.of("author: \"Jane Hopper\""))
                 .streams(Stream.ALL_SYSTEM_STREAM_IDS)
                 .groupBy(ImmutableList.of("project"))
-                .series(ImmutableList.of(series))
+                .series(ImmutableList.of(series).stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(condition)
                 .executeEveryMs(122200000L)
                 .searchWithinMs(1231312123L)

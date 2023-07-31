@@ -55,6 +55,8 @@ import java.util.Optional;
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
+    public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
 
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
@@ -87,7 +89,7 @@ public class Configuration extends BaseConfiguration {
     private String configLocation;
 
     @Parameter(value = "process_logs_buffer_size")
-    private Integer logs = 500;
+    private Integer opensearchProcessLogsBufferSize = 500;
 
 
     @Parameter(value = "node_name")
@@ -109,13 +111,13 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "transport_certificate")
     private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
 
-    @Parameter(value = "transport_certificate_password")
+    @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = "datanode-http-certificates.p12";
 
-    @Parameter(value = "http_certificate_password")
+    @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
@@ -172,7 +174,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public Integer getProcessLogsBufferSize() {
-        return logs;
+        return opensearchProcessLogsBufferSize;
     }
 
     @Parameter(value = "rest_api_username")
@@ -332,7 +334,10 @@ public class Configuration extends BaseConfiguration {
     public static final String PATH_API = "api/";
 
     @Parameter(value = "http_bind_address", required = true)
-    private HostAndPort httpBindAddress = HostAndPort.fromParts("127.0.0.1", GRAYLOG_DEFAULT_PORT);
+    private HostAndPort httpBindAddress = HostAndPort.fromParts("0.0.0.0", GRAYLOG_DEFAULT_PORT);
+
+    @Parameter(value = "hostname", required = true)
+    private String hostname = Tools.getLocalCanonicalHostname();
 
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
@@ -547,5 +552,9 @@ public class Configuration extends BaseConfiguration {
 
     private boolean isRegularFileAndReadable(Path path) {
         return path != null && Files.isRegularFile(path) && Files.isReadable(path);
+    }
+
+    public String getHostname() {
+        return hostname;
     }
 }

@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { Alert, Badge, List, Button } from 'preflight/components/common';
+import { Alert, Badge, List } from 'preflight/components/common';
 
 const P = styled.p`
   max-width: 700px;
@@ -30,11 +30,7 @@ const NodeId = styled(Badge)`
   margin-right: 3px;
 `;
 
-type Props = {
-  onResumeStartup: () => void
-}
-
-const DataNodesOverview = ({ onResumeStartup }: Props) => {
+const DataNodesOverview = () => {
   const {
     data: dataNodes,
     isFetching: isFetchingDataNodes,
@@ -46,7 +42,7 @@ const DataNodesOverview = ({ onResumeStartup }: Props) => {
     <>
       <P>
         Graylog data nodes offer a better integration with Graylog and simplify future updates.
-        Once a Graylog data node is running, you can click on &quot;Resume startup&quot;.
+        Once a Graylog data node is running and you configured the certificate authority, you can resume startup.
       </P>
       <P>
         These are the data nodes which are currently registered.
@@ -82,9 +78,6 @@ const DataNodesOverview = ({ onResumeStartup }: Props) => {
         </Alert>
       )}
       <Space h="md" />
-      <Button onClick={onResumeStartup} size="xs">
-        Resume startup
-      </Button>
     </>
   );
 };

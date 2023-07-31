@@ -18,7 +18,6 @@ package org.graylog.datanode.bootstrap;
 
 import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
@@ -27,9 +26,9 @@ import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
+import org.graylog.datanode.bindings.DatanodeConfigurationBindings;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
-import org.graylog.datanode.bindings.OpensearchDistributionBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
@@ -55,7 +54,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -157,25 +155,24 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
-                new OpensearchDistributionBindings()
+                new DatanodeConfigurationBindings()
 
         );
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
-        final Injector injector = Guice.createInjector(
+        return Guice.createInjector(
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(),
-                new OpensearchDistributionBindings(),
+                new DatanodeConfigurationBindings(),
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
                         preflightCheckModules.forEach(binder::install);
                     }
                 });
-        return injector;
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
@@ -192,10 +189,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
     @Override
     protected void startCommand() {
         final String systemInformation = Tools.getSystemInformation();
-        final Map<String, Object> auditEventContext = ImmutableMap.of(
-                "version", version.toString(),
-                "java", systemInformation
-        );
 
         final OS os = OS.getOs();
 
@@ -281,7 +274,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 //        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
-        result.add(new OpensearchDistributionBindings());
+        result.add(new DatanodeConfigurationBindings());
 //        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;

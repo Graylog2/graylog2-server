@@ -19,49 +19,41 @@ package org.graylog.plugins.views.favorites;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
-import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.users.events.UserDeletedEvent;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public static final String COLLECTION_NAME = "favorites";
 
-    private final EntityOwnershipService entityOwnerShipService;
-    private final Catalog catalog;
+    private final StartPageItemTitleRetriever startPageItemTitleRetriever;
     private final GRNRegistry grnRegistry;
 
     @Inject
     protected FavoritesService(final MongoConnection mongoConnection,
                                EventBus eventBus,
                                final MongoJackObjectMapperProvider mapper,
-                               final EntityOwnershipService entityOwnerShipService,
-                               final Catalog catalog,
+                               final StartPageItemTitleRetriever startPageItemTitleRetriever,
                                final GRNRegistry grnRegistry) {
         super(mongoConnection, mapper, FavoritesForUserDTO.class, COLLECTION_NAME);
         eventBus.register(this);
-        this.entityOwnerShipService = entityOwnerShipService;
-        this.catalog = catalog;
+        this.startPageItemTitleRetriever = startPageItemTitleRetriever;
         this.grnRegistry = grnRegistry;
 
         db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_USER_ID, 1));
@@ -72,8 +64,12 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         var items = this.findForUser(searchUser)
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
-                .stream().filter(i -> type.isPresent() ? i.type().equals(type.get()) : true)
-                .map(i -> new Favorite(i, catalog.getTitle(i)))
+                .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
+                .map(i -> startPageItemTitleRetriever
+                        .retrieveTitle(i)
+                        .map(title -> new Favorite(i, title))
+                )
+                .flatMap(Optional::stream)
                 .toList();
 
         return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
@@ -84,7 +80,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         final var favorites = this.findForUser(searchUser);
         if(favorites.isPresent()) {
             var fi = favorites.get();
-            fi.items().add(grn);
+            fi.items().add(0, grn);
             this.save(fi);
         } else {
             var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn));
@@ -116,9 +112,6 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         try {
             final WriteResult<FavoritesForUserDTO, ObjectId> result = db.insert(favorite);
             final FavoritesForUserDTO savedObject = result.getSavedObject();
-            if (savedObject != null) {
-                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.FAVORITE);
-            }
             return Optional.ofNullable(savedObject);
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());

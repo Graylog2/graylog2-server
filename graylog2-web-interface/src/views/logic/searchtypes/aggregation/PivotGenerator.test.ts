@@ -29,6 +29,6 @@ describe('PivotGenerator', () => {
   it('generates values pivot for other fields', () => {
     const result = PivotGenerator('foo', new FieldType('keyword', [], []));
 
-    expect(result).toEqual(Pivot.create(['foo'], 'values', { limit: 15 }));
+    expect(result).toEqual(Pivot.createValues(['foo']));
   });
 });

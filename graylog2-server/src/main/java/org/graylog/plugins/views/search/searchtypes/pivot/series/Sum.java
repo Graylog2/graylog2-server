@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -28,7 +30,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Sum.NAME)
 @JsonDeserialize(builder = Sum.Builder.class)
-public abstract class Sum implements SeriesSpec {
+public abstract class Sum implements SeriesSpec, HasField {
     public static final String NAME = "sum";
 
     @Override
@@ -37,9 +39,20 @@ public abstract class Sum implements SeriesSpec {
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
+
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
+
+    public abstract Builder toBuilder();
+
+    @Override
+    public Sum withId(String id) {
+        return toBuilder().id(id).build();
+    }
 
     public static Builder builder() {
         return new AutoValue_Sum.Builder().type(NAME);
@@ -56,7 +69,6 @@ public abstract class Sum implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -66,7 +78,7 @@ public abstract class Sum implements SeriesSpec {
 
         @Override
         public Sum build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
             }
             return autoBuild();

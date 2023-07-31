@@ -25,7 +25,7 @@ class ProcessStateMachineTest {
     @Test
     void testOptimalScenario() {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
-        Assertions.assertEquals(machine.getState(), ProcessState.NEW);
+        Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
@@ -40,7 +40,7 @@ class ProcessStateMachineTest {
     @Test
     void testRestFailing() {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
-        Assertions.assertEquals(machine.getState(), ProcessState.NEW);
+        Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
@@ -65,7 +65,7 @@ class ProcessStateMachineTest {
     @Test
     void testStartupFailure() {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
-        Assertions.assertEquals(machine.getState(), ProcessState.NEW);
+        Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
@@ -84,7 +84,7 @@ class ProcessStateMachineTest {
     @Test
     void testStartupFailureResolved() {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
-        Assertions.assertEquals(machine.getState(), ProcessState.NEW);
+        Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());

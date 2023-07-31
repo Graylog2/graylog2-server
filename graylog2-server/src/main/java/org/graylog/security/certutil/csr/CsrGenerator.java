@@ -33,6 +33,7 @@ import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 
 import javax.security.auth.x500.X500Principal;
 import java.security.KeyPairGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
@@ -64,23 +65,23 @@ public class CsrGenerator {
                     certKeyPair.getPublic()
             );
 
-            if (altNames != null && !altNames.isEmpty()) {
-                Extension subjectAltNames = new Extension(Extension.subjectAlternativeName, false,
-                        new DEROctetString(
-                                new GeneralNames(
-                                        altNames.stream()
-                                                .map(alternativeName -> new GeneralName(
-                                                        new X500Name("CN=" + alternativeName))
-                                                )
-                                                .toArray(GeneralName[]::new)
-                                )
-                        )
-                );
-                p10Builder.addAttribute(
-                        PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
-                        new Extensions(subjectAltNames));
+            var names = new ArrayList<>(List.of(principalName));
+            if(altNames != null) {
+                names.addAll(altNames);
             }
 
+            Extension subjectAltNames = new Extension(Extension.subjectAlternativeName, false,
+                    new DEROctetString(
+                            new GeneralNames(
+                                    names.stream()
+                                            .map(alternativeName -> new GeneralName(GeneralName.dNSName, alternativeName))
+                                            .toArray(GeneralName[]::new)
+                            )
+                    )
+            );
+            p10Builder.addAttribute(
+                    PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
+                    new Extensions(subjectAltNames));
 
             JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(SIGNING_ALGORITHM);
             ContentSigner signer = csBuilder.build(certKeyPair.getPrivate());

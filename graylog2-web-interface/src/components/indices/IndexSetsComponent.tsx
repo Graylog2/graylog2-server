@@ -16,7 +16,6 @@
  */
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
@@ -124,22 +123,22 @@ const IndexSetsComponent = () => {
   const Toolbar = styled(Row)(({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[90]};
     padding-bottom: 15px;
-  `);
+`);
 
   const GlobalStatsCol = styled(Col)`
     display: flex;
     align-items: center;
     gap: 10px;
-  `;
+`;
 
   const GlobalStats = styled.p`
     margin-bottom: 0;
-  `;
+`;
 
-  const StatsInfoText = styled.span(({ theme }: { theme: DefaultTheme }) => css`
+  const StatsInfoText = styled.span(({ theme }) => css`
     color: ${theme.colors.textAlt};
     font-style: italic;
-  `);
+`);
 
   const statsDisabledText = 'Stats are disabled by default';
 

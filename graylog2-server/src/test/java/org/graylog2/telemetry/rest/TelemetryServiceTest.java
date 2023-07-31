@@ -16,8 +16,6 @@
  */
 package org.graylog2.telemetry.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
@@ -44,7 +42,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.CLUSTER;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.CURRENT_USER;
@@ -71,8 +68,6 @@ public class TelemetryServiceTest {
     ClusterAdapter elasticClusterAdapter;
     @Mock
     SearchVersion elasticsearchVersion;
-    @Mock
-    ObjectMapper objectMapper;
     @Mock
     DBTelemetryUserSettingsService dbTelemetryUserSettingsService;
     @Mock
@@ -123,15 +118,6 @@ public class TelemetryServiceTest {
         assertThatAllTelemetryDataIsPresent(response);
     }
 
-    @Test
-    void test_json_serialization_error() throws JsonProcessingException {
-        TelemetryService telemetryService = createTelemetryService(true, objectMapper);
-        mockUserTelemetryEnabled(true);
-        when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-        mockTrafficData(trafficCounterService);
-
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> telemetryService.getTelemetryResponse(user));
-    }
 
     @Test
     void test_licenses() {
@@ -171,11 +157,11 @@ public class TelemetryServiceTest {
 
     private Map<String, Object> toMap(TelemetryLicenseStatus license, String licenseName) {
         return Map.of(
-                f("license.%s.violated", licenseName), license.violated(),
-                f("license.%s.expired", licenseName), license.expired(),
-                f("license.%s.valid", licenseName), license.valid(),
-                f("license.%s.expiration_date", licenseName), license.expirationDate(),
-                f("license.%s.traffic_limit", licenseName), license.trafficLimit()
+                f("license_%s_violated", licenseName), license.violated(),
+                f("license_%s_expired", licenseName), license.expired(),
+                f("license_%s_valid", licenseName), license.valid(),
+                f("license_%s_expiration_date", licenseName), license.expirationDate(),
+                f("license_%s_traffic_limit", licenseName), license.trafficLimit()
         );
     }
 
@@ -195,10 +181,6 @@ public class TelemetryServiceTest {
     }
 
     private TelemetryService createTelemetryService(boolean isTelemetryEnabled) {
-        return createTelemetryService(isTelemetryEnabled, new ObjectMapper());
-    }
-
-    private TelemetryService createTelemetryService(boolean isTelemetryEnabled, ObjectMapper objectMapper) {
         return new TelemetryService(
                 isTelemetryEnabled,
                 trafficCounterService,
@@ -207,10 +189,11 @@ public class TelemetryServiceTest {
                 pluginMetaDataSet,
                 elasticClusterAdapter,
                 elasticsearchVersion,
-                new TelemetryResponseFactory(objectMapper),
+                new TelemetryResponseFactory(),
                 dbTelemetryUserSettingsService,
                 eventBus,
-                telemetryClusterService);
+                telemetryClusterService,
+                "unknown");
     }
 
     private void mockUserTelemetryEnabled(boolean isTelemetryEnabled) {

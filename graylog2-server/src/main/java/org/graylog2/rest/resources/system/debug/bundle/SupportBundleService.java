@@ -28,6 +28,7 @@ import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -129,7 +130,7 @@ public class SupportBundleService {
                                 ObjectMapperProvider objectMapperProvider,
                                 ClusterStatsService clusterStatsService,
                                 VersionProbe searchDbProbe,
-                                @Named("elasticsearch_hosts") List<URI> searchDbHosts,
+                                @IndexerHosts List<URI> searchDbHosts,
                                 ClusterAdapter searchDbClusterAdapter) {
         this.executor = executor;
         this.nodeService = nodeService;
@@ -500,7 +501,7 @@ public class SupportBundleService {
     }
 
     public void downloadBundle(String filename, OutputStream outputStream) throws IOException {
-        ensureFileWithinBundleDir(filename);
+        ensureFileWithinBundleDir(bundleDir, filename);
 
         try {
             final Path filePath = bundleDir.resolve(filename);
@@ -512,14 +513,15 @@ public class SupportBundleService {
         }
     }
 
-    private void ensureFileWithinBundleDir(String filename) throws IOException {
-        if (!bundleDir.resolve(filename).toFile().getCanonicalPath().startsWith(bundleDir.toFile().getCanonicalPath())) {
+    @VisibleForTesting
+    void ensureFileWithinBundleDir(Path bundleDir, String filename) {
+        if (!bundleDir.resolve(filename).toAbsolutePath().normalize().startsWith(bundleDir.toAbsolutePath().normalize())) {
             throw new NotFoundException();
         }
     }
 
     public void deleteBundle(String filename) throws IOException {
-        ensureFileWithinBundleDir(filename);
+        ensureFileWithinBundleDir(bundleDir, filename);
         final Path filePath = bundleDir.resolve(filename);
         Files.delete(filePath);
     }

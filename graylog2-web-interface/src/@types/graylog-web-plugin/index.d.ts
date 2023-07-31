@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type * as React from 'react';
+
 import type FetchError from 'logic/errors/FetchError';
 
 interface PluginRoute {
@@ -41,6 +43,11 @@ interface PluginNavigationItems {
   key: string;
   component: React.ComponentType<{ smallScreen?: boolean }>;
 }
+interface SystemNavigationItem {
+  description: string;
+  path: string;
+  permissions: string | Array<string>;
+}
 interface GlobalNotification {
   key: string;
   component: React.ComponentType;
@@ -56,11 +63,22 @@ interface PluginPageFooter {
   component: React.ComponentType;
 }
 
+interface ForwarderInput {
+  id: string;
+  title: string;
+}
+
+interface Forwarder {
+  title: string;
+  node_id: string;
+}
 interface PluginForwarder {
   ForwarderReceivedBy: React.ComponentType<{
     inputId: string;
     forwarderNodeId: string;
   }>;
+  fetchForwarderInput: (inputId: string) => Promise<ForwarderInput>;
+  fetchForwarderNode: (nodeId: string) => Promise<Forwarder>;
   isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
@@ -105,6 +123,7 @@ declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    systemnavigation?: Array<SystemNavigationItem>;
     globalNotifications?: Array<GlobalNotification>
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.

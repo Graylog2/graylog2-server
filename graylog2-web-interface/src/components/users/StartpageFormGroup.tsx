@@ -138,7 +138,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
 
   return (
     <Field name="startpage">
-      {({ field: { name, value, onChange } }) => {
+      {({ field: { name, value, onChange }, meta }) => {
         const type = value?.type ?? 'dashboard';
 
         const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
@@ -158,7 +158,8 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                  label="Start page"
                  help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
                  labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
+                 wrapperClassName="col-sm-9"
+                 error={meta?.error}>
             <>
               <Container>
                 <TypeSelect options={typeOptions}

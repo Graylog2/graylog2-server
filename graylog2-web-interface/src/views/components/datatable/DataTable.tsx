@@ -61,18 +61,19 @@ const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnInde
     }
   `).concat((' ; '));
 
-const THead = styled.thead(({ stickyLeftMarginsByColumnIndex }: {
-  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}) => css`
+const THead = styled.thead<{
+    $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}>(({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr.pivot-header-row {
-    & ${getStylesForPinnedColumns('th', stickyLeftMarginsByColumnIndex)}
+    & ${getStylesForPinnedColumns('th', $stickyLeftMarginsByColumnIndex)}
   }
 `);
-const TBody = styled.tbody(({ stickyLeftMarginsByColumnIndex }: {
-  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}) => css`
+
+const TBody = styled.tbody<{
+  $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}>(({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr {
-    & ${getStylesForPinnedColumns('td', stickyLeftMarginsByColumnIndex)}
+    & ${getStylesForPinnedColumns('td', $stickyLeftMarginsByColumnIndex)}
   }
 `);
 
@@ -262,7 +263,7 @@ const DataTable = ({
                        borderedHeader={borderedHeader}
                        stickyHeader={stickyHeader}
                        condensed={condensed}>
-          <THead stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+          <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             <Headers actualColumnPivotFields={actualColumnPivotFields}
                      columnPivots={columnPivots}
                      fields={fields}
@@ -275,7 +276,7 @@ const DataTable = ({
                      pinnedColumns={pinnedColumns}
                      togglePin={togglePin} />
           </THead>
-          <TBody stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             {formattedRows}
           </TBody>
         </MessagesTable>

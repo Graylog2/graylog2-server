@@ -41,7 +41,7 @@ const renderBulkActions = (
 );
 
 const DashboardsOverview = () => {
-  const [query, setQuery] = useQueryParam('q', StringParam);
+  const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -103,6 +103,7 @@ const DashboardsOverview = () => {
         <SearchForm onSearch={onSearch}
                     queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
                     onReset={onReset}
+                    query={query}
                     topMargin={0} />
       </div>
       {!dashboards?.length && !query && (

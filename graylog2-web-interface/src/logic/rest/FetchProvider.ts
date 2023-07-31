@@ -247,6 +247,18 @@ export default function fetch<T = any>(method: Method, url: string, body?: any, 
   return promise();
 }
 
+export function fetchMultiPartFormData<T = any>(url: string, body?: any, requireSession: boolean = true): Promise<T> {
+  const promise = () => new Builder('POST', url)
+    .formData(body)
+    .build();
+
+  if (requireSession) {
+    return queuePromiseIfNotLoggedin(promise)();
+  }
+
+  return promise();
+}
+
 export function fetchPlainText(method, url, body) {
   const promise = () => new Builder(method, url)
     .plaintext(body)
@@ -263,7 +275,7 @@ export function fetchStreamingPlainText(method, url, body) {
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPeriodically(method, url, body?) {
+export function fetchPeriodically<T = unknown>(method, url, body?): Promise<T> {
   const promise = () => new Builder(method, url)
     .noSessionExtension()
     .json(body)

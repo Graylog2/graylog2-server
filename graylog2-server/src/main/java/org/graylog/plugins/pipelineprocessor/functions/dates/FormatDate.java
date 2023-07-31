@@ -37,7 +37,7 @@ public class FormatDate extends AbstractFunction<String> {
     private final ParameterDescriptor<String, DateTimeZone> timeZoneParam;
 
     public FormatDate() {
-        value = ParameterDescriptor.type("value", DateTime.class).description("The date to format").build();
+        value = ParameterDescriptor.type("value", DateTime.class).description("The date to format").primary().build();
         format = ParameterDescriptor.string("format", DateTimeFormatter.class)
                 .transform(DateTimeFormat::forPattern)
                 .description("The format string to use, see http://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html")
@@ -68,6 +68,8 @@ public class FormatDate extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(of(value, format, timeZoneParam))
                 .description("Formats a date using the given format string")
+//                .ruleBuilderEnabled()
+//                .ruleBuilderTitle("Format date (format '${format}')")
                 .build();
     }
 

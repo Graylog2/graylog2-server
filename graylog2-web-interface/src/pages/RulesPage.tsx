@@ -19,17 +19,19 @@ import styled, { css } from 'styled-components';
 
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import DocsHelper from 'util/DocsHelper';
-import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
 import RuleList from 'components/rules/RuleList';
 import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
-import Routes from 'routing/Routes';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { Pagination } from 'stores/PaginationTypes';
 import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import CreateRuleModal from 'components/rules/CreateRuleModal';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
 
 const Flex = styled.div`
   display: flex;
@@ -57,7 +59,10 @@ const _loadRuleMetricData = (setMetricsConfig) => {
 
 const RulesPage = () => {
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
   const [query, setQuery] = useState('');
+  const [openCreateRuleModal, setOpenCreateRuleModal] = useState<boolean>(false);
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
   const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
@@ -109,9 +114,18 @@ const RulesPage = () => {
   // eslint-disable-next-line react/no-unstable-nested-components
   const RulesButtonToolbar = () => (
     <ButtonToolbar className="pull-right">
-      <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-        <Button bsStyle="success">Create Rule</Button>
-      </LinkContainer>
+      <Button bsStyle="success"
+              onClick={() => {
+                sendTelemetry('click', {
+                  app_pathname: getPathnameWithoutId(pathname),
+                  app_section: 'pipeline-rules',
+                  app_action_value: 'create-rule-button',
+                });
+
+                setOpenCreateRuleModal(true);
+              }}>
+        Create Rule
+      </Button>
       {renderDebugMetricsButton()}
     </ButtonToolbar>
   );
@@ -153,7 +167,10 @@ const RulesPage = () => {
             <Row>
               <Col md={12}>
                 <PaginatedList totalItems={total}>
-                  <RuleList rules={rules} rulesContext={rulesContext} onDelete={handleDelete} searchFilter={searchFilter} />
+                  <RuleList rules={rules}
+                            rulesContext={rulesContext}
+                            onDelete={handleDelete}
+                            searchFilter={searchFilter} />
                   {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
                 </PaginatedList>
               </Col>
@@ -161,6 +178,8 @@ const RulesPage = () => {
           )}
         </Col>
       </Row>
+
+      <CreateRuleModal showModal={openCreateRuleModal} onClose={() => setOpenCreateRuleModal(false)} />
     </DocumentTitle>
   );
 };

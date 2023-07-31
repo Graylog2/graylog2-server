@@ -17,14 +17,17 @@
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.OptionalInt;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonTypeName(ValueConfigDTO.NAME)
@@ -32,6 +35,7 @@ import java.util.OptionalInt;
 public abstract class ValueConfigDTO implements PivotConfigDTO {
     public static final String NAME = "values";
     static final String FIELD_LIMIT = "limit";
+    static final String FIELD_SKIP_EMPTY_VALUES = "skip_empty_values";
 
     @JsonProperty
     public abstract OptionalInt limit();
@@ -40,10 +44,27 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
         return Builder.builder().build();
     }
 
+    abstract Builder toBuilder();
+
+    @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public abstract Optional<Boolean> skipEmptyValues();
+
+    public ValueConfigDTO withLimit(int limit) {
+        return toBuilder().limit(limit).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_LIMIT)
         public abstract Builder limit(int limit);
+
+        public abstract Builder skipEmptyValues(Boolean skipEmptyValues);
+
+        @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
+        public Builder setSkipEmptyValues(@Nullable Boolean skipEmptyValues) {
+            return skipEmptyValues(firstNonNull(skipEmptyValues, false));
+        }
 
         public abstract ValueConfigDTO build();
 

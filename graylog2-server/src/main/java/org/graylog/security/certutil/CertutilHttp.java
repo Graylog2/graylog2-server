@@ -55,6 +55,7 @@ import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilHttp implements CliCommand {
 
+    @Deprecated //no need to have separate alias for both certificates types
     public static final String DATANODE_KEY_ALIAS = "datanode";
     @Option(name = "--ca", description = "Filename for the CA keystore")
     protected String caKeystoreFilename = "datanode-ca.p12";
@@ -122,10 +123,10 @@ public class CertutilHttp implements CliCommand {
 
                 final int validityDays = console.readInt("Enter certificate validity in days: ");
 
-                final String cnName = "localhost";
+                final String cnName = Tools.getLocalCanonicalHostname();
 
                 CertRequest certificateRequest = CertRequest.signed(cnName, caKeyPair)
-                        .withSubjectAlternativeName(cnName)
+                        .withSubjectAlternativeName("localhost")
                         .withSubjectAlternativeName(Tools.getLocalHostname())
                         .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
                         .withSubjectAlternativeName("127.0.0.1")

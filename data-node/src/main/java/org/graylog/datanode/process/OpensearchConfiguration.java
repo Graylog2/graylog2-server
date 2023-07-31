@@ -16,7 +16,9 @@
  */
 package org.graylog.datanode.process;
 
+import org.apache.commons.exec.OS;
 import org.graylog.datanode.management.Environment;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -24,9 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 public record OpensearchConfiguration(
-        String opensearchVersion,
         Path opensearchDir,
         Path opensearchConfigDir,
+        String bindAddress,
+        String hostname,
         int httpPort,
         int transportPort,
         String authUsername,
@@ -37,6 +40,16 @@ public record OpensearchConfiguration(
     public Map<String, String> asMap() {
 
         Map<String, String> config = new LinkedHashMap<>();
+
+        // currently, startup fails on macOS without disabling this filter.
+        // for a description of the filter (although it's for ES), see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/_system_call_filter_check.html
+        if(OS.isFamilyMac()) {
+            config.put("bootstrap.system_call_filter", "false");
+        }
+
+        if (bindAddress != null && !bindAddress.isBlank()) {
+            config.put("network.host", bindAddress);
+        }
         config.put("http.port", String.valueOf(httpPort));
         config.put("transport.port", String.valueOf(transportPort));
         if (clusterName != null && !clusterName.isBlank()) {
@@ -63,5 +76,10 @@ public record OpensearchConfiguration(
         final Environment env = new Environment(System.getenv());
         env.put("OPENSEARCH_PATH_CONF", opensearchConfigDir.resolve("opensearch").toAbsolutePath().toString());
         return env;
+    }
+
+    public HttpHost getRestBaseUrl() {
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
     }
 }

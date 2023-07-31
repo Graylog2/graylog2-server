@@ -38,6 +38,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.isNull;
@@ -54,18 +55,25 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected OpenSearch13Instance(String image, SearchVersion version, Network network) {
-        super(image, version, network, "2g");
+    public OpenSearch13Instance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(version, network, heapSize);
+
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
+        this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
 
     @Override
     public SearchServer searchServer() {
         return SearchServer.OS1;
+    }
+
+    @Override
+    protected String imageName() {
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version().version());
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -79,6 +87,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 1,
                 1,
                 false,
+                false,
                 null,
                 Duration.seconds(60),
                 "http",
@@ -86,18 +95,6 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 false,
                 new BasicCredentialsProvider())
                 .get();
-    }
-
-    public static OpenSearch13Instance create(SearchVersion searchVersion, Network network) {
-        final String image = imageNameFrom(searchVersion);
-
-        LOG.debug("Creating instance {}", image);
-
-        return new OpenSearch13Instance(image, searchVersion, network);
-    }
-
-    private static String imageNameFrom(SearchVersion version) {
-        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version());
     }
 
     @Override

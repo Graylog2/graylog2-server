@@ -17,7 +17,7 @@
 package org.graylog2.shared.rest.resources.csp;
 
 public interface CSPService {
-    void buildConnectSrc();
+    void updateConnectSrc();
 
-    String connectSrcValue();
+    String cspString(String group);
 }

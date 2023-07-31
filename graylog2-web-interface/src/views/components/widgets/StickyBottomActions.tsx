@@ -45,7 +45,7 @@ const Actions = styled.div<{ $scrolledToBottom: boolean, $alignAtBottom: boolean
   justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
   padding-top: 5px;
 
-  ::before {
+  &::before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
     content: ' ';
     display: ${$scrolledToBottom ? 'block' : 'none'};

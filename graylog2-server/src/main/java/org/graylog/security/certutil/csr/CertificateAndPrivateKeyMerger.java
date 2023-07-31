@@ -18,18 +18,16 @@ package org.graylog.security.certutil.csr;
 
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
+import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
-import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 
 /**
  * Merges signed certificate, received after CSR was processed, with private key, that was awaiting in a safe file.
@@ -38,35 +36,28 @@ import java.security.cert.X509Certificate;
 public class CertificateAndPrivateKeyMerger {
 
     private final KeyPairChecker keyPairChecker;
-    private final KeystoreMongoStorage keystoreMongoStorage;
-    private final NodeId nodeId;
 
     @Inject
-    public CertificateAndPrivateKeyMerger(final KeyPairChecker keyPairChecker,
-                                          final KeystoreMongoStorage keystoreMongoStorage,
-                                          final NodeId nodeId) {
+    public CertificateAndPrivateKeyMerger(final KeyPairChecker keyPairChecker) {
         this.keyPairChecker = keyPairChecker;
-        this.keystoreMongoStorage = keystoreMongoStorage;
-        this.nodeId = nodeId;
     }
 
-    public void merge(final X509Certificate signedCertificate,
-                      final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
-                      final char[] privateKeyStoragePassword,
-                      final char[] certFilePassword,
-                      final String alias) throws GeneralSecurityException, IOException,
+    public KeyStore merge(final CertificateChain certificateChain,
+                          final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
+                          final char[] privateKeyStoragePassword,
+                          final char[] certFilePassword,
+                          final String alias) throws GeneralSecurityException, IOException,
             OperatorCreationException, PKCSException, KeyStoreStorageException {
 
-        KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
+        KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
         nodeKeystore.load(null, null);
 
         final PrivateKey privateKey = privateKeyEncryptedStorage.readEncryptedKey(privateKeyStoragePassword);
-        nodeKeystore.setKeyEntry(alias, privateKey, privateKeyStoragePassword, new Certificate[]{signedCertificate});
-
-        if (!keyPairChecker.matchingKeys(privateKey, signedCertificate.getPublicKey())) {
+        if (!keyPairChecker.matchingKeys(privateKey, certificateChain.signedCertificate().getPublicKey())) {
             throw new GeneralSecurityException("Private key from CSR and public key from certificate do not form a valid pair");
         }
+        nodeKeystore.setKeyEntry(alias, privateKey, certFilePassword, certificateChain.toCertificateChainArray());
 
-        keystoreMongoStorage.writeKeyStore(nodeId, nodeKeystore, certFilePassword);
+        return nodeKeystore;
     }
 }

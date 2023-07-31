@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
@@ -39,7 +40,7 @@ public class SearchDbPreflightCheck implements PreflightCheck {
     @Inject
     public SearchDbPreflightCheck(
             VersionProbe elasticVersionProbe,
-            @Named("elasticsearch_hosts") List<URI> elasticsearchHosts) {
+            @IndexerHosts List<URI> elasticsearchHosts) {
         this.elasticVersionProbe = elasticVersionProbe;
         this.elasticsearchHosts = elasticsearchHosts;
     }

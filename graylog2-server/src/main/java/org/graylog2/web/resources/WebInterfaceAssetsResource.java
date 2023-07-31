@@ -44,7 +44,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -68,7 +67,7 @@ import static java.util.Objects.requireNonNull;
 
 @Singleton
 @Path("")
-@CSP(value = CSP.CSP_DEFAULT)
+@CSP(group = CSP.DEFAULT)
 public class WebInterfaceAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final IndexHtmlGenerator indexHtmlGenerator;
@@ -82,7 +81,7 @@ public class WebInterfaceAssetsResource {
         this.mimeTypes = requireNonNull(mimeTypes);
         this.fileSystemCache = CacheBuilder.newBuilder()
                 .maximumSize(1024)
-                .build(new CacheLoader<URI, FileSystem>() {
+                .build(new CacheLoader<>() {
                     @Override
                     public FileSystem load(@Nonnull URI key) throws Exception {
                         try {
@@ -123,32 +122,19 @@ public class WebInterfaceAssetsResource {
     public Response get(@Context ContainerRequest request,
                         @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
-        if (filename == null || filename.isEmpty() || "/".equals(filename) || "index.html".equals(filename)) {
-            return getDefaultResponse(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
-        }
         try {
             final URL resourceUrl = getResourceUri(false, filename, this.getClass());
             return getResponse(request, filename, resourceUrl, false);
         } catch (IOException | URISyntaxException e) {
-            return getDefaultResponse(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
+            return generateIndexHtml(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
         }
-    }
-
-    @GET
-    @Path("index.html")
-    public Response getIndexHtml(@Context ContainerRequest request, @Context HttpHeaders headers) {
-        return getDefaultResponse(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
     }
 
     @GET
     @Path("{filename:.*}")
     public Response getIndex(@Context ContainerRequest request, @Context HttpHeaders headers) {
         final URI originalLocation = request.getRequestUri();
-        if (originalLocation.getPath().endsWith("/")) {
-            return get(request, headers, originalLocation.getPath());
-        }
-        final URI redirect = UriBuilder.fromPath(originalLocation.getPath() + "/").build();
-        return Response.temporaryRedirect(redirect).build();
+        return get(request, headers, originalLocation.getPath());
     }
 
     private Response getResponse(Request request, String filename,
@@ -215,7 +201,7 @@ public class WebInterfaceAssetsResource {
         }
     }
 
-    private Response getDefaultResponse(HttpHeaders headers, String nonce) {
+    private Response generateIndexHtml(HttpHeaders headers, String nonce) {
         return Response
                 .ok(indexHtmlGenerator.get(headers.getRequestHeaders(), nonce))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML)

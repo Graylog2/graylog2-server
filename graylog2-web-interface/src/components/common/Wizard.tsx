@@ -17,14 +17,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import find from 'lodash/find';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/bootstrap';
 
 import Icon from './Icon';
 
-const SubnavigationCol = styled(Col)(({ theme }: { theme: DefaultTheme }) => css`
+const SubnavigationCol = styled(Col)(({ theme }) => css`
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
@@ -32,7 +31,7 @@ const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
+const StyledNav = styled(Nav)(({ theme }) => css`
   &.nav {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};
@@ -56,7 +55,7 @@ const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
       }
 
       &:not(:last-child) > a {
-        ::after {
+        &::after {
           transition: background-color 150ms ease-in-out;
           background-color: ${theme.colors.global.contentBackground};
           border-color: ${theme.colors.variant.lighter.default};
@@ -73,7 +72,7 @@ const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
           z-index: 2;
         }
 
-        :hover::after {
+        &:hover::after {
           background-color: ${theme.colors.variant.lightest.default};
         }
       }
@@ -109,7 +108,7 @@ const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
         }
 
         &:not(:last-child) > a {
-          ::after {
+          &::after {
             bottom: 0;
             left: 50%;
             top: auto;
@@ -130,6 +129,26 @@ const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
+
+const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+  if (activeStep === undefined || activeStep === null) {
+    return false;
+  }
+
+  return find(steps, { key: activeStep });
+};
+
+const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+  if (activeStep === undefined || activeStep === null) {
+    return;
+  }
+
+  if (!isValidActiveStep(activeStep, steps)) {
+    // eslint-disable-next-line no-console
+    console.warn(`activeStep ${activeStep} is not a key in any element of the 'steps' prop!`);
+  }
+};
+
 export type StepKey = number | string;
 
 export type Step = {
@@ -205,7 +224,7 @@ class Wizard extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this._warnOnInvalidActiveStep(props.activeStep, props.steps);
+    warnOnInvalidActiveStep(props.activeStep, props.steps);
 
     this.state = {
       selectedStep: props.steps[0].key,
@@ -215,33 +234,14 @@ class Wizard extends React.Component<Props, State> {
   componentDidUpdate() {
     const { activeStep, steps } = this.props;
 
-    this._warnOnInvalidActiveStep(activeStep, steps);
+    warnOnInvalidActiveStep(activeStep, steps);
   }
-
-  _warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
-    if (activeStep === undefined || activeStep === null) {
-      return;
-    }
-
-    if (!this._isValidActiveStep(activeStep, steps)) {
-      // eslint-disable-next-line no-console
-      console.warn(`activeStep ${activeStep} is not a key in any element of the 'steps' prop!`);
-    }
-  };
-
-  _isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
-    if (activeStep === undefined || activeStep === null) {
-      return false;
-    }
-
-    return find(steps, { key: activeStep });
-  };
 
   _getSelectedStep = () => {
     const { activeStep, steps } = this.props;
     const { selectedStep } = this.state;
 
-    return (this._isValidActiveStep(activeStep, steps) ? activeStep : selectedStep);
+    return (isValidActiveStep(activeStep, steps) ? activeStep : selectedStep);
   };
 
   _wizardChanged = (eventKey: StepKey) => {
