@@ -104,16 +104,15 @@ describe('QuickAccessTimeRangeForm', () => {
     ]));
   });
 
-  it('edit timerange action trigger onUpdate', async () => {
+  it('edit time range action trigger onUpdate', async () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
-    await fireEvent.click(timerangeFilter);
-    await screen.findByText(/search time range/i);
+    fireEvent.click(timerangeFilter);
     const fromInput = await screen.findByTitle('Set the from value');
-    await fireEvent.change(fromInput, { target: { value: 15 } });
+    fireEvent.change(fromInput, { target: { value: 15 } });
     const submit = await screen.findByTitle('Update time range');
-    await fireEvent.click(submit);
+    fireEvent.click(submit);
 
     await waitFor(() => expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
       { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 900, type: 'relative' } },

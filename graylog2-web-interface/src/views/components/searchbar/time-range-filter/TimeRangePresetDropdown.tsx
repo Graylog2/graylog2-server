@@ -84,7 +84,7 @@ const preparePresetOptions = async (presets: SearchesConfig['quick_access_timera
       eventKey: timerange,
       key: `timerange-option-${id}`,
       disabled,
-      label: description.replace(/Search\sin(\sthe\slast)?\s/, ''),
+      label: description,
     }));
   }
 
@@ -151,7 +151,7 @@ const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, c
     if (!options) {
       await setDropdownOptions();
     }
-  }, [setDropdownOptions]);
+  }, [options, setDropdownOptions]);
 
   return (
     <DropdownButton title={displayTitle && 'Load Preset'}
