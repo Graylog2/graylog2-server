@@ -30,6 +30,7 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.testcontainers.OpensearchContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -116,7 +117,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpenSearchContainer(DockerImageName.parse(image))
+        return new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
@@ -124,8 +125,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
                 .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
+                .withNetworkAliases(NETWORK_ALIAS);
     }
 
     @Override
