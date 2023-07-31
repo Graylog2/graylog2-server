@@ -80,7 +80,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         final var favorites = this.findForUser(searchUser);
         if(favorites.isPresent()) {
             var fi = favorites.get();
-            fi.items().add(grn);
+            fi.items().add(0, grn);
             this.save(fi);
         } else {
             var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn));

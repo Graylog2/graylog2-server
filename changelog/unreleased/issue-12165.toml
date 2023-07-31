@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Do not show query input suggestions when using `Add to query` field value action.
+message = "Do not show query input suggestions when using `Add to query` field value action."
 
 issues = ["12165"]
 pulls = ["15885"]

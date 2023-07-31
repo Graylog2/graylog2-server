@@ -17,20 +17,14 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type { SyntheticEvent } from 'react';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
-import ThemePropTypes from 'preflight/theme/types';
 import { Icon } from 'preflight/components/common';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
 } from 'theme/constants';
-
-type Props = {
-  theme: DefaultTheme,
-};
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
@@ -105,7 +99,8 @@ const Toggle = styled.label(({ theme }) => css`
   }
 `);
 
-const ThemeModeToggle = ({ theme }: Props) => {
+const ThemeModeToggle = () => {
+  const theme = useTheme();
   const currentMode = theme.mode;
   const [loadingTheme, setLoadingTheme] = useState(false);
 
@@ -146,8 +141,4 @@ const ThemeModeToggle = ({ theme }: Props) => {
   );
 };
 
-ThemeModeToggle.propTypes = {
-  theme: ThemePropTypes.isRequired,
-};
-
-export default withTheme(ThemeModeToggle);
+export default ThemeModeToggle;

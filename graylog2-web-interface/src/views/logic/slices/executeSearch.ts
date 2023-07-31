@@ -27,7 +27,7 @@ const delay = (ms: number) => new Promise((resolve) => {
 });
 
 const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promise((resolve) => {
-  if (job?.execution?.done) {
+  if (job?.execution?.done || job?.execution?.completed_exceptionally) {
     resolve(job);
   } else {
     resolve(delay(250)

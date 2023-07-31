@@ -24,7 +24,12 @@ import useRenewalPolicy from 'preflight/hooks/useRenewalPolicy';
 
 import useDataNodesCA from './useDataNodesCA';
 
-const configurationStep = (dataNodes: DataNodes, dataNodesCA: DataNodesCA, renewalPolicy: RenewalPolicy) => {
+const configurationStep = (
+  dataNodes: DataNodes,
+  dataNodesCA: DataNodesCA,
+  renewalPolicy: RenewalPolicy,
+  isSkippingProvisioning: boolean,
+) => {
   if (!dataNodesCA) {
     return CONFIGURATION_STEPS.CA_CONFIGURATION.key;
   }
@@ -33,20 +38,24 @@ const configurationStep = (dataNodes: DataNodes, dataNodesCA: DataNodesCA, renew
     return CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key;
   }
 
-  const finishedProvisioning = !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED.key);
+  const finishedProvisioning = !!dataNodes?.length && !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED.key);
 
-  if (!finishedProvisioning) {
+  if (!finishedProvisioning && !isSkippingProvisioning) {
     return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
   }
 
   return CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key;
 };
 
-const useConfigurationStep = (): { step: ConfigurationStep | undefined, isLoading: boolean } => {
+type Props = {
+  isSkippingProvisioning: boolean
+}
+
+const useConfigurationStep = ({ isSkippingProvisioning }: Props): { step: ConfigurationStep | undefined, isLoading: boolean } => {
   const { data: dataNodes, isInitialLoading: isLoadingDataNodes } = useDataNodes();
   const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus } = useDataNodesCA();
   const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy } = useRenewalPolicy();
-  const step = configurationStep(dataNodes, dataNodesCA, renewalPolicy);
+  const step = configurationStep(dataNodes, dataNodesCA, renewalPolicy, isSkippingProvisioning);
 
   return useMemo(() => {
     if (isLoadingDataNodes || isLoadingCAStatus || isLoadingRenewalPolicy) {
@@ -54,6 +63,7 @@ const useConfigurationStep = (): { step: ConfigurationStep | undefined, isLoadin
     }
 
     return ({
+
       isLoading: false,
       step,
     });
