@@ -258,7 +258,7 @@ export const RulesStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
       const promise = fetch('DELETE', url).then(() => {
-        this.rules = this.rules.filter((el) => el.id !== rule.id);
+        this.rules = this.rules?.filter((el) => el.id !== rule.id);
         this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
         UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
       }, failCallback);
