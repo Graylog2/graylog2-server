@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -91,6 +91,7 @@ const preparePresetOptions = async (presets: SearchesConfig['quick_access_timera
   return [{
     disabled: true,
     label: 'No available presets',
+    key: 'no-available-presets',
   }];
 };
 
@@ -99,21 +100,17 @@ const usePresetOptions = (disabled: boolean) => {
   const [presetOptions, setPresetOptions] = useState<Array<PresetOption> | undefined>();
   const timeRangeLimit = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds(), [config?.query_time_range_limit]);
 
-  useEffect(() => {
-    const updateOptions = async () => {
-      setPresetOptions(
-        await preparePresetOptions(
-          config?.quick_access_timerange_presets,
-          timeRangeLimit,
-          disabled,
-        ),
-      );
-    };
+  const onSetOptions = async () => {
+    setPresetOptions(
+      await preparePresetOptions(
+        config?.quick_access_timerange_presets,
+        timeRangeLimit,
+        disabled,
+      ),
+    );
+  };
 
-    updateOptions();
-  }, [config?.quick_access_timerange_presets, disabled, timeRangeLimit]);
-
-  return presetOptions;
+  return ({ options: presetOptions, setOptions: onSetOptions });
 };
 
 type Props = {
@@ -126,10 +123,10 @@ type Props = {
   onChange?: (timerange: TimeRange) => void,
 };
 
-const TimeRangePresetDropdown = ({ disabled, onChange, onToggle, className, displayTitle, bsSize, header }: Props) => {
+const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, className, displayTitle, bsSize, header }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { formatTime } = useUserDateTime();
-  const options = usePresetOptions(disabled);
+  const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled);
 
   const _onChange = useCallback((timerange: TimeRange) => {
     if (timerange !== null && timerange !== undefined) {
@@ -144,6 +141,18 @@ const TimeRangePresetDropdown = ({ disabled, onChange, onToggle, className, disp
     }
   }, [formatTime, onChange, sendTelemetry]);
 
+  const onToggle = useCallback(async (isOpen: boolean) => {
+    if (typeof onToggleProp === 'function') {
+      onToggleProp(isOpen);
+    }
+  }, [onToggleProp]);
+
+  const onMouseDown = useCallback(async () => {
+    if (!options) {
+      await setDropdownOptions();
+    }
+  }, [setDropdownOptions]);
+
   return (
     <DropdownButton title={displayTitle && 'Load Preset'}
                     id="relative-timerange-selector"
@@ -151,15 +160,20 @@ const TimeRangePresetDropdown = ({ disabled, onChange, onToggle, className, disp
                     bsSize={bsSize}
                     className={className}
                     onToggle={onToggle}
+                    onMouseDown={onMouseDown}
                     onSelect={_onChange}>
       {header && (
         <MenuItem header>{header}</MenuItem>
       )}
-      {options ? options?.map(({ eventKey, key, disabled: isDisabled, label }) => (
+      {options ? options.map(({ eventKey, key, disabled: isDisabled, label }) => (
         <MenuItem eventKey={eventKey} key={key} disabled={isDisabled}>
           {label}
         </MenuItem>
-      )) : 'Loading...'}
+      )) : (
+        <MenuItem eventKey="loading" key="loading" disabled>
+          Loading...
+        </MenuItem>
+      )}
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
         <AdminMenuItem href="/system/configurations" target="_blank">
