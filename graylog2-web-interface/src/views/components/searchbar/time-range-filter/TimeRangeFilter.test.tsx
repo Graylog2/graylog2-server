@@ -145,13 +145,13 @@ describe('TimeRangeFilter', () => {
     expect(screen.queryByRole('button', { name: /open time range preset select/i })).not.toBeInTheDocument();
   });
 
-  it('has no button add time renge to quick access for non admin users', async () => {
+  it('has no button for non admin users to save current time range as preset', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByText(/search time range/i);
 
-    expect(screen.queryByTitle('Add time range to quick access time range list')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Save current time range as preset')).not.toBeInTheDocument();
   });
 });

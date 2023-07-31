@@ -68,7 +68,7 @@ describe('TimeRangeAddToQuickListButton', () => {
     asMock(debounce as DebouncedFunc<(...args: any) => any>).mockImplementation((fn) => fn);
   });
 
-  const getOpenButton = () => screen.findByTitle('Add time range to quick access time range list');
+  const getOpenButton = () => screen.findByTitle('Save current time range as preset');
 
   it('shows popover on click', async () => {
     render(
@@ -81,7 +81,7 @@ describe('TimeRangeAddToQuickListButton', () => {
 
     fireEvent.click(buttonIcon);
 
-    await screen.findByText('Add to quick access list');
+    await screen.findByText('Save as preset');
   });
 
   it('dont shows alert about duplication when there is no similar time range', async () => {
@@ -129,7 +129,7 @@ describe('TimeRangeAddToQuickListButton', () => {
     await suppressConsole(async () => {
       await fireEvent.change(descriptionInput, { target: { value: 'My new time range' } });
 
-      const submitButton = await screen.findByTitle('Add time range');
+      const submitButton = await screen.findByTitle('Save preset');
       await fireEvent.click(submitButton);
     });
 
@@ -171,7 +171,7 @@ describe('TimeRangeAddToQuickListButton', () => {
       await fireEvent.change(descriptionInput, { target: { value: '' } });
     });
 
-    const submitButton = await screen.findByTitle('Add time range');
+    const submitButton = await screen.findByTitle('Save preset');
 
     await expect(submitButton).toHaveAttribute('disabled');
   });

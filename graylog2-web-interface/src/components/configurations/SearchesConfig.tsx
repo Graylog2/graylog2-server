@@ -248,7 +248,7 @@ const SearchesConfig = () => {
 
       <Row>
         <Col md={4}>
-          <strong>Quick access time range options</strong>
+          <strong>Search Time Range Presets</strong>
           <QuickAccessTimeRangeOptionsSummary options={quickAccessTimeRangePresetsFromBE.toArray()} />
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />

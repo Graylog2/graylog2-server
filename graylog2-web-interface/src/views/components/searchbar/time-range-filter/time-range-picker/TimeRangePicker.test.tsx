@@ -154,11 +154,11 @@ describe('TimeRangePicker', () => {
     expect(setCurrentTimeRange).toHaveBeenCalledWith({ type: 'keyword', keyword: 'yesterday', timezone: 'Asia/Tokyo' });
   });
 
-  it('has button add time range to quick access for admin users', async () => {
+  it('Displays button for admin users to save time range as preset', async () => {
     asMock(useCurrentUser).mockReturnValue(adminUser);
 
     render(<TimeRangePicker {...defaultProps} />);
 
-    await screen.findByTitle('Add time range to quick access time range list');
+    await screen.findByTitle('Save current time range as preset');
   });
 });

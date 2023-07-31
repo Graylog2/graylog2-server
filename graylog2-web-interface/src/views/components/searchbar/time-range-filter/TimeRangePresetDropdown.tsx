@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -177,7 +177,7 @@ const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, c
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
         <AdminMenuItem href="/system/configurations" target="_blank">
-          Configure Ranges <ExternalIcon name="external-link-alt" />
+          Configure presets <ExternalIcon name="external-link-alt" />
         </AdminMenuItem>
       </IfPermitted>
     </DropdownButton>

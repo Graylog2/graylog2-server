@@ -80,7 +80,7 @@ describe('QuickAccessTimeRangeForm', () => {
 
   it('add action trigger onUpdate', async () => {
     renderForm();
-    const addItemButton = await screen.findByLabelText('Add quick access timerange');
+    const addItemButton = await screen.findByLabelText('Add new search time range preset');
 
     fireEvent.click(addItemButton);
 

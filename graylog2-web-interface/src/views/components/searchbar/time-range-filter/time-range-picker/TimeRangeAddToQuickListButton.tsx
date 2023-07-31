@@ -70,7 +70,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
     <Portal>
       <Position placement="left"
                 target={target}>
-        <Popover title="Add to quick access list"
+        <Popover title="Save as preset"
                  id="add-to-quick-list-popover"
                  data-app-section="add-to-quick-list-popover_form"
                  data-event-element="Add to quick list"
@@ -93,7 +93,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
             </p>
           )}
           <StyledModalSubmit disabledSubmit={!description}
-                             submitButtonText="Add time range"
+                             submitButtonText="Save preset"
                              isAsyncSubmit={false}
                              displayCancel
                              onCancel={toggleModal}
@@ -161,7 +161,7 @@ const TimeRangeAddToQuickListButton = () => {
   return (
     <>
       <Button disabled={!isValidTimeRange}
-              title="Add time range to quick access time range list"
+              title="Save current time range as preset"
               ref={formTarget}
               bsSize="small"
               onClick={toggleModal}>

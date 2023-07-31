@@ -150,9 +150,9 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
 
   return (
     <div className="form-group">
-      <strong>Quick Access Time Range Options</strong>
+      <strong>Search Time Range Presets</strong>
       <span className="help-block">
-        <span>Configure the available options for the <strong>quick access</strong> time range selector</span>
+        <span>Configure the available search time range presets.</span>
       </span>
       <div className="wrapper">
         <TimeRangeInputSettingsContext.Provider value={contextSettings}>
@@ -163,7 +163,7 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
                         customContentRender={customContentRender} />
         </TimeRangeInputSettingsContext.Provider>
       </div>
-      <Button bsSize="xs" onClick={addTimeRange} title="Add quick access timerange" aria-label="Add quick access timerange">
+      <Button bsSize="xs" onClick={addTimeRange} title="Add new search time range preset" aria-label="Add new search time range preset">
         Add option
       </Button>
     </div>
