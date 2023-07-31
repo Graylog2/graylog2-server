@@ -17,6 +17,7 @@
 package org.graylog.events.processor;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
@@ -26,13 +27,15 @@ import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.plugin.database.users.User;
+import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -134,36 +137,31 @@ public class EventDefinitionHandler {
     }
 
     /**
-     * Update the timestamp of last match based on the event parameter
+     * Update the timestamp of last match based on given list of events (which may include events for
+     * multiple event definitions).
+     * Does not change the updatedAt timestamp.
      *
      * @param eventsList list of events that successfully matched
-     * @param isOrdered  if false, the list is not ordered: scan it for the most recent event
-     *                   if true, list is sorted in chronological ascending order: last element is most recent
      */
-    public void updateLastMatched(List<EventWithContext> eventsList, boolean isOrdered) {
+    public void updateLastMatched(List<EventWithContext> eventsList) {
         if (CollectionUtils.isEmpty(eventsList)) {
             return;
         }
-        if (!isOrdered) {
-            eventsList.sort(Comparator.comparing(eventWithContext -> eventWithContext.event().getEventTimestamp()));
-        }
-        updateLastMatched(eventsList.get(eventsList.size() - 1));
-    }
 
-    /**
-     * Update the timestamp of last match based on the event parameter
-     *
-     * @param eventWithContext event that successfully matched
-     */
-    public void updateLastMatched(EventWithContext eventWithContext) {
-        final Optional<EventDefinitionDto> eventDefinitionDto =
-                eventDefinitionService.get(eventWithContext.event().getEventDefinitionId());
-        if (eventDefinitionDto.isPresent()) {
-            final EventDefinitionDto newDto = eventDefinitionDto.get().toBuilder()
-                    .matchedAt(eventWithContext.event().getEventTimestamp())
-                    .build();
-            updateEventDefinition(newDto);
-            LOG.info("Updating {} {}", newDto.title(), newDto.updatedAt());
+        Map<String, DateTime> lastMatched = new HashMap<>();
+        for (EventWithContext eventWithContext : eventsList) {
+            Event currEvent = eventWithContext.event();
+            if (lastMatched.containsKey(currEvent.getId())) {
+                if (currEvent.getEventTimestamp().isAfter(lastMatched.get(currEvent.getEventDefinitionId()))) {
+                    lastMatched.put(currEvent.getEventDefinitionId(), currEvent.getEventTimestamp());
+                }
+            } else {
+                lastMatched.put(currEvent.getEventDefinitionId(), currEvent.getEventTimestamp());
+            }
+        }
+
+        for (String id : lastMatched.keySet()) {
+            eventDefinitionService.updateMatchedAt(id, lastMatched.get(id));
         }
     }
 

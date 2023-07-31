@@ -62,8 +62,8 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_NOTIFICATIONS = "notifications";
     public static final String FIELD_STATE = "state";
-    public static final String UPDATED_AT = "updated_at";
-    public static final String MATCHED_AT = "matched_at";
+    public static final String FIELD_UPDATED_AT = "updated_at";
+    public static final String FIELD_MATCHED_AT = "matched_at";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
@@ -90,12 +90,12 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
     @Override
     @Nullable
-    @JsonProperty(UPDATED_AT)
+    @JsonProperty(FIELD_UPDATED_AT)
     public abstract DateTime updatedAt();
 
     @Override
     @Nullable
-    @JsonProperty(MATCHED_AT)
+    @JsonProperty(FIELD_MATCHED_AT)
     public abstract DateTime matchedAt();
 
     @Override
@@ -196,10 +196,10 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
-        @JsonProperty(UPDATED_AT)
+        @JsonProperty(FIELD_UPDATED_AT)
         public abstract Builder updatedAt(DateTime updatedAt);
 
-        @JsonProperty(MATCHED_AT)
+        @JsonProperty(FIELD_MATCHED_AT)
         public abstract Builder matchedAt(DateTime matchedAt);
 
         @JsonProperty(FIELD_PRIORITY)

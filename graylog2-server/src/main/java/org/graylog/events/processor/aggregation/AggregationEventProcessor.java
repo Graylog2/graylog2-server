@@ -244,7 +244,7 @@ public class AggregationEventProcessor implements EventProcessor {
             }
 
             List<EventWithContext> eventsList = eventsWithContext.build();
-            eventDefinitionHandler.updateLastMatched(eventsList, true);
+            eventDefinitionHandler.updateLastMatched(eventsList);
 
             eventsConsumer.accept(eventsList);
         };
@@ -266,7 +266,7 @@ public class AggregationEventProcessor implements EventProcessor {
         LOG.debug("Got {} (total-aggregated-messages={}) results.", result.keyResults().size(), result.totalAggregatedMessages());
 
         List<EventWithContext> eventsList = eventsFromAggregationResult(eventFactory, parameters, result);
-        eventDefinitionHandler.updateLastMatched(eventsList, true);
+        eventDefinitionHandler.updateLastMatched(eventsList);
 
         eventsConsumer.accept(eventsList);
     }
