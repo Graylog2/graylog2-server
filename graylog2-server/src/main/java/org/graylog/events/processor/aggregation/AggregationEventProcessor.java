@@ -88,8 +88,8 @@ public class AggregationEventProcessor implements EventProcessor {
     private final DBEventProcessorStateService stateService;
     private final MoreSearch moreSearch;
     private final EventStreamService eventStreamService;
-    private final EventDefinitionHandler eventDefinitionHandler;
     private final Messages messages;
+    private final EventDefinitionHandler eventDefinitionHandler;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -98,8 +98,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
-                                     EventDefinitionHandler eventDefinitionHandler,
-                                     Messages messages) {
+                                     Messages messages,
+                                     EventDefinitionHandler eventDefinitionHandler) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -107,8 +107,8 @@ public class AggregationEventProcessor implements EventProcessor {
         this.stateService = stateService;
         this.moreSearch = moreSearch;
         this.eventStreamService = eventStreamService;
-        this.eventDefinitionHandler = eventDefinitionHandler;
         this.messages = messages;
+        this.eventDefinitionHandler = eventDefinitionHandler;
     }
 
     @Override
@@ -239,14 +239,14 @@ public class AggregationEventProcessor implements EventProcessor {
                         .streams(event.getSourceStreams())
                         .build());
 
+                LOG.debug("Creating event {}/{} {}", eventDefinition.title(), eventDefinition.id(), msg.getTimestamp());
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
 
             List<EventWithContext> eventsList = eventsWithContext.build();
-            EventWithContext lastEventWithContext = eventsList.get(eventsList.size() - 1);
-            eventDefinitionHandler.updateLastMatched(lastEventWithContext);
+            eventDefinitionHandler.updateLastMatched(eventsList, true);
 
-            eventsConsumer.accept(eventsWithContext.build());
+            eventsConsumer.accept(eventsList);
         };
 
         moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
@@ -265,7 +265,10 @@ public class AggregationEventProcessor implements EventProcessor {
 
         LOG.debug("Got {} (total-aggregated-messages={}) results.", result.keyResults().size(), result.totalAggregatedMessages());
 
-        eventsConsumer.accept(eventsFromAggregationResult(eventFactory, parameters, result));
+        List<EventWithContext> eventsList = eventsFromAggregationResult(eventFactory, parameters, result);
+        eventDefinitionHandler.updateLastMatched(eventsList, true);
+
+        eventsConsumer.accept(eventsList);
     }
 
     private boolean satisfiesConditions(AggregationKeyResult keyResult) {

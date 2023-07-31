@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
@@ -30,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -131,10 +134,26 @@ public class EventDefinitionHandler {
     }
 
     /**
-     * Update the timestamp of last match
+     * Update the timestamp of last match based on the event parameter
      *
-     * @param eventDefinition
-     * @param lastMatched
+     * @param eventsList list of events that successfully matched
+     * @param isOrdered  if false, the list is not ordered: scan it for the most recent event
+     *                   if true, list is sorted in chronological ascending order: last element is most recent
+     */
+    public void updateLastMatched(List<EventWithContext> eventsList, boolean isOrdered) {
+        if (CollectionUtils.isEmpty(eventsList)) {
+            return;
+        }
+        if (!isOrdered) {
+            eventsList.sort(Comparator.comparing(eventWithContext -> eventWithContext.event().getEventTimestamp()));
+        }
+        updateLastMatched(eventsList.get(eventsList.size() - 1));
+    }
+
+    /**
+     * Update the timestamp of last match based on the event parameter
+     *
+     * @param eventWithContext event that successfully matched
      */
     public void updateLastMatched(EventWithContext eventWithContext) {
         final Optional<EventDefinitionDto> eventDefinitionDto =
@@ -144,6 +163,7 @@ public class EventDefinitionHandler {
                     .matchedAt(eventWithContext.event().getEventTimestamp())
                     .build();
             updateEventDefinition(newDto);
+            LOG.info("Updating {} {}", newDto.title(), newDto.updatedAt());
         }
     }
 
