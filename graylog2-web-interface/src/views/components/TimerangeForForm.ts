@@ -20,6 +20,7 @@ import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import type { DateTimeFormats } from 'util/DateTime';
 
+// eslint-disable-next-line import/prefer-default-export
 export const onInitializingTimerange = (timerange: TimeRange, formatTime: (dateTime: string, format: DateTimeFormats) => string): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 
