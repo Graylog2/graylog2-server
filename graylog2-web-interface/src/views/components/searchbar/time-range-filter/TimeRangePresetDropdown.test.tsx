@@ -33,7 +33,7 @@ describe('RangePresetDropdown', () => {
     });
 
     const onSelectOption = jest.fn();
-    render(<RangePresetDropdown onChange={onSelectOption} availableOptions={[]} />);
+    render(<RangePresetDropdown onChange={onSelectOption} />);
 
     const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
     fireEvent.click(timeRangePresetButton);
@@ -48,32 +48,32 @@ describe('RangePresetDropdown', () => {
       config: {
         ...mockSearchClusterConfig,
         query_time_range_limit: 'PT6M',
+        quick_access_timerange_presets: [
+          {
+            id: '639843f5-049a-4532-8a54-102da850b7f1',
+            timerange: {
+              from: 300,
+              type: 'relative',
+            },
+            description: '5 minutes',
+          },
+          {
+            id: '8dda08e9-cd23-44ff-b4eb-edeb7a704cf4',
+            timerange: {
+              keyword: 'Last ten minutes',
+              timezone: 'Europe/Berlin',
+              type: 'keyword',
+            },
+            description: 'Keyword ten min',
+          },
+        ],
       },
       refresh: jest.fn(),
     });
 
     const onSelectOption = jest.fn();
 
-    render(<RangePresetDropdown onChange={onSelectOption}
-                                availableOptions={[
-                                  {
-                                    id: '639843f5-049a-4532-8a54-102da850b7f1',
-                                    timerange: {
-                                      from: 300,
-                                      type: 'relative',
-                                    },
-                                    description: '5 minutes',
-                                  },
-                                  {
-                                    id: '8dda08e9-cd23-44ff-b4eb-edeb7a704cf4',
-                                    timerange: {
-                                      keyword: 'Last ten minutes',
-                                      timezone: 'Europe/Berlin',
-                                      type: 'keyword',
-                                    },
-                                    description: 'Keyword ten min',
-                                  },
-                                ]} />);
+    render(<RangePresetDropdown onChange={onSelectOption} />);
 
     const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
     fireEvent.click(timeRangePresetButton);

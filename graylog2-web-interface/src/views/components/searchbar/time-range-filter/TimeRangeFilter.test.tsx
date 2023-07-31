@@ -154,12 +154,4 @@ describe('TimeRangeFilter', () => {
 
     expect(screen.queryByTitle('Add time range to quick access time range list')).not.toBeInTheDocument();
   });
-
-  it('has button add time renge to quick access for admin users', async () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
-
-    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
-    await fireEvent.click(await screen.findByText(/5 minutes ago/));
-    await screen.findByTitle('Add time range to quick access time range list');
-  });
 });
