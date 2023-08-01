@@ -72,6 +72,8 @@ describe('<Sidebar />', () => {
   const searchTypes = {};
   const queryResult = new QueryResult({ execution_stats: executionStats, query, errors, search_types: searchTypes });
 
+  const openDescriptionSection = async () => fireEvent.click(await screen.findByRole('button', { name: /description/i }));
+
   const TestComponent = () => <div id="martian">Marc Watney</div>;
 
   const renderSidebar = () => render(
@@ -92,20 +94,10 @@ describe('<Sidebar />', () => {
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
-  it('should render and open when clicking on header', async () => {
-    asMock(useViewTitle).mockReturnValue(viewMetaData.title);
-
-    renderSidebar();
-
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
-
-    await screen.findByText(viewMetaData.title);
-  });
-
   it('should render with a description about the query results', async () => {
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:27'));
   });
@@ -115,7 +107,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(viewMetaData.summary);
     await screen.findByText(viewMetaData.description);
@@ -127,7 +119,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(/This dashboard has no description/);
     await screen.findByText(/This dashboard has no summary/);
@@ -139,7 +131,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(/This search has no description/);
     await screen.findByText(/This search has no summary/);
@@ -150,7 +142,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText(viewMetaData.summary);
     await screen.findByText(viewMetaData.description);
@@ -161,7 +153,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText('Save the search or export it to a dashboard to add a custom summary and description.');
 
@@ -173,7 +165,7 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    await openDescriptionSection();
 
     await screen.findByText('2018-08-28 16:34:26.192');
     await screen.findByText('2018-08-28 16:39:26.192');
@@ -183,7 +175,7 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
 
     await screen.findByText('Varies per widget');
   });
@@ -200,7 +192,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
+    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
 
     await screen.findByText('2018-08-28 16:34:26.192');
     await screen.findByText('2018-08-28 16:39:26.192');

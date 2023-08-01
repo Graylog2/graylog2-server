@@ -27,11 +27,10 @@ export const CONFIGURATION_STEPS = {
   CERTIFICATE_PROVISIONING: {
     key: 'CERTIFICATE_PROVISIONING',
     description: 'Provision certificates for your data nodes',
-
   },
   CONFIGURATION_FINISHED: {
     key: 'CONFIGURATION_FINISHED',
-    description: 'All data nodes are secured and reachable',
+    description: 'Configuration finished',
   },
 } as const;
 

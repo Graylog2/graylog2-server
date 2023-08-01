@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix event definition enable UI state for Filter & Aggregation."
+
+issues = ["#16070"]
+pulls = ["16072"]

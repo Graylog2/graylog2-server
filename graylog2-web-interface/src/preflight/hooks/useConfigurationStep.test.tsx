@@ -64,7 +64,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -75,7 +75,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -86,7 +86,7 @@ describe('useConfigurationStep', () => {
       data: undefined,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CA_CONFIGURATION.key,
@@ -100,7 +100,7 @@ describe('useConfigurationStep', () => {
       data: { id: 'ca-id', type: 'ca-type' },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
@@ -138,10 +138,32 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
+      isLoading: false,
+    }));
+  });
+
+  it('should define success step as active step, when CA has been configures, but provisioning has been skipped', async () => {
+    asMock(useDataNodesCA).mockReturnValue({
+      ...useDataNodesResult,
+      data: { id: 'ca-id', type: 'ca-type' },
+    });
+
+    asMock(useRenewalPolicy).mockReturnValue({
+      ...useRenewalPolicyResult,
+      data: {
+        mode: 'AUTOMATIC',
+        certificate_lifetime: 'P30D',
+      },
+    });
+
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: true }));
+
+    await waitFor(() => expect(result.current).toEqual({
+      step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
       isLoading: false,
     }));
   });
@@ -176,7 +198,7 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
