@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "When deactivating an authentication backend, users associated with this backend will be disabled."
+
+issues = ["13823"]
+pulls = ["16088"]
