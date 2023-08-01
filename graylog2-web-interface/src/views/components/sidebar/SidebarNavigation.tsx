@@ -78,14 +78,19 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
   return (
     <Container $sidebarIsPinned={sidebarIsPinned} $isOpen={!!activeSection}>
       <SectionList>
-        {sections.map(({ key, icon, title }) => (
-          <NavItem isSelected={activeSectionKey === key}
-                   icon={icon}
-                   onClick={() => selectSidebarSection(key)}
-                   key={key}
-                   title={title}
-                   sidebarIsPinned={sidebarIsPinned} />
-        ))}
+        {sections.map(({ key, icon, title }) => {
+          const isSelected = activeSectionKey === key;
+
+          return (
+            <NavItem isSelected={isSelected}
+                     ariaLabel={isSelected ? `Close ${title} section` : `Open ${title} section`}
+                     icon={icon}
+                     onClick={() => selectSidebarSection(key)}
+                     key={key}
+                     title={title}
+                     sidebarIsPinned={sidebarIsPinned} />
+          );
+        })}
       </SectionList>
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>
