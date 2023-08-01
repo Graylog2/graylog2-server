@@ -81,15 +81,13 @@ public class GlobalAuthServiceConfig {
     }
 
     public Data updateConfiguration(Data updatedData) {
-        final String currentActiveBackend = getConfiguration().activeBackend().orElse(null);
+        Optional<String> previouslyActiveBackend = getConfiguration().activeBackend();
 
         clusterConfigService.write(updatedData);
 
-        updatedData.activeBackend().ifPresent(newActiveBackend -> {
-            if (!newActiveBackend.equals(currentActiveBackend)) {
-                eventBus.post(ActiveAuthServiceBackendChangedEvent.create(newActiveBackend));
-            }
-        });
+        if (!previouslyActiveBackend.equals(updatedData.activeBackend())) {
+            eventBus.post(ActiveAuthServiceBackendChangedEvent.create(updatedData.activeBackend(), previouslyActiveBackend));
+        }
 
         return requireNonNull(clusterConfigService.get(Data.class), "updated configuration cannot be null");
     }
