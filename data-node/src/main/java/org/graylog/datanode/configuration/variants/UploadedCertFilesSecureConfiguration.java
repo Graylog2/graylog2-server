@@ -88,7 +88,7 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
     }
 
     @Override
-    public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws KeyStoreStorageException, IOException, GeneralSecurityException {
+    public OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException {
 
         final char[] transportOTP = keystoreReEncryption.reEncyptWithOtp(new KeystoreFileLocation(uploadedTransportKeystorePath),
                 datanodeTransportCertificatePassword.toCharArray(),

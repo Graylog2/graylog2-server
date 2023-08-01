@@ -26,5 +26,5 @@ public interface SecurityConfigurationVariant {
 
     boolean checkPrerequisites(final Configuration localConfiguration);
 
-    OpensearchSecurityConfiguration configure(final Configuration localConfiguration) throws KeyStoreStorageException, IOException, GeneralSecurityException;
+    OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException;
 }

@@ -39,6 +39,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.variants.KeystoreInformation;
+import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.CertConstants;
@@ -134,15 +136,10 @@ public class JerseyService extends AbstractIdleService {
      * TODO: replace this map magic with proper types in OpensearchConfiguration
      */
     private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
-        final Map<String, String> cfgMap = config.asMap();
-        if(!Boolean.parseBoolean(cfgMap.get("plugins.security.disabled"))) {
+        final OpensearchSecurityConfiguration securityConfiguration = config.opensearchSecurityConfiguration();
+        if(securityConfiguration.securityEnabled()) {
             // caution, this path is relative to the opensearch config directory!
-
-            final String keystore = cfgMap.get("plugins.security.ssl.http.keystore_filepath");
-            final Path keystorePath = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch").resolve(keystore);
-            final String keystoreOTP = cfgMap.get("plugins.security.ssl.http.keystore_password");
-
-            return buildSslEngineConfigurator(keystorePath, keystoreOTP);
+            return buildSslEngineConfigurator(securityConfiguration.getHttpCertificate());
         } else {
             return null;
         }
@@ -331,17 +328,17 @@ public class JerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    private SSLEngineConfigurator buildSslEngineConfigurator(Path keystoreFile, String keyPassword)
+    private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)
             throws GeneralSecurityException, IOException {
-        if (keystoreFile == null || !Files.isRegularFile(keystoreFile) || !Files.isReadable(keystoreFile)) {
-            throw new IllegalArgumentException("Unreadable or missing private key: " + keystoreFile);
+        if (keystoreInformation == null || !Files.isRegularFile(keystoreInformation.location()) || !Files.isReadable(keystoreInformation.location())) {
+            throw new IllegalArgumentException("Unreadable to read private key");
         }
 
 
         final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
-        final char[] password = firstNonNull(keyPassword, "").toCharArray();
+        final char[] password = firstNonNull(keystoreInformation.passwordAsString(), "").toCharArray();
 
-        final KeyStore keyStore = readKeystore(keystoreFile, password);
+        final KeyStore keyStore = readKeystore(keystoreInformation);
 
         sslContextConfigurator.setKeyStorePass(password);
         sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
@@ -352,10 +349,10 @@ public class JerseyService extends AbstractIdleService {
         return sslEngineConfigurator;
     }
 
-    private static KeyStore readKeystore(Path keystoreFile, char[] password) {
-        try (var in = Files.newInputStream(keystoreFile)) {
+    private static KeyStore readKeystore(KeystoreInformation keystoreInformation) {
+        try (var in = Files.newInputStream(keystoreInformation.location())) {
             KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-            caKeystore.load(in, password);
+            caKeystore.load(in, keystoreInformation.password());
             return caKeystore;
         } catch (IOException | GeneralSecurityException ex) {
             throw new RuntimeException("Could not read keystore: " + ex.getMessage(), ex);
@@ -374,9 +371,5 @@ public class JerseyService extends AbstractIdleService {
                 Executors.newFixedThreadPool(poolSize, threadFactory),
                 metricRegistry,
                 name(JerseyService.class, executorName));
-    }
-
-    public void restartWithConfig(OpensearchConfiguration config) {
-
     }
 }

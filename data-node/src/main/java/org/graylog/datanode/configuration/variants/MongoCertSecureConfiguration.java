@@ -73,7 +73,7 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
     }
 
     @Override
-    public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws KeyStoreStorageException, IOException, GeneralSecurityException {
+    public OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException {
         // this will take the mongodb-stored keys and persist them on a disk, in the opensearch configuration directory
         keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, finalTransportKeystoreLocation);
         keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, finalHttpKeystoreLocation);

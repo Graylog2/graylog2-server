@@ -29,7 +29,7 @@ public class InSecureConfiguration implements SecurityConfigurationVariant {
     }
 
     @Override
-    public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws KeyStoreStorageException {
+    public OpensearchSecurityConfiguration build() throws KeyStoreStorageException {
         return OpensearchSecurityConfiguration.disabled();
     }
 }

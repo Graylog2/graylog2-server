@@ -77,9 +77,13 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 .orElseThrow(() -> new OpensearchConfigurationException("No valid option to start up OpenSearch"));
 
         try {
-            final OpensearchSecurityConfiguration securityConfiguration = chosenSecurityConfigurationVariant.configure(localConfiguration);
+            final OpensearchSecurityConfiguration securityConfiguration = chosenSecurityConfigurationVariant
+                    .build()
+                    .configure(localConfiguration);
 
-            final Map<String, String> opensearchConfig = securityConfiguration.toOpensearchConfig(localConfiguration, Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch"));
+            ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
+            opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
+            opensearchProperties.putAll(securityConfiguration.getProperties());
 
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistribution().directory(),
@@ -95,14 +99,14 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     Collections.emptyList(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
-                    opensearchConfig
+                    opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
             throw new OpensearchConfigurationException(e);
         }
     }
 
-    private ImmutableMap<String, String> commonConfig(final Configuration localConfiguration) {
+    private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(

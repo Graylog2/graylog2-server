@@ -42,27 +42,45 @@ public class OpensearchSecurityConfiguration {
 
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
-    private final String truststorePassword;
+    private KeystoreInformation truststore;
 
     public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
         this.httpCertificate = httpCertificate;
-        this.truststorePassword = RandomStringUtils.randomAlphabetic(256);
     }
 
     public static OpensearchSecurityConfiguration disabled() {
         return new OpensearchSecurityConfiguration(null, null);
     }
 
-    public Map<String, String> toOpensearchConfig(Configuration localConfiguration, Path opensearchConfigDir) throws GeneralSecurityException, IOException {
 
+    public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws GeneralSecurityException, IOException {
+
+        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
+
+        final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
+        final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
+
+        this.truststore = TruststoreCreator.newTruststore()
+                .addRootCert("transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                .addRootCert("http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                .persist(trustStorePath, truststorePassword.toCharArray());
+
+        System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
+        System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
+
+        configureInitialAdmin(localConfiguration, opensearchConfigDir, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
+
+        return this;
+    }
+
+    /**
+     * Caution, this method is full of sideeffects. It creates files, it sets system properties!
+     */
+    public Map<String, String> getProperties() throws GeneralSecurityException, IOException {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        config.putAll(commonConfig(localConfiguration));
-
         if (securityEnabled()) {
-
             config.putAll(commonSecureConfig());
-
 
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", transportCertificate.location().getFileName().toString()); // todo: this should be computed as a relative path
@@ -71,7 +89,7 @@ public class OpensearchSecurityConfiguration {
 
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILENAME);
-            config.put("plugins.security.ssl.transport.truststore_password", truststorePassword);
+            config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
 
 
             config.put("plugins.security.ssl.http.enabled", "true");
@@ -83,23 +101,7 @@ public class OpensearchSecurityConfiguration {
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILENAME);
-            config.put("plugins.security.ssl.http.truststore_password", truststorePassword);
-
-
-            // TODO: caution, side-effect
-            final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
-            TruststoreCreator.newTruststore()
-                    .addRootCert("transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                    .addRootCert("http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                    .persist(trustStorePath, truststorePassword.toCharArray());
-
-            // TODO: caution, side-effect
-            System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
-            System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
-
-            // TODO: caution, side-effect
-            configureInitialAdmin(localConfiguration, opensearchConfigDir, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
-
+            config.put("plugins.security.ssl.http.truststore_password", truststore.passwordAsString());
         } else {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
@@ -107,31 +109,21 @@ public class OpensearchSecurityConfiguration {
         return config.build();
     }
 
-    /**
-     * This is not part of the security setup, it should be moved elsewhere
-     */
-    @Deprecated(forRemoval = true)
-    private ImmutableMap<String, String> commonConfig(final Configuration localConfiguration) {
-        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
-        localConfiguration.getOpensearchNetworkHostHost().ifPresent(
-                networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        if (localConfiguration.isSingleNodeOnly()) {
-            config.put("discovery.type", "single-node");
-        } else {
-            config.put("cluster.initial_master_nodes", "node1");
-        }
-
-        // listen on all interfaces
-        config.put("network.bind_host", "0.0.0.0");
-
-        return config.build();
-    }
-
     public boolean securityEnabled() {
         return !Objects.isNull(httpCertificate) && !Objects.isNull(transportCertificate);
+    }
+
+
+    public KeystoreInformation getTransportCertificate() {
+        return transportCertificate;
+    }
+
+    public KeystoreInformation getHttpCertificate() {
+        return httpCertificate;
+    }
+
+    public KeystoreInformation getTruststore() {
+        return truststore;
     }
 
     protected ImmutableMap<String, String> commonSecureConfig() {
@@ -183,4 +175,6 @@ public class OpensearchSecurityConfiguration {
         final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
         mapper.writeValue(fos, map);
     }
+
+
 }
