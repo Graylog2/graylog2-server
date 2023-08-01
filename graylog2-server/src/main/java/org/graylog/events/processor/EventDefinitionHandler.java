@@ -160,9 +160,7 @@ public class EventDefinitionHandler {
             }
         }
 
-        for (String id : lastMatched.keySet()) {
-            eventDefinitionService.updateMatchedAt(id, lastMatched.get(id));
-        }
+        lastMatched.keySet().forEach(id -> eventDefinitionService.updateMatchedAt(id, lastMatched.get(id)));
     }
 
     /**
