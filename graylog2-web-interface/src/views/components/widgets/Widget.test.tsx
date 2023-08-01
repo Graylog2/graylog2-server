@@ -18,19 +18,18 @@ import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import useWidgetResults from 'views/components/useWidgetResults';
-import type SearchError from 'views/logic/SearchError';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import SearchError from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import { duplicateWidget, updateWidgetConfig, updateWidget } from 'views/logic/slices/widgetActions';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import { usePlugin } from 'views/test/testPlugins';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -54,19 +53,13 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 
 const pluginManifest: PluginRegistration = {
   exports: {
-    'views.reducers': [
-      { key: 'view', reducer: viewSliceReducer },
-      { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-    ],
     enterpriseWidgets: [
       {
         type: 'dummy',
         displayName: 'Some Dummy Visualization',
         visualizationComponent: () => <>dummy-visualization</>,
 
-        editComponent: ({ onChange }) => {
-          return <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>;
-        },
+        editComponent: ({ onChange }) => <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>,
         needsControlledHeight: () => true,
         searchTypes: () => [],
       },
@@ -82,9 +75,8 @@ const pluginManifest: PluginRegistration = {
 };
 
 describe('<Widget />', () => {
-  beforeAll(() => PluginStore.register(pluginManifest));
-
-  afterAll(() => PluginStore.unregister(pluginManifest));
+  usePlugin(pluginManifest);
+  useViewsPlugin();
 
   const widget = WidgetModel.builder().newId()
     .type('dummy')
@@ -147,7 +139,18 @@ describe('<Widget />', () => {
   });
 
   it('should render error widget for widget with one error', async () => {
-    asMock(useWidgetResults).mockReturnValue({ error: [{ description: 'The widget has failed: the dungeon collapsed, you die!' } as SearchError], widgetData: undefined });
+    asMock(useWidgetResults).mockReturnValue({
+      error: [
+        new SearchError({
+          description: 'The widget has failed: the dungeon collapsed, you die!',
+          query_id: 'query-id-2',
+          search_type_id: 'search_type_id-2',
+          type: 'query',
+          backtrace: '',
+        })],
+      widgetData: undefined,
+    });
+
     render(<DummyWidget />);
 
     await screen.findByText('The widget has failed: the dungeon collapsed, you die!');
@@ -156,8 +159,20 @@ describe('<Widget />', () => {
   it('should render error widget including all error messages for widget with multiple errors', async () => {
     asMock(useWidgetResults).mockReturnValue({
       error: [
-        { description: 'Something is wrong' } as SearchError,
-        { description: 'Very wrong' } as SearchError,
+        new SearchError({
+          description: 'Something is wrong',
+          query_id: 'query-id-1',
+          search_type_id: 'search_type_id-1',
+          type: 'query',
+          backtrace: '',
+        }),
+        new SearchError({
+          description: 'Very wrong',
+          query_id: 'query-id-2',
+          search_type_id: 'search_type_id-2',
+          type: 'query',
+          backtrace: '',
+        }),
       ],
       widgetData: undefined,
     });

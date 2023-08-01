@@ -26,38 +26,35 @@ import { TimesList } from 'components/times';
 import { GraylogClusterOverview } from 'components/cluster';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
-const SystemOverviewPage = () => {
-  return (
-    <DocumentTitle title="System overview">
-      <span>
-        <IfPermitted permissions="notifications:read">
-          <NotificationsList />
+const SystemOverviewPage = () => (
+  <DocumentTitle title="System overview">
+    <span>
+      <IfPermitted permissions="notifications:read">
+        <NotificationsList />
+      </IfPermitted>
+
+      <HideOnCloud>
+        <IfPermitted permissions="systemjobs:read">
+          <SystemJobsComponent />
         </IfPermitted>
+      </HideOnCloud>
 
-        <HideOnCloud>
-          <IfPermitted permissions="systemjobs:read">
-            <SystemJobsComponent />
-          </IfPermitted>
-        </HideOnCloud>
+      <GraylogClusterOverview />
 
-        <GraylogClusterOverview />
+      <HideOnCloud>
+        <IndexerClusterHealth />
+      </HideOnCloud>
 
-        <HideOnCloud>
-          <IndexerClusterHealth />
+      <IfPermitted permissions="indices:failures">
+        <IndexerSystemOverviewComponent />
+      </IfPermitted>
+      <TimesList />
 
-          <IfPermitted permissions="indices:failures">
-            <IndexerSystemOverviewComponent />
-          </IfPermitted>
-        </HideOnCloud>
-
-        <TimesList />
-
-        <IfPermitted permissions="systemmessages:read">
-          <SystemMessagesComponent />
-        </IfPermitted>
-      </span>
-    </DocumentTitle>
-  );
-};
+      <IfPermitted permissions="systemmessages:read">
+        <SystemMessagesComponent />
+      </IfPermitted>
+    </span>
+  </DocumentTitle>
+);
 
 export default SystemOverviewPage;

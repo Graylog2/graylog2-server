@@ -28,6 +28,7 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.collect.Sets;
+import org.graylog.security.certutil.CaConfiguration;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -50,7 +51,7 @@ import java.util.Set;
  * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration extends BaseConfiguration {
+public class Configuration extends CaConfiguration {
 
     /**
      * Deprecated! Use isLeader() instead.

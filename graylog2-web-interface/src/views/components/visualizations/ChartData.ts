@@ -23,7 +23,11 @@ import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
+import type { KeyMapper } from './TransformKeys';
 import transformKeys from './TransformKeys';
+
+const keySeparator = '\u2E31';
+const humanSeparator = '-';
 
 export type ChartDefinition = {
   type: string,
@@ -42,10 +46,11 @@ export type ChartDefinition = {
     color: string,
   },
   customdata?: any,
-  colorscale?: [number, string][],
+  colorscale?: string,
   reversescale?: boolean,
-  zmin?: boolean,
-  zmax?: boolean,
+  zmin?: number,
+  zmax?: number,
+  originalName: string,
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
@@ -54,86 +59,96 @@ export type ValuesBySeries = { [key: string]: Array<number> };
 
 export type KeyJoiner = (keys: Array<any>) => string;
 
-export type Generator = (type: string, name: string, labels: Array<string>, values: Array<any>, data: Array<Array<any>>, idx: number, total: number, config: AggregationWidgetConfig) => ChartDefinition;
+type ChartInput = {
+  type: string,
+  name: string,
+  originalName: string,
+  labels: Array<string>,
+  values: Array<any>,
+  data: Array<Array<any>>,
+  idx: number,
+  total: number,
+  config: AggregationWidgetConfig
+};
+export type Generator = (chartInput: ChartInput) => ChartDefinition;
 
-const _defaultKeyJoiner = (keys) => keys.join('-');
+const _defaultKeyJoiner = (keys: Array<any>) => keys.join(keySeparator);
 
-const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({
+const _defaultChartGenerator = ({ type, name, labels, values, originalName }: ChartInput): ChartDefinition => ({
   type,
   name,
   x: labels,
   y: values,
+  originalName,
 });
 
-export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => {
-  return flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
-};
+export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
 
 export const formatSeries = ({
   valuesBySeries = {},
   xLabels = [],
-}: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
-  return Object.keys(valuesBySeries).map((value) => [
-    value,
-    xLabels,
-    valuesBySeries[value],
-    [],
-  ]);
-};
+}: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => Object.keys(valuesBySeries).map((value) => [
+  value,
+  xLabels,
+  valuesBySeries[value],
+  [],
+]);
 
 const isLeaf = (row: Row): row is Leaf => (row.source === 'leaf');
 
-export const getLeafsFromRows = (rows: Rows): Array<Leaf> => {
-  return rows.filter(isLeaf);
-};
+export const getLeafsFromRows = (rows: Rows): Array<Leaf> => rows.filter(isLeaf);
 
 export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
 
-export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher: (value: Value) => boolean = undefined) => {
-  return (results: Rows) => {
-    const leafs = getLeafsFromRows(results);
-    const xLabels = getXLabelsFromLeafs(leafs);
-    const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
-    const valuesBySeries = {};
+export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher: (value: Value) => boolean = undefined) => (results: Rows) => {
+  const leafs = getLeafsFromRows(results);
+  const xLabels = getXLabelsFromLeafs(leafs);
+  const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
+  const valuesBySeries = {};
 
-    flatLeafs.forEach(([key, value]) => {
-      const joinedKey = keyJoiner(value.key);
-      const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
+  flatLeafs.forEach(([key, value]) => {
+    const joinedKey = keyJoiner(value.key);
+    const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
 
-      if (value.value !== null && value.value !== undefined) {
-        set(valuesBySeries, [joinedKey, targetIdx], value.value);
-      }
-    });
-
-    return { valuesBySeries, xLabels };
-  };
-};
-
-export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config: AggregationWidgetConfig = undefined): ((ExtractedSeries) => Array<ChartDefinition>) => {
-  return (results: ExtractedSeries) => {
-    const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
-      chartType,
-      value,
-      x.map((key) => key.join('-')),
-      values,
-      z,
-    ]);
-
-    return allCharts.map((args, idx) => generator(...args, idx, allCharts.length, config));
-  };
-};
-
-export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
-  return (results: ExtractedSeries) => results.map(([name, keys, values, z]) => {
-    const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
-    const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
-    const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
-
-    return [name, newKeys, newValues, z];
+    if (value.value !== null && value.value !== undefined) {
+      set(valuesBySeries, [joinedKey, targetIdx], value.value);
+    }
   });
+
+  return { valuesBySeries, xLabels };
 };
 
-const doNotSuffixTraceForSingleSeries = (keys) => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
+export const generateChart = (
+  chartType: string,
+  generator: Generator = _defaultChartGenerator,
+  config: AggregationWidgetConfig = undefined,
+  mapKeys: KeyMapper = (key) => key,
+): ((results: ExtractedSeries) => Array<ChartDefinition>) => {
+  const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
+
+  return (results: ExtractedSeries) => {
+    const allCharts = results.map(([value, x, values, z]) => ({
+      type: chartType,
+      name: value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
+      labels: x.map((key) => key.join(keySeparator)),
+      values,
+      data: z,
+      originalName: value,
+    }));
+
+    return allCharts.map((args, idx) => generator({ ...args, idx, total: allCharts.length, config }));
+  };
+};
+
+export const removeNulls = (): ((series: ExtractedSeries) => ExtractedSeries) => (results: ExtractedSeries) => results.map(([name, keys, values, z]) => {
+  const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
+  const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
+  const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
+
+  return [name, newKeys, newValues, z];
+});
+
+const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) => (keys.length > 1 ? keys.slice(0, -1).join(keySeparator) : keys[0]);
 
 export type ChartDataConfig = {
   widgetConfig: AggregationWidgetConfig,
@@ -142,6 +157,7 @@ export type ChartDataConfig = {
   seriesFormatter?: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries,
   leafValueMatcher?: (value: Value) => boolean,
   formatTime: (time: DateTime, format?: DateTimeFormats) => string,
+  mapKeys?: (key: Key, field: string) => Key,
 };
 
 export const chartData = (
@@ -153,6 +169,7 @@ export const chartData = (
     seriesFormatter: customSeriesFormatter = formatSeries,
     leafValueMatcher,
     formatTime,
+    mapKeys,
   }: ChartDataConfig,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
@@ -162,6 +179,6 @@ export const chartData = (
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
     customSeriesFormatter,
     removeNulls(),
-    generateChart(chartType, generator, config),
+    generateChart(chartType, generator, config, mapKeys),
   ])(data);
 };

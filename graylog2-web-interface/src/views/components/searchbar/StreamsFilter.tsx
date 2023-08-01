@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 import Select from 'components/common/Select';
 import { defaultCompare } from 'logic/DefaultCompare';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const Container = styled.div`
   flex: 1;
@@ -34,9 +35,20 @@ type Props = {
 };
 
 const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
   const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
+
+  const handleChange = (selected: string) => {
+    sendTelemetry('input_value_change', {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-filter',
+    });
+
+    onChange(selected === '' ? [] : selected.split(','));
+  };
 
   return (
     <Container data-testid="streams-filter" title={placeholder}>
@@ -45,7 +57,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
               inputProps={{ 'aria-label': placeholder }}
               displayKey="key"
               inputId="streams-filter"
-              onChange={(selected: string) => onChange(selected === '' ? [] : selected.split(','))}
+              onChange={handleChange}
               options={options}
               multi
               value={selectedStreams} />

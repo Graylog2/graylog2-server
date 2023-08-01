@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -28,19 +30,31 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Latest.NAME)
 @JsonDeserialize(builder = Latest.Builder.class)
-public abstract class Latest implements SeriesSpec {
+public abstract class Latest implements SeriesSpec, HasField {
     public static final String NAME = "latest";
+
     @Override
     public abstract String type();
 
     @Override
     public abstract String id();
 
-    @Override
     @JsonProperty
     public abstract String field();
 
-    public static Latest.Builder builder() {
+    @Override
+    public String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
+
+    public abstract Builder toBuilder();
+
+    @Override
+    public Latest withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
+    public static Builder builder() {
         return new AutoValue_Latest.Builder().type(NAME);
     }
 
@@ -55,7 +69,6 @@ public abstract class Latest implements SeriesSpec {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -65,7 +78,7 @@ public abstract class Latest implements SeriesSpec {
 
         @Override
         public Latest build() {
-            if (!id().isPresent()) {
+            if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
             }
             return autoBuild();

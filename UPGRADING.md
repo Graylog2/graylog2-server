@@ -1,181 +1,33 @@
-Upgrading to Graylog 5.1.x
+Upgrading to Graylog 5.2.x
 ==========================
 
 ## New Functionality
 
-### Index Default Configuration
-Support for configuring index defaults has been added:
-1) Adds the ability to specify Index Set initialization default settings in the server configuration file for new Graylog clusters.
-2) Adds the ability to subsequently maintain the current Index Set defaults from the System > Configurations page
-   and through the Graylog API.
+## Breaking Changes
 
-#### New Graylog Cluster Index Set Initialization Defaults
-New Graylog server clusters can now initialize the settings for Index Sets with the following server configuration
-values. Please see the sample [graylog.conf](https://github.com/Graylog2/graylog2-server/blob/master/misc/graylog.conf) file for more details and example values.
+## Deprecation and Change in Functionality of GreyNoise Data Adapters
 
-- `elasticsearch_analyzer`
-- `elasticsearch_shards`
-- `elasticsearch_replicas`
-- `disable_index_optimization`
-- `index_optimization_max_num_segments`
-- `index_field_type_periodical_full_refresh_interval`
-- `rotation_strategy`
-- `elasticsearch_max_docs_per_index`
-- `elasticsearch_max_size_per_index`
-- `elasticsearch_max_time_per_index`
-- `retention_strategy`
-- `elasticsearch_max_number_of_indices`
+- GreyNoise Community IP Lookup Data Adapters have been marked as deprecated. Existing Data Adapters can no longer be
+  started or lookups performed.
+- GreyNoise Full IP Lookup [Enterprise] Data Adapter can no longer be used with a free GreyNoise Community API tokens.
+- GreyNoise Quick IP Lookup Data Adapter can no longer be used with a free GreyNoise Community API tokens.
 
-If you are using a pre-existing version of the `graylog.conf` configuration file, it is recommended that you review the
-aforementioned settings there before upgrading, to ensure the in-database defaults are established as expected with the
-upgrade. Although the `graylog.conf` sample configuration file now ships with all index default example
-properties commented out, you may be using an older version of the file where certain index default values were present
-and not commented-out.
-
-All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
-have been un-deprecated, as Graylog intends to maintain them going forward.
-
-Once the first Graylog server instance is started to establish the cluster, the following system indexes will be created
-with the specified defaults.
-
-- Default index set
-- Graylog Events
-- Graylog System Events
-- Graylog Message Failures
-- Restored Archives
-
-#### In-database Cluster Index Set Defaults
-
-The current in-database defaults for new Index Sets can now be edited from the new System > Configuration >
-Index Set defaults configuration area. The default values set here will be used for all new index sets created:
-
-- Those created from the System > Index Sets page.
-- New indexes created through the Graylog Illuminate system.
-
-Once the upgrade is installed, these in-database defaults will be established, and the server configuration option
-values described above will no longer be used.
-
-The in-database Index Set default configuration can also be edited VIA the Graylog API:
-
-```
-curl 'http://graylog-server:8080/api/system/indices/index_set_defaults' \
-  -X 'PUT' \
-  -H 'Content-Type: application/json' \
-  -H 'X-Requested-By: my-api-request' \
-  --data-raw '
-  {
-    "index_analyzer": "standard",
-    "shards": 1,
-    "replicas": 0,
-    "index_optimization_max_num_segments": 1,
-    "index_optimization_disabled": false,
-    "field_type_refresh_interval": 300,
-    "field_type_refresh_interval_unit": "SECONDS",
-    "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy",
-    "rotation_strategy_config": {
-      "type": "org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig",
-      "max_size": 32212254720
-    },
-    "retention_strategy_class": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
-    "retention_strategy_config": {
-      "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
-      "max_number_of_indices": 20
-    }
-  }'
-```
-
-#### New Index Default values
-Unless user-specified defaults are specified, the following new defaults will be effective for all new index sets created:
-
-- Shards: 1 (previously 4 in many cases)
-- Rotation Strategy: Time Size Optimizing - 30-40 days (previously Index Time [1D] in many cases)
-
-## Removal of deprecated Inputs
-
-The following inputs are no longer available:
-- AWS Logs (deprecated)
-- AWS Flow Logs (deprecated)
-
-The inputs were marked as deprecated since Graylog version `3.2.0`.
-If you still run any of those inputs, please configure the alternative "Kinesis/CloudWatch" input instead ahead of upgrading.
+## Shutdown of Graylog on OutOfMemoryError
+Because of an error in HttpCore 4.4.12, which is required by Elasticsearch and older versions of Opensearch, OutOfMemoryError errors were not properly handled.
+The Reactor was stopped, which prevented proper Graylog operation and the reason (OutOfMemoryError) was not clearly visible.
+From now on, Graylog will shutdown on OutOfMemoryError, trying to log some basic information about the thread and memory consumption during this event.
 
 ## Java API Changes
 The following Java Code API changes have been made.
 
-| File/method                                  | Description                                                                                                 |
-|----------------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| `IndexSetValidator#validateRefreshInterval`  | The method argument have changed from `IndexSetConfig` to `Duration`                                        |
-| `IndexSetValidator#validateRetentionPeriod`  | The method argument have changed from `IndexSetConfig` to `RotationStrategyConfig, RetentionStrategyConfig` |
-| `ElasticsearchConfiguration#getIndexPrefix`  | The method name has changed to `getDefaultIndexPrefix`                                                      |
-| `ElasticsearchConfiguration#getTemplateName` | The method name has changed to `getDefaultIndexTemplateName`                                                |
+| File/method                   | Description                                                      |
+|-------------------------------|------------------------------------------------------------------|
+| `ExampleClass#exampleFuntion` | TODO placeholder comment                                         |
 
-All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
-have been un-deprecated, as Graylog intends to maintain them going forward. 
 
 ## REST API Endpoint Changes
+The following REST API changes have been made.
 
-| Endpoint                                                                                                   | Description                                                                                                                                                                                                                                                                                                                                                                                                |
-|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET /system/configuration`                                                                                | Key `gc_warning_threshold` has been removed from response object.                                                                                                                                                                                                                                                                                                                                          |                                                                                                
-| `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute.                                                                                                                                                                                                                                                                                                                                                              |
-
-### Change to the format of `Input` entities in API responses
-
-This change applies to the format of input entities in responses to the resources at or beneath `/system/inputs` and `plugins/org.graylog.plugins.forwarder/forwarder/profiles`.
-
-Input configuration may now contain values of type [EncryptedValue](https://github.com/Graylog2/graylog2-server/blob/f35df42e165ac570b8b27de3f8eeac85e74ed610/graylog2-server/src/main/java/org/graylog2/security/encryption/EncryptedValue.java).
-Sensitive input configuration values for various inputs may be stored encrypted from now on and will therefore be represented differently in the JSON response.
-
-For example, an input previously rendered like this in a response:
-```json
-{
-  "id": "63f489ee73561d699b210677",
-  "attributes": {
-    "not_so_secret_value": "plaintext",
-    "secret_value": "plaintext",
-    ...
-  },
-  ...
-}
-```
-
-will be returned like this if the `secret` attribute contains a sensitive value:
-
-```json
-{
-  "id": "63f489ee73561d699b210677",
-  "attributes": {
-    "not_so_secret_value": "plaintext",
-    "secret_value": {
-      "is_set": true
-    },
-    ...
-  },
-  ...
-}
-```
-
-### Added Optional Default Timezone configuration for Syslog inputs
-When creating or editing a new syslog input, it is now possible to configure a default timezone in case logs ingested are not
-sending dates in UTC. When left as "Not configured", system behaves as before. 
-
-The following REST API endpoints were changed:
-
-| Endpoint                                                                                                   | Description                                   |
-|------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
-| `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute. |
-
-## Behaviour Changes
-
-- The `JSON path value from HTTP API` input will now only run on the leader node, if the `Global` option has been selected in the input configuration. Previously, the input was started on all nodes in the cluster.
-- The default connection and read timeouts for email sending have been reduced from 60 seconds to 10 seconds.
-- We are now parsing the time zone information send by Fortigate syslog messages. Any workarounds to transform the date into the right timezone because the forwared timezone information was not honored, should be removed.
-
-## Configuration File Changes
-
-| Option                                      | Action  | Description                                                                                     |
-|---------------------------------------------|---------|-------------------------------------------------------------------------------------------------|
-| `gc_warning_threshold`                      | removed | GC warnings have been removed.                                                                  |
-| `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds.      |
-| `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.                    |
-| `disabled_retention_strategies`             | added   | Allow disabling of `none` `close` `delete` retention strategies. At least one must stay enabled |
+| Endpoint                                              | Description                               |
+|-------------------------------------------------------|-------------------------------------------|
+| `PUT /example/placeholder`                            | TODO placeholder comment                  |

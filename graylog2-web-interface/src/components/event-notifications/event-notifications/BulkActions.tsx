@@ -27,6 +27,7 @@ import UserNotification from 'util/UserNotification';
 import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   selectedNotificationsIds: Array<string>,
@@ -36,20 +37,34 @@ type Props = {
 
 const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, refetchEventNotifications }: Props) => {
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
   const selectedItemsAmount = selectedNotificationsIds?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
+
   const onDelete = useCallback(() => {
+    sendTelemetry('click', {
+      app_pathname: 'event-notification',
+      app_section: 'event-notification-bulk',
+      app_action_value: 'delete-button',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
       const deleteCalls = selectedNotificationsIds.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
 
       Promise.allSettled(deleteCalls).then((result) => {
-        const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
+        const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{
+          status: 'fulfilled',
+          value: string
+        }>;
         const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
         const notDeletedNotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
 
         if (notDeletedNotificationIds.length) {
-          const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
+          const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{
+            status: 'rejected',
+            reason: FetchError
+          }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
           if (notDeletedNotificationIds.length !== selectedNotificationsIds.length) {
@@ -67,7 +82,7 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
         UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
     }
-  }, [descriptor, queryClient, refetchEventNotifications, selectedNotificationsIds, selectedItemsAmount, setSelectedNotificationsIds]);
+  }, [sendTelemetry, selectedItemsAmount, descriptor, selectedNotificationsIds, queryClient, setSelectedNotificationsIds, refetchEventNotifications]);
 
   return (
     <BulkActionsDropdown selectedEntities={selectedNotificationsIds} setSelectedEntities={setSelectedNotificationsIds}>

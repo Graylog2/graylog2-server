@@ -1,0 +1,8 @@
+_meta:
+  type: "nodesdn"
+  config_version: 2
+
+# Define nodesdn mapping name and corresponding values
+# cluster1:
+#   nodes_dn:
+#       - CN=*.example.com

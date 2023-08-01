@@ -46,6 +46,7 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
                           isSubmitting={loading}
                           submitLoadingText="Loading message..."
                           isAsyncSubmit
+                          displayCancel
                           onCancel={() => history.goBack()} />
       </form>
     </div>

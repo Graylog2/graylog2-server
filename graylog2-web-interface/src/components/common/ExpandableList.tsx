@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import style from './ExpandableList.css';
 
-type Props = {
-  children?: React.ReactElement,
+type Props = PropsWithChildren<{
   className?: string,
-};
+}>;
 
 /**
  * The ExpandableList will take a array or one of ExpandableListItem to render
@@ -30,27 +30,20 @@ type Props = {
  * of categories. Inside the categories the user has the possibility of doing a selection.
  * The ExpandableList can be used nested.
  */
-const ExpandableList = ({ children, className }: Props) => {
-  return (
-    <ul className={className ? `${style.list} ${className}` : style.list}>
-      {children}
-    </ul>
-  );
-};
+const ExpandableList = ({ children, className }: Props) => (
+  <ul className={className ? `${style.list} ${className}` : style.list}>
+    {children}
+  </ul>
+);
 
 ExpandableList.defaultProps = {
-  children: [],
-  className: undefined,
+  className: '',
 };
 
 ExpandableList.propTypes = {
   /**
    * One or more elements of ExpandableListItem
    */
-  children: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.arrayOf(PropTypes.element),
-  ]),
   className: PropTypes.string,
 };
 

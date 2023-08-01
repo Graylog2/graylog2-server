@@ -33,10 +33,10 @@ import Icon from './Icon';
 import './webpack-resolver';
 import './ace/theme-graylog';
 
-const SourceCodeContainer = styled.div(({ resizable, theme }) => css`
+const SourceCodeContainer = styled.div(({ $resizable, theme }) => css`
   .react-resizable-handle {
     z-index: 100; /* Ensure resize handle is over text editor */
-    display: ${resizable ? 'block' : 'none'};
+    display: ${$resizable ? 'block' : 'none'};
   }
 
   ${theme.components.aceEditor}
@@ -55,7 +55,7 @@ const Toolbar = styled.div(({ theme }) => css`
   .btn-link {
     color: ${theme.colors.variant.dark.info};
     
-    :hover {
+    &:hover {
       color: ${theme.colors.variant.darkest.info};
       background-color: ${theme.colors.variant.lightest.info};
     }
@@ -64,7 +64,7 @@ const Toolbar = styled.div(({ theme }) => css`
     &[disabled] {
       color: ${theme.colors.variant.light.default};
       
-      :hover {
+      &:hover {
         color: ${theme.colors.variant.light.default};
       }
     }
@@ -251,7 +251,7 @@ class SourceCodeEditor extends React.Component {
     const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
 
     return (
-      <div>
+      <div className="source-code-editor">
         {toolbar
           && (
           <Toolbar style={{ width: validCssWidth }}>
@@ -294,7 +294,7 @@ class SourceCodeEditor extends React.Component {
                    minConstraints={[200, 200]}
                    onResize={this.handleResize}>
           <SourceCodeContainer style={{ height: height, width: validCssWidth }}
-                               resizable={resizable}>
+                               $resizable={resizable}>
             <AceEditor ref={(c) => {
               this.reactAce = c;
               if (innerRef) { innerRef.current = c; }

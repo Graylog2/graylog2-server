@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import joptsimple.internal.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
@@ -34,9 +34,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.mockito.Mockito.mock;
 
 public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
@@ -73,7 +73,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
         final int MESSAGECOUNT = 50;
         // Each Message is about 1 MB
         final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
-        final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+        final Set<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
 
         client().refreshNode(); // wait for ES to finish indexing
 
@@ -92,7 +92,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
     private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
         final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
 
-        final String message = Strings.repeat('A', size);
+        final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
             messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", now())));
         }

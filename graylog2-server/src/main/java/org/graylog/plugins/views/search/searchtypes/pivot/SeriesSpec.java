@@ -21,12 +21,12 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -44,11 +44,18 @@ public interface SeriesSpec extends PivotSpec {
     @Nullable
     String id();
 
-    @JsonProperty
-    String field();
-
     default String literal() {
-        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+        return type() + "()";
+    }
+
+    SeriesSpec withId(String id);
+
+    /**
+     * Override if your series are based on "stats" or "extended stats" aggregation,
+     * to give exact name of the subfield of those aggregations which represents the series.
+     */
+    default Optional<String> statsSubfieldName() {
+        return Optional.empty();
     }
 
     @JsonAutoDetect
@@ -59,15 +66,13 @@ public interface SeriesSpec extends PivotSpec {
         @JsonProperty
         private String id;
 
-        @JsonProperty
-        private String field;
-
         private Map<String, Object> props = Maps.newHashMap();
 
         @Override
         public String type() {
             return type;
         }
+
 
         @Nullable
         @Override
@@ -76,7 +81,10 @@ public interface SeriesSpec extends PivotSpec {
         }
 
         @Override
-        public String field() { return field; }
+        public Fallback withId(String id) {
+            this.id = id;
+            return this;
+        }
 
         @JsonAnySetter
         public void setProperties(String key, Object value) {

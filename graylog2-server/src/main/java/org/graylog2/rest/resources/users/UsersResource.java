@@ -31,6 +31,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
 import org.graylog.security.UserContext;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
@@ -56,6 +59,7 @@ import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDbSession;
+import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -102,6 +106,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -131,6 +136,8 @@ public class UsersResource extends RestResource {
     private final RoleService roleService;
     private final MongoDBSessionService sessionService;
     private final SearchQueryParser searchQueryParser;
+    private final UserSessionTerminationService sessionTerminationService;
+    private final DefaultSecurityManager securityManager;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
@@ -144,12 +151,15 @@ public class UsersResource extends RestResource {
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
-                         MongoDBSessionService sessionService) {
+                         MongoDBSessionService sessionService,
+                         UserSessionTerminationService sessionTerminationService, DefaultSecurityManager securityManager) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
         this.sessionService = sessionService;
         this.paginatedUserService = paginatedUserService;
+        this.sessionTerminationService = sessionTerminationService;
+        this.securityManager = securityManager;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
     }
 
@@ -432,8 +442,9 @@ public class UsersResource extends RestResource {
 
         if (isPermitted("*")) {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
-            if (sessionTimeoutMs != null && sessionTimeoutMs != 0) {
+            if (Objects.nonNull(sessionTimeoutMs) && sessionTimeoutMs != 0 && (user.getSessionTimeoutMs() != sessionTimeoutMs)) {
                 user.setSessionTimeoutMs(sessionTimeoutMs);
+                terminateSessions(user);
             }
         }
 
@@ -442,6 +453,24 @@ public class UsersResource extends RestResource {
         }
 
         userManagementService.update(user, cr);
+    }
+
+    private void terminateSessions(User user) {
+        final List<Session> allSessions = sessionTerminationService.getActiveSessionsForUser(user);
+
+        final Subject subject = getSubject();
+        final Session currentSession = subject.getSession(false);
+        final User currentUser = getCurrentUser();
+
+        if (currentSession != null && currentUser != null && user.getId().equals(currentUser.getId())) {
+            // Stop all sessions but handle the current session differently by issuing a proper logout
+            allSessions.stream()
+                    .filter(session -> !session.getId().equals(currentSession.getId()))
+                    .forEach(Session::stop);
+            securityManager.logout(subject);
+        } else {
+            allSessions.forEach(Session::stop);
+        }
     }
 
     private boolean rolesContainAdmin(List<String> roles) {

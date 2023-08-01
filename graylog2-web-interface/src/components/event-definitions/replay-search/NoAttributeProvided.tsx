@@ -20,8 +20,6 @@ type Props = {
   name: string
 }
 
-const NoAttributeProvided = ({ name }: Props) => {
-  return <i>No {name.toLowerCase()} provided</i>;
-};
+const NoAttributeProvided = ({ name }: Props) => <i>No {name.toLowerCase()} provided</i>;
 
 export default NoAttributeProvided;

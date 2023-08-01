@@ -23,6 +23,7 @@ import { Formik, Form, Field } from 'formik';
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Input, Button, ButtonToolbar } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import type { WizardFormValues } from './BackendWizardContext';
 import BackendWizardContext from './BackendWizardContext';
@@ -57,7 +58,7 @@ const ServerUrl = styled.div`
     min-height: 34px;
     flex-grow: 1;
 
-    :last-child {
+    &:last-child {
       flex: 0.8;
       min-width: 130px;
     }
@@ -93,6 +94,8 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendValidationErrors, authBackendMeta: { backendHasPassword } } = stepsState;
 
+  const sendTelemetry = useSendTelemetry();
+
   const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
     const currentValue = values.transportSecurity;
     const newValue = event.target.value;
@@ -111,6 +114,12 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   };
 
   const _onSubmitAll = (validateForm) => {
+    sendTelemetry('click', {
+      app_pathname: 'authentication',
+      app_section: 'directory-service',
+      app_action_value: 'server-configuration-save',
+    });
+
     validateForm().then((errors) => {
       if (!formHasErrors(errors)) {
         onSubmitAll();
@@ -244,6 +253,13 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             </Button>
             <Button bsStyle="primary"
                     disabled={isSubmitting}
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        app_pathname: 'authentication',
+                        app_section: 'directory-service',
+                        app_action_value: 'usersync-button',
+                      });
+                    }}
                     type="submit">
               Next: User Synchronization
             </Button>

@@ -26,6 +26,7 @@ import UserNotification from 'util/UserNotification';
 import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   selectedDefinitionsIds: Array<string>,
@@ -62,6 +63,7 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
   const [showDialog, setShowDialog] = useState(false);
   const [actionType, setActionType] = useState(null);
   const selectedItemsAmount = selectedDefinitionsIds?.length;
+  const sendTelemetry = useSendTelemetry();
   const refetchEventDefinitions = useCallback(() => queryClient.invalidateQueries(['eventDefinition', 'overview']), [queryClient]);
 
   const updateState = ({ show, type }) => {
@@ -70,6 +72,12 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
   };
 
   const handleAction = (action) => {
+    sendTelemetry('click', {
+      app_pathname: 'event-definition',
+      app_section: 'event-definition-bulk',
+      app_action_value: `event-definition-bulk-${action}`,
+    });
+
     switch (action) {
       case ACTION_TYPES.DELETE:
         updateState({ show: true, type: ACTION_TYPES.DELETE });
@@ -93,9 +101,7 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
     refetchEventDefinitions();
   };
 
-  const getErrorExplanation = (failures: Array<{entity_id: string, failure_explanation: string}>) => {
-    return failures?.reduce((acc, failure) => `${acc} ${failure?.failure_explanation}`, '');
-  };
+  const getErrorExplanation = (failures: Array<{ entity_id: string, failure_explanation: string }>) => failures?.reduce((acc, failure) => `${acc} ${failure?.failure_explanation}`, '');
 
   const onAction = useCallback(() => {
     fetch('POST',
@@ -120,6 +126,7 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
 
   const handleConfirm = () => {
     onAction();
+    setShowDialog(false);
   };
 
   return (

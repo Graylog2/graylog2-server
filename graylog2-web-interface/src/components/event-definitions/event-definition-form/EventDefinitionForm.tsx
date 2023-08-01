@@ -15,18 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { SyntheticEvent } from 'react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import last from 'lodash/last';
 import defaultTo from 'lodash/defaultTo';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
+import URI from 'urijs';
+import QS from 'qs';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { ModalSubmit, Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
+import useQuery from 'routing/useQuery';
+import useHistory from 'routing/useHistory';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -78,7 +82,19 @@ const EventDefinitionForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const [activeStep, setActiveStep] = useState(STEP_KEYS[0]);
+  const { step } = useQuery();
+  const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
+  const history = useHistory();
+
+  useEffect(() => {
+    const currentUrl = new URI(window.location.href);
+    const queryParameters = QS.parse(currentUrl.query());
+
+    if (queryParameters.step !== activeStep) {
+      const newUrl = currentUrl.removeSearch('step').addQuery('step', activeStep);
+      history.replace(newUrl.resource());
+    }
+  }, [activeStep, history]);
 
   const handleStepChange = (nextStep) => {
     setActiveStep(nextStep);

@@ -19,6 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -39,6 +40,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import { setTitle } from 'views/logic/slices/titlesActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -66,17 +69,11 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-const _visualizationForType = (type: string) => {
-  return widgetDefinition(type).visualizationComponent;
-};
+const _visualizationForType = (type: string) => widgetDefinition(type).visualizationComponent;
 
-const _editComponentForType = (type: string) => {
-  return widgetDefinition(type).editComponent;
-};
+const _editComponentForType = (type: string) => widgetDefinition(type).editComponent;
 
-const _hasOwnEditSubmitButton = (type: string) => {
-  return widgetDefinition(type).hasEditSubmitButton;
-};
+const _hasOwnEditSubmitButton = (type: string) => widgetDefinition(type).hasEditSubmitButton;
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
@@ -99,7 +96,17 @@ type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
   fields: FieldTypeMappingsList,
 };
 
-const Visualization = ({ title, id, widget, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
+const Visualization = ({
+  title,
+  id,
+  widget,
+  fields,
+  queryId,
+  editing,
+  setLoadingState,
+  onToggleEdit,
+  onWidgetConfigChange,
+}: VisualizationProps) => {
   const VisComponent = useMemo(() => _visualizationForType(widget.type), [widget.type]);
   const { error: errors, widgetData: data } = useWidgetResults(id);
 
@@ -141,7 +148,17 @@ type EditWrapperProps = {
   type: string,
 };
 
-const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCancelEdit, onWidgetConfigChange, type }: EditWrapperProps) => {
+const EditWrapper = ({
+  children,
+  config,
+  editing,
+  fields,
+  id,
+  onToggleEdit,
+  onCancelEdit,
+  onWidgetConfigChange,
+  type,
+}: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
 
@@ -173,7 +190,16 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
   const dispatch = useAppDispatch();
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+
   const onToggleEdit = useCallback(() => {
+    sendTelemetry('input_button_toggle', {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'search-widget',
+      app_action_value: 'widget-edit-button',
+    });
+
     if (editing) {
       unsetWidgetEditing();
       setOldWidget(undefined);
@@ -182,16 +208,23 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       setWidgetEditing(widget.id);
       setOldWidget(widget);
     }
-  }, [editing, setWidgetEditing, unsetWidgetEditing, widget]);
+  }, [editing, pathname, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
+    sendTelemetry('click', {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'search-widget',
+      app_action_value: 'widget-edit-cancel-button',
+    });
+
     if (oldWidget) {
       dispatch(updateWidget(id, oldWidget));
     }
 
     onToggleEdit();
-  }, [dispatch, id, oldWidget, onToggleEdit]);
+  }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
-  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {}), [dispatch, id]);
+  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
+  }), [dispatch, id]);
   const activeQuery = useActiveQueryId();
 
   const { config } = widget;

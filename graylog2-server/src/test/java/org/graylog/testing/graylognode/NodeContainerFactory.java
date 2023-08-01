@@ -24,7 +24,6 @@ import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.MountableFile;
@@ -38,7 +37,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -146,7 +144,11 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
 
                 .waitingFor(new WaitAllStrategy()
-                        .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(".*Graylog server up and running.*", ".*Exception while running migrations.*", ".*Graylog startup failed.*"))
+                        .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(
+                                ".*Graylog server up and running.*",
+                                ".*Exception while running migrations.*",
+                                ".*Graylog startup failed.*",
+                                ".*Guice/MissingImplementation.*"))
                         // To be able to search for data we need the index ranges to be computed. Since this is an async
                         // background job, we need to wait until they have been created.
                         .withStrategy(new HttpWaitStrategy()
@@ -164,11 +166,13 @@ public class NodeContainerFactory {
                                     }
                                 })))
                 .withExposedPorts(config.portsToExpose())
-                .withStartupTimeout(Duration.of(120, SECONDS));
+                .withStartupTimeout(Duration.of(600, SECONDS));
 
         if (!includeFrontend) {
             container.withEnv("DEVELOPMENT", "true");
         }
+
+        config.proxiedRequestsTimeout.ifPresent(proxiedRequestsTimeout -> container.withEnv("GRAYLOG_PROXIED_REQUESTS_DEFAULT_CALL_TIMEOUT", proxiedRequestsTimeout));
 
         pluginJars.forEach(hostPath -> {
             if (Files.exists(hostPath)) {
@@ -202,7 +206,7 @@ public class NodeContainerFactory {
                 .stream()
                 .map(e -> e.startsWith(FEATURE_PREFIX) ? e : String.join("_", FEATURE_PREFIX, e))
                 .map(e -> e.toUpperCase(Locale.ENGLISH))
-                .collect(Collectors.toList());
+                .toList();
 
         for (String name : prefixed) {
             container.withEnv(name, "on");

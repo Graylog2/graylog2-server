@@ -1,0 +1,5 @@
+type = "c"
+message = "Updated AWS Java SDK to the latest version"
+
+issues = ["graylog-plugin-enterprise-integrations#971"]
+pulls = ["14712"]

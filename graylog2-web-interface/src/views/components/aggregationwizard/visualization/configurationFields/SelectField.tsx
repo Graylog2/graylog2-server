@@ -21,17 +21,15 @@ import Select from 'components/common/Select';
 
 import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
-const makeOptions = (options: ReadonlyArray<string | [string, any]>) => {
-  return options.map((option) => {
-    if (typeof option === 'string') {
-      return { label: option, value: option };
-    }
+const makeOptions = (options: ReadonlyArray<string | [string, any]>) => options.map((option) => {
+  if (typeof option === 'string') {
+    return { label: option, value: option };
+  }
 
-    const [label, value] = option;
+  const [label, value] = option;
 
-    return { label, value };
-  });
-};
+  return { label, value };
+});
 
 const createEvent = (name: string, value: any) => (({
   target: { name, value },

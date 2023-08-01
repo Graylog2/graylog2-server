@@ -24,8 +24,10 @@ import graylogLogo from 'images/auth/gl_logo_horiz.svg';
 
 const Logo = styled.img`
   display: block;
-  height: 3rem;
+  height: 5rem;
   width: auto;
+  margin: auto;
+  margin-bottom: 1.5rem;
 `;
 
 const Background = styled.div`
@@ -35,6 +37,7 @@ const Background = styled.div`
 `;
 
 const BackgroundText = styled.div`
+  z-index: -1;
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -43,11 +46,9 @@ const BackgroundText = styled.div`
   height: 100%;
   width: 100%;
   padding: 0 30px;
-`;
-
-const BackgroundImage = styled.img`
-  height: 100%;
-  width: 100%;
+  background-image: url(${bgImage});
+  background-position: center;
+  background-size: cover;
 `;
 
 const NotificationsContainer = styled.div`
@@ -81,16 +82,12 @@ const WelcomeMessage = styled.strong(({ theme }) => css`
   margin-bottom: 1.5rem;
 `);
 
-const BrandName = styled.h3(({ theme }) => css`
-  color: ${theme.colors.gray['60']};
-  font-size: 1.5rem;
-  line-height: 2rem;
-`);
 const Claim = styled.h1(({ theme }) => css`
-  color: ${theme.colors.brand.secondary};
+  color: #fcfcfc;
   text-transform: uppercase;
   font-size: ${theme.fonts.size.huge};
   line-height: 1;
+  font-weight: 600;
 `);
 const Highlight = styled.span(({ theme }) => css`
   color: ${theme.colors.brand.primary};
@@ -103,7 +100,6 @@ type Props = {
 const LoginChrome = ({ children }: Props) => (
   <LoginContainer>
     <LoginBox>
-      <Logo alt="logo" src={graylogLogo} />
       <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
       {children}
     </LoginBox>
@@ -113,11 +109,10 @@ const LoginChrome = ({ children }: Props) => (
       </NotificationsContainer>
       <BackgroundText>
         <TextContainer>
-          <BrandName>Graylog</BrandName>
-          <Claim><Highlight>Log Management</Highlight> Done Right</Claim>
+          <Logo alt="logo" src={graylogLogo} />
+          <Claim>Data. Insights. <Highlight>Answers.</Highlight></Claim>
         </TextContainer>
       </BackgroundText>
-      <BackgroundImage alt="background" src={bgImage} />
     </Background>
   </LoginContainer>
 );

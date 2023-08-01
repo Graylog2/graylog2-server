@@ -18,13 +18,11 @@ import * as React from 'react';
 
 import { FormikFormGroup } from 'components/common';
 
-const UsernameFormGroup = () => {
-  return (
-    <FormikFormGroup label="Username"
-                     name="username"
-                     required
-                     help="Select a unique user name used to log in with." />
-  );
-};
+const UsernameFormGroup = () => (
+  <FormikFormGroup label="Username"
+                   name="username"
+                   required
+                   help="Select a unique user name used to log in with." />
+);
 
 export default UsernameFormGroup;

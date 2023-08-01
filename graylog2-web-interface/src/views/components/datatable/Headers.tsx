@@ -49,28 +49,26 @@ const StyledTh = styled.th`
   }
 `;
 
-const DefaultTh = styled(StyledTh)(({ isNumeric }: { isNumeric: boolean }) => css`
-  ${isNumeric ? 'text-align: right;' : ''}
+const DefaultTh = styled(StyledTh)<{ $isNumeric: boolean }>(({ $isNumeric }) => css`
+  ${$isNumeric ? 'text-align: right;' : ''}
 `);
 
 const CenteredTh = styled(StyledTh)`
   text-align: center;
 `;
 
-const PinIcon = styled.button(({ theme }) => {
-  return css`
-    border: 0;
-    background: transparent;
-    padding: 5px;
-    cursor: pointer;
-    position: relative;
-    color: ${theme.colors.gray[70]};
+const PinIcon = styled.button(({ theme }) => css`
+  border: 0;
+  background: transparent;
+  padding: 5px;
+  cursor: pointer;
+  position: relative;
+  color: ${theme.colors.gray[70]};
 
-    &.active {
-      color: ${theme.colors.gray[20]};
-    }
-`;
-});
+  &.active {
+    color: ${theme.colors.gray[20]};
+  }
+`);
 
 type HeaderFilterProps = {
   activeQuery: string;
@@ -104,7 +102,7 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
   }, [togglePin, prefix, field]);
 
   return (
-    <DefaultTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
+    <DefaultTh ref={thRef} $isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
       {showPinIcon && <PinIcon data-testid={`pin-${prefix}${field}`} type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (
@@ -220,25 +218,23 @@ const Headers = ({ columnPivots, fields, rowPivots, series, rollup, actualColumn
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
   const interactive = useContext(InteractiveContext);
 
-  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => {
-    return (
-      <HeaderField activeQuery={activeQuery}
-                   key={`${prefix}${field}`}
-                   fields={fields}
-                   field={field}
-                   prefix={prefix}
-                   span={span}
-                   title={title}
-                   onSortChange={onSortChange}
-                   sortConfigMap={sortConfigMap}
-                   sortable={sortable}
-                   sortType={sortType}
-                   onSetColumnsWidth={onSetColumnsWidth}
-                   isPinned={pinnedColumns.has(`${prefix}${field}`)}
-                   showPinIcon={showPinIcon}
-                   togglePin={togglePin} />
-    );
-  };
+  const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => (
+    <HeaderField activeQuery={activeQuery}
+                 key={`${prefix}${field}`}
+                 fields={fields}
+                 field={field}
+                 prefix={prefix}
+                 span={span}
+                 title={title}
+                 onSortChange={onSortChange}
+                 sortConfigMap={sortConfigMap}
+                 sortable={sortable}
+                 sortType={sortType}
+                 onSetColumnsWidth={onSetColumnsWidth}
+                 isPinned={pinnedColumns.has(`${prefix}${field}`)}
+                 showPinIcon={showPinIcon}
+                 togglePin={togglePin} />
+  );
 
   const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }));
   const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: interactive, sortType: SortConfig.SERIES_TYPE, showPinIcon: false }));

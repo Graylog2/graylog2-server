@@ -66,4 +66,5 @@ export type EventDefinition = {
   notifications?: Array<Notification>,
   _scope?: string,
   scheduler?: Scheduler,
+  state?: 'ENABLED' | 'DISABLED',
 };

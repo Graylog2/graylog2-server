@@ -51,9 +51,7 @@ class ImportsViewModal extends React.Component {
     }
   }
 
-  _isLoading = () => {
-    return !this.state.uploads;
-  };
+  _isLoading = () => !this.state.uploads;
 
   _loadUploads = (page) => {
     CollectorConfigurationsActions.listUploads({ page: page })
@@ -75,9 +73,7 @@ class ImportsViewModal extends React.Component {
   };
 
   // eslint-disable-next-line class-methods-use-this
-  _buildVariableName = (name) => {
-    return `\${sidecar.${name}}`;
-  };
+  _buildVariableName = (name) => `\${sidecar.${name}}`;
 
   _formatUpload(upload) {
     const tooltip = <Tooltip id={`${upload.id}-status-tooltip`}>{upload.collector_id}</Tooltip>;
@@ -142,7 +138,9 @@ class ImportsViewModal extends React.Component {
     return (
       <BootstrapModalWrapper showModal={this.props.showModal}
                              onHide={this.props.onHide}
-                             bsSize="large">
+                             bsSize="large"
+                             data-app-section="collector_configuration_form"
+                             data-event-element="Migrate Imports from the old Collector system">
         <Modal.Header closeButton>
           <Modal.Title><span>Imports from the old Collector system</span></Modal.Title>
           Edit the imported configuration after pressing the Apply button by hand. Dynamic values like the node ID can be replaced with the variables system, e.g. <code>{this._buildVariableName('nodeId')}</code>

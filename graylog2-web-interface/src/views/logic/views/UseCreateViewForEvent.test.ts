@@ -18,9 +18,14 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import ObjectID from 'bson-objectid';
 
 import {
-  mockedMappedAggregation, mockedViewWithOneAggregation,
+  mockedMappedAggregation,
+  mockedMappedAggregationNoField,
+  mockedViewWithOneAggregation,
+  mockedViewWithOneAggregationNoField,
   mockedViewWithTwoAggregations,
-  mockEventData, mockEventDefinitionOneAggregation,
+  mockEventData,
+  mockEventDefinitionOneAggregation,
+  mockEventDefinitionOneAggregationNoFields,
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import { UseCreateViewForEvent } from 'views/logic/views/UseCreateViewForEvent';
@@ -43,6 +48,8 @@ const generateIdCounterTwoAggregations = counter();
 const objectIdCounterTwoAggregations = counter();
 const generateIdCounterOneAggregation = counter();
 const objectIdCounterOneAggregations = counter();
+const generateIdCounterOneAggregationNoField = counter();
+const objectIdCounterOneAggregationsNoField = counter();
 
 const mockedGenerateIdTwoAggregations = () => {
   const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id', 'field1-widget-id', 'field2-widget-id', 'summary-widget-id'];
@@ -65,9 +72,23 @@ const mockedObjectIdOneAggregation = () => {
   return idSet[index];
 };
 
+const mockedObjectIdOneAggregationNoFields = () => {
+  const idSet = ['', 'view-id', 'search-id'];
+  const index = objectIdCounterOneAggregationsNoField();
+
+  return idSet[index];
+};
+
 const mockedGenerateIdOneAggregation = () => {
   const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id', 'field1-widget-id'];
   const index = generateIdCounterOneAggregation();
+
+  return idSet[index];
+};
+
+const mockedGenerateIdOneAggregationNoFields = () => {
+  const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id', 'field1-widget-id'];
+  const index = generateIdCounterOneAggregationNoField();
 
   return idSet[index];
 };
@@ -122,5 +143,18 @@ describe('UseCreateViewForEvent', () => {
     const view = await result.current.then((r) => r);
 
     expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithOneAggregation));
+  });
+
+  it('should create view with 1 aggregation widgets when aggregation has no fields and grouping by', async () => {
+    asMock(generateId).mockImplementation(mockedGenerateIdOneAggregationNoFields);
+
+    asMock(ObjectID).mockImplementation(() => ({
+      toString: () => mockedObjectIdOneAggregationNoFields(),
+    }) as ObjectID);
+
+    const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinitionOneAggregationNoFields, aggregations: mockedMappedAggregationNoField }));
+    const view = await result.current.then((r) => r);
+
+    expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithOneAggregationNoField));
   });
 });

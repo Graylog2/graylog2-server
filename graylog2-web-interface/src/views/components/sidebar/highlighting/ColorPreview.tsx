@@ -37,8 +37,8 @@ const StaticColorPreview = styled(ColorPreviewBase)(({ color }) => css`
 
 const colorsForGradient = (gradient: string, count = 5): Array<string> => scaleForGradient(gradient).colors(count);
 
-export const GradientColorPreview = styled(ColorPreviewBase)(({ gradient }: { gradient: string }) => {
-  const colors = colorsForGradient(gradient);
+export const GradientColorPreview = styled(ColorPreviewBase)<{ $gradient: string }>(({ $gradient }) => {
+  const colors = colorsForGradient($gradient);
 
   return css`
       border: none;
@@ -57,7 +57,7 @@ const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ colo
   }
 
   if (color.type === 'gradient') {
-    return <GradientColorPreview ref={ref} onClick={onClick} gradient={(color as GradientColor).gradient} />;
+    return <GradientColorPreview ref={ref} onClick={onClick} $gradient={(color as GradientColor).gradient} />;
   }
 
   throw new Error(`Invalid highlighting color type: ${color}`);

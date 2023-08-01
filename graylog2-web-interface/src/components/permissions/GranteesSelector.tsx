@@ -61,7 +61,7 @@ const Errors = styled.div(({ theme }) => css`
   > * {
     margin-right: 5px;
 
-    :last-child {
+    &:last-child {
       margin-right: 0;
     }
   }
@@ -92,11 +92,9 @@ const SubmitButton = styled(Button)`
   margin-left: 15px;
 `;
 
-const _granteesOptions = (grantees: GranteesList) => {
-  return grantees.map((grantee) => (
-    { label: grantee.title, value: grantee.id, granteeType: grantee.type }
-  )).toJS();
-};
+const _granteesOptions = (grantees: GranteesList) => grantees.map((grantee) => (
+  { label: grantee.title, value: grantee.id, granteeType: grantee.type }
+)).toJS();
 
 const _initialCapabilityId = (capabilities: CapabilitiesList) => {
   const initialCapabilityTitle = 'Viewer';

@@ -41,6 +41,7 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import { pushIntoRevisions } from 'views/logic/slices/undoRedoSlice';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -84,7 +85,7 @@ const viewSlice = createSlice({
 export const viewSliceReducer = viewSlice.reducer;
 export const { setView, setIsDirty, setIsNew, setActiveQuery } = viewSlice.actions;
 
-const isViewEqualForSearch = (view: View, newView: View) => {
+export const isViewWidgetsEqualForSearch = (view: View, newView: View) => {
   const oldWidgets = view?.state?.map((s) => s.widgets);
   const newWidgets = newView?.state?.map((s) => s.widgets);
 
@@ -110,7 +111,7 @@ export const selectQuery = (activeQuery: string) => async (dispatch: AppDispatch
 export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
 
-  if (recreateSearch || !isViewEqualForSearch(view, newView)) {
+  if (recreateSearch || !isViewWidgetsEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
 
     await dispatch(setView(updatedViewWithSearch));
@@ -121,12 +122,28 @@ export const loadView = (newView: View, recreateSearch: boolean = false) => asyn
   return dispatch(setView(newView));
 };
 
-export const updateView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const view = selectView(getState());
+type UpdateViewOptions = { hasToPushRevision: boolean };
+const defaultUpdateViewOptions = { hasToPushRevision: true };
 
-  if (recreateSearch || !isViewEqualForSearch(view, newView)) {
+export const updateView = (
+  newView: View,
+  recreateSearch: boolean = false,
+  options: UpdateViewOptions = defaultUpdateViewOptions,
+) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const state = getState();
+  const view = selectView(state);
+
+  if (options.hasToPushRevision) {
+    await dispatch(pushIntoRevisions({
+      type: 'view',
+      state: {
+        ...state.view,
+      },
+    }));
+  }
+
+  if (recreateSearch || !isViewWidgetsEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
-
     await dispatch(setView(updatedViewWithSearch, true));
 
     return dispatch(execute());
@@ -138,10 +155,14 @@ export const updateView = (newView: View, recreateSearch: boolean = false) => as
 export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
   const { search } = view;
+  const newSearch = search.toBuilder()
+    .newId()
+    .queries(newQueries)
+    .build();
+
+  const searchAfterSave = await createSearch(newSearch);
   const newView = view.toBuilder()
-    .search(search.toBuilder()
-      .queries(newQueries)
-      .build())
+    .search(searchAfterSave)
     .build();
 
   return dispatch(updateView(newView));
@@ -273,7 +294,7 @@ export const updateQueryString = (queryId: string, newQueryString: string) => (d
     return dispatch(setQueryString(queryId, newQueryString));
   }
 
-  return dispatch(setGlobalOverrideQuery(newQueryString));
+  return dispatch(setGlobalOverrideQuery(newQueryString)).then(() => dispatch(execute()));
 };
 
 export const updateViewState = (id: QueryId, newViewState: ViewStateType) => (dispatch: AppDispatch, getState: () => RootState) => {

@@ -21,10 +21,12 @@ import com.github.rvesse.airline.annotations.Option;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.plugin.Tools;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.security.Key;
 import java.security.KeyStore;
@@ -36,9 +38,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
+import static org.graylog.security.certutil.CertConstants.PKCS12;
+
+
 @Command(name = "cert", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilCert implements CliCommand {
 
+    @Deprecated //no need to have separate alias for both certificates types
     public static final String DATANODE_KEY_ALIAS = "datanode";
     @Option(name = "--ca", description = "Filename for the CA keystore")
     protected String caKeystoreFilename = "datanode-ca.p12";
@@ -68,7 +74,7 @@ public class CertutilCert implements CliCommand {
 
         try {
             char[] password = console.readPassword("Enter CA password: ");
-            KeyStore caKeystore = KeyStore.getInstance("PKCS12");
+            KeyStore caKeystore = KeyStore.getInstance(PKCS12);
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
             final Key caPrivateKey = caKeystore.getKey("ca", password);
@@ -82,11 +88,16 @@ public class CertutilCert implements CliCommand {
 
             console.printLine("Generating private key and certificate for this datanode");
 
-            final CertRequest req = CertRequest.signed("localhost", intermediateCA)
+            final CertRequest req = CertRequest.signed(Tools.getLocalCanonicalHostname(), intermediateCA)
+                    .withSubjectAlternativeName("localhost")
+                    .withSubjectAlternativeName(Tools.getLocalHostname())
+                    .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
+                    .withSubjectAlternativeName("127.0.0.1")
+                    .withSubjectAlternativeName("ip6-localhost")
                     .validity(Duration.ofDays(10 * 365));
             KeyPair nodePair = CertificateGenerator.generate(req);
 
-            KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
+            KeyStore nodeKeystore = KeyStore.getInstance(PKCS12);
             nodeKeystore.load(null, null);
 
             char[] nodeKeystorePassword = console.readPassword("Enter datanode certificate password: ");

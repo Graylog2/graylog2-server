@@ -19,7 +19,6 @@ package org.graylog.storage.elasticsearch7;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Node;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -40,45 +39,45 @@ class FilteredElasticsearchNodesSnifferTest {
     void doesNotFilterNodesIfNoFilterIsSet() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(mockSniffer(nodes), null, null);
+        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(null, null);
 
-        assertThat(nodesSniffer.sniff()).isEqualTo(nodes);
+        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
 
     @Test
     void worksWithEmptyNodesListIfFilterIsSet() throws Exception {
         final List<Node> nodes = Collections.emptyList();
 
-        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(mockSniffer(nodes), "rack", "42");
+        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer("rack", "42");
 
-        assertThat(nodesSniffer.sniff()).isEqualTo(nodes);
+        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
 
     @Test
     void returnsNodesMatchingGivenFilter() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(mockSniffer(nodes), "rack", "42");
+        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer("rack", "42");
 
-        assertThat(nodesSniffer.sniff()).containsExactly(nodeOnRack42);
+        assertThat(nodesSniffer.sniff(nodes)).containsExactly(nodeOnRack42);
     }
 
     @Test
     void returnsNoNodesIfFilterDoesNotMatch() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(mockSniffer(nodes), "location", "alaska");
+        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer("location", "alaska");
 
-        assertThat(nodesSniffer.sniff()).isEmpty();
+        assertThat(nodesSniffer.sniff(nodes)).isEmpty();
     }
 
     @Test
     void returnsAllNodesIfFilterMatchesAll() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(mockSniffer(nodes), "always", "true");
+        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer("always", "true");
 
-        assertThat(nodesSniffer.sniff()).isEqualTo(nodes);
+        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
 
     @Test
@@ -88,9 +87,9 @@ class FilteredElasticsearchNodesSnifferTest {
         ));
         final List<Node> nodes = Collections.singletonList(matchingNode);
 
-        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(mockSniffer(nodes), "something", "42");
+        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer("something", "42");
 
-        assertThat(nodesSniffer.sniff()).isEqualTo(nodes);
+        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
 
     private Node nodeOnRack(int rackNo) {
@@ -115,7 +114,7 @@ class FilteredElasticsearchNodesSnifferTest {
 
     private NodesSniffer mockSniffer(List<Node> nodes) throws IOException {
         final NodesSniffer mockSniffer = mock(NodesSniffer.class);
-        when(mockSniffer.sniff()).thenReturn(nodes);
+        when(mockSniffer.sniff(nodes)).thenReturn(nodes);
         return mockSniffer;
     }
 }

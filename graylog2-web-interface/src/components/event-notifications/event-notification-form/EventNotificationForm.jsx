@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import withTelemetry from 'logic/telemetry/withTelemetry';
 import { FormSubmit, Select, Spinner } from 'components/common';
 import { Alert, Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -31,10 +32,8 @@ const getNotificationPlugin = (type) => {
   return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
 };
 
-const formattedEventNotificationTypes = () => {
-  return PluginStore.exports('eventNotificationTypes')
-    .map((type) => ({ label: type.displayName, value: type.type }));
-};
+const formattedEventNotificationTypes = () => PluginStore.exports('eventNotificationTypes')
+  .map((type) => ({ label: type.displayName, value: type.type }));
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
@@ -52,6 +51,7 @@ class EventNotificationForm extends React.Component {
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onTest: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -72,7 +72,13 @@ class EventNotificationForm extends React.Component {
   };
 
   handleSubmit = (event) => {
-    const { notification, onSubmit } = this.props;
+    const { notification, onSubmit, sendTelemetry } = this.props;
+
+    sendTelemetry('form_submit', {
+      app_pathname: 'events',
+      app_section: 'event-notification',
+      app_action_value: 'save',
+    });
 
     event.preventDefault();
 
@@ -93,6 +99,15 @@ class EventNotificationForm extends React.Component {
   };
 
   handleTypeChange = (nextType) => {
+    const { sendTelemetry } = this.props;
+
+    sendTelemetry('input_value_change', {
+      app_pathname: 'events',
+      app_section: 'event-notification',
+      app_action_value: 'notification-type',
+      event_details: { notification_type: nextType },
+    });
+
     const notificationPlugin = getNotificationPlugin(nextType);
     const defaultConfig = notificationPlugin.defaultConfig || {};
 
@@ -100,7 +115,13 @@ class EventNotificationForm extends React.Component {
   };
 
   handleTestTrigger = () => {
-    const { notification, onTest } = this.props;
+    const { notification, onTest, sendTelemetry } = this.props;
+
+    sendTelemetry('input_value_change', {
+      app_pathname: 'events',
+      app_section: 'event-notification',
+      app_action_value: 'notification-test',
+    });
 
     onTest(notification);
   };
@@ -195,4 +216,4 @@ class EventNotificationForm extends React.Component {
   }
 }
 
-export default EventNotificationForm;
+export default withTelemetry(EventNotificationForm);

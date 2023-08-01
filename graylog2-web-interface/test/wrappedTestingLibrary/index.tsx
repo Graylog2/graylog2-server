@@ -23,6 +23,7 @@ import '@testing-library/jest-dom';
 import 'jest-styled-components';
 import DefaultProviders from 'DefaultProviders';
 
+import PreflightWrappingContainer from '../PreflightWrappingContainer';
 import WrappingContainer from '../WrappingContainer';
 
 export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) => render(Component, {
@@ -34,6 +35,11 @@ export const renderWithDataRouter = (element: React.ReactElement<any>, options?:
   <RouterProvider router={createMemoryRouter([{ path: '/', element }])} />
 ), {
   wrapper: DefaultProviders,
+  ...options,
+});
+
+export const renderPreflightWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) => render(Component, {
+  wrapper: PreflightWrappingContainer,
   ...options,
 });
 
@@ -50,5 +56,6 @@ export function asElement<T extends new(...args: any) => any> (elem: any, elemen
 export * from '@testing-library/react';
 export {
   renderWithWrapper as render,
+  renderPreflightWithWrapper as renderPreflight,
   render as renderUnwrapped,
 };

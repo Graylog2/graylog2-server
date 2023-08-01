@@ -36,8 +36,13 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
-import org.graylog.events.processor.aggregation.AggregationFunction;
-import org.graylog.events.processor.aggregation.AggregationSeries;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
@@ -224,11 +229,7 @@ public class LegacyAlertConditionMigrator {
     private void migrateMessageCount(Helper helper) {
         final String seriesId = helper.newSeriesId();
 
-        final AggregationSeries messageCountSeries = AggregationSeries.builder()
-                .id(seriesId)
-                .function(AggregationFunction.COUNT)
-                .field(null)
-                .build();
+        var messageCountSeries = Count.builder().id(seriesId).build();
 
         final Expression<Boolean> expression = helper.createExpression(seriesId, "MORE");
         final EventProcessorConfig config = helper.createAggregationProcessorConfig(messageCountSeries, expression, executeEveryMs);
@@ -267,32 +268,21 @@ public class LegacyAlertConditionMigrator {
 
         final String seriesId = helper.newSeriesId();
 
-        final AggregationSeries.Builder aggregationSeriesBuilder = AggregationSeries.builder()
-                .id(seriesId)
-                .field(field);
-
-        switch (type.toUpperCase(Locale.US)) {
+        var aggregationSeries = switch (type.toUpperCase(Locale.US)) {
             case "MEAN":
-                aggregationSeriesBuilder.function(AggregationFunction.AVG);
-                break;
+                yield Average.builder().id(seriesId).field(field).build();
             case "MIN":
-                aggregationSeriesBuilder.function(AggregationFunction.MIN);
-                break;
+                yield Min.builder().id(seriesId).field(field).build();
             case "MAX":
-                aggregationSeriesBuilder.function(AggregationFunction.MAX);
-                break;
+                yield Max.builder().id(seriesId).field(field).build();
             case "SUM":
-                aggregationSeriesBuilder.function(AggregationFunction.SUM);
-                break;
+                yield Sum.builder().id(seriesId).field(field).build();
             case "STDDEV":
-                aggregationSeriesBuilder.function(AggregationFunction.STDDEV);
-                break;
+                yield StdDev.builder().id(seriesId).field(field).build();
             default:
-                LOG.warn("Couldn't migrate field value alert condition with unknown type: {}", type);
-                return;
-        }
+                throw new IllegalStateException("Couldn't migrate field value alert condition with unknown type: " + type);
+        };
 
-        final AggregationSeries aggregationSeries = aggregationSeriesBuilder.build();
         final Expression<Boolean> expression = helper.createExpression(seriesId, "HIGHER");
         final EventProcessorConfig config = helper.createAggregationProcessorConfig(aggregationSeries, expression, executeEveryMs);
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
@@ -333,11 +323,7 @@ public class LegacyAlertConditionMigrator {
 
         final String seriesId = helper.newSeriesId();
 
-        final AggregationSeries messageCountSeries = AggregationSeries.builder()
-                .id(seriesId)
-                .function(AggregationFunction.COUNT)
-                .field(null)
-                .build();
+        var messageCountSeries = Count.builder().id(seriesId).build();
 
         final Expr.NumberReference left = Expr.NumberReference.create(seriesId);
         final Expr.NumberValue right = Expr.NumberValue.create(0);
@@ -390,7 +376,7 @@ public class LegacyAlertConditionMigrator {
             return parameters;
         }
 
-        EventProcessorConfig createAggregationProcessorConfig(AggregationSeries aggregationSeries, Expression<Boolean> expression, long executeEveryMs) {
+        EventProcessorConfig createAggregationProcessorConfig(SeriesSpec aggregationSeries, Expression<Boolean> expression, long executeEveryMs) {
             return AggregationEventProcessorConfig.builder()
                     .streams(ImmutableSet.of(streamId))
                     .query(query)

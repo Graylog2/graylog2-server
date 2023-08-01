@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 
 import { Button } from 'components/bootstrap';
-import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
+import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult, IfPermitted } from 'components/common';
 import type View from 'views/logic/views/View';
 import QueryHelper from 'components/common/QueryHelper';
 import EntityDataTable from 'components/common/EntityDataTable';
@@ -94,8 +94,9 @@ const SavedSearchesList = ({
   );
 
   const onPageSizeChange = useCallback((newPageSize: number) => {
-    setActivePage(newPageSize);
-  }, []);
+    setActivePage(1);
+    updateTableLayout({ perPage: newPageSize });
+  }, [updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
     setActivePage(1);
@@ -114,14 +115,16 @@ const SavedSearchesList = ({
   }, [updateTableLayout]);
 
   const renderSavedSearchActions = useCallback((search: View) => (
-    <Button onClick={(e) => onDelete(e, search, deleteSavedSearch, activeSavedSearchId, refetch)}
-            role="button"
-            bsSize="xsmall"
-            bsStyle="danger"
-            title={`Delete search ${search.title}`}
-            tabIndex={0}>
-      Delete
-    </Button>
+    <IfPermitted permissions={[`view:edit:${search.id}`, 'view:edit']} anyPermissions>
+      <Button onClick={(e) => onDelete(e, search, deleteSavedSearch, activeSavedSearchId, refetch)}
+              role="button"
+              bsSize="xsmall"
+              bsStyle="danger"
+              title={`Delete search ${search.title}`}
+              tabIndex={0}>
+        Delete
+      </Button>
+    </IfPermitted>
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
   const customColumnRenderers = useColumnRenderers(onLoadSavedSearch, searchParams);
@@ -166,6 +169,7 @@ const SavedSearchesList = ({
                                activeSort={layoutConfig.sort}
                                pageSize={searchParams.pageSize}
                                onPageSizeChange={onPageSizeChange}
+                               actionsCellWidth={60}
                                rowActions={renderSavedSearchActions}
                                columnRenderers={customColumnRenderers}
                                columnDefinitions={attributes} />

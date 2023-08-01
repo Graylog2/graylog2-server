@@ -49,14 +49,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 /**
  * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
+    public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
 
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
@@ -74,10 +74,7 @@ public class Configuration extends BaseConfiguration {
     private boolean disableNativeSystemStatsCollector = false;
 
     @Parameter(value = "opensearch_location")
-    private String opensearchLocation = "dist/opensearch-2.5.0";
-
-    @Parameter(value = "opensearch_version")
-    private String opensearchVersion = "2.5.0";
+    private String opensearchDistributionRoot = "dist";
 
     @Parameter(value = "opensearch_data_location")
     private String opensearchDataLocation = "data";
@@ -88,8 +85,11 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_config_location")
     private String opensearchConfigLocation = "config";
 
+    @Parameter(value = "config_location")
+    private String configLocation;
+
     @Parameter(value = "process_logs_buffer_size")
-    private Integer logs = 500;
+    private Integer opensearchProcessLogsBufferSize = 500;
 
 
     @Parameter(value = "node_name")
@@ -111,14 +111,14 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "transport_certificate")
     private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
 
-    @Parameter(value = "transport_certificate_password")
-    private String datanodeTransportCertificatePassword = null;
+    @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
+    private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = "datanode-http-certificates.p12";
 
-    @Parameter(value = "http_certificate_password")
-    private String datanodeHttpCertificatePassword = null;
+    @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
+    private String datanodeHttpCertificatePassword;
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
@@ -153,28 +153,16 @@ public class Configuration extends BaseConfiguration {
         return isLeader;
     }
 
+    public String getOpensearchDistributionRoot() {
+        return opensearchDistributionRoot;
+    }
+
     public String getOpensearchConfigLocation() {
         return opensearchConfigLocation;
     }
 
-    public String getOpensearchLocation() {
-        // If the configured location exists, just use it.
-        if (Files.exists(Path.of(opensearchLocation))) {
-            return opensearchLocation;
-        }
-
-        // Otherwise check if the architecture dependent distribution exists.
-        final var osArch = System.getProperty("os.arch");
-        return switch (osArch) {
-            case "amd64" -> f("%s-linux-x64", opensearchLocation);
-            case "aarch64" -> f("%s-linux-aarch64", opensearchLocation);
-            default ->
-                    throw new UnsupportedOperationException("Unsupported OpenSearch distribution architecture: " + osArch);
-        };
-    }
-
-    public String getOpensearchVersion() {
-        return opensearchVersion;
+    public String getConfigLocation() {
+        return configLocation;
     }
 
     public String getOpensearchDataLocation() {
@@ -186,7 +174,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public Integer getProcessLogsBufferSize() {
-        return logs;
+        return opensearchProcessLogsBufferSize;
     }
 
     @Parameter(value = "rest_api_username")
@@ -346,7 +334,10 @@ public class Configuration extends BaseConfiguration {
     public static final String PATH_API = "api/";
 
     @Parameter(value = "http_bind_address", required = true)
-    private HostAndPort httpBindAddress = HostAndPort.fromParts("127.0.0.1", GRAYLOG_DEFAULT_PORT);
+    private HostAndPort httpBindAddress = HostAndPort.fromParts("0.0.0.0", GRAYLOG_DEFAULT_PORT);
+
+    @Parameter(value = "hostname", required = true)
+    private String hostname = Tools.getLocalCanonicalHostname();
 
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
@@ -561,5 +552,9 @@ public class Configuration extends BaseConfiguration {
 
     private boolean isRegularFileAndReadable(Path path) {
         return path != null && Files.isRegularFile(path) && Files.isReadable(path);
+    }
+
+    public String getHostname() {
+        return hostname;
     }
 }

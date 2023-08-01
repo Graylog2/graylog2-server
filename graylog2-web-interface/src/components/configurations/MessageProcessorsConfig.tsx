@@ -60,9 +60,7 @@ const MessageProcessorsConfig = () => {
     setFormConfig(viewConfig);
   };
 
-  const hasNoActiveProcessor = () => {
-    return formConfig.disabled_processors.length >= formConfig.processor_order.length;
-  };
+  const hasNoActiveProcessor = () => formConfig.disabled_processors.length >= formConfig.processor_order.length;
 
   const saveConfig = () => {
     if (!hasNoActiveProcessor()) {
@@ -73,9 +71,7 @@ const MessageProcessorsConfig = () => {
   };
 
   const updateSorting = (newSorting: Array<{id: string, title: string}>) => {
-    const processorOrder = newSorting.map((item) => {
-      return { class_name: item.id, name: item.title };
-    });
+    const processorOrder = newSorting.map((item) => ({ class_name: item.id, name: item.title }));
 
     setFormConfig({ ...formConfig, processor_order: processorOrder });
   };
@@ -94,25 +90,19 @@ const MessageProcessorsConfig = () => {
     config.disabled_processors.filter((p) => p === processor.class_name).length < 1
   );
 
-  const summary = () => {
-    return viewConfig.processor_order.map((processor, idx) => {
-      const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
+  const summary = () => viewConfig.processor_order.map((processor, idx) => {
+    const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
 
-      return (
-        <tr key={processor.name}>
-          <td>{idx + 1}</td>
-          <td>{processor.name}</td>
-          <td>{status}</td>
-        </tr>
-      );
-    });
-  };
+    return (
+      <tr key={processor.name}>
+        <td>{idx + 1}</td>
+        <td>{processor.name}</td>
+        <td>{status}</td>
+      </tr>
+    );
+  });
 
-  const sortableItems = () => {
-    return formConfig.processor_order.map((processor) => {
-      return { id: processor.class_name, title: processor.name };
-    });
-  };
+  const sortableItems = () => formConfig.processor_order.map((processor) => ({ id: processor.class_name, title: processor.name }));
 
   const statusForm = () => {
     const sortedProcessorOrder = [...formConfig.processor_order].sort((a, b) => naturalSort(a.name, b.name));

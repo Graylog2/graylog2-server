@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
@@ -36,6 +37,10 @@ type Props = {
 type State = {
   editing: boolean,
 };
+
+const SpacedActions = styled.div`
+  margin-left: 5px;
+`;
 
 class DecoratorSummary extends React.Component<Props, State> {
   static propTypes = {
@@ -118,11 +123,13 @@ class DecoratorSummary extends React.Component<Props, State> {
     const { decorator } = this.props;
 
     return (
-      <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
-        <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
-        <MenuItem divider />
-        <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
-      </DropdownButton>
+      <SpacedActions>
+        <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
+          <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
+          <MenuItem divider />
+          <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
+        </DropdownButton>
+      </SpacedActions>
     );
   };
 

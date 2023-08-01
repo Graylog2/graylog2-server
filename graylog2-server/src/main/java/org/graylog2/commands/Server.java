@@ -70,6 +70,7 @@ import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
@@ -79,6 +80,7 @@ import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration;
 import org.graylog2.messageprocessors.MessageProcessorModule;
 import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
@@ -112,12 +114,14 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
+import static org.graylog2.plugin.ServerStatus.Capability.CLOUD;
+import static org.graylog2.plugin.ServerStatus.Capability.MASTER;
+import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
 
 @Command(name = "server", description = "Start the Graylog server")
 public class Server extends ServerBootstrap {
-    private static final Logger LOG = LoggerFactory.getLogger(Server.class);
-
     protected static final Configuration configuration = new Configuration();
+    private static final Logger LOG = LoggerFactory.getLogger(Server.class);
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private final ElasticsearchClientConfiguration elasticsearchClientConfiguration = new ElasticsearchClientConfiguration();
@@ -133,6 +137,11 @@ public class Server extends ServerBootstrap {
     private final PrometheusExporterConfiguration prometheusExporterConfiguration = new PrometheusExporterConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
     private final GeoIpProcessorConfig geoIpProcessorConfig = new GeoIpProcessorConfig();
+    private final TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
+    private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
+
+    @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
+    private boolean local = false;
 
     public Server() {
         super("server", configuration);
@@ -141,9 +150,6 @@ public class Server extends ServerBootstrap {
     public Server(String commandName) {
         super(commandName, configuration);
     }
-
-    @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
-    private boolean local = false;
 
     public boolean isLocal() {
         return local;
@@ -215,7 +221,9 @@ public class Server extends ServerBootstrap {
                 jobSchedulerConfiguration,
                 prometheusExporterConfiguration,
                 tlsConfiguration,
-                geoIpProcessorConfig);
+                geoIpProcessorConfig,
+                telemetryConfiguration,
+                dnsLookupAdapterConfiguration);
     }
 
     @Override
@@ -263,6 +271,40 @@ public class Server extends ServerBootstrap {
         }
     }
 
+    @Override
+    protected Class<? extends Runnable> shutdownHook() {
+        return ShutdownHook.class;
+    }
+
+    @Override
+    protected void annotateInjectorExceptions(Collection<Message> messages) {
+        super.annotateInjectorExceptions(messages);
+        for (Message message : messages) {
+            if (message.getCause() instanceof MongoException) {
+                MongoException e = (MongoException) message.getCause();
+                LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?\n" +
+                        "Details: " + e.getMessage()));
+                System.exit(-1);
+            }
+        }
+    }
+
+    @Override
+    protected Set<ServerStatus.Capability> capabilities() {
+        final EnumSet<ServerStatus.Capability> capabilities = EnumSet.of(SERVER);
+
+        if (configuration.isLeader()) {
+            //noinspection deprecation
+            capabilities.add(MASTER);
+        }
+
+        if (configuration.isCloud()) {
+            capabilities.add(CLOUD);
+        }
+
+        return capabilities;
+    }
+
     private static class ShutdownHook implements Runnable {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;
@@ -308,34 +350,6 @@ public class Server extends ServerBootstrap {
             // right before shutting down to avoid repetitive processing
             // and duplicates.
             journal.flush();
-        }
-    }
-
-    @Override
-    protected Class<? extends Runnable> shutdownHook() {
-        return ShutdownHook.class;
-    }
-
-    @Override
-    protected void annotateInjectorExceptions(Collection<Message> messages) {
-        super.annotateInjectorExceptions(messages);
-        for (Message message : messages) {
-            if (message.getCause() instanceof MongoException) {
-                MongoException e = (MongoException) message.getCause();
-                LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?\n" +
-                        "Details: " + e.getMessage()));
-                System.exit(-1);
-            }
-        }
-    }
-
-    @Override
-    protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isLeader()) {
-            //noinspection deprecation
-            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
-        } else {
-            return EnumSet.of(ServerStatus.Capability.SERVER);
         }
     }
 }

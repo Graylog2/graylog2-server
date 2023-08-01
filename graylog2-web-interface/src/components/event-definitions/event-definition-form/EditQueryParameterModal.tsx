@@ -142,6 +142,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
 
         <BootstrapModalForm show={showModal}
                             title={`Declare Query Parameter "${queryParameter.name}" from Lookup Table`}
+                            data-telemetry-title="Declare Query Parameter from Lookup Table"
                             onSubmitForm={this._saved}
                             onCancel={this._cleanState}
                             submitButtonText="Save">

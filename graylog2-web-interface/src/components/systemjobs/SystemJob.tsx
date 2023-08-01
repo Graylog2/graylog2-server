@@ -17,7 +17,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
@@ -67,11 +66,11 @@ const JobWrap = styled.div`
   margin-bottom: 5px;
 `;
 
-const AcknowledgeButton = styled(Button)(({ theme }: { theme: DefaultTheme }) => css`
+const AcknowledgeButton = styled(Button)(({ theme }) => css`
   && {
     color: ${theme.colors.variant.light.default};
     
-    :hover {
+    &:hover {
       color: ${theme.colors.variant.default};
     }
   }
@@ -84,27 +83,23 @@ const SystemJob = ({ job }) => {
                     || job.job_status === JobStatus.Error;
   const mappedJobStatus = job.job_status === JobStatus.Runnable ? 'queued' : job.job_status;
 
-  const _onAcknowledge = () => {
-    return (e) => {
-      e.preventDefault();
+  const _onAcknowledge = () => (e) => {
+    e.preventDefault();
 
-      SystemJobsActions.acknowledgeJob(job.id).catch((error) => {
-        UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
-      });
-    };
+    SystemJobsActions.acknowledgeJob(job.id).catch((error) => {
+      UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
+    });
   };
 
-  const _onCancel = () => {
-    return (e) => {
-      e.preventDefault();
+  const _onCancel = () => (e) => {
+    e.preventDefault();
 
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
-        SystemJobsActions.cancelJob(job.id).catch((error) => {
-          UserNotification.error(error.responseMessage, 'Unable to cancel the job');
-        });
-      }
-    };
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
+      SystemJobsActions.cancelJob(job.id).catch((error) => {
+        UserNotification.error(error.responseMessage, 'Unable to cancel the job');
+      });
+    }
   };
 
   return (

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Dropdown } from 'components/bootstrap';
@@ -44,16 +43,16 @@ const Toggle = styled.a.attrs({ href: '#' })(({ theme }) => css`
   }
 `);
 
-const StyledSubmenu = styled(Dropdown)(({ left, theme }: { left: boolean, theme: DefaultTheme }) => css`
+const StyledSubmenu = styled(Dropdown)<{ $left: boolean }>(({ $left, theme }) => css`
   position: relative;
 
   > .dropdown-menu {
     top: 0;
-    left: ${left ? 'auto' : '100%'};
-    right: ${left ? '98%' : 'auto'};
+    left: ${$left ? 'auto' : '100%'};
+    right: ${$left ? '98%' : 'auto'};
     margin-top: -6px;
-    margin-left: ${left ? '10px' : '-1px'};
-    border-radius: ${left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
+    margin-left: ${$left ? '10px' : '-1px'};
+    border-radius: ${$left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
   }
 
   &:hover > .dropdown-menu {
@@ -65,17 +64,15 @@ const StyledSubmenu = styled(Dropdown)(({ left, theme }: { left: boolean, theme:
   }
 `);
 
-const DropdownSubmenu = ({ children, left, title }: Props) => {
-  return (
-    <StyledSubmenu left={left} as="li">
-      {title && <Toggle>{title}</Toggle>}
+const DropdownSubmenu = ({ children, left, title }: Props) => (
+  <StyledSubmenu $left={left} as="li">
+    {title && <Toggle>{title}</Toggle>}
 
-      <Dropdown.Menu>
-        {children}
-      </Dropdown.Menu>
-    </StyledSubmenu>
-  );
-};
+    <Dropdown.Menu>
+      {children}
+    </Dropdown.Menu>
+  </StyledSubmenu>
+);
 
 DropdownSubmenu.propTypes = {
   children: PropTypes.node.isRequired,

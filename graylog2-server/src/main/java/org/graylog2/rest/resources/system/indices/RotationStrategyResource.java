@@ -82,7 +82,10 @@ public class RotationStrategyResource extends RestResource {
                 .map(this::getRotationStrategyDescription)
                 .collect(Collectors.toList());
 
-        return RotationStrategies.create(strategies);
+        final RotationStrategies.Context context =
+                RotationStrategies.Context.create(elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway());
+
+        return RotationStrategies.create(strategies, context);
     }
 
     @GET

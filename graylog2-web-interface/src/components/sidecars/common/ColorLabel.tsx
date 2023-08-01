@@ -16,42 +16,35 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
-import { themePropTypes } from 'theme';
 import { Label } from 'components/bootstrap';
 
 type Size = 'normal' | 'small' | 'xsmall';
 
-interface ColorLabelWrapProps {
-  size: Size,
-  theme: DefaultTheme
-}
-
-interface ColorLabelProps {
-  color: string,
-  size?: Size,
-  text?: string | React.ReactNode,
-  theme: DefaultTheme,
-}
-
-const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
+const ColorLabelWrap = styled.span<{ $size: Size }>(({ $size, theme }) => {
   const { body, small, tiny } = theme.fonts.size;
-  const fontSize = size === 'small' ? small : body;
+  const fontSize = $size === 'small' ? small : body;
 
   return css`
     vertical-align: middle;
-    font-size: ${size === 'xsmall' ? tiny : fontSize};
+    font-size: ${$size === 'xsmall' ? tiny : fontSize};
 `;
 });
 
-const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {
+type Props = {
+  color: string,
+  size?: Size,
+  text?: string | React.ReactNode,
+}
+
+const ColorLabel = ({ color, size, text }: Props) => {
+  const theme = useTheme();
   const borderColor = theme.utils.colorLevel(color, 5);
   const textColor = theme.utils.contrastingColor(color);
 
   return (
-    <ColorLabelWrap size={size} className="color-label-wrapper">
+    <ColorLabelWrap $size={size} className="color-label-wrapper">
       <Label style={{
         backgroundColor: color,
         border: `1px solid ${borderColor}`,
@@ -72,7 +65,6 @@ ColorLabel.propTypes = {
   color: PropTypes.string.isRequired,
   text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
-  theme: themePropTypes.isRequired,
 };
 
 ColorLabel.defaultProps = {
@@ -80,4 +72,4 @@ ColorLabel.defaultProps = {
   size: 'normal',
 };
 
-export default withTheme(ColorLabel);
+export default ColorLabel;

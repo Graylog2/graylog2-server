@@ -29,6 +29,7 @@ export type AppConfigs = {
   isCloud: boolean,
   pluginUISettings: { [key: string]: {} },
   featureFlags: { [key: string]: string },
+  telemetry: { api_key: string, host: string, enabled: boolean },
 };
 
 declare global {
@@ -37,16 +38,12 @@ declare global {
   }
 }
 
-const appConfig = (): AppConfigs => {
-  return (window.appConfig || {}) as AppConfigs;
-};
+const appConfig = (): AppConfigs => (window.appConfig || {}) as AppConfigs;
 
-const getEnabledFeatures = () => {
-  return Immutable.Map(appConfig().featureFlags)
-    .filter((value) => value.trim().toLowerCase() === 'on')
-    .keySeq().toList()
-    .filter((s) => typeof s === 'string');
-};
+const getEnabledFeatures = () => Immutable.Map(appConfig().featureFlags)
+  .filter((value) => value.trim().toLowerCase() === 'on')
+  .keySeq().toList()
+  .filter((s) => typeof s === 'string');
 
 const AppConfig = {
   features: getEnabledFeatures(),
@@ -86,6 +83,10 @@ const AppConfig = {
 
   customThemeColors() {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
+  },
+
+  telemetry() {
+    return appConfig()?.telemetry;
   },
 
   publicNotifications() {

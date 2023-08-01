@@ -17,6 +17,7 @@
 package org.graylog.datanode.bootstrap;
 
 import org.assertj.core.api.Assertions;
+import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.shared.utilities.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -28,9 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class OpensearchBinPreflightCheckTest {
+public class OpensearchBinPreflightCheckTest {
 
     @TempDir
     private Path tempDir;

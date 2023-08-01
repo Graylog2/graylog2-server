@@ -40,13 +40,11 @@ type Arguments = {
   contexts: Contexts;
 };
 
-const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
-  return valuePath.map((item) => Object.entries(item)
-    .map(([key, value]: [string, string]) => (
-      key === '_exists_' ? value : key)))
-    .reduce((prev, cur) => [...prev, ...cur], [])
-    .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
-};
+const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => valuePath.map((item) => Object.entries(item)
+  .map(([key, value]: [string, string]) => (
+    key === '_exists_' ? value : key)))
+  .reduce((prev, cur) => [...prev, ...cur], [])
+  .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 
 const ShowDocumentsHandler = ({
   contexts: { valuePath, widget },

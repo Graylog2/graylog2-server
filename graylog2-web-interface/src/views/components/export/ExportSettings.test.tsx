@@ -18,7 +18,6 @@ import * as React from 'react';
 import { Formik } from 'formik';
 import * as Immutable from 'immutable';
 import { render } from 'wrappedTestingLibrary';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
@@ -26,11 +25,12 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import viewsReducers from 'views/viewsReducers';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import { asMock } from 'helpers/mocking';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import { usePlugin } from 'views/test/testPlugins';
 
 import { viewWithoutWidget, stateWithOneWidget } from './Fixtures';
 import ExportSettings from './ExportSettings';
@@ -62,7 +62,6 @@ const pluginExports = {
         visualizationComponent: () => <>Hey!</>,
       },
     ],
-    'views.reducers': viewsReducers,
   },
 };
 
@@ -92,16 +91,11 @@ const view = viewWithoutWidget(View.Type.Search).toBuilder()
   .build();
 
 describe('ExportSettings', () => {
-  beforeAll(() => {
-    PluginStore.register(pluginExports);
-  });
+  useViewsPlugin();
+  usePlugin(pluginExports);
 
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue('view-query-id');
-  });
-
-  afterAll(() => {
-    PluginStore.unregister(pluginExports);
   });
 
   it('renders custom export settings component', async () => {

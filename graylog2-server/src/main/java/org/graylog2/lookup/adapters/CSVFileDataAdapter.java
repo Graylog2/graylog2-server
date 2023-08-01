@@ -284,17 +284,21 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     }
 
     public LookupResult getResultForCIDRRange(Object ip) {
+        LookupResult result = getEmptyResult();
         try {
             // Convert directly to InetAddress to avoid long timeouts using name service lookups
             InetAddress address = InetAddresses.forString(String.valueOf(ip));
+            int longestMatch = 0;
             for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
                 String range = entry.getKey();
-                Optional<IpSubnet> subnet = ReservedIpChecker.stringToSubnet(range);
-                if (subnet.isEmpty()) {
+                Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(range);
+                if (optSubnet.isEmpty()) {
                     LOG.debug("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
                 } else {
-                    if (subnet.get().contains(address)) {
-                        return LookupResult.single(entry.getValue());
+                    IpSubnet subnet = optSubnet.get();
+                    if (subnet.contains(address) && (result.isEmpty() || longestMatch < subnet.getPrefixLength())) {
+                        longestMatch = subnet.getPrefixLength();
+                        result = LookupResult.single(entry.getValue());
                     }
                 }
             }
@@ -303,7 +307,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return getErrorResult();
         }
 
-        return getEmptyResult();
+        return result;
     }
 
     @Override

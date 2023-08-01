@@ -46,13 +46,11 @@ type Props = {
   className: string,
 };
 
-const ContentHeadRow = ({ children, className, ...props }: Props) => {
-  return (
-    <StyledRow className={classNames('content-head', className)} {...props}>
-      {children}
-    </StyledRow>
-  );
-};
+const ContentHeadRow = ({ children, className, ...props }: Props) => (
+  <StyledRow className={classNames('content-head', className)} {...props}>
+    {children}
+  </StyledRow>
+);
 
 ContentHeadRow.propTypes = {
   children: PropTypes.node.isRequired,

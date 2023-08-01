@@ -108,6 +108,26 @@ export const EventsStore = singletonStore(
         this.propagateChanges();
 
         return response;
+      }).catch((error) => {
+        this.events = [];
+
+        this.parameters = {
+          query,
+          page,
+          pageSize,
+          filter,
+          timerange,
+        };
+
+        this.totalEvents = 0;
+
+        this.context = {
+          event_definitions: {}, streams: {},
+        };
+
+        this.propagateChanges();
+
+        return error;
       });
 
       EventsActions.search.promise(promise);

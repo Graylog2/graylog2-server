@@ -17,13 +17,10 @@
 package org.graylog.events.search;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -56,17 +53,17 @@ public class MoreSearch {
 
     private final StreamService streamService;
     private final IndexRangeService indexRangeService;
-    private final QueryStringDecorators esQueryDecorators;
+    private final QueryStringDecorators queryDecorators;
     private final MoreSearchAdapter moreSearchAdapter;
 
     @Inject
     public MoreSearch(StreamService streamService,
                       IndexRangeService indexRangeService,
-                      QueryStringDecorators esQueryDecorators,
+                      QueryStringDecorators queryDecorators,
                       MoreSearchAdapter moreSearchAdapter) {
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
-        this.esQueryDecorators = esQueryDecorators;
+        this.queryDecorators = queryDecorators;
         this.moreSearchAdapter = moreSearchAdapter;
     }
 
@@ -133,7 +130,7 @@ public class MoreSearch {
         final Set<String> affectedIndices = getAffectedIndices(streams, timeRange);
 
         try {
-            queryString = decorateQuery(queryParameters, timeRange, queryString);
+            queryString = decorateQuery(queryString, queryParameters);
         } catch (SearchException e) {
             if (e.error() instanceof EmptyParameterError) {
                 LOG.debug("Empty parameter from lookup table. Assuming non-matching query. Error: {}", e.getMessage());
@@ -161,22 +158,10 @@ public class MoreSearch {
     }
 
     /**
-     * Substitute query string parameters using ESQueryDecorators.
+     * Substitute query string parameters using {@link QueryStringDecorators}.
      */
-    private String decorateQuery(Set<Parameter> queryParameters, TimeRange timeRange, String queryString) {
-        // TODO
-        // We need to create a dummy SearchJob and a Query to use the decorator API.
-        // Maybe the decorate call could be refactored to make this easier.
-        org.graylog.plugins.views.search.Search search = org.graylog.plugins.views.search.Search.builder()
-                .parameters(ImmutableSet.copyOf(queryParameters))
-                .build();
-        SearchJob searchJob = new SearchJob("1234", search, "events backend");
-        Query dummyQuery = Query.builder()
-                .id("123")
-                .timerange(timeRange)
-                .query(ElasticsearchQueryString.of(queryString))
-                .build();
-        return esQueryDecorators.decorate(queryString, searchJob, dummyQuery);
+    private String decorateQuery(String queryString, Set<Parameter> queryParameters) {
+        return queryDecorators.decorate(queryString, ParameterProvider.of(queryParameters));
     }
 
 

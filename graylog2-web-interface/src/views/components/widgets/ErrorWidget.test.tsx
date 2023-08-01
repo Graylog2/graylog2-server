@@ -17,13 +17,27 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 
+import SearchError from 'views/logic/SearchError';
+
 import ErrorWidget from './ErrorWidget';
 
 describe('<ErrorWidget />', () => {
   it('should display a list item for every provided error', () => {
     const errors = [
-      { description: 'The first error' },
-      { description: 'The second error' },
+      new SearchError({
+        description: 'The first error',
+        query_id: 'query-id-1',
+        search_type_id: 'search_type_id-1',
+        type: 'query',
+        backtrace: '',
+      }),
+      new SearchError({
+        description: 'The second error',
+        query_id: 'query-id-2',
+        search_type_id: 'search_type_id-2',
+        type: 'query',
+        backtrace: '',
+      }),
     ];
 
     const wrapper = mount(<ErrorWidget errors={errors} />);

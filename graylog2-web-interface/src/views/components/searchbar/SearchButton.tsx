@@ -16,18 +16,18 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StyledButton = styled(Button)(({ theme, $dirty }: { theme: DefaultTheme, $dirty: boolean }) => css`
+const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
   position: relative;
   min-width: 63px;
-  
+
   &&&.disabled {
     color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
   }
@@ -53,19 +53,33 @@ type Props = {
   displaySpinner?: boolean,
 };
 
-const onButtonClick = (e: MouseEvent, disabled: Boolean) => {
+const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () => void) => {
   if (disabled) {
     e.preventDefault();
     QueryValidationActions.displayValidationErrors();
   }
+
+  triggerTelemetry();
 };
 
 const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const className = disabled ? 'disabled' : '';
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
+  const triggerTelemetry = () => {
+    sendTelemetry('click', {
+      app_pathname: 'search',
+      app_section: 'search-bar',
+      app_action_value: 'search-button',
+      event_details: {
+        disabled,
+      },
+    });
+  };
+
   return (
-    <StyledButton onClick={(e) => onButtonClick(e, disabled)}
+    <StyledButton onClick={(e) => onButtonClick(e, disabled, triggerTelemetry)}
                   title={title}
                   className={className}
                   type="submit"

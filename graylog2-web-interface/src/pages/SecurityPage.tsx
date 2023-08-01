@@ -16,61 +16,47 @@
  */
 
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
-import { IfPermitted } from 'components/common';
-import { Alert } from 'components/bootstrap';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
+import SecurityNoLicenseImage from 'assets/security-no-license-bg.png';
+import SecurityNoLicenseImageDark from 'assets/security-no-license-bg-dark.png';
+import SecurityNoLicenseOverlay from 'assets/security-no-license-overlay.png';
+import SecurityNoLicenseOverlayDark from 'assets/security-no-license-overlay-dark.png';
+import ThemeModeContext from 'theme/ThemeModeContext';
+import type { ThemeMode } from 'theme/constants';
 
-const StyledH2 = styled.h2`
-  font-weight: bold;
-  margin-bottom: 15px;
-`;
-
-const StyledH4 = styled.h4`
-  font-weight: bold;
-  margin-bottom: 10px;
-`;
-
-const StyledAlert = styled(Alert)`
-  margin-top: 15px;
-`;
-
-const isCloud = AppConfig.isCloud();
-
-const LinkTo = () => {
-  if (Routes.pluginRoute('SYSTEM_LICENSES', false)) {
-    return (
-      <IfPermitted permissions="licenses:create">
-        <p>
-          See <Link to={Routes.pluginRoute('SYSTEM_LICENSES')}>Licenses page</Link> for details.
-        </p>
-      </IfPermitted>
-    );
+const generateStyles = () => css<{ backgroundImage: string }>`
+  body {
+    background: url(${({ backgroundImage }) => backgroundImage}) no-repeat center center fixed;
+    background-size: cover;
   }
+`;
 
-  return (
-    <p>
-      Please see <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">our product page</a> for details.
-    </p>
-  );
-};
+const PageLayout = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-const SecurityPage = () => {
-  return (
-    <StyledAlert bsStyle="danger" className="tm">
-      <StyledH2>Invalid License for the Security plugin</StyledH2>
-      <StyledH4>Security plugin is disabled</StyledH4>
-      <p>
-        The security plugin is disabled because a valid Graylog for Security license was not found{Routes.pluginRoute('SYSTEM_LICENSES', false) ? '' : ' and the enterprise plugin is not installed'}.
-      </p>
-      {isCloud
-        ? (<>Contact your Graylog account manager.</>)
-        : (<LinkTo />)}
-    </StyledAlert>
-  );
-};
+const SecurityPageStyles = createGlobalStyle`
+  ${generateStyles()}
+`;
+
+const SecurityPage = () => (
+  <PageLayout>
+    <ThemeModeContext.Consumer>
+      {(theme: ThemeMode) => (<SecurityPageStyles backgroundImage={theme === 'noir' ? SecurityNoLicenseImageDark : SecurityNoLicenseImage} />)}
+    </ThemeModeContext.Consumer>
+    <ThemeModeContext.Consumer>
+      {(theme: ThemeMode) => (
+        <div>
+          <a href="https://www.graylog.org/explore-security/" target="_blank" rel="noreferrer">
+            <img style={{ height: '500px' }} src={theme === 'noir' ? SecurityNoLicenseOverlayDark : SecurityNoLicenseOverlay} alt="security-overlay" />
+          </a>
+        </div>
+      )}
+    </ThemeModeContext.Consumer>
+  </PageLayout>
+);
 
 export default SecurityPage;

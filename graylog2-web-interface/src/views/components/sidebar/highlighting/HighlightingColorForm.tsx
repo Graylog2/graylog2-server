@@ -74,7 +74,7 @@ const StaticColorPicker = () => (
 const OptionContainer = styled.div`
   display: flex;
 `;
-const createOption = (name) => ({ label: <OptionContainer><GradientColorPreview gradient={name} />{name}</OptionContainer>, value: name });
+const createOption = (name) => ({ label: <OptionContainer><GradientColorPreview $gradient={name} />{name}</OptionContainer>, value: name });
 
 const GRADIENTS = [...COLORSCALES].sort(defaultCompare).map(createOption);
 
@@ -110,54 +110,52 @@ const validateColor = (values) => {
   return Object.keys(errors).length > 0 ? errors : undefined;
 };
 
-const GradientColorPicker = () => {
-  return (
-    <Field name="color" validate={validateColor}>
-      {() => (
-        <>
-          <Field name="color.gradient">
-            {({ field: { name, value, onChange }, meta }) => (
-              <Input id={`${name}-name`}
-                     error={meta?.error}
-                     label="Gradient Name">
-                <Select options={GRADIENTS}
-                        inputProps={{ 'aria-label': 'Select gradient colors' }}
-                        value={value}
-                        onChange={(newGradient) => onChange({ target: { name, value: newGradient } })} />
-              </Input>
-            )}
-          </Field>
-          <Field name="color.lower">
-            {({ field: { name, value, onChange }, meta }) => (
-              <Input id={name}
-                     aria-label="Specify lowest value"
-                     label="Lowest Value"
-                     type="number"
-                     value={value}
-                     error={meta?.error}
-                     onChange={onChange}
-                     help="The lowest value expected in the field/series."
-                     required />
-            )}
-          </Field>
-          <Field name="color.upper">
-            {({ field: { name, value, onChange }, meta }) => (
-              <Input id={name}
-                     aria-label="Specify highest value"
-                     label="Highest Value"
-                     type="number"
-                     value={value}
-                     error={meta?.error}
-                     onChange={onChange}
-                     help="The highest value expected in the field/series."
-                     required />
-            )}
-          </Field>
-        </>
-      )}
-    </Field>
-  );
-};
+const GradientColorPicker = () => (
+  <Field name="color" validate={validateColor}>
+    {() => (
+      <>
+        <Field name="color.gradient">
+          {({ field: { name, value, onChange }, meta }) => (
+            <Input id={`${name}-name`}
+                   error={meta?.error}
+                   label="Gradient Name">
+              <Select options={GRADIENTS}
+                      inputProps={{ 'aria-label': 'Select gradient colors' }}
+                      value={value}
+                      onChange={(newGradient) => onChange({ target: { name, value: newGradient } })} />
+            </Input>
+          )}
+        </Field>
+        <Field name="color.lower">
+          {({ field: { name, value, onChange }, meta }) => (
+            <Input id={name}
+                   aria-label="Specify lowest value"
+                   label="Lowest Value"
+                   type="number"
+                   value={value}
+                   error={meta?.error}
+                   onChange={onChange}
+                   help="The lowest value expected in the field/series."
+                   required />
+          )}
+        </Field>
+        <Field name="color.upper">
+          {({ field: { name, value, onChange }, meta }) => (
+            <Input id={name}
+                   aria-label="Specify highest value"
+                   label="Highest Value"
+                   type="number"
+                   value={value}
+                   error={meta?.error}
+                   onChange={onChange}
+                   help="The highest value expected in the field/series."
+                   required />
+          )}
+        </Field>
+      </>
+    )}
+  </Field>
+);
 
 const ColorForm = ({ type }: ColorPickerProps) => {
   switch (type) {

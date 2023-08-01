@@ -22,6 +22,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { EventDefinition } from 'logic/alerts/types';
+import type FetchError from 'logic/errors/FetchError';
 
 export type ValueExpr = '>' | '<' | '>=' | '<=' | '==';
 
@@ -30,7 +31,7 @@ export type EventDefinitionAggregation = {
   value: number,
   function: string,
   fnSeries: string,
-  field: string
+  field?: string
 }
 export const definitionsUrl = (definitionId: string) => qualifyUrl(`/events/definitions/${definitionId}`);
 
@@ -47,10 +48,10 @@ const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinit
         return ({ value: expression.value });
       case 'number-ref':
         // eslint-disable-next-line no-case-declarations
-        const selectedSeriesk = series.find((s) => s.id === expression.ref);
+        const numberRefSeries = series.find((s) => s.id === expression.ref);
 
-        return (selectedSeriesk && selectedSeriesk.function
-          ? { field: `${selectedSeriesk.function}(${selectedSeriesk.field || ''})` }
+        return (numberRefSeries?.type
+          ? { field: `${numberRefSeries.type}(${numberRefSeries.field || ''})` }
           : null);
       case '&&':
       case '||':
@@ -67,8 +68,8 @@ const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinit
         // eslint-disable-next-line no-case-declarations
         const selectedSeries = series.find((s) => s.id === ref);
         // eslint-disable-next-line no-case-declarations
-        const fnSeries = selectedSeries && selectedSeries?.function ? `${selectedSeries.function}(${selectedSeries.field || ''})` : undefined;
-        res.push({ expr: expression.expr, value: expression.right.value, function: selectedSeries?.function, fnSeries, field: selectedSeries.field });
+        const fnSeries = selectedSeries?.type ? `${selectedSeries.type}(${selectedSeries.field || ''})` : undefined;
+        res.push({ expr: expression.expr, value: expression.right.value, function: selectedSeries?.type, fnSeries, field: selectedSeries?.field });
 
         return [rec(expression.left), rec(expression.right)];
       default:
@@ -83,14 +84,14 @@ const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinit
 
 const eventDefinitionDataMapper = (data: EventDefinition): { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>} => ({
   eventDefinition: data,
-  aggregations: uniqWith(transformExpressionsToArray({ series: data.config.series, conditions: data.config.conditions }), isEqual),
+  aggregations: (data?.config?.series && data?.config?.conditions)
+    ? uniqWith(transformExpressionsToArray({ series: data.config.series, conditions: data.config.conditions }), isEqual)
+    : [],
 });
 
-const fetchDefinition = (definitionId: string) => {
-  return fetch('GET', definitionsUrl(definitionId)).then(eventDefinitionDataMapper);
-};
+const fetchDefinition = (definitionId: string) => fetch('GET', definitionsUrl(definitionId)).then(eventDefinitionDataMapper);
 
-const useEventDefinition = (definitionId: string): {
+const useEventDefinition = (definitionId: string, { onErrorHandler }: { onErrorHandler?: (e: FetchError)=>void} = {}): {
   data: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
   refetch: () => void,
   isLoading: boolean,
@@ -100,12 +101,18 @@ const useEventDefinition = (definitionId: string): {
     ['event-definition-by-id', definitionId],
     () => fetchDefinition(definitionId),
     {
-      onError: (errorThrown) => {
+      onError: (errorThrown: FetchError) => {
+        if (onErrorHandler) onErrorHandler(errorThrown);
+
         UserNotification.error(`Loading event definition failed with status: ${errorThrown}`,
           'Could not load event definition');
       },
       keepPreviousData: true,
       enabled: !!definitionId,
+      initialData: {
+        eventDefinition: null,
+        aggregations: [],
+      },
     },
   );
 

@@ -15,54 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 import isEmpty from 'lodash/isEmpty';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';
-import { Timestamp, Icon } from 'components/common';
-import { AddEvidence, AddEvidenceModal } from 'components/security/investigations';
+import { Timestamp } from 'components/common';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 
-const EvidenceActionButton = styled.a(({ $disabled, theme }: { $disabled?: boolean, theme: DefaultTheme }) => css`
-  display: flex;
-  align-items: center;
-  color: ${$disabled ? theme.colors.gray[90] : 'inherit'};
-  text-decoration: none;
-  gap: 6px;
-  cursor: ${$disabled ? 'not-allowed' : 'pointer'};
-
-  &:hover {
-    color: ${$disabled ? theme.colors.gray[90] : 'default'};
-  }
-
-  &:visited {
-    color: inherit;
-  }
-`);
-
 type Props = {
   event: Event,
   eventDefinitionContext: EventDefinitionContext,
 };
 
-const addToInvestigation = ({ investigationSelected }) => (
-  <dd>
-    <EvidenceActionButton $disabled={!investigationSelected}>
-      Add to investigation <Icon name="puzzle-piece" size="sm" />
-    </EvidenceActionButton>
-  </dd>
-);
-
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
-  const addEvidenceModalRef = React.useRef(null);
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
+  const pluggableEventActions = usePluginEntities('views.components.eventActions');
+  const eventActions = useMemo(() => pluggableEventActions.map(
+    ({ component: PluggableEventAction, key }) => (
+      <PluggableEventAction key={key} event={event} />
+    ),
+  ), [pluggableEventActions, event]);
 
   const plugin = useMemo(() => {
     if (event.event_definition_type === undefined) {
@@ -73,68 +50,60 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   }, [event, eventDefinitionTypes]);
 
   return (
-    <>
-      <Row>
-        <Col md={6}>
-          <dl>
-            <dt>ID</dt>
-            <dd>{event.id}</dd>
-            <dt>Priority</dt>
+    <Row>
+      <Col md={6}>
+        <dl>
+          <dt>ID</dt>
+          <dd>{event.id}</dd>
+          <dt>Priority</dt>
+          <dd>
+            {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
+          </dd>
+          <dt>Timestamp</dt>
+          <dd> <Timestamp dateTime={event.timestamp} />
+          </dd>
+          <dt>Event Definition</dt>
+          <dd>
+            <EventDefinitionLink event={event} eventDefinitionContext={eventDefinitionContext} />
+            &emsp;
+            ({(plugin && plugin.displayName) || event.event_definition_type})
+          </dd>
+          {event.replay_info && (
+          <>
+            <dt>Actions</dt>
             <dd>
-              {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
+              <LinkToReplaySearch id={event.id} isEvent />
             </dd>
-            <dt>Timestamp</dt>
-            <dd> <Timestamp dateTime={event.timestamp} />
-            </dd>
-            <dt>Event Definition</dt>
+            {eventActions}
+          </>
+          )}
+        </dl>
+      </Col>
+      <Col md={6}>
+        <dl>
+          {event.timerange_start && event.timerange_end && (
+          <>
+            <dt>Aggregation time range</dt>
             <dd>
-              <EventDefinitionLink event={event} eventDefinitionContext={eventDefinitionContext} />
-              &emsp;
-              ({(plugin && plugin.displayName) || event.event_definition_type})
-            </dd>
-            {event.replay_info && (
-              <>
-                <dt>Actions</dt>
-                <dd>
-                  <LinkToReplaySearch id={event.id} isEvent />
-                </dd>
-                <AddEvidence id={event.id} type="events" child={addToInvestigation} />
-                <dd>
-                  <EvidenceActionButton onClick={() => addEvidenceModalRef.current.toggle()}>
-                    Select an investigation <Icon name="puzzle-piece" size="sm" />
-                  </EvidenceActionButton>
-                </dd>
-              </>
-            )}
-          </dl>
-        </Col>
-        <Col md={6}>
-          <dl>
-            {event.timerange_start && event.timerange_end && (
-              <>
-                <dt>Aggregation time range</dt>
-                <dd>
-                  <Timestamp dateTime={event.timerange_start} />
+              <Timestamp dateTime={event.timerange_start} />
                   &ensp;&mdash;&ensp;
-                  <Timestamp dateTime={event.timerange_end} />
-                </dd>
-              </>
-            )}
-            <dt>Event Key</dt>
-            <dd>{event.key || 'No Key set for this Event.'}</dd>
-            <dt>Additional Fields</dt>
-            {isEmpty(event.fields)
-              ? <dd>No additional Fields added to this Event.</dd>
-              : <EventFields fields={event.fields} />}
-            <dt>Group-By Fields</dt>
-            {isEmpty(event.group_by_fields)
-              ? <dd>No group-by fields on this Event.</dd>
-              : <EventFields fields={event.group_by_fields} />}
-          </dl>
-        </Col>
-      </Row>
-      <AddEvidenceModal id={event.id} type="events" ref={addEvidenceModalRef} />
-    </>
+              <Timestamp dateTime={event.timerange_end} />
+            </dd>
+          </>
+          )}
+          <dt>Event Key</dt>
+          <dd>{event.key || 'No Key set for this Event.'}</dd>
+          <dt>Additional Fields</dt>
+          {isEmpty(event.fields)
+            ? <dd>No additional Fields added to this Event.</dd>
+            : <EventFields fields={event.fields} />}
+          <dt>Group-By Fields</dt>
+          {isEmpty(event.group_by_fields)
+            ? <dd>No group-by fields on this Event.</dd>
+            : <EventFields fields={event.group_by_fields} />}
+        </dl>
+      </Col>
+    </Row>
   );
 };
 

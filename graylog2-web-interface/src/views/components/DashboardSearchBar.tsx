@@ -59,7 +59,7 @@ import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHandlerContext from 'views/components/useHandlerContext';
 import type { TimeRange } from 'views/logic/queries/Query';
 
-import TimeRangeInput from './searchbar/TimeRangeInput';
+import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
@@ -74,7 +74,7 @@ const TimeRangeRow = styled.div(({ theme }) => css`
   }
 `);
 
-const StyledTimeRangeInput = styled(TimeRangeInput)(({ theme }) => css`
+const StyledTimeRangeFilter = styled(TimeRangeFilter)(({ theme }) => css`
   flex: 0.2;
   flex-basis: 380px;
   
@@ -99,9 +99,7 @@ const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarCon
 const useInitialFormValues = (timerange: TimeRange, queryString: string) => {
   const initialValuesFromPlugins = usePluggableInitialValues();
 
-  return useMemo(() => {
-    return { timerange, queryString, ...initialValuesFromPlugins };
-  }, [queryString, timerange, initialValuesFromPlugins]);
+  return useMemo(() => ({ timerange, queryString, ...initialValuesFromPlugins }), [queryString, timerange, initialValuesFromPlugins]);
 };
 
 const DashboardSearchBar = () => {
@@ -145,11 +143,11 @@ const DashboardSearchBar = () => {
                   <SearchBarContainer>
                     <ValidateOnParameterChange parameters={parameters} />
                     <TimeRangeRow>
-                      <StyledTimeRangeInput onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                            value={values?.timerange}
-                                            limitDuration={limitDuration}
-                                            hasErrorOnMount={!!errors.timerange}
-                                            noOverride />
+                      <StyledTimeRangeFilter onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                             value={values?.timerange}
+                                             limitDuration={limitDuration}
+                                             hasErrorOnMount={!!errors.timerange}
+                                             noOverride />
                       <RefreshControls />
                     </TimeRangeRow>
 

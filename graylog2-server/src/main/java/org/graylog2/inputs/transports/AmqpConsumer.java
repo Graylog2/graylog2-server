@@ -18,25 +18,48 @@ package org.graylog2.inputs.transports;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Command;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.TrafficListener;
+import com.rabbitmq.client.impl.DefaultExceptionHandler;
+import org.graylog2.plugin.InputFailureRecorder;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_EXCHANGE;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_EXCHANGE_BIND;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_HOSTNAME;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_PARALLEL_QUEUES;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_PASSWORD;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_PORT;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_PREFETCH;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_QUEUE;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_REQUEUE_INVALID_MESSAGES;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_ROUTING_KEY;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_TLS;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_USERNAME;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_VHOST;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class AmqpConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(AmqpConsumer.class);
@@ -47,7 +70,7 @@ public class AmqpConsumer {
     private final int port;
     private final String virtualHost;
     private final String username;
-    private final String password;
+    private final EncryptedValue password;
     private final int prefetchCount;
 
     private final String queue;
@@ -55,50 +78,60 @@ public class AmqpConsumer {
     private final boolean exchangeBind;
     private final String routingKey;
     private final boolean requeueInvalid;
-
-    private Connection connection;
-    private Channel channel;
-
     private final int heartbeatTimeout;
     private final MessageInput sourceInput;
     private final int parallelQueues;
     private final boolean tls;
-    private AmqpTransport amqpTransport;
+    private final ScheduledExecutorService scheduler;
+    private final InputFailureRecorder inputFailureRecorder;
+    private final AmqpTransport amqpTransport;
+    private final EncryptedValueService encryptedValueService;
+    private final Duration connectionRecoveryInterval;
 
-    private AtomicLong totalBytesRead = new AtomicLong(0);
-    private AtomicLong lastSecBytesRead = new AtomicLong(0);
-    private AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+    private final AtomicLong totalBytesRead = new AtomicLong(0);
+    private final AtomicLong lastSecBytesRead = new AtomicLong(0);
+    private final AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
 
-    public AmqpConsumer(String hostname, int port, String virtualHost, String username, String password,
-                        int prefetchCount, String queue, String exchange, boolean exchangeBind, String routingKey,int parallelQueues,
-                        boolean tls, boolean requeueInvalid, int heartbeatTimeout, MessageInput sourceInput,
-                        ScheduledExecutorService scheduler, AmqpTransport amqpTransport) {
-        this.hostname = hostname;
-        this.port = port;
-        this.virtualHost = virtualHost;
-        this.username = username;
-        this.password = password;
-        this.prefetchCount = prefetchCount;
+    private Connection connection;
+    private Channel channel;
+    private ScheduledFuture<?> scheduledFuture;
 
-        this.queue = queue;
-        this.exchange = exchange;
-        this.exchangeBind = exchangeBind;
-        this.routingKey = routingKey;
+    public AmqpConsumer(int heartbeatTimeout,
+                        MessageInput sourceInput,
+                        Configuration configuration,
+                        ScheduledExecutorService scheduler,
+                        InputFailureRecorder inputFailureRecorder,
+                        AmqpTransport amqpTransport,
+                        EncryptedValueService encryptedValueService,
+                        Duration connectionRecoveryInterval) {
+        this.hostname = configuration.getString(CK_HOSTNAME);
+        this.port = configuration.getInt(CK_PORT);
+        this.virtualHost = configuration.getString(CK_VHOST);
+        this.username = configuration.getString(CK_USERNAME);
+        this.password = configuration.getEncryptedValue(CK_PASSWORD);
+        this.prefetchCount = configuration.getInt(CK_PREFETCH);
+        this.queue = configuration.getString(CK_QUEUE);
+        this.exchange = configuration.getString(CK_EXCHANGE);
+        this.exchangeBind = configuration.getBoolean(CK_EXCHANGE_BIND);
+        this.routingKey = configuration.getString(CK_ROUTING_KEY);
+        this.parallelQueues = configuration.getInt(CK_PARALLEL_QUEUES);
+        this.requeueInvalid = configuration.getBoolean(CK_REQUEUE_INVALID_MESSAGES);
+        this.tls = configuration.getBoolean(CK_TLS);
         this.heartbeatTimeout = heartbeatTimeout;
-
         this.sourceInput = sourceInput;
-        this.parallelQueues = parallelQueues;
-        this.tls = tls;
-        this.requeueInvalid = requeueInvalid;
+        this.scheduler = scheduler;
+        this.inputFailureRecorder = inputFailureRecorder;
         this.amqpTransport = amqpTransport;
-
-        scheduler.scheduleAtFixedRate(() -> lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0)), 1, 1, TimeUnit.SECONDS);
+        this.encryptedValueService = encryptedValueService;
+        this.connectionRecoveryInterval = connectionRecoveryInterval;
     }
 
-    public void run() throws IOException {
+    public void run() throws IOException, TimeoutException {
+
         if (!isConnected()) {
             connect();
         }
+        scheduledFuture = scheduler.scheduleAtFixedRate(() -> lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0)), 1, 1, TimeUnit.SECONDS);
 
         for (int i = 0; i < parallelQueues; i++) {
             final String queueName = String.format(Locale.ENGLISH, queue, i);
@@ -142,14 +175,33 @@ public class AmqpConsumer {
         }
     }
 
-    public void connect() throws IOException {
+    public void connect() throws IOException, TimeoutException {
         final ConnectionFactory factory = new ConnectionFactory();
+        factory.setExceptionHandler(new DefaultExceptionHandler() {
+            @Override
+            public void handleConnectionRecoveryException(Connection conn, Throwable exception) {
+                super.handleConnectionRecoveryException(conn, exception);
+                inputFailureRecorder.setFailing(getClass(), "Connection recovery error!", exception);
+            }
+        });
+        factory.setTrafficListener(new TrafficListener() {
+            @Override
+            public void write(Command outboundCommand) {
+            }
+
+            @Override
+            public void read(Command inboundCommand) {
+                inputFailureRecorder.setRunning();
+            }
+        });
+
         factory.setHost(hostname);
         factory.setPort(port);
         factory.setVirtualHost(virtualHost);
         factory.setRequestedHeartbeat(heartbeatTimeout);
         // explicitly setting this, to ensure it is true even if the default changes.
         factory.setAutomaticRecoveryEnabled(true);
+        factory.setNetworkRecoveryInterval(connectionRecoveryInterval.toMillis());
 
         if (tls) {
             try {
@@ -161,17 +213,11 @@ public class AmqpConsumer {
         }
 
         // Authenticate?
-        if (!isNullOrEmpty(username) && !isNullOrEmpty(password)) {
+        if (!isNullOrEmpty(username) && password.isSet()) {
             factory.setUsername(username);
-            factory.setPassword(password);
+            factory.setPassword(encryptedValueService.decrypt(password));
         }
-
-        try {
-            connection = factory.newConnection();
-        } catch (TimeoutException e) {
-            throw new IOException("Timeout while opening new AMQP connection", e);
-        }
-
+        connection = factory.newConnection();
         channel = connection.createChannel();
 
         if (null == channel) {
@@ -189,7 +235,9 @@ public class AmqpConsumer {
                 LOG.info("Shutting down AMPQ consumer.");
                 return;
             }
-            LOG.warn("AMQP connection lost! Reconnecting ...");
+
+            inputFailureRecorder.setFailing(getClass(),
+                    f("AMQP connection lost (reason: %s)! Reconnecting ...", cause.getReason().protocolMethodName()));
         });
     }
 
@@ -206,6 +254,11 @@ public class AmqpConsumer {
 
         if (connection != null && connection.isOpen()) {
             connection.close();
+        } else if (connection != null) {
+            connection.abort();
+        }
+        if (null != scheduledFuture) {
+            scheduledFuture.cancel(true);
         }
     }
 

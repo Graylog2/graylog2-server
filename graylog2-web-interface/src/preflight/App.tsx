@@ -16,20 +16,24 @@
  */
 import * as React from 'react';
 import { AppShell } from '@mantine/core';
+import { useState } from 'react';
 
-import Section from 'preflight/common/Section';
-import Button from 'preflight/common/Button';
 import Navigation from 'preflight/navigation/Navigation';
+import Setup from 'preflight/components/Setup';
+import WaitingForStartup from 'preflight/components/WaitingForStartup';
+import ErrorBoundary from 'preflight/components/ErrorBoundary';
 
-const App = () => (
-  <AppShell padding="md" header={<Navigation />}>
-    <Section title="Welcome!">
-      <p>
-        It looks like you are starting Graylog for the first time.
-        Through this wizard, you can configure and secure your data nodes.
-      </p>
-      <Button size="xs">Continue</Button>
-    </Section>
-  </AppShell>
-);
+const App = () => {
+  const [isWaitingForStartup, setIsWaitingForStartup] = useState(false);
+
+  return (
+    <AppShell padding="md" header={<Navigation />}>
+      <ErrorBoundary>
+        {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
+        {isWaitingForStartup && <WaitingForStartup />}
+      </ErrorBoundary>
+    </AppShell>
+  );
+};
+
 export default App;

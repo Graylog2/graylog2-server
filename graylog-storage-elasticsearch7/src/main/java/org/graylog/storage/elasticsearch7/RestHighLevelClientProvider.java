@@ -26,6 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Sniffer;
+import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 
 import javax.annotation.Nullable;
@@ -47,7 +48,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
     @Inject
     public RestHighLevelClientProvider(
             GracefulShutdownService shutdownService,
-            @Named("elasticsearch_hosts") List<URI> hosts,
+            @IndexerHosts List<URI> hosts,
             @Named("elasticsearch_connect_timeout") Duration connectTimeout,
             @Named("elasticsearch_socket_timeout") Duration socketTimeout,
             @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,
@@ -55,6 +56,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_max_total_connections_per_route") int maxTotalConnectionsPerRoute,
             @Named("elasticsearch_max_retries") int elasticsearchMaxRetries,
             @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled,
+            @Named("elasticsearch_node_activity_logger_enabled") boolean nodeActivity,
             @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
@@ -71,26 +73,24 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     muteElasticsearchDeprecationWarnings,
                 credentialsProvider);
 
+            var sniffer = SnifferWrapper.create(
+                    client.getLowLevelClient(),
+                    TimeUnit.SECONDS.toMillis(5),
+                    discoveryFrequency,
+                    mapDefaultScheme(defaultSchemeForDiscoveredNodes)
+            );
+
             if (discoveryEnabled) {
-                final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
-                shutdownService.register(sniffer::close);
+                sniffer.add(FilteredElasticsearchNodesSniffer.create(discoveryFilter));
             }
+            if(nodeActivity) {
+                sniffer.add(NodeListSniffer.create());
+            }
+
+            sniffer.build().ifPresent(s -> shutdownService.register(s::close));
 
             return client;
         });
-    }
-
-    private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
-        final NodesSniffer nodesSniffer = FilteredElasticsearchNodesSniffer.create(
-                restClient,
-                TimeUnit.SECONDS.toMillis(5),
-                mapDefaultScheme(defaultSchemeForDiscoveredNodes),
-                discoveryFilter
-        );
-        return Sniffer.builder(restClient)
-                .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
-                .setNodesSniffer(nodesSniffer)
-                .build();
     }
 
     private ElasticsearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {

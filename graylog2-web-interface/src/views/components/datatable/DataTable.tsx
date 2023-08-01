@@ -53,28 +53,27 @@ type Props = VisualizationComponentProps & {
   condensed?: boolean,
 };
 
-const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>) => {
-  return stickyLeftMarginsByColumnIndex.map(({ index, leftMargin }) => `
+const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>) => stickyLeftMarginsByColumnIndex.map(({ index, leftMargin }) => `
     ${tag}:nth-child(${index + 1}) {
         position: sticky!important;
         left: ${leftMargin}px;
         z-index: 1;
     }
   `).concat((' ; '));
-};
 
-const THead = styled.thead(({ stickyLeftMarginsByColumnIndex }: {
-  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}) => css`
+const THead = styled.thead<{
+    $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}>(({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr.pivot-header-row {
-    & ${getStylesForPinnedColumns('th', stickyLeftMarginsByColumnIndex)}
+    & ${getStylesForPinnedColumns('th', $stickyLeftMarginsByColumnIndex)}
   }
 `);
-const TBody = styled.tbody(({ stickyLeftMarginsByColumnIndex }: {
-  stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}) => css`
+
+const TBody = styled.tbody<{
+  $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
+}>(({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr {
-    & ${getStylesForPinnedColumns('td', stickyLeftMarginsByColumnIndex)}
+    & ${getStylesForPinnedColumns('td', $stickyLeftMarginsByColumnIndex)}
   }
 `);
 
@@ -209,9 +208,7 @@ const DataTable = ({
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r): r is Leaf => r.source === 'leaf'));
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
-  const pinnedColumns = useMemo(() => {
-    return widget?.config?.visualizationConfig?.pinnedColumns || Immutable.Set();
-  }, [widget?.config?.visualizationConfig?.pinnedColumns]);
+  const pinnedColumns = useMemo(() => widget?.config?.visualizationConfig?.pinnedColumns || Immutable.Set(), [widget?.config?.visualizationConfig?.pinnedColumns]);
 
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
@@ -266,7 +263,7 @@ const DataTable = ({
                        borderedHeader={borderedHeader}
                        stickyHeader={stickyHeader}
                        condensed={condensed}>
-          <THead stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+          <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             <Headers actualColumnPivotFields={actualColumnPivotFields}
                      columnPivots={columnPivots}
                      fields={fields}
@@ -279,7 +276,7 @@ const DataTable = ({
                      pinnedColumns={pinnedColumns}
                      togglePin={togglePin} />
           </THead>
-          <TBody stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             {formattedRows}
           </TBody>
         </MessagesTable>

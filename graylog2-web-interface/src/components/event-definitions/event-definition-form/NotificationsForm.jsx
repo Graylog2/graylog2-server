@@ -86,16 +86,6 @@ class NotificationsForm extends React.Component {
       );
     }
 
-    if (notifications.length < 1) {
-      return (
-        <Row>
-          <Col md={6} lg={5}>
-            <p>No Notifications found.</p>
-          </Col>
-        </Row>
-      );
-    }
-
     if (showAddNotificationForm) {
       return (
         <AddNotificationForm notifications={notifications}

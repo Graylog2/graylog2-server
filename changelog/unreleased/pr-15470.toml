@@ -1,0 +1,7 @@
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "added"
+message = "Pipeline Rule Builder UI"
+
+issues = ["15490"]
+pulls = ["15470"]
+

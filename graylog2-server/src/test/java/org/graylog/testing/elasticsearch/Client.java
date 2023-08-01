@@ -70,4 +70,6 @@ public interface Client {
 
     void updateMapping(String index, Map<String, Object> mapping);
     Map<String, Object> getMapping(String index);
+
+    String getClusterSetting(String setting);
 }

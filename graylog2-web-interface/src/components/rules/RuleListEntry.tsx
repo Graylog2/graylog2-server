@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
@@ -32,7 +31,8 @@ type Props = {
   onDelete: (rule: RuleType) => () => void,
 }
 const STRING_SIZE_LIMIT = 30;
-const LimitedTd = styled.td(({ theme }: {theme: DefaultTheme}) => css`
+
+const LimitedTd = styled.td(({ theme }) => css`
   max-width: 250px;
   min-width: 250px;
   
@@ -44,9 +44,10 @@ const LimitedTd = styled.td(({ theme }: {theme: DefaultTheme}) => css`
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { id, title, description, created_at, modified_at } = rule;
   const pipelinesLength = usingPipelines.length;
+  const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
   const actions = (
     <ButtonToolbar>
-      <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE(id)}>
+      <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
         <Button bsSize="xsmall">Edit</Button>
       </LinkContainer>
       <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
@@ -55,33 +56,31 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
     </ButtonToolbar>
   );
 
-  const _showPipelines = (pipelines: Array<PipelineSummary>) => {
-    return pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => {
-      const tooltip = <Tooltip id={`${id}${pipelineId}`} show>{pipelineTitle}</Tooltip>;
+  const _showPipelines = (pipelines: Array<PipelineSummary>) => pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => {
+    const tooltip = <Tooltip id={`${id}${pipelineId}`} show>{pipelineTitle}</Tooltip>;
 
-      return (
-        <React.Fragment key={pipelineId}>
-          {pipelineTitle.length > STRING_SIZE_LIMIT ? (
-            <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
-              <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-                {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
-              </Link>
-            </OverlayTrigger>
-          ) : (
+    return (
+      <React.Fragment key={pipelineId}>
+        {pipelineTitle.length > STRING_SIZE_LIMIT ? (
+          <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
             <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-              {pipelineTitle}
+              {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
             </Link>
-          )}
-          {index < (pipelinesLength - 1) && ',  '}
-        </React.Fragment>
-      );
-    });
-  };
+          </OverlayTrigger>
+        ) : (
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+            {pipelineTitle}
+          </Link>
+        )}
+        {index < (pipelinesLength - 1) && ',  '}
+      </React.Fragment>
+    );
+  });
 
   return (
     <tr key={title}>
       <td>
-        <Link to={Routes.SYSTEM.PIPELINES.RULE(id)}>
+        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
           {title}
         </Link>
       </td>

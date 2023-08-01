@@ -35,14 +35,14 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
-import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
-import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
+import org.graylog2.bootstrap.preflight.web.PreflightBoot;
+import org.graylog2.cluster.preflight.PreflightConfigBindings;
+import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
@@ -62,6 +62,7 @@ import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.graylog2.shared.initializers.ServiceManagerListener;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -80,17 +81,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
-import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED;
+import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_WEB_ENABLED;
 
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
@@ -159,7 +158,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
-        if(featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_CONFIG_ENABLED)) {
+        if(featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
         }
 
@@ -170,28 +169,35 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
+        modules.add(new PreflightConfigBindings());
         modules.add(new PreflightWebModule());
         modules.add(new ObjectMapperModule(chainingClassLoader));
+        modules.add(new SchedulerBindings());
+        modules.add((binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         final Injector preflightInjector = getPreflightInjector(modules);
         GuiceInjectorHolder.setInjector(preflightInjector);
+        try {
+            doRunWithPreflightInjector(preflightInjector);
+        } finally {
+            GuiceInjectorHolder.resetInjector();
+        }
+    }
 
-        final PreflightConfigService preflightConfigService = preflightInjector.getInstance(PreflightConfigService.class);
+    private void doRunWithPreflightInjector(Injector preflightInjector) {
+        final PreflightBoot preflightBoot = preflightInjector.getInstance(PreflightBoot.class);
 
-        final Supplier<Boolean> shouldRun = () -> preflightConfigService.getPersistedConfig().isEmpty() || configuration.enablePreflightWebserver();
-
-        if(!shouldRun.get()) {
+        if (!preflightBoot.shouldRunPreflightWeb()) {
             return;
         }
 
         LOG.info("Fresh installation detected, starting configuration webserver");
 
-
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         try {
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
-            while(shouldRun.get()) {
+            while (preflightBoot.shouldRunPreflightWeb()) {
                 try {
                     LOG.debug("Preflight config still in progress, waiting for the marker document");
                     Thread.sleep(1000);
@@ -199,10 +205,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
                     throw new RuntimeException(e);
                 }
             }
-
         } finally {
             serviceManager.stopAsync().awaitStopped();
-            GuiceInjectorHolder.resetInjector();
         }
     }
 
@@ -238,6 +242,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new IndexerDiscoveryModule(),
                 new ServerPreflightChecksModule(),
                 binder -> preflightCheckModules.forEach(binder::install));
     }
@@ -393,6 +398,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
+        result.add(new IndexerDiscoveryModule());
+        result.add(new PreflightConfigBindings());
 
         return result;
     }

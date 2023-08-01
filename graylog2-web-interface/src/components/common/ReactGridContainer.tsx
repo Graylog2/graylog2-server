@@ -17,12 +17,10 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import type { ItemCallback } from 'react-grid-layout';
 
-import { themePropTypes } from 'theme';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
@@ -105,7 +103,11 @@ type Position = {
   width: number
 };
 
-const _onLayoutChange = (newLayout: Layout, callback: (newPositions: Position[]) => void) => {
+const _onLayoutChange = (newLayout: Layout, callback: ((newPositions: Position[]) => void) | undefined) => {
+  if (typeof callback !== 'function') {
+    return undefined;
+  }
+
   const newPositions: Position[] = [];
 
   newLayout
@@ -142,23 +144,20 @@ type Props = {
   onSyncLayout?: (newPositions: Array<WidgetPositionJSON>) => void,
   positions: { [widgetId: string]: WidgetPosition },
   rowHeight?: number,
-  theme: DefaultTheme,
   width?: number,
 }
 
-const computeLayout = (positions: WidgetPositions = {}) => {
-  return Object.keys(positions).map((id) => {
-    const { col, row, height, width } = positions[id];
+const computeLayout = (positions: WidgetPositions = {}) => Object.keys(positions).map((id) => {
+  const { col, row, height, width } = positions[id];
 
-    return {
-      i: id,
-      x: col ? Math.max(col - 1, 0) : 0,
-      y: (row === undefined || row <= 0 ? Infinity : row - 1),
-      h: height || 1,
-      w: width || 1,
-    };
-  });
-};
+  return {
+    i: id,
+    x: col ? Math.max(col - 1, 0) : 0,
+    y: (row === undefined || row <= 0 ? Infinity : row - 1),
+    h: height || 1,
+    w: width || 1,
+  };
+});
 
 type Layout = { i: string, x: number, y: number, h: number, w: number }[];
 
@@ -192,9 +191,9 @@ const ReactGridContainer = ({
   onSyncLayout: _onSyncLayout,
   positions,
   rowHeight,
-  theme,
   width,
 }: Props) => {
+  const theme = useTheme();
   const cellMargin = theme.spacings.px.xs;
   const onLayoutChange = useCallback<ItemCallback>((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
   const onSyncLayout = useCallback((layout: Layout) => _onLayoutChange(layout, _onSyncLayout), [_onSyncLayout]);
@@ -318,7 +317,6 @@ ReactGridContainer.propTypes = {
    */
   measureBeforeMount: PropTypes.bool,
   width: PropTypes.number,
-  theme: themePropTypes.isRequired,
 };
 
 ReactGridContainer.defaultProps = {
@@ -330,7 +328,7 @@ ReactGridContainer.defaultProps = {
   rowHeight: ROW_HEIGHT,
   draggableHandle: undefined,
   width: undefined,
-  onSyncLayout: () => {},
+  onSyncLayout: undefined,
 };
 
-export default withTheme(ReactGridContainer);
+export default ReactGridContainer;

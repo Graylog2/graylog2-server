@@ -22,9 +22,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { IndexConfig } from 'components/configurations/IndexSetsDefaultsConfig';
 
-const fetchIndexDefaults: () => Promise<IndexConfig> = () => {
-  return fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultConfiguration`));
-};
+const fetchIndexDefaults: () => Promise<IndexConfig> = () => fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultConfiguration`));
 
 const useIndexDefaults = () => {
   const { data, isLoading } = useQuery(

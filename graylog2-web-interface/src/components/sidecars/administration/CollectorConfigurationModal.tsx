@@ -59,7 +59,7 @@ const SecondaryText = styled.div`
   margin-bottom: -2px;
 `;
 
-const TableRow = styled.tr(({ disabled = false }: {disabled?: boolean}) => css`
+const TableRow = styled.tr<{ disabled?: boolean }>(({ disabled = false }) => css`
   cursor: ${disabled ? 'auto' : 'pointer'};
   background-color: ${disabled ? '#E8E8E8 !important' : 'initial'};
   border-bottom: 1px solid lightgray;
@@ -215,7 +215,10 @@ const CollectorConfigurationModal = ({
   });
 
   return (
-    <BootstrapModalWrapper showModal={show} onHide={onCancel}>
+    <BootstrapModalWrapper showModal={show}
+                           onHide={onCancel}
+                           data-app-section="collectors_administration_assign_configurations"
+                           data-event-element={`Edit ${selectedCollectorName} Configurations`}>
       <Modal.Header>
         <ModalTitle>
           Edit <b>{selectedCollectorName}</b> Configurations

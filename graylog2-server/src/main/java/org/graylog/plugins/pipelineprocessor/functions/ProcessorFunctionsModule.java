@@ -80,6 +80,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
@@ -91,6 +92,7 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.GetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
@@ -117,6 +119,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.StringEntropy;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
@@ -158,6 +161,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);
+        addMessageProcessorFunction(GetField.NAME, GetField.class);
         addMessageProcessorFunction(SetField.NAME, SetField.class);
         addMessageProcessorFunction(SetFields.NAME, SetFields.class);
         addMessageProcessorFunction(RenameField.NAME, RenameField.class);
@@ -200,6 +204,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Replace.NAME, Replace.class);
         addMessageProcessorFunction(Length.NAME, Length.class);
         addMessageProcessorFunction(FirstNonNull.NAME, FirstNonNull.class);
+        addMessageProcessorFunction(StringEntropy.NAME, StringEntropy.class);
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
@@ -275,6 +280,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LookupAddStringList.NAME, LookupAddStringList.class);
         addMessageProcessorFunction(LookupRemoveStringList.NAME, LookupRemoveStringList.class);
         addMessageProcessorFunction(LookupStringListContains.NAME, LookupStringListContains.class);
+        addMessageProcessorFunction(LookupAssignTtl.NAME, LookupAssignTtl.class);
 
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);

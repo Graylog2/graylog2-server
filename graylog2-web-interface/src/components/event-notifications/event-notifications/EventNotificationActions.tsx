@@ -26,6 +26,8 @@ import type { EventNotification } from 'stores/event-notifications/EventNotifica
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 
 type Props = {
   isTestLoading: boolean,
@@ -37,8 +39,15 @@ type Props = {
 const EventNotificationActions = ({ isTestLoading, notification, refetchEventNotification, onTest }: Props) => {
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);
+  const sendTelemetry = useSendTelemetry();
 
   const onDelete = () => {
+    sendTelemetry('input_value_change', {
+      app_pathname: 'events',
+      app_section: 'event-notification',
+      app_action_value: 'notification-delete',
+    });
+
     setShowDialog(true);
   };
 
@@ -70,7 +79,8 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
                      onClick={() => setShowShareNotification(notification)}
                      bsSize="xsmall" />
 
-        <OverlayDropdownButton title="More Actions"
+        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
 
@@ -81,7 +91,8 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
               </MenuItem>
             </LinkContainer>
           </IfPermitted>
-          <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]} anyPermissions>
+          <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}
+                       anyPermissions>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
               <MenuItem disabled={isTestLoading} onClick={() => onTest(notification)}>
                 {isTestLoading ? 'Testing...' : 'Test Notification'}
@@ -96,19 +107,19 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
 
       </ButtonToolbar>
       {showDialog && (
-      <ConfirmDialog title="Delete Notification"
-                     show
-                     onConfirm={handleDelete}
-                     onCancel={handleClearState}>
-        {`Are you sure you want to delete "${notification.title}"`}
-      </ConfirmDialog>
+        <ConfirmDialog title="Delete Notification"
+                       show
+                       onConfirm={handleDelete}
+                       onCancel={handleClearState}>
+          {`Are you sure you want to delete "${notification.title}"`}
+        </ConfirmDialog>
       )}
       {showShareNotification && (
-      <EntityShareModal entityId={notification.id}
-                        entityType="notification"
-                        description="Search for a user or team to add as collaborator on this notification."
-                        entityTitle={notification.title}
-                        onClose={() => setShowShareNotification(undefined)} />
+        <EntityShareModal entityId={notification.id}
+                          entityType="notification"
+                          description="Search for a user or team to add as collaborator on this notification."
+                          entityTitle={notification.title}
+                          onClose={() => setShowShareNotification(undefined)} />
       )}
     </>
   );

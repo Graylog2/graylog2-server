@@ -44,6 +44,17 @@ const unitValues = [
   'MINUTES',
   'HOURS',
   'DAYS',
+  'MONTHS',
+  'YEARS',
+];
+const defaultUnits = [
+  'NANOSECONDS',
+  'MICROSECONDS',
+  'MILLISECONDS',
+  'SECONDS',
+  'MINUTES',
+  'HOURS',
+  'DAYS',
 ];
 const unitType = PropTypes.oneOf(unitValues);
 
@@ -132,7 +143,7 @@ const TimeUnitInput = createReactClass({
       defaultValue: 1,
       value: undefined,
       unit: 'SECONDS',
-      units: unitValues,
+      units: defaultUnits,
       label: '',
       help: '',
       name: null,
@@ -229,15 +240,13 @@ const TimeUnitInput = createReactClass({
     const { unitOptions } = this.state;
     const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox, pullRight } = this.props;
 
-    const options = unitOptions.map((o) => {
-      return (
-        <MenuItem key={o.value}
-                  onSelect={() => this._onUnitSelect(o.value)}
-                  active={unit === o.value}>
-          {o.label}
-        </MenuItem>
-      );
-    });
+    const options = unitOptions.map((o) => (
+      <MenuItem key={o.value}
+                onSelect={() => this._onUnitSelect(o.value)}
+                active={unit === o.value}>
+        {o.label}
+      </MenuItem>
+    ));
 
     const checkbox = (
       <InputGroup.Addon>

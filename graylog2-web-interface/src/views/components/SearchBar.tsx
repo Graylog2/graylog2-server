@@ -26,7 +26,7 @@ import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
-import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
@@ -147,7 +147,6 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   }
 
   const { query } = currentQuery;
-
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   return (
@@ -167,10 +166,10 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                     <ValidateOnParameterChange parameters={parameters} />
                     <SearchBarContainer>
                       <TimeRangeRow>
-                        <TimeRangeInput limitDuration={limitDuration}
-                                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                        value={values?.timerange}
-                                        hasErrorOnMount={!!errors.timerange} />
+                        <TimeRangeFilter limitDuration={limitDuration}
+                                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                         value={values?.timerange}
+                                         hasErrorOnMount={!!errors.timerange} />
                         <StreamsAndRefresh>
                           <Field name="streams">
                             {({ field: { name, value, onChange } }) => (

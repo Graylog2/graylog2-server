@@ -25,10 +25,14 @@ import { EventNotificationsActions } from 'stores/event-notifications/EventNotif
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import useCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import useCreateSearch from 'views/hooks/useCreateSearch';
 
 const EventView = () => {
   const { eventDefinition, aggregations } = useAlertAndEventDefinitionData();
-  const view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
+  const _view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
+  const view = useCreateSearch(_view);
 
   return (
     <SearchPage view={view}
@@ -39,10 +43,16 @@ const EventView = () => {
   );
 };
 
+export const onErrorHandler = (error) => {
+  if (error.status === 404) {
+    ErrorsActions.report(createFromFetchError(error));
+  }
+};
+
 const EventDefinitionReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
   const { definitionId } = useParams<{ definitionId?: string }>();
-  const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(definitionId);
+  const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(definitionId, { onErrorHandler });
 
   useEffect(() => {
     EventNotificationsActions.listAll().then(() => setIsNotificationLoaded(true));

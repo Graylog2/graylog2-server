@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
@@ -33,14 +32,15 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> {
@@ -48,17 +48,16 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
-        final String field = count.field();
-        if (field == null) {
-            // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
-            return Optional.empty();
-        } else {
-            // the request was for a field count, we have to add a value_count sub aggregation
-            final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
-            record(queryContext, pivot, count, name, ValueCount.class);
-            return Optional.of(value);
-        }
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+        return count.field()
+                .map(field -> {
+                    // the request was for a field count, we have to add a value_count sub aggregation
+                    final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
+                    record(queryContext, pivot, count, name, ValueCount.class);
+                    return List.of(SeriesAggregationBuilder.metric(value));
+                })
+                // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
+                .orElse(List.of());
     }
 
     @Override
@@ -83,7 +82,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
     }
 
     @Override
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
         final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
         if (objects == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {

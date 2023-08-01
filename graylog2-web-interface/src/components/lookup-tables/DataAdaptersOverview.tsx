@@ -40,7 +40,11 @@ const ScrollContainer = styled.div`
 `;
 
 const buildHelpPopover = () => (
-  <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+  <Popover id="search-query-help"
+           className={Styles.popoverWide}
+           title="Search Syntax Help"
+           data-app-section="data_adapter_query_helper"
+           data-event-element="Available search fields">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -91,19 +95,17 @@ const queryHelpComponent = (
   </OverlayTrigger>
 );
 
-const NoResults = ({ query }: { query: string }) => {
-  return (
-    <tbody>
-      <tr>
-        <td colSpan={5}>
-          {query
-            ? <NoSearchResult>No data adapters found with title &quot;{query}&quot;</NoSearchResult>
-            : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
-        </td>
-      </tr>
-    </tbody>
-  );
-};
+const NoResults = ({ query }: { query: string }) => (
+  <tbody>
+    <tr>
+      <td colSpan={5}>
+        {query
+          ? <NoSearchResult>No data adapters found with title &quot;{query}&quot;</NoSearchResult>
+          : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+      </td>
+    </tr>
+  </tbody>
+);
 
 const DataRow = ({
   dataAdapters,
@@ -113,20 +115,18 @@ const DataRow = ({
   dataAdapters: LookupTableAdapter[],
   query: string,
   errors: { [key: string]: string },
-}) => {
-  return dataAdapters.length > 0
-    ? (
-      <>
-        {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
-          <DataAdapterTableEntry key={dataAdapter.id}
-                                 adapter={dataAdapter}
-                                 error={errors[dataAdapter.name]} />
-        ))}
-      </>
-    ) : (
-      <NoResults query={query} />
-    );
-};
+}) => (dataAdapters.length > 0
+  ? (
+    <>
+      {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
+        <DataAdapterTableEntry key={dataAdapter.id}
+                               adapter={dataAdapter}
+                               error={errors[dataAdapter.name]} />
+      ))}
+    </>
+  ) : (
+    <NoResults query={query} />
+  ));
 
 type Props = {
   dataAdapters: LookupTableAdapter[],

@@ -16,18 +16,16 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
-import com.google.auto.value.AutoValue;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
-import java.util.Optional;
-
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 @JsonAutoDetect
@@ -45,6 +43,12 @@ public abstract class ParameterDescriptor<T, R> {
     @JsonProperty
     public abstract boolean optional();
 
+    @JsonProperty
+    public abstract boolean primary();
+
+    @JsonProperty
+    public abstract boolean allowNegatives();
+
     @JsonIgnore
     public abstract java.util.function.Function<T, R> transform();
 
@@ -52,8 +56,8 @@ public abstract class ParameterDescriptor<T, R> {
     @Nullable
     public abstract String description();
 
-    public static <T,R> Builder<T, R> param() {
-        return new AutoValue_ParameterDescriptor.Builder<T, R>().optional(false);
+    public static <T, R> Builder<T, R> param() {
+        return new AutoValue_ParameterDescriptor.Builder<T, R>().optional(false).primary(false).allowNegatives(false);
     }
 
     public static Builder<String, String> string(String name) {
@@ -124,17 +128,29 @@ public abstract class ParameterDescriptor<T, R> {
     @AutoValue.Builder
     public static abstract class Builder<T, R> {
         public abstract Builder<T, R> type(Class<? extends T> type);
+
         public abstract Builder<T, R> transformedType(Class<? extends R> type);
+
         public abstract Builder<T, R> name(String name);
+
         public abstract Builder<T, R> optional(boolean optional);
+
+        public abstract Builder<T, R> primary(boolean primary);
+
+        public abstract Builder<T, R> allowNegatives(boolean allowNegatives);
 
         public Builder<T, R> optional() {
             return optional(true);
         }
 
+        public Builder<T, R> primary() {
+            return primary(true);
+        }
+
         public abstract Builder<T, R> description(String description);
 
         abstract ParameterDescriptor<T, R> autoBuild();
+
         public ParameterDescriptor<T, R> build() {
             try {
                 transform();
@@ -147,8 +163,23 @@ public abstract class ParameterDescriptor<T, R> {
         }
 
         public abstract Builder<T, R> transform(java.util.function.Function<T, R> transform);
+
         @Nullable
         public abstract java.util.function.Function<T, R> transform();
 
+    }
+
+    @JsonCreator
+    public static <T, R> ParameterDescriptor<T, R> createForRuleBuilder(
+            @JsonProperty("type") Class<? extends T> type,
+            @JsonProperty("transformed_type") Class<? extends R> transformedType,
+            @JsonProperty("name") String name,
+            @JsonProperty("description") @Nullable String description) {
+        return ParameterDescriptor.<T, R>param()
+                .type(type)
+                .transformedType(transformedType)
+                .name(name)
+                .description(description)
+                .build();
     }
 }

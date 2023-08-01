@@ -32,7 +32,7 @@ const SigninButton = styled(ModalSubmit)(({ theme }) => css`
     background-color: ${theme.colors.brand.primary};
     border-color: ${theme.colors.brand.primary};
     
-    :hover {
+    &:hover {
       background-color: ${theme.colors.brand.primary};
       border-color: ${theme.colors.brand.primary};
     }
@@ -45,12 +45,10 @@ const LoginForm = ({ onErrorChange }: Props) => {
   let usernameInput;
   let passwordInput;
 
-  useEffect(() => {
-    return () => {
-      if (promise) {
-        promise.cancel();
-      }
-    };
+  useEffect(() => () => {
+    if (promise) {
+      promise.cancel();
+    }
   }, [promise]);
 
   const onSignInClicked = (event) => {

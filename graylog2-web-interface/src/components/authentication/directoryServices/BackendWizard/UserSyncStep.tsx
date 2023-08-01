@@ -25,6 +25,7 @@ import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { Icon, FormikFormGroup, Select, InputList } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import type { WizardFormValues } from './BackendWizardContext';
 import BackendWizardContext from './BackendWizardContext';
@@ -56,13 +57,30 @@ const StyledInputList = styled(InputList)`
   margin: auto 15px;
 `;
 
-const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
+const UserSyncStep = ({
+  help = {},
+  excludedFields = {},
+  formRef,
+  onSubmit,
+  onSubmitAll,
+  submitAllError,
+  validateOnMount,
+  roles,
+}: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendValidationErrors } = stepsState;
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
 
+  const sendTelemetry = useSendTelemetry();
+
   const _onSubmitAll = (validateForm) => {
+    sendTelemetry('click', {
+      app_pathname: 'authentication',
+      app_section: 'directory-service',
+      app_action_value: 'usersync-save',
+    });
+
     validateForm().then((errors) => {
       if (!formHasErrors(errors)) {
         onSubmitAll();
@@ -70,9 +88,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
     });
   };
 
-  const getInitalFormValues = (values: WizardFormValues) => {
-    return { ...values, ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }) };
-  };
+  const getInitalFormValues = (values: WizardFormValues) => ({ ...values, ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }) });
 
   return (
     <Formik initialValues={getInitalFormValues(stepsState.formValues)}
@@ -106,24 +122,24 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                            validate={validateField(FORM_VALIDATION.userNameAttribute)} />
 
           {!excludedFields.emailAttributes && (
-          <Field name="emailAttributes" validate={validateField(FORM_VALIDATION.emailAttributes)}>
-            {({ field: { name, value, onChange }, meta: { error } }) => (
-              <Input bsStyle={error ? 'error' : undefined}
-                     help={help.emailAttributes}
-                     error={error ?? backendValidationErrors?.emailAttributes}
-                     id="email-attributes-input"
-                     label="Email Attributes"
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <StyledInputList id="userEmailAttributes"
-                                 placeholder="Email Attributes"
-                                 name={name}
-                                 values={value}
-                                 isClearable
-                                 onChange={onChange} />
-              </Input>
-            )}
-          </Field>
+            <Field name="emailAttributes" validate={validateField(FORM_VALIDATION.emailAttributes)}>
+              {({ field: { name, value, onChange }, meta: { error } }) => (
+                <Input bsStyle={error ? 'error' : undefined}
+                       help={help.emailAttributes}
+                       error={error ?? backendValidationErrors?.emailAttributes}
+                       id="email-attributes-input"
+                       label="Email Attributes"
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9">
+                  <StyledInputList id="userEmailAttributes"
+                                   placeholder="Email Attributes"
+                                   name={name}
+                                   values={value}
+                                   isClearable
+                                   onChange={onChange} />
+                </Input>
+              )}
+            </Field>
           )}
           <FormikFormGroup help={help.userFullNameAttribute}
                            label="Full Name Attribute"
@@ -144,7 +160,8 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the static role assignment will only affect new users created via {stepsState.authBackendMeta.serviceTitle}!
+                Changing the static role assignment will only affect new users created
+                via {stepsState.authBackendMeta.serviceTitle}!
                 Existing user accounts will be updated on their next login, or if you edit their roles manually.
               </Panel>
             </Col>
@@ -189,6 +206,13 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
             </Button>
             <Button bsStyle="success"
                     disabled={isSubmitting}
+                    onClick={() => {
+                      sendTelemetry('click', {
+                        app_pathname: 'authentication',
+                        app_section: 'directory-service',
+                        app_action_value: 'groupsync-button',
+                      });
+                    }}
                     type="submit">
               Next: Group Synchronization
             </Button>

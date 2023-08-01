@@ -27,6 +27,7 @@ import { Select, InputDescription } from 'components/common';
 import { Button } from 'components/bootstrap';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const ElementsContainer = styled.div`
   display: flex;
@@ -55,7 +56,17 @@ const BackendCreateSelect = () => {
   const sortedAuthServices = authServices.sort((s1, s2) => defaultCompare(s1.displayName, s2.displayName));
   const authServicesOptions = sortedAuthServices.map((service) => ({ label: service.displayName, value: service.name }));
   const history = useHistory();
-  const onSubmit = useCallback((formState: FormState) => _onSubmit(history, formState), [history]);
+  const sendTelemetry = useSendTelemetry();
+
+  const onSubmit = useCallback((formState: FormState) => {
+    sendTelemetry('form_submit', {
+      app_pathname: 'authentication',
+      app_section: 'services',
+      app_action_value: 'create-service-form',
+    });
+
+    _onSubmit(history, formState);
+  }, [history, sendTelemetry]);
 
   return (
     <Formik onSubmit={onSubmit} initialValues={{ authServiceType: undefined }}>
@@ -68,7 +79,15 @@ const BackendCreateSelect = () => {
                   <>
                     <Select clearable={false}
                             inputProps={{ 'aria-label': 'Select a service' }}
-                            onChange={(authService) => onChange({ target: { value: authService, name } })}
+                            onChange={(authService) => {
+                              sendTelemetry('input_value_change', {
+                                app_pathname: 'authentication',
+                                app_section: 'services',
+                                app_action_value: 'selectservice',
+                              });
+
+                              onChange({ target: { value: authService, name } });
+                            }}
                             options={authServicesOptions}
                             placeholder="Select a service"
                             value={value} />

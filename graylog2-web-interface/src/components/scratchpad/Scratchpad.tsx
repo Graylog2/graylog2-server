@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
@@ -41,7 +40,7 @@ const ContentArea = styled.div`
   height: 100%;
 `;
 
-const Textarea = styled.textarea(({ $copied, theme }: {$copied: boolean, theme:DefaultTheme}) => css`
+const Textarea = styled.textarea<{ $copied: boolean }>(({ $copied, theme }) => css`
   width: 100%;
   padding: 3px;
   resize: none;
@@ -53,7 +52,7 @@ const Textarea = styled.textarea(({ $copied, theme }: {$copied: boolean, theme:D
   font-family: ${theme.fonts.family.monospace};
   font-size: ${theme.fonts.size.body};
 
-  :focus {
+  &:focus {
     border-color: ${theme.colors.variant.light.info};
     outline: none;
   }
@@ -73,14 +72,14 @@ const AlertNote = styled.em`
   flex: 1;
 `;
 
-const Footer = styled.footer(({ theme }: { theme: DefaultTheme }) => css`
+const Footer = styled.footer(({ theme }) => css`
   display: flex;
   align-items: center;
   padding: 7px 0 9px;
   border-top: 1px solid ${theme.colors.gray[80]};
 `);
 
-const StatusMessage = styled.span(({ theme, $visible }: { theme: DefaultTheme, $visible: boolean}) => css`
+const StatusMessage = styled.span<{ $visible: boolean }>(({ theme, $visible }) => css`
   flex: 1;
   color: ${theme.colors.variant.success};
   font-style: italic;

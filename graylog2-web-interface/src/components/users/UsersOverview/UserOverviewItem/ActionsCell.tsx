@@ -24,6 +24,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, Tooltip, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
 import { OverlayTrigger, IfPermitted } from 'components/common';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   user: UserOverview,
@@ -51,7 +52,11 @@ const EditTokensAction = ({
 );
 
 const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
-  const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
+  const tooltip = (
+    <Tooltip id="system-user">System users can only be modified in the Graylog configuration
+      file.
+    </Tooltip>
+  );
 
   return (
     <>
@@ -63,11 +68,19 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
   );
 };
 
-const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
+const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: {
+  user: UserOverview
+}) => {
   const currentUser = useCurrentUser();
+  const sendTelemetry = useSendTelemetry();
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {
+      sendTelemetry('click', {
+        app_pathname: 'users',
+        app_action_value: 'user-item-disable',
+      });
+
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
         UsersDomain.setStatus(id, 'disabled');
@@ -77,9 +90,19 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
     }
 
     UsersDomain.setStatus(id, 'enabled');
+
+    sendTelemetry('click', {
+      app_pathname: 'users',
+      app_action_value: 'user-item-enable',
+    });
   };
 
   const _deleteUser = () => {
+    sendTelemetry('click', {
+      app_pathname: 'users',
+      app_action_value: 'user-item-delete',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete user ${fullName}?`)) {
       UsersDomain.delete(id, fullName);

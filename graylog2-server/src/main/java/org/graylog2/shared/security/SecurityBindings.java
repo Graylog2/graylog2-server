@@ -19,10 +19,16 @@ package org.graylog2.shared.security;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
+import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CaServiceImpl;
+import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
+import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.DefaultX509TrustManager;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -38,9 +44,12 @@ public class SecurityBindings extends PluginModule {
         addPermissions(RestPermissions.class);
         addInitializer(UserSessionTerminationService.class);
 
+        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, DefaultX509TrustManager.class)
                 .build(TrustManagerProvider.class));
+        bind(CustomCAX509TrustManager.class).asEagerSingleton();
+        bind(CaService.class).to(CaServiceImpl.class);
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                 .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);

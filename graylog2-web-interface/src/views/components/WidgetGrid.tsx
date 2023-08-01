@@ -62,7 +62,7 @@ const DashboardWrap = styled(ElementDimensions)(({ theme }) => css`
   height: 100%;
 `);
 
-const StyledReactGridContainer = styled(ReactGridContainer)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
+const StyledReactGridContainer = styled(ReactGridContainer)<{ $hasFocusedWidget: boolean }>(({ $hasFocusedWidget }) => css`
   height: ${$hasFocusedWidget ? '100% !important' : '100%'};
   max-height: ${$hasFocusedWidget ? '100%' : 'auto'};
   overflow: ${$hasFocusedWidget ? 'hidden' : 'visible'};
@@ -143,7 +143,7 @@ const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, wi
 };
 
 Grid.defaultProps = {
-  onSyncLayout: () => {},
+  onSyncLayout: undefined,
 };
 
 const MAXIMUM_GRID_SIZE = 12;
@@ -174,20 +174,18 @@ const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWi
 };
 
 const renderGaps = (widgets: Widget[], positions: WidgetPositions) => {
-  const items = widgets.map((widget) => positions[widget.id])
-    .filter((position) => !!position)
-    .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
-  const gaps = findGaps(items);
+  const gaps = findGaps(widgets.map((widget) => positions[widget.id]));
   const _positions = { ...positions };
 
   const gapsItems = gaps.map((gap) => {
     const id = `gap-${generateId()}`;
 
+    const { col, row, height, width } = gap;
     const gapPosition = WidgetPosition.builder()
-      .col(gap.start.x)
-      .row(gap.start.y)
-      .height(gap.end.y - gap.start.y)
-      .width(gap.end.x - gap.start.x)
+      .col(col)
+      .row(row)
+      .height(height)
+      .width(width)
       .build();
 
     _positions[id] = gapPosition;

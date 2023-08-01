@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { useStore } from 'stores/connect';
@@ -30,27 +30,32 @@ import type { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { InputsStore } from 'stores/inputs/InputsStore';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-import CustomHighlighting from './CustomHighlighting';
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
 import MessagePreview from './MessagePreview';
 import type { Message } from './Types';
 
+import CustomHighlighting from '../highlighting/CustomHighlighting';
 import TypeSpecificValue from '../TypeSpecificValue';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-export const TableBody = styled.tbody<{ expanded?: boolean, highlighted?: boolean }>(({ expanded, highlighted, theme }) => `
+export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: boolean }>(({
+  $expanded,
+  $highlighted,
+  theme,
+}) => `
   && {
     border-top: 0;
 
-    ${expanded ? `
+    ${$expanded ? css`
       border-left: 7px solid ${theme.colors.variant.light.info};
-    ` : ''}
+` : ''}
 
-    ${highlighted ? `
+    ${$highlighted ? css`
       border-left: 7px solid ${theme.colors.variant.light.success};
-    ` : ''}
+` : ''}
   }
 `);
 
@@ -98,7 +103,9 @@ type Props = {
 const isDecoratedField = (field, decorationStats) => decorationStats
   && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
 
-const fieldType = (fieldName, { decoration_stats: decorationStats }: { decoration_stats?: any }, fields) => (isDecoratedField(fieldName, decorationStats)
+const fieldType = (fieldName, { decoration_stats: decorationStats }: {
+  decoration_stats?: any
+}, fields) => (isDecoratedField(fieldName, decorationStats)
   ? FieldType.Decorated
   : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
@@ -124,6 +131,7 @@ const MessageTableEntry = ({
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
+  const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = Immutable.List<Stream>(streamsList);
   const streams = Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream]));
@@ -133,6 +141,12 @@ const MessageTableEntry = ({
     const isSelectingText = !!window.getSelection()?.toString();
 
     if (!isSelectingText) {
+      sendTelemetry('input_button_toggle', {
+        app_pathname: 'search',
+        app_section: 'widget',
+        app_action_value: 'widget-message-table-toggle-details',
+      });
+
       toggleDetail(`${message.index}-${message.id}`);
     }
   };
@@ -141,7 +155,7 @@ const MessageTableEntry = ({
 
   return (
     <AdditionalContext.Provider value={additionalContextValue}>
-      <TableBody expanded={expanded} highlighted={message.id === highlightMessageId}>
+      <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
         <FieldsRow onClick={_toggleDetail}>
           {selectedFields.toArray().map((selectedFieldName, idx) => {
             const type = fieldType(selectedFieldName, message, fields);

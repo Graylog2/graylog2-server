@@ -51,17 +51,15 @@ const validateDateTime = (dateTime: Moment, originalDateTime: DateTime, addition
   return dateTime;
 };
 
-const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeFormats>) => {
-  return dateTimeFormats?.map((dateTimeFormat) => {
-    const format = DATE_TIME_FORMATS[dateTimeFormat];
+const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeFormats>) => dateTimeFormats?.map((dateTimeFormat) => {
+  const format = DATE_TIME_FORMATS[dateTimeFormat];
 
-    if (!format) {
-      throw new Error(`Provided date time format "${dateTimeFormat}" is not supported.`);
-    }
+  if (!format) {
+    throw new Error(`Provided date time format "${dateTimeFormat}" is not supported.`);
+  }
 
-    return format;
-  });
-};
+  return format;
+});
 
 export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTimeFormats>, tz = DEFAULT_OUTPUT_TZ) => {
   const acceptedFormatStrings = getFormatStringsForDateTimeFormats(acceptedFormats);
@@ -71,21 +69,13 @@ export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTim
   return validateDateTime(dateObject, dateTime, validationInfo);
 };
 
-export const parseFromIsoString = (dateTimeString: string, tz = DEFAULT_OUTPUT_TZ) => {
-  return toDateObject(dateTimeString, ['internal'], tz);
-};
+export const parseFromIsoString = (dateTimeString: string, tz = DEFAULT_OUTPUT_TZ) => toDateObject(dateTimeString, ['internal'], tz);
 
-export const getBrowserTimezone = () => {
-  return moment.tz.guess();
-};
+export const getBrowserTimezone = () => moment.tz.guess();
 
-export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'default', tz = DEFAULT_OUTPUT_TZ) => {
-  return toDateObject(dateTime, undefined, tz).format(DATE_TIME_FORMATS[format]);
-};
+export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'default', tz = DEFAULT_OUTPUT_TZ) => toDateObject(dateTime, undefined, tz).format(DATE_TIME_FORMATS[format]);
 
-export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') => {
-  return adjustFormat(time, format, getBrowserTimezone());
-};
+export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') => adjustFormat(time, format, getBrowserTimezone());
 
 export const relativeDifference = (dateTime: DateTime) => {
   const dateObject = toDateObject(dateTime);

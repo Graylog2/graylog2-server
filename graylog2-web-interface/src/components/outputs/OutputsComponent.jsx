@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Row, Col } from 'components/bootstrap';
@@ -23,14 +25,28 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import Spinner from 'components/common/Spinner';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { OutputsStore } from 'stores/outputs/OutputsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
 
 const OutputsComponent = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'OutputsComponent',
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    streamId: PropTypes.string.isRequired,
+    permissions: PropTypes.array.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
+  },
+
   mixins: [PermissionsMixin],
+
+  getInitialState() {
+    return {};
+  },
 
   componentDidMount() {
     this.loadData();
@@ -58,19 +74,17 @@ const OutputsComponent = createReactClass({
     });
   },
 
-  getInitialState() {
-    return {
-    };
-  },
-
   _handleUpdate() {
     this.loadData();
   },
 
   _handleCreateOutput(data) {
-    OutputsStore.save(data, (result) => {
-      this.setState({ typeName: 'placeholder' });
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'outputs',
+      app_action_value: 'create-output',
+    });
 
+    OutputsStore.save(data, (result) => {
       if (this.props.streamId) {
         StreamsStore.addOutput(this.props.streamId, result.id, (response) => {
           this._handleUpdate();
@@ -87,16 +101,21 @@ const OutputsComponent = createReactClass({
 
   _fetchAssignableOutputs(outputs) {
     OutputsStore.load((resp) => {
-      const streamOutputIds = outputs.map((output) => { return output.id; });
+      const streamOutputIds = outputs.map((output) => output.id);
       const assignableOutputs = resp.outputs
-        .filter((output) => { return streamOutputIds.indexOf(output.id) === -1; })
-        .sort((output1, output2) => { return output1.title.localeCompare(output2.title); });
+        .filter((output) => streamOutputIds.indexOf(output.id) === -1)
+        .sort((output1, output2) => output1.title.localeCompare(output2.title));
 
       this.setState({ assignableOutputs: assignableOutputs });
     });
   },
 
   _handleAssignOutput(outputId) {
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'outputs',
+      app_action_value: 'assign-output',
+    });
+
     StreamsStore.addOutput(this.props.streamId, outputId, (response) => {
       this._handleUpdate();
 
@@ -105,6 +124,12 @@ const OutputsComponent = createReactClass({
   },
 
   _removeOutputGlobally(outputId) {
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'outputs',
+      app_action_value: 'globally-remove-output',
+    });
+
+    // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to terminate this output?')) {
       OutputsStore.remove(outputId, (response) => {
         UserNotification.success('Output was terminated.', 'Success');
@@ -116,6 +141,12 @@ const OutputsComponent = createReactClass({
   },
 
   _removeOutputFromStream(outputId, streamId) {
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'outputs',
+      app_action_value: 'remove-output-from-stream',
+    });
+
+    // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this output from the stream?')) {
       StreamsStore.removeOutput(streamId, outputId, (response) => {
         UserNotification.success('Output was removed from stream.', 'Success');
@@ -127,6 +158,11 @@ const OutputsComponent = createReactClass({
   },
 
   _handleOutputUpdate(output, deltas) {
+    this.props.sendTelemetry('form_submit', {
+      app_pathname: 'outputs',
+      app_action_value: 'output-update',
+    });
+
     OutputsStore.update(output, deltas, () => {
       this._handleUpdate();
     });
@@ -176,4 +212,5 @@ const OutputsComponent = createReactClass({
     return <Spinner />;
   },
 });
-export default OutputsComponent;
+
+export default withTelemetry(OutputsComponent);

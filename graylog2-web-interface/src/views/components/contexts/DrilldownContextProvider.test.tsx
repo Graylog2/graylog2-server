@@ -76,7 +76,7 @@ describe('DrilldownContextProvider', () => {
         wrapper);
     });
 
-    it('passes query & timerange of global override, streams of widget', () => {
+    it('passes timerange of global override, streams of widget and combined query of global override and widget', () => {
       asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
       asMock(useGlobalOverride)
@@ -89,7 +89,7 @@ describe('DrilldownContextProvider', () => {
 
       expectDrilldown(['stream1', 'stream2'],
         { type: 'absolute', from: '2020-01-10T13:23:42.000Z', to: '2020-01-10T14:23:42.000Z' },
-        { type: 'elasticsearch', query_string: 'something:"else"' },
+        { type: 'elasticsearch', query_string: '(foo:42) AND (something:"else")' },
         wrapper);
     });
   });

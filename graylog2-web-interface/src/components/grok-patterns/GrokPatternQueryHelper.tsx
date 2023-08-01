@@ -19,7 +19,11 @@ import * as React from 'react';
 import { Popover, Table } from 'components/bootstrap';
 
 const GrokPatternQueryHelper = () => (
-  <Popover id="search-query-help" className="popover-wide" title="Search Syntax Help">
+  <Popover id="search-query-help"
+           className="popover-wide"
+           title="Search Syntax Help"
+           data-app-section="grok_pattern_query_helper"
+           data-event-element="Available search fields">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>

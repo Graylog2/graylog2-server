@@ -26,6 +26,11 @@ import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import useMapKeys from 'views/components/visualizations/useMapKeys';
+import { keySeparator, humanSeparator } from 'views/Constants';
+import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -36,24 +41,19 @@ type ChartDefinition = {
   x?: Array<string>,
   y?: Array<any>,
   z?: Array<Array<any>>,
-  opacity: number,
+  opacity?: number,
+  originalName: string,
 };
 
-const getChartColor = (fullData, name) => {
-  const data = fullData.find((d) => (d.name === name)).marker;
+const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
+  const data = fullData.find((d) => (d.name === name));
 
-  if (data && data.marker && data.marker.color) {
-    const { marker: color } = data;
-
-    return color;
-  }
-
-  return undefined;
+  return data?.marker?.color;
 };
 
-const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
+const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.originalName ?? chart.name) } });
 
-const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom: string, timeRangeTo: string) => {
+const defineSingleDateBarWidth = (chartDataResult: ChartDefinition[], config: AggregationWidgetConfig, timeRangeFrom: string, timeRangeTo: string) => {
   const barWidth = 0.03; // width in percentage, relative to chart width
   const minXUnits = 30;
 
@@ -97,13 +97,22 @@ const BarVisualization = makeVisualization(({
 
   const opacity = visualizationConfig?.opacity ?? 1.0;
 
-  const _seriesGenerator: Generator = useCallback((type, name, labels, values): ChartDefinition => ({
+  const mapKeys = useMapKeys();
+  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
+  const _mapKeys = useCallback((labels: string[]) => labels
+    .map((label) => label.split(keySeparator)
+      .map((l, i) => mapKeys(l, rowPivotFields[i]))
+      .join(humanSeparator),
+    ), [mapKeys, rowPivotFields]);
+
+  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }): ChartDefinition => ({
     type,
     name,
-    x: labels,
+    x: _mapKeys(labels),
     y: values,
     opacity,
-  }), [opacity]);
+    originalName,
+  }), [_mapKeys, opacity]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, { widgetConfig: config, chartType: 'bar', generator: _seriesGenerator });
@@ -119,8 +128,8 @@ const BarVisualization = makeVisualization(({
             chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to)}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
-            height={height}
             setChartColor={setChartColor}
+            height={height}
             plotLayout={layout} />
   );
 }, 'bar');

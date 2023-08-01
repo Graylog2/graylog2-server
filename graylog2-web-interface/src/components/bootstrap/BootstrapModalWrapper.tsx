@@ -35,17 +35,17 @@ const BootstrapModalWrapper = ({
   bsSize,
   backdrop,
   role,
-}: Props) => {
-  return (
-    <Modal show={showModal}
-           onHide={onHide}
-           bsSize={bsSize}
-           backdrop={backdrop}
-           role={role}>
-      {children}
-    </Modal>
-  );
-};
+  ...restProps
+}: Props) => (
+  <Modal show={showModal}
+         onHide={onHide}
+         bsSize={bsSize}
+         backdrop={backdrop}
+         role={role}
+         {...restProps}>
+    {children}
+  </Modal>
+);
 
 BootstrapModalWrapper.propTypes = {
   showModal: PropTypes.bool.isRequired,

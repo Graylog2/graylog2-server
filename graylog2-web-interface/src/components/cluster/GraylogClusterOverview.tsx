@@ -20,7 +20,6 @@ import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
@@ -33,6 +32,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { formatTrafficData } from 'util/TrafficUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import TrafficGraph from './TrafficGraph';
 
@@ -64,10 +64,10 @@ const Wrapper = styled.div`
 const StyledDl = styled.dl`
   margin-bottom: 0;
 `;
-const StyledH2 = styled.h2(({ theme }: { theme: DefaultTheme }) => css`
+const StyledH2 = styled.h2(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
 `);
-const StyledH3 = styled.h3(({ theme }: { theme: DefaultTheme }) => css`
+const StyledH3 = styled.h3(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
 `);
 
@@ -100,12 +100,20 @@ const GraylogClusterTrafficGraph = () => {
   const containerRef = useRef(null);
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
+  const sendTelemetry = useSendTelemetry();
 
   const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
     event.preventDefault();
     const newDays = Number(event.target.value);
 
     setGraphDays(newDays);
+
+    sendTelemetry('input_value_change', {
+      app_pathname: 'system-overview',
+      app_section: 'outgoing-traffic',
+      app_action_value: 'trafficgraph-days-button',
+      event_details: { value: newDays },
+    });
   };
 
   useEffect(() => {

@@ -42,6 +42,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import Parameter from 'views/logic/parameters/Parameter';
+import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
@@ -49,21 +50,19 @@ export const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
   rowPivots: Array<Pivot>,
   fnSeries: Array<Series>,
   sort?: Array<SortConfig>
-}) => {
-  return AggregationWidget.builder()
-    .id(generateId())
-    .config(
-      AggregationWidgetConfig.builder()
-        .columnPivots([])
-        .rowPivots(rowPivots)
-        .series(fnSeries)
-        .sort(sort)
-        .visualization('table')
-        .rollup(true)
-        .build(),
-    )
-    .build();
-};
+}) => AggregationWidget.builder()
+  .id(generateId())
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots(rowPivots)
+      .series(fnSeries)
+      .sort(sort)
+      .visualization('table')
+      .rollup(true)
+      .build(),
+  )
+  .build();
 
 const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
   const isEven = (index + 1) % 2 === 0;
@@ -75,7 +74,8 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
 };
 
 const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
-  const rowPivots = [pivotForField(uniq([field, ...groupBy].filter((v) => !!v)), new FieldType('value', [], []))];
+  const uniqPivotFields = uniq([field, ...groupBy].filter((v) => !!v));
+  const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
   const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
@@ -202,6 +202,8 @@ export const ViewGenerator = async ({
 export const UseCreateViewForEvent = (
   { eventData, eventDefinition, aggregations }: { eventData: Event, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
+  const queryStringFromGrouping = concatQueryStrings(Object.entries(eventData.group_by_fields).map(([field, value]) => `${field}:${escape(value)}`), { withBrackets: false });
+  const eventQueryString = eventData?.replay_info?.query || '';
   const { streams } = eventData.replay_info;
   const timeRange: AbsoluteTimeRange = {
     type: 'absolute',
@@ -210,12 +212,12 @@ export const UseCreateViewForEvent = (
   };
   const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
-    query_string: eventData?.replay_info?.query || '',
+    query_string: concatQueryStrings([eventQueryString, queryStringFromGrouping]),
   };
 
   const queryParameters = eventDefinition?.config?.query_parameters || [];
 
-  const groupBy = eventDefinition.config.group_by;
+  const groupBy = eventDefinition?.config?.group_by ?? [];
 
   return useMemo(
     () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters }),

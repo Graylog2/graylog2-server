@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
+import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -69,10 +70,6 @@ public class NodeImpl extends PersistedImpl implements Node {
         return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }
 
-    @Override
-    public String getShortNodeId() {
-        return getNodeId().split("-")[0];
-    }
 
     @Override
     public Type getType() {
@@ -98,5 +95,10 @@ public class NodeImpl extends PersistedImpl implements Node {
     @JsonIgnore
     public Map<String, Validator> getEmbeddedValidations(String key) {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }

@@ -24,13 +24,17 @@ import { Col, Row, Button } from 'components/bootstrap';
 import { LinkToNode, IfPermitted, Icon } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
 
 const NodeLoggers = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'NodeLoggers',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     nodeId: PropTypes.string.isRequired,
     subsystems: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connect(MetricsStore)],
@@ -67,7 +71,7 @@ const NodeLoggers = createReactClass({
   },
 
   render() {
-    const { nodeId, subsystems } = this.props;
+    const { nodeId, subsystems, sendTelemetry } = this.props;
     const { showDetails } = this.state;
     const subsystemKeys = Object.keys(subsystems)
       .map((subsystem) => (
@@ -88,14 +92,25 @@ const NodeLoggers = createReactClass({
                 <Button bsSize="sm"
                         bsStyle="primary"
                         className="trigger-log-level-metrics"
-                        onClick={() => this.setState({ showDetails: !showDetails })}>
+                        onClick={() => {
+                          this.setState({ showDetails: !showDetails });
+
+                          sendTelemetry('input_button_toggle', {
+                            app_pathname: 'logging',
+                            app_section: 'log-level',
+                            app_action_value: 'show-metrics',
+                            event_details: { showing: !showDetails },
+                          });
+                        }}>
                   <Icon name="tachometer-alt" />{' '}
                   {showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
               </div>
               <h2>
                 <LinkToNode nodeId={nodeId} />
-                <small> Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong></small>
+                <small>
+                  Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong>
+                </small>
               </h2>
             </div>
             <div className="subsystems">
@@ -109,4 +124,4 @@ const NodeLoggers = createReactClass({
   },
 });
 
-export default NodeLoggers;
+export default withTelemetry(NodeLoggers);

@@ -16,17 +16,16 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+import { act } from 'react-dom/test-utils';
 
 import NumberRefExpression from './NumberRefExpression';
 
 describe('NumberRefExpression', () => {
-  const eventDefinition = (series = []) => {
-    return {
-      config: {
-        series: series,
-      },
-    };
-  };
+  const eventDefinition = (series = []) => ({
+    config: {
+      series: series,
+    },
+  });
 
   const aggregationFunctions = ['avg', 'card'];
   const formattedFields = [
@@ -65,7 +64,7 @@ describe('NumberRefExpression', () => {
       ref: 'avg-took_ms',
     };
     const series = [
-      { id: 'avg-took_ms', function: 'avg', field: 'took_ms' },
+      { id: 'avg-took_ms', type: 'avg', field: 'took_ms' },
     ];
 
     const wrapper = mount(
@@ -92,14 +91,14 @@ describe('NumberRefExpression', () => {
       expr: 'number-ref',
       ref: 'avg-took_ms',
     };
-    const initialSeries = { id: 'avg-took_ms', function: 'avg', field: 'took_ms' };
+    const initialSeries = { id: 'avg-took_ms', type: 'avg', field: 'took_ms' };
     const definition = eventDefinition([initialSeries]);
     const handleChange = jest.fn(({ conditions, series }) => {
       expect(conditions).toBeDefined();
       expect(conditions.ref).toBe('card-took_ms');
       expect(series).toBeDefined();
       expect(series).toHaveLength(2);
-      expect(series).toContainEqual({ id: 'card-took_ms', function: 'card', field: 'took_ms' });
+      expect(series).toContainEqual({ id: 'card-took_ms', type: 'card', field: 'took_ms' });
       expect(series).toContainEqual(initialSeries);
     });
 
@@ -115,7 +114,9 @@ describe('NumberRefExpression', () => {
 
     const functionSelect = wrapper.find('Select Select.aggregation-function').at(0);
 
-    functionSelect.prop('onChange')({ value: 'card' });
+    act(() => {
+      functionSelect.prop('onChange')({ value: 'card' });
+    });
 
     expect(handleChange.mock.calls.length).toBe(1);
   });
@@ -125,14 +126,14 @@ describe('NumberRefExpression', () => {
       expr: 'number-ref',
       ref: 'avg-took_ms',
     };
-    const initialSeries = { id: 'avg-took_ms', function: 'avg', field: 'took_ms' };
+    const initialSeries = { id: 'avg-took_ms', type: 'avg', field: 'took_ms' };
     const definition = eventDefinition([initialSeries]);
     const handleChange = jest.fn(({ conditions, series }) => {
       expect(conditions).toBeDefined();
       expect(conditions.ref).toBe('avg-source');
       expect(series).toBeDefined();
       expect(series).toHaveLength(2);
-      expect(series).toContainEqual({ id: 'avg-source', function: 'avg', field: 'source' });
+      expect(series).toContainEqual({ id: 'avg-source', type: 'avg', field: 'source' });
       expect(series).toContainEqual(initialSeries);
     });
 
@@ -148,7 +149,9 @@ describe('NumberRefExpression', () => {
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
 
-    fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    act(() => {
+      fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    });
 
     expect(handleChange.mock.calls.length).toBe(1);
   });
@@ -158,14 +161,14 @@ describe('NumberRefExpression', () => {
       expr: 'number-ref',
       ref: 'avg-took_ms',
     };
-    const initialSeries = { id: 'avg-took_ms', function: 'avg', field: 'took_ms' };
+    const initialSeries = { id: 'avg-took_ms', type: 'avg', field: 'took_ms' };
     const definition = eventDefinition([initialSeries]);
     const handleChange = jest.fn(({ conditions, series }) => {
       expect(conditions).toBeDefined();
       expect(conditions.ref).toBe('avg-source');
       expect(series).toBeDefined();
       expect(series).toHaveLength(2);
-      expect(series).toContainEqual({ id: 'avg-source', function: 'avg', field: 'source' });
+      expect(series).toContainEqual({ id: 'avg-source', type: 'avg', field: 'source' });
       expect(series).toContainEqual(initialSeries);
     });
 
@@ -181,7 +184,9 @@ describe('NumberRefExpression', () => {
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
 
-    fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    act(() => {
+      fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+    });
 
     expect(handleChange.mock.calls.length).toBe(1);
   });

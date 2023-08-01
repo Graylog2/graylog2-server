@@ -41,6 +41,7 @@ export type MetricFormValues = {
   field: string | undefined,
   name?: string | undefined,
   percentile?: number | undefined,
+  strategy?: string,
 };
 
 export type GroupingDirection = 'row' | 'column';
@@ -59,6 +60,7 @@ export type DateGrouping = Required<BaseGrouping, 'id'> & {
 export type ValuesGrouping = Required<BaseGrouping, 'id'> & {
   type: typeof ValuesType,
   limit: number,
+  skipEmptyValues?: boolean,
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
@@ -99,12 +101,12 @@ export interface WidgetConfigFormValues {
   rowLimit?: string,
   columnLimit?: string,
 }
-
+export type GroupingValidationErrors = {
+  groupings?: Array<{ [key: string]: string }>,
+}
 export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
-  groupBy?: {
-    groupings?: Array<{ [key: string]: string }>,
-  },
+  groupBy?: GroupingValidationErrors | string,
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,
 }

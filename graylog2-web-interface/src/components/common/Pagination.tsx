@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import Icon from './Icon';
@@ -27,16 +26,16 @@ import Icon from './Icon';
 type Props = {
   currentPage: number,
   totalPages: number,
-  boundaryPagesRange: number,
-  siblingPagesRange: number,
-  hideEllipsis: boolean,
-  hidePreviousAndNextPageLinks: boolean,
-  hideFirstAndLastPageLinks: boolean,
-  disabled: boolean,
+  boundaryPagesRange?: number,
+  siblingPagesRange?: number,
+  hideEllipsis?: boolean,
+  hidePreviousAndNextPageLinks?: boolean,
+  hideFirstAndLastPageLinks?: boolean,
+  disabled?: boolean,
   onChange: (nextPage: number) => void,
 };
 
-const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }: { theme: DefaultTheme }) => css`
+const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
   &.pagination {
     font-size: ${theme.fonts.size.small};
     margin-top: 10px;
@@ -90,36 +89,63 @@ const UltimatePagination = createUltimatePagination({
   WrapperComponent: StyledBootstrapPagination,
   itemTypeToComponent: {
     /* eslint-disable react/prop-types */
-    [ITEM_TYPES.PAGE]: ({ value, isActive, onClick }) => (
-      <BootstrapPagination.Item active={isActive} onClick={onClick}>
-        {value}
-      </BootstrapPagination.Item>
-    ),
-    [ITEM_TYPES.ELLIPSIS]: ({ isActive, onClick }) => (
-      <BootstrapPagination.Ellipsis disabled={isActive} onClick={onClick}>
-        <Icon name="ellipsis-h" />
-      </BootstrapPagination.Ellipsis>
-    ),
-    [ITEM_TYPES.FIRST_PAGE_LINK]: ({ isActive, onClick }) => (
-      <BootstrapPagination.First disabled={isActive} onClick={onClick}>
-        <Icon name="angle-double-left" />
-      </BootstrapPagination.First>
-    ),
-    [ITEM_TYPES.PREVIOUS_PAGE_LINK]: ({ isActive, onClick }) => (
-      <BootstrapPagination.Prev disabled={isActive} onClick={onClick}>
-        <Icon name="angle-left" />
-      </BootstrapPagination.Prev>
-    ),
-    [ITEM_TYPES.NEXT_PAGE_LINK]: ({ isActive, onClick }) => (
-      <BootstrapPagination.Next disabled={isActive} onClick={onClick}>
-        <Icon name="angle-right" />
-      </BootstrapPagination.Next>
-    ),
-    [ITEM_TYPES.LAST_PAGE_LINK]: ({ isActive, onClick }) => (
-      <BootstrapPagination.Last disabled={isActive} onClick={onClick}>
-        <Icon name="angle-double-right" />
-      </BootstrapPagination.Last>
-    ),
+    [ITEM_TYPES.PAGE]: ({ value, isActive, onClick }) => {
+      const title = isActive ? 'Active page' : `Open page ${value}`;
+
+      return (
+        <BootstrapPagination.Item active={isActive}
+                                  onClick={onClick}
+                                  title={title}
+                                  aria-label={title}>
+          {value}
+        </BootstrapPagination.Item>
+      );
+    },
+    [ITEM_TYPES.ELLIPSIS]: ({ isActive, onClick }) => {
+      const title = 'Open following page';
+
+      return (
+        <BootstrapPagination.Ellipsis disabled={isActive} onClick={onClick} title={title} aria-label={title}>
+          <Icon name="ellipsis-h" />
+        </BootstrapPagination.Ellipsis>
+      );
+    },
+    [ITEM_TYPES.FIRST_PAGE_LINK]: ({ isActive, onClick }) => {
+      const title = 'Open first page';
+
+      return (
+        <BootstrapPagination.First disabled={isActive} onClick={onClick} title={title} aria-label={title}>
+          <Icon name="angle-double-left" />
+        </BootstrapPagination.First>
+      );
+    },
+    [ITEM_TYPES.PREVIOUS_PAGE_LINK]: ({ isActive, onClick }) => {
+      const title = 'Open previous page';
+
+      return (
+        <BootstrapPagination.Prev disabled={isActive} onClick={onClick} title={title} aria-label={title}>
+          <Icon name="angle-left" />
+        </BootstrapPagination.Prev>
+      );
+    },
+    [ITEM_TYPES.NEXT_PAGE_LINK]: ({ isActive, onClick }) => {
+      const title = 'Open next page';
+
+      return (
+        <BootstrapPagination.Next disabled={isActive} onClick={onClick} title={title} aria-label={title}>
+          <Icon name="angle-right" />
+        </BootstrapPagination.Next>
+      );
+    },
+    [ITEM_TYPES.LAST_PAGE_LINK]: ({ isActive, onClick }) => {
+      const title = 'Open last page';
+
+      return (
+        <BootstrapPagination.Last disabled={isActive} onClick={onClick} title={title} aria-label={title}>
+          <Icon name="angle-double-right" />
+        </BootstrapPagination.Last>
+      );
+    },
     /* eslint-enable react/prop-types */
   },
 });

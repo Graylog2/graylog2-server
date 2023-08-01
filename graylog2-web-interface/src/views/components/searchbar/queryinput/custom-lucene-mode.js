@@ -89,7 +89,7 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
         }, {
           token: 'string.regexp.end',
           regex: '/[sxngimy]*',
-          next: 'no_regex',
+          next: 'start',
         }, {
           token: 'invalid',
           regex: /\{\d+\b,?\d*\}[+*]|[+*$^?][+*]|[$^][?]|\?{3,}/,
@@ -110,7 +110,7 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
         }, {
           token: 'empty',
           regex: '$',
-          next: 'no_regex',
+          next: 'start',
         }, {
           defaultToken: 'string.regexp',
         },
@@ -129,7 +129,7 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
         }, {
           token: 'empty',
           regex: '$',
-          next: 'no_regex',
+          next: 'start',
         }, {
           defaultToken: 'string.regexp.charachterclass',
         },

@@ -40,6 +40,7 @@ import type {
 import { adjustFormat } from 'util/DateTime';
 import useIndexDefaults from 'pages/useIndexDefaults';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Props = {
   retentionStrategies?: Array<RetentionStrategy> | null | undefined,
@@ -49,6 +50,7 @@ type Props = {
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
@@ -56,6 +58,11 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   }, []);
 
   const _saveConfiguration = (indexSetItem: IndexSet) => {
+    sendTelemetry('form_submit', {
+      app_pathname: 'indexsets',
+      app_action_value: 'createindexset',
+    });
+
     const copy = indexSetItem;
 
     copy.creation_date = adjustFormat(new Date(), 'internal');
@@ -67,9 +74,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
   const { loadingIndexDefaultsConfig, indexDefaultsConfig: config } = useIndexDefaults();
 
-  const _isLoading = () => {
-    return !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
-  };
+  const _isLoading = () => !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
 
   if (_isLoading()) {
     return <Spinner />;

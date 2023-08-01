@@ -20,6 +20,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -30,10 +31,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class CommandFactory {
-    private final QueryStringDecorator queryStringDecorator;
+    private final QueryStringDecorators queryStringDecorator;
 
     @Inject
-    public CommandFactory(QueryStringDecorator queryStringDecorator) {
+    public CommandFactory(QueryStringDecorators queryStringDecorator) {
         this.queryStringDecorator = queryStringDecorator;
     }
 
@@ -45,9 +46,8 @@ public class CommandFactory {
                 .fieldsInOrder(request.fieldsInOrder())
                 .chunkSize(request.chunkSize());
 
-        if (request.limit().isPresent()) {
-            builder.limit(request.limit().getAsInt());
-        }
+        request.timeZone().ifPresent(builder::timeZone);
+        request.limit().ifPresent(builder::limit);
 
         return builder.build();
     }
@@ -158,7 +158,7 @@ public class CommandFactory {
 
     private ElasticsearchQueryString decorateQueryString(Search search, Query query, ElasticsearchQueryString undecorated) {
         String queryString = undecorated.queryString();
-        String decorated = queryStringDecorator.decorateQueryString(queryString, search, query);
+        String decorated = queryStringDecorator.decorate(queryString, search, query);
         return ElasticsearchQueryString.of(decorated);
     }
 }

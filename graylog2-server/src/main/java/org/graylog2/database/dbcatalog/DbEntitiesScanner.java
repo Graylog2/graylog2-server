@@ -16,73 +16,45 @@
  */
 package org.graylog2.database.dbcatalog;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import org.graylog2.database.DbEntity;
+import com.google.common.base.Stopwatch;
+import org.graylog2.database.dbcatalog.impl.ClassGraphDbEntitiesScanningMethod;
+import org.graylog2.database.dbcatalog.impl.DbEntitiesScanningMethod;
 import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbEntitiesScanner.class);
 
     private final String[] packagesToScan;
-
-    private final ClassLoader chainingClassLoader;
+    private final String[] packagesToExclude;
+    private final ChainingClassLoader chainingClassLoader;
+    private final DbEntitiesScanningMethod dbEntitiesScanningMethod = new ClassGraphDbEntitiesScanningMethod();
 
     @SuppressWarnings("unused")
     @Inject
     public DbEntitiesScanner(final ChainingClassLoader chainingClassLoader) {
         this.chainingClassLoader = chainingClassLoader;
         this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
+        this.packagesToExclude = new String[]{"org.graylog.shaded", "org.graylog.storage", "org.graylog2.migrations"};
     }
 
-    DbEntitiesScanner(String[] packagesToScan) {
+    DbEntitiesScanner(final String[] packagesToScan, final String[] packagesToExclude) {
         this.chainingClassLoader = null;
         this.packagesToScan = packagesToScan;
-
+        this.packagesToExclude = packagesToExclude;
     }
 
     @Override
     public DbEntitiesCatalog get() {
-        final ConfigurationBuilder configuration = new ConfigurationBuilder();
-        if (chainingClassLoader != null) {
-            configuration.setClassLoaders(new ClassLoader[]{chainingClassLoader});
-            Stream.of(packagesToScan).forEach(pkg -> {
-                configuration.forPackage(pkg, chainingClassLoader);
-            });
-        } else {
-            configuration.forPackages(packagesToScan);
-        }
-        configuration.setScanners(Scanners.TypesAnnotated);
-
-        final Reflections reflections = new Reflections(configuration);
-
-        final List<DbEntityCatalogEntry> dbEntities = reflections.getTypesAnnotatedWith(DbEntity.class).stream()
-                .map(
-                        type -> {
-                            final DbEntity annotation = type.getAnnotation(DbEntity.class);
-
-                            return new DbEntityCatalogEntry(
-                                    annotation.collection(),
-                                    annotation.titleField(),
-                                    type,
-                                    annotation.readPermission());
-
-                        }
-                ).collect(Collectors.toList());
-
-        LOG.info(dbEntities.size() + " entities have been scanned and added to DB Entity Catalog");
-        return new DbEntitiesCatalog(dbEntities);
+        final Stopwatch stopwatch = Stopwatch.createStarted();
+        final DbEntitiesCatalog catalog = dbEntitiesScanningMethod.scan(packagesToScan, packagesToExclude, chainingClassLoader);
+        stopwatch.stop();
+        LOG.info("{} entities have been scanned and added to DB Entity Catalog, it took {}", catalog.size(), stopwatch);
+        return catalog;
     }
-
-
 }

@@ -26,14 +26,23 @@ import { FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import useHistory from 'routing/useHistory';
 import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const HTTPHeaderAuthConfigSection = () => {
   const [submitError, setSubmitError] = useState<string | undefined>();
-  const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined>();
+  const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined | void>();
   const sectionTitle = 'Trusted Header Authentication';
   const history = useHistory();
 
+  const sendTelemetry = useSendTelemetry();
+
   const _onSubmit = (data: HTTPHeaderAuthConfigJSON) => {
+    sendTelemetry('form_submit', {
+      app_pathname: 'authentication',
+      app_section: 'authenticator-trustedheader',
+      app_action_value: 'config-update',
+    });
+
     setSubmitError(undefined);
 
     return HTTPHeaderAuthConfigDomain.update(data).then(() => {
@@ -79,7 +88,8 @@ const HTTPHeaderAuthConfigSection = () => {
             <Row>
               <Col mdOffset={3} md={9}>
                 <Alert bsStyle="info">
-                  <Icon name="info-circle" /> Please configure the <code>trusted_proxies</code> setting in the Graylog server configuration file.
+                  <Icon name="info-circle" /> Please configure the <code>trusted_proxies</code> setting in the Graylog
+                  server configuration file.
                 </Alert>
               </Col>
             </Row>

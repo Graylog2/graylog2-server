@@ -69,6 +69,7 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
   return (
     <BootstrapModalForm show={show}
                         title={modalTitle}
+                        data-telemetry-title="Dashboard Properties"
                         onCancel={onClose}
                         onSubmitForm={_onSave}
                         submitButtonText={submitButtonText}

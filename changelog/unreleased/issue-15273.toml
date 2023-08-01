@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix pagination problems on Events page."
+
+issues = ["15273"]
+pulls = ["15357"]

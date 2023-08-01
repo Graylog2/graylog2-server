@@ -26,7 +26,7 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import EventReplaySearchPage from 'views/pages/EventReplaySearchPage';
+import EventReplaySearchPage, { onErrorHandler } from 'views/pages/EventReplaySearchPage';
 import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'hooks/useEventDefinition';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
@@ -45,7 +45,7 @@ jest.mock('routing/useParams');
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateViewForEvent');
 jest.mock('views/logic/views/UseProcessHooksForView');
-jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useCreateSearch');
 jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
 jest.mock('hooks/useAlertAndEventDefinitionData');
@@ -69,7 +69,7 @@ jest.mock('views/logic/Widgets', () => ({
 
 describe('EventReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
-    <StreamsContext.Provider value={[{}]}>
+    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' }]}>
       <EventReplaySearchPage />
     </StreamsContext.Provider>
   );
@@ -113,7 +113,7 @@ describe('EventReplaySearchPage', () => {
     }));
 
     render(<SimpleReplaySearchPage />);
-    await waitFor(() => expect(useEventById).toHaveBeenCalledWith(mockEventData.event.id));
+    await waitFor(() => expect(useEventById).toHaveBeenCalledWith(mockEventData.event.id, { onErrorHandler }));
     await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventData.event.event_definition_id));
 
     await expect(UseCreateViewForEvent).toHaveBeenCalledWith({

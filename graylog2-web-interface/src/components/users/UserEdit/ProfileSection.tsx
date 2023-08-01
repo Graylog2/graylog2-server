@@ -42,7 +42,7 @@ type Props = {
 };
 
 const StyledReadOnlyFormGroup = styled(ReadOnlyFormGroup)`
-  :not(:last-child) {
+  &:not(:last-child) {
     margin-bottom: 15px;
   }
 `;
@@ -79,9 +79,7 @@ const ProfileSection = ({
     );
   };
 
-  const isOldUser = () => {
-    return fullName && (!firstName && !lastName);
-  };
+  const isOldUser = () => fullName && (!firstName && !lastName);
 
   return (
     <SectionComponent title="Profile">
