@@ -36,6 +36,7 @@ import org.graylog.security.authservice.rest.AuthServicesResource;
 import org.graylog.security.authservice.rest.GlobalAuthServiceConfigResource;
 import org.graylog.security.authservice.rest.HTTPHeaderAuthenticationConfigResource;
 import org.graylog.security.authzroles.AuthzRolesResource;
+import org.graylog.security.events.AuthServiceDeactivatedEventListener;
 import org.graylog.security.rest.EntitySharesResource;
 import org.graylog.security.rest.GrantsOverviewResource;
 import org.graylog.security.shares.DefaultGranteeService;
@@ -85,5 +86,8 @@ public class SecurityModule extends PluginModule {
                 ADAuthServiceBackend.class,
                 ADAuthServiceBackend.Factory.class,
                 ADAuthServiceBackendConfig.class);
+
+        bind(AuthServiceDeactivatedEventListener.class).asEagerSingleton();
+
     }
 }
