@@ -38,7 +38,7 @@ import java.security.SecureRandom;
 public class OpensearchRestClient {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchRestClient.class);
 
-    public static RestHighLevelClient build(final OpensearchConfiguration configuration, final CaService caService) {
+    public static RestHighLevelClient build(final OpensearchConfiguration configuration, final CustomCAX509TrustManager tm) {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
         final HttpHost host = configuration.getRestBaseUrl();
@@ -51,7 +51,6 @@ public class OpensearchRestClient {
 
             try {
                 final var sslContext = SSLContext.getInstance("TLS");
-                final var tm = new CustomCAX509TrustManager(caService);
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
 
                 builder.setHttpClientConfigCallback(httpClientBuilder -> {
