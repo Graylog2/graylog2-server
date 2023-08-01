@@ -109,7 +109,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpenSearchContainer(DockerImageName.parse(image))
+        return new GenericContainer<>(DockerImageName.parse(image))
                 .withImagePullPolicy(PullPolicy.alwaysPull())
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
