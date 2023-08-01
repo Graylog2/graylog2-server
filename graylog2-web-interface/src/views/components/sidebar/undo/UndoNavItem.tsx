@@ -22,12 +22,21 @@ import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { undo } from 'views/logic/slices/undoRedoActions';
 
+const TITLE = 'Undo';
+
 const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(undo()), [dispatch]);
 
-  return <NavItem disabled={!isUndoAvailable} onClick={onClick} icon="undo" title="Undo" sidebarIsPinned={sidebarIsPinned} />;
+  return (
+    <NavItem disabled={!isUndoAvailable}
+             onClick={onClick}
+             icon="undo"
+             title={TITLE}
+             ariaLabel={TITLE}
+             sidebarIsPinned={sidebarIsPinned} />
+  );
 };
 
 export default UndoNavItem;

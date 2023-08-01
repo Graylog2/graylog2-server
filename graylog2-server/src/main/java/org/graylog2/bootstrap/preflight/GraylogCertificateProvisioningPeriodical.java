@@ -61,8 +61,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
 @Singleton
-public class GraylogPreflightGeneratePeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogPreflightGeneratePeriodical.class);
+public class GraylogCertificateProvisioningPeriodical extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
 
     private final NodePreflightConfigService nodePreflightConfigService;
     private final NodeService nodeService;
@@ -76,14 +76,14 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
     @Inject
-    public GraylogPreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
-                                              final CsrMongoStorage csrStorage,
-                                              final CertChainMongoStorage certMongoStorage,
-                                              final CaService caService,
-                                              final Configuration configuration,
-                                              final NodeService nodeService,
-                                              final CsrSigner csrSigner,
-                                              final @Named("password_secret") String passwordSecret) {
+    public GraylogCertificateProvisioningPeriodical(final NodePreflightConfigService nodePreflightConfigService,
+                                                    final CsrMongoStorage csrStorage,
+                                                    final CertChainMongoStorage certMongoStorage,
+                                                    final CaService caService,
+                                                    final Configuration configuration,
+                                                    final NodeService nodeService,
+                                                    final CsrSigner csrSigner,
+                                                    final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -118,58 +118,62 @@ public class GraylogPreflightGeneratePeriodical extends Periodical {
         LOG.debug("checking if there are configuration steps to take care of");
 
         try {
-            final var password = configuration.configuredCaExists() ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
-            Optional<KeyStore> optKey = caService.loadKeyStore();
-            if(optKey.isEmpty()) {
-                LOG.warn("No keystore available.");
-                return;
-            }
+            // only load nodes that are in a state that need sth done
+            final var nodes = nodePreflightConfigService.findAllNodesThatNeedAttention();
+            if(!nodes.isEmpty()) {
 
-            if(okHttpClient.isEmpty()) {
-                okHttpClient = buildTempHttpClient();
-            }
+                final var password = configuration.configuredCaExists() ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
+                Optional<KeyStore> optKey = caService.loadKeyStore();
+                if (optKey.isEmpty()) {
+                    LOG.warn("No keystore available.");
+                    return;
+                }
 
-            KeyStore caKeystore = optKey.get();
-            var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
-            var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
+                if (okHttpClient.isEmpty()) {
+                    okHttpClient = buildTempHttpClient();
+                }
 
-            var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+                KeyStore caKeystore = optKey.get();
+                var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
+                var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
-            nodePreflightConfigService.streamAll()
-                    .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
-                    .forEach(c -> {
-                        try {
-                            var csr = csrStorage.readCsr(c.nodeId());
-                            if (csr.isEmpty()) {
-                                LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                nodePreflightConfigService.save(c.toBuilder()
-                                        .state(NodePreflightConfig.State.ERROR)
-                                        .errorMsg("Node in CSR state, but no CSR present")
-                                        .build());
-                            } else {
-                                var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
-                                //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
-                                final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
-                                certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
+                var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+
+                nodes.stream()
+                        .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
+                        .forEach(c -> {
+                            try {
+                                var csr = csrStorage.readCsr(c.nodeId());
+                                if (csr.isEmpty()) {
+                                    LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
+                                    nodePreflightConfigService.save(c.toBuilder()
+                                            .state(NodePreflightConfig.State.ERROR)
+                                            .errorMsg("Node in CSR state, but no CSR present")
+                                            .build());
+                                } else {
+                                    var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                                    //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
+                                    final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
+                                    certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
+                                }
+                            } catch (Exception e) {
+                                LOG.error("Could not sign CSR: " + e.getMessage(), e);
+                                nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
                             }
-                        } catch (Exception e) {
-                            LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                            nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
-                        }
-                    });
+                        });
 
-            nodePreflightConfigService.streamAll()
-                    .filter(c -> NodePreflightConfig.State.STORED.equals(c.state()))
-                    .forEach(c -> {
-                        try {
-                            if(checkConnectivity(c.nodeId())) {
-                                nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
+                nodes.stream()
+                        .filter(c -> NodePreflightConfig.State.STORED.equals(c.state()))
+                        .forEach(c -> {
+                            try {
+                                if (checkConnectivity(c.nodeId())) {
+                                    nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
+                                }
+                            } catch (Exception e) {
+                                LOG.warn("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage() + ", retrying", e);
                             }
-                        } catch (Exception e) {
-                            LOG.warn("Exception trying to connect to node "  + c.nodeId() + ": " + e.getMessage() + ", retrying", e);
-                        }
-                    });
-
+                        });
+            }
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {

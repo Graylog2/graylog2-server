@@ -27,6 +27,7 @@ import { EventNotificationsActions } from 'stores/event-notifications/EventNotif
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 
 type Props = {
   isTestLoading: boolean,
@@ -78,7 +79,8 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
                      onClick={() => setShowShareNotification(notification)}
                      bsSize="xsmall" />
 
-        <OverlayDropdownButton title="More"
+        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
 

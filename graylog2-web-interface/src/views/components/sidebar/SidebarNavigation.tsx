@@ -28,7 +28,6 @@ type Props = {
   actions: Array<SidebarAction>,
   selectSidebarSection: (sectionKey: string) => void,
   sidebarIsPinned: boolean,
-  toggleSidebar: () => void,
 };
 
 const Container = styled.div<{ $isOpen: boolean, $sidebarIsPinned: boolean }>(({ $isOpen, $sidebarIsPinned, theme }) => css`
@@ -73,27 +72,25 @@ const HorizontalRuleWrapper = styled.div`
   }
 `;
 
-const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, toggleSidebar, actions }: Props) => {
-  const toggleIcon = activeSection ? 'chevron-left' : 'chevron-right';
+const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, actions }: Props) => {
   const activeSectionKey = activeSection?.key;
 
   return (
     <Container $sidebarIsPinned={sidebarIsPinned} $isOpen={!!activeSection}>
-      <NavItem icon={toggleIcon}
-               onClick={toggleSidebar}
-               showTitleOnHover={false}
-               title={`${activeSection ? 'Close' : 'Open'} sidebar`}
-               sidebarIsPinned={sidebarIsPinned} />
-      <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>
-        {sections.map(({ key, icon, title }) => (
-          <NavItem isSelected={activeSectionKey === key}
-                   icon={icon}
-                   onClick={() => selectSidebarSection(key)}
-                   key={key}
-                   title={title}
-                   sidebarIsPinned={sidebarIsPinned} />
-        ))}
+        {sections.map(({ key, icon, title }) => {
+          const isSelected = activeSectionKey === key;
+
+          return (
+            <NavItem isSelected={isSelected}
+                     ariaLabel={isSelected ? `Close ${title} section` : `Open ${title} section`}
+                     icon={icon}
+                     onClick={() => selectSidebarSection(key)}
+                     key={key}
+                     title={title}
+                     sidebarIsPinned={sidebarIsPinned} />
+          );
+        })}
       </SectionList>
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>

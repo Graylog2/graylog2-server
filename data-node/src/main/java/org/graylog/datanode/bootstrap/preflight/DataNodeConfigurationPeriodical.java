@@ -46,8 +46,8 @@ import java.security.KeyStore;
 import java.util.Optional;
 
 @Singleton
-public class DataNodePreflightGeneratePeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(DataNodePreflightGeneratePeriodical.class);
+public class DataNodeConfigurationPeriodical extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(DataNodeConfigurationPeriodical.class);
 
     private final NodePreflightConfigService nodePreflightConfigService;
     private final NodeService nodeService;
@@ -61,15 +61,15 @@ public class DataNodePreflightGeneratePeriodical extends Periodical {
     private final char[] passwordSecret;
 
     @Inject
-    public DataNodePreflightGeneratePeriodical(final NodePreflightConfigService nodePreflightConfigService,
-                                               final NodeService nodeService,
-                                               final NodeId nodeId,
-                                               final CsrMongoStorage csrStorage,
-                                               final CsrGenerator csrGenerator,
-                                               final CertChainMongoStorage certMongoStorage,
-                                               final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
-                                               final SmartKeystoreStorage keystoreStorage,
-                                               final @Named("password_secret") String passwordSecret) {
+    public DataNodeConfigurationPeriodical(final NodePreflightConfigService nodePreflightConfigService,
+                                           final NodeService nodeService,
+                                           final NodeId nodeId,
+                                           final CsrMongoStorage csrStorage,
+                                           final CsrGenerator csrGenerator,
+                                           final CertChainMongoStorage certMongoStorage,
+                                           final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
+                                           final SmartKeystoreStorage keystoreStorage,
+                                           final @Named("password_secret") String passwordSecret) {
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;

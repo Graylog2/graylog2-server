@@ -22,7 +22,6 @@ import { Builder } from 'logic/rest/FetchProvider';
 
 const fetchServerAvailability = () => new Builder('GET', qualifyUrl('/api'))
   .json()
-  .setHeader('X-Graylog-No-Session-Extension', 'true')
   .build();
 
 const useServerAvailability = () => {

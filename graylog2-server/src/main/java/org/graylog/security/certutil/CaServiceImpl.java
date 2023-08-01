@@ -29,6 +29,7 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLoca
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
+import org.graylog2.cluster.certificates.CertificatesService;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,7 @@ public class CaServiceImpl implements CaService {
     private final CACreator caCreator;
     private final PemCaReader pemCaReader;
     private final CaConfiguration configuration;
+    private final CertificatesService certificatesService;
     private final String passwordSecret;
 
     @Inject
@@ -68,12 +70,14 @@ public class CaServiceImpl implements CaService {
                      final NodeId nodeId,
                      final CACreator caCreator,
                      final PemCaReader pemCaReader,
+                     final CertificatesService certificatesService,
                      final @Named("password_secret") String passwordSecret) {
         this.keystoreStorage = keystoreStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
         this.pemCaReader = pemCaReader;
         this.configuration = configuration;
+        this.certificatesService = certificatesService;
         this.passwordSecret = configuration.getCaPassword() != null ? configuration.getCaPassword() : passwordSecret;
         this.mongoDbCaLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
         this.manuallyProvidedCALocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
@@ -126,7 +130,7 @@ public class CaServiceImpl implements CaService {
 
     @Override
     public void startOver() {
-
+        certificatesService.removeCert(mongoDbCaLocation);
     }
 
     @Override
