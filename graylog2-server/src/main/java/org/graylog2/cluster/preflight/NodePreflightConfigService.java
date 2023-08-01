@@ -16,11 +16,13 @@
  */
 package org.graylog2.cluster.preflight;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface NodePreflightConfigService {
     NodePreflightConfig getPreflightConfigFor(String nodeId);
+    List<NodePreflightConfig> findAllNodesThatNeedAttention();
 
     void writeCsr(String nodeId, String csr);
 

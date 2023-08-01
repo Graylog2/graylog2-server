@@ -20,17 +20,17 @@ import { useCallback } from 'react';
 
 import SelectedFieldsList from 'views/components/widgets/SelectedFieldsList';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
-import type { FieldTypeCategory } from 'views/logic/aggregationbuilder/Pivot';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type Props = {
   createSelectPlaceholder?: string
   displaySortableListOverlayInPortal?: boolean,
   menuPortalTarget?: HTMLElement,
   onChange: (newFields: Array<string>) => void,
-  qualifiedTypeCategory?: FieldTypeCategory
+  isFieldQualified?: (field: FieldTypeMapping) => boolean,
   selectSize?: 'normal' | 'small',
-  selectedFields: Array<string>
-  testPrefix?: string
+  selectedFields: Array<string>,
+  testPrefix?: string,
 }
 
 const FieldsConfiguration = ({
@@ -38,7 +38,7 @@ const FieldsConfiguration = ({
   displaySortableListOverlayInPortal,
   menuPortalTarget,
   onChange,
-  qualifiedTypeCategory,
+  isFieldQualified,
   selectSize,
   selectedFields,
   testPrefix,
@@ -57,7 +57,7 @@ const FieldsConfiguration = ({
       <FieldSelect id="field-create-select"
                    onChange={onAddField}
                    clearable={false}
-                   qualifiedTypeCategory={qualifiedTypeCategory}
+                   isFieldQualified={isFieldQualified}
                    persistSelection={false}
                    name="field-create-select"
                    value={undefined}
@@ -73,7 +73,7 @@ const FieldsConfiguration = ({
 FieldsConfiguration.defaultProps = {
   createSelectPlaceholder: 'Add a field',
   displaySortableListOverlayInPortal: false,
-  qualifiedTypeCategory: undefined,
+  isFieldQualified: undefined,
   selectSize: undefined,
   menuPortalTarget: undefined,
   testPrefix: '',
