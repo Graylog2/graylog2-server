@@ -18,9 +18,9 @@ package org.graylog.datanode.initializers;
 
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
@@ -42,11 +42,9 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.CertConstants;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
-import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
@@ -67,7 +65,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -138,7 +135,7 @@ public class JerseyService extends AbstractIdleService {
      */
     private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
         final Map<String, String> cfgMap = config.asMap();
-        if(config.opensearchSecurityConfiguration().securityEnabled()) {
+        if(!Boolean.parseBoolean(cfgMap.get("plugins.security.disabled"))) {
             // caution, this path is relative to the opensearch config directory!
 
             final String keystore = cfgMap.get("plugins.security.ssl.http.keystore_filepath");
