@@ -20,12 +20,12 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Provides support for decoding resolver view IDs (in the format resolver-name:viewId).
+ * Provides support for decoding resolver view IDs (in the format resolver-name__viewId).
  * See {@link ViewResolver} for more information.
  */
 public class ViewResolverDecoder {
 
-    public static final String SEPARATOR = ":";
+    public static final String SEPARATOR = "__";
     private final String viewId;
 
     public ViewResolverDecoder(String viewId) throws IllegalArgumentException {
@@ -41,7 +41,7 @@ public class ViewResolverDecoder {
     }
 
     /**
-     * @return The resolver name (provided before the ':' separator).
+     * @return The resolver name (provided before the '__' separator).
      */
     public String getResolverName() {
         final String[] split = viewId.split(SEPARATOR);
@@ -50,7 +50,7 @@ public class ViewResolverDecoder {
     }
 
     /**
-     * @return The view id (provided after the ':' separator).
+     * @return The view id (provided after the '__' separator).
      */
     public String getViewId() {
         final String[] split = viewId.split(SEPARATOR);
