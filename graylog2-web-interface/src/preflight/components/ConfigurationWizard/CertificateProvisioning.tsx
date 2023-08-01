@@ -23,7 +23,7 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
 
-const onProvisionCertificates = () => fetch(
+const onProvisionCertificate = () => fetch(
   'POST',
   URLUtils.qualifyUrl('api/generate'),
   undefined,
@@ -38,7 +38,7 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
   const queryClient = useQueryClient();
   const { data: dataNodes, isInitialLoading } = useDataNodes();
 
-  const { mutate: provisionCertificates, isLoading } = useMutation(onProvisionCertificates, {
+  const { mutate: provisionCertificate, isLoading: isProvisioning } = useMutation(onProvisionCertificate, {
     onSuccess: () => {
       UserNotification.success('Certificate provisioning successful');
       queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
@@ -62,8 +62,8 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
         </Alert>
       )}
       <Group>
-        <Button onClick={() => provisionCertificates()} disabled={!dataNodes.length}>
-          {isLoading ? 'Provisioning certificate...' : 'Provision certificate and continue'}
+        <Button onClick={() => provisionCertificate()} disabled={!dataNodes.length || isProvisioning}>
+          {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}
         </Button>
         <Button onClick={() => onSkipProvisioning()} variant="light">
           Skip provisioning
