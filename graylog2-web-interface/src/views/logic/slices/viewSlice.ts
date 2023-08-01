@@ -85,7 +85,7 @@ const viewSlice = createSlice({
 export const viewSliceReducer = viewSlice.reducer;
 export const { setView, setIsDirty, setIsNew, setActiveQuery } = viewSlice.actions;
 
-const isViewEqualForSearch = (view: View, newView: View) => {
+export const isViewWidgetsEqualForSearch = (view: View, newView: View) => {
   const oldWidgets = view?.state?.map((s) => s.widgets);
   const newWidgets = newView?.state?.map((s) => s.widgets);
 
@@ -111,7 +111,7 @@ export const selectQuery = (activeQuery: string) => async (dispatch: AppDispatch
 export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
 
-  if (recreateSearch || !isViewEqualForSearch(view, newView)) {
+  if (recreateSearch || !isViewWidgetsEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
 
     await dispatch(setView(updatedViewWithSearch));
@@ -142,7 +142,7 @@ export const updateView = (
     }));
   }
 
-  if (recreateSearch || !isViewEqualForSearch(view, newView)) {
+  if (recreateSearch || !isViewWidgetsEqualForSearch(view, newView)) {
     const updatedViewWithSearch = await _recreateSearch(newView);
     await dispatch(setView(updatedViewWithSearch, true));
 
