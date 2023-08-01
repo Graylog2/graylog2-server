@@ -128,19 +128,18 @@ public class JerseyService extends AbstractIdleService {
 
     @Subscribe
     public synchronized void handleOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) throws Exception {
-        LOG.info("Opensearch config changed");
+        LOG.info("Opensearch config changed, restarting jersey service to apply security changes");
         shutDown();
         doStartup(extractSslConfiguration(event.config()));
     }
 
+    /**
+     * TODO: replace this map magic with proper types in OpensearchConfiguration
+     */
     private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
-
-        System.out.println(config);
-
         final Map<String, String> cfgMap = config.asMap();
-        if(!Boolean.valueOf(cfgMap.get("plugins.security.disabled"))) {
+        if(config.opensearchSecurityConfiguration().securityEnabled()) {
             // caution, this path is relative to the opensearch config directory!
-
 
             final String keystore = cfgMap.get("plugins.security.ssl.http.keystore_filepath");
             final Path keystorePath = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch").resolve(keystore);
@@ -155,7 +154,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void startUp() {
-        //doStartup();
+        // do nothing, the actual startup will be triggered in the moment opensearch configuration is available
     }
 
     private void doStartup(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
@@ -166,7 +165,7 @@ public class JerseyService extends AbstractIdleService {
     }
 
     @Override
-    protected void shutDown() throws Exception {
+    protected void shutDown() {
         shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
     }
 
@@ -204,13 +203,6 @@ public class JerseyService extends AbstractIdleService {
         apiHttpServer.start();
 
         LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
-    }
-
-    private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<Class<? extends PluginRestResource>>> pluginResourceMap) {
-        return pluginResourceMap.entrySet().stream()
-                .map(entry -> prefixResources(pluginPrefix + "/" + entry.getKey(), entry.getValue()))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
     }
 
     private <T> Set<Resource> prefixResources(String prefix, Set<Class<? extends T>> resources) {
