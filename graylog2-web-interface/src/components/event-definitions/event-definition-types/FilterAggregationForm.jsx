@@ -38,6 +38,7 @@ const initialFilterConfig = {
   streams: [],
   search_within_ms: 5 * 60 * 1000,
   execute_every_ms: 5 * 60 * 1000,
+  _is_scheduled: true,
   event_limit: 500,
 };
 

@@ -29,6 +29,7 @@ export type NavItemProps = {
   showTitleOnHover?: boolean,
   sidebarIsPinned: boolean,
   disabled?: boolean,
+  ariaLabel: string,
 };
 
 type ContainerProps = {
@@ -147,8 +148,8 @@ const Title = styled.div(({ theme: { colors, fonts } }) => css`
   }
 `);
 
-const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned, disabled }: NavItemProps) => (
-  <Container aria-label={title}
+const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned, disabled, ariaLabel }: NavItemProps) => (
+  <Container aria-label={ariaLabel}
              $isSelected={isSelected}
              onClick={!disabled ? onClick : undefined}
              title={showTitleOnHover ? '' : title}
