@@ -60,7 +60,7 @@ class SearchResult {
 
     this._results = fromJS(mapValues(result.results, (queryResult) => new QueryResult(queryResult)));
 
-    this._errors = fromJS(result?.errors ?? [].map((error: SearchErrorResponse | ResultWindowLimitErrorResponse) => {
+    this._errors = fromJS((result?.errors ?? []).map((error: SearchErrorResponse | ResultWindowLimitErrorResponse) => {
       if (isResultWindowLimitErrorResponse(error)) {
         return new ResultWindowLimitError(error, this);
       }
