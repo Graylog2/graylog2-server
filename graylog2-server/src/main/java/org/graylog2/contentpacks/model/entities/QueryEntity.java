@@ -172,7 +172,7 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                         .collect(Collectors.toSet()))
                 .query(query())
                 .filter(shallowMappedFilter(nativeEntities))
-                .filters(filters())
+                .filters(convertSearchFilters(filters()))
                 .timerange(timerange())
                 .globalOverride(globalOverride().orElse(null))
                 .build();

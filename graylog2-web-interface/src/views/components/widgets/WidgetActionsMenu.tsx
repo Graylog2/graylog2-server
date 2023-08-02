@@ -47,6 +47,7 @@ import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import useParameters from 'views/hooks/useParameters';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -156,6 +157,7 @@ const WidgetActionsMenu = ({
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const { parameters, parameterBindings } = useParameters();
 
   const onDuplicate = useCallback(() => {
     sendTelemetry('click', {
@@ -209,7 +211,9 @@ const WidgetActionsMenu = ({
         <IfDashboard>
           <ReplaySearchButton queryString={query.query_string}
                               timerange={timerange}
-                              streams={streams} />
+                              streams={streams}
+                              parameterBindings={parameterBindings}
+                              parameters={parameters} />
         </IfDashboard>
         {isFocused && (
           <IconButton name="compress-arrows-alt"

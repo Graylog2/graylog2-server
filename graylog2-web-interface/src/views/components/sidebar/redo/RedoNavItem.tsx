@@ -22,12 +22,21 @@ import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { redo } from 'views/logic/slices/undoRedoActions';
 
+const TITLE = 'Redo';
+
 const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(redo()), [dispatch]);
 
-  return <NavItem disabled={!isRedoAvailable} onClick={onClick} icon="redo" title="Redo" sidebarIsPinned={sidebarIsPinned} />;
+  return (
+    <NavItem disabled={!isRedoAvailable}
+             onClick={onClick}
+             icon="redo"
+             title={TITLE}
+             ariaLabel={TITLE}
+             sidebarIsPinned={sidebarIsPinned} />
+  );
 };
 
 export default RedoNavItem;
