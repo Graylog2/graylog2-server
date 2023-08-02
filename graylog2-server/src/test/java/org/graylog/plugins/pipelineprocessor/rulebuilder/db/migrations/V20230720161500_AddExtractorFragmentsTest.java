@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversi
 import org.graylog.plugins.pipelineprocessor.functions.messages.GetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.BaseFragmentTest;
@@ -45,6 +46,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         functions.put(SetField.NAME, new SetField());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(RegexMatch.NAME, new RegexMatch());
+        functions.put(RegexReplace.NAME, new RegexReplace());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -65,6 +67,31 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         Rule rule = super.createFragmentSource(fragment, params);
         final Message message = evaluateRule(rule, new Message("bippitysnickerdoodledoobadoo", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("doobad");
+    }
+
+    @Test
+    public void testRegexReplacement() {
+        RuleFragment fragment = V20230720161500_AddExtractorFragments.createRegexReplacementExtractor();
+        Map<String, Object> params = Map.of(
+                "field", "message",
+                "pattern", "dog",
+                "replacement", "cat",
+                "newField", "copyfield"
+        );
+        Rule rule = super.createFragmentSource(fragment, params);
+        Message message = evaluateRule(rule, new Message("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
+        assertThat(message.getField("copyfield")).isEqualTo("zzzcatzzzcatzzz");
+        params = Map.of(
+                "field", "message",
+                "pattern", "dog",
+                "replacement", "cat",
+                "newField", "copyfield2",
+                "replaceAll", false
+        );
+        rule = super.createFragmentSource(fragment, params);
+        message = evaluateRule(rule, new Message("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
+        assertThat(message.getField("copyfield2")).isEqualTo("zzzcatzzzdogzzz");
+
     }
 
 

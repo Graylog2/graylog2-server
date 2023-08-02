@@ -31,6 +31,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
 public class V20230720161500_AddExtractorFragments extends Migration {
@@ -60,6 +61,7 @@ public class V20230720161500_AddExtractorFragments extends Migration {
 
         addFragment(createCopyFieldExtractor());
         addFragment(createRegexExtractor());
+        addFragment(createRegexReplacementExtractor());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("extractor fragments were successfully added");
@@ -111,6 +113,62 @@ public class V20230720161500_AddExtractorFragments extends Migration {
                         ))
                         .returnType(String.class)
                         .description("Copy extracted regular expression of field value to a new field")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Extract regular expression to new field")
+                        .ruleBuilderTitle("Extract regular expression '${pattern}' for field '${field}' and set to new field '${newField}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
+                        .build())
+                .fragmentOutputVariable(resultvariable)
+                .build();
+    }
+
+    static RuleFragment createRegexReplacementExtractor() {
+        String resultvariable = "gl2_fragment_extractor_" + System.currentTimeMillis();
+        return RuleFragment.builder()
+                .fragment("""
+                        let regex_pattern = ${pattern};
+                        let %resultvar% = regex_replace(
+                            pattern: regex_pattern,
+                            value: to_string($message.${field}),
+                            replacement: ${replacement}<#if replaceAll??>,
+                            replace_all: ${replaceAll?c}</#if>
+                        );
+                        set_field(${newField}, %resultvar%);"""
+                        .replace("%resultvar%", resultvariable))
+                .descriptor(FunctionDescriptor.builder()
+                        .name("extract_regex_replace")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to extract").build(),
+                                string("pattern").description("The regular expression used for extraction.").build(),
+                                string("replacement").description("The replacement used for the matching text. Please refer to the Matcher API documentation for the possible options.").build(),
+                                bool("replaceAll").description("Replace all occurences of the pattern, or only the first occurence. (default: true)").build(),
+                                string("newField").description("New field to copy value to").build()
+                        ))
+                        .returnType(String.class)
+                        .description("Copy extracted regular expression of field value to a new field")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Extract regular expression to new field")
+                        .ruleBuilderTitle("Extract regular expression '${pattern}' for field '${field}' and set to new field '${newField}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
+                        .build())
+                .fragmentOutputVariable(resultvariable)
+                .build();
+    }
+
+    static RuleFragment createJsonExtractor() {
+        String resultvariable = "gl2_fragment_extractor_" + System.currentTimeMillis();
+        return RuleFragment.builder()
+                .fragment("""
+                        let %resultvar% = parse_json(to_string($message.${field}));
+                        set_fields(to_map(%resultvar%));"""
+                        .replace("%resultvar%", resultvariable))
+                .descriptor(FunctionDescriptor.builder()
+                        .name("extract_json")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to extract").build()
+                        ))
+                        .returnType(String.class)
+                        .description("Parse field as json and ")
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Extract regular expression to new field")
                         .ruleBuilderTitle("Extract regular expression '${pattern}' for field '${field}' and set to new field '${newField}'")
