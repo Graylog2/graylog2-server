@@ -201,7 +201,7 @@ describe('<Sidebar />', () => {
   it('should render widget create options', async () => {
     renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Create'));
+    fireEvent.click(await screen.findByRole('button', { name: /open create section/i }));
 
     await screen.findByText('Predefined Aggregation');
   });
@@ -209,7 +209,7 @@ describe('<Sidebar />', () => {
   it('should render passed children', async () => {
     renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Fields'));
+    fireEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
 
     await screen.findByText('Marc Watney');
   });
@@ -220,7 +220,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Description'));
+    fireEvent.click(await screen.findByRole('button', { name: /open description section/i }));
 
     await screen.findByText('Execution');
 
@@ -232,11 +232,11 @@ describe('<Sidebar />', () => {
   it('should close an active section when clicking on its navigation item', async () => {
     renderSidebar();
 
-    fireEvent.click(await screen.findByLabelText('Fields'));
+    fireEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
 
     await screen.findByText('Marc Watney');
 
-    fireEvent.click(await screen.findByLabelText('Fields'));
+    fireEvent.click(await screen.findByRole('button', { name: /close fields section/i }));
 
     expect(screen.queryByText('Marc Watney')).toBeNull();
   });
