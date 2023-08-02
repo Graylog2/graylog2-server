@@ -31,6 +31,7 @@ import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -74,7 +74,7 @@ public class DatanodeSecuritySetupIT {
         // use the CA to generate transport certificate keystore
         final Path nodeCert = generateNodeCert(ca);
         // use the CA to generate HTTP certificate keystore
-        httpCert = generateHttpCert(ca, containerHostname);
+        httpCert = generateHttpCert(ca, containerHostname, Tools.getLocalCanonicalHostname());
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
@@ -107,12 +107,14 @@ public class DatanodeSecuritySetupIT {
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort());
+        final KeyStore trustStore = buildTruststore(httpCert, "password");
+
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
             given()
                 .auth().basic("admin", "admin")
-                .trustStore(buildTruststore(httpCert, "password"))
+                .trustStore(trustStore)
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
                 .body("name", Matchers.equalTo("node1"))
@@ -123,7 +125,7 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort, KeyStore trustStore) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
@@ -134,9 +136,10 @@ public class DatanodeSecuritySetupIT {
 
         try {
             var hostname = Tools.getLocalCanonicalHostname();
-            var url = "http://" + hostname + ":" + datanodeRestPort;
+            var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
             LOG.info("Trying to connect to: {}", url);
             retryer.call(() -> RestAssured.given()
+                    .trustStore(trustStore)
                     .get(url)
                     .then());
         } catch (Exception ex) {
@@ -190,13 +193,13 @@ public class DatanodeSecuritySetupIT {
         return nodePath;
     }
 
-    private Path generateHttpCert(Path caPath, String containerHostname) {
+    private Path generateHttpCert(Path caPath, String... containerHostname) {
         final Path httpPath = tempDir.resolve("test-http.p12");
         TestableConsole inputHttp = TestableConsole.empty().silent()
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", containerHostname)
+                .register("Enter alternative names (addresses) of this node [comma separated]", String.join(",", containerHostname))
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),

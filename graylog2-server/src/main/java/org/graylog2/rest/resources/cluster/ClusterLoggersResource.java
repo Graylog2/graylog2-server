@@ -111,6 +111,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @ApiOperation(value = "Set the loglevel of a single logger",
             notes = "Provided level is falling back to DEBUG if it does not exist")
     @NoAuditEvent("proxy resource, audit event will be emitted on target nodes")
+    @Produces(MediaType.APPLICATION_JSON)
     public Map<String, CallResult<Void>> setClusterSingleLoggerLevel(
             @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
             @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
