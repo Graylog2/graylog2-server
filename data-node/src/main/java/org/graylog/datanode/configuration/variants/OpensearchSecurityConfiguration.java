@@ -55,22 +55,22 @@ public class OpensearchSecurityConfiguration {
 
 
     public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws GeneralSecurityException, IOException {
+        if (securityEnabled()) {
+            final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
 
-        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
+            final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
+            final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
-        final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
-        final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
+            this.truststore = TruststoreCreator.newTruststore()
+                    .addRootCert("transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addRootCert("http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .persist(trustStorePath, truststorePassword.toCharArray());
 
-        this.truststore = TruststoreCreator.newTruststore()
-                .addRootCert("transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                .addRootCert("http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                .persist(trustStorePath, truststorePassword.toCharArray());
+            System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
+            System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-        System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
-        System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
-
-        configureInitialAdmin(localConfiguration, opensearchConfigDir, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
-
+            configureInitialAdmin(localConfiguration, opensearchConfigDir, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
+        }
         return this;
     }
 
