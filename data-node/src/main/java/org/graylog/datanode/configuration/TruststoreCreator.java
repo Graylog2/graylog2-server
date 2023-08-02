@@ -19,25 +19,34 @@ package org.graylog.datanode.configuration;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.security.certutil.CertConstants;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TruststoreCreator {
 
-    private final Map<String, X509Certificate> rootCertificates = new LinkedHashMap<>();
+    private final Map<String, X509Certificate> rootCertificates;
+    private final RootCertificateFinder rootCertificateFinder;
+
+    public TruststoreCreator(RootCertificateFinder rootCertificateFinder) {
+        this.rootCertificateFinder = rootCertificateFinder;
+        this.rootCertificates = new LinkedHashMap<>();
+    }
 
     public static TruststoreCreator newTruststore() {
-        return new TruststoreCreator();
+        return new TruststoreCreator(new RootCertificateFinder());
+    }
+
+    public TruststoreCreator addRootCert(final String name, KeystoreInformation keystoreInformation,
+                                         final String alias) throws IOException, GeneralSecurityException {
+        final X509Certificate rootCert = rootCertificateFinder.findRootCert(keystoreInformation.location(), keystoreInformation.password(), alias);
+        rootCertificates.put(name, rootCert);
+        return this;
     }
 
     public KeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
@@ -53,33 +62,4 @@ public class TruststoreCreator {
         }
         return new KeystoreInformation(truststorePath, truststorePassword);
     }
-
-    public TruststoreCreator addRootCert(final String name, KeystoreInformation keystoreInformation,
-                                         final String alias) throws IOException, GeneralSecurityException {
-        final KeyStore keystore = loadKeystore(keystoreInformation.location(), keystoreInformation.password());
-        final Certificate[] certs = keystore.getCertificateChain(alias);
-
-        final X509Certificate rootCert = Arrays.stream(certs)
-                .filter(cert -> cert instanceof X509Certificate)
-                .map(cert -> (X509Certificate) cert)
-                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)//TODO: certs.length == 1 may be temporary, our merged does not create a proper cert chain, it seems
-                .findFirst()
-                .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
-        rootCertificates.put(name, rootCert);
-        return this;
-    }
-
-    private boolean isRootCaCertificate(X509Certificate cert) {
-        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-    }
-
-    private KeyStore loadKeystore(final Path keystorePath,
-                                         final char[] password) throws IOException, GeneralSecurityException {
-        KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-        try (final FileInputStream is = new FileInputStream(keystorePath.toFile())) {
-            nodeKeystore.load(is, password);
-        }
-        return nodeKeystore;
-    }
-
 }
