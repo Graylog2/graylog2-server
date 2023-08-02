@@ -14,21 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.certificates;
+package org.graylog.datanode.configuration.variants;
 
-import org.graylog.security.certutil.CertConstants;
+import java.nio.file.Path;
 
-public record CertificateMetaData(String alias,
-                                  String keystoreFilePath,
-                                  char[] keystoreFilePassword) {
-
-    public CertificateMetaData(String keystoreFilePath,
-                               char[] keystoreFilePassword) {
-        this(CertConstants.DATANODE_KEY_ALIAS, keystoreFilePath, keystoreFilePassword);
-    }
-
+public record KeystoreInformation(Path location, char[] password) {
     public String passwordAsString() {
-        return new String(keystoreFilePassword());
+        return new String(password());
     }
-
 }
