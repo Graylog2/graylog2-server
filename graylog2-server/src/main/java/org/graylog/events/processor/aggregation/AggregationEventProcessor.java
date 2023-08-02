@@ -34,7 +34,6 @@ import org.graylog.events.event.EventWithContext;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventConsumer;
 import org.graylog.events.processor.EventDefinition;
-import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorDependencyCheck;
 import org.graylog.events.processor.EventProcessorException;
@@ -89,7 +88,6 @@ public class AggregationEventProcessor implements EventProcessor {
     private final MoreSearch moreSearch;
     private final EventStreamService eventStreamService;
     private final Messages messages;
-    private final EventDefinitionHandler eventDefinitionHandler;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -98,8 +96,7 @@ public class AggregationEventProcessor implements EventProcessor {
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
-                                     Messages messages,
-                                     EventDefinitionHandler eventDefinitionHandler) {
+                                     Messages messages) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -108,7 +105,6 @@ public class AggregationEventProcessor implements EventProcessor {
         this.moreSearch = moreSearch;
         this.eventStreamService = eventStreamService;
         this.messages = messages;
-        this.eventDefinitionHandler = eventDefinitionHandler;
     }
 
     @Override
@@ -239,14 +235,10 @@ public class AggregationEventProcessor implements EventProcessor {
                         .streams(event.getSourceStreams())
                         .build());
 
-                LOG.debug("Creating event {}/{} {}", eventDefinition.title(), eventDefinition.id(), msg.getTimestamp());
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
 
-            List<EventWithContext> eventsList = eventsWithContext.build();
-            eventDefinitionHandler.updateLastMatched(eventsList);
-
-            eventsConsumer.accept(eventsList);
+            eventsConsumer.accept(eventsWithContext.build());
         };
 
         moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
@@ -265,10 +257,7 @@ public class AggregationEventProcessor implements EventProcessor {
 
         LOG.debug("Got {} (total-aggregated-messages={}) results.", result.keyResults().size(), result.totalAggregatedMessages());
 
-        List<EventWithContext> eventsList = eventsFromAggregationResult(eventFactory, parameters, result);
-        eventDefinitionHandler.updateLastMatched(eventsList);
-
-        eventsConsumer.accept(eventsList);
+        eventsConsumer.accept(eventsFromAggregationResult(eventFactory, parameters, result));
     }
 
     private boolean satisfiesConditions(AggregationKeyResult keyResult) {

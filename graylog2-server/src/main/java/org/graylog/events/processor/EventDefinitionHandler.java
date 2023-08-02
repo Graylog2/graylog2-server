@@ -16,7 +16,6 @@
  */
 package org.graylog.events.processor;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
@@ -144,10 +143,6 @@ public class EventDefinitionHandler {
      * @param eventsList list of events that successfully matched
      */
     public void updateLastMatched(List<EventWithContext> eventsList) {
-        if (CollectionUtils.isEmpty(eventsList)) {
-            return;
-        }
-
         Map<String, DateTime> lastMatched = new HashMap<>();
         for (EventWithContext eventWithContext : eventsList) {
             Event currEvent = eventWithContext.event();
