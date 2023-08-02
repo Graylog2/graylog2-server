@@ -41,7 +41,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -65,7 +67,7 @@ public class DatanodeSecuritySetupIT {
     private Path httpCert;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UnknownHostException {
 
         String containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
@@ -74,7 +76,7 @@ public class DatanodeSecuritySetupIT {
         // use the CA to generate transport certificate keystore
         final Path nodeCert = generateNodeCert(ca);
         // use the CA to generate HTTP certificate keystore
-        httpCert = generateHttpCert(ca, containerHostname);
+        httpCert = generateHttpCert(ca, containerHostname, Tools.getLocalCanonicalHostname());
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
@@ -193,13 +195,13 @@ public class DatanodeSecuritySetupIT {
         return nodePath;
     }
 
-    private Path generateHttpCert(Path caPath, String containerHostname) {
+    private Path generateHttpCert(Path caPath, String... containerHostname) {
         final Path httpPath = tempDir.resolve("test-http.p12");
         TestableConsole inputHttp = TestableConsole.empty().silent()
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", containerHostname)
+                .register("Enter alternative names (addresses) of this node [comma separated]", String.join(",", containerHostname))
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),
