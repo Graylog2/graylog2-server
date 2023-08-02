@@ -17,17 +17,10 @@
 package org.graylog.security.certutil;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.AbstractIdleService;
 import org.apache.commons.lang3.tuple.Pair;
-import org.graylog.scheduler.DBCustomJobDefinitionService;
-import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
-import org.graylog.scheduler.JobDefinitionDto;
-import org.graylog.scheduler.JobScheduleStrategies;
 import org.graylog.scheduler.JobTriggerDto;
-import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
@@ -60,7 +53,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.graylog.security.certutil.CheckForCertRenewalJob.DEFINITION_INSTANCE;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
 @Singleton
@@ -159,11 +151,11 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                 final var nextRenewal = getNextRenewal();
                 final var rootCert = ks.getCertificate("root");
                 if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) rootCert)) {
-                    notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, "root cert");
+                    notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "root cert");
                 }
                 final var caCert = ks.getCertificate("ca");
                 if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
-                    notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, "ca cert");
+                    notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
                 }
             }
         } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException e) {
@@ -202,7 +194,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                         dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
                     } else {
                         // TODO: send notification - don't send one out, if there is one still open
-                        notificationService.fixed(Notification.Type.CERT_NEEDS_RENEWAL, pair.getLeft());
+                        notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, pair.getLeft());
                     }
                 });
     }

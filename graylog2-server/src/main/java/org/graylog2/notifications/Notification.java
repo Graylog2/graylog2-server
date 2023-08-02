@@ -90,7 +90,7 @@ public interface Notification extends Persisted {
         NO_LEADER,
         ARCHIVING_SUMMARY,
         SEARCH_ERROR,
-        CERT_NEEDS_RENEWAL
+        CERTIFICATE_NEEDS_RENEWAL
         }
 
     enum Severity {
