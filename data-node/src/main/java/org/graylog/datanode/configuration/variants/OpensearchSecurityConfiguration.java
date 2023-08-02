@@ -53,7 +53,13 @@ public class OpensearchSecurityConfiguration {
         return new OpensearchSecurityConfiguration(null, null);
     }
 
-
+    /**
+     * Caution: side effects!
+     *
+     * This method will take the current security setup and apply it to the managed opensearch. It will change the
+     * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
+     * truststore.
+     */
     public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws GeneralSecurityException, IOException {
         if (securityEnabled()) {
             final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
@@ -74,9 +80,6 @@ public class OpensearchSecurityConfiguration {
         return this;
     }
 
-    /**
-     * Caution, this method is full of sideeffects. It creates files, it sets system properties!
-     */
     public Map<String, String> getProperties() throws GeneralSecurityException, IOException {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         if (securityEnabled()) {
@@ -112,7 +115,6 @@ public class OpensearchSecurityConfiguration {
     public boolean securityEnabled() {
         return !Objects.isNull(httpCertificate) && !Objects.isNull(transportCertificate);
     }
-
 
     public KeystoreInformation getTransportCertificate() {
         return transportCertificate;

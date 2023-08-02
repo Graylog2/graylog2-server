@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.configuration;
 
-import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.security.certutil.CertConstants;
 
@@ -30,14 +29,12 @@ import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TruststoreCreator {
 
-    private final ImmutableMap.Builder<String, X509Certificate> rootCertificates = ImmutableMap.builder();
-
-    public TruststoreCreator() {
-    }
+    private final Map<String, X509Certificate> rootCertificates = new LinkedHashMap<>();
 
     public static TruststoreCreator newTruststore() {
         return new TruststoreCreator();
@@ -47,7 +44,7 @@ public class TruststoreCreator {
         KeyStore trustStore = KeyStore.getInstance(CertConstants.PKCS12);
         trustStore.load(null, null);
 
-        for (Map.Entry<String, X509Certificate> cert : rootCertificates.build().entrySet()) {
+        for (Map.Entry<String, X509Certificate> cert : rootCertificates.entrySet()) {
             trustStore.setCertificateEntry(cert.getKey(), cert.getValue());
         }
 
