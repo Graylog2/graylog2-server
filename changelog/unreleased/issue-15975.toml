@@ -1,0 +1,5 @@
+type = "a"
+message = "Add bulk action for streams overview to start a search with selected streams."
+
+issues = ["15975"]
+pulls = ["16015"]
