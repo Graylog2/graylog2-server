@@ -57,7 +57,7 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
       metricError.percentile = 'Percentile is required.';
     }
 
-    if (values.metrics.filter(({ name }) => name === metric.name).length > 1) {
+    if (metric.name && values.metrics.filter(({ name }) => name === metric.name).length > 1) {
       metricError.name = 'Name must be unique.';
     }
 
