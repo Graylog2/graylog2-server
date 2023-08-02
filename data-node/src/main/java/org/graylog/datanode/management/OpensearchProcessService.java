@@ -43,9 +43,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final CustomCAX509TrustManager trustManager;
 
     @Inject
-    public OpensearchProcessService(DatanodeConfiguration datanodeConfiguration,
-                                    Provider<OpensearchConfiguration> configurationProvider,
-                                    EventBus eventBus,
+    public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
+                                    final Provider<OpensearchConfiguration> configurationProvider,
+                                    final EventBus eventBus,
                                     final CustomCAX509TrustManager trustManager) {
         this.configurationProvider = configurationProvider;
         this.trustManager = trustManager;
