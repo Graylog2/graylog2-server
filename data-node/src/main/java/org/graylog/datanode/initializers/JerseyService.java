@@ -21,7 +21,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -39,10 +38,11 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.variants.KeystoreInformation;
+import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.CertConstants;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
@@ -62,7 +62,6 @@ import javax.ws.rs.ext.ExceptionMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.Map;
@@ -70,7 +69,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -78,21 +76,16 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
 public class JerseyService extends AbstractIdleService {
-    public static final String PLUGIN_PREFIX = "/plugins";
     private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
     private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final Configuration configuration;
     private final Set<Class<?>> systemRestResources;
-//    private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
 
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
-//    private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
-//    private final Set<Class> additionalComponents;
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
- //   private final ErrorPageGenerator errorPageGenerator;
     private final TLSProtocolsConfiguration tlsConfiguration;
 
     private HttpServer apiHttpServer = null;
@@ -100,25 +93,17 @@ public class JerseyService extends AbstractIdleService {
     @Inject
     public JerseyService(final Configuration configuration,
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
-//                         Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
-//                         @Named("additionalJerseyComponents") final Set<Class> additionalComponents,
                          @Named(Graylog2Module.SYSTEM_REST_RESOURCES) final Set<Class<?>> systemRestResources,
-                         //                      final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
-//                         ErrorPageGenerator errorPageGenerator,
-                         TLSProtocolsConfiguration tlsConfiguration,  EventBus eventBus) {
+                         TLSProtocolsConfiguration tlsConfiguration, EventBus eventBus) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
- //       this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
         this.exceptionMappers = requireNonNull(exceptionMappers, "exceptionMappers");
-//        this.additionalComponents = requireNonNull(additionalComponents, "additionalComponents");
         this.systemRestResources = systemRestResources;
-//        this.pluginRestResources = requireNonNull(pluginRestResources, "pluginResources");
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
-//        this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         eventBus.register(this);
     }
@@ -134,15 +119,10 @@ public class JerseyService extends AbstractIdleService {
      * TODO: replace this map magic with proper types in OpensearchConfiguration
      */
     private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
-        final Map<String, String> cfgMap = config.asMap();
-        if(!Boolean.parseBoolean(cfgMap.get("plugins.security.disabled"))) {
+        final OpensearchSecurityConfiguration securityConfiguration = config.opensearchSecurityConfiguration();
+        if (securityConfiguration.securityEnabled()) {
             // caution, this path is relative to the opensearch config directory!
-
-            final String keystore = cfgMap.get("plugins.security.ssl.http.keystore_filepath");
-            final Path keystorePath = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch").resolve(keystore);
-            final String keystoreOTP = cfgMap.get("plugins.security.ssl.http.keystore_password");
-
-            return buildSslEngineConfigurator(keystorePath, keystoreOTP);
+            return buildSslEngineConfigurator(securityConfiguration.getHttpCertificate());
         } else {
             return null;
         }
@@ -151,7 +131,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void startUp() {
-        // do nothing, the actual startup will be triggered in the moment opensearch configuration is available
+        // do nothing, the actual startup will be triggered at the moment opensearch configuration is available
     }
 
     private void doStartup(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
@@ -193,65 +173,23 @@ public class JerseyService extends AbstractIdleService {
                 configuration.getHttpSelectorRunnersCount(),
                 configuration.getHttpMaxHeaderSize(),
                 configuration.isHttpEnableGzip(),
-                configuration.isHttpEnableCors(),
                 Set.of());
-        //                pluginResources);
 
         apiHttpServer.start();
 
         LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
     }
 
-    private <T> Set<Resource> prefixResources(String prefix, Set<Class<? extends T>> resources) {
-        final String pathPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
-
-        return resources
-                .stream()
-                .map(resource -> {
-                    final javax.ws.rs.Path pathAnnotation = Resource.getPath(resource);
-                    final String resourcePathSuffix = Strings.nullToEmpty(pathAnnotation.value());
-                    final String resourcePath = resourcePathSuffix.startsWith("/") ? pathPrefix + resourcePathSuffix : pathPrefix + "/" + resourcePathSuffix;
-
-                    return Resource
-                            .builder(resource)
-                            .path(resourcePath)
-                            .build();
-                })
-                .collect(Collectors.toSet());
-    }
-
-
-    private ResourceConfig buildResourceConfig(final boolean enableCors,
-                                               final Set<Resource> additionalResources) {
-        final Map<String, String> packagePrefixes = ImmutableMap.of(
-                RESOURCE_PACKAGE_WEB, HttpConfiguration.PATH_WEB,
-                "", HttpConfiguration.PATH_API
-        );
-
+    private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
-//                .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
                 .registerClasses(
-/*                        ShiroSecurityContextFilter.class,
-                        ShiroRequestHeadersBinder.class,
-                        VerboseCsrfProtectionFilter.class, */
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
-                        JacksonPropertyExceptionMapper.class
-/*                        AnyExceptionClassMapper.class,
-                        MissingStreamPermissionExceptionMapper.class,
-                        WebApplicationExceptionMapper.class,
-                        BadRequestExceptionMapper.class,
-                        RestAccessLogFilter.class,
-                        NodeIdResponseFilter.class,
-                        RequestIdFilter.class,
-                        XHRFilter.class,
-                        NotAuthorizedResponseFilter.class,
-                        WebAppNotFoundResponseFilter.class,
-                        EmbeddingControlFilter.class */)
+                        JacksonPropertyExceptionMapper.class)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
@@ -259,24 +197,12 @@ public class JerseyService extends AbstractIdleService {
                         return objectMapper;
                     }
                 })
-//                .register(new UserContextBinder())
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
                 .registerResources(additionalResources);
 
         exceptionMappers.forEach(rc::registerClasses);
         dynamicFeatures.forEach(rc::registerClasses);
-//        containerResponseFilters.forEach(rc::registerClasses);
-//        additionalComponents.forEach(rc::registerClasses);
-
-        if (enableCors) {
-            LOG.info("Enabling CORS for HTTP endpoint");
-//            rc.registerClasses(CORSFilter.class);
-        }
-
-        if (LOG.isDebugEnabled()) {
-//            rc.registerClasses(PrintModelProcessor.class);
-        }
 
         return rc;
     }
@@ -296,9 +222,8 @@ public class JerseyService extends AbstractIdleService {
                              int selectorRunnersCount,
                              int maxHeaderSize,
                              boolean enableGzip,
-                             boolean enableCors,
                              Set<Resource> additionalResources) {
-        final ResourceConfig resourceConfig = buildResourceConfig(enableCors, additionalResources);
+        final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
         final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
                 listenUri,
                 resourceConfig,
@@ -320,8 +245,6 @@ public class JerseyService extends AbstractIdleService {
         // See "Selector runners count" at https://grizzly.java.net/bestpractices.html for details.
         listener.getTransport().setSelectorRunnersCount(selectorRunnersCount);
 
-//        listener.setDefaultErrorPageGenerator(errorPageGenerator);
-
         if (enableGzip) {
             final CompressionConfig compressionConfig = listener.getCompressionConfig();
             compressionConfig.setCompressionMode(CompressionConfig.CompressionMode.ON);
@@ -331,17 +254,17 @@ public class JerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    private SSLEngineConfigurator buildSslEngineConfigurator(Path keystoreFile, String keyPassword)
+    private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)
             throws GeneralSecurityException, IOException {
-        if (keystoreFile == null || !Files.isRegularFile(keystoreFile) || !Files.isReadable(keystoreFile)) {
-            throw new IllegalArgumentException("Unreadable or missing private key: " + keystoreFile);
+        if (keystoreInformation == null || !Files.isRegularFile(keystoreInformation.location()) || !Files.isReadable(keystoreInformation.location())) {
+            throw new IllegalArgumentException("Unreadable to read private key");
         }
 
 
         final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
-        final char[] password = firstNonNull(keyPassword, "").toCharArray();
+        final char[] password = firstNonNull(keystoreInformation.passwordAsString(), "").toCharArray();
 
-        final KeyStore keyStore = readKeystore(keystoreFile, password);
+        final KeyStore keyStore = readKeystore(keystoreInformation);
 
         sslContextConfigurator.setKeyStorePass(password);
         sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
@@ -352,10 +275,10 @@ public class JerseyService extends AbstractIdleService {
         return sslEngineConfigurator;
     }
 
-    private static KeyStore readKeystore(Path keystoreFile, char[] password) {
-        try (var in = Files.newInputStream(keystoreFile)) {
+    private static KeyStore readKeystore(KeystoreInformation keystoreInformation) {
+        try (var in = Files.newInputStream(keystoreInformation.location())) {
             KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-            caKeystore.load(in, password);
+            caKeystore.load(in, keystoreInformation.password());
             return caKeystore;
         } catch (IOException | GeneralSecurityException ex) {
             throw new RuntimeException("Could not read keystore: " + ex.getMessage(), ex);
@@ -374,9 +297,5 @@ public class JerseyService extends AbstractIdleService {
                 Executors.newFixedThreadPool(poolSize, threadFactory),
                 metricRegistry,
                 name(JerseyService.class, executorName));
-    }
-
-    public void restartWithConfig(OpensearchConfiguration config) {
-
     }
 }

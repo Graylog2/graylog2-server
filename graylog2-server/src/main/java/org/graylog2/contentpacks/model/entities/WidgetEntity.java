@@ -152,7 +152,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
                 .config(this.config())
                 .filter(this.filter())
-                .filters(this.filters())
+                .filters(convertSearchFilters(this.filters()))
                 .id(this.id())
                 .streams(this.streams().stream()
                         .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
