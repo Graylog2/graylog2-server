@@ -23,7 +23,6 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog2.cluster.preflight.NodePreflightStateChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
