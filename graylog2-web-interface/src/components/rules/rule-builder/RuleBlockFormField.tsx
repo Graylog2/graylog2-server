@@ -29,12 +29,11 @@ type Props = {
   functionName: string,
   blockId: string,
   order: number,
-  previousOutputPresent: boolean,
   outputVariableList?: OutputVariables,
   resetField: (fieldName: string) => void;
 }
 
-const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutputPresent, outputVariableList, resetField }: Props) => {
+const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList, resetField }: Props) => {
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
 
@@ -51,7 +50,6 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, previousOutpu
   const shouldHandlePrimaryParam = () => {
     if (!param.primary) return false;
     if ((order === 0)) return false;
-    if (!previousOutputPresent) return false;
 
     return true;
   };
@@ -181,7 +179,6 @@ RuleBlockFormField.propTypes = {
   blockId: PropTypes.string,
   functionName: PropTypes.string.isRequired,
   order: PropTypes.number.isRequired,
-  previousOutputPresent: PropTypes.bool.isRequired,
   outputVariableList: outputVariablesPropType,
   resetField: PropTypes.func.isRequired,
 };

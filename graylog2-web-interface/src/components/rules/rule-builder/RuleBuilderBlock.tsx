@@ -40,7 +40,6 @@ type Props = {
   blockDict: Array<BlockDict>,
   block?: RuleBlock,
   order: number,
-  previousOutputPresent?: boolean,
   outputVariableList?: OutputVariables,
   addBlock: (type: string, block: RuleBlock) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
@@ -52,7 +51,6 @@ const RuleBuilderBlock = ({
   blockDict,
   block,
   order,
-  previousOutputPresent,
   outputVariableList,
   addBlock,
   updateBlock,
@@ -171,7 +169,6 @@ const RuleBuilderBlock = ({
                        order={order}
                        options={options}
                        outputVariableList={outputVariableList}
-                       previousOutputPresent={previousOutputPresent}
                        selectedBlockDict={currentBlockDict}
                        type={type} />
       ) : (
@@ -191,7 +188,6 @@ RuleBuilderBlock.propTypes = {
   blockDict: PropTypes.arrayOf(blockDictPropType).isRequired,
   block: ruleBlockPropType,
   order: PropTypes.number.isRequired,
-  previousOutputPresent: PropTypes.bool,
   outputVariableList: outputVariablesPropType,
   addBlock: PropTypes.func.isRequired,
   updateBlock: PropTypes.func.isRequired,
@@ -201,7 +197,6 @@ RuleBuilderBlock.propTypes = {
 RuleBuilderBlock.defaultProps = {
   block: undefined,
   outputVariableList: undefined,
-  previousOutputPresent: false,
 };
 
 export default RuleBuilderBlock;

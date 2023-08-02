@@ -47,7 +47,6 @@ const comp = ({
                  onCancel={mockCancel}
                  onSelect={mockSelect}
                  onUpdate={mockUpdate}
-                 previousOutputPresent={false}
                  options={options}
                  selectedBlockDict={selectedBlockDict}
                  existingBlock={existingBlock}

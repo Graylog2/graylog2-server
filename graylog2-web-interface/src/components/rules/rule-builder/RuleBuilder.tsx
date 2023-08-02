@@ -135,25 +135,6 @@ const RuleBuilder = () => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
   }).catch(() => setRule(ruleToValidate));
 
-  const getPreviousBlock = (blocks: RuleBlock[], index?: number): RuleBlock | undefined => {
-    if (index === 0) return undefined;
-
-    if (!index) return (blocks[blocks.length - 1]);
-
-    return (blocks[index - 1]);
-  };
-
-  const getPreviousOutput = (blocks: RuleBlock[], index?: number): {
-    previousOutputPresent: boolean,
-    outputVariable?: string
-  } => {
-    const previousBlock = getPreviousBlock(blocks, index);
-
-    if (!previousBlock?.outputvariable) return { previousOutputPresent: false };
-
-    return { previousOutputPresent: true, outputVariable: previousBlock.outputvariable };
-  };
-
   const setOutputVariable = (block: RuleBlock, index?: number): RuleBlock => {
     const newBlock = block;
     const blockDict = getDictForFunction(actionsDict, block.function);
@@ -415,7 +396,6 @@ const RuleBuilder = () => {
                                   block={action}
                                   order={index}
                                   type="action"
-                                  previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, index).previousOutputPresent}
                                   outputVariableList={outputVariableList()}
                                   addBlock={addBlock}
                                   updateBlock={updateBlock}
@@ -424,7 +404,6 @@ const RuleBuilder = () => {
               <RuleBuilderBlock blockDict={actionsDict || []}
                                 order={newActionBlockIndex}
                                 type="action"
-                                previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, newActionBlockIndex).previousOutputPresent}
                                 outputVariableList={outputVariableList()}
                                 addBlock={addBlock}
                                 updateBlock={updateBlock}
