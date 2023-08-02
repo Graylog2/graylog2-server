@@ -68,13 +68,14 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         final var network = Network.newNetwork();
         final var builder = SearchServerInstanceProvider.getBuilderFor(version).orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
 
-        SearchServerInstance searchServer = builder.network(network).featureFlags(enabledFeatureFlags).build();
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
         if(withMailServerEnabled) {
             this.emailServerInstance = MailServerContainer.createStarted(network);
         }
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
+
+        SearchServerInstance searchServer = builder.network(network).featureFlags(enabledFeatureFlags).build();
 
         if(preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
