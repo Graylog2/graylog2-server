@@ -74,7 +74,7 @@ public class DatanodeSecuritySetupIT {
         // use the CA to generate transport certificate keystore
         final Path nodeCert = generateNodeCert(ca);
         // use the CA to generate HTTP certificate keystore
-        httpCert = generateHttpCert(ca, containerHostname);
+        httpCert = generateHttpCert(ca, containerHostname, Tools.getLocalCanonicalHostname());
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
@@ -193,13 +193,13 @@ public class DatanodeSecuritySetupIT {
         return nodePath;
     }
 
-    private Path generateHttpCert(Path caPath, String containerHostname) {
+    private Path generateHttpCert(Path caPath, String... containerHostname) {
         final Path httpPath = tempDir.resolve("test-http.p12");
         TestableConsole inputHttp = TestableConsole.empty().silent()
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", containerHostname)
+                .register("Enter alternative names (addresses) of this node [comma separated]", String.join(",", containerHostname))
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),
