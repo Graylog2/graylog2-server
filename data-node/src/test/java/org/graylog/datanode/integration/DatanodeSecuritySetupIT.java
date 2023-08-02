@@ -41,7 +41,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -65,7 +67,7 @@ public class DatanodeSecuritySetupIT {
     private Path httpCert;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UnknownHostException {
 
         String containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
