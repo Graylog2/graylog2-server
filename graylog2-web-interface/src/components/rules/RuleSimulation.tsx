@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import { Button, ControlLabel, FormGroup, Input } from 'components/bootstrap';
@@ -28,25 +28,16 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
 
-const RuleSimulationFormGroup = styled(FormGroup)`
-  margin-bottom: 40px;
-  #margin-top: 25px;
-`;
+const ResetButton = styled(Button)(({ theme }) => css`
+  margin-left: ${theme.spacings.xs};
+`);
 
-const ResetButton = styled(Button)`
-  margin-left: 8px;
-`;
-
-const MessageShowContainer = styled.div`
-  padding: 16px;
-`;
+const MessageShowContainer = styled.div(({ theme }) => css`
+  padding: ${theme.spacings.md};
+`);
 
 const ActionOutputIndex = styled.b`
   color: #aaa;
-`;
-
-const OutputContainer = styled.div`
-  margin-top: 8px;
 `;
 
 type Props = {
@@ -110,7 +101,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
   };
 
   return (
-    <RuleSimulationFormGroup>
+    <FormGroup>
       <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
       <div>
         <Input id="message"
@@ -140,31 +131,31 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
             {is_rule_builder && (
               <>
                 {conditionsOutputKeys.length > 0 && (
-                  <OutputContainer data-testid="conditions-output">
+                  <div data-testid="conditions-output">
                     <label htmlFor="simulation_conditions_output">Conditions Output</label>
                     {conditionsOutputKeys.map((conditionsOutputKey) => (
                       <div key={conditionsOutputKey}>
                         <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
                       </div>
                     ))}
-                  </OutputContainer>
+                  </div>
                 )}
                 {actionsOutputKeys.length > 0 && (
-                  <OutputContainer data-testid="actions-output">
+                  <div data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
                     {actionsOutputKeys.map((actionsOutputKey) => (
                       <div key={actionsOutputKey}>
                         <ActionOutputIndex>{actionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
                       </div>
                     ))}
-                  </OutputContainer>
+                  </div>
                 )}
               </>
             )}
           </>
         )}
       </div>
-    </RuleSimulationFormGroup>
+    </FormGroup>
   );
 };
 
