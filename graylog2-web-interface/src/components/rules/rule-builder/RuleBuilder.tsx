@@ -260,7 +260,7 @@ const RuleBuilder = () => {
       app_action_value: 'cancel-button',
     });
 
-    history.goBack();
+    history.replace(Routes.SYSTEM.PIPELINES.RULES);
   };
 
   const handleSave = async (event?: React.FormEvent<HTMLFormElement>, closeAfter: boolean = false) => {
