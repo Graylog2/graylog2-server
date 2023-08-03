@@ -26,7 +26,7 @@ export interface CarouselSlideProps extends React.ComponentPropsWithoutRef<'div'
   gap?: number;
 }
 
-const StyledSlide = styled.div(({ $size, $gap, theme }: {
+const StyledSlide = styled.div<{ $size?: string | number, $gap?: number }>(({ $size, $gap, theme }: {
   theme: DefaultTheme,
   $size: string | number,
   $gap: number
