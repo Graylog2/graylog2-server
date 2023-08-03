@@ -196,7 +196,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .rollup(rollup())
                 .query(query().orElse(null))
                 .filter(filter())
-                .filters(filters())
+                .filters(convertSearchFilters(filters()))
                 .type(type())
                 .id(id())
                 .build();
