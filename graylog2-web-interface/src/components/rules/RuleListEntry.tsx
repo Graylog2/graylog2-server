@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
@@ -32,7 +31,8 @@ type Props = {
   onDelete: (rule: RuleType) => () => void,
 }
 const STRING_SIZE_LIMIT = 30;
-const LimitedTd = styled.td(({ theme }: {theme: DefaultTheme}) => css`
+
+const LimitedTd = styled.td(({ theme }) => css`
   max-width: 250px;
   min-width: 250px;
   

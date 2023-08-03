@@ -98,7 +98,6 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
 import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
-import ShowAssetInformation from 'views/logic/valueactions/ShowAssetInformation';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -126,26 +125,6 @@ Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
 const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
-
-const GIMSchemaAssetLookupFields = [
-  'source_hostname',
-  'source_ip',
-  'source_ipv6',
-  'source_nat_ip',
-  'destination_hostname',
-  'destination_ip',
-  'destination_nat_ip',
-  'host_hostname',
-  'host_ip',
-  'host_ipv6',
-  'host_mac',
-  'vendor_private_ip',
-  'vendor_private_ipv6',
-  'vendor_public_ip',
-  'vendor_public_ipv6',
-  'event_observer_ip',
-  'event_source',
-];
 
 const exports: PluginExports = {
   pages: {
@@ -362,13 +341,6 @@ const exports: PluginExports = {
       isEnabled: () => true,
       resetFocus: false,
       component: CreateEventDefinition,
-    },
-    {
-      type: 'show-asset-information',
-      title: 'Show asset information',
-      isHidden: ({ field }: ActionHandlerArguments) => (GIMSchemaAssetLookupFields.indexOf(field) === -1),
-      resetFocus: false,
-      component: ShowAssetInformation,
     },
   ], ['create-extractor']),
   visualizationTypes: visualizationBindings,

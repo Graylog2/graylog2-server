@@ -20,7 +20,6 @@ import { useEffect } from 'react';
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import { useStore } from 'stores/connect';
-import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
 import type { Store } from 'stores/StoreTypes';
@@ -52,11 +51,7 @@ const AppFacade = () => {
   }
 
   if (!username) {
-    return (
-      <LoginQueryClientProvider>
-        <LoginPage />
-      </LoginQueryClientProvider>
-    );
+    return <LoginPage />;
   }
 
   if (!currentUser) {

@@ -66,5 +66,4 @@ public final class KeystoreFileStorage implements KeystoreStorage<KeystoreFileLo
             throw new KeyStoreStorageException("Could not read keystore: " + ex.getMessage(), ex);
         }
     }
-
 }

@@ -16,20 +16,34 @@
  */
 import * as React from 'react';
 
-import { Title, Space } from 'preflight/components/common';
+import { Title, Space, Button } from 'preflight/components/common';
 import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 
 type Props = {
+  isSkippingProvisioning: boolean,
   setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsSkippingProvisioning: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const ConfigurationFinished = ({ setIsWaitingForStartup }: Props) => (
-  <div>
-    <Title order={3}>All data nodes are secured and reachable.</Title>
-    <p>The provisioning has been successful and all data nodes are secured and reachable.</p>
-    <Space h="md" />
-    <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup} />
-  </div>
-);
+const ConfigurationFinished = ({ setIsWaitingForStartup, isSkippingProvisioning, setIsSkippingProvisioning }: Props) => {
+  const description = isSkippingProvisioning
+    ? (
+      <>
+        You&apos;ve finished the configuration successfully. You can still
+        {' '}<Button variant="light" compact onClick={() => setIsSkippingProvisioning(false)} size="xs">go back</Button>
+        {' '}to provision the certificates.
+      </>
+    )
+    : 'The provisioning has been successful and all data nodes are secured and reachable.';
+
+  return (
+    <div>
+      <Title order={3}>Configuration finished</Title>
+      <p>{description}</p>
+      <Space h="md" />
+      <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup} />
+    </div>
+  );
+};
 
 export default ConfigurationFinished;

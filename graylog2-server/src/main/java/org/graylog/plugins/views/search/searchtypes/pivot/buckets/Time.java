@@ -61,7 +61,7 @@ public abstract class Time implements BucketSpec {
         @JsonProperty
         public Builder field(String field) {
             return fields(Collections.singletonList(field));
-        };
+        }
 
         @JsonProperty
         public abstract Builder fields(List<String> fields);
@@ -69,6 +69,5 @@ public abstract class Time implements BucketSpec {
         @JsonProperty
         public abstract Builder interval(Interval interval);
     }
-
 }
 

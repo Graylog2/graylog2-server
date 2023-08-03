@@ -23,7 +23,7 @@ import type { IconName } from 'components/common/Icon';
 import Icon from './Icon';
 import Delayed from './Delayed';
 
-const StyledIcon = styled(Icon)(({ $displayMargin }: { $displayMargin: boolean }) => (
+const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) => (
   $displayMargin ? 'margin-right: 6px;' : ''
 ));
 

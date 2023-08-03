@@ -49,7 +49,7 @@ type Props = {
 const Section = styled.div`
   margin-bottom: 25px;
 
-  :last-child {
+  &:last-child {
     margin-bottom: 0;
   }
 `;

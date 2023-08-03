@@ -43,7 +43,7 @@ public class PreflightConfigServiceImpl extends PersistedServiceImpl implements 
 
     @Override
     public PreflightConfig saveConfiguration() throws ValidationException {
-        final ImmutableMap<String, Object> fields = ImmutableMap.of("finished", true);
+        final ImmutableMap<String, Object> fields = ImmutableMap.of("result", PreflightConfigResult.FINISHED);
         final PreflightConfigImpl config = new PreflightConfigImpl(fields);
         final String id = save(config);
         return getPersistedConfig().orElseThrow(() -> new IllegalStateException("Failed to obtain configuration that was just stored"));

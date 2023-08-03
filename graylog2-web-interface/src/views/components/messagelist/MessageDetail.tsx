@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useContext, useCallback } from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import styled from 'styled-components';
@@ -37,7 +37,9 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
+import FormatAssetList from 'views/components/messagelist/FormatAssetList';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -89,13 +91,16 @@ const MessageDetail = ({
   const { searchesClusterConfig } = useStore(SearchConfigStore);
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
-  const { gl2_source_node, gl2_source_input } = fields;
+  const { gl2_source_node, gl2_source_input, associated_assets } = fields;
   const { isLocalNode } = useIsLocalNode(gl2_source_node);
   const additionalContext = useMemo(() => ({ isLocalNode }), [isLocalNode]);
+  const { all } = useContext(FieldTypesContext);
 
   const _toggleShowOriginal = () => {
     setShowOriginal(!showOriginal);
   };
+
+  const findFieldType = useCallback((field) => all.find((f) => f.name === field), [all]);
 
   // Short circuit when all messages are being expanded at the same time
   if (expandAllRenderAsync) {
@@ -166,7 +171,10 @@ const MessageDetail = ({
                                                    sourceNodeId={gl2_source_node}
                                                    sourceInputId={gl2_source_input} />
                                )}
-                               streams={streamsListItems} />
+                               streams={streamsListItems}
+                               assets={associated_assets ? (
+                                 <FormatAssetList associated_assets={associated_assets} fieldType={findFieldType('associated_assets')?.type} />
+                               ) : <div />} />
               <MessageAugmentations message={message} />
             </Col>
             <Col md={9}>

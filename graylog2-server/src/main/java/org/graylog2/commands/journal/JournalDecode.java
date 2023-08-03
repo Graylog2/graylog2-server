@@ -29,6 +29,7 @@ import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
+import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.ObjectMapperModule;
@@ -55,6 +56,12 @@ public class JournalDecode extends AbstractJournalCommand {
                 .addAll(super.getCommandBindings(featureFlags))
                 .add(new CodecsModule())
                 .add(new ObjectMapperModule(getClass().getClassLoader()))
+                .add(new Graylog2Module() {
+                    @Override
+                    protected void configure() {
+                        inputsMapBinder();
+                    }
+                })
                 .build();
     }
 

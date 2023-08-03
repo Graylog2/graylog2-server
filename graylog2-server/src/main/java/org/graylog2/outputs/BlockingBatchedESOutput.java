@@ -36,6 +36,7 @@ import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -130,17 +132,26 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
                     activeFlushThreads.get());
         }
 
-        try (Timer.Context ignored = processTime.time()) {
-            lastFlushTime.set(System.nanoTime());
-            writeMessageEntries(messages);
-            batchSize.update(messages.size());
-            bufferFlushes.mark();
+        try {
+            indexMessageBatch(messages);
+            // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
+            acknowledger.acknowledge(messages.stream().map(Map.Entry::getValue).collect(Collectors.toList()));
         } catch (Exception e) {
             log.error("Unable to flush message buffer", e);
             bufferFlushFailures.mark();
         }
         activeFlushThreads.decrementAndGet();
         log.debug("Flushing {} messages completed", messages.size());
+    }
+
+    protected Set<String> indexMessageBatch(List<Map.Entry<IndexSet, Message>> messages) throws Exception {
+        try (Timer.Context ignored = processTime.time()) {
+            lastFlushTime.set(System.nanoTime());
+            final Set<String> failedMessageIds = writeMessageEntries(messages);
+            batchSize.update(messages.size());
+            bufferFlushes.mark();
+            return failedMessageIds;
+        }
     }
 
     public void forceFlushIfTimedout() {

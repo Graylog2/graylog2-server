@@ -117,7 +117,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
           </Col>
           <Col xs={4}>
             <TimeoutUnitSelect disabled={sessionTimeoutNever}
-                               value={`${unit}`}
+                               value={unit}
                                onChange={_onChangeUnit} />
           </Col>
           <Row className="no-bm">

@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch2.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -31,6 +30,7 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.testcontainers.OpensearchContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -39,6 +39,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.isNull;
@@ -46,7 +47,6 @@ import static java.util.Objects.isNull;
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
-    public static final String DEFAULT_HEAP_SIZE = "2g";
     public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
     private final OpenSearchClient openSearchClient;
@@ -54,16 +54,24 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private final FixtureImporter fixtureImporter;
     private final Adapters adapters;
 
-    protected OpenSearchInstance(String image, SearchVersion version, Network network, String heapSize) {
-        super(image, version, network, heapSize);
+    public OpenSearchInstance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(version, network, heapSize);
+
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientOS2(this.openSearchClient);
+        this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
-    protected OpenSearchInstance(String image, SearchVersion version, Network network) {
-        this(image, version, network, DEFAULT_HEAP_SIZE);
+
+    public static OpenSearchInstance create() {
+        return OpenSearchInstanceBuilder.builder().instantiate();
+    }
+
+    @Override
+    protected String imageName() {
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version().version());
     }
 
     @Override
@@ -88,33 +96,9 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 "http",
                 false,
                 false,
-                new BasicCredentialsProvider())
+                new BasicCredentialsProvider(),
+                null)
                 .get();
-    }
-
-    public static OpenSearchInstance create() {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), DEFAULT_HEAP_SIZE);
-    }
-
-    public static OpenSearchInstance create(String heapSize) {
-        return create(OPENSEARCH_VERSION.getSearchVersion(), Network.newNetwork(), heapSize);
-    }
-
-    // Caution, do not change this signature. It's required by our container matrix tests. See SearchServerInstanceFactoryByVersion
-    public static OpenSearchInstance create(SearchVersion searchVersion, Network network) {
-        return create(searchVersion, network, DEFAULT_HEAP_SIZE);
-    }
-
-    private static OpenSearchInstance create(SearchVersion searchVersion, Network network, String heapSize) {
-        final String image = imageNameFrom(searchVersion.version());
-
-        LOG.debug("Creating instance {}", image);
-
-        return new OpenSearchInstance(image, searchVersion, network, heapSize);
-    }
-
-    protected static String imageNameFrom(Version version) {
-        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.toString());
     }
 
     @Override
@@ -133,19 +117,16 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpenSearchContainer(DockerImageName.parse(image))
+        return new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", "false")
-                .withEnv("plugins.security.ssl.http.enabled", "false")
-                .withEnv("plugins.security.disabled", "true")
-                .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
+                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
+                .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
+                .withNetworkAliases(NETWORK_ALIAS);
     }
 
     @Override

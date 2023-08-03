@@ -33,6 +33,9 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorPreconditionException;
 import org.graylog.events.processor.EventStreamService;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
@@ -135,26 +138,23 @@ public class AggregationEventProcessorTest {
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(42.0d)
-                                                .series(AggregationSeries.builder()
+                                                .series(Count.builder()
                                                         .id("abc123")
-                                                        .function(AggregationFunction.COUNT)
                                                         .field("source")
                                                         .build())
                                                 .build(),
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(23.0d)
-                                                .series(AggregationSeries.builder()
+                                                .series(Count.builder()
                                                         .id("abc123-no-field")
-                                                        .function(AggregationFunction.COUNT)
                                                         .build())
                                                 .build(),
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(1.0d)
-                                                .series(AggregationSeries.builder()
+                                                .series(Cardinality.builder()
                                                         .id("xyz789")
-                                                        .function(AggregationFunction.CARD)
                                                         .field("source")
                                                         .build())
                                                 .build()
@@ -234,18 +234,16 @@ public class AggregationEventProcessorTest {
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(42.0d)
-                                                .series(AggregationSeries.builder()
+                                                .series(Count.builder()
                                                         .id("abc123")
-                                                        .function(AggregationFunction.COUNT)
                                                         .field("source")
                                                         .build())
                                                 .build(),
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(1.0d)
-                                                .series(AggregationSeries.builder()
+                                                .series(Cardinality.builder()
                                                         .id("xyz789")
-                                                        .function(AggregationFunction.CARD)
                                                         .field("source")
                                                         .build())
                                                 .build()
@@ -257,18 +255,16 @@ public class AggregationEventProcessorTest {
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(23.0d) // Doesn't match condition
-                                                .series(AggregationSeries.builder()
+                                                .series(Count.builder()
                                                         .id("abc123")
-                                                        .function(AggregationFunction.COUNT)
                                                         .field("source")
                                                         .build())
                                                 .build(),
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(1.0d)
-                                                .series(AggregationSeries.builder()
+                                                .series(Cardinality.builder()
                                                         .id("xyz789")
-                                                        .function(AggregationFunction.CARD)
                                                         .field("source")
                                                         .build())
                                                 .build()
@@ -458,8 +454,6 @@ public class AggregationEventProcessorTest {
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
-        final StreamService streamService = mock(StreamService.class);
-
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
@@ -551,9 +545,8 @@ public class AggregationEventProcessorTest {
         event.setTimerangeEnd(timeRange.to());
         event.setGroupByFields(groupByFields);
 
-        final AggregationSeries series = AggregationSeries.builder()
+        final SeriesSpec series = Count.builder()
                 .id("abc123")
-                .function(AggregationFunction.COUNT)
                 .field("source")
                 .build();
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(series), null);
@@ -577,9 +570,8 @@ public class AggregationEventProcessorTest {
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(0.0d)
-                                                .series(AggregationSeries.builder()
+                                                .series(Count.builder()
                                                         .id("abc123")
-                                                        .function(AggregationFunction.COUNT)
                                                         .build())
                                                 .build()
                                 ))
@@ -590,7 +582,7 @@ public class AggregationEventProcessorTest {
 
     // Helper method to build test EventDefinitionDto, since we only care about a few of the values
     private EventDefinitionDto buildEventDefinitionDto(
-            Set<String> testStreams, List<AggregationSeries> testSeries, AggregationConditions testConditions) {
+            Set<String> testStreams, List<SeriesSpec> testSeries, AggregationConditions testConditions) {
         return EventDefinitionDto.builder()
                 .id("dto-id-1")
                 .title("Test Aggregation")

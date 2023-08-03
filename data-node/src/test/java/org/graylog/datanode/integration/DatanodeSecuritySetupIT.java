@@ -23,20 +23,27 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog2.plugin.Tools;
+import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -52,6 +59,7 @@ import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_
 
 
 public class DatanodeSecuritySetupIT {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
 
     @TempDir
     static Path tempDir;
@@ -59,14 +67,16 @@ public class DatanodeSecuritySetupIT {
     private Path httpCert;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UnknownHostException {
+
+        String containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
         final Path ca = generateCa();
 
         // use the CA to generate transport certificate keystore
         final Path nodeCert = generateNodeCert(ca);
         // use the CA to generate HTTP certificate keystore
-        httpCert = generateHttpCert(ca);
+        httpCert = generateHttpCert(ca, containerHostname, Tools.getLocalCanonicalHostname());
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
@@ -84,25 +94,40 @@ public class DatanodeSecuritySetupIT {
             // configure initial admin username and password for Opensearch REST
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin");
+
+            // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
+            // to be able to reach opensearch from outside the container and docker network (true?)
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0");
+
+            // HOSTNAME is used to generate the SSL certificates and to communicate inside the
+            // container and docker network, where we do the hostname validation.
+            datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(containerHostname));
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
         }).start();
     }
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort());
+        final KeyStore trustStore = buildTruststore(httpCert, "password");
 
-        given()
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
+
+        try {
+            given()
                 .auth().basic("admin", "admin")
-                .trustStore(buildTruststore(httpCert, "password"))
+                .trustStore(trustStore)
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
                 .body("name", Matchers.equalTo("node1"))
                 .body("cluster_name", Matchers.equalTo("datanode-cluster"));
-
+        } catch (Exception ex) {
+            LOG.error("Error connecting to OpenSearch in the DataNode, showing logs:\n{}", backend.getLogs());
+            throw ex;
+        }
     }
 
-    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort, KeyStore trustStore) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
@@ -111,9 +136,18 @@ public class DatanodeSecuritySetupIT {
                 .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
-        retryer.call(() -> RestAssured.given()
-                .get("http://localhost:" + datanodeRestPort)
-                .then());
+        try {
+            var hostname = Tools.getLocalCanonicalHostname();
+            var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
+            LOG.info("Trying to connect to: {}", url);
+            retryer.call(() -> RestAssured.given()
+                    .trustStore(trustStore)
+                    .get(url)
+                    .then());
+        } catch (Exception ex) {
+            LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
+            throw ex;
+        }
     }
 
     /**
@@ -161,13 +195,13 @@ public class DatanodeSecuritySetupIT {
         return nodePath;
     }
 
-    private Path generateHttpCert(Path caPath) {
+    private Path generateHttpCert(Path caPath, String... containerHostname) {
         final Path httpPath = tempDir.resolve("test-http.p12");
         TestableConsole inputHttp = TestableConsole.empty().silent()
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", "example.com")
+                .register("Enter alternative names (addresses) of this node [comma separated]", String.join(",", containerHostname))
                 .register("Enter HTTP certificate password", "password");
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),

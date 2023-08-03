@@ -16,31 +16,24 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
 import { Icon } from 'components/common';
-import { themePropTypes } from 'theme';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
 } from 'theme/constants';
-
-type Props = {
-  theme: DefaultTheme,
-};
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
   align-items: center;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ModeIcon = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
-  opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
-  color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default)};
-`;
+const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(({ theme, $currentMode }) => css`
+  opacity: ${$currentMode ? '1' : '0.5'};
+  color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
+`);
 
 const Toggle = styled.label(({ theme }) => css`
   display: flex;
@@ -105,7 +98,8 @@ const Toggle = styled.label(({ theme }) => css`
   }
 `);
 
-const ThemeModeToggle = ({ theme }: Props) => {
+const ThemeModeToggle = () => {
+  const theme = useTheme();
   const currentMode = theme.mode;
   const [loadingTheme, setLoadingTheme] = useState(false);
 
@@ -113,6 +107,7 @@ const ThemeModeToggle = ({ theme }: Props) => {
     if (loadingTheme) {
       setLoadingTheme(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);
 
   const toggleThemeMode = (event) => {
@@ -128,7 +123,9 @@ const ThemeModeToggle = ({ theme }: Props) => {
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'} spin={loadingLightMode} currentMode={currentMode === THEME_MODE_LIGHT} />
+      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
+                spin={loadingLightMode}
+                $currentMode={currentMode === THEME_MODE_LIGHT} />
       <Toggle>
         <input value={THEME_MODE_DARK}
                type="checkbox"
@@ -137,13 +134,11 @@ const ThemeModeToggle = ({ theme }: Props) => {
                disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'} spin={loadingDarkMode} currentMode={currentMode === THEME_MODE_DARK} />
+      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
+                spin={loadingDarkMode}
+                $currentMode={currentMode === THEME_MODE_DARK} />
     </ThemeModeToggleWrap>
   );
 };
 
-ThemeModeToggle.propTypes = {
-  theme: themePropTypes.isRequired,
-};
-
-export default withTheme(ThemeModeToggle);
+export default ThemeModeToggle;

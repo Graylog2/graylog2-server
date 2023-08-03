@@ -19,7 +19,6 @@ import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import type { TitleType } from 'views/stores/TitleTypes';
@@ -41,10 +40,10 @@ import {
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useViewType from 'views/hooks/useViewType';
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
+import useViewsPlugin from 'views/test/testViewsPlugin';
+import { usePlugin } from 'views/test/testPlugins';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -63,10 +62,6 @@ const pluginExports: PluginRegistration = {
       mimeType: 'text/csv',
       fileExtension: 'csv',
     }],
-    'views.reducers': [
-      { key: 'view', reducer: viewSliceReducer },
-      { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-    ],
   },
 };
 
@@ -91,13 +86,8 @@ describe('ExportModal', () => {
     execution_state: new SearchExecutionState(),
   };
 
-  beforeAll(() => {
-    PluginStore.register(pluginExports);
-  });
-
-  afterAll(() => {
-    PluginStore.unregister(pluginExports);
-  });
+  useViewsPlugin();
+  usePlugin(pluginExports);
 
   beforeEach(() => {
     jest.clearAllMocks();

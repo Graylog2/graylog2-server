@@ -21,11 +21,13 @@ import { CONFIGURATION_STEPS } from 'preflight/Constants';
 import asMock from 'helpers/mocking/AsMock';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { dataNodes } from 'fixtures/dataNodes';
+import useRenewalPolicy from 'preflight/hooks/useRenewalPolicy';
 
 import useConfigurationStep from './useConfigurationStep';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('preflight/hooks/useDataNodesCA');
+jest.mock('preflight/hooks/useRenewalPolicy');
 jest.mock('logic/rest/FetchProvider');
 
 describe('useConfigurationStep', () => {
@@ -43,9 +45,17 @@ describe('useConfigurationStep', () => {
     error: undefined,
   };
 
+  const useRenewalPolicyResult = {
+    data: undefined,
+    isInitialLoading: false,
+    isFetching: false,
+    error: undefined,
+  };
+
   beforeEach(() => {
     asMock(useDataNodes).mockReturnValue(useDataNodesResult);
     asMock(useDataNodesCA).mockReturnValue(useDataNodesCAResult);
+    asMock(useRenewalPolicy).mockReturnValue(useRenewalPolicyResult);
   });
 
   it('should return isLoading: true when data nodes are loading', async () => {
@@ -54,7 +64,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -65,7 +75,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -76,7 +86,7 @@ describe('useConfigurationStep', () => {
       data: undefined,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CA_CONFIGURATION.key,
@@ -84,7 +94,21 @@ describe('useConfigurationStep', () => {
     }));
   });
 
-  it('should define certificate provisioning step as active step, when CA has not been provisioned', async () => {
+  it('should define renewal policy creation step as active step, when none is configured', async () => {
+    asMock(useDataNodesCA).mockReturnValue({
+      ...useDataNodesResult,
+      data: { id: 'ca-id', type: 'ca-type' },
+    });
+
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+
+    await waitFor(() => expect(result.current).toEqual({
+      step: CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
+      isLoading: false,
+    }));
+  });
+
+  it('should define certificate provisioning step as active step, when data nodes have not been provisioned', async () => {
     asMock(useDataNodesCA).mockReturnValue({
       ...useDataNodesResult,
       data: { id: 'ca-id', type: 'ca-type' },
@@ -106,7 +130,15 @@ describe('useConfigurationStep', () => {
       }],
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    asMock(useRenewalPolicy).mockReturnValue({
+      ...useRenewalPolicyResult,
+      data: {
+        mode: 'AUTOMATIC',
+        certificate_lifetime: 'P30D',
+      },
+    });
+
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
@@ -114,7 +146,29 @@ describe('useConfigurationStep', () => {
     }));
   });
 
-  it('should define success step as active step, when CA been provisioned', async () => {
+  it('should define success step as active step, when CA has been configures, but provisioning has been skipped', async () => {
+    asMock(useDataNodesCA).mockReturnValue({
+      ...useDataNodesResult,
+      data: { id: 'ca-id', type: 'ca-type' },
+    });
+
+    asMock(useRenewalPolicy).mockReturnValue({
+      ...useRenewalPolicyResult,
+      data: {
+        mode: 'AUTOMATIC',
+        certificate_lifetime: 'P30D',
+      },
+    });
+
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: true }));
+
+    await waitFor(() => expect(result.current).toEqual({
+      step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
+      isLoading: false,
+    }));
+  });
+
+  it('should define success step as active step, when data nodes have been provisioned', async () => {
     asMock(useDataNodesCA).mockReturnValue({
       ...useDataNodesResult,
       data: { id: 'ca-id', type: 'ca-type' },
@@ -136,7 +190,15 @@ describe('useConfigurationStep', () => {
       }],
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep());
+    asMock(useRenewalPolicy).mockReturnValue({
+      ...useRenewalPolicyResult,
+      data: {
+        mode: 'AUTOMATIC',
+        certificate_lifetime: 'P30D',
+      },
+    });
+
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,

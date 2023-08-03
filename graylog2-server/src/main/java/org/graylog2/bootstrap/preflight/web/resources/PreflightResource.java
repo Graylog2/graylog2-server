@@ -17,7 +17,6 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
@@ -27,23 +26,22 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.NodePreflightConfig;
 import org.graylog2.cluster.preflight.NodePreflightConfigService;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -56,16 +54,19 @@ public class PreflightResource {
     private final NodeService nodeService;
     private final NodePreflightConfigService nodePreflightConfigService;
     private final CaService caService;
+    private final TransportAddressSanitizer transportAddressSanitizer;
     private final String passwordSecret;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final NodePreflightConfigService nodePreflightConfigService,
                              final CaService caService,
+                             final TransportAddressSanitizer transportAddressSanitizer,
                              final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.nodePreflightConfigService = nodePreflightConfigService;
         this.caService = caService;
+        this.transportAddressSanitizer = transportAddressSanitizer;
         this.passwordSecret = passwordSecret;
     }
 
@@ -79,7 +80,12 @@ public class PreflightResource {
 
         return activeDataNodes.values().stream().map(n -> {
             final var preflight = preflightDataNodes.get(n.getNodeId());
-            return new DataNode(n.getNodeId(), n.getType(), n.getTransportAddress(), preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null, n.getHostname(), n.getShortNodeId());
+            return new DataNode(n.getNodeId(),
+                    n.getType(),
+                    transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
+                    preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
+                    n.getHostname(),
+                    n.getShortNodeId());
         }).collect(Collectors.toList());
     }
 

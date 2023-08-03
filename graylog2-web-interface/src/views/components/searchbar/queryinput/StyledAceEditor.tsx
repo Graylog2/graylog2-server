@@ -23,17 +23,13 @@ import AceEditor from './ace';
 
 type Props = {
   $height: number,
-  aceTheme: string,
-  theme: DefaultTheme,
+  $scTheme: DefaultTheme,
+  disabled: boolean,
 };
-const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }: Props) => ({
-  // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
-  theme: aceTheme, /* stylelint-disable-line */
-  $scTheme: theme,
-  $height,
-}))<{ disabled: boolean }>(({ $scTheme, $height, disabled, value }) => css`
+
+const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled, value }) => css`
   &.ace-queryinput {
-    ${$height ? `height: ${$height}px !important` : ''};
+    ${$height ? `height: ${$height}px !important` : ''}
     min-height: 34px;
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};

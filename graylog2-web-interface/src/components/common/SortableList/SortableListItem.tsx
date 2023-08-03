@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Portal } from 'components/common';
 
@@ -34,7 +34,7 @@ type Props<ItemType extends ListItemType> = {
   item: ItemType,
 };
 
-const StyledListItem = styled(ListItem)(({ $isDragging }: { $isDragging: boolean }) => `
+const StyledListItem = styled(ListItem)<{ $isDragging: boolean }>(({ $isDragging }) => css`
   box-shadow: ${$isDragging ? 'rgba(0, 0, 0, 0.24) 0px 3px 8px' : 'none'};
 `);
 

@@ -21,44 +21,49 @@ import styled, { css } from 'styled-components';
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
 
-type Props = {
+export type NavItemProps = {
   isSelected: boolean,
   title: string,
   icon: IconName,
   onClick: () => void,
-  showTitleOnHover: boolean,
+  showTitleOnHover?: boolean,
   sidebarIsPinned: boolean,
+  disabled?: boolean,
+  ariaLabel: string,
 };
 
 type ContainerProps = {
-  isSelected: boolean,
-  sidebarIsPinned: boolean,
+  $isSelected: boolean,
+  $sidebarIsPinned: boolean,
+  $disabled: boolean,
 };
 
-const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSelected, sidebarIsPinned }) => css`
+const Container = styled.button<ContainerProps>(({ theme: { colors, fonts }, $isSelected, $sidebarIsPinned, $disabled }) => css`
   position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
   height: 40px;
   text-align: center;
-  cursor: pointer;
+  cursor: ${$disabled ? 'not-allowed' : 'pointer'};
   font-size: ${fonts.size.h3};
   color: ${colors.variant.darkest.default};
-  background: ${isSelected ? colors.gray[90] : colors.global.contentBackground};
+  background: ${$isSelected ? colors.gray[90] : colors.global.contentBackground};
+  border: 0;
+  padding: 0;
 
-  :hover {
-    color: ${isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
-    background: ${isSelected ? colors.gray[80] : colors.variant.lightest.default};
+  &:hover {
+    color: ${$isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
+    background: ${$isSelected ? colors.gray[80] : colors.variant.lightest.default};
   }
 
-  :active {
+  &:active {
     background: ${colors.variant.lighter.default};
   }
 
   /* stylelint-disable selector-max-empty-lines, indentation */
-  ${(isSelected && !sidebarIsPinned) && css`
-    ::before,
-    ::after {
+  ${($isSelected && !$sidebarIsPinned) && css`
+    &::before,
+    &::after {
       content: '';
       position: absolute;
       right: -5px;
@@ -67,12 +72,12 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSele
       background-color: ${colors.global.contentBackground};
     }
 
-    ::before {
+    &::before {
       transform: skewY(-45deg);
       top: calc(50% - 12px);
     }
     
-    ::after {
+    &::after {
       transform: skewY(45deg);
       bottom: calc(50% - 12px);
     }
@@ -81,33 +86,35 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, isSele
 `);
 
 type IconWrapProps = {
-  showTitleOnHover: boolean,
-  isSelected: boolean,
-  sidebarIsPinned: boolean,
+  $showTitleOnHover: boolean,
+  $isSelected: boolean,
+  $sidebarIsPinned: boolean,
+  $disabled: boolean,
 }
-const IconWrap = styled.span<IconWrapProps>(({ showTitleOnHover, isSelected, theme: { colors }, sidebarIsPinned }) => `
+const IconWrap = styled.span<IconWrapProps>(({ $showTitleOnHover, $isSelected, $disabled, $sidebarIsPinned, theme: { colors } }) => css`
   display: flex;
   width: 100%;
   height: 100%;
   align-items: center;
   justify-content: center;
   position: relative;
+  opacity: ${$disabled ? 0.65 : 1};
 
-  :hover {
+  &:hover {
     + div {
-      display: ${(showTitleOnHover && !isSelected) ? 'flex' : 'none'};
+      display: ${($showTitleOnHover && !$isSelected) ? 'flex' : 'none'};
     }
 
-    ::after {
-      display: ${(showTitleOnHover) ? 'block' : 'none'};
+    &::after {
+      display: ${($showTitleOnHover) ? 'block' : 'none'};
     }
   }
 
-  ::after {
-    display: ${isSelected ? 'block' : 'none'};
-    box-shadow: ${(isSelected && !sidebarIsPinned) ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}` : 'none'};
-    background-color: ${isSelected ? colors.global.contentBackground : colors.variant.lightest.info};
-    border: ${isSelected ? 'none' : `1px solid ${colors.variant.light.info}`};
+  &::after {
+    display: ${$isSelected ? 'block' : 'none'};
+    box-shadow: ${($isSelected && !$sidebarIsPinned) ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}` : 'none'};
+    background-color: ${$isSelected ? colors.global.contentBackground : colors.variant.lightest.info};
+    border: ${$isSelected ? 'none' : `1px solid ${colors.variant.light.info}`};
     content: ' ';
     position: absolute;
     left: 82.5%;
@@ -141,15 +148,17 @@ const Title = styled.div(({ theme: { colors, fonts } }) => css`
   }
 `);
 
-const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned }: Props) => (
-  <Container aria-label={title}
-             isSelected={isSelected}
-             onClick={onClick}
+const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned, disabled, ariaLabel }: NavItemProps) => (
+  <Container aria-label={ariaLabel}
+             $isSelected={isSelected}
+             onClick={!disabled ? onClick : undefined}
              title={showTitleOnHover ? '' : title}
-             sidebarIsPinned={sidebarIsPinned}>
-    <IconWrap showTitleOnHover={showTitleOnHover}
-              isSelected={isSelected}
-              sidebarIsPinned={sidebarIsPinned}>
+             $sidebarIsPinned={sidebarIsPinned}
+             $disabled={disabled}>
+    <IconWrap $showTitleOnHover={showTitleOnHover}
+              $isSelected={isSelected}
+              $sidebarIsPinned={sidebarIsPinned}
+              $disabled={disabled}>
       <Icon name={icon} />
     </IconWrap>
     {(showTitleOnHover && !isSelected) && <Title><span>{title}</span></Title>}
@@ -162,11 +171,13 @@ NavItem.propTypes = {
   showTitleOnHover: PropTypes.bool,
   sidebarIsPinned: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
 };
 
 NavItem.defaultProps = {
   isSelected: false,
   showTitleOnHover: true,
+  disabled: false,
 };
 
 export default NavItem;

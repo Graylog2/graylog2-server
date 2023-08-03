@@ -30,6 +30,8 @@ import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
 import type { SidebarSection } from './sidebarSections';
 import sidebarSections from './sidebarSections';
+import type { SidebarAction } from './sidebarActions';
+import sidebarActions from './sidebarActions';
 
 import CustomPropTypes from '../CustomPropTypes';
 
@@ -38,6 +40,7 @@ type Props = {
   results: QueryResult,
   searchPageLayout?: SearchPreferencesLayout,
   sections?: Array<SidebarSection>,
+  actions?: Array<SidebarAction>,
 };
 
 const Container = styled.div`
@@ -76,7 +79,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, sections }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const queryId = useActiveQueryId();
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
@@ -101,9 +104,9 @@ const Sidebar = ({ searchPageLayout, results, children, sections }: Props) => {
     <Container>
       <SidebarNavigation activeSection={activeSection}
                          selectSidebarSection={selectSidebarSection}
-                         toggleSidebar={toggleSidebar}
                          sections={sections}
-                         sidebarIsPinned={sidebarIsPinned} />
+                         sidebarIsPinned={sidebarIsPinned}
+                         actions={actions} />
       {activeSection && !!SectionContent && (
         <ContentColumn closeSidebar={toggleSidebar}
                        searchPageLayout={searchPageLayout}
@@ -131,6 +134,7 @@ Sidebar.propTypes = {
 Sidebar.defaultProps = {
   results: {},
   sections: sidebarSections,
+  actions: sidebarActions,
   searchPageLayout: undefined,
 };
 
