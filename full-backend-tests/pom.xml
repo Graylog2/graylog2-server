@@ -181,6 +181,12 @@
             <artifactId>elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opensearch</groupId>
+            <artifactId>opensearch-testcontainers</artifactId>
+            <version>${testcontainers.opensearch.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

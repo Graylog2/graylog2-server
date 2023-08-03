@@ -109,7 +109,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpenSearchContainer(DockerImageName.parse(image))
+        return new GenericContainer<>(DockerImageName.parse(image))
                 .withImagePullPolicy(PullPolicy.alwaysPull())
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
@@ -118,6 +118,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", "<root-pw-sha2>")
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb:27017/graylog")
                 .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
+                .withExposedPorts(9200, 9300)
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/_cluster/health").forPort(OPENSEARCH_PORT).forStatusCode(200).forResponsePredicate(s -> s.contains("\"status\":\"green\"")));
