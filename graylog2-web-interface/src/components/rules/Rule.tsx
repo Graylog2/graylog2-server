@@ -27,7 +27,13 @@ import RuleHelper from './rule-helper/RuleHelper';
 
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
-const Rule = ({ create, title, isRuleBuilder }) => {
+type Props = {
+  create: boolean,
+  title: string,
+  isRuleBuilder: boolean,
+};
+
+const Rule = ({ create, title, isRuleBuilder }: Props) => {
   let pageTitle;
 
   if (create) {
