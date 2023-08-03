@@ -20,7 +20,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
-import org.graylog2.cluster.preflight.NodePreflightStateChangeEvent;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.process.OpensearchConfiguration;
