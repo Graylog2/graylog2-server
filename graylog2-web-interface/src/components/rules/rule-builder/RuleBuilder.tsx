@@ -97,6 +97,7 @@ const RuleBuilder = () => {
   } = useRuleBuilder();
 
   const {
+    rawMessageToSimulate,
     simulateRule,
     setRawMessageToSimulate,
   } = useContext(PipelineRulesContext);
@@ -183,7 +184,7 @@ const RuleBuilder = () => {
     await validateAndSaveRuleBuilder(ruleToAdd);
 
     if (showSimulator) {
-      await simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, ruleToAdd);
+      await simulateRule(rawMessageToSimulate, ruleToAdd);
     }
   };
 
@@ -217,7 +218,7 @@ const RuleBuilder = () => {
     await validateAndSaveRuleBuilder(ruleToUpdate);
 
     if (showSimulator) {
-      await simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, ruleToUpdate);
+      await simulateRule(rawMessageToSimulate, ruleToUpdate);
     }
   };
 
@@ -249,7 +250,7 @@ const RuleBuilder = () => {
     await validateAndSaveRuleBuilder(ruleToDelete);
 
     if (showSimulator) {
-      await simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, ruleToDelete);
+      await simulateRule(rawMessageToSimulate, ruleToDelete);
     }
   };
 
