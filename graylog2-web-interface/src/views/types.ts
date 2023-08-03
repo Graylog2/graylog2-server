@@ -235,7 +235,7 @@ export type MessagePreviewOption = {
   sort: number,
 }
 
-type ExternalActionsHookData = {
+export type ExternalActionsHookData = {
       error: Error | null;
       externalValueActions: Array<ActionDefinition> | null;
       isLoading: boolean;

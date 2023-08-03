@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -43,7 +43,11 @@ const InteractiveValue = ({ field, value, render, type }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
-  const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
+  const element = useMemo(() => <TypeSpecificValue field={field} value={value} type={type} render={Component} />, [Component, field, type, value]);
+
+  useEffect(() => {
+    console.log('MOUNT InteractiveValue');
+  }, []);
 
   return (
     <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
@@ -58,13 +62,22 @@ InteractiveValue.defaultProps = {
   render: defaultRenderer,
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
-  <InteractiveContext.Consumer>
-    {(interactive) => ((interactive)
-      ? <InteractiveValue field={field} value={value} render={render} type={type} />
-      : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
-  </InteractiveContext.Consumer>
-);
+const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
+  useEffect(() => {
+    console.log('MOUNT Value');
+  }, []);
+
+  return (
+    <InteractiveContext.Consumer>
+      {(interactive) => {
+        console.log({ interactive });
+
+        return (interactive) ? <InteractiveValue field={field} value={value} render={render} type={type} />
+          : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>;
+      }}
+    </InteractiveContext.Consumer>
+  );
+};
 
 Value.defaultProps = {
   render: defaultRenderer,

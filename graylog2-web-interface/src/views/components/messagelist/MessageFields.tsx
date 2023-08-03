@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useEffect, useMemo } from 'react';
 
 import { MessageDetailsDefinitionList } from 'components/common';
 import MessageField from 'views/components/messagelist/MessageField';
@@ -43,27 +44,33 @@ const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }) => css
 `);
 
 const MessageFields = ({ message, fields }: Props) => {
+  useEffect(() => {
+    console.log('!!!!!!!!!!! !!!!!!!!!!! MOUNT MessageFields');
+  }, []);
+
   const formattedFields = message.formatted_fields;
-  const renderedFields = Object.keys(formattedFields)
+  const renderedFields = useMemo(() => Object.keys(formattedFields)
     .sort()
     .map((key) => {
       const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
 
-      return (
-        <CustomHighlighting key={key}
-                            field={key}
-                            value={formattedFields[key]}>
-          <MessageField fieldName={key}
-                        fieldType={type}
-                        message={message}
-                        value={formattedFields[key]} />
-        </CustomHighlighting>
-      );
-    });
+      return ({ key, type, value: formattedFields[key] });
+    }), [fields, formattedFields]);
 
   return (
     <MessageDetailsDL className="message-details-fields">
-      {renderedFields}
+      {renderedFields.map(({ key, value, type }) => (
+        (
+          <CustomHighlighting key={key}
+                              field={key}
+                              value={value}>
+            <MessageField fieldName={key}
+                          fieldType={type}
+                          message={message}
+                          value={value} />
+          </CustomHighlighting>
+        )
+      ))}
     </MessageDetailsDL>
   );
 };

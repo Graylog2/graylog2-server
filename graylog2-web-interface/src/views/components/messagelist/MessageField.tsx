@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
 import Field from 'views/components/Field';
@@ -51,6 +51,10 @@ const DefinitionDescription = styled.dd(({ theme }) => `
 const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
   const activeQuery = useActiveQueryId();
+
+  useEffect(() => {
+    console.log('MOUNT MessageField');
+  }, []);
 
   const {
     decoration_stats: decorationStats = {

@@ -38,47 +38,6 @@ const StyledListItem = styled.li`
   list-style: none;
 `;
 
-const filterVisibleActions = (dispatch: AppDispatch, handlerArgs: Props['handlerArgs'], actions: Array<ActionDefinition> | undefined = []) => actions.filter((action: ActionDefinition) => {
-  const { isHidden = () => false } = action;
-
-  return dispatch((_dispatch, getState) => !isHidden(handlerArgs, getState));
-});
-
-const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const valueActions = usePluginEntities('valueActions');
-  const fieldActions = usePluginEntities('fieldActions');
-  const dispatch = useAppDispatch();
-
-  if (type === 'value') {
-    return filterVisibleActions(dispatch, handlerArgs, valueActions);
-  }
-
-  if (type === 'field') {
-    return filterVisibleActions(dispatch, handlerArgs, fieldActions);
-  }
-
-  return [];
-};
-
-const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const usePluginExternalActions = usePluginEntities('useExternalActions');
-  const dispatch = useAppDispatch();
-
-  if (usePluginExternalActions && typeof usePluginExternalActions[0] === 'function') {
-    const { isLoading, isError, externalValueActions } = usePluginExternalActions[0]();
-
-    if (type !== 'value') {
-      return { isLoading, isError, externalValueActions: [] };
-    }
-
-    const externalActions = filterVisibleActions(dispatch, handlerArgs, externalValueActions);
-
-    return { isLoading, isError, externalActions };
-  }
-
-  return { isLoading: false, isError: false, externalValueActions: [] };
-};
-
 type Props = {
   children: React.ReactNode,
   type: 'field' | 'value',
@@ -86,6 +45,8 @@ type Props = {
   setOverflowingComponents: (components: ActionComponents) => void,
   overflowingComponents: ActionComponents,
   onMenuToggle: () => void,
+  internalActions: Array<ActionDefinition>,
+  externalActions: Array<ActionDefinition>,
 };
 
 const ActionDropdown = ({
@@ -95,46 +56,43 @@ const ActionDropdown = ({
   setOverflowingComponents,
   overflowingComponents,
   onMenuToggle,
-}: Props) => {
-  const internalActions = useInternalActions(type, handlerArgs);
-  const { isLoading, externalActions } = useExternalActions(type, handlerArgs);
+  internalActions,
+  externalActions,
+}: Props) => (
+  <>
+    <StyledListItem>
+      <DropdownHeader>
+        {children}
+      </DropdownHeader>
+    </StyledListItem>
 
-  return (
+    <MenuItem divider />
+    <MenuItem header>Actions</MenuItem>
+    {internalActions.map((action) => (
+      <ActionMenuItem action={action}
+                      key={`${type}-action-${action.type}`}
+                      handlerArgs={handlerArgs}
+                      setOverflowingComponents={setOverflowingComponents}
+                      overflowingComponents={overflowingComponents}
+                      type={type}
+                      onMenuToggle={onMenuToggle} />
+    ))}
+
+    {(internalActions && internalActions.length !== 0) && (
     <>
-      <StyledListItem>
-        <DropdownHeader>
-          {children}
-        </DropdownHeader>
-      </StyledListItem>
-
       <MenuItem divider />
-      <MenuItem header>Actions</MenuItem>
       {internalActions.map((action) => (
         <ActionMenuItem action={action}
-                        key={`${type}-action-${action.type}`}
+                        key={`${type}-action-external-${action.type}`}
                         handlerArgs={handlerArgs}
                         setOverflowingComponents={setOverflowingComponents}
                         overflowingComponents={overflowingComponents}
                         type={type}
                         onMenuToggle={onMenuToggle} />
       ))}
-      {isLoading && (<><MenuItem divider /><MenuItem disabled><Spinner text="Loading" /></MenuItem></>)}
-      {(!isLoading && externalActions && externalActions.length !== 0) && (
-        <>
-          <MenuItem divider />
-          {externalActions.map((action) => (
-            <ActionMenuItem action={action}
-                            key={`${type}-action-${action.type}`}
-                            handlerArgs={handlerArgs}
-                            setOverflowingComponents={setOverflowingComponents}
-                            overflowingComponents={overflowingComponents}
-                            type={type}
-                            onMenuToggle={onMenuToggle} />
-          ))}
-        </>
-      )}
     </>
-  );
-};
+    )}
+  </>
+);
 
 export default ActionDropdown;
