@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.IsNotNull;
@@ -43,6 +45,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
@@ -51,6 +54,9 @@ import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.BaseFragmentTest;
+import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternRegistry;
+import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -66,6 +72,11 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
@@ -106,6 +117,17 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         functions.put(Contains.NAME, new Contains());
         functions.put(StartsWith.NAME, new StartsWith());
         functions.put(EndsWith.NAME, new EndsWith());
+
+        final GrokPatternService grokPatternService = mock(GrokPatternService.class);
+        Set<GrokPattern> patterns = Sets.newHashSet(
+                GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))")
+        );
+        when(grokPatternService.loadAll()).thenReturn(patterns);
+        final EventBus clusterBus = new EventBus();
+        final GrokPatternRegistry grokPatternRegistry = new GrokPatternRegistry(clusterBus,
+                grokPatternService,
+                Executors.newScheduledThreadPool(1));
+        functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -405,6 +427,19 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
         testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "DOO"));
         evaluateCondition(testRule, message, false);
         testRule = createFragmentSource(fragment, Map.of("field", "string", "search", "DOO", "ignoreCase", true));
+        evaluateCondition(testRule, message, true);
+    }
+
+    @Test
+    public void testFieldGrokMatches() {
+        Message message = new Message("Dummy Message", "test", Tools.nowUTC());
+        final RuleFragment fragment = migration.createGrokMatchesField();
+
+        message.addField("string", "string");
+        message.addField("number", "10");
+        Rule testRule = createFragmentSource(fragment, Map.of("field", "string", "pattern", "%{BASE10NUM}"));
+        evaluateCondition(testRule, message, false);
+        testRule = createFragmentSource(fragment, Map.of("field", "number", "pattern", "%{BASE10NUM}"));
         evaluateCondition(testRule, message, true);
     }
 

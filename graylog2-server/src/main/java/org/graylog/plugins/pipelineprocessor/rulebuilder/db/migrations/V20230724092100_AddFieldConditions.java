@@ -68,6 +68,7 @@ public class V20230724092100_AddFieldConditions extends Migration {
         addFragment(createStringContainsField());
         addFragment(createStringEndsWithField());
         addFragment(createStringStartsWithField());
+        addFragment(createGrokMatchesField());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("field condition fragments were successfully added");
@@ -242,6 +243,30 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Field ends with")
                         .ruleBuilderTitle("Check if string value in '${field}' ends with '${search}' <#if ignoreCase??>(ignore case: ${ignoreCase})</#if>")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
+                        .build())
+                .isCondition()
+                .build();
+    }
+
+    RuleFragment createGrokMatchesField() {
+        return RuleFragment.builder()
+                .fragment("""
+                        grok(
+                          value: to_string($message.${field}),
+                          pattern: ${pattern}
+                        ).matches == true""")
+                .descriptor(FunctionDescriptor.builder()
+                        .name("grok_matches")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to check").build(),
+                                string("pattern").description("Grok pattern to check string against").build()
+                        ))
+                        .returnType(Void.class)
+                        .description("Checks if the field value's string representation matches the given grok pattern.")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Field ends with")
+                        .ruleBuilderTitle("Check if string value in '${field}' matches grok pattern '${pattern}'")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                         .build())
                 .isCondition()
