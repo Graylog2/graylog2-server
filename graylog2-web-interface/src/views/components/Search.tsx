@@ -119,9 +119,10 @@ const useAutoRefresh = (refresh: () => Promise<unknown>) => {
 
 type Props = {
   InfoBarSlot?: React.ComponentType,
+  SearchAreaContainer?: React.ComponentType,
 }
 
-const Search = ({ InfoBarSlot }: Props) => {
+const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
@@ -169,7 +170,7 @@ const Search = ({ InfoBarSlot }: Props) => {
                               </ConnectedSidebar>
                               )}
                             </IfInteractive>
-                            <SearchArea>
+                            <SearchArea as={SearchAreaContainer}>
                               <IfInteractive>
                                 <HeaderElements />
                                 {InfoBarSlot && <InfoBarSlot />}
@@ -207,6 +208,7 @@ const Search = ({ InfoBarSlot }: Props) => {
 
 Search.defaultProps = {
   InfoBarSlot: undefined,
+  SearchAreaContainer: undefined,
 };
 
 export default Search;

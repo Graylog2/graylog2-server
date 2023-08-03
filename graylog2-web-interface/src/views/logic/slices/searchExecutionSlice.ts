@@ -97,7 +97,7 @@ const searchExecutionSlice = createSlice({
   },
 });
 
-export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues } = searchExecutionSlice.actions;
+export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues, setParameterBindings } = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 

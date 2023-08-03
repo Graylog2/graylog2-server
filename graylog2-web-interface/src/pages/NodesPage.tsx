@@ -15,28 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import URI from 'urijs';
 import PropTypes from 'prop-types';
 
 import * as URLUtils from 'util/URLUtils';
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
 import { NodesList } from 'components/nodes';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { NodeInfo } from 'stores/nodes/NodesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import { useStore } from 'stores/connect';
+
+import useCurrentUser from '../hooks/useCurrentUser';
 
 const GLOBAL_API_BROWSER_URL = '/api-browser/global/index.html';
 
-const hasExternalURI = (nodes) => {
+const hasExternalURI = (nodes: { [nodeId: string]: NodeInfo }) => {
   const nodeVals = Object.values(nodes);
   const publishURI = URLUtils.qualifyUrl('/');
 
   return (nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
 };
 
-const GlobalAPIButton = ({ nodes }) => {
+const GlobalAPIButton = ({ nodes }: { nodes: { [nodeId: string]: NodeInfo } }) => {
   if (!nodes) {
     return <Spinner />;
   }
@@ -53,37 +53,28 @@ const GlobalAPIButton = ({ nodes }) => {
 };
 
 GlobalAPIButton.propTypes = {
-  nodes: PropTypes.object,
+  nodes: PropTypes.object.isRequired,
 };
 
-GlobalAPIButton.defaultProps = {
-  nodes: undefined,
+const NodesPage = () => {
+  const currentUser = useCurrentUser();
+  const { nodes } = useStore(NodesStore);
+
+  return (
+    <DocumentTitle title="Nodes">
+      <div>
+        <PageHeader title="Nodes" actions={<GlobalAPIButton nodes={nodes} />}>
+          <span>
+            This page provides a real-time overview of the nodes in your Graylog cluster.
+            You can pause message processing at any time. The process buffers will not accept any new messages until
+            you resume it. If the message journal is enabled for a node, which it is by default, incoming messages
+            will be persisted to disk, even when processing is disabled.
+          </span>
+        </PageHeader>
+        <NodesList permissions={currentUser.permissions} nodes={nodes} />
+      </div>
+    </DocumentTitle>
+  );
 };
-
-const NodesPage = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  displayName: 'NodesPage',
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(NodesStore)],
-
-  render() {
-    const { nodes, currentUser } = this.state;
-
-    return (
-      <DocumentTitle title="Nodes">
-        <div>
-          <PageHeader title="Nodes" actions={<GlobalAPIButton nodes={nodes} />}>
-            <span>
-              This page provides a real-time overview of the nodes in your Graylog cluster.
-              You can pause message processing at any time. The process buffers will not accept any new messages until
-              you resume it. If the message journal is enabled for a node, which it is by default, incoming messages
-              will be persisted to disk, even when processing is disabled.
-            </span>
-          </PageHeader>
-          <NodesList permissions={currentUser.permissions} nodes={nodes} />
-        </div>
-      </DocumentTitle>
-    );
-  },
-});
 
 export default NodesPage;
