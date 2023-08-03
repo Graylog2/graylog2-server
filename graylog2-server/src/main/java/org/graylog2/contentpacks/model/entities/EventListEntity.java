@@ -117,7 +117,7 @@ public abstract class EventListEntity implements SearchTypeEntity {
                 .streams(mappedStreams(nativeEntities))
                 .id(id())
                 .filter(filter())
-                .filters(filters())
+                .filters(convertSearchFilters(filters()))
                 .query(query().orElse(null))
                 .timerange(timerange().orElse(null))
                 .name(name().orElse(null))
