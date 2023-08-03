@@ -22,12 +22,10 @@ import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
-import { ConfirmDialog, FormSubmit } from 'components/common';
+import { ConfirmDialog, FormSubmit, Toggle } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-// eslint-disable-next-line no-irregular-whitespace
-import { Toggle } from 'components/navigation/ThemeModeToggle';
 
 import Errors from './Errors';
 import RuleBuilderBlock from './RuleBuilderBlock';
