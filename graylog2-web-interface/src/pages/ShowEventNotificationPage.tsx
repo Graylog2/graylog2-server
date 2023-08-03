@@ -27,6 +27,7 @@ import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import 'components/event-notifications/event-notification-types';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
@@ -35,13 +36,13 @@ import useHistory from '../routing/useHistory';
 
 const ShowEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
-  const [notification, setNotification] = useState();
+  const [notification, setNotification] = useState<EventNotification | undefined>();
   const { notificationId } = useParams();
   const history = useHistory();
 
   useEffect(() => {
     EventNotificationsActions.get(notificationId).then(
-      setNotification,
+      (result) => setNotification(result),
       (error) => {
         if (error.status === 404) {
           ErrorsActions.report(createFromFetchError(error));

@@ -15,38 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import CollectorsAdministrationContainer from 'components/sidecars/administration/CollectorsAdministrationContainer';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
-import withLocation from 'routing/withLocation';
+import useQuery from 'routing/useQuery';
 
-const SidecarAdministrationPage = ({ location: { query: { node_id: nodeId } } }) => (
-  <DocumentTitle title="Collectors Administration">
-    <SidecarsPageNavigation />
-    <PageHeader title="Collectors Administration"
-                documentationLink={{
-                  title: 'Sidecar documentation',
-                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                }}>
-      <span>
-        The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
-      </span>
-    </PageHeader>
+const SidecarAdministrationPage = () => {
+  const { node_id: nodeId } = useQuery();
 
-    <Row className="content">
-      <Col md={12}>
-        <CollectorsAdministrationContainer nodeId={nodeId} />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title="Collectors Administration">
+      <SidecarsPageNavigation />
+      <PageHeader title="Collectors Administration"
+                  documentationLink={{
+                    title: 'Sidecar documentation',
+                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+                  }}>
+        <span>
+          The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
+        </span>
+      </PageHeader>
 
-SidecarAdministrationPage.propTypes = {
-  location: PropTypes.object.isRequired,
+      <Row className="content">
+        <Col md={12}>
+          <CollectorsAdministrationContainer nodeId={nodeId} />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
 };
 
-export default withLocation(SidecarAdministrationPage);
+export default SidecarAdministrationPage;
