@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog.plugins.views.search.views.ViewResolver;
+import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.Test;
 
@@ -118,19 +119,19 @@ class SearchUserTest {
     void testResolvedViewReadAccess() {
         // Test that the resolver permission check allows and disallows appropriately.
         assertThat(searchUserResolvedRequiringPermission("missing-permission")
-                .canReadView(new TestView("resolver:resolved-id"))).isFalse();
+                .canReadView(new TestView("resolver" + ViewResolverDecoder.SEPARATOR + "resolved-id"))).isFalse();
         assertThat(searchUserResolvedRequiringPermission("allowed-permission")
-                .canReadView(new TestView("resolver:resolved-id"))).isTrue();
+                .canReadView(new TestView("resolver" + ViewResolverDecoder.SEPARATOR + "resolved-id"))).isTrue();
 
         // Test that the resolver permission and entity id check allows and disallows appropriately.
         assertThat(searchUserResolvedRequiringPermissionEntity("bad-permission", "resolved-id")
-                .canReadView(new TestView("resolver:resolved-id"))).isFalse();
+                .canReadView(new TestView("resolver" + ViewResolverDecoder.SEPARATOR + "resolved-id"))).isFalse();
         assertThat(searchUserResolvedRequiringPermissionEntity("allowed-permission", "bad-id")
-                .canReadView(new TestView("resolver:resolved-id"))).isFalse();
+                .canReadView(new TestView("resolver" + ViewResolverDecoder.SEPARATOR + "resolved-id"))).isFalse();
         assertThat(searchUserResolvedRequiringPermissionEntity("missing-permission", "bad-id")
-                .canReadView(new TestView("resolver:resolved-id"))).isFalse();
+                .canReadView(new TestView("resolver" + ViewResolverDecoder.SEPARATOR + "resolved-id"))).isFalse();
         assertThat(searchUserResolvedRequiringPermissionEntity("allowed-permission", "resolved-id")
-                .canReadView(new TestView("resolver:resolved-id"))).isTrue();
+                .canReadView(new TestView("resolver" + ViewResolverDecoder.SEPARATOR + "resolved-id"))).isTrue();
     }
 
     private SearchUser searchUserResolvedRequiringPermission(String expectedPermission) {

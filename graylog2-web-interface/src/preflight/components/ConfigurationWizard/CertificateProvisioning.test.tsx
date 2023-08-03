@@ -68,9 +68,9 @@ describe('CertificateProvisioning', () => {
       false,
     ));
 
-    expect(UserNotification.success).toHaveBeenCalledWith('Certificate provisioning successful');
+    expect(UserNotification.success).toHaveBeenCalledWith('Started certificate provisioning successfully');
 
-    await screen.findByRole('button', { name: /provision certificate and continue/i });
+    await screen.findByRole('button', { name: /provisioning certificate.../i });
   });
 
   it('should show error when certificate provisioning failed', async () => {
@@ -91,7 +91,7 @@ describe('CertificateProvisioning', () => {
       false,
     ));
 
-    expect(UserNotification.error).toHaveBeenCalledWith('Certificate provisioning failed with error: Error: Error');
+    expect(UserNotification.error).toHaveBeenCalledWith('Starting certificate provisioning failed with error: Error: Error');
 
     await screen.findByRole('button', { name: /provision certificate and continue/i });
   });

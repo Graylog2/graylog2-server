@@ -14,21 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.certificates;
+package org.graylog.datanode.management;
 
-import org.graylog.security.certutil.CertConstants;
+import org.graylog.datanode.process.OpensearchConfiguration;
 
-public record CertificateMetaData(String alias,
-                                  String keystoreFilePath,
-                                  char[] keystoreFilePassword) {
-
-    public CertificateMetaData(String keystoreFilePath,
-                               char[] keystoreFilePassword) {
-        this(CertConstants.DATANODE_KEY_ALIAS, keystoreFilePath, keystoreFilePassword);
-    }
-
-    public String passwordAsString() {
-        return new String(keystoreFilePassword());
-    }
-
+public record OpensearchConfigurationChangeEvent(OpensearchConfiguration config) {
 }

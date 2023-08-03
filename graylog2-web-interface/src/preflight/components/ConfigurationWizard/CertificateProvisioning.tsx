@@ -16,14 +16,15 @@
  */
 import * as React from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 
 import fetch from 'logic/rest/FetchProvider';
-import { Button, Title, Alert, Group } from 'preflight/components/common';
+import { Button, Title, Alert, Group, Space } from 'preflight/components/common';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
 
-const onProvisionCertificates = () => fetch(
+const onProvisionCertificate = () => fetch(
   'POST',
   URLUtils.qualifyUrl('api/generate'),
   undefined,
@@ -37,17 +38,24 @@ type Props = {
 const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
   const queryClient = useQueryClient();
   const { data: dataNodes, isInitialLoading } = useDataNodes();
+  const [isProvisioning, setIsProvisioning] = useState(false);
 
-  const { mutate: provisionCertificates, isLoading } = useMutation(onProvisionCertificates, {
+  const { mutate: provisionCertificate } = useMutation(onProvisionCertificate, {
     onSuccess: () => {
-      UserNotification.success('Certificate provisioning successful');
+      UserNotification.success('Started certificate provisioning successfully');
       queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
     },
     onError: (error) => {
-      UserNotification.error(`Certificate provisioning failed with error: ${error}`);
+      UserNotification.error(`Starting certificate provisioning failed with error: ${error}`);
       queryClient.invalidateQueries(DATA_NODES_OVERVIEW_QUERY_KEY);
+      setIsProvisioning(false);
     },
   });
+
+  const onSubmit = useCallback(() => {
+    setIsProvisioning(true);
+    provisionCertificate();
+  }, [provisionCertificate]);
 
   return (
     <div>
@@ -56,16 +64,16 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
         Certificate authority has been configured successfully.<br />
         You can now provision certificate for your data nodes.
       </p>
-      {(!dataNodes.length && !isInitialLoading) && (
+      {(!dataNodes.length && !isInitialLoading) ? (
         <Alert type="warning">
           At least one Graylog data node needs to run before the certificate can be provisioned.
         </Alert>
-      )}
+      ) : <Space h="sm" />}
       <Group>
-        <Button onClick={() => provisionCertificates()} disabled={!dataNodes.length}>
-          {isLoading ? 'Provisioning certificate...' : 'Provision certificate and continue'}
+        <Button onClick={() => onSubmit()} disabled={!dataNodes.length || isProvisioning}>
+          {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}
         </Button>
-        <Button onClick={() => onSkipProvisioning()} variant="light">
+        <Button onClick={() => onSkipProvisioning()} variant="light" disabled={isProvisioning}>
           Skip provisioning
         </Button>
       </Group>

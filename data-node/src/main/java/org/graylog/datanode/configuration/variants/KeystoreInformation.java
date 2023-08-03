@@ -16,15 +16,10 @@
  */
 package org.graylog.datanode.configuration.variants;
 
-import org.graylog.datanode.Configuration;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import java.nio.file.Path;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-public interface SecurityConfigurationVariant {
-
-    boolean checkPrerequisites(final Configuration localConfiguration);
-
-    OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException;
+public record KeystoreInformation(Path location, char[] password) {
+    public String passwordAsString() {
+        return new String(password());
+    }
 }
