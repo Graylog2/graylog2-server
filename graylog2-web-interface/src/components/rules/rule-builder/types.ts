@@ -97,7 +97,7 @@ export type BlockDict = {
 
 export type OutputVariables = Array<{
   variableName: string,
-  variableType: RuleBuilderTypes,
+  variableType?: RuleBuilderTypes,
   stepOrder: number,
   blockId: string
 }>
@@ -105,7 +105,7 @@ export type OutputVariables = Array<{
 export const outputVariablesPropType = PropTypes.arrayOf(
   PropTypes.shape({
     variableName: PropTypes.string.isRequired,
-    variableType: PropTypes.string.isRequired,
+    variableType: PropTypes.string,
     stepOrder: PropTypes.number.isRequired,
     blockId: PropTypes.string.isRequired,
   }),
