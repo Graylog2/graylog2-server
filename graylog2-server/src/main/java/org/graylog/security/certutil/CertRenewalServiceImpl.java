@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateExpiredException;
@@ -163,38 +164,50 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
+    private void initiateAutomaticRenewalForNode(Node node) {
+        // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
+        var config = dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
+        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
+    }
+
+    private void initiateManualRenewalForNode(Node node) {
+        // TODO: send notification - don't send one out, if there is one still open
+        notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, node);
+    }
+
+    private Pair<Node, KeyStore> loadKeyStoreForNode(Node node) {
+        try {
+            return Pair.of(node, keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret).orElse(null));
+        } catch (KeyStoreStorageException e) {
+            LOG.error("Could not read keystore for DataNode: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private Pair<Node, X509Certificate> getCertificateForNode(Pair<Node, KeyStore> pair) {
+        try {
+            return Pair.of(pair.getLeft(), (X509Certificate)pair.getRight().getCertificate(CertConstants.DATANODE_KEY_ALIAS));
+        } catch (KeyStoreException e) {
+            LOG.error("Could not read certificate for DataNode: {}", e.getMessage());
+            return null;
+        }
+    }
+
     protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         final var nextRenewal = getNextRenewal();
         activeDataNodes.values().stream()
-                .map(node -> {
-                    try {
-                        return Pair.of(node, keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret).orElse(null));
-                    } catch (KeyStoreStorageException e) {
-                        LOG.error("Could not read keystore for DataNode: {}", e.getMessage());
-                        return null;
-                    }
-                })
+                .map(this::loadKeyStoreForNode)
                 .filter(Objects::nonNull)
                 .filter(p -> p.getRight() != null)
-                .map(pair -> {
-                    try {
-                        return Pair.of(pair.getLeft(), (X509Certificate)pair.getRight().getCertificate(CertConstants.DATANODE_KEY_ALIAS));
-                    } catch (KeyStoreException e) {
-                        LOG.error("Could not read certificate for DataNode: {}", e.getMessage());
-                        return null;
-                    }
-                })
+                .map(this::getCertificateForNode)
                 .filter(Objects::nonNull)
                 .filter(p -> needsRenewal(nextRenewal, renewalPolicy, p.getRight()))
                 .forEach(pair -> {
                     if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
-                        // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
-                        var config = dataNodeProvisioningService.getPreflightConfigFor(pair.getLeft().getNodeId());
-                        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
+                        initiateAutomaticRenewalForNode(pair.getLeft());
                     } else {
-                        // TODO: send notification - don't send one out, if there is one still open
-                        notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, pair.getLeft());
+                        initiateManualRenewalForNode(pair.getLeft());
                     }
                 });
     }
