@@ -16,25 +16,34 @@
  */
 
 import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { availableTimeRangeTypes } from 'views/Constants';
 import { Tab, Tabs } from 'components/bootstrap';
 import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
-  NoTimeRangeOverride,
   TimeRange,
   RelativeTimeRange,
 } from 'views/logic/queries/Query';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { isTimeRange } from 'views/typeGuards/timeRange';
+import migrateTimeRangeToNewType
+  from 'views/components/searchbar/time-range-filter/time-range-picker/migrateTimeRangeToNewType';
+import useUserDateTime from 'hooks/useUserDateTime';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import { toDateObject } from 'util/DateTime';
+import {
+  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+} from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
-import type { SupportedTimeRangeType } from './TimeRangePicker';
+import type { SupportedTimeRangeType, TimeRangePickerFormValues } from './TimeRangePicker';
 
 export const timeRangePickerTabs = {
   absolute: TabAbsoluteTimeRange,
@@ -77,27 +86,51 @@ const timeRangeTypeTabs = ({
     );
   });
 
+const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormats) => string) => ({
+  absolute: {
+    type: 'absolute',
+    from: formatTime(toDateObject(new Date()).subtract(300, 'seconds'), 'complete'),
+    to: formatTime(toDateObject(new Date()), 'complete'),
+  },
+  relative: {
+    type: 'relative',
+    from: {
+      value: 5,
+      unit: 'minutes',
+      isAllTime: false,
+    },
+    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  },
+  keyword: {
+    type: 'keyword',
+    keyword: 'Last five minutes',
+  },
+  disabled: undefined,
+});
+
 type Props = {
-  handleActiveTab: (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => void,
-  currentTimeRange: NoTimeRangeOverride | TimeRange,
   limitDuration: number,
   validTypes: Array<'absolute' | 'relative' | 'keyword'>,
   setValidatingKeyword: (validating: boolean) => void,
 };
 
 const TimeRangeTabs = ({
-  handleActiveTab,
-  currentTimeRange,
   limitDuration,
   validTypes,
   setValidatingKeyword,
 }: Props) => {
-  const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
   const sendTelemetry = useSendTelemetry();
+  const { formatTime } = useUserDateTime();
+  const { setFieldValue, values: { nextTimeRange } } = useFormikContext<TimeRangePickerFormValues>();
+  const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
+  const activeTab = isTimeRange(nextTimeRange) ? nextTimeRange.type : undefined;
 
   const onSelect = useCallback((nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
-    handleActiveTab(nextTab);
-    setActiveTab(nextTab);
+    if ('type' in nextTimeRange) {
+      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, formatTime));
+    } else {
+      setFieldValue('nextTimeRange', defaultRanges[nextTab]);
+    }
 
     sendTelemetry('click', {
       app_pathname: 'search',
@@ -107,7 +140,7 @@ const TimeRangeTabs = ({
         tab: nextTab,
       },
     });
-  }, [handleActiveTab, sendTelemetry]);
+  }, [defaultRanges, formatTime, nextTimeRange, sendTelemetry, setFieldValue]);
 
   const tabs = useMemo(() => timeRangeTypeTabs({
     activeTab,

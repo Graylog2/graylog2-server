@@ -49,7 +49,12 @@ class QueryEntityTest {
 
         final ImmutableList<UsedSearchFilter> originalSearchFilters = ImmutableList.of(
                 InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").disabled(true).build(),
-                ReferencedQueryStringSearchFilter.create("42")
+                ReferencedQueryStringSearchFilter.create("42").withQueryString("method:GET")
+        );
+
+        final ImmutableList<UsedSearchFilter> expectedSearchFilters = ImmutableList.of(
+                InlineQueryStringSearchFilter.builder().title("title").description("descr").queryString("*").disabled(true).build(),
+                InlineQueryStringSearchFilter.builder().queryString("method:GET").build()
         );
         QueryEntity queryWithFilters = QueryEntity.Builder
                 .createWithDefaults()
@@ -60,6 +65,6 @@ class QueryEntityTest {
                 .build();
         assertThat(queryWithFilters.toNativeEntity(Collections.emptyMap(), Collections.emptyMap()).filters())
                 .isNotNull()
-                .isEqualTo(originalSearchFilters);
+                .isEqualTo(expectedSearchFilters);
     }
 }

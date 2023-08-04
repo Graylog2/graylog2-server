@@ -381,8 +381,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
     private static Set<String> getSecureCipherSuites() {
         final Set<String> openSslCipherSuites = OpenSsl.availableOpenSslCipherSuites();
-        final String[] disabledAlgorithms = {".*CBC.*", "AES128-SHA", "AES256-SHA", "ECDHE-RSA-AES128-SHA",
-                "ECDHE-RSA-AES256-SHA", "AES128-GCM-SHA256", "AES256-GCM-SHA384"};
+        final String[] disabledAlgorithms = {".*CBC.*", "AES128-SHA", "AES256-SHA", "ECDHE-RSA-AES128-SHA", "ECDHE-RSA-AES256-SHA"};
         return openSslCipherSuites.stream().filter(s -> Arrays.stream(disabledAlgorithms).noneMatch(s::matches)).collect(Collectors.toSet());
     }
 

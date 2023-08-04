@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
 import * as React from 'react';
 
@@ -33,15 +34,19 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
   SearchConfigStore: {
     listen: () => jest.fn(),
-    getInitialState: () => ({ searchesClusterConfig: mockSearchClusterConfig }),
+    getInitialState: () => ({ searchesClusterConfig: { ...mockSearchClusterConfig, query_time_range_limit: undefined } }),
   },
 }));
 
 const selectRangePreset = async (optionLabel: string) => {
-  const timeRangePresetButton = screen.getByLabelText('Open time range preset select');
-  fireEvent.click(timeRangePresetButton);
-  const rangePresetOption = await screen.findByText(optionLabel);
-  fireEvent.click(rangePresetOption);
+  const timeRangePresetButton = screen.getByRole('button', {
+    name: /open time range preset select/i,
+  });
+  userEvent.click(timeRangePresetButton);
+  const rangePresetOption = await screen.findByRole('menuitem', {
+    name: new RegExp(optionLabel, 'i'),
+  });
+  userEvent.click(rangePresetOption);
 };
 
 describe('TimeRangeFilterButtons', () => {
@@ -61,7 +66,7 @@ describe('TimeRangeFilterButtons', () => {
 
     const timeRangePickerButton = screen.getByLabelText('Open Time Range Selector');
 
-    fireEvent.click(timeRangePickerButton);
+    userEvent.click(timeRangePickerButton);
 
     expect(toggleShow).toHaveBeenCalled();
   });

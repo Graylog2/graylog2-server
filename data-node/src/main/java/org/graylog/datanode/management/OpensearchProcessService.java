@@ -23,6 +23,7 @@ import org.graylog2.cluster.preflight.NodePreflightStateChangeEvent;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +39,23 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
+    private final CustomCAX509TrustManager trustManager;
+    private final EventBus eventBus;
 
     @Inject
-    public OpensearchProcessService(DatanodeConfiguration datanodeConfiguration, Provider<OpensearchConfiguration> configurationProvider, EventBus eventBus) {
+    public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
+                                    final Provider<OpensearchConfiguration> configurationProvider,
+                                    final EventBus eventBus,
+                                    final CustomCAX509TrustManager trustManager) {
         this.configurationProvider = configurationProvider;
+        this.trustManager = trustManager;
         this.process = createOpensearchProcess(datanodeConfiguration);
+        this.eventBus = eventBus;
         eventBus.register(this);
     }
 
     private OpensearchProcess createOpensearchProcess(DatanodeConfiguration datanodeConfiguration) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize());
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.setStateMachineTracer(watchdog);
         return process;
@@ -56,18 +64,23 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @Subscribe
     public void handlePreflightConfigEvent(NodePreflightStateChangeEvent event) {
         switch (event.state()) {
-            case STORED -> this.process.startWithConfig(configurationProvider.get());
+            case STORED -> startWithConfig();
         }
     }
 
     @Override
     protected void startUp() {
         try {
-            final OpensearchConfiguration config = configurationProvider.get();
-            this.process.startWithConfig(config);
+            startWithConfig();
         } catch (OpensearchConfigurationException e) {
             LOG.warn("Failed to obtain opensearch configuration. Adapt your datanode configuration or use the preflight web interface", e);
         }
+    }
+
+    private void startWithConfig() {
+        final OpensearchConfiguration config = configurationProvider.get();
+        this.process.startWithConfig(config);
+        eventBus.post(new OpensearchConfigurationChangeEvent(config));
     }
 
 

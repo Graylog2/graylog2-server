@@ -18,21 +18,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
-import { useContext, useMemo } from 'react';
 
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { RelativeTimeRange } from 'views/logic/queries/Query';
 
-import TimeRangePresetRow from './TimeRangePresetRow';
 import {
   classifyToRange,
   classifyFromRange,
   RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-  classifyRelativeTimeRange,
 } from './RelativeTimeRangeClassifiedHelper';
 import type { TimeRangePickerFormValues } from './TimeRangePicker';
 import RelativeRangeSelect from './RelativeRangeSelect';
@@ -56,13 +50,6 @@ const StyledIcon = styled(Icon)`
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangePickerFormValues>();
   const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
-  const { config } = useSearchConfiguration();
-  const { showRelativePresetsButton } = useContext(TimeRangeInputSettingsContext);
-  const relativeOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'relative'), [config?.quick_access_timerange_presets]);
-
-  const onSetPreset = (range: RelativeTimeRange) => {
-    setFieldValue('nextTimeRange', classifyRelativeTimeRange(range));
-  };
 
   return (
     <div>
@@ -87,11 +74,6 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
                                unsetRangeLabel="Now" />
         </>
       </RelativeWrapper>
-      {showRelativePresetsButton && (
-        <TimeRangePresetRow disabled={disabled}
-                            onSetPreset={onSetPreset}
-                            availableOptions={relativeOptions} />
-      )}
     </div>
   );
 };
