@@ -100,7 +100,7 @@ const usePresetOptions = (disabled: boolean) => {
   const [presetOptions, setPresetOptions] = useState<Array<PresetOption> | undefined>();
   const timeRangeLimit = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds(), [config?.query_time_range_limit]);
 
-  const onSetOptions = async () => {
+  const onSetOptions = useCallback(async () => {
     setPresetOptions(
       await preparePresetOptions(
         config?.quick_access_timerange_presets,
@@ -108,7 +108,7 @@ const usePresetOptions = (disabled: boolean) => {
         disabled,
       ),
     );
-  };
+  }, [config?.quick_access_timerange_presets, disabled, timeRangeLimit]);
 
   return ({ options: presetOptions, setOptions: onSetOptions });
 };
@@ -148,10 +148,8 @@ const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, c
   }, [onToggleProp]);
 
   const onMouseDown = useCallback(async () => {
-    if (!options) {
-      await setDropdownOptions();
-    }
-  }, [options, setDropdownOptions]);
+    await setDropdownOptions();
+  }, [setDropdownOptions]);
 
   return (
     <DropdownButton title={displayTitle && 'Load Preset'}
