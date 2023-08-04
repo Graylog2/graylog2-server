@@ -19,21 +19,25 @@ import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import ExternalValueActionsContext from './ExternalValueActionsContext';
 
 const usePluginExternalActions = () => {
   const useExternalActions = usePluginEntities('useExternalActions');
+  const useExternalAction = useMemo<()=>({
+    isLoading: boolean,
+    externalValueActions: Array<ActionDefinition>,
+    isError: boolean,
+  })>(() => ((useExternalActions && typeof useExternalActions[0] === 'function') ? useExternalActions[0] : () => ({
+      isLoading: false,
+      externalValueActions: [],
+      isError: false,
+    })), [useExternalActions]);
 
-  if (useExternalActions && typeof useExternalActions[0] === 'function') {
-    const { isLoading, isError, externalValueActions } = useExternalActions[0]();
+  const { isLoading, externalValueActions, isError } = useExternalAction();
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useMemo(() => ({ isLoading, isError, externalValueActions }), [externalValueActions, isError, isLoading]);
-  }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  return useMemo(() => ({ isLoading: false, isError: false, externalValueActions: [] }), []);
+  return useMemo(() => ({ isLoading, isError, externalValueActions }), [externalValueActions, isError, isLoading]);
 };
 
 const ExternalValueActionsProvider = ({ children }) => {
