@@ -68,7 +68,6 @@ type Props = {
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const [nextRangeProps, , nextRangeHelpers] = useField('timeRangeTabs.keyword');
-  console.log(nextRangeProps);
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
