@@ -24,6 +24,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { keySeparator } from 'views/Constants';
+import ExternalValueActionsProvider from 'views/components/ExternalValueActionsProvider';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -42,19 +43,22 @@ const config = AggregationWidgetConfig.builder().series([Series.forFunction('cou
 
 // eslint-disable-next-line react/require-default-props
 const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig, neverHide?: boolean }) => (
-  <WidgetFocusContext.Provider value={{
-    focusedWidget: undefined,
-    setWidgetFocusing: jest.fn(),
-    unsetWidgetFocusing: jest.fn(),
-    unsetWidgetEditing: jest.fn(),
-    setWidgetEditing: jest.fn(),
-  }}>
-    <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
-        <div>Plot</div>
-      </PlotLegend>
-    </ChartColorContext.Provider>
-  </WidgetFocusContext.Provider>
+  <ExternalValueActionsProvider>
+    <WidgetFocusContext.Provider value={{
+      focusedWidget: undefined,
+      setWidgetFocusing: jest.fn(),
+      unsetWidgetFocusing: jest.fn(),
+      unsetWidgetEditing: jest.fn(),
+      setWidgetEditing: jest.fn(),
+    }}>
+
+      <ChartColorContext.Provider value={{ colors, setColor }}>
+        <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
+          <div>Plot</div>
+        </PlotLegend>
+      </ChartColorContext.Provider>
+    </WidgetFocusContext.Provider>
+  </ExternalValueActionsProvider>
 );
 
 describe('PlotLegend', () => {

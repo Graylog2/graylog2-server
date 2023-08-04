@@ -27,6 +27,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import useAppDispatch from 'stores/useAppDispatch';
 import mockDispatch from 'views/test/mockDispatch';
 import { createSearch } from 'fixtures/searches';
+import ExternalValueActionsProvider from 'views/components/ExternalValueActionsProvider';
 
 import Action from './Action';
 
@@ -62,12 +63,14 @@ describe('Action', () => {
     menuContainer = undefined,
     type = 'field',
   }: Props) => (
-    <Action element={OpenActionsMenu}
-            handlerArgs={handlerArgs}
-            menuContainer={menuContainer}
-            type={type}>
-      {children}
-    </Action>
+    <ExternalValueActionsProvider>
+      <Action element={OpenActionsMenu}
+              handlerArgs={handlerArgs}
+              menuContainer={menuContainer}
+              type={type}>
+        {children}
+      </Action>
+    </ExternalValueActionsProvider>
   );
 
   const openDropdown = async (headerTitle = 'The dropdown header') => {

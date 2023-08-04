@@ -21,14 +21,17 @@ import userEvent from '@testing-library/user-event';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import ExternalValueActionsProvider from 'views/components/ExternalValueActionsProvider';
 
 import OriginalValue from './Value';
 import InteractiveContext from './contexts/InteractiveContext';
 
 const Value = (props: React.ComponentProps<typeof OriginalValue>) => (
-  <TestStoreProvider>
-    <OriginalValue {...props} />
-  </TestStoreProvider>
+  <ExternalValueActionsProvider>
+    <TestStoreProvider>
+      <OriginalValue {...props} />
+    </TestStoreProvider>
+  </ExternalValueActionsProvider>
 );
 
 describe('Value', () => {
