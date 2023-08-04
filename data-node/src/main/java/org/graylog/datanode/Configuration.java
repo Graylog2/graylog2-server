@@ -61,6 +61,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 
+    @Parameter(value = "insecure_startup")
+    private boolean insecureStartup = false;
+
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
@@ -128,6 +131,10 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
+
+    public boolean isInsecureStartup() {
+        return insecureStartup;
+    }
 
     public Integer getStaleLeaderTimeout() {
         return staleLeaderTimeout;

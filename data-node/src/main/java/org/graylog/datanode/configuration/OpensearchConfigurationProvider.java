@@ -34,7 +34,6 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Singleton
@@ -66,9 +65,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         //TODO: at some point bind the whole list, for now there is too much experiments with order and prerequisites
         List<SecurityConfigurationVariant> securityConfigurationTypes = List.of(
+                inSecureConfiguration,
                 uploadedCertFilesSecureConfiguration,
-                mongoCertSecureConfiguration,
-                inSecureConfiguration //TODO: in final version, this configuration is tried first, not last
+                mongoCertSecureConfiguration
         );
 
         SecurityConfigurationVariant chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
