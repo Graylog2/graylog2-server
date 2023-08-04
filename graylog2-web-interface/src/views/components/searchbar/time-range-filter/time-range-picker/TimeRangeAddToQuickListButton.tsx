@@ -71,9 +71,11 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target } : Pro
 
   const equalTimerange = useMemo(() => (config
     ?.quick_access_timerange_presets
-    ?.find((existingTimerange) => isTimerangeEqual(
-      existingTimerange.timerange,
-      normalizeFromSearchBarForBackend((activeTabTimeRange ?? {}) as TimeRange, userTimezone),
+    ?.find((existingPreset) => isTimerangeEqual(
+      existingPreset.timerange,
+      normalizeFromSearchBarForBackend((
+        normalizeFromPickerForSearchBar(activeTabTimeRange)
+      ) as TimeRange, userTimezone),
     ))), [config, activeTabTimeRange, userTimezone]);
 
   const onAddTimerange = useCallback(() => addTimerange(description), [addTimerange, description]);
