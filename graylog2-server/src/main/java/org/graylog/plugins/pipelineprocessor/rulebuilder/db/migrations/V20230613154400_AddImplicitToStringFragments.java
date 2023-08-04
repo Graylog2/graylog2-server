@@ -112,7 +112,7 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                         ))
                         .returnType(DateTime.class)
                         .description("Parses a value using the given date format")
-                        .ruleBuilderEnabled()
+                        .ruleBuilderEnabled(false)
                         .ruleBuilderName("Parse date")
                         .ruleBuilderTitle("Parse date from value")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)

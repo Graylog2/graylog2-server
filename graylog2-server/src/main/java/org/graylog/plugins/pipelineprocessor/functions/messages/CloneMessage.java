@@ -68,7 +68,7 @@ public class CloneMessage extends AbstractFunction<Message> {
             }
 
             if (preventLoops.isEmpty() && cloneNumber >= MAX_CLONES) {
-               throw new IllegalStateException(
+                throw new IllegalStateException(
                         StringUtils.f("Message was cloned more than %d times by rule '%s'. Not allowing any more " +
                                         "clones to prevent a potential endless loop. If this was intentional, please " +
                                         "explicitly set the 'preventLoops' parameter to 'false'.",
@@ -97,7 +97,7 @@ public class CloneMessage extends AbstractFunction<Message> {
                 .params(ImmutableList.of(messageParam, loopDetectionParam))
                 .returnType(Message.class)
                 .description("Clones a message. If no specific message is provided, it clones the currently processed message")
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Clone message")
                 .ruleBuilderTitle("Clone message")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)

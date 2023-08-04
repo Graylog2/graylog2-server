@@ -47,7 +47,7 @@ public class PeriodParseFunction extends AbstractFunction<Period> {
                 .pure(true)
                 .returnType(Period.class)
                 .params(value)
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Parse period")
                 .ruleBuilderTitle("Parse period from '${value}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)

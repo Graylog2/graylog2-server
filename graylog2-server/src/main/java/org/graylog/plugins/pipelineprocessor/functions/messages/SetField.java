@@ -63,8 +63,7 @@ public class SetField extends AbstractFunction<Void> {
             if (!args.isPresent("default")) {
                 throw e;
             }
-        }
-        finally {
+        } finally {
             if (value == null) {
                 value = defaultParam.optional(args, context).orElse(null);
             }
@@ -98,7 +97,7 @@ public class SetField extends AbstractFunction<Void> {
                         messageParam,
                         defaultParam))
                 .description("Sets the given value to the named field. If no specific message is provided, it sets the field in the currently processed message.")
-                .ruleBuilderEnabled()
+                .ruleBuilderEnabled(false)
                 .ruleBuilderName("Set to field")
                 .ruleBuilderTitle("Set '${value}' to field '${field}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
