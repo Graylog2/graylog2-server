@@ -31,6 +31,7 @@ import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.SuppressForbidden;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,6 +48,7 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragmentsTest extends Ba
     V20220522125200_AddSetGrokToFieldsExtractorFragments migration;
 
     @BeforeClass
+    @SuppressForbidden("Allow using default thread factory")
     public static void initialize() {
         final Map<String, Function<?>> functions = commonFunctions();
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);

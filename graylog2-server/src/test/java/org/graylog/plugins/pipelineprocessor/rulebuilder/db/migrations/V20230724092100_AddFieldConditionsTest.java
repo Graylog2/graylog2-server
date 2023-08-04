@@ -60,6 +60,7 @@ import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -88,6 +89,7 @@ public class V20230724092100_AddFieldConditionsTest extends BaseFragmentTest {
     private ClusterConfigService clusterConfigService;
 
     @BeforeClass
+    @SuppressForbidden("Allow using default thread factory")
     public static void initialize() {
         final Map<String, Function<?>> functions = commonFunctions();
         functions.put(SetField.NAME, new SetField());
