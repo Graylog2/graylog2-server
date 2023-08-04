@@ -97,7 +97,7 @@ public class SetField extends AbstractFunction<Void> {
                         messageParam,
                         defaultParam))
                 .description("Sets the given value to the named field. If no specific message is provided, it sets the field in the currently processed message.")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Set to field")
                 .ruleBuilderTitle("Set '${value}' to field '${field}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
