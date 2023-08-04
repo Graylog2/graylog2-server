@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useContext } from 'react';
 
 import Spinner from 'components/common/Spinner';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -24,6 +25,7 @@ import ActionMenuItem from 'views/components/actions/ActionMenuItem';
 import type { ActionDefinition, ActionHandlerArguments, ActionComponents } from 'views/components/actions/ActionHandler';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
+import ExternalValueActionsContext from 'views/components/ExternalValueActionsContext';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;
@@ -61,22 +63,16 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 };
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const usePluginExternalActions = usePluginEntities('useExternalActions');
+  const { isLoading, isError, externalValueActions } = useContext(ExternalValueActionsContext);
   const dispatch = useAppDispatch();
 
-  if (usePluginExternalActions && typeof usePluginExternalActions[0] === 'function') {
-    const { isLoading, isError, externalValueActions } = usePluginExternalActions[0]();
-
-    if (type !== 'value') {
-      return { isLoading, isError, externalValueActions: [] };
-    }
-
-    const externalActions = filterVisibleActions(dispatch, handlerArgs, externalValueActions);
-
-    return { isLoading, isError, externalActions };
+  if (type !== 'value') {
+    return { isLoading, isError, externalValueActions: [] };
   }
 
-  return { isLoading: false, isError: false, externalValueActions: [] };
+  const externalActions = filterVisibleActions(dispatch, handlerArgs, externalValueActions);
+
+  return { isLoading, isError, externalActions };
 };
 
 type Props = {
