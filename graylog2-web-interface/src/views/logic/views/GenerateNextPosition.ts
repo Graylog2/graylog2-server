@@ -29,19 +29,19 @@ export const ConcatPositions = (
 
   const newUpdatedPositions = newPositions.map((initialPosition) => {
     const defaultHeight = initialPosition.height;
-    const row: number = rowIncrement + initialPosition.row;
+    const row = rowIncrement + initialPosition.row;
     const widgetPosition = initialPosition.toBuilder().row(row).build();
     rowIncrement += defaultHeight;
 
     return widgetPosition;
-  }) as Immutable.Map<string, WidgetPosition>;
+  }).toMap();
 
   const curUpdatedPositions = curPositions.map((initialPosition) => {
-    const row: number = rowIncrement + initialPosition.row;
+    const row = rowIncrement + initialPosition.row;
     const widgetPosition = initialPosition.toBuilder().row(row).build();
 
     return widgetPosition;
-  }) as Immutable.Map<string, WidgetPosition>;
+  }).toMap();
 
   return newUpdatedPositions.merge(curUpdatedPositions);
 };
