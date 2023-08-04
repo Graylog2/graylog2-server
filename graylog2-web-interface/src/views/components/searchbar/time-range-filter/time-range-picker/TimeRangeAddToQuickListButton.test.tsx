@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
@@ -24,7 +24,6 @@ import { Form, Formik } from 'formik';
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import suppressConsole from 'helpers/suppressConsole';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 import TimeRangeAddToQuickListButton from './TimeRangeAddToQuickListButton';
@@ -68,7 +67,9 @@ describe('TimeRangeAddToQuickListButton', () => {
     asMock(debounce as DebouncedFunc<(...args: any) => any>).mockImplementation((fn) => fn);
   });
 
-  const getOpenButton = () => screen.findByTitle('Add time range to quick access time range list');
+  const getOpenButton = () => screen.getByRole('button', {
+    name: /save current time range as preset/i,
+  });
 
   it('shows popover on click', async () => {
     render(
@@ -81,7 +82,9 @@ describe('TimeRangeAddToQuickListButton', () => {
 
     fireEvent.click(buttonIcon);
 
-    await screen.findByText('Add to quick access list');
+    await screen.findByRole('heading', {
+      name: /save as preset/i,
+    });
   });
 
   it('dont shows alert about duplication when there is no similar time range', async () => {
@@ -126,14 +129,15 @@ describe('TimeRangeAddToQuickListButton', () => {
     const descriptionInput = await screen.findByLabelText('Time range description');
     descriptionInput.focus();
 
-    await suppressConsole(async () => {
-      await fireEvent.change(descriptionInput, { target: { value: 'My new time range' } });
+    fireEvent.change(descriptionInput, { target: { value: 'My new time range' } });
 
-      const submitButton = await screen.findByTitle('Add time range');
-      await fireEvent.click(submitButton);
+    const submitButton = await screen.findByRole('button', {
+      name: /save preset/i,
     });
 
-    await expect(mockUpdate)
+    fireEvent.click(submitButton);
+
+    await waitFor(() => expect(mockUpdate)
       .toHaveBeenCalledWith('org.graylog2.indexer.searches.SearchesClusterConfig',
         {
           ...mockSearchClusterConfig,
@@ -149,7 +153,7 @@ describe('TimeRangeAddToQuickListButton', () => {
             },
           ],
         },
-      );
+      ));
   });
 
   it('not runs action to update config on submitting form when description is empty', async () => {
@@ -166,12 +170,11 @@ describe('TimeRangeAddToQuickListButton', () => {
     const descriptionInput = await screen.findByLabelText('Time range description');
     descriptionInput.focus();
 
-    await suppressConsole(async () => {
-      await fireEvent.change(descriptionInput, { target: { value: 'Some description' } });
-      await fireEvent.change(descriptionInput, { target: { value: '' } });
-    });
+    fireEvent.change(descriptionInput, { target: { value: '' } });
 
-    const submitButton = await screen.findByTitle('Add time range');
+    const submitButton = await screen.findByRole('button', {
+      name: /save preset/i,
+    });
 
     await expect(submitButton).toHaveAttribute('disabled');
   });

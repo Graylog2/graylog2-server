@@ -19,8 +19,8 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import generateId from 'logic/generateId';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 
 export type ValidationQuery = {
   queryString: ElasticsearchQueryString | string,
@@ -48,7 +48,7 @@ export const validateQuery = (
 
   const payload = {
     query: queryString,
-    timerange: timeRange ? onSubmittingTimerange(timeRange, userTimezone) : undefined,
+    timerange: timeRange ? normalizeFromSearchBarForBackend(timeRange, userTimezone) : undefined,
     streams,
     filter,
     ...rest,

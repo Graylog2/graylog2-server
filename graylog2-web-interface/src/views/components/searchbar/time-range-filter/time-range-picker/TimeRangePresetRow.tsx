@@ -14,34 +14,59 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+
+import * as React from 'react';
+import { useContext } from 'react';
+import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
-import { ButtonGroup } from 'components/bootstrap';
 import TimeRangePresetDropdown from 'views/components/searchbar/time-range-filter/TimeRangePresetDropdown';
+import { isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
+import { IfPermitted } from 'components/common';
+import TimeRangeAddToQuickListButton
+  from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangeAddToQuickListButton';
+import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import type {
+  TimeRangePickerFormValues,
+} from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import {
+  classifyRelativeTimeRange,
+} from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import { ButtonToolbar } from 'components/bootstrap';
 
-const ConfiguredWrapper = styled.div`
-  display: flex;
-  margin: 3px 0;
-  justify-content: end;
+const Container = styled(ButtonToolbar)`
+  float: right;
+  margin-top: 6px;
 `;
 
-type Props = {
-  disabled: boolean,
-  onSetPreset: (timerange: TimeRange) => void,
-  availableOptions: Array<QuickAccessTimeRange>,
+const normalizePresetTimeRange = (timeRange: TimeRange) => {
+  if (isTypeRelative(timeRange)) {
+    return classifyRelativeTimeRange(timeRange);
+  }
+
+  return timeRange;
 };
 
-const TimeRangePresetRow = ({ onSetPreset, availableOptions, disabled }: Props) => (
-  <ConfiguredWrapper>
-    <ButtonGroup>
-      <TimeRangePresetDropdown disabled={disabled}
-                               onChange={onSetPreset}
-                               availableOptions={availableOptions} />
-    </ButtonGroup>
-  </ConfiguredWrapper>
-);
+const TimeRangePresetRow = () => {
+  const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
+  const { showPresetsButton } = useContext(TimeRangeInputSettingsContext);
+  const { setFieldValue, values } = useFormikContext<TimeRangePickerFormValues>();
+
+  const onSetPreset = (newTimeRange: TimeRange) => {
+    setFieldValue('nextTimeRange', normalizePresetTimeRange(newTimeRange));
+  };
+
+  return (
+    <Container>
+      {showAddToQuickListButton && isTimeRange(values.nextTimeRange) && (
+        <IfPermitted permissions="clusterconfigentry:edit">
+          <TimeRangeAddToQuickListButton />
+        </IfPermitted>
+      )}
+      {showPresetsButton && <TimeRangePresetDropdown onChange={onSetPreset} />}
+    </Container>
+  );
+};
 
 export default TimeRangePresetRow;
