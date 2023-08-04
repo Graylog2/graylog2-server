@@ -65,6 +65,7 @@ public class V20230720161500_AddExtractorFragments extends Migration {
         addFragment(createRegexReplacementExtractor());
         addFragment(createJsonExtractor());
         addFragment(createSplitIndexExtractor());
+        addFragment(createLookupExtractor());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("extractor fragments were successfully added");
