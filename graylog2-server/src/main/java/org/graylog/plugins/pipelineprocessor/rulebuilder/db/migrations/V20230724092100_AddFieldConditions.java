@@ -265,7 +265,7 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .returnType(Void.class)
                         .description("Checks if the field value's string representation matches the given grok pattern.")
                         .ruleBuilderEnabled()
-                        .ruleBuilderName("Field ends with")
+                        .ruleBuilderName("Field matches grok")
                         .ruleBuilderTitle("Check if string value in '${field}' matches grok pattern '${pattern}'")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                         .build())

@@ -69,18 +69,18 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
         log.debug("set_grok_to_fields fragment was successfully added");
     }
 
-    private static RuleFragment createSetGrokToFieldsFragment() {
+    static RuleFragment createSetGrokToFieldsFragment() {
         return RuleFragment.builder()
                 .fragment("""
                         let gl2_fragment_grok_results = grok(
-                          pattern: "${grokPattern}",
-                          value: to_string($message.${field}),
-                          only_named_captures: ${grokNamedOnly?c}
+                          pattern: ${grokPattern},
+                          value: to_string($message.${field})<#if grokNamedOnly??>,
+                          only_named_captures: ${grokNamedOnly?c}</#if>
                         );
                         set_fields(
-                          fields: gl2_fragment_grok_results,
-                          prefix: "${prefix!""}",
-                          suffix: "${suffix!""}"
+                          fields: gl2_fragment_grok_results<#if prefix??>,
+                          prefix: ${prefix!""}</#if><#if suffix??>,
+                          suffix: ${suffix!""}</#if>
                         );""")
                 .descriptor(FunctionDescriptor.builder()
                         .name("set_grok_to_fields")
@@ -95,7 +95,7 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
                         .description("Match grok pattern and set fields")
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Extract grok to fields")
-                        .ruleBuilderTitle("Match grok pattern on field '${field}' and set fields")
+                        .ruleBuilderTitle("Match grok pattern on field '${field}' and set fields for matches")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
                         .build())
                 .build();
