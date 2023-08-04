@@ -95,7 +95,7 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
                         .description("Match grok pattern and set fields")
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Extract grok to fields")
-                        .ruleBuilderTitle("Match grok pattern on field '${field}' and set fields for matches")
+                        .ruleBuilderTitle("Match grok pattern '${grokPattern}' on field '${field}' and set fields for matches")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
                         .build())
                 .build();
