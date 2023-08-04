@@ -18,7 +18,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useContext } from 'react';
 
-import Spinner from 'components/common/Spinner';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
@@ -93,7 +92,7 @@ const ActionDropdown = ({
   onMenuToggle,
 }: Props) => {
   const internalActions = useInternalActions(type, handlerArgs);
-  const { isLoading, externalActions } = useExternalActions(type, handlerArgs);
+  const { externalActions } = useExternalActions(type, handlerArgs);
 
   return (
     <>
@@ -114,8 +113,7 @@ const ActionDropdown = ({
                         type={type}
                         onMenuToggle={onMenuToggle} />
       ))}
-      {isLoading && (<><MenuItem divider /><MenuItem disabled><Spinner text="Loading" /></MenuItem></>)}
-      {(!isLoading && externalActions && externalActions.length !== 0) && (
+      {(externalActions && externalActions.length !== 0) && (
         <>
           <MenuItem divider />
           {externalActions.map((action) => (
