@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.GetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
@@ -27,18 +28,29 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.BaseFragmentTest;
+import org.graylog2.lookup.LookupTable;
+import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.lookup.LookupResult;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest {
 
     V20230720161500_AddExtractorFragments migration;
+
+    private static LookupTableService lookupTableService;
+    private static LookupTableService.Function lookupServiceFunction;
+    private static LookupTable lookupTable;
 
     @BeforeClass
     public static void initialize() {
@@ -49,6 +61,18 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         functions.put(RegexMatch.NAME, new RegexMatch());
         functions.put(RegexReplace.NAME, new RegexReplace());
         functions.put(Split.NAME, new Split());
+
+        lookupTable = mock(LookupTable.class);
+        when(lookupTable.lookup("ExistingKey")).thenReturn(LookupResult.builder()
+                .single("ThisKeysValue")
+                .cacheTTL(1000)
+                .build());
+        lookupTableService = mock(LookupTableService.class, RETURNS_DEEP_STUBS);
+        when(lookupTableService.getTable(anyString())).thenReturn(lookupTable);
+        lookupServiceFunction = new LookupTableService.Function(lookupTableService, "lookup-table");
+        when(lookupTableService.newBuilder().lookupTable(anyString()).build()).thenReturn(lookupServiceFunction);
+        functions.put(LookupValue.NAME, new LookupValue(lookupTableService));
+
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -108,8 +132,22 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         Rule rule = super.createFragmentSource(fragment, params);
         Message message = evaluateRule(rule, new Message("cat,dog,mouse", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("dog");
+    }
 
+    @Test
+    public void testLookup() {
+        RuleFragment fragment = V20230720161500_AddExtractorFragments.createLookupExtractor();
+        Map<String, Object> params = Map.of(
+                "field", "message",
+                "lookupTable", "lookup-table",
+                "newField", "copyfield"
+        );
+        Rule rule = super.createFragmentSource(fragment, params);
+        Message message = evaluateRule(rule, new Message("ExistingKey", "test", Tools.nowUTC()));
+        assertThat(message.getField("copyfield")).isEqualTo("ThisKeysValue");
 
+        message = evaluateRule(rule, new Message("NoKey", "test", Tools.nowUTC()));
+        assertThat(message.getField("copyfield")).isNull();
     }
 
 

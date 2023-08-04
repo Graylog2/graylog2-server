@@ -207,6 +207,31 @@ public class V20230720161500_AddExtractorFragments extends Migration {
                 .build();
     }
 
+    static RuleFragment createLookupExtractor() {
+        String resultvariable = "gl2_fragment_extractor_" + System.currentTimeMillis();
+        return RuleFragment.builder()
+                .fragment("""
+                        let %resultvar% = lookup_value(${lookupTable}, to_string($message.${field}));
+                        set_field(${newField}, %resultvar%);"""
+                        .replace("%resultvar%", resultvariable))
+                .descriptor(FunctionDescriptor.builder()
+                        .name("extract_lookup")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to extract").build(),
+                                string("lookupTable").description("Lookup table to use").build(),
+                                string("newField").description("New field to copy value to").build()
+                        ))
+                        .returnType(String.class)
+                        .description("Lookup value for key in field in lookup table and set it to new field.")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Extract lookup value")
+                        .ruleBuilderTitle("Extract value for field '${field}', do lookup in '${lookupTable}' and set value to new field '${newField}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
+                        .build())
+                .fragmentOutputVariable(resultvariable)
+                .build();
+    }
+
     private void addFragment(RuleFragment ruleFragment) {
         Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
         existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
