@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
 public class V20230720161500_AddExtractorFragments extends Migration {
@@ -62,6 +63,8 @@ public class V20230720161500_AddExtractorFragments extends Migration {
         addFragment(createCopyFieldExtractor());
         addFragment(createRegexExtractor());
         addFragment(createRegexReplacementExtractor());
+        addFragment(createJsonExtractor());
+        addFragment(createSplitIndexExtractor());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("extractor fragments were successfully added");
@@ -168,10 +171,36 @@ public class V20230720161500_AddExtractorFragments extends Migration {
                                 string("field").description("Field to extract").build()
                         ))
                         .returnType(String.class)
-                        .description("Parse field as json and ")
+                        .description("Parse field as json and set to fields")
                         .ruleBuilderEnabled()
-                        .ruleBuilderName("Extract regular expression to new field")
-                        .ruleBuilderTitle("Extract regular expression '${pattern}' for field '${field}' and set to new field '${newField}'")
+                        .ruleBuilderName("Extract json and set to fields")
+                        .ruleBuilderTitle("Extract Json in field '${field}' and set to new fields")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
+                        .build())
+                .fragmentOutputVariable(resultvariable)
+                .build();
+    }
+
+    static RuleFragment createSplitIndexExtractor() {
+        String resultvariable = "gl2_fragment_extractor_" + System.currentTimeMillis();
+        return RuleFragment.builder()
+                .fragment("""
+                        let %resultvar% = split(${character}, to_string($message.${field}))[${targetIndex}];
+                        set_field(${newField}, %resultvar%);"""
+                        .replace("%resultvar%", resultvariable))
+                .descriptor(FunctionDescriptor.builder()
+                        .name("extract_split_index")
+                        .params(ImmutableList.of(
+                                string("field").description("Field to extract").build(),
+                                string("character").description("What character to split on").build(),
+                                integer("targetIndex").description("What part of the split string to use (0-based)").build(),
+                                string("newField").description("New field to copy value to").build()
+                        ))
+                        .returnType(String.class)
+                        .description("Split field into tokens by character and set one token to new field.")
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Extract split & index")
+                        .ruleBuilderTitle("Extract token number '${targetIndex}' from split field '${field}' and set to new field '${newField}'")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
                         .build())
                 .fragmentOutputVariable(resultvariable)

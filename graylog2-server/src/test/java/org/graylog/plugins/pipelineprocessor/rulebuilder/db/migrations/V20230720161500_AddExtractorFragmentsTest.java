@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.GetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.BaseFragmentTest;
@@ -47,6 +48,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(RegexMatch.NAME, new RegexMatch());
         functions.put(RegexReplace.NAME, new RegexReplace());
+        functions.put(Split.NAME, new Split());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -91,6 +93,22 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         rule = super.createFragmentSource(fragment, params);
         message = evaluateRule(rule, new Message("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield2")).isEqualTo("zzzcatzzzdogzzz");
+
+    }
+
+    @Test
+    public void testSplitIndex() {
+        RuleFragment fragment = V20230720161500_AddExtractorFragments.createSplitIndexExtractor();
+        Map<String, Object> params = Map.of(
+                "field", "message",
+                "character", ",",
+                "targetIndex", 1,
+                "newField", "copyfield"
+        );
+        Rule rule = super.createFragmentSource(fragment, params);
+        Message message = evaluateRule(rule, new Message("cat,dog,mouse", "test", Tools.nowUTC()));
+        assertThat(message.getField("copyfield")).isEqualTo("dog");
+
 
     }
 
