@@ -28,36 +28,29 @@ import type { TimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import type { TimeRangePreset } from 'components/configurations/TimeRangePresetForm';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type {
   TimeRangePickerFormValues,
 } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import {
+  normalizeFromPickerForSearchBar,
+  normalizeFromSearchBarForBackend,
+} from 'views/logic/queries/NormalizeTimeRange';
 
 const StyledModalSubmit = styled(ModalSubmit)`
   margin-top: 15px;
-`;
-
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  float: right;
-  transform: translateY(-3px);
-  gap: 5px;
-  margin-top: 6px;
 `;
 
 type Props = {
   addTimerange: (title: string) => void,
   toggleModal: () => void,
   target: Button | undefined | null,
-  equalTimerange: QuickAccessTimeRange
+  equalTimerange: TimeRangePreset
 };
 
 const isTimerangeEqual = (firstTimerange: TimeRange, secondTimerange: TimeRange) => {
@@ -77,7 +70,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
     <Portal>
       <Position placement="left"
                 target={target}>
-        <Popover title="Add to quick access list"
+        <Popover title="Save as preset"
                  id="add-to-quick-list-popover"
                  data-app-section="add-to-quick-list-popover_form"
                  data-event-element="Add to quick list"
@@ -93,15 +86,14 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
           {!!equalTimerange && (
             <p>
               <Icon name="exclamation-triangle" />
-              You already have similar time range in
-                {' '}
+              You already have similar time range in{' '}
               <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
               <br />
               <i>f.e. ({equalTimerange.description})</i>
             </p>
           )}
           <StyledModalSubmit disabledSubmit={!description}
-                             submitButtonText="Add time range"
+                             submitButtonText="Save preset"
                              isAsyncSubmit={false}
                              displayCancel
                              onCancel={toggleModal}
@@ -129,9 +121,9 @@ const TimeRangeAddToQuickListButton = () => {
   }, []);
 
   const addTimerange = useCallback((description: string) => {
-    const quickAccessTimerangePreset = {
+    const timeRangePreset = {
       description,
-      timerange: onSubmittingTimerange(values.nextTimeRange as TimeRange, userTimezone),
+      timerange: normalizeFromSearchBarForBackend(normalizeFromPickerForSearchBar(values.nextTimeRange) as TimeRange, userTimezone),
       id: generateId(),
     };
 
@@ -140,20 +132,20 @@ const TimeRangeAddToQuickListButton = () => {
         ...config,
         quick_access_timerange_presets: [
           ...config.quick_access_timerange_presets,
-          quickAccessTimerangePreset],
+          timeRangePreset],
       }).then(() => {
       refresh();
       toggleModal();
     });
 
-    if (quickAccessTimerangePreset) {
+    if (timeRangePreset) {
       sendTelemetry('form_submit', {
         app_pathname: 'search',
         app_section: 'search-bar',
         app_action_value: 'add_to_quick_access_timerange_presets',
         event_details: {
-          timerange: quickAccessTimerangePreset.timerange,
-          id: quickAccessTimerangePreset.id,
+          timerange: timeRangePreset.timerange,
+          id: timeRangePreset.id,
         },
       });
     }
@@ -163,16 +155,17 @@ const TimeRangeAddToQuickListButton = () => {
     ?.quick_access_timerange_presets
     ?.find((existingTimerange) => isTimerangeEqual(
       existingTimerange.timerange,
-      onSubmittingTimerange(values.nextTimeRange as TimeRange, userTimezone),
+      normalizeFromSearchBarForBackend(values.nextTimeRange as TimeRange, userTimezone),
     )), [config, values.nextTimeRange, userTimezone]);
 
   return (
-    <Container>
+    <>
       <Button disabled={!isValidTimeRange}
-              title="Add time range to quick access time range list"
+              title="Save current time range as preset"
               ref={formTarget}
+              bsSize="small"
               onClick={toggleModal}>
-        <Icon name="floppy-disk" type="regular" />
+        Save as preset
       </Button>
       {showForm && (
         <TimeRangeAddToQuickListForm addTimerange={addTimerange}
@@ -180,7 +173,7 @@ const TimeRangeAddToQuickListButton = () => {
                                      target={formTarget.current}
                                      equalTimerange={equalTimerange} />
       )}
-    </Container>
+    </>
   );
 };
 

@@ -27,15 +27,16 @@ import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContai
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import type User from 'logic/users/User';
 
 const SidecarsPage = () => {
-  const [sidecarUser, setSidecarUser] = useState();
+  const [sidecarUser, setSidecarUser] = useState<User | undefined>();
   const currentUser = useCurrentUser();
   const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokenlist:graylog-sidecar']);
 
   useEffect(() => {
     if (canCreateSidecarUserTokens) {
-      UsersDomain.loadByUsername('graylog-sidecar').then(setSidecarUser);
+      UsersDomain.loadByUsername('graylog-sidecar').then((result) => setSidecarUser(result));
     }
   }, [canCreateSidecarUserTokens]);
 

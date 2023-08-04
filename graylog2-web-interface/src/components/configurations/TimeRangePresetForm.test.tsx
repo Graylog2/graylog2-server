@@ -26,7 +26,7 @@ import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
-import QuickAccessTimeRangeForm from './QuickAccessTimeRangeForm';
+import TimeRangePresetForm from './TimeRangePresetForm';
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
@@ -43,14 +43,14 @@ const mockOnUpdate = jest.fn();
 
 const renderForm = () => render(
   <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
-    <QuickAccessTimeRangeForm options={Immutable.List([
+    <TimeRangePresetForm options={Immutable.List([
       { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
       { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
     ])}
-                              onUpdate={mockOnUpdate} />
+                         onUpdate={mockOnUpdate} />
   </Formik>);
 
-describe('QuickAccessTimeRangeForm', () => {
+describe('TimeRangePresetForm', () => {
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchesClusterConfig,
@@ -80,7 +80,7 @@ describe('QuickAccessTimeRangeForm', () => {
 
   it('add action trigger onUpdate', async () => {
     renderForm();
-    const addItemButton = await screen.findByLabelText('Add quick access timerange');
+    const addItemButton = await screen.findByLabelText('Add new search time range preset');
 
     fireEvent.click(addItemButton);
 
@@ -104,16 +104,15 @@ describe('QuickAccessTimeRangeForm', () => {
     ]));
   });
 
-  it('edit timerange action trigger onUpdate', async () => {
+  it('edit time range action trigger onUpdate', async () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
-    await fireEvent.click(timerangeFilter);
-    await screen.findByText(/search time range/i);
+    fireEvent.click(timerangeFilter);
     const fromInput = await screen.findByTitle('Set the from value');
-    await fireEvent.change(fromInput, { target: { value: 15 } });
+    fireEvent.change(fromInput, { target: { value: 15 } });
     const submit = await screen.findByTitle('Update time range');
-    await fireEvent.click(submit);
+    fireEvent.click(submit);
 
     await waitFor(() => expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
       { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 900, type: 'relative' } },
