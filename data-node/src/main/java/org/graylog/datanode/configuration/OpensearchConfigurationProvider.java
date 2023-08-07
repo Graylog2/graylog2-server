@@ -35,6 +35,7 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
@@ -70,19 +71,20 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 mongoCertSecureConfiguration
         );
 
-        SecurityConfigurationVariant chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
+        Optional<SecurityConfigurationVariant> chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
                 .filter(s -> s.checkPrerequisites(localConfiguration))
-                .findFirst()
-                .orElseThrow(() -> new OpensearchConfigurationException("No valid option to start up OpenSearch"));
+                .findFirst();
 
         try {
-            final OpensearchSecurityConfiguration securityConfiguration = chosenSecurityConfigurationVariant
-                    .build()
-                    .configure(localConfiguration);
-
             ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
-            opensearchProperties.putAll(securityConfiguration.getProperties());
+            OpensearchSecurityConfiguration securityConfiguration = null;
+            if (chosenSecurityConfigurationVariant.isPresent()) {
+                securityConfiguration = chosenSecurityConfigurationVariant.get()
+                        .build()
+                        .configure(localConfiguration);
+                opensearchProperties.putAll(securityConfiguration.getProperties());
+            }
 
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistribution().directory(),
