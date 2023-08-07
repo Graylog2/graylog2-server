@@ -101,6 +101,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         } catch (Exception ex) {
             // if the graylog Node is not coming up (because OpenSearch hangs?) it fails here. So in this case, we also log the search server logs
             LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
+            throw ex;
         }
     }
 
