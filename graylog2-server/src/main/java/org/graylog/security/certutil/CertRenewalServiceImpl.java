@@ -51,6 +51,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -193,22 +194,38 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
-    protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
+    protected List<Node> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         final var nextRenewal = getNextRenewal();
-        activeDataNodes.values().stream()
+        return activeDataNodes.values().stream()
                 .map(this::loadKeyStoreForNode)
                 .filter(Objects::nonNull)
                 .filter(p -> p.getRight() != null)
                 .map(this::getCertificateForNode)
                 .filter(Objects::nonNull)
                 .filter(p -> needsRenewal(nextRenewal, renewalPolicy, p.getRight()))
-                .forEach(pair -> {
-                    if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
-                        initiateAutomaticRenewalForNode(pair.getLeft());
-                    } else {
-                        initiateManualRenewalForNode(pair.getLeft());
-                    }
-                });
+                .map(Pair::getLeft).toList();
+    }
+
+    @Override
+    public void initiateRenewalForNode(final String nodeId) {
+        // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
+        var config = dataNodeProvisioningService.getPreflightConfigFor(nodeId);
+        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
+    }
+
+    private void notifyManualRenewalForNode(final Node node) {
+        // TODO: send notification - don't send one out, if there is one still open
+        notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, node);
+    }
+
+    protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
+        findNodesThatNeedCertificateRenewal(renewalPolicy).forEach(node -> {
+            if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
+                initiateRenewalForNode(node.getNodeId());
+            } else {
+                notifyManualRenewalForNode(node);
+            }
+        });
     }
 }
