@@ -44,6 +44,16 @@ import static com.mongodb.client.model.Filters.exists;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class V20180212165000_AddDefaultCollectors extends Migration {
+    public static final String BEATS_PREAMBEL = """
+            # Needed for Graylog
+            fields_under_root: true
+            fields.collector_node_id: ${sidecar.nodeName}
+            fields.gl2_source_collector: ${sidecar.nodeId}
+
+            """;
+    public static final String OS_FREEBSD = "freebsd";
+    public static final String OS_LINUX = "linux";
+    public static final String OS_DARWIN = "darwin";
     private static final Logger LOG = LoggerFactory.getLogger(V20180212165000_AddDefaultCollectors.class);
     private final CollectorService collectorService;
     private final ConfigurationVariableService configurationVariableService;
@@ -75,91 +85,158 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         removeConfigPath();
         ensureConfigurationVariable("graylog_host", "Graylog Host.", httpExternalUri.getHost());
 
-        final String beatsPreambel =
-                """
-                        # Needed for Graylog
-                        fields_under_root: true
-                        fields.collector_node_id: ${sidecar.nodeName}
-                        fields.gl2_source_collector: ${sidecar.nodeId}
+        ensureFilebeatCollectorsAndConfig();
+        ensureAuditbeatCollectorsAndConfig();
+        ensureWinlogbeatCollectorsAndConfig();
+        ensureNxLogCollectors();
+    }
 
-                        """;
+    private void ensureFilebeatCollectorsAndConfig() {
 
-        ensureCollector(
-                "filebeat",
-                "exec",
-                "linux",
-                "/usr/lib/graylog-sidecar/filebeat",
-                "-c  %s",
-                "test config -c %s",
-                f("""
-                                %s
-                                filebeat.inputs:
-                                - input_type: log
-                                  paths:
-                                    - /var/log/*.log
-                                  type: log
-                                output.logstash:
-                                   hosts: ["${user.graylog_host}:5044"]
-                                path:
-                                  data: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/filebeat"}/data
-                                  logs: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/filebeat"}/log"""
-                        , beatsPreambel
-                )
-        );
-        ensureCollector(
-                "filebeat",
-                "exec",
-                "darwin",
-                "/usr/share/filebeat/bin/filebeat",
-                "-c  %s",
-                "test config -c %s",
-                f("""
-                                %s
-                                filebeat.inputs:
-                                - input_type: log
-                                  paths:
-                                    - /var/log/*.log
-                                  type: log
-                                output.logstash:
-                                   hosts: ["${user.graylog_host}:5044"]
-                                path:
-                                  data: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/filebeat"}/data
-                                  logs: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/filebeat"}/log""",
-                        beatsPreambel
-                )
-        );
-        ensureCollector(
-                "filebeat",
-                "exec",
-                "freebsd",
-                "/usr/share/filebeat/bin/filebeat",
-                "-c  %s",
-                "test config -c %s",
-                f("""
-                                %s
-                                filebeat.inputs:
-                                - input_type: log
-                                  paths:
-                                    - /var/log/*.log
-                                  type: log
-                                output.logstash:
-                                   hosts: ["${user.graylog_host}:5044"]
-                                path:
-                                  data: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/filebeat"}/data
-                                  logs: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/filebeat"}/log""",
-                        beatsPreambel
-                )
-        );
+        StringBuilder filebeatConfigBuilder = new StringBuilder(f("""
+                        %s
+                        output.logstash:
+                           hosts: ["${user.graylog_host}:5044"]
+                        data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
+                        logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+                        filebeat.inputs:
+                        """,
+                BEATS_PREAMBEL));
+
+        String apacheConfigType = """
+                    - type: filestream
+                      id: apache-filestream
+                      enabled: true
+                      %s
+                      fields_under_root: true
+                      fields:
+                          event_source_product: apache_httpd""";
+
+        ensureFilebeatCollector(OS_LINUX, "/usr/lib/graylog-sidecar/filebeat", filebeatConfigBuilder
+                .append("""
+
+                        - type: filestream
+                          id: snort-filestream
+                          enabled: true
+                          paths:
+                            - /var/log/snort/alert_json.txt
+                            - /var/log/snort/appid-output.json
+                          parsers:
+                            - ndjson:
+                                target: "snort3"
+                                add_error_key: true
+                                overwrite_keys: true
+                          fields:
+                            event_source_product: snort3
+                        """)
+                .append("""
+
+                        - type: filestream
+                          id: zeek-filestream
+                          enabled: true
+                          paths:
+                            - /opt/zeek/logs/current
+                          parsers:
+                            - ndjson:
+                                target: "zeek"
+                                add_error_key: true
+                                overwrite_keys: true
+                          fields:
+                            event_source_product: zeek
+                        """)
+                .append(f(apacheConfigType, """
+                        paths:
+                          - /var/log/apache2/access.log
+                          - /var/log/apache2/error.log
+                          - /var/log/httpd/access_log
+                          - /var/log/httpd/error_log
+                        """))
+                .toString()
+        ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-linux-default", collector));
+
+        ensureFilebeatCollector(OS_FREEBSD, "/usr/share/filebeat/bin/filebeat", filebeatConfigBuilder
+                .append(f(apacheConfigType, """
+                        paths:
+                          - /var/log/httpd-access.log
+                          - /var/log/httpd-error.log
+                        """))
+                .toString()
+        ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-freebsd-default", collector));
+
+        ensureFilebeatCollector(OS_DARWIN, "/usr/share/filebeat/bin/filebeat", filebeatConfigBuilder
+                .append(f(apacheConfigType, """
+                        paths:
+                          - /etc/httpd/log/access_log
+                          - /etc/httpd/log/error_log
+                        """))
+                .toString()
+        ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-darwin-default", collector));
+    }
+
+    private void ensureAuditbeatCollectorsAndConfig() {
         ensureCollector(
                 "auditbeat",
                 "exec",
-                "linux",
+                OS_LINUX,
                 "/usr/lib/graylog-sidecar/auditbeat",
                 "-c  %s",
                 "test config -c %s",
                 f("""
                                 %s
+                                output.logstash:
+                                   hosts: ["${user.graylog_host}:5044"]
+                                path:
+                                   data: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/auditbeat"}/data
+                                   logs: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/auditbeat"}/log
+                                fields:
+                                  event_source_product: linux_auditbeat
+
+                                # You can find the full configuration reference here:
+                                # https://www.elastic.co/guide/en/beats/auditbeat/index.html
+
+                                # =========================== Modules configuration ============================
                                 auditbeat.modules:
+
+                                # The auditd module collects events from the audit framework in the Linux kernel.
+                                - module: auditd
+                                  resolve_ids: true
+                                  failure_mode: log
+                                  backlog_limit: 8196
+                                  rate_limit: 0
+                                  include_raw_message: true
+                                  include_warnings: true
+                                  backpressure_strategy: auto
+
+                                  audit_rules: |
+                                    ## Define audit rules here.
+                                    ## Create file watches (-w) or syscall audits (-a or -A).
+
+                                    ## If you are on a 64 bit platform, everything should be running
+                                    ## in 64 bit mode. This rule will detect any use of the 32 bit syscalls
+                                    ## because this might be a sign of someone exploiting a hole in the 32
+                                    ## bit API.
+                                    -a always,exit -F arch=b32 -S all -F key=32bit-abi
+
+                                    ## Executions.
+                                    -a always,exit -F arch=b64 -S execve,execveat -k exec
+
+                                    ## External access (warning: these can be expensive to audit).
+                                    -a always,exit -F arch=b64 -S accept,bind,connect -F key=external-access
+
+                                    ## Identity changes.
+                                    -w /etc/group -p wa -k identity
+                                    -w /etc/passwd -p wa -k identity
+                                    -w /etc/gshadow -p wa -k identity
+                                    -w /etc/shadow -p wa -k identity
+
+                                    ## Unauthorized access attempts.
+                                    -a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+                                    -a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+                                    -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+                                    -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+
+                                # The file integrity module sends events when files are changed (created, updated, deleted).
+                                # The events contain file metadata and hashes.
                                 - module: file_integrity
                                   paths:
                                   - /bin
@@ -167,13 +244,22 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                   - /sbin
                                   - /usr/sbin
                                   - /etc
-                                output.logstash:
-                                   hosts: ["${user.graylog_host}:5044"]
-                                path:
-                                  data: /var/lib/graylog-sidecar/collectors/auditbeat/data
-                                  logs: /var/lib/graylog-sidecar/collectors/auditbeat/log""",
-                        beatsPreambel)
-        ).ifPresent(collector -> ensureDefaultConfiguration("auditlogbeat-default", collector));
+                                  - /etc/graylog/server
+                                  exclude_files:
+                                  - '(?i)\\.sw[nop]$'
+                                  - '~$'
+                                  - '/\\.git($|/)'
+                                  include_files: []
+                                  scan_at_start: true
+                                  scan_rate_per_sec: 50 MiB
+                                  max_file_size: 100 MiB
+                                  hash_types: [sha256]
+                                  recursive: false""",
+                        BEATS_PREAMBEL)
+        ).ifPresent(collector -> ensureDefaultConfiguration("auditbeat-linux-default", collector));
+    }
+
+    private void ensureWinlogbeatCollectorsAndConfig() {
         ensureCollector(
                 "winlogbeat",
                 "svc",
@@ -195,13 +281,16 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                    - name: Application
                                    - name: System
                                    - name: Security""",
-                        beatsPreambel
+                        BEATS_PREAMBEL
                 )
         ).ifPresent(collector -> ensureDefaultConfiguration("winlogbeat-default", collector));
+    }
+
+    private void ensureNxLogCollectors() {
         ensureCollector(
                 "nxlog",
                 "exec",
-                "linux",
+                OS_LINUX,
                 "/usr/bin/nxlog",
                 "-f -c %s",
                 "-v -c %s",
@@ -352,30 +441,18 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
                         """
         );
-        ensureCollector(
+    }
+
+
+    private Optional<Collector> ensureFilebeatCollector(String operatingSystem, String executablePath, String config) {
+        return ensureCollector(
                 "filebeat",
-                "svc",
-                "windows",
-                "C:\\Program Files\\Graylog\\sidecar\\filebeat.exe",
-                "-c \"%s\"",
-                "test config -c \"%s\"",
-                f("""
-                                %s
-                                output.logstash:
-                                   hosts: ["${user.graylog_host}:5044"]
-                                path:
-                                  data: ${sidecar.spoolDir!"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\filebeat"}\\data
-                                  logs: ${sidecar.spoolDir!"C:\\\\Program Files\\\\Graylog\\\\sidecar"}\\logs
-                                tags:
-                                 - windows
-                                filebeat.inputs:
-                                - type: log
-                                  enabled: true
-                                  paths:
-                                    - C:\\logs\\log.log
-                                """,
-                        beatsPreambel
-                )
+                "exec",
+                operatingSystem,
+                executablePath,
+                "-c  %s",
+                "test config -c %s",
+                config
         );
     }
 
