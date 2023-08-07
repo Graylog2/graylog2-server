@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.preflight;
+package org.graylog.security.certutil;
 
-public record NodePreflightStateChangeEvent(String nodeId, NodePreflightConfig.State state) {
+public interface CertRenewalService {
+    void checkCertificatesForRenewal();
 }
