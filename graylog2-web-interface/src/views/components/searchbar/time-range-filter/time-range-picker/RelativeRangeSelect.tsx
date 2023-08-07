@@ -159,9 +159,9 @@ const RelativeRangeSelectInner = ({
 
   const _onUnsetRange = (event) => {
     const isUnsetting = event.target.checked;
-    const hasInitialRelativeRange = isTypeRelativeClassified(initialValues.nextTimeRange);
-    const _defaultRange = (hasInitialRelativeRange && !initialValues.nextTimeRange[fieldName].isAllTime)
-      ? initialValues.nextTimeRange[fieldName]
+    const hasInitialRelativeRange = isTypeRelativeClassified(initialValues.timeRangeTabs.relative);
+    const _defaultRange = (hasInitialRelativeRange && !initialValues.timeRangeTabs.relative?.[fieldName].isAllTime)
+      ? initialValues.timeRangeTabs.relative[fieldName]
       : defaultRange;
 
     if (isUnsetting && !!onUnsetRange) {
@@ -223,7 +223,7 @@ const RelativeRangeSelect = ({
   title,
   unsetRangeLabel,
 }: Props) => (
-  <Field name={`nextTimeRange.${fieldName}`}>
+  <Field name={`timeRangeTabs.relative.${fieldName}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => (
       <RelativeRangeSelectInner classifiedRange={value}
                                 defaultRange={defaultRange}

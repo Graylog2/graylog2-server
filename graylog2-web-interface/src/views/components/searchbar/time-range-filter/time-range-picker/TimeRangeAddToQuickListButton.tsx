@@ -31,7 +31,6 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { TimeRangePreset } from 'components/configurations/TimeRangePresetForm';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type {
@@ -41,6 +40,7 @@ import {
   normalizeFromPickerForSearchBar,
   normalizeFromSearchBarForBackend,
 } from 'views/logic/queries/NormalizeTimeRange';
+import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 
 const StyledModalSubmit = styled(ModalSubmit)`
   margin-top: 15px;
@@ -50,7 +50,6 @@ type Props = {
   addTimerange: (title: string) => void,
   toggleModal: () => void,
   target: Button | undefined | null,
-  equalTimerange: TimeRangePreset
 };
 
 const isTimerangeEqual = (firstTimerange: TimeRange, secondTimerange: TimeRange) => {
@@ -60,9 +59,24 @@ const isTimerangeEqual = (firstTimerange: TimeRange, secondTimerange: TimeRange)
   return isEqual(firstTimerange, secondTimerange);
 };
 
-const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalTimerange } : Props) => {
+const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target } : Props) => {
+  const { userTimezone } = useUserDateTime();
+  const { config } = useSearchConfiguration();
+  const { values: { timeRangeTabs, activeTab } } = useFormikContext<TimeRangePickerFormValues>();
+
   const [description, setDescription] = useState('');
   const debounceHandleOnChangeDescription = debounce((value: string) => setDescription(value), 300);
+
+  const activeTabTimeRange = timeRangeTabs[activeTab];
+
+  const equalTimerange = useMemo(() => (config
+    ?.quick_access_timerange_presets
+    ?.find((existingPreset) => isTimerangeEqual(
+      existingPreset.timerange,
+      normalizeFromSearchBarForBackend((
+        normalizeFromPickerForSearchBar(activeTabTimeRange)
+      ) as TimeRange, userTimezone),
+    ))), [config, activeTabTimeRange, userTimezone]);
 
   const onAddTimerange = useCallback(() => addTimerange(description), [addTimerange, description]);
 
@@ -107,14 +121,15 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target, equalT
 
 const TimeRangeAddToQuickListButton = () => {
   const { userTimezone } = useUserDateTime();
-  const { values, errors } = useFormikContext<TimeRangePickerFormValues>();
+  const { values: { timeRangeTabs, activeTab }, errors } = useFormikContext<TimeRangePickerFormValues>();
   const formTarget = useRef();
+  const activeTabTimeRange = timeRangeTabs[activeTab];
 
   const { config, refresh } = useSearchConfiguration();
   const [showForm, setShowForm] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
-  const isValidTimeRange = !errors.nextTimeRange;
+  const isValidTimeRange = !errors.timeRangeTabs?.[activeTab];
 
   const toggleModal = useCallback(() => {
     setShowForm((cur) => !cur);
@@ -123,7 +138,7 @@ const TimeRangeAddToQuickListButton = () => {
   const addTimerange = useCallback((description: string) => {
     const timeRangePreset = {
       description,
-      timerange: normalizeFromSearchBarForBackend(normalizeFromPickerForSearchBar(values.nextTimeRange) as TimeRange, userTimezone),
+      timerange: activeTabTimeRange ? normalizeFromSearchBarForBackend(normalizeFromPickerForSearchBar(activeTabTimeRange) as TimeRange, userTimezone) : NO_TIMERANGE_OVERRIDE,
       id: generateId(),
     };
 
@@ -149,14 +164,7 @@ const TimeRangeAddToQuickListButton = () => {
         },
       });
     }
-  }, [config, refresh, sendTelemetry, values.nextTimeRange, toggleModal, userTimezone]);
-
-  const equalTimerange = useMemo(() => config
-    ?.quick_access_timerange_presets
-    ?.find((existingTimerange) => isTimerangeEqual(
-      existingTimerange.timerange,
-      normalizeFromSearchBarForBackend(values.nextTimeRange as TimeRange, userTimezone),
-    )), [config, values.nextTimeRange, userTimezone]);
+  }, [config, refresh, sendTelemetry, activeTabTimeRange, toggleModal, userTimezone]);
 
   return (
     <>
@@ -170,8 +178,7 @@ const TimeRangeAddToQuickListButton = () => {
       {showForm && (
         <TimeRangeAddToQuickListForm addTimerange={addTimerange}
                                      toggleModal={toggleModal}
-                                     target={formTarget.current}
-                                     equalTimerange={equalTimerange} />
+                                     target={formTarget.current} />
       )}
     </>
   );
