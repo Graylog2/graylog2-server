@@ -199,6 +199,7 @@ export interface SystemConfiguration {
 export type SearchTypeResult = {
   type: string,
   effective_timerange: TimeRange,
+  total: number,
 };
 
 export type MessageResult = {

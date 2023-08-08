@@ -33,6 +33,7 @@ import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
 import { createGRN } from 'logic/permissions/GRN';
+import ExecutionInfo from 'views/components/views/ExecutionInfo';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [{
@@ -138,6 +139,8 @@ const ViewHeader = () => {
     return links[view.type]({ id: view.id, title });
   }, [alertId, definitionId, definitionTitle, isAlert, isEvent, isEventDefinition, view, title]);
 
+  const showExecutionInfo = view.type === 'SEARCH';
+
   return (
     <Row>
       <Content>
@@ -172,6 +175,7 @@ const ViewHeader = () => {
                              onSave={_onSaveView}
                              submitButtonText={`Save ${typeText}`} />
         )}
+        {showExecutionInfo && <ExecutionInfo />}
       </Content>
     </Row>
   );

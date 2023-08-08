@@ -25,6 +25,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime } from 'util/DateTime';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useSearchResult from 'views/hooks/useSearchResult';
+import SearchQueryExecutionInfoHelper from 'views/components/widgets/SearchQueryExecutionInfoHelper';
 
 type Props = {
   className?: string,
@@ -37,6 +38,9 @@ const Wrapper = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.tiny};
   color: ${theme.colors.gray[30]};
   width: max-content;
+  display: flex;
+  gap: 5px;
+  align-items: center;
 `);
 
 const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
@@ -58,11 +62,15 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
   const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, toInternalTime) : 'Effective widget time range is currently not available.';
 
+  const currentWidgetMapping = widgetMapping?.get(widgetId);
+  console.log('WWWWWMMMMMMMMWWWWWWWWW', { widgetMapping });
+
   return (
     <Wrapper className={className}>
       <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
         {globalTimerangeString || configuredTimerange}
       </TextOverflowEllipsis>
+      <SearchQueryExecutionInfoHelper currentWidgetMapping={currentWidgetMapping} />
     </Wrapper>
   );
 };
