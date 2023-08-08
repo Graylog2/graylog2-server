@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useContext } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
@@ -24,7 +23,8 @@ import ActionMenuItem from 'views/components/actions/ActionMenuItem';
 import type { ActionDefinition, ActionHandlerArguments, ActionComponents } from 'views/components/actions/ActionHandler';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
-import ExternalValueActionsContext from 'views/components/ExternalValueActionsContext';
+import { Spinner } from 'components/common';
+import useExternalValueActions from 'views/hooks/useExternalValueActions';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;
@@ -62,7 +62,7 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 };
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const { isLoading, isError, externalValueActions } = useContext(ExternalValueActionsContext);
+  const { isLoading, isError, externalValueActions } = useExternalValueActions();
   const dispatch = useAppDispatch();
 
   if (type !== 'value') {
@@ -92,7 +92,7 @@ const ActionDropdown = ({
   onMenuToggle,
 }: Props) => {
   const internalActions = useInternalActions(type, handlerArgs);
-  const { externalActions } = useExternalActions(type, handlerArgs);
+  const { externalActions, isLoading } = useExternalActions(type, handlerArgs);
 
   return (
     <>
@@ -113,7 +113,8 @@ const ActionDropdown = ({
                         type={type}
                         onMenuToggle={onMenuToggle} />
       ))}
-      {(externalActions && externalActions.length !== 0) && (
+      {isLoading && (<><MenuItem divider /><MenuItem disabled><Spinner text="Loading" /></MenuItem></>)}
+      {(!isLoading && externalActions && externalActions.length !== 0) && (
         <>
           <MenuItem divider />
           {externalActions.map((action) => (

@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext } from 'react';
 
-import { singleton } from 'logic/singleton';
-import type { ActionDefinition } from 'views/components/actions/ActionHandler';
+import ExternalValueActionsContext from 'views/components/ExternalValueActionsContext';
 
-const ExternalValueActionsContext = React.createContext<{
-    isLoading: boolean,
-    externalValueActions: Array<ActionDefinition>,
-    isError: boolean,
-} | undefined>(undefined);
+const useExternalValueActions = () => useContext(ExternalValueActionsContext);
 
-export default singleton('contexts.ExternalValueActionsContext', () => ExternalValueActionsContext);
+export default useExternalValueActions;
