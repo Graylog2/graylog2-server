@@ -18,6 +18,7 @@ import flatten from 'lodash/flatten';
 import flow from 'lodash/flow';
 import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
+import type { ColorBar } from 'plotly.js';
 
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -47,6 +48,7 @@ export type ChartDefinition = {
   },
   customdata?: any,
   colorscale?: string,
+  colorbar?: { tickfont: { color: string } },
   reversescale?: boolean,
   zmin?: number,
   zmax?: number,
