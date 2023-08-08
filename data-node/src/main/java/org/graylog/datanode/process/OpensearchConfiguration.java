@@ -36,7 +36,9 @@ public record OpensearchConfiguration(
         String authUsername,
         String authPassword,
         String clusterName, String nodeName, List<String> nodeRoles,
-        List<String> discoverySeedHosts, OpensearchSecurityConfiguration opensearchSecurityConfiguration, Map<String, String> additionalConfiguration
+        List<String> discoverySeedHosts,
+        OpensearchSecurityConfiguration opensearchSecurityConfiguration,
+        Map<String, String> additionalConfiguration
 ) {
     public Map<String, String> asMap() {
 
@@ -82,5 +84,9 @@ public record OpensearchConfiguration(
     public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
+    }
+
+    public boolean securityConfigured() {
+        return opensearchSecurityConfiguration() != null;
     }
 }

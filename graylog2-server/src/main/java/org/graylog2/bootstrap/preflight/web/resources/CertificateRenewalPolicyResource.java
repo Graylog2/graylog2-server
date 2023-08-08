@@ -35,7 +35,7 @@ public class CertificateRenewalPolicyResource {
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public CertificateRenewalPolicyResource(ClusterConfigService clusterConfigService) {
+    public CertificateRenewalPolicyResource(final ClusterConfigService clusterConfigService) {
         this.clusterConfigService = clusterConfigService;
     }
 

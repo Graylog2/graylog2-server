@@ -52,6 +52,8 @@ export const DEFAULT_RELATIVE_FROM = 300;
 export const DEFAULT_RELATIVE_TO = DEFAULT_RELATIVE_FROM - 60;
 export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE_TYPE, from: DEFAULT_RELATIVE_FROM };
 
+export const NO_TIMERANGE_OVERRIDE = {};
+
 export const DEFAULT_HIGHLIGHT_COLOR = StaticColor.create('#ffec3d');
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
   .mode('lch')

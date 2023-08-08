@@ -70,7 +70,7 @@ export type RulesStoreState = {
 type RulesActionsType = {
   delete: (rule: RuleType) => Promise<unknown>,
   list: () => Promise<unknown>,
-  get: () => Promise<unknown>,
+  get: (ruleId: string) => Promise<unknown>,
   save: (rule: RuleType) => Promise<unknown>,
   update: (rule: RuleType) => Promise<unknown>,
   parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
@@ -182,7 +182,7 @@ export const RulesStore = singletonStore(
       return promise;
     },
 
-    get(ruleId) {
+    get(ruleId: string) {
       const failCallback = (error: Error) => {
         UserNotification.error(`Fetching rule "${ruleId}" failed with status: ${error.message}`,
           `Could not retrieve processing rule "${ruleId}"`);

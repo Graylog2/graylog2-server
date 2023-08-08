@@ -36,11 +36,18 @@ import java.util.List;
 
 public class CustomCAX509TrustManager implements X509TrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CustomCAX509TrustManager.class);
-    private final List<X509TrustManager> trustManagers = new ArrayList<>();
+    private final CaService caService;
+    private List<X509TrustManager> trustManagers = new ArrayList<>();
 
     @Inject
     public CustomCAX509TrustManager(CaService caService) {
+        this.caService = caService;
+        this.refresh();
+    }
+
+    public void refresh() {
         try {
+            trustManagers = new ArrayList<>();
             trustManagers.add(getDefaultTrustManager());
             caService.loadKeyStore().ifPresent(keystore -> trustManagers.add(getTrustManager(keystore)));
         } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException k) {
