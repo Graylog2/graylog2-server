@@ -127,7 +127,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS);
+                .withNetworkAliases(NETWORK_ALIAS)
+                .withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
     }
 
     @Override
