@@ -226,6 +226,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 .conditions(conditions().orElse(null))
                 .executeEveryMs(executeEveryMs())
                 .searchWithinMs(searchWithinMs())
+                .eventLimit(eventLimit())
                 .build();
     }
 
