@@ -36,6 +36,7 @@ import {
   getDictForFunction,
 } from './helpers';
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
+import ConfirmNavigateToSourceCodeEditorModal from './ConfirmNavigateToSourceCodeEditorModal';
 
 import RuleSimulation from '../RuleSimulation';
 import RuleHelper from '../rule-helper/RuleHelper';
@@ -110,6 +111,7 @@ const RuleBuilder = () => {
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
   const [showSimulator, setShowSimulator] = useState<boolean>(false);
+  const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
 
   useEffect(() => {
     if (initialRule) {
@@ -123,6 +125,8 @@ const RuleBuilder = () => {
 
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
+
+  const isFormDirty = (_rule: RuleBuilderRule) => Boolean(rule.title || _rule.rule_builder.conditions.length || _rule.rule_builder.conditions.length);
 
   const getActionOutputVariableName = (order : number) : string => {
     if (order === 0) return '';
@@ -335,8 +339,10 @@ const RuleBuilder = () => {
 
                     if (initialRule) {
                       setRuleSourceCodeToShow(rule);
+                    } else if (isFormDirty(rule)) {
+                      setShowConfirmSourceCodeEditor(true);
                     } else {
-                      history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                      history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
                     }
                   }}>
             {initialRule ? 'Convert to Source Code' : 'Source Code Editor'}
@@ -444,6 +450,12 @@ const RuleBuilder = () => {
         <ConvertToSourceCodeModal show
                                   onHide={() => setRuleSourceCodeToShow(null)}
                                   rule={ruleSourceCodeToShow} />
+      )}
+      {showConfirmSourceCodeEditor && (
+        <ConfirmNavigateToSourceCodeEditorModal show
+                                                rule={rule}
+                                                onHide={() => setShowConfirmSourceCodeEditor(false)}
+                                                onSave={createRule} />
       )}
     </form>
   );
