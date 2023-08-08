@@ -129,6 +129,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS);
 
+        // disabling the performance plugin in 2.0.1 consistently created errors during CI runs, but keeping it running
+        // in later versions sometimes created errors on CI, too.
         if(version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
             return container.withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
         } else {
