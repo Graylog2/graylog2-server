@@ -17,6 +17,7 @@
 package org.graylog.datanode.process;
 
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
@@ -35,7 +36,9 @@ public record OpensearchConfiguration(
         String authUsername,
         String authPassword,
         String clusterName, String nodeName, List<String> nodeRoles,
-        List<String> discoverySeedHosts, Map<String, String> additionalConfiguration
+        List<String> discoverySeedHosts,
+        OpensearchSecurityConfiguration opensearchSecurityConfiguration,
+        Map<String, String> additionalConfiguration
 ) {
     public Map<String, String> asMap() {
 
@@ -81,5 +84,9 @@ public record OpensearchConfiguration(
     public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
+    }
+
+    public boolean securityConfigured() {
+        return opensearchSecurityConfiguration() != null;
     }
 }

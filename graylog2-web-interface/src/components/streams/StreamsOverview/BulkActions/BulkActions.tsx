@@ -28,6 +28,7 @@ import MenuItem from 'components/bootstrap/MenuItem';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import AssignIndexSetAction from 'components/streams/StreamsOverview/BulkActions/AssignIndexSetAction';
 import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/StopStreamsAction';
+import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
 
 import StartStreamsAction from './StartStreamsAction';
 
@@ -77,7 +78,7 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
                             setSelectedStreamIds={setSelectedStreamIds}
                             descriptor={descriptor}
                             refetchStreams={refetchStreams} />
-
+      <SearchStreamsAction selectedStreamIds={selectedStreamIds} />
       <StartStreamsAction handleFailures={handleFailures}
                           selectedStreamIds={selectedStreamIds}
                           refetchStreams={refetchStreams}

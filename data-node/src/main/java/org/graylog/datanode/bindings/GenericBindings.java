@@ -17,7 +17,10 @@
 package org.graylog.datanode.bindings;
 
 import com.google.common.util.concurrent.ServiceManager;
+import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 
 public class GenericBindings extends Graylog2Module {
@@ -30,6 +33,8 @@ public class GenericBindings extends Graylog2Module {
     @Override
     protected void configure() {
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
+        bind(CustomCAX509TrustManager.class).asEagerSingleton();
+        bind(CaService.class).to(CaServiceImpl.class);
     }
 
 }
