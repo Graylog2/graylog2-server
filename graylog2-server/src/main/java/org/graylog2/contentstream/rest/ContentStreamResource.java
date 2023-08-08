@@ -20,7 +20,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -37,13 +36,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
-import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 
 @RequiresAuthentication
 @Api(value = "ContentStream", description = "Content Stream", tags = {CLOUD_VISIBLE})
@@ -64,10 +61,9 @@ public class ContentStreamResource extends RestResource {
     @Path("settings/{username}")
     @ApiOperation("Retrieve Content Stream settings for specified user")
     public ContentStreamSettings getContentStreamUserSettings(
-            @ApiParam(name = "username") @PathParam("username") String username,
-            @Context UserContext userContext
+            @ApiParam(name = "username") @PathParam("username") String username
     ) throws NotFoundException {
-        if (userContext.getUser().getName().equals(username) || isPermitted(USERS_READ, username)) {
+        if (isPermitted(USERS_EDIT, username)) {
             return contentStreamService.getUserSettings(loadUser(username));
         }
         throw new ForbiddenException("Not allowed to view user " + username);
@@ -78,10 +74,9 @@ public class ContentStreamResource extends RestResource {
     @ApiOperation("Enable Content Stream for specified user")
     @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
     public ContentStreamSettings contentStreamEnable(
-            @ApiParam(name = "username") @PathParam("username") String username,
-            @Context UserContext userContext
+            @ApiParam(name = "username") @PathParam("username") String username
     ) throws NotFoundException {
-        if (userContext.getUser().getName().equals(username) || isPermitted(USERS_EDIT, username)) {
+        if (isPermitted(USERS_EDIT, username)) {
             return setStatus(username, true);
         }
         throw new ForbiddenException("Not allowed to edit user " + username);
@@ -92,10 +87,9 @@ public class ContentStreamResource extends RestResource {
     @ApiOperation("Disable Content Stream for specified user")
     @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
     public ContentStreamSettings contentStreamDisable(
-            @ApiParam(name = "username") @PathParam("username") String username,
-            @Context UserContext userContext
+            @ApiParam(name = "username") @PathParam("username") String username
     ) throws NotFoundException {
-        if (userContext.getUser().getName().equals(username) || isPermitted(USERS_EDIT, username)) {
+        if (isPermitted(USERS_EDIT, username)) {
             return setStatus(username, false);
         }
         throw new ForbiddenException("Not allowed to edit user " + username);
@@ -108,10 +102,9 @@ public class ContentStreamResource extends RestResource {
     public ContentStreamSettings saveContentStreamUserTopics(
             @ApiParam(name = "username") @PathParam("username") String username,
             @ApiParam(name = "JSON body", value = "Content Stream topics for the specified user.", required = true)
-            @Valid @NotNull List<String> topicList,
-            @Context UserContext userContext
+            @Valid @NotNull List<String> topicList
     ) throws NotFoundException {
-        if (userContext.getUser().getName().equals(username) || isPermitted(USERS_EDIT, username)) {
+        if (isPermitted(USERS_EDIT, username)) {
             final User user = loadUser(username);
             ContentStreamSettings contentStreamSettings = contentStreamService.getUserSettings(user);
             ContentStreamSettings newSettings = ContentStreamSettings.builder()
