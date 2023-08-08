@@ -61,6 +61,7 @@ const parseXML = (text: string): Array<FeedITem> => {
     attributeNamePrefix: 'attr_',
   };
   const parser = new XMLParser(options);
+
   const parsed = parser.parse(text);
 
   const { rss: { channel: { item: items = undefined } } } = parsed as RssFeed;
