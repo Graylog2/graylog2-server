@@ -48,7 +48,7 @@ public class Capitalize extends StringUtilsFunction {
     @Nonnull
     @Override
     protected String getRuleBuilderName() {
-        return "Capitalize String";
+        return "Capitalize string";
     }
 
     @Nonnull

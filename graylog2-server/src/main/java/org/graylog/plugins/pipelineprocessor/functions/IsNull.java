@@ -52,8 +52,8 @@ public class IsNull extends AbstractFunction<Boolean> {
                 .params(of(valueParam))
                 .description("Checks whether a value is 'null'")
                 .ruleBuilderEnabled(false)
-                .ruleBuilderName("Check if not null")
-                .ruleBuilderTitle("Check if value is not null")
+                .ruleBuilderName("Check if null")
+                .ruleBuilderTitle("Check if value is null")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

@@ -31,7 +31,7 @@ public class IsUrl extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsUrl() {
-        valueParam = object("value").description("Value to check").build();
+        valueParam = object("value").primary().description("Value to check").build();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class IsUrl extends AbstractFunction<Boolean> {
                 .description("Checks whether a value is a URL")
                 .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if URL")
-                .ruleBuilderTitle("Check if '${value}' is a URL")
+                .ruleBuilderTitle("Check whether '${value}' is a URL")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }

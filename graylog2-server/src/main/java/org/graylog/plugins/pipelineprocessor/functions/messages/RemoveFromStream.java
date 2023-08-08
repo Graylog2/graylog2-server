@@ -100,7 +100,7 @@ public class RemoveFromStream extends AbstractFunction<Void> {
                         nameParam,
                         idParam,
                         messageParam))
-                .description("Removes a message from a stream. Removing the last stream will put the message back onto the default stream. To complete drop a message use the drop_message function. If no specific message is provided, it removes the message from the currently processed message.")
+                .description("Removes a message from a stream. Removing the last stream will put the message back onto the default stream. To completely drop a message use the drop_message function. If no specific message is provided, it removes the currently processed message from the stream.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Remove from stream")
                 .ruleBuilderTitle("Remove message from stream<#if name??> '${name}'</#if><#if id??> '${id}'</#if>")
