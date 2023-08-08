@@ -18,11 +18,15 @@ package org.graylog2.bootstrap.preflight.web.resources;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.certutil.CertRenewalService;
-import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
@@ -37,6 +41,7 @@ import java.util.List;
 @Api(value = "Certificates")
 @Path("/certrenewal")
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class CertificateRenewalResource implements PluginRestResource {
     private final TransportAddressSanitizer transportAddressSanitizer;
     private final CertRenewalService certRenewalService;
@@ -52,6 +57,8 @@ public class CertificateRenewalResource implements PluginRestResource {
     }
 
     @GET
+    // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public List<PreflightResource.DataNode> listDataNodesThatNeedCertRenewal() {
         return nodeService.allActive(Node.Type.DATANODE).values().stream().map(n -> new PreflightResource.DataNode(n.getNodeId(),
                 n.getType(),
@@ -63,7 +70,9 @@ public class CertificateRenewalResource implements PluginRestResource {
 
     @POST
     @Path("{nodeID}")
-    @NoAuditEvent("No Audit Event needed")
+    @AuditEvent(type = AuditEventTypes.CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
+    // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
+    @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
     public void initiateCertRenewalForNode(@ApiParam(name = "nodeID") @PathParam("nodeID") String nodeID) {
         certRenewalService.initiateRenewalForNode(nodeID);
     }
