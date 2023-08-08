@@ -17,19 +17,41 @@
 package org.graylog2.contentpacks;
 
 import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public interface NativeEntityConverter<T> {
     T toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities);
+
     default void resolveForInstallation(EntityV1 entity,
                                         Map<String, ValueReference> parameters,
                                         Map<EntityDescriptor, Entity> entities,
                                         MutableGraph<Entity> graph) {
+
+    }
+
+    default List<UsedSearchFilter> convertSearchFilters(final List<UsedSearchFilter> contentPackSavedFilters) {
+        if (contentPackSavedFilters == null) {
+            return List.of();
+        }
+        return contentPackSavedFilters.stream()
+                .map(filter -> {
+                    if (filter instanceof ReferencedSearchFilter referenced) {
+                        return referenced.toInlineRepresentation();
+                    } else {
+                        return filter;
+                    }
+                })
+                .collect(Collectors.toList());
+
 
     }
 }
