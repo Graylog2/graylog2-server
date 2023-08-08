@@ -69,7 +69,7 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId, refet
         <EntityShareModal entityId={search.id}
                           entityType="search"
                           entityTitle={search.title}
-                          description="Search for a User or Team to add as collaborator on this stream."
+                          description="Search for a User or Team to add as collaborator on this search."
                           onClose={toggleEntityShareModal} />
       )}
     </>
