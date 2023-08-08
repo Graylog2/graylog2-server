@@ -16,5 +16,26 @@
  */
 package org.graylog2.cluster.preflight;
 
-public record NodePreflightStateChangeEvent(String nodeId, NodePreflightConfig.State state) {
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+public interface DataNodeProvisioningService {
+    DataNodeProvisioningConfig getPreflightConfigFor(String nodeId);
+    List<DataNodeProvisioningConfig> findAllNodesThatNeedAttention();
+
+    void writeCsr(String nodeId, String csr);
+
+    void writeCert(String nodeId, String cert);
+
+    Optional<String> readCert(String nodeId);
+
+    void changeState(String nodeId, DataNodeProvisioningConfig.State state);
+
+    DataNodeProvisioningConfig save(DataNodeProvisioningConfig config);
+
+    Stream<DataNodeProvisioningConfig> streamAll();
+
+    int delete(String id);
+    void deleteAll();
 }

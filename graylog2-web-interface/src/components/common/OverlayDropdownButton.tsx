@@ -28,7 +28,7 @@ type Props = {
   disabled?: boolean
   dropdownMinWidth?: number
   dropdownZIndex?: number,
-  onToggle?: () => void,
+  onToggle?: (isOpen: boolean) => void,
   title: React.ReactNode,
 };
 
@@ -50,7 +50,7 @@ const OverlayDropdownButton = ({
 
   const _onToggle = () => {
     if (typeof onToggleProp === 'function') {
-      onToggleProp();
+      onToggleProp(!show);
     }
 
     setShowDropdown((cur) => !cur);

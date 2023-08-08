@@ -38,4 +38,4 @@ export const isTypeKeyword = (timeRange: TimeRange | NoTimeRangeOverride): timeR
 
 export const isNoTimeRangeOverride = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is NoTimeRangeOverride => timeRange !== undefined && isEqual(timeRange, {});
 
-export const isTimeRange = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is TimeRange => !isNoTimeRangeOverride(timeRange);
+export const isTimeRange = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is TimeRange => timeRange && 'type' in timeRange;

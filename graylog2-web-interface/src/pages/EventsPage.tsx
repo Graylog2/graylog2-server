@@ -15,54 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import Routes from 'routing/Routes';
+import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
-import connect from 'stores/connect';
-import { isPermitted } from 'util/PermissionsMixin';
-import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import useQuery from 'routing/useQuery';
 
-import useHistory from '../routing/useHistory';
-
-const CreateEventDefinitionPage = ({ currentUser }) => {
-  const history = useHistory();
-
-  if (!isPermitted(currentUser.permissions, 'eventnotifications:create')) {
-    history.push(Routes.NOTFOUND);
-  }
+const EventsPage = () => {
+  const { stream_id: streamId } = useQuery();
 
   return (
-    <DocumentTitle title="New Notification">
+    <DocumentTitle title="Alerts &amp; Events">
       <EventsPageNavigation />
-      <PageHeader title="New Notification"
+      <PageHeader title="Alerts &amp; Events"
                   documentationLink={{
                     title: 'Alerts documentation',
                     path: DocsHelper.PAGES.ALERTS,
                   }}>
         <span>
-          Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-          to you or to other systems you use for that purpose.
+          Define Events through different conditions. Add Notifications to Events that require your attention
+          to create Alerts.
         </span>
       </PageHeader>
 
       <Row className="content">
         <Col md={12}>
-          <EventNotificationFormContainer action="create" />
+          <EventsContainer key={streamId} streamId={streamId} />
         </Col>
       </Row>
     </DocumentTitle>
   );
 };
 
-CreateEventDefinitionPage.propTypes = {
-  currentUser: PropTypes.object.isRequired,
-};
-
-export default connect(CreateEventDefinitionPage, {
-  currentUser: CurrentUserStore,
-}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+export default EventsPage;

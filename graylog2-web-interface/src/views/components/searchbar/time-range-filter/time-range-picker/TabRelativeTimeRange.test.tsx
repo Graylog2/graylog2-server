@@ -37,15 +37,18 @@ const defaultProps = {
 };
 
 const initialValues = {
-  nextTimeRange: {
-    type: 'relative',
-    from: {
-      value: 1,
-      unit: 'hours',
-      isAllTime: false,
+  timeRangeTabs: {
+    relative: {
+      type: 'relative',
+      from: {
+        value: 1,
+        unit: 'hours',
+        isAllTime: false,
+      },
+      to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
     },
-    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
   },
+  activeTab: 'relative',
 };
 
 const renderSUT = (allProps = defaultProps, initialFormValues = initialValues) => render(
@@ -89,21 +92,24 @@ describe('TabRelativeTimeRange', () => {
 
   it('renders initial time range with from and to value', async () => {
     const initialFormValues = {
-      ...initialValues,
-      nextTimeRange: {
-        ...initialValues.nextTimeRange,
-        from: {
-          value: 5,
-          unit: 'minutes',
-          isAllTime: false,
-        },
-        to: {
-          value: 4,
-          unit: 'minutes' as const,
-          isAllTime: false,
+      activeTab: 'relative',
+      timeRangeTabs: {
+        relative: {
+          type: 'relative',
+          from: {
+            value: 5,
+            unit: 'minutes',
+            isAllTime: false,
+          },
+          to: {
+            value: 4,
+            unit: 'minutes' as const,
+            isAllTime: false,
+          },
         },
       },
     };
+
     renderSUT(undefined, initialFormValues);
 
     expect((await screen.findByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('5');

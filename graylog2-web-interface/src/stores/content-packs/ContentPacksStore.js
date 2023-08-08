@@ -43,6 +43,16 @@ export const ContentPacksStore = singletonStore(
   () => Reflux.createStore({
     listenables: [ContentPacksActions],
 
+    getInitialState() {
+      return ({
+        contentPack: undefined,
+        contentPackMetadata: undefined,
+        contentPacks: undefined,
+        installations: undefined,
+        uninstallEntities: undefined,
+      });
+    },
+
     get(contentPackId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.get(contentPackId).url);
       const promise = fetch('GET', url)
