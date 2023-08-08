@@ -28,9 +28,9 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 @AutoValue
-@JsonDeserialize(builder = NodePreflightConfig.Builder.class)
+@JsonDeserialize(builder = DataNodeProvisioningConfig.Builder.class)
 @WithBeanGetter
-public abstract class  NodePreflightConfig {
+public abstract class DataNodeProvisioningConfig {
     public enum State {
         UNCONFIGURED, // first start of a DataNode
         CONFIGURED, // the DataNode has been configured by the Preflight UI
@@ -119,9 +119,9 @@ public abstract class  NodePreflightConfig {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_NodePreflightConfig.Builder();
+            return new AutoValue_DataNodeProvisioningConfig.Builder();
         }
 
-        public abstract NodePreflightConfig build();
+        public abstract DataNodeProvisioningConfig build();
     }
 }

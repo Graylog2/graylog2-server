@@ -120,7 +120,7 @@ public class JerseyService extends AbstractIdleService {
      */
     private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
         final OpensearchSecurityConfiguration securityConfiguration = config.opensearchSecurityConfiguration();
-        if (securityConfiguration.securityEnabled()) {
+        if (securityConfiguration != null && securityConfiguration.securityEnabled()) {
             // caution, this path is relative to the opensearch config directory!
             return buildSslEngineConfigurator(securityConfiguration.getHttpCertificate());
         } else {

@@ -15,43 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import EventsContainer from 'components/events/events/EventsContainer';
+import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import withLocation from 'routing/withLocation';
+import { isPermitted } from 'util/PermissionsMixin';
+import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useHistory from 'routing/useHistory';
 
-const EventsPage = ({ location }) => {
-  const filteredSourceStream = location.query.stream_id;
+const CreateEventDefinitionPage = () => {
+  const currentUser = useCurrentUser();
+  const history = useHistory();
+
+  if (!isPermitted(currentUser.permissions, 'eventnotifications:create')) {
+    history.push(Routes.NOTFOUND);
+  }
 
   return (
-    <DocumentTitle title="Alerts &amp; Events">
+    <DocumentTitle title="New Notification">
       <EventsPageNavigation />
-      <PageHeader title="Alerts &amp; Events"
+      <PageHeader title="New Notification"
                   documentationLink={{
                     title: 'Alerts documentation',
                     path: DocsHelper.PAGES.ALERTS,
                   }}>
         <span>
-          Define Events through different conditions. Add Notifications to Events that require your attention
-          to create Alerts.
+          Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+          to you or to other systems you use for that purpose.
         </span>
       </PageHeader>
 
       <Row className="content">
         <Col md={12}>
-          <EventsContainer key={filteredSourceStream} streamId={filteredSourceStream} />
+          <EventNotificationFormContainer action="create" />
         </Col>
       </Row>
     </DocumentTitle>
   );
 };
 
-EventsPage.propTypes = {
-  location: PropTypes.object.isRequired,
-};
-
-export default withLocation(EventsPage);
+export default CreateEventDefinitionPage;

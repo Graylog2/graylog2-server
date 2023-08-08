@@ -28,7 +28,7 @@ import ContentStreamReleasesSection from 'components/content-stream/ContentStrea
 const StyledNewsSectionComponent = styled(SectionComponent)(({ theme }) => css`
   overflow: hidden;
   flex-grow: 3;
-  
+
   @media (max-width: ${theme.breakpoints.max.md}) {
     flex-grow: 1;
   }

@@ -19,7 +19,7 @@ import isEqual from 'lodash/isEqual';
 import { SearchSuggestions } from '@graylog/server-api';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import { onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { escape } from 'views/logic/queries/QueryHelper';
 
@@ -166,7 +166,7 @@ class FieldValueCompletion implements Completer {
       }
     }
 
-    const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : onSubmittingTimerange(timeRange, userTimezone);
+    const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : normalizeFromSearchBarForBackend(timeRange, userTimezone);
 
     return SearchSuggestions.suggestFieldValue({
       field: fieldName,

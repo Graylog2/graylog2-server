@@ -31,7 +31,7 @@ const StyledImage = styled.img`
   max-width: 100%;
   width: 100%;
   object-fit: contain;
-  border-radius: 4px;
+  border-radius: 4px 0;
 `;
 const StyledPanelBody = styled(Panel.Body)(({ theme }: { theme: DefaultTheme }) => css`
   flex-grow: 1;
@@ -57,7 +57,7 @@ const _sanitizeText = (text) => DOMPurify.sanitize(text);
 const ContentStreamNewsItem = ({ feed }: Props) => (
   <Carousel.Slide>
     <StyledPanel>
-      <StyledImage src="https://placehold.co/600x400" alt="test" />
+      <StyledImage src={feed?.['media:content']?.attr_url} alt={feed?.title} />
       <StyledPanelBody>
         {/* eslint-disable-next-line react/no-danger */}
         <a href={feed.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed.title) }} />

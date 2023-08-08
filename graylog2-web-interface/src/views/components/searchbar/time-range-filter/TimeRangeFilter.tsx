@@ -26,6 +26,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import type { SupportedTimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 import TimeRangePicker from 'views/components/searchbar/time-range-filter/time-range-picker/index';
+import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 
 import TimeRangeFilterButtons from './TimeRangeFilterButtons';
 import TimeRangeDisplay from './TimeRangeDisplay';
@@ -46,7 +47,7 @@ type Props = {
   hasErrorOnMount?: boolean,
   limitDuration: number,
   noOverride?: boolean,
-  onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
   position?: 'bottom' | 'right',
   showPresetDropdown?: boolean,
   validTypes?: Array<SupportedTimeRangeType>,
@@ -57,7 +58,7 @@ const TimeRangeFilter = ({
   disabled,
   hasErrorOnMount,
   noOverride,
-  value = {},
+  value = NO_TIMERANGE_OVERRIDE,
   onChange,
   validTypes,
   position,
