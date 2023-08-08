@@ -117,7 +117,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpensearchContainer(DockerImageName.parse(image))
+        var container = new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
@@ -127,8 +127,13 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
+                .withNetworkAliases(NETWORK_ALIAS);
+
+        if(version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
+            return container.withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
+        } else {
+            return container;
+        }
     }
 
     @Override
