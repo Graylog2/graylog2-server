@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.contentStream.rest;
+package org.graylog2.contentstream.rest;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 import java.util.List;
 
 @AutoValue
-public abstract class ContentStreamUserSettings {
+public abstract class ContentStreamSettings {
     private static final String FIELD_ENABLED = "content_stream_enabled";
     private static final String FIELD_TOPICS = "content_stream_topics";
 
@@ -34,11 +34,11 @@ public abstract class ContentStreamUserSettings {
     public abstract List<String> topics();
 
     public static Builder builder() {
-        return new AutoValue_ContentStreamUserSettings.Builder();
+        return new AutoValue_ContentStreamSettings.Builder();
     }
 
     @JsonCreator
-    public static ContentStreamUserSettings create(
+    public static ContentStreamSettings create(
             @JsonProperty(FIELD_ENABLED) Boolean enabled,
             @JsonProperty(FIELD_TOPICS) List<String> topics
     ) {
@@ -57,6 +57,6 @@ public abstract class ContentStreamUserSettings {
         @JsonProperty(FIELD_TOPICS)
         public abstract Builder topics(List<String> topics);
 
-        public abstract ContentStreamUserSettings build();
+        public abstract ContentStreamSettings build();
     }
 }

@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.contentStream;
+package org.graylog2.contentstream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.contentStream.db.DBContentStreamUserSettingsService;
-import org.graylog2.contentStream.rest.ContentStreamService;
-import org.graylog2.contentStream.rest.ContentStreamUserSettings;
+import org.graylog2.contentstream.db.DBContentStreamUserSettingsService;
+import org.graylog2.contentstream.rest.ContentStreamService;
+import org.graylog2.contentstream.rest.ContentStreamSettings;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.junit.Before;
@@ -69,28 +69,28 @@ public class ContentStreamServiceWithDbTest {
 
     @Test
     public void test_no_content_stream_user_settings_present() {
-        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getUserSettings(user1);
+        ContentStreamSettings contentStreamSettings = contentStreamService.getUserSettings(user1);
 
-        assertThat(contentStreamUserSettings.contentStreamEnabled()).isTrue();
-        assertThat(contentStreamUserSettings.topics()).isEmpty();
+        assertThat(contentStreamSettings.contentStreamEnabled()).isTrue();
+        assertThat(contentStreamSettings.topics()).isEmpty();
     }
 
 
     @Test
     public void test_save_content_stream_user_settings() {
         saveUserSettings(user2, false, ImmutableList.of());
-        ContentStreamUserSettings contentStreamUserSettings = contentStreamService.getUserSettings(user2);
+        ContentStreamSettings contentStreamSettings = contentStreamService.getUserSettings(user2);
 
-        assertThat(contentStreamUserSettings.contentStreamEnabled()).isFalse();
-        assertThat(contentStreamUserSettings.topics()).isEmpty();
+        assertThat(contentStreamSettings.contentStreamEnabled()).isFalse();
+        assertThat(contentStreamSettings.topics()).isEmpty();
 
         saveUserSettings(user2, false, ImmutableList.of("1", "2"));
-        contentStreamUserSettings = contentStreamService.getUserSettings(user2);
-        assertThat(contentStreamUserSettings.topics()).containsExactly("1", "2");
+        contentStreamSettings = contentStreamService.getUserSettings(user2);
+        assertThat(contentStreamSettings.topics()).containsExactly("1", "2");
     }
 
     private void saveUserSettings(User user, boolean isEnabled, List<String> topicList) {
-        ContentStreamUserSettings userSettings = ContentStreamUserSettings.builder()
+        ContentStreamSettings userSettings = ContentStreamSettings.builder()
                 .contentStreamEnabled(isEnabled)
                 .topics(topicList)
                 .build();

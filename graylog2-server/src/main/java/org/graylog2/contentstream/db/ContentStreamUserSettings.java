@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.contentStream.db;
+package org.graylog2.contentstream.db;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,21 +27,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AutoValue
-public abstract class ContentStreamUserSettingsDto {
+public abstract class ContentStreamUserSettings {
 
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_ENABLED = "content_stream_enabled";
     public static final String FIELD_TOPICS = "content_stream_topics";
 
     public static Builder builder() {
-        return new AutoValue_ContentStreamUserSettingsDto.Builder();
+        return new AutoValue_ContentStreamUserSettings.Builder();
     }
 
     @JsonCreator
-    public static ContentStreamUserSettingsDto create(@JsonProperty("id") @Id @ObjectId String id,
-                                                      @JsonProperty(FIELD_USER_ID) String userId,
-                                                      @JsonProperty(FIELD_ENABLED) Boolean contentStreamEnabled,
-                                                      @JsonProperty(FIELD_TOPICS) List<String> topicList
+    public static ContentStreamUserSettings create(@JsonProperty("id") @Id @ObjectId String id,
+                                                   @JsonProperty(FIELD_USER_ID) String userId,
+                                                   @JsonProperty(FIELD_ENABLED) Boolean contentStreamEnabled,
+                                                   @JsonProperty(FIELD_TOPICS) List<String> topicList
     ) {
         return builder()
                 .id(id)
@@ -77,6 +77,6 @@ public abstract class ContentStreamUserSettingsDto {
 
         public abstract Builder topics(List<String> topicList);
 
-        public abstract ContentStreamUserSettingsDto build();
+        public abstract ContentStreamUserSettings build();
     }
 }

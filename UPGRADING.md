@@ -28,12 +28,12 @@ The following Java Code API changes have been made.
 ## REST API Endpoint Changes
 The following REST API changes have been made.
 
-| Endpoint                              | Description                                |
-|---------------------------------------|--------------------------------------------|
-| `GET /contentStream/settings/{username}` | Retrieve Content Stream settings for specified user |
-| `PUT /contentStream/enable/{username}` | Enable Content Stream for specified user   |
-| `PUT /contentStream/disable/{username}` | Disable Content Stream for specified user  |
-| `PUT /contentStream/topics/{username}` | Update per user Content Stream topic list  |
+| Endpoint                                 | Description                                |
+|------------------------------------------|--------------------------------------------|
+| `GET /contentstream/settings/{username}` | Retrieve Content Stream settings for specified user |
+| `PUT /contentstream/enable/{username}`   | Enable Content Stream for specified user   |
+| `PUT /contentstream/disable/{username}`  | Disable Content Stream for specified user  |
+| `PUT /contentstream/topics/{username}`   | Update per user Content Stream topic list  |
 
 
 

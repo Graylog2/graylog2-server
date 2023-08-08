@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.contentStream.db;
+package org.graylog2.contentstream.db;
 
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -31,22 +31,22 @@ public class DBContentStreamUserSettingsService {
 
     public static final String COLLECTION_NAME = "content_stream_user_settings";
 
-    private final JacksonDBCollection<ContentStreamUserSettingsDto, ObjectId> db;
+    private final JacksonDBCollection<ContentStreamUserSettings, ObjectId> db;
 
     @Inject
     public DBContentStreamUserSettingsService(MongoConnection mongoConnection,
                                               MongoJackObjectMapperProvider mapper) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                ContentStreamUserSettingsDto.class,
+                ContentStreamUserSettings.class,
                 ObjectId.class,
                 mapper.get());
     }
 
-    public Optional<ContentStreamUserSettingsDto> findByUserId(String userId) {
+    public Optional<ContentStreamUserSettings> findByUserId(String userId) {
         return Optional.ofNullable(db.findOne(DBQuery.is(FIELD_USER_ID, userId)));
     }
 
-    public void save(ContentStreamUserSettingsDto dto) {
+    public void save(ContentStreamUserSettings dto) {
         db.save(dto);
     }
 
