@@ -30,7 +30,8 @@ import java.util.List;
 public abstract class ContentStreamUserSettings {
 
     public static final String FIELD_USER_ID = "user_id";
-    public static final String FIELD_ENABLED = "content_stream_enabled";
+    public static final String FIELD_CONTENT_ENABLED = "content_stream_enabled";
+    public static final String FIELD_RELEASES_ENABLED = "releases_enabled";
     public static final String FIELD_TOPICS = "content_stream_topics";
 
     public static Builder builder() {
@@ -40,13 +41,15 @@ public abstract class ContentStreamUserSettings {
     @JsonCreator
     public static ContentStreamUserSettings create(@JsonProperty("id") @Id @ObjectId String id,
                                                    @JsonProperty(FIELD_USER_ID) String userId,
-                                                   @JsonProperty(FIELD_ENABLED) Boolean contentStreamEnabled,
+                                                   @JsonProperty(FIELD_CONTENT_ENABLED) Boolean contentStreamEnabled,
+                                                   @JsonProperty(FIELD_RELEASES_ENABLED) Boolean releasesEnabled,
                                                    @JsonProperty(FIELD_TOPICS) List<String> topicList
     ) {
         return builder()
                 .id(id)
                 .userId(userId)
                 .contentStreamEnabled(contentStreamEnabled)
+                .releasesEnabled(releasesEnabled)
                 .topics(topicList != null ? topicList : new ArrayList<>())
                 .build();
     }
@@ -60,8 +63,11 @@ public abstract class ContentStreamUserSettings {
     @JsonProperty(FIELD_USER_ID)
     public abstract String userId();
 
-    @JsonProperty(FIELD_ENABLED)
+    @JsonProperty(FIELD_CONTENT_ENABLED)
     public abstract Boolean contentStreamEnabled();
+
+    @JsonProperty(FIELD_RELEASES_ENABLED)
+    public abstract Boolean releasesEnabled();
 
     @JsonProperty(FIELD_TOPICS)
     public abstract List<String> topics();
@@ -74,6 +80,8 @@ public abstract class ContentStreamUserSettings {
         public abstract Builder userId(String userId);
 
         public abstract Builder contentStreamEnabled(Boolean contentStreamEnabled);
+
+        public abstract Builder releasesEnabled(Boolean releasesEnabled);
 
         public abstract Builder topics(List<String> topicList);
 

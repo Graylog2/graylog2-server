@@ -49,11 +49,12 @@ public class ContentStreamService {
                 .build();
     }
 
-    public void saveUserSettings(User user, ContentStreamSettings contentStreamSettings) {
+    public void saveUserSettings(User user, ContentStreamSettings settings) {
         ContentStreamUserSettings.Builder builder = ContentStreamUserSettings.builder()
                 .userId(user.getId())
-                .contentStreamEnabled(contentStreamSettings.contentStreamEnabled())
-                .topics(contentStreamSettings.topics());
+                .contentStreamEnabled(settings.contentStreamEnabled())
+                .releasesEnabled(settings.releasesEnabled())
+                .topics(settings.topics());
         dbContentStreamUserSettingsService.findByUserId(user.getId()).ifPresent(dto -> builder.id(dto.id()));
         dbContentStreamUserSettingsService.save(builder.build());
     }
