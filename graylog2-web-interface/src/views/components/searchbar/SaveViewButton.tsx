@@ -45,4 +45,8 @@ const SaveViewButton = forwardRef<HTMLButtonElement, Props>(({ title, onClick, d
   );
 });
 
+SaveViewButton.defaultProps = {
+  disabled: false,
+};
+
 export default SaveViewButton;
