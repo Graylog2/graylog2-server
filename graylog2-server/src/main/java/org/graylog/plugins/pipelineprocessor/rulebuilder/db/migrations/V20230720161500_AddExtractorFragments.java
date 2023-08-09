@@ -37,7 +37,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 
 public class V20230720161500_AddExtractorFragments extends Migration {
 
-    private static final Logger log = LoggerFactory.getLogger(V20230720161500_AddExtractorFragments);
+    private static final Logger log = LoggerFactory.getLogger(V20230720161500_AddExtractorFragments.class);
     private final RuleFragmentService ruleFragmentService;
     private final ClusterConfigService clusterConfigService;
 
