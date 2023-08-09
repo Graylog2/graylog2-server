@@ -15,13 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
 import DataNodesCertificateRenewal from './DataNodesCertificateRenewal';
 
+const StyledCertificateRenewalPolicyConfig = styled(CertificateRenewalPolicyConfig)`
+  margin-bottom: 20px;
+`;
+
 const CertificateRenewal = () => (
   <>
-    <CertificateRenewalPolicyConfig />
+    <StyledCertificateRenewalPolicyConfig />
     <DataNodesCertificateRenewal />
   </>
 );

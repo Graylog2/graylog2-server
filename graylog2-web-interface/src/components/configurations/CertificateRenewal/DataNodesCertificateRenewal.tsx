@@ -16,18 +16,23 @@
  */
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Space } from '@mantine/core';
 import styled from 'styled-components';
+import { useState } from 'react';
 
 import { qualifyUrl } from 'util/URLUtils';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode } from 'preflight/types';
 import UserNotification from 'util/UserNotification';
 import { Spinner } from 'components/common';
-import { Alert, Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { Alert, Badge, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
 
 const StyledList = styled(ListGroup)`
   max-width: 700px;
+  
+  .list-group-item {
+    display: flex;
+    justify-content: space-between;
+  }
 `;
 
 const DataNodeInfos = styled.div`
@@ -40,11 +45,7 @@ const NodeId = styled(Badge)`
   margin-right: 3px;
 `;
 
-export const fetchDataNodes = () => {
-  const url = qualifyUrl('certrenewal');
-
-  return fetchPeriodically<Array<DataNode>>('GET', url);
-};
+export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qualifyUrl('/certrenewal'));
 
 const useDataNodes = () => {
   const { data, isInitialLoading } = useQuery({
@@ -65,6 +66,31 @@ const useDataNodes = () => {
   });
 };
 
+const CertRenewalButton = ({ nodeId }: { nodeId: string }) => {
+  const [isRenewing, setIsRenewing] = useState(false);
+
+  const onCertificateRenewal = () => {
+    setIsRenewing(true);
+
+    fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
+      .then(() => {
+        UserNotification.success('Certificate renewed successfully');
+      })
+      .catch((error) => {
+        UserNotification.error(`Certificate renewal failed with error: ${error}`);
+      })
+      .finally(() => {
+        setIsRenewing(false);
+      });
+  };
+
+  return (
+    <Button onClick={onCertificateRenewal} bsSize="xsmall">
+      {isRenewing ? 'Renewing certificate...' : 'Renew certificate'}
+    </Button>
+  );
+};
+
 const DataNodesCertificateRenewal = () => {
   const { data: dataNodes, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
 
@@ -78,16 +104,18 @@ const DataNodesCertificateRenewal = () => {
       {!!dataNodes?.length && (
         <StyledList>
             {dataNodes.map(({
+              node_id,
               hostname,
               transport_address,
               short_node_id,
             }) => (
               <ListGroupItem key={short_node_id}>
                 <DataNodeInfos>
-                  <NodeId title="Short node id">{short_node_id}</NodeId>
+                  <NodeId title="Short node id" bsStyle="primary">{short_node_id}</NodeId>
                   <span title="Transport address">{transport_address}</span>{' – '}
                   <span title="Hostname">{hostname}</span>
                 </DataNodeInfos>
+                <CertRenewalButton nodeId={node_id} />
               </ListGroupItem>
             ))}
         </StyledList>
