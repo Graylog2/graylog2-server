@@ -39,9 +39,8 @@ const SaveViewButton = forwardRef<HTMLButtonElement, Props>(({ title, onClick, d
     <Button title={title}
             ref={ref}
             onClick={onClick}
-            disabled={disabled}
-            $isDirty={isDirty}>
-      <StyledIcon name="floppy-disk" type={isDirty ? 'solid' : 'regular'} $isDirty={isDirty} /> Save
+            disabled={disabled}>
+      <StyledIcon name="floppy-disk" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} /> Save
     </Button>
   );
 });
