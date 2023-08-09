@@ -64,10 +64,6 @@ public class ConditionParserTest {
                         integer("optional").optional().build()
                 ), Boolean.class
         ));
-//        functions.put(FRAGMENT1_NAME, FunctionUtil.testCondition(
-//                FRAGMENT1_NAME, "hasField(\"{field}\")",
-//                ImmutableList.of(string("field").build())
-//        ));
 
         RuleFragmentService ruleFragmentService = mock(RuleFragmentService.class);
         when(ruleFragmentService.all()).thenReturn(new ArrayList<>());
@@ -157,11 +153,6 @@ public class ConditionParserTest {
                     AND
                   ! function2()
                 """.stripTrailing());
-    }
-
-    @Test
-    public void generate_WhenRuleConditionsContainsOneFragment() {
-
     }
 
 
