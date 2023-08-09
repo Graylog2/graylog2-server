@@ -19,14 +19,14 @@ package org.graylog2.cluster.preflight;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-public class PreflightConfigBindings extends AbstractModule {
+public class DataNodeProvisioningBindings extends AbstractModule {
 
     @Override
     protected void configure() {
         // this wires the NodePreflightConfigServiceImpl delegate into the NodePreflightConfigBusEvents from above
-        bind(NodePreflightConfigService.class).annotatedWith(Names.named(NodePreflightConfigBusEvents.DELEGATE_NAME)).to(NodePreflightConfigServiceImpl.class);
+        bind(DataNodeProvisioningService.class).annotatedWith(Names.named(DataNodeProvisioningBusEvents.DELEGATE_NAME)).to(DataNodeProvisioningServiceImpl.class);
 
         // this is the generic dependency used by callers
-        bind(NodePreflightConfigService.class).to(NodePreflightConfigBusEvents.class);
+        bind(DataNodeProvisioningService.class).to(DataNodeProvisioningBusEvents.class);
     }
 }

@@ -19,14 +19,14 @@ import React from 'react';
 import styled from 'styled-components';
 
 import assertUnreachable from 'logic/assertUnreachable';
-import type { QuickAccessTimeRange } from 'components/configurations/QuickAccessTimeRangeForm';
+import type { TimeRangePreset } from 'components/configurations/TimeRangePresetForm';
 import type {
   KeywordTimeRange,
   TimeRange,
 } from 'views/logic/queries/Query';
 import { range } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
 
-type Props = { options : Array<QuickAccessTimeRange>};
+type Props = { options : Array<TimeRangePreset>};
 
 const StyledDL = styled.dl`
   && {
@@ -60,7 +60,7 @@ export const getTimeRangeValueSummary = (timerange: TimeRange) => {
   }
 };
 
-const QuickAccessTimeRangeOptionsSummary = ({ options }: Props) => (
+const TimeRangePresetOptionSummary = ({ options }: Props) => (
   <StyledDL className="deflist">
     {options.map(({ timerange, id, description }) => (
       <span key={`timerange-options-summary-${id}`}>
@@ -71,8 +71,8 @@ const QuickAccessTimeRangeOptionsSummary = ({ options }: Props) => (
   </StyledDL>
 );
 
-QuickAccessTimeRangeOptionsSummary.propTypes = {
+TimeRangePresetOptionSummary.propTypes = {
   options: PropTypes.object.isRequired,
 };
 
-export default QuickAccessTimeRangeOptionsSummary;
+export default TimeRangePresetOptionSummary;
