@@ -204,8 +204,13 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     private void notifyManualRenewalForNode(final Node node) {
-        // TODO: send notification - don't send one out, if there is one still open
-        notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, node);
+        if(notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {
+            Notification notification = notificationService.buildNow()
+                    .addType(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)
+                    .addSeverity(Notification.Severity.URGENT)
+                    .addDetail("certificate", node.getNodeId());
+            notificationService.publishIfFirst(notification);
+        }
     }
 
     protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
