@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -60,15 +59,15 @@ public class V20230724092100_AddFieldConditions extends Migration {
 //            return;
         }
         String[] noConversionTypes = {"collection", "ip", "list", "not_null", "null", "number", "period"};
-        Arrays.stream(noConversionTypes).forEach(type -> addFragment(createCheckFieldTypeNoConversion(type)));
+        Arrays.stream(noConversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeNoConversion(type)));
         String[] conversionTypes = {"bool", "double", "long", "map", "string", "url"};
-        Arrays.stream(conversionTypes).forEach(type -> addFragment(createCheckFieldType(type)));
-        addFragment(createCheckDateField());
-        addFragment(createCIDRMatchField());
-        addFragment(createStringContainsField());
-        addFragment(createStringEndsWithField());
-        addFragment(createStringStartsWithField());
-        addFragment(createGrokMatchesField());
+        Arrays.stream(conversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldType(type)));
+        ruleFragmentService.upsert(createCheckDateField());
+        ruleFragmentService.upsert(createCIDRMatchField());
+        ruleFragmentService.upsert(createStringContainsField());
+        ruleFragmentService.upsert(createStringEndsWithField());
+        ruleFragmentService.upsert(createStringStartsWithField());
+        ruleFragmentService.upsert(createGrokMatchesField());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("field condition fragments were successfully added");
@@ -271,13 +270,6 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .build())
                 .isCondition()
                 .build();
-    }
-
-
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
     }
 
     public record MigrationCompleted() {}

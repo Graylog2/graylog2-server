@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -59,12 +58,8 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
 
         }
 
-        RuleFragment setGrokTFieldsFragment = createSetGrokToFieldsFragment();
-        ruleFragmentService.get(setGrokTFieldsFragment.getName()).ifPresent(fragment -> {
-            ruleFragmentService.delete(fragment.getName());
-        });
+        ruleFragmentService.upsert(createSetGrokToFieldsFragment());
 
-        ruleFragmentService.save(setGrokTFieldsFragment);
         clusterConfigService.write(new MigrationCompleted());
         log.debug("set_grok_to_fields fragment was successfully added");
     }
@@ -99,12 +94,6 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
                         .build())
                 .build();
-    }
-
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
     }
 
     public record MigrationCompleted() {}

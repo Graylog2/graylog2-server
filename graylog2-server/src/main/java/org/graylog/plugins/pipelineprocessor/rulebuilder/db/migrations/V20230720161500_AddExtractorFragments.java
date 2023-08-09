@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
@@ -60,12 +59,12 @@ public class V20230720161500_AddExtractorFragments extends Migration {
 //            return;
         }
 
-        addFragment(createCopyFieldExtractor());
-        addFragment(createRegexExtractor());
-        addFragment(createRegexReplacementExtractor());
-        addFragment(createJsonExtractor());
-        addFragment(createSplitIndexExtractor());
-        addFragment(createLookupExtractor());
+        ruleFragmentService.upsert(createCopyFieldExtractor());
+        ruleFragmentService.upsert(createRegexExtractor());
+        ruleFragmentService.upsert(createRegexReplacementExtractor());
+        ruleFragmentService.upsert(createJsonExtractor());
+        ruleFragmentService.upsert(createSplitIndexExtractor());
+        ruleFragmentService.upsert(createLookupExtractor());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("extractor fragments were successfully added");
@@ -231,12 +230,6 @@ public class V20230720161500_AddExtractorFragments extends Migration {
                         .build())
                 .fragmentOutputVariable(resultvariable)
                 .build();
-    }
-
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
     }
 
     public record MigrationCompleted() {}

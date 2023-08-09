@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -60,8 +59,8 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
 //            return;
         }
 
-        addFragment(createSubstringFragment());
-        addFragment(createDateFragment());
+        ruleFragmentService.upsert(createSubstringFragment());
+        ruleFragmentService.upsert(createDateFragment());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("implicit to_string fragments were successfully added");
@@ -119,12 +118,6 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                         .build())
                 .fragmentOutputVariable("gl2_fragment_date_results")
                 .build();
-    }
-
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
     }
 
     public record MigrationCompleted() {}

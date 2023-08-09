@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
@@ -59,18 +58,12 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 //            return;
         }
 
-        addFragment(createHasFieldEqualsFragment());
-        addFragment(createHasFieldGreateOrEqualFragment());
-        addFragment(createHasFieldLessOrEqualFragment());
+        ruleFragmentService.upsert(createHasFieldEqualsFragment());
+        ruleFragmentService.upsert(createHasFieldGreateOrEqualFragment());
+        ruleFragmentService.upsert(createHasFieldLessOrEqualFragment());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("has_field_equals, has_field_greater_or_equal, has_field_less_or_equal fragments were successfully added");
-    }
-
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
     }
 
     private RuleFragment createHasFieldLessOrEqualFragment() {
