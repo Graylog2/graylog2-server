@@ -33,7 +33,7 @@ import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
-import CertificateRenewal from 'components/configurations/CertificateRenewal';
+import CertificateRenewal from 'components/configurations/CertificateRenewal/CertificateRenewal';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';

@@ -14,12 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import CertificateRenewalPolicyConfig from 'components/configurations/CertificateRenewalPolicyConfig';
-
-const CertificateRenewal = () => (
-  <CertificateRenewalPolicyConfig />
-);
+import CertificateRenewal from './CertificateRenewal';
 
 export default CertificateRenewal;
