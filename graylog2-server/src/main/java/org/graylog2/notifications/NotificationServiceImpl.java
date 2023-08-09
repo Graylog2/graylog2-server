@@ -127,7 +127,8 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         return isFirst(type, null);
     }
 
-    private boolean isFirst(Notification.Type type, @Nullable String key) {
+    @Override
+    public boolean isFirst(Notification.Type type, @Nullable String key) {
         final BasicDBObject query = typeAndKeyQuery(type, key);
         return findOne(NotificationImpl.class, query) == null;
     }
