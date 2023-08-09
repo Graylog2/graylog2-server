@@ -183,6 +183,18 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
+    @Override
+    public List<Pair<Node, X509Certificate>> findNodesAndCertificates() {
+        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        return activeDataNodes.values().stream()
+                .map(this::loadKeyStoreForNode)
+                .filter(Objects::nonNull)
+                .filter(p -> p.getRight() != null)
+                .map(this::getCertificateForNode)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
     protected List<Node> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
         final var nextRenewal = getNextRenewal();
         return findNodesAndCertificates().stream()
@@ -199,14 +211,15 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     private void notifyManualRenewalForNode(final List<Node> nodes) {
         final var key = String.join(",", nodes.stream().map(Node::getNodeId).toList());
-        if(notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, key)) {
-            Notification notification = notificationService.buildNow()
+        if(!notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {
+            notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL);
+        }
+        Notification notification = notificationService.buildNow()
                     .addType(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)
                     .addSeverity(Notification.Severity.URGENT)
                     .addKey(key)
                     .addDetail("nodes", key);
-            notificationService.publishIfFirst(notification);
-        }
+        notificationService.publishIfFirst(notification);
     }
 
     protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
