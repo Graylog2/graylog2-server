@@ -203,23 +203,24 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
     }
 
-    private void notifyManualRenewalForNode(final Node node) {
-        if(notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {
+    private void notifyManualRenewalForNode(final List<Node> nodes) {
+        final var key = String.join(",", nodes.stream().map(Node::getNodeId).toList());
+        if(notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, key)) {
             Notification notification = notificationService.buildNow()
                     .addType(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)
                     .addSeverity(Notification.Severity.URGENT)
-                    .addDetail("certificate", node.getNodeId());
+                    .addKey(key)
+                    .addDetail("nodes", key);
             notificationService.publishIfFirst(notification);
         }
     }
 
     protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
-        findNodesThatNeedCertificateRenewal(renewalPolicy).forEach(node -> {
-            if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
-                initiateRenewalForNode(node.getNodeId());
-            } else {
-                notifyManualRenewalForNode(node);
-            }
-        });
+        final var nodes = findNodesThatNeedCertificateRenewal(renewalPolicy);
+        if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
+            nodes.forEach(node -> initiateRenewalForNode(node.getNodeId()));
+        } else {
+            notifyManualRenewalForNode(nodes);
+        }
     }
 }
