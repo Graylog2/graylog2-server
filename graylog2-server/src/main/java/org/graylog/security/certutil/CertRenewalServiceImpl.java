@@ -184,14 +184,8 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     protected List<Node> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
-        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         final var nextRenewal = getNextRenewal();
-        return activeDataNodes.values().stream()
-                .map(this::loadKeyStoreForNode)
-                .filter(Objects::nonNull)
-                .filter(p -> p.getRight() != null)
-                .map(this::getCertificateForNode)
-                .filter(Objects::nonNull)
+        return findNodesAndCertificates().stream()
                 .filter(p -> needsRenewal(nextRenewal, renewalPolicy, p.getRight()))
                 .map(Pair::getLeft).toList();
     }
