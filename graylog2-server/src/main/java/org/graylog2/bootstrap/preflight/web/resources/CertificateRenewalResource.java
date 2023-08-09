@@ -59,7 +59,8 @@ public class CertificateRenewalResource implements PluginRestResource {
     @GET
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
-    public List<PreflightResource.DataNode> listDataNodesThatNeedCertRenewal() {
+    public List<PreflightResource.DataNode> listDataNodes() {
+        // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
         return nodeService.allActive(Node.Type.DATANODE).values().stream().map(n -> new PreflightResource.DataNode(n.getNodeId(),
                 n.getType(),
                 transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
