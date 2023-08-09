@@ -268,7 +268,7 @@ public class AggregationEventProcessor implements EventProcessor {
                     .addSeverity(Notification.Severity.NORMAL)
             );
 
-            LOG.info("Event limit reached at {} for '{}' event definition.", config.eventLimit(), eventDefinition.title());
+            LOG.debug("Event limit reached at {} for '{}' event definition.", config.eventLimit(), eventDefinition.title());
         }
     }
 
