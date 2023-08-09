@@ -33,7 +33,7 @@ import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
-import CertificateRenewalPolicyConfig from 'components/configurations/CertificateRenewalPolicyConfig';
+import CertificateRenewal from 'components/configurations/CertificateRenewal';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -145,7 +145,7 @@ const ConfigurationsPage = () => {
       name: 'Certificate Renewal',
       SectionComponent: ConfigurationSection,
       props: {
-        ConfigurationComponent: CertificateRenewalPolicyConfig,
+        ConfigurationComponent: CertificateRenewal,
         title: 'Certificate Renewal Policy',
       },
     },
