@@ -95,6 +95,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "node_name")
     private String datanodeNodeName = "node1";
 
+    /**
+     * Comma separated list of opensearch nodes that are eligible as manager nodes.
+     */
+    @Parameter(value = "cluster_initial_manager_nodes")
+    private String initialManagerNodes = "node1";
+
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
 
@@ -227,6 +233,10 @@ public class Configuration extends BaseConfiguration {
 
     public String getDatanodeNodeName() {
         return datanodeNodeName;
+    }
+
+    public String getInitialManagerNodes() {
+        return initialManagerNodes;
     }
 
     public int getOpensearchHttpPort() {

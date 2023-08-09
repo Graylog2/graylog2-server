@@ -16,7 +16,9 @@
  */
 package org.graylog.datanode.integration;
 
+import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
@@ -46,13 +48,19 @@ public class DatanodeClusterIT {
 
     @BeforeEach
     void setUp() {
-        primaryNode = new DatanodeContainerizedBackend().start();
+        primaryNode = new DatanodeContainerizedBackend("nodeA", datanodeContainer -> datanodeContainer
+                .withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", "nodeA")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "nodeA:9300")
+        ).start();
 
         secondaryNode = new DatanodeContainerizedBackend(
                 primaryNode.getNetwork(),
                 primaryNode.getMongodbContainer(),
-                "node2",
-                new DatanodeDockerHooksAdapter()
+                "nodeB",
+                datanodeContainer ->
+                        datanodeContainer
+                                .withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", "nodeA")
+                                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "nodeA:9300")
         );
         secondaryNode.start();
     }
@@ -72,6 +80,16 @@ public class DatanodeClusterIT {
                     .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                     .retryIfException(input -> input instanceof NoHttpResponseException)
                     .retryIfException(input -> input instanceof SocketException)
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            try {
+                                System.out.println(((ValidatableResponse)attempt.get()).extract().body().asString());
+                            } catch (ExecutionException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    })
                     .retryIfResult(input -> !input.extract().body().path("number_of_nodes").equals(2))
                     .build();
 

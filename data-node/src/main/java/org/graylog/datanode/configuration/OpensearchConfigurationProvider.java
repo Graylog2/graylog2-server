@@ -34,7 +34,6 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Singleton
@@ -116,7 +115,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         if (localConfiguration.isSingleNodeOnly()) {
             config.put("discovery.type", "single-node");
         } else {
-            config.put("cluster.initial_master_nodes", "node1");
+            config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
         }
 
         // listen on all interfaces
