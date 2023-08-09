@@ -165,17 +165,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
-    private void initiateAutomaticRenewalForNode(Node node) {
-        // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
-        var config = dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
-        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
-    }
-
-    private void initiateManualRenewalForNode(Node node) {
-        // TODO: send notification - don't send one out, if there is one still open
-        notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, node);
-    }
-
     private Pair<Node, KeyStore> loadKeyStoreForNode(Node node) {
         try {
             return Pair.of(node, keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret).orElse(null));
