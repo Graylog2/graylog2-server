@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix migration of default index rotation strategy on first server startup."
+
+pulls = ["16153"]
