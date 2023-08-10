@@ -113,3 +113,4 @@ export { default as URLWhiteListFormModal } from './URLWhiteListFormModal';
 export { default as URLWhiteListInput } from './URLWhiteListInput';
 export { default as Wizard } from './Wizard';
 export { default as SortIcon } from './SortIcon';
+export { default as Toggle } from './Toggle';

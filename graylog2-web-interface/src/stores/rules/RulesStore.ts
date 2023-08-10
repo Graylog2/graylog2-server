@@ -74,7 +74,7 @@ type RulesActionsType = {
   save: (rule: RuleType) => Promise<unknown>,
   update: (rule: RuleType) => Promise<unknown>,
   parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
-  simulate: (messageString: string, rule: RuleType, callback: () => void) => Promise<unknown>,
+  simulate: (messageString: string, rule: RuleType, callback: React.Dispatch<any> | (() => void)) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
@@ -258,7 +258,7 @@ export const RulesStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
       const promise = fetch('DELETE', url).then(() => {
-        this.rules = this.rules.filter((el) => el.id !== rule.id);
+        this.rules = this.rules?.filter((el) => el.id !== rule.id);
         this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
         UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
       }, failCallback);

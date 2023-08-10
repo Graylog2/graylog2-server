@@ -52,6 +52,7 @@ const RuleBuilderForm = ({ rule, onChange }: Props) => {
              label="Description"
              value={rule.description}
              onChange={handleDescriptionChange}
+             rows={3}
              help="Rule description (optional)." />
 
       <PipelinesUsingRule create={Boolean(rule)} />
