@@ -62,6 +62,7 @@ describe('HeatmapVisualization', () => {
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
         colorscale: 'Viridis',
         reversescale: false,
+        colorbar: { tickfont: { color: '#3e434c' } },
       },
     ];
 
@@ -107,6 +108,7 @@ describe('HeatmapVisualization', () => {
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
         colorscale: 'Viridis',
         reversescale: false,
+        colorbar: { tickfont: { color: '#3e434c' } },
       },
     ];
 
