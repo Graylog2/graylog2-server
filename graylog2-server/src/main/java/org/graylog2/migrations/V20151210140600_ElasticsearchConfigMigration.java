@@ -28,6 +28,7 @@ import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -113,6 +114,9 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
                     break;
                 case "count":
                     rotationStrategyClass = MessageCountRotationStrategy.class;
+                    break;
+                case "time-size-optimizing":
+                    rotationStrategyClass = TimeBasedSizeOptimizingStrategy.class;
                     break;
                 default:
                     LOG.warn("Unknown retention strategy \"{}\"", elasticsearchConfiguration.getRotationStrategy());
