@@ -58,6 +58,8 @@ import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_
 
 public class DatanodeSecuritySetupIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
+    public static final String OPENSEARCH_REST_USERNAME = "admin";
+    public static final String OPENSEARCH_REST_PASSWORD = "admin";
 
     @TempDir
     static Path tempDir;
@@ -91,8 +93,8 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", "password");
 
             // configure initial admin username and password for Opensearch REST
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin");
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin");
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", OPENSEARCH_REST_USERNAME);
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", OPENSEARCH_REST_PASSWORD);
 
             // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
             // to be able to reach opensearch from outside the container and docker network (true?)
@@ -114,7 +116,7 @@ public class DatanodeSecuritySetupIT {
 
         try {
             given()
-                .auth().basic("admin", "admin")
+                .auth().basic(OPENSEARCH_REST_USERNAME, OPENSEARCH_REST_PASSWORD)
                 .trustStore(trustStore)
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
