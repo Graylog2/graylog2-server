@@ -80,16 +80,6 @@ public class DatanodeClusterIT {
                     .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                     .retryIfException(input -> input instanceof NoHttpResponseException)
                     .retryIfException(input -> input instanceof SocketException)
-                    .withRetryListener(new RetryListener() {
-                        @Override
-                        public <V> void onRetry(Attempt<V> attempt) {
-                            try {
-                                System.out.println(((ValidatableResponse)attempt.get()).extract().body().asString());
-                            } catch (ExecutionException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    })
                     .retryIfResult(input -> !input.extract().body().path("number_of_nodes").equals(2))
                     .build();
 
