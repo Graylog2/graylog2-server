@@ -47,9 +47,9 @@ import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
+import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 
 import SavedSearchForm from './SavedSearchForm';
-import SavedSearchesModal from './SavedSearchesModal';
 
 const Container = styled(ButtonGroup)`
   display: flex;
