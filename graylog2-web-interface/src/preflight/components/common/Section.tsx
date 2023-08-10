@@ -49,6 +49,7 @@ type Props = {
   title: React.ReactNode,
   actions?: React.ReactNode,
   titleOrder?: TitleOrder
+  dataTestid?: string,
 };
 
 const SectionHeader = ({ title, actions, titleOrder }: Props) => (
@@ -79,8 +80,8 @@ Subsection.defaultProps = {
   titleOrder: undefined,
 };
 
-const Section = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => (
-  <SectionContainer component="section">
+const Section = ({ title, children, actions, titleOrder, dataTestid }: React.PropsWithChildren<Props>) => (
+  <SectionContainer component="section" data-testid={dataTestid}>
     <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
     {children}
   </SectionContainer>
