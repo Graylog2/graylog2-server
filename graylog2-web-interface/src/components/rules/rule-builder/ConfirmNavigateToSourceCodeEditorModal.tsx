@@ -38,6 +38,33 @@ const ConfirmNavigateToSourceCodeEditorModal = ({ show, onHide, onSave, rule }: 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
+  const handleClickSave = async () => {
+    sendTelemetry('click', {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'source-code-editor-modal',
+      app_action_value: 'save-button',
+    });
+
+    const autoSavedTitle = `auto-saved ${new Date().toISOString()}`;
+
+    await onSave({
+      ...rule,
+      title: rule.title || autoSavedTitle,
+    });
+
+    history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
+  };
+
+  const handleClickDontSave = () => {
+    sendTelemetry('click', {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'source-code-editor-modal',
+      app_action_value: 'dont-save-button',
+    });
+
+    history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
+  };
+
   return (
     <BootstrapModalWrapper showModal={show}
                            onHide={onHide}
@@ -51,34 +78,11 @@ const ConfirmNavigateToSourceCodeEditorModal = ({ show, onHide, onSave, rule }: 
       <Modal.Footer>
         <Button type="button"
                 bsStyle="success"
-                onClick={async () => {
-                  sendTelemetry('click', {
-                    app_pathname: getPathnameWithoutId(pathname),
-                    app_section: 'source-code-editor-modal',
-                    app_action_value: 'save-button',
-                  });
-
-                  const autoSavedTitle = `auto-saved ${new Date().toISOString()}`;
-
-                  await onSave({
-                    ...rule,
-                    title: rule.title || autoSavedTitle,
-                  });
-
-                  history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
-                }}>
+                onClick={handleClickSave}>
           Save
         </Button>
         <Button type="button"
-                onClick={() => {
-                  sendTelemetry('click', {
-                    app_pathname: getPathnameWithoutId(pathname),
-                    app_section: 'source-code-editor-modal',
-                    app_action_value: 'dont-save-button',
-                  });
-
-                  history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
-                }}>
+                onClick={handleClickDontSave}>
           Don&apos;t save
         </Button>
       </Modal.Footer>
