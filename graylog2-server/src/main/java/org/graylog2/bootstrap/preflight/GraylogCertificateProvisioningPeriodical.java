@@ -32,8 +32,8 @@ import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
-import org.graylog2.cluster.preflight.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
 
-    private final NodePreflightConfigService nodePreflightConfigService;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService nodeService;
 
     private final CaConfiguration configuration;
@@ -76,7 +76,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
     @Inject
-    public GraylogCertificateProvisioningPeriodical(final NodePreflightConfigService nodePreflightConfigService,
+    public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
                                                     final CsrMongoStorage csrStorage,
                                                     final CertChainMongoStorage certMongoStorage,
                                                     final CaService caService,
@@ -84,7 +84,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final NodeService nodeService,
                                                     final CsrSigner csrSigner,
                                                     final @Named("password_secret") String passwordSecret) {
-        this.nodePreflightConfigService = nodePreflightConfigService;
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
         this.caService = caService;
@@ -119,7 +119,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
 
         try {
             // only load nodes that are in a state that need sth done
-            final var nodes = nodePreflightConfigService.findAllNodesThatNeedAttention();
+            final var nodes = dataNodeProvisioningService.findAllNodesThatNeedAttention();
             if(!nodes.isEmpty()) {
 
                 final var password = configuration.configuredCaExists() ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
@@ -140,14 +140,14 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
                 nodes.stream()
-                        .filter(c -> NodePreflightConfig.State.CSR.equals(c.state()))
+                        .filter(c -> DataNodeProvisioningConfig.State.CSR.equals(c.state()))
                         .forEach(c -> {
                             try {
                                 var csr = csrStorage.readCsr(c.nodeId());
                                 if (csr.isEmpty()) {
                                     LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                    nodePreflightConfigService.save(c.toBuilder()
-                                            .state(NodePreflightConfig.State.ERROR)
+                                    dataNodeProvisioningService.save(c.toBuilder()
+                                            .state(DataNodeProvisioningConfig.State.ERROR)
                                             .errorMsg("Node in CSR state, but no CSR present")
                                             .build());
                                 } else {
@@ -158,16 +158,16 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                 }
                             } catch (Exception e) {
                                 LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                                nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                                dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
                             }
                         });
 
                 nodes.stream()
-                        .filter(c -> NodePreflightConfig.State.STORED.equals(c.state()))
+                        .filter(c -> DataNodeProvisioningConfig.State.STORED.equals(c.state()))
                         .forEach(c -> {
                             try {
                                 if (checkConnectivity(c.nodeId())) {
-                                    nodePreflightConfigService.save(c.toBuilder().state(NodePreflightConfig.State.CONNECTED).build());
+                                    dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
                                 }
                             } catch (Exception e) {
                                 LOG.warn("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage() + ", retrying", e);

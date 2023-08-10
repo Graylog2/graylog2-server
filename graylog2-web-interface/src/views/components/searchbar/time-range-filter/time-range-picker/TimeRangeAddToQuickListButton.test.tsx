@@ -51,7 +51,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
 
 describe('TimeRangeAddToQuickListButton', () => {
   const SUT = ({ timeRange }: { timeRange: TimeRange }) => (
-    <Formik initialValues={{ nextTimeRange: timeRange }} onSubmit={() => {}}>
+    <Formik initialValues={{ timeRangeTabs: { [timeRange.type]: timeRange }, activeTab: timeRange.type }} onSubmit={() => {}}>
       <Form>
         <TimeRangeAddToQuickListButton />
       </Form>

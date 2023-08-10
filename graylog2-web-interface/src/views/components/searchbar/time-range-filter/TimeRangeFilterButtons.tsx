@@ -29,7 +29,7 @@ type Props = {
   disabled?: boolean,
   hasErrorOnMount?: boolean,
   onPresetSelectOpen: () => void,
-  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
   toggleShow: () => void,
   showPresetDropdown?: boolean,
 };
