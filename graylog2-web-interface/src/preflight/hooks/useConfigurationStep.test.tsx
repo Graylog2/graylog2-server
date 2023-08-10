@@ -91,6 +91,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CA_CONFIGURATION.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -105,6 +106,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -143,6 +145,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -165,6 +168,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -203,6 +207,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
       isLoading: false,
+      errors: null,
     }));
   });
 });
