@@ -74,7 +74,7 @@ const HighlightingRules = () => {
       </SectionInfo>
       <SectionSubheadline>Active highlights <IconButton className="pull-right" name="plus" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} />}
-      <Container>
+      <Container $displayBorder={!!rulesWithId?.length}>
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
         <RuleContainer>Search terms</RuleContainer>
       </Container>

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { forwardRef, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
@@ -32,12 +32,16 @@ import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slic
 
 import ColorPreview from './ColorPreview';
 
-export const Container = styled.div`
+export const Container = styled.div<{ $displayBorder?: boolean }>(({ theme, $displayBorder = true }) => css`
   display: flex;
   padding-top: 5px;
   padding-bottom: 5px;
   word-break: break-word;
-`;
+  
+  &:not(:last-child) {
+    border-bottom: ${$displayBorder ? `1px solid ${theme.colors.global.background}` : 'none'};
+  }
+`);
 
 const RightCol = styled.div`
   flex: 1
