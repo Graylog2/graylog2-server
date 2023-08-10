@@ -15,6 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import toPairs from 'lodash/toPairs';
+import fromPairs from 'lodash/fromPairs';
+import orderBy from 'lodash/orderBy';
+import keyBy from 'lodash/keyBy';
 
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { AppDispatch } from 'stores/useAppDispatch';
@@ -28,6 +32,7 @@ import generateId from 'logic/generateId';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
+import type ViewStateType from 'views/logic/views/ViewState';
 
 export const updateWidgetPositions = (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -46,6 +51,39 @@ export const updateWidgetPosition = (id: string, newWidgetPosition: WidgetPositi
   return dispatch(updateWidgetPositions(newWidgetPositions));
 };
 
+const normalizeWidgetPositions = (widgetPositions: { [key: string]: WidgetPosition }, widgetById: {[name: string]: Widget}) => {
+  const filtratedOrderedWidgetPositions = orderBy(toPairs(widgetPositions), ['1.row', 'col'], ['asc', 'asc']).filter(([id]) => !!widgetById[id]);
+
+  let currentRow = 1;
+  let originalRow: number;
+  let currentBiggestHeight = 0;
+
+  const recalculatedPositions = filtratedOrderedWidgetPositions.map(([id, widgetPosition]) => {
+    if (widgetPosition.row !== originalRow) {
+      originalRow = widgetPosition.row;
+      currentRow += currentBiggestHeight;
+      currentBiggestHeight = widgetPosition.height;
+    }
+
+    currentBiggestHeight = Math.max(widgetPosition.height, currentBiggestHeight);
+
+    return [id, widgetPosition.toBuilder().row(currentRow).build()];
+  });
+
+  return fromPairs(recalculatedPositions);
+};
+
+export const normalizeViewState = (viewState: ViewStateType) => {
+  const { widgetPositions, widgets } = viewState;
+  const widgetById = keyBy(widgets.toArray(), 'id');
+  const normalizedWidgetPositions = normalizeWidgetPositions(widgetPositions, widgetById);
+
+  return viewState
+    .toBuilder()
+    .widgetPositions(normalizedWidgetPositions)
+    .build();
+};
+
 export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
   const activeViewState = selectActiveViewState(getState());
@@ -53,7 +91,9 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
     .widgets(newWidgets)
     .build();
 
-  return dispatch(updateViewState(activeQuery, newViewState));
+  const newViewStateNormalized = normalizeViewState(newViewState);
+
+  return dispatch(updateViewState(activeQuery, newViewStateNormalized));
 };
 
 export const addWidget = (widget: Widget, position?: WidgetPosition) => (dispatch: AppDispatch, getState: GetState) => {
