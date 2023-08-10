@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useContext, useState, useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 import chunk from 'lodash/chunk';
 
@@ -32,7 +32,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 
-const ColorHint = styled.div(({ color }) => `
+const ColorHint = styled.div(({ color }) => css`
   cursor: pointer;
   background-color: ${color} !important; /* Needed for report generation */
   -webkit-print-color-adjust: exact !important; /* Needed for report generation */

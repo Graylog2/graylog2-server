@@ -20,6 +20,7 @@ import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
+import { useTheme } from 'styled-components';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -43,7 +44,7 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visualizationConfig): ChartDefinition => {
+const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visualizationConfig, theme): ChartDefinition => {
   const xAxisTitle = config.rowPivots[idx].fields?.join(', ');
   const yAxisTitle = config.columnPivots[idx].fields?.join(', ');
   const zSeriesTitles = _generateSeriesTitles(config, y, x);
@@ -63,10 +64,13 @@ const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visual
     reversescale: reverseScale,
     zmin: zMin,
     zmax: zMax,
+    colorbar: {
+      tickfont: { color: theme.colors.global.textDefault },
+    },
   };
 };
 
-const _generateSeries = (visualizationConfig) => (type, name, x, y, z, idx, total, config) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
+const _generateSeries = (visualizationConfig, theme) => (type, name, x, y, z, idx, total, config) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig, theme);
 
 const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue = 'None') => {
   return z.map((series) => {
@@ -142,12 +146,13 @@ const _chartLayout = (heatmapData) => {
 const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
 
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+  const theme = useTheme();
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
   const heatmapData = useChartData(rows, {
     widgetConfig: config,
     chartType: 'heatmap',
-    generator: _generateSeries(visualizationConfig),
+    generator: _generateSeries(visualizationConfig, theme),
     seriesFormatter: _formatSeries(visualizationConfig),
     leafValueMatcher: _leafSourceMatcher,
   });
