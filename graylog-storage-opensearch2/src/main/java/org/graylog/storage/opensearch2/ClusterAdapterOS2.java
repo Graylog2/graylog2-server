@@ -174,9 +174,10 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
             final ClusterHealthResponse result = client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions));
             return result.getNumberOfDataNodes() > 0;
         } catch (OpenSearchException e) {
-//            if (LOG.isDebugEnabled()) {
+            LOG.error("Check for connectivity failed with exception '{}' - enable debug level for this class to see the stack trace.", e.getMessage());
+            if (LOG.isDebugEnabled()) {
                 LOG.error(e.getMessage(), e);
-//            }
+            }
             return false;
         }
     }
