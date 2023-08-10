@@ -19,10 +19,9 @@ package org.graylog.datanode.management;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
-import org.graylog2.cluster.preflight.NodePreflightStateChangeEvent;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +61,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     }
 
     @Subscribe
-    public void handlePreflightConfigEvent(NodePreflightStateChangeEvent event) {
+    public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
             case STORED -> startWithConfig();
         }
@@ -70,16 +69,16 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Override
     protected void startUp() {
-        try {
-            startWithConfig();
-        } catch (OpensearchConfigurationException e) {
-            LOG.warn("Failed to obtain opensearch configuration. Adapt your datanode configuration or use the preflight web interface", e);
-        }
+        startWithConfig();
     }
 
     private void startWithConfig() {
         final OpensearchConfiguration config = configurationProvider.get();
-        this.process.startWithConfig(config);
+        if (config.securityConfigured()) {
+            this.process.startWithConfig(config);
+        } else {
+            LOG.warn("Opensearch process not started. Please provide proper security configuration, using certificate provisioning in the pre-flight mode, by manual certificate creation or by disabling security in the config.");
+        }
         eventBus.post(new OpensearchConfigurationChangeEvent(config));
     }
 
