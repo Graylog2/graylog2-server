@@ -17,8 +17,13 @@
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 
-import { Button } from 'components/bootstrap';
-import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult, IfPermitted } from 'components/common';
+import {
+  PaginatedList,
+  SearchForm,
+  Spinner,
+  NoEntitiesExist,
+  NoSearchResult,
+} from 'components/common';
 import type View from 'views/logic/views/View';
 import QueryHelper from 'components/common/QueryHelper';
 import EntityDataTable from 'components/common/EntityDataTable';
@@ -28,21 +33,10 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useColumnRenderers from 'views/components/searchbar/saved-search/useColumnRenderes';
 
-import BulkActions from './BulkActions';
-import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from './Constants';
+import SearchActions from './SearchActions';
 
-const onDelete = (e, savedSearch: View, deleteSavedSearch: (search: View) => Promise<View>, activeSavedSearchId: string, refetch: () => void) => {
-  e.stopPropagation();
-
-  // eslint-disable-next-line no-alert
-  if (window.confirm(`You are about to delete saved search: "${savedSearch.title}". Are you sure?`)) {
-    deleteSavedSearch(savedSearch).then(() => {
-      if (savedSearch.id !== activeSavedSearchId) {
-        refetch();
-      }
-    });
-  }
-};
+import BulkActions from '../BulkActions';
+import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from '../Constants';
 
 const renderBulkActions = (
   selectedSavedSearchIds: Array<string>,
@@ -58,7 +52,7 @@ type Props = {
   onLoadSavedSearch: () => void,
 };
 
-const SavedSearchesList = ({
+const SavedSearchesOverview = ({
   activeSavedSearchId,
   deleteSavedSearch,
   onLoadSavedSearch,
@@ -115,16 +109,10 @@ const SavedSearchesList = ({
   }, [updateTableLayout]);
 
   const renderSavedSearchActions = useCallback((search: View) => (
-    <IfPermitted permissions={[`view:edit:${search.id}`, 'view:edit']} anyPermissions>
-      <Button onClick={(e) => onDelete(e, search, deleteSavedSearch, activeSavedSearchId, refetch)}
-              role="button"
-              bsSize="xsmall"
-              bsStyle="danger"
-              title={`Delete search ${search.title}`}
-              tabIndex={0}>
-        Delete
-      </Button>
-    </IfPermitted>
+    <SearchActions search={search}
+                   onDeleteSavedSearch={deleteSavedSearch}
+                   refetch={refetch}
+                   activeSavedSearchId={activeSavedSearchId} />
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
   const customColumnRenderers = useColumnRenderers(onLoadSavedSearch, searchParams);
@@ -169,7 +157,7 @@ const SavedSearchesList = ({
                                activeSort={layoutConfig.sort}
                                pageSize={searchParams.pageSize}
                                onPageSizeChange={onPageSizeChange}
-                               actionsCellWidth={60}
+                               actionsCellWidth={120}
                                rowActions={renderSavedSearchActions}
                                columnRenderers={customColumnRenderers}
                                columnDefinitions={attributes} />
@@ -178,4 +166,4 @@ const SavedSearchesList = ({
   );
 };
 
-export default SavedSearchesList;
+export default SavedSearchesOverview;
