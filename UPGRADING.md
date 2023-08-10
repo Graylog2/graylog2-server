@@ -129,13 +129,17 @@ have been un-deprecated, as Graylog intends to maintain them going forward.
 
 ## REST API Endpoint Changes
 
-| Endpoint                                                                                                  | Description                                                                                                                                      |
-|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET /system/configuration`                                                                               | Key `gc_warning_threshold` has been removed from response object.                                                                                |                                                                                                
+| Endpoint                                                                                                   | Description                                                                                                                                      |
+|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /system/configuration`                                                                                | Key `gc_warning_threshold` has been removed from response object.                                                                                |                                                                                                
 | `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute.                                                                                                    |
-| `GET /streams/paginated`                                                                                  | Key `streams` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes. |
-| `GET /dashboards`                                                                                         | Key `views` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes.   |
-| `GET /search/saved`                                                                                       | Key `views` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes.   |
+| `GET /streams/paginated`                                                                                   | Key `streams` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes. |
+| `GET /dashboards`                                                                                          | Key `views` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes.   |
+| `GET /search/saved`                                                                                        | Key `views` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes.   |
+| `GET /events/definitions`                                                                                  | Endpoint has been deprecated in favor of `/events/definitions/paginated` (see below)                                                             |
+| `GET /events/definitions/paginated`                                                                        | Returns a paginated list of event definitions with request parameters and response format suited for the new entity data table                   |
+| `GET /events/notifications`                                                                                | Endpoint has been deprecated in favor of `/events/notifications/paginated` (see below)                                                           |
+| `GET /events/notifications/paginated`                                                                      | Returns a paginated list of event notifications with request parameters and response format suited for the new entity data table                 |
 
 ### Change to the format of `Input` entities in API responses
 
