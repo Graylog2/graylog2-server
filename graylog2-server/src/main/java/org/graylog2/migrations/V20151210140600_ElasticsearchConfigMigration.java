@@ -120,7 +120,7 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
                     break;
                 default:
                     LOG.warn("Unknown retention strategy \"{}\"", elasticsearchConfiguration.getRotationStrategy());
-                    rotationStrategyClass = MessageCountRotationStrategy.class;
+                    rotationStrategyClass = TimeBasedSizeOptimizingStrategy.class;
             }
 
             final Class<? extends RetentionStrategy> retentionStrategyClass;
