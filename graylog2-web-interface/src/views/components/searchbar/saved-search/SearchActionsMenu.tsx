@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef, useMemo } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
@@ -47,6 +47,7 @@ import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
+import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -69,7 +70,6 @@ const _extractErrorMessage = (error: FetchError) => {
 };
 
 const SearchActionsMenu = () => {
-  const theme = useTheme();
   const dirty = useIsDirty();
   const view = useView();
   const isNew = useIsNew();
@@ -88,7 +88,6 @@ const SearchActionsMenu = () => {
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
 
   const loaded = isNew === false;
-  const savedSearchColor = dirty ? theme.colors.variant.dark.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
@@ -164,9 +163,9 @@ const SearchActionsMenu = () => {
 
   return (
     <Container aria-label="Search Meta Buttons">
-      <Button title={title} ref={formTarget} onClick={toggleFormModal}>
-        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
-      </Button>
+      <SaveViewButton title={title}
+                      ref={formTarget}
+                      onClick={toggleFormModal} />
       {showForm && (
         <SavedSearchForm target={formTarget.current}
                          saveSearch={saveSearch}

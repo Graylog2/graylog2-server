@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Display indicator when dashboard has unsaved changes."
+
+issues = ["10682"]
+pulls = ["16122"]
