@@ -123,6 +123,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
+                .withEnv("action.auto_create_index", "false")
                 .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
