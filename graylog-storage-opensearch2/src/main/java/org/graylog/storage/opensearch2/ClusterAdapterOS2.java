@@ -174,9 +174,9 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
             final ClusterHealthResponse result = client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions));
             return result.getNumberOfDataNodes() > 0;
         } catch (OpenSearchException e) {
-            if (LOG.isDebugEnabled()) {
+//            if (LOG.isDebugEnabled()) {
                 LOG.error(e.getMessage(), e);
-            }
+//            }
             return false;
         }
     }
