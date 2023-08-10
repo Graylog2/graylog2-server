@@ -89,7 +89,7 @@ public class DatanodeContainerizedBackend {
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_TRANSPORT_PORT", "9300")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "node1:9300")
 
-              //  .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
 
                 .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
                 .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
