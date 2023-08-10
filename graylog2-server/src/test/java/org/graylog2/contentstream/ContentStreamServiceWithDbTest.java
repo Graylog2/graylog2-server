@@ -36,7 +36,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 public class ContentStreamServiceWithDbTest {
     @Rule
@@ -63,8 +63,8 @@ public class ContentStreamServiceWithDbTest {
                 new DBContentStreamUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
                 eventBus
         );
-        when(user1.getId()).thenReturn("id1");
-        when(user2.getId()).thenReturn("id2");
+        lenient().when(user1.getId()).thenReturn("id1");
+        lenient().when(user2.getId()).thenReturn("id2");
     }
 
     @Test
@@ -78,20 +78,22 @@ public class ContentStreamServiceWithDbTest {
 
     @Test
     public void test_save_content_stream_user_settings() {
-        saveUserSettings(user2, false, ImmutableList.of());
+        saveUserSettings(user2, false, true, ImmutableList.of());
         ContentStreamSettings contentStreamSettings = contentStreamService.getUserSettings(user2);
 
         assertThat(contentStreamSettings.contentStreamEnabled()).isFalse();
+        assertThat(contentStreamSettings.releasesEnabled()).isTrue();
         assertThat(contentStreamSettings.topics()).isEmpty();
 
-        saveUserSettings(user2, false, ImmutableList.of("1", "2"));
+        saveUserSettings(user2, false, false, ImmutableList.of("1", "2"));
         contentStreamSettings = contentStreamService.getUserSettings(user2);
         assertThat(contentStreamSettings.topics()).containsExactly("1", "2");
     }
 
-    private void saveUserSettings(User user, boolean isEnabled, List<String> topicList) {
+    private void saveUserSettings(User user, boolean isContentEnabled, boolean isReleaseEnabled, List<String> topicList) {
         ContentStreamSettings userSettings = ContentStreamSettings.builder()
-                .contentStreamEnabled(isEnabled)
+                .contentStreamEnabled(isContentEnabled)
+                .releasesEnabled(isReleaseEnabled)
                 .topics(topicList)
                 .build();
         contentStreamService.saveUserSettings(user, userSettings);
