@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
@@ -28,8 +29,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
@@ -57,18 +58,12 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 //            return;
         }
 
-        addFragment(createHasFieldEqualsFragment());
-        addFragment(createHasFieldGreateOrEqualFragment());
-        addFragment(createHasFieldLessOrEqualFragment());
+        ruleFragmentService.upsert(createHasFieldEqualsFragment());
+        ruleFragmentService.upsert(createHasFieldGreateOrEqualFragment());
+        ruleFragmentService.upsert(createHasFieldLessOrEqualFragment());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("has_field_equals, has_field_greater_or_equal, has_field_less_or_equal fragments were successfully added");
-    }
-
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
     }
 
     private RuleFragment createHasFieldLessOrEqualFragment() {
@@ -83,7 +78,9 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
                         .returnType(Boolean.class)
                         .description("Checks if the message has a field and if this field's numeric value is less than or equal to the given fieldValue")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Field <=")
                         .ruleBuilderTitle("Field '${field}' less than or equal '${fieldValue}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.NUMBER)
                         .build())
                 .isCondition()
                 .build();
@@ -101,7 +98,9 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
                         .returnType(Boolean.class)
                         .description("Checks if the message has a field and if this field's numeric value is greater than or equal to the given fieldValue")
                         .ruleBuilderEnabled()
+                        .ruleBuilderName("Field >=")
                         .ruleBuilderTitle("Field '${field}' greater than or equal '${fieldValue}'")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.NUMBER)
                         .build())
                 .isCondition()
                 .build();
@@ -109,17 +108,28 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 
     private RuleFragment createHasFieldEqualsFragment() {
         return RuleFragment.builder()
-                .fragment("( has_field(${field}) && to_string($message.${field}) == ${fieldValue} )")
+                .fragment("""
+                        ( has_field(${field}) &&
+                        <#if caseInsensitive!false>
+                        lower(to_string($message.${field})) == lower(${fieldValue})
+                        <#else>
+                        to_string($message.${field}) == ${fieldValue}
+                        </#if>
+                        )
+                        """)
                 .descriptor(FunctionDescriptor.builder()
                         .name("has_field_equals")
                         .params(ImmutableList.of(
                                 string("field").description("Message field to check against").build(),
-                                string("fieldValue").description("Field value to check for").build()
+                                string("fieldValue").description("Field value to check for").build(),
+                                bool("caseInsensitive").optional().description("Ignore case").build()
                         ))
                         .returnType(Boolean.class)
                         .description("Checks if the message has a field and if this field's string value is equal to the given fieldValue")
                         .ruleBuilderEnabled()
-                        .ruleBuilderTitle("Field '${field}' equals '${fieldValue}'")
+                        .ruleBuilderName("Field equals")
+                        .ruleBuilderTitle("Field '${field}' equals '${fieldValue}' <#if caseInsensitive??>(case insensitive: ${caseInsensitive})</#if>")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                         .build())
                 .isCondition()
                 .build();

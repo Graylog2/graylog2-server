@@ -22,7 +22,7 @@ Immutable.Map {
   "foo": {
     "col": 1,
     "height": 8,
-    "row": 2,
+    "row": 6,
     "width": 3,
   },
 }

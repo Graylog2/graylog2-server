@@ -44,12 +44,15 @@ public class DatanodeContainerizedBackend {
         this(new DatanodeDockerHooksAdapter());
     }
 
-
     public DatanodeContainerizedBackend(DatanodeDockerHooks hooks) {
+        this("node1", hooks);
+    }
+
+    public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
         this.network = Network.newNetwork();
         this.mongodbContainer = createMongodbContainer();
         this.datanodeContainer = createDatanodeContainer(
-                "node1",
+                nodeName,
                 hooks, createDockerImageFile(getOpensearchVersion()),
                 getDatanodeVersion());
     }

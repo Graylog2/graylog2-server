@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useContext, useState, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 import chunk from 'lodash/chunk';
 
@@ -35,7 +35,7 @@ import type { ChartDefinition } from 'views/components/visualizations/ChartData'
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 
-const ColorHint = styled.div(({ color }) => `
+const ColorHint = styled.div(({ color }) => css`
   cursor: pointer;
   background-color: ${color} !important; /* Needed for report generation */
   -webkit-print-color-adjust: exact !important; /* Needed for report generation */

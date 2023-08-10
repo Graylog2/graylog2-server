@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -59,8 +59,8 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
 //            return;
         }
 
-        addFragment(createSubstringFragment());
-        addFragment(createDateFragment());
+        ruleFragmentService.upsert(createSubstringFragment());
+        ruleFragmentService.upsert(createDateFragment());
 
         clusterConfigService.write(new MigrationCompleted());
         log.debug("implicit to_string fragments were successfully added");
@@ -83,8 +83,10 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                         ))
                         .returnType(String.class)
                         .description("Get substring of value")
-                        .ruleBuilderEnabled()
+                        .ruleBuilderEnabled(false)
+                        .ruleBuilderName("Substring")
                         .ruleBuilderTitle("Get substring from '${start}' to '${end!\"end\"}' of value")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                         .build())
                 .fragmentOutputVariable("gl2_fragment_substring_results")
                 .build();
@@ -97,7 +99,7 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                           value: to_string(${value}),
                           pattern: ${pattern}<#if locale??>,
                           locale: ${locale}</#if><#if timezone??>,
-                          locale: ${timezone}</#if>
+                          timezone: ${timezone}</#if>
                         );""")
                 .descriptor(FunctionDescriptor.builder()
                         .name("get_date")
@@ -109,17 +111,13 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                         ))
                         .returnType(DateTime.class)
                         .description("Parses a value using the given date format")
-                        .ruleBuilderEnabled()
+                        .ruleBuilderEnabled(false)
+                        .ruleBuilderName("Parse date")
                         .ruleBuilderTitle("Parse date from value")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)
                         .build())
                 .fragmentOutputVariable("gl2_fragment_date_results")
                 .build();
-    }
-
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
     }
 
     public record MigrationCompleted() {}

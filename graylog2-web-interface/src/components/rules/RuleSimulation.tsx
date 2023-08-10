@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import { Button, ControlLabel, FormGroup, Input } from 'components/bootstrap';
@@ -25,19 +25,19 @@ import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 
-import { PipelineRulesContext } from './RuleContext';
+import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
 
-const RuleSimulationFormGroup = styled(FormGroup)`
-  margin-bottom: 40px;
-`;
+const ResetButton = styled(Button)(({ theme }) => css`
+  margin-left: ${theme.spacings.xs};
+`);
 
-const ResetButton = styled(Button)`
-  margin-left: 8px;
-`;
+const MessageShowContainer = styled.div(({ theme }) => css`
+  padding: ${theme.spacings.md};
+`);
 
-const MessageShowContainer = styled.div`
-  padding: 16px;
+const ActionOutputIndex = styled.b`
+  color: #aaa;
 `;
 
 type Props = {
@@ -47,26 +47,25 @@ type Props = {
 const RuleSimulation = ({ rule: currentRule }: Props) => {
   const {
     rule,
-    ruleSource,
     simulateRule,
     rawMessageToSimulate,
     setRawMessageToSimulate,
     ruleSimulationResult,
     setRuleSimulationResult,
-    startRuleSimulation,
     setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
+
+  const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {}).sort();
+  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort();
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => () => {
-    setRawMessageToSimulate('');
     setRuleSimulationResult(null);
     setStartRuleSimulation(false);
   }, [setRawMessageToSimulate, setRuleSimulationResult, setStartRuleSimulation]);
 
-  const disableSimulation = !rawMessageToSimulate || (!ruleSource && !currentRule?.rule_builder?.conditions?.length && !currentRule?.rule_builder?.actions?.length);
   const is_rule_builder = Boolean(currentRule?.rule_builder);
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,59 +100,62 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setStartRuleSimulation(false);
   };
 
-  const handleStartRuleSimulation = () => {
-    sendTelemetry('click', {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-simulation',
-      app_action_value: 'start-rule-simulation-button',
-      event_details: { is_rule_builder },
-    });
-
-    setStartRuleSimulation(true);
-  };
-
   return (
-    <RuleSimulationFormGroup>
+    <FormGroup>
       <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
       <div>
-        {!startRuleSimulation && (
-          <Button bsStyle="info"
-                  bsSize="xsmall"
-                  onClick={handleStartRuleSimulation}>
-            Start rule simulation
-          </Button>
-        )}
-        {startRuleSimulation && (
+        <Input id="message"
+               type="textarea"
+               placeholder={DEFAULT_SIMULATOR_JSON_MESSAGE}
+               value={rawMessageToSimulate}
+               onChange={handleRawMessageChange}
+               title="Message string or JSON"
+               help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
+               rows={3} />
+        <Button bsStyle="info"
+                bsSize="xsmall"
+                disabled={!rawMessageToSimulate}
+                onClick={handleRunRuleSimulation}>
+          Run rule simulation
+        </Button>
+        <ResetButton bsStyle="default"
+                     bsSize="xsmall"
+                     onClick={handleResetRuleSimulation}>
+          Reset
+        </ResetButton>
+        {ruleSimulationResult && (
           <>
-            <Input id="message"
-                   type="textarea"
-                   // eslint-disable-next-line quotes
-                   placeholder={`{\n    "message": "test"\n}`}
-                   value={rawMessageToSimulate}
-                   onChange={handleRawMessageChange}
-                   title="Message string or JSON"
-                   help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
-                   rows={5} />
-            <Button bsStyle="info"
-                    bsSize="xsmall"
-                    disabled={disableSimulation}
-                    onClick={handleRunRuleSimulation}>
-              Run rule simulation
-            </Button>
-            <ResetButton bsStyle="default"
-                         bsSize="xsmall"
-                         onClick={handleResetRuleSimulation}>
-              Reset
-            </ResetButton>
-            {ruleSimulationResult && (
-              <MessageShowContainer>
-                <MessageShow message={ruleSimulationResult} />
-              </MessageShowContainer>
+            <MessageShowContainer>
+              <MessageShow message={ruleSimulationResult} />
+            </MessageShowContainer>
+            {is_rule_builder && (
+              <>
+                {conditionsOutputKeys.length > 0 && (
+                  <div data-testid="conditions-output">
+                    <label htmlFor="simulation_conditions_output">Conditions Output</label>
+                    {conditionsOutputKeys.map((conditionsOutputKey) => (
+                      <div key={conditionsOutputKey}>
+                        <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {actionsOutputKeys.length > 0 && (
+                  <div data-testid="actions-output">
+                    <label htmlFor="simulation_actions_output">Actions Output</label>
+                    {actionsOutputKeys.map((actionsOutputKey) => (
+                      <div key={actionsOutputKey}>
+                        <ActionOutputIndex>{actionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
       </div>
-    </RuleSimulationFormGroup>
+    </FormGroup>
   );
 };
 
