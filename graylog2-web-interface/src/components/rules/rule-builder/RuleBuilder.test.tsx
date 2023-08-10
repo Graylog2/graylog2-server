@@ -28,6 +28,10 @@ import { PipelineRulesContext } from '../RuleContext';
 jest.mock('hooks/useRuleBuilder');
 
 describe('RuleBuilder', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
   it('should save Title and Description', () => {
     const createRule = jest.fn();
     const title = 'title';
@@ -125,5 +129,78 @@ describe('RuleBuilder', () => {
 
     expect(createRuleFromCodeButton).toBeInTheDocument();
     expect(copyCloseButton).toBeInTheDocument();
+  });
+
+  it('should show simulator', () => {
+    const title = 'title';
+    const description = 'description';
+    const rule_builder = { actions: [], conditions: [] };
+
+    asMock(useRuleBuilder).mockReturnValue({
+      rule: { title, description, rule_builder },
+    } as any);
+
+    const { getByTitle, getByText, getByRole } = renderWithDataRouter((
+      <PipelineRulesContext.Provider value={{
+        simulateRule: () => {},
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
+      }}>
+        <RuleBuilder />
+      </PipelineRulesContext.Provider>
+    ));
+
+    const showSimulatorSwitch = getByTitle('Show Simulator');
+    userEvent.click(showSimulatorSwitch);
+
+    const ruleSimulationLabel = getByText('Rule Simulation');
+    const runRuleSimulation = getByRole('button', { name: 'Run rule simulation' });
+
+    expect(ruleSimulationLabel).toBeInTheDocument();
+    expect(runRuleSimulation).toBeInTheDocument();
+  });
+
+  it('should show simulator with conditions and actions output', () => {
+    const title = 'title';
+    const description = 'description';
+    const rule_builder = { actions: [], conditions: [] };
+    const conditionOutput1 = 'condition_output_1';
+    const actionOutput1 = 'action_output_1';
+    const actionOutput2 = 'action_output_2';
+
+    asMock(useRuleBuilder).mockReturnValue({
+      rule: { title, description, rule_builder },
+    } as any);
+
+    const { getByTitle, getByText, getByTestId } = renderWithDataRouter((
+      <PipelineRulesContext.Provider value={{
+        ruleSimulationResult: {
+          fields: { message: 'test' },
+          simulator_condition_variables: { 1: conditionOutput1 },
+          simulator_action_variables: { 1: actionOutput1, 2: actionOutput2 },
+        },
+        simulateRule: () => {},
+        setRawMessageToSimulate: () => {},
+        setRuleSimulationResult: () => {},
+        setStartRuleSimulation: () => {},
+      }}>
+        <RuleBuilder />
+      </PipelineRulesContext.Provider>
+    ));
+
+    const showSimulatorSwitch = getByTitle('Show Simulator');
+    userEvent.click(showSimulatorSwitch);
+
+    const conditionOutputs = getByText('Conditions Output');
+    const actionOutputs = getByText('Actions Output');
+    const conditionOutputContainer = getByTestId('conditions-output');
+    const actionOutputContainer = getByTestId('actions-output');
+
+    expect(conditionOutputs).toBeInTheDocument();
+    expect(actionOutputs).toBeInTheDocument();
+    expect(conditionOutputContainer).toContainHTML(conditionOutput1);
+    expect(actionOutputContainer).toContainHTML(actionOutput1);
+    expect(actionOutputContainer).toContainHTML(actionOutput2);
   });
 });
