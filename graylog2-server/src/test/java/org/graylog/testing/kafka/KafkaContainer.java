@@ -48,8 +48,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 public class KafkaContainer extends GenericContainer<KafkaContainer> {
     public enum Version {
-        V34("3.4");
-
+        V34("3.4.1-debian-11-r60");
         private final String version;
 
         Version(String version) {
