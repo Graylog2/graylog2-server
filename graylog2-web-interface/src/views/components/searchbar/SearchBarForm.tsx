@@ -21,7 +21,8 @@ import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
 
-import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
+import { onInitializingTimerange } from 'views/components/TimerangeForForm';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 import type { SearchBarFormValues } from 'views/Constants';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
@@ -43,7 +44,7 @@ type Props = {
 
 const _isFunction = (children: Props['children']): children is FormRenderer => isFunction(children);
 
-export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues, userTimezone: string) => ({ timerange: onSubmittingTimerange(timerange, userTimezone), ...rest });
+export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues, userTimezone: string) => ({ timerange: normalizeFromSearchBarForBackend(timerange, userTimezone), ...rest });
 
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
   const [enableReinitialize, setEnableReinitialize] = useState(true);

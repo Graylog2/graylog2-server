@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 
 import { Modal, Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
-import SavedSearchesList from 'views/components/searchbar/saved-search/SavedSearchesList';
+
+import SavedSearchesOverview from './SavedSearchesOverview';
 
 type Props = {
   toggleModal: () => void,
@@ -38,10 +39,9 @@ const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchI
       <Modal.Title>Saved Searches</Modal.Title>
     </Modal.Header>
     <Modal.Body>
-      <SavedSearchesList deleteSavedSearch={deleteSavedSearch}
-                         activeSavedSearchId={activeSavedSearchId}
-                         onLoadSavedSearch={toggleModal} />
-
+      <SavedSearchesOverview deleteSavedSearch={deleteSavedSearch}
+                             activeSavedSearchId={activeSavedSearchId}
+                             onLoadSavedSearch={toggleModal} />
     </Modal.Body>
     <Modal.Footer>
       <Button onClick={toggleModal}>Cancel</Button>

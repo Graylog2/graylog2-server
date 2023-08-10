@@ -21,7 +21,6 @@ import { useFormikContext } from 'formik';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import RangePresetDropdown from './TimeRangePresetDropdown';
 import TimeRangePickerButton from './time-range-picker/TimeRangePickerButton';
@@ -30,7 +29,7 @@ type Props = {
   disabled?: boolean,
   hasErrorOnMount?: boolean,
   onPresetSelectOpen: () => void,
-  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
   toggleShow: () => void,
   showPresetDropdown?: boolean,
 };
@@ -53,8 +52,6 @@ const TimeRangeFilterButtons = ({
   toggleShow,
 }: Props) => {
   const { submitForm, isValid } = useFormikContext();
-  const { config } = useSearchConfiguration();
-  const availableOptions = config?.quick_access_timerange_presets;
 
   const _onClick = (e) => {
     e.currentTarget.blur();
@@ -86,8 +83,7 @@ const TimeRangeFilterButtons = ({
                                    onChange={selectRelativeTimeRangePreset}
                                    onToggle={_onPresetSelectToggle}
                                    header="Select time range"
-                                   bsSize={null}
-                                   availableOptions={availableOptions} />
+                                   bsSize={null} />
       )}
     </StyledButtonGroup>
   );

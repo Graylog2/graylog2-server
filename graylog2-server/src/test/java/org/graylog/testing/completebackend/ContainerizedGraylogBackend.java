@@ -64,12 +64,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                         int[] extraPorts, List<URL> mongoDBFixtures,
                         PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
                         List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
-
         final var network = Network.newNetwork();
         final var builder = SearchServerInstanceProvider.getBuilderFor(version).orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
 
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
-        if(withMailServerEnabled) {
+        if (withMailServerEnabled) {
             this.emailServerInstance = MailServerContainer.createStarted(network);
         }
         mongoDB.dropDatabase();
@@ -77,27 +76,33 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
         SearchServerInstance searchServer = builder.network(network).featureFlags(enabledFeatureFlags).build();
 
-        if(preImportLicense) {
+        if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
-        NodeInstance node = NodeInstance.createStarted(
-                network,
-                MongoDBInstance.internalUri(),
-                searchServer.internalUri(),
-                searchServer.version(),
-                extraPorts,
-                pluginJarsProvider, mavenProjectDirProvider,
-                enabledFeatureFlags);
-        this.network = network;
-        this.searchServer = searchServer;
-        this.mongodb = mongoDB;
-        this.node = node;
+        try {
+            NodeInstance node = NodeInstance.createStarted(
+                    network,
+                    MongoDBInstance.internalUri(),
+                    searchServer.internalUri(),
+                    searchServer.version(),
+                    extraPorts,
+                    pluginJarsProvider, mavenProjectDirProvider,
+                    enabledFeatureFlags);
+            this.network = network;
+            this.searchServer = searchServer;
+            this.mongodb = mongoDB;
+            this.node = node;
 
-        // ensure that all containers and networks will be removed after all tests finish
-        // We can't close the resources in an afterAll callback, as the instances are cached and reused
-        // so we need a solution that will be triggered only once after all test classes
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+            // ensure that all containers and networks will be removed after all tests finish
+            // We can't close the resources in an afterAll callback, as the instances are cached and reused
+            // so we need a solution that will be triggered only once after all test classes
+            Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        } catch (Exception ex) {
+            // if the graylog Node is not coming up (because OpenSearch hangs?) it fails here. So in this case, we also log the search server logs
+            LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
+            throw ex;
+        }
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {

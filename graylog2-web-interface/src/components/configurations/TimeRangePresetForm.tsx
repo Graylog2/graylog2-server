@@ -30,7 +30,7 @@ import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import generateId from 'logic/generateId';
 
-export type QuickAccessTimeRange = {
+export type TimeRangePreset = {
   timerange: TimeRange,
   description: string,
   id: string,
@@ -61,21 +61,19 @@ type ItemProps = {
   id: string,
   timerange: TimeRange,
   description: string,
-  onChange: (timerange: QuickAccessTimeRange, idx: number) => void,
+  onChange: (timerange: TimeRangePreset, idx: number) => void,
   onRemove: (idx: number) => void,
   limitDuration: number,
 }
 
 const contextSettings = {
   showDropdownButton: false,
-  showRelativePresetsButton: false,
-  showAbsolutePresetsButton: false,
-  showKeywordPresetsButton: false,
+  showPresetsButton: false,
   showAddToQuickListButton: false,
   ignoreLimitDurationInTimeRangeDropdown: true,
 };
 
-const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChange, onRemove, limitDuration }: ItemProps) => {
+const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, onRemove, limitDuration }: ItemProps) => {
   const handleOnChangeRange = useCallback((newTimerange: TimeRange) => {
     onChange({ timerange: newTimerange, description, id }, idx);
   }, [description, id, idx, onChange]);
@@ -111,11 +109,11 @@ const QuickAccessTimeRangeFormItem = ({ idx, id, timerange, description, onChang
   );
 };
 
-const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
-  options: Immutable.List<QuickAccessTimeRange>,
-  onUpdate: Dispatch<Immutable.List<QuickAccessTimeRange>>
+const TimeRangePresetForm = ({ options, onUpdate }: {
+  options: Immutable.List<TimeRangePreset>,
+  onUpdate: Dispatch<Immutable.List<TimeRangePreset>>
 }) => {
-  const onChange = useCallback((newPreset: QuickAccessTimeRange, idx: number) => {
+  const onChange = useCallback((newPreset: TimeRangePreset, idx: number) => {
     const newState = options.set(idx, newPreset);
     onUpdate(newState);
   }, [onUpdate, options]);
@@ -128,7 +126,7 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
     onUpdate(newState);
   }, [onUpdate, options]);
 
-  const onMoveItem = useCallback((items: Array<QuickAccessTimeRange>) => {
+  const onMoveItem = useCallback((items: Array<TimeRangePreset>) => {
     onUpdate(Immutable.List(items));
   }, [onUpdate]);
 
@@ -141,20 +139,20 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
   }, [onUpdate, options]);
 
   const customContentRender = useCallback(({ item: { id, description, timerange }, index }) => (
-    <QuickAccessTimeRangeFormItem id={id}
-                                  onRemove={onRemove}
-                                  idx={index}
-                                  onChange={onChange}
-                                  timerange={timerange}
-                                  description={description}
-                                  limitDuration={limitDuration} />
+    <TimeRangePresetFormItem id={id}
+                             onRemove={onRemove}
+                             idx={index}
+                             onChange={onChange}
+                             timerange={timerange}
+                             description={description}
+                             limitDuration={limitDuration} />
   ), [limitDuration, onChange, onRemove]);
 
   return (
     <div className="form-group">
-      <strong>Quick Access Time Range Options</strong>
+      <strong>Search Time Range Presets</strong>
       <span className="help-block">
-        <span>Configure the available options for the <strong>quick access</strong> time range selector</span>
+        <span>Configure the available search time range presets.</span>
       </span>
       <div className="wrapper">
         <TimeRangeInputSettingsContext.Provider value={contextSettings}>
@@ -165,11 +163,11 @@ const QuickAccessTimeRangeForm = ({ options, onUpdate }: {
                         customContentRender={customContentRender} />
         </TimeRangeInputSettingsContext.Provider>
       </div>
-      <Button bsSize="xs" onClick={addTimeRange} title="Add quick access timerange" aria-label="Add quick access timerange">
+      <Button bsSize="xs" onClick={addTimeRange} title="Add new search time range preset" aria-label="Add new search time range preset">
         Add option
       </Button>
     </div>
   );
 };
 
-export default QuickAccessTimeRangeForm;
+export default TimeRangePresetForm;
