@@ -1,0 +1,14 @@
+type = "fixed"
+message = "Adjust keybindings for query input autocompletion (disable `Return` key)."
+
+issues = ["14793"]
+pulls = ["16162"]
+
+details.user = """
+With #6909 we received the feedback that it would be useful to only press tab once to insert the first autocomplete suggestion (instead of pressing it twice).
+As result we implemented a change to automatically focus the first suggestion. This led to a problem in a different use case.
+When you search for a custom value like `ssh login` the autocomplete suggested field names for login and pressing `Return`
+did not execute the search but inserted the first suggestion.
+
+We are now disabling the `Return` and `Shift-Return` keybindings for the query input autocompletion. Only the `Tab` key inserts a suggestion.
+"""
