@@ -186,8 +186,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                 output.logstash:
                                    hosts: ["${user.graylog_host}:5044"]
                                 path:
-                                   data: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/auditbeat"}/data
-                                   logs: ${sidecar.spoolDir!"/var/lib/graylog-sidecar/collectors/auditbeat"}/log
+                                   data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/auditbeat\"}/data
+                                   logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/auditbeat\"}/log
                                 fields:
                                   event_source_product: linux_auditbeat
 
@@ -279,8 +279,26 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                 winlogbeat:
                                   event_logs:
                                    - name: Application
+                                     ignore_older: 96h
                                    - name: System
-                                   - name: Security""",
+                                     ignore_older: 96h
+                                   - name: Security
+                                     ignore_older: 96h
+                                   - name: Setup
+                                     ignore_older: 96h
+                                   - name: ForwardedEvents
+                                     forwarded: true
+                                     ignore_older: 96h
+                                   - name: Microsoft-Windows-Windows Defender/Operational
+                                     ignore_older: 96h
+                                   - name: Microsoft-Windows-Sysmon/Operational
+                                     ignore_older: 96h
+                                   - name: Microsoft-Windows-TerminalServices-LocalSessionManager/Operational
+                                     ignore_older: 96h
+                                   - name: Microsoft-Windows-PowerShell/Operational
+                                     ignore_older: 96h
+                                   - name: windows PowerShell
+                                     ignore_older: 96h""",
                         BEATS_PREAMBEL
                 )
         ).ifPresent(collector -> ensureDefaultConfiguration("winlogbeat-default", collector));
@@ -515,7 +533,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         try {
             variable = configurationVariableService.findByName(name);
             if (variable == null) {
-                LOG.error("Couldn't find sidecar configuration variable '{}' fixing it.", name);
+                LOG.info("Couldn't find sidecar configuration variable '{}' fixing it.", name);
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException ignored) {
