@@ -41,7 +41,7 @@ import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
-import org.graylog2.cluster.preflight.PreflightConfigBindings;
+import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -63,6 +63,7 @@ import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.shared.security.CertificateRenewalBindings;
 import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -169,7 +170,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
-        modules.add(new PreflightConfigBindings());
+        modules.add(new DataNodeProvisioningBindings());
         modules.add(new PreflightWebModule());
         modules.add(new ObjectMapperModule(chainingClassLoader));
         modules.add(new SchedulerBindings());
@@ -399,7 +400,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());
-        result.add(new PreflightConfigBindings());
+        result.add(new CertificateRenewalBindings());
+        result.add(new DataNodeProvisioningBindings());
 
         return result;
     }

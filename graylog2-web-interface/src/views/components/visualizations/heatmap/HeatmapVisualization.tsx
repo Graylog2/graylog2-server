@@ -20,6 +20,8 @@ import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
+import type { DefaultTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -45,7 +47,7 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKeys: KeyMapper): Generator => ({
+const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKeys: KeyMapper, theme: DefaultTheme): Generator => ({
   type,
   name,
   labels,
@@ -77,6 +79,9 @@ const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKey
     zmin: zMin,
     zmax: zMax,
     originalName: name,
+    colorbar: {
+      tickfont: { color: theme.colors.global.textDefault },
+    },
   };
 };
 
@@ -148,13 +153,14 @@ const _chartLayout = (heatmapData: ChartDefinition[]) => {
 const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('leaf') && source !== 'row-leaf';
 
 const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+  const theme = useTheme();
   const visualizationConfig = (config.visualizationConfig ?? HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const heatmapData = useChartData(rows, {
     widgetConfig: config,
     chartType: 'heatmap',
-    generator: _generateSeries(visualizationConfig, mapKeys),
+    generator: _generateSeries(visualizationConfig, mapKeys, theme),
     seriesFormatter: _formatSeries(visualizationConfig),
     leafValueMatcher: _leafSourceMatcher,
   });

@@ -64,36 +64,33 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                         int[] extraPorts, List<URL> mongoDBFixtures,
                         PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
                         List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
-
         final var network = Network.newNetwork();
         final var builder = SearchServerInstanceProvider.getBuilderFor(version).orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
 
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-indexer-container-for-api-it").build());
-        Future<SearchServerInstance> esFuture = executor.submit(() -> builder.network(network).featureFlags(enabledFeatureFlags).build());
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
-        if(withMailServerEnabled) {
+        if (withMailServerEnabled) {
             this.emailServerInstance = MailServerContainer.createStarted(network);
         }
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
-        if(preImportLicense) {
+        SearchServerInstance searchServer = builder.network(network).featureFlags(enabledFeatureFlags).build();
+
+        if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
         try {
-            // Wait for ES before starting the Graylog node to avoid any race conditions
-            SearchServerInstance esInstance = esFuture.get();
             NodeInstance node = NodeInstance.createStarted(
                     network,
                     MongoDBInstance.internalUri(),
-                    esInstance.internalUri(),
-                    esInstance.version(),
+                    searchServer.internalUri(),
+                    searchServer.version(),
                     extraPorts,
                     pluginJarsProvider, mavenProjectDirProvider,
                     enabledFeatureFlags);
             this.network = network;
-            this.searchServer = esInstance;
+            this.searchServer = searchServer;
             this.mongodb = mongoDB;
             this.node = node;
 
@@ -101,11 +98,10 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             // We can't close the resources in an afterAll callback, as the instances are cached and reused
             // so we need a solution that will be triggered only once after all test classes
             Runtime.getRuntime().addShutdownHook(new Thread(this::close));
-        } catch (InterruptedException | ExecutionException | ExecutableNotFoundException e) {
-            LOG.error("Container creation aborted", e);
-            throw new RuntimeException(e);
-        } finally {
-            executor.shutdown();
+        } catch (Exception ex) {
+            // if the graylog Node is not coming up (because OpenSearch hangs?) it fails here. So in this case, we also log the search server logs
+            LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
+            throw ex;
         }
     }
 

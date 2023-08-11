@@ -19,48 +19,8 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import type { DateTimeFormats } from 'util/DateTime';
-import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 
-export const onSubmittingTimerange = (timerange: TimeRange, userTz: string): TimeRange => {
-  const { type } = timerange;
-
-  switch (timerange.type) {
-    case 'absolute':
-      return {
-        type: timerange.type,
-        from: adjustFormat(toUTCFromTz(timerange.from, userTz), 'internal'),
-        to: adjustFormat(toUTCFromTz(timerange.to, userTz), 'internal'),
-      };
-    case 'relative':
-      if (isTypeRelativeWithStartOnly(timerange)) {
-        return {
-          type: timerange.type,
-          range: timerange.range,
-        };
-      }
-
-      if (isTypeRelativeWithEnd(timerange)) {
-        if ('to' in timerange) {
-          return {
-            type: timerange.type,
-            from: timerange.from,
-            to: timerange.to,
-          };
-        }
-
-        return {
-          type: timerange.type,
-          from: timerange.from,
-        };
-      }
-
-      throw new Error('Invalid relative time range');
-    case 'keyword':
-      return timerange;
-    default: throw new Error(`Invalid time range type: ${type}`);
-  }
-};
-
+// eslint-disable-next-line import/prefer-default-export
 export const onInitializingTimerange = (timerange: TimeRange, formatTime: (dateTime: string, format: DateTimeFormats) => string): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 

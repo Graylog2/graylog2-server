@@ -18,12 +18,17 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import userEvent from '@testing-library/user-event';
+import { defaultUser } from 'defaultMockValues';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 import ToolsStore from 'stores/tools/ToolsStore';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import TimeRangePicker from './TimeRangePicker';
+
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -59,6 +64,8 @@ describe('TimeRangePicker', () => {
       to: '2018-11-14 13:57:38',
       timezone: 'Asia/Tokyo',
     }));
+
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   it('renders initial time range value', async () => {
@@ -145,5 +152,13 @@ describe('TimeRangePicker', () => {
     await waitFor(() => expect(setCurrentTimeRange).toHaveBeenCalledTimes(1));
 
     expect(setCurrentTimeRange).toHaveBeenCalledWith({ type: 'keyword', keyword: 'yesterday', timezone: 'Asia/Tokyo' });
+  });
+
+  it('Displays button for admin users to save time range as preset', async () => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+
+    render(<TimeRangePicker {...defaultProps} />);
+
+    await screen.findByTitle('Save current time range as preset');
   });
 });
