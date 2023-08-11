@@ -124,8 +124,15 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
   const editor = node && node.editor;
 
   if (editor) {
-    commands.forEach((command) => editor.commands.addCommand(command));
+    editor.commands.on('afterExec', () => {
+      const completerCommandKeyBinding = editor.completer?.keyboardHandler?.commandKeyBinding;
 
+      if (completerCommandKeyBinding?.return || completerCommandKeyBinding?.['Shift-Return']) {
+        editor.completer.keyboardHandler.removeCommands(['Return', 'Shift-Return']);
+      }
+    });
+
+    commands.forEach((command) => editor.commands.addCommand(command));
     editor.completers = [completer];
   }
 };

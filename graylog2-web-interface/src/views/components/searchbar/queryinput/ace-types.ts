@@ -57,6 +57,7 @@ export type Command = {
 export type Commands = {
   addCommand: (command: Command) => void,
   removeCommands: (commands: Array<string>) => void,
+  on: (commandName: string, callback: () => void) => void
 };
 
 export type Popup = {
@@ -67,6 +68,13 @@ export type Completer = {
   autoSelect: boolean,
   popup?: Popup,
   activated: boolean,
+  keyboardHandler: {
+    commandKeyBinding: {
+      return: unknown,
+      'Shift-Return': unknown
+    },
+    removeCommands: (commands: Array<string>) => void
+  }
 };
 
 export type Editor = {
