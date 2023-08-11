@@ -659,8 +659,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
         content: "⇥";
         right: 3px;
         position: absolute;
-        display: inline-block;
-        font-size: 20px;
+        font-size: 1.3rem;
         font-family: ${theme.fonts.family.body};
       }
     }
