@@ -115,7 +115,9 @@ const PieVisualization = makeVisualization(({ config, data }: VisualizationCompo
       <GenericPlot chartData={transformedData}
                    layout={{ showlegend: false }}
                    getChartColor={getChartColor}
-                   setChartColor={setChartColor} />
+                   setChartColor={setChartColor}
+                   labelFields={rowPivotsToFields}
+                   config={config} />
     </PlotLegend>
   );
 }, 'pie');

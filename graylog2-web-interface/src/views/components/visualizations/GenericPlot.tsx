@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { Popover } from 'components/bootstrap';
 import ColorPicker from 'components/common/ColorPicker';
@@ -28,6 +27,12 @@ import { colors as defaultColors } from 'views/components/visualizations/Colors'
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
+import { humanSeparator } from 'views/Constants';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import Value from 'views/components/Value';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import ChartColorContext from './ChartColorContext';
 import styles from './GenericPlot.lazy.css';
@@ -39,7 +44,7 @@ const StyledPlot = styled(Plot)(({ theme }) => css`
   .hoverlayer .hovertext {
     rect {
       fill: ${theme.colors.global.contentBackground} !important;
-      opcity: 0.9 !important;
+      opacity: 0.9 !important;
     }
 
     .name {
@@ -51,6 +56,11 @@ const StyledPlot = styled(Plot)(({ theme }) => css`
     }
   }
 `);
+
+const ValueContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 type LegendConfig = {
   name: string,
@@ -73,10 +83,6 @@ export type ChartConfig = {
   originalName?: string,
 };
 
-export type ColorMap = {
-  [key: string]: string,
-};
-
 export type ChartColor = {
   line?: ChartMarker,
   marker?: ChartMarker,
@@ -88,15 +94,11 @@ export type ChartColor = {
 type Props = {
   chartData: Array<any>,
   getChartColor?: (data: Array<ChartConfig>, name: string) => string | undefined | null,
-  layout: {},
-  onZoom: (from: string, to: string) => boolean,
+  layout?: {},
+  onZoom?: (from: string, to: string) => boolean,
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
-};
-
-type GenericPlotProps = Props & { theme: DefaultTheme };
-
-type State = {
-  legendConfig?: LegendConfig,
+  config: AggregationWidgetConfig,
+  labelFields?: (config: Props['config']) => Array<string>,
 };
 
 type Axis = {
@@ -111,40 +113,28 @@ const nonInteractiveLayout = {
 
 const style = { height: '100%', width: '100%' };
 
-const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
+const plotConfig = { displayModeBar: false, doubleClick: false as const, responsive: true };
+const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
-class GenericPlot extends React.Component<GenericPlotProps, State> {
-  static propTypes = {
-    chartData: PropTypes.array.isRequired,
-    layout: PropTypes.object,
-    onZoom: PropTypes.func,
-    getChartColor: PropTypes.func,
-    setChartColor: PropTypes.func,
-  };
+const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChartColor, labelFields }: Props) => {
+  const [legendConfig, setLegendConfig] = useState<LegendConfig>();
+  const [valueTarget, setValueTarget] = useState(null);
+  const [valueItems, setValueItems] = useState<Array<{ label: string, field: string, type: FieldType }>>([]);
+  const theme = useTheme();
+  const activeQuery = useActiveQueryId();
+  const { colors, setColor } = useContext(ChartColorContext);
+  const interactive = useContext(InteractiveContext);
+  const onRenderComplete = useContext(RenderCompletionCallback);
+  const fieldTypes = useContext(FieldTypesContext);
 
-  static defaultProps = {
-    layout: {},
-    onZoom: () => true,
-    getChartColor: undefined,
-    setChartColor: undefined,
-  };
-
-  constructor(props: GenericPlotProps) {
-    super(props);
-    this.state = {};
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     styles.use();
-  }
 
-  componentWillUnmount() {
-    styles.unuse();
-  }
+    return () => styles.unuse();
+  });
 
-  _onRelayout = (axis: Axis) => {
+  const _onRelayout = (axis: Axis) => {
     if (!axis.autosize && axis['xaxis.range[0]'] && axis['xaxis.range[1]']) {
-      const { onZoom } = this.props;
       const from = axis['xaxis.range[0]'];
       const to = axis['xaxis.range[1]'];
 
@@ -154,149 +144,178 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     return true;
   };
 
-  _onLegendClick = (e: any) => {
+  const _onLegendClick = (e: any) => {
     const name = e.node.textContent;
     const target = e.node.querySelector('g.layers');
-    const { getChartColor } = this.props;
 
     if (getChartColor) {
       const color = getChartColor(e.fullData, name);
 
-      this.setState({ legendConfig: { name, target, color } });
+      setLegendConfig({ name, target, color });
     }
 
     return false;
   };
 
-  _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
-    .then(this._onCloseColorPopup);
+  const _onCloseColorPopup = () => setLegendConfig(undefined);
+  const _onColorSelect = (name: string, newColor: string) => setColor(name, newColor)
+    .then(_onCloseColorPopup);
 
-  _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
-
-  render() {
-    const { chartData, layout, setChartColor, theme } = this.props;
-    const fontSettings = {
-      color: theme.colors.global.textDefault,
-      size: ROOT_FONT_SIZE * theme.fonts.size.small.replace(/rem|em/i, ''),
-      family: theme.fonts.family.body,
-    };
-    const defaultLayout = {
-      shapes: [],
-      autosize: true,
-      showlegend: true,
-      margin: {
-        t: 10,
-        l: 40,
-        r: 10,
-        b: 0,
-        pad: 0,
-      },
-      legend: {
-        orientation: 'h' as const,
-        font: fontSettings,
-      },
-      hoverlabel: {
-        namelength: -1,
-      },
-      paper_bgcolor: 'transparent',
-      plot_bgcolor: 'transparent',
+  const fontSettings = useMemo(() => ({
+    color: theme.colors.global.textDefault,
+    size: ROOT_FONT_SIZE * theme.fonts.size.small.replace(/rem|em/i, ''),
+    family: theme.fonts.family.body,
+  }), [theme.colors.global.textDefault, theme.fonts.family.body, theme.fonts.size.small]);
+  const defaultLayout = useMemo(() => ({
+    shapes: [],
+    autosize: true,
+    showlegend: true,
+    margin: {
+      t: 10,
+      l: 40,
+      r: 10,
+      b: 0,
+      pad: 0,
+    },
+    legend: {
+      orientation: 'h' as const,
+      font: fontSettings,
+    },
+    hoverlabel: {
+      namelength: -1,
+    },
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    title: {
+      font: fontSettings,
+    },
+    yaxis: {
+      automargin: true,
+      gridcolor: theme.colors.variant.lightest.default,
+      tickfont: fontSettings,
       title: {
         font: fontSettings,
       },
-      yaxis: {
-        automargin: true,
-        gridcolor: theme.colors.variant.lightest.default,
-        tickfont: fontSettings,
-        title: {
-          font: fontSettings,
-        },
+    },
+    xaxis: {
+      automargin: true,
+      tickfont: fontSettings,
+      title: {
+        font: fontSettings,
       },
-      xaxis: {
-        automargin: true,
-        tickfont: fontSettings,
-        title: {
-          font: fontSettings,
-        },
-      },
-    };
-    const plotLayout = merge({}, defaultLayout, layout);
+    },
+  }), [fontSettings, theme.colors.variant.lightest.default]);
+  const plotLayout = useMemo(() => {
+    const mergedData = merge({}, defaultLayout, layout);
 
-    const { legendConfig } = this.state;
+    mergedData.shapes = mergedData.shapes.map((shape) => ({
+      ...shape,
+      line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
+    }));
 
-    return (
-      <ChartColorContext.Consumer>
-        {({ colors, setColor }) => {
-          plotLayout.shapes = plotLayout.shapes.map((shape) => ({
-            ...shape,
-            line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
-          }));
+    return mergedData;
+  }, [colors, defaultLayout, layout]);
 
-          const newChartData = chartData.map((chart) => {
-            if (setChartColor && colors) {
-              const conf = setChartColor(chart, colors);
+  const newChartData = useMemo(() => chartData.map((chart) => {
+    if (setChartColor && colors) {
+      const conf = setChartColor(chart, colors);
 
-              if (chart.type === 'pie') {
-                conf.outsidetextfont = { color: theme.colors.global.textDefault };
-              }
+      if (chart.type === 'pie') {
+        conf.outsidetextfont = { color: theme.colors.global.textDefault };
+      }
 
-              if (chart?.name === eventsDisplayName) {
-                const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
+      if (chart?.name === eventsDisplayName) {
+        const eventColor = colors.get(eventsDisplayName, EVENT_COLOR);
 
-                conf.marker = { color: eventColor, size: 5 };
-              }
+        conf.marker = { color: eventColor, size: 5 };
+      }
 
-              if (conf.line || conf.marker) {
-                return merge(chart, conf);
-              }
+      if (conf.line || conf.marker) {
+        return merge(chart, conf);
+      }
 
-              return chart;
-            }
+      return chart;
+    }
 
-            return chart;
-          });
+    return chart;
+  }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
 
-          return (
-            <InteractiveContext.Consumer>
-              {(interactive) => (
-                <RenderCompletionCallback.Consumer>
-                  {(onRenderComplete) => (
-                    <>
-                      <StyledPlot data={newChartData}
-                                  useResizeHandler
-                                  layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                                  style={style}
-                                  onAfterPlot={onRenderComplete}
-                                  onClick={interactive ? null : () => false}
-                                  onLegendClick={interactive ? this._onLegendClick : () => false}
-                                  onRelayout={interactive ? this._onRelayout : () => false}
-                                  config={config} />
-                      {legendConfig && (
-                        <RootCloseWrapper event="mousedown"
-                                          onRootClose={this._onCloseColorPopup}>
-                          <Overlay show
-                                   placement="top"
-                                   target={legendConfig.target}>
-                            <Popover id="legend-config"
-                                     title={`Configuration for ${legendConfig.name}`}
-                                     className={styles.locals.customPopover}
-                                     data-event-element="Generic Plot">
-                              <ColorPicker color={legendConfig.color}
-                                           colors={defaultColors}
-                                           onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />
-                            </Popover>
-                          </Overlay>
-                        </RootCloseWrapper>
-                      )}
-                    </>
-                  )}
-                </RenderCompletionCallback.Consumer>
-              )}
-            </InteractiveContext.Consumer>
-          );
-        }}
-      </ChartColorContext.Consumer>
-    );
-  }
+  const _onCloseValuePopup = useCallback(() => {
+    setValueTarget(null);
+  }, []);
+  const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
+  const onPLotCLick = useCallback(({ event: { target }, points }) => {
+    setValueTarget(target);
+    const { label: value } = points[0];
+
+    const labelsWithField = value.split(humanSeparator).map((label: string, idx: number) => {
+      const field = _labelFields[idx];
+      const fieldType = fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+
+      return { label, field, type: fieldType };
+    });
+
+    setValueItems(labelsWithField);
+  }, [_labelFields, activeQuery, fieldTypes?.queryFields]);
+
+  return (
+    <>
+      <StyledPlot data={newChartData}
+                  useResizeHandler
+                  layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
+                  style={style}
+                  onAfterPlot={onRenderComplete}
+                  onClick={onPLotCLick}
+                  onLegendClick={interactive ? _onLegendClick : () => false}
+                  onRelayout={interactive ? _onRelayout : () => false}
+                  config={plotConfig} />
+      {legendConfig && (
+        <RootCloseWrapper event="mousedown"
+                          onRootClose={_onCloseColorPopup}>
+          <Overlay show
+                   placement="top"
+                   target={legendConfig.target}>
+            <Popover id="legend-config"
+                     title={`Configuration for ${legendConfig.name}`}
+                     className={styles.locals.customPopover}
+                     data-event-element="Generic Plot">
+              <ColorPicker color={legendConfig.color}
+                           colors={defaultColors}
+                           onChange={(newColor) => _onColorSelect(legendConfig.name, newColor)} />
+            </Popover>
+          </Overlay>
+        </RootCloseWrapper>
+      )}
+      {valueTarget && (
+      <RootCloseWrapper event="mousedown"
+                        onRootClose={_onCloseValuePopup}>
+        <Overlay show
+                 placement="bottom"
+                 target={valueTarget}>
+          <Popover id="value-config-popover"
+                   title="Value"
+                   className={styles.locals.customPopover}
+                   data-event-element="Generic Plot">
+            <ValueContainer> {
+              valueItems.map(({ label, field, type }) => (field
+                ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
+                : label))
 }
+            </ValueContainer>
+          </Popover>
+        </Overlay>
+      </RootCloseWrapper>
+      )}
+    </>
+  );
+};
 
-export default withTheme(GenericPlot);
+GenericPlot.defaultProps = {
+  layout: {},
+  onZoom: () => true,
+  getChartColor: undefined,
+  setChartColor: undefined,
+  labelFields: columnPivotsToFields,
+};
+
+export default GenericPlot;
