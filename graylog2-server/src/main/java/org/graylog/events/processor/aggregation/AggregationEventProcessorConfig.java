@@ -27,6 +27,7 @@ import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEn
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
@@ -51,6 +52,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
@@ -203,8 +206,27 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         if (!series().isEmpty() && isConditionsEmpty()) {
             validationResult.addError(FIELD_CONDITIONS, "Aggregation with series must also contain conditions");
         }
-        if (eventLimit() <= 0) {
-            validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
+        return validationResult;
+    }
+
+    @Override
+    public ValidationResult validate(@Nullable EventProcessorConfig oldEventProcessorConfig,
+                                     EventDefinitionConfiguration eventDefinitionConfiguration) {
+        final ValidationResult validationResult = new ValidationResult();
+        AggregationEventProcessorConfig oldConfig = (AggregationEventProcessorConfig) oldEventProcessorConfig;
+
+        if (oldConfig == null) {
+            if (eventLimit() <= 0) {
+                validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
+            }
+        } else {
+            if (oldConfig.eventLimit() != 0 && eventLimit() <= 0) {
+                validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
+            }
+        }
+
+        if (eventLimit() > eventDefinitionConfiguration.getMaxEventLimit()) {
+            validationResult.addError(FIELD_EVENT_LIMIT, f("Event limit must be less than %s.", eventDefinitionConfiguration.getMaxEventLimit()));
         }
 
         return validationResult;
