@@ -28,23 +28,24 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
-public class MapUpsert extends AbstractFunction<Map> {
+public class MapSet extends AbstractFunction<Map> {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    public static final String NAME = "map_upsert";
+    public static final String NAME = "map_set";
     private static final String MAPARG = "map";
     private static final String KEYARG = "key";
     private static final String VALUEARG = "value";
     private final ParameterDescriptor<Map, Map> mapParam;
     private final ParameterDescriptor<String, String> keyParam;
-    private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<Object, Object> valueParam;
 
-    public MapUpsert() {
+    public MapSet() {
         mapParam = type(MAPARG, Map.class).primary().description("A map").build();
         keyParam = string(KEYARG).description("Set this key in map").build();
-        valueParam = string(VALUEARG).description("New value").build();
+        valueParam = object(VALUEARG).description("New value").build();
     }
 
     @Override
@@ -52,7 +53,7 @@ public class MapUpsert extends AbstractFunction<Map> {
 
         final Map<String, Object> mapValue = mapParam.required(args, context);
         final String keyValue = keyParam.required(args, context);
-        final String valueValue = valueParam.required(args, context);
+        final Object valueValue = valueParam.required(args, context);
         if (mapValue == null || Strings.isNullOrEmpty(keyValue)) {
             return mapValue;
         }

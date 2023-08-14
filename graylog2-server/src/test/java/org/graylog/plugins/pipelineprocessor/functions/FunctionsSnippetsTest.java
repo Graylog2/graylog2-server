@@ -94,7 +94,7 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveString
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
 import org.graylog.plugins.pipelineprocessor.functions.maps.MapRemove;
-import org.graylog.plugins.pipelineprocessor.functions.maps.MapUpsert;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapSet;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -384,7 +384,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
 
         functions.put(MapRemove.NAME, new MapRemove());
-        functions.put(MapUpsert.NAME, new MapUpsert());
+        functions.put(MapSet.NAME, new MapSet());
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1372,13 +1372,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void mapUpsert() {
+    public void mapSet() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
 
         assertThat(message.getField("k1")).isEqualTo("v11");
-        assertThat(message.getField("k3")).isEqualTo("v3");
+        assertThat(message.getField("k3")).isEqualTo(1L);
     }
 
     @Test

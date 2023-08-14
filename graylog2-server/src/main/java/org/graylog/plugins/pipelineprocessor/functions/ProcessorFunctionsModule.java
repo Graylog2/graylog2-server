@@ -90,7 +90,7 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupStringListContains;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupValue;
 import org.graylog.plugins.pipelineprocessor.functions.maps.MapRemove;
-import org.graylog.plugins.pipelineprocessor.functions.maps.MapUpsert;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapSet;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -286,7 +286,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // Maps
         addMessageProcessorFunction(MapRemove.NAME, MapRemove.class);
-        addMessageProcessorFunction(MapUpsert.NAME, MapUpsert.class);
+        addMessageProcessorFunction(MapSet.NAME, MapSet.class);
 
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);
