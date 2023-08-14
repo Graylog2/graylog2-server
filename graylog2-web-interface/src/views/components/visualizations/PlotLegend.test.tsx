@@ -24,12 +24,14 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { keySeparator } from 'views/Constants';
-import ExternalValueActionsProvider from 'views/components/ExternalValueActionsProvider';
+import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import asMock from 'helpers/mocking/AsMock';
 
 import ChartColorContext from './ChartColorContext';
 
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
 jest.mock('stores/useAppDispatch');
+jest.mock('views/hooks/useExternalValueActions');
 
 const colors = ColorMapper.create();
 const setColor = jest.fn();
@@ -43,25 +45,31 @@ const config = AggregationWidgetConfig.builder().series([Series.forFunction('cou
 
 // eslint-disable-next-line react/require-default-props
 const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false }: { chartDataProp?: Array<{ name: string, }>, plotConfig?: AggregationWidgetConfig, neverHide?: boolean }) => (
-  <ExternalValueActionsProvider>
-    <WidgetFocusContext.Provider value={{
-      focusedWidget: undefined,
-      setWidgetFocusing: jest.fn(),
-      unsetWidgetFocusing: jest.fn(),
-      unsetWidgetEditing: jest.fn(),
-      setWidgetEditing: jest.fn(),
-    }}>
+  <WidgetFocusContext.Provider value={{
+    focusedWidget: undefined,
+    setWidgetFocusing: jest.fn(),
+    unsetWidgetFocusing: jest.fn(),
+    unsetWidgetEditing: jest.fn(),
+    setWidgetEditing: jest.fn(),
+  }}>
 
-      <ChartColorContext.Provider value={{ colors, setColor }}>
-        <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
-          <div>Plot</div>
-        </PlotLegend>
-      </ChartColorContext.Provider>
-    </WidgetFocusContext.Provider>
-  </ExternalValueActionsProvider>
+    <ChartColorContext.Provider value={{ colors, setColor }}>
+      <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
+        <div>Plot</div>
+      </PlotLegend>
+    </ChartColorContext.Provider>
+  </WidgetFocusContext.Provider>
 );
 
 describe('PlotLegend', () => {
+  beforeEach(() => {
+    asMock(useExternalValueActions).mockReturnValue({
+      isLoading: false,
+      externalValueActions: [],
+      isError: false,
+    });
+  });
+
   it('should render the plot legend', async () => {
     render(<SUT />);
     await screen.findByText('name1');

@@ -23,17 +23,23 @@ import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 import ExternalValueActionsContext from './ExternalValueActionsContext';
 
+const DEFAULT_EXTERNAL_ACTIONS = {
+  isLoading: false,
+  externalValueActions: [],
+  isError: false,
+};
+
 const usePluginExternalActions = () => {
   const useExternalActions = usePluginEntities('useExternalActions');
   const useExternalAction = useMemo<()=>({
     isLoading: boolean,
     externalValueActions: Array<ActionDefinition>,
     isError: boolean,
-  })>(() => ((useExternalActions && typeof useExternalActions[0] === 'function') ? useExternalActions[0] : () => ({
-      isLoading: false,
-      externalValueActions: [],
-      isError: false,
-    })), [useExternalActions]);
+  })>(() => {
+      if (useExternalActions && typeof useExternalActions[0] === 'function') return useExternalActions[0];
+
+      return () => DEFAULT_EXTERNAL_ACTIONS;
+    }, [useExternalActions]);
 
   const { isLoading, externalValueActions, isError } = useExternalAction();
 
