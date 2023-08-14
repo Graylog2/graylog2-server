@@ -3,6 +3,8 @@ Upgrading to Graylog 5.2.x
 
 ## New Functionality
 
+- New pipeline rule functions for manipulating maps: `map_upsert` and `map_remove`.
+
 ## Breaking Changes
 
 ## Deprecation and Change in Functionality of GreyNoise Data Adapters
