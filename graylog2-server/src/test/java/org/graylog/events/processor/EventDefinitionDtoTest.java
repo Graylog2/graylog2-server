@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +39,7 @@ public class EventDefinitionDtoTest {
     public void setUp() throws Exception {
         final AggregationEventProcessorConfig configMock = mock(AggregationEventProcessorConfig.class);
         when(configMock.validate()).thenReturn(new ValidationResult());
+        when(configMock.validate(any(), any())).thenReturn(new ValidationResult());
 
         testSubject = EventDefinitionDto.builder()
             .title("foo")
@@ -76,6 +78,7 @@ public class EventDefinitionDtoTest {
         final ValidationResult mockedValidationResult = new ValidationResult();
         mockedValidationResult.addError("foo", "bar");
         when(configMock.validate()).thenReturn(mockedValidationResult);
+        when(configMock.validate(any(), any())).thenReturn(mockedValidationResult);
 
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
             .config(configMock)
