@@ -3,7 +3,7 @@ Upgrading to Graylog 5.2.x
 
 ## New Functionality
 
-- New pipeline rule functions for manipulating maps: `map_upsert` and `map_remove`.
+- New pipeline rule functions for manipulating maps: `map_set` and `map_remove`.
 
 ## Breaking Changes
 
