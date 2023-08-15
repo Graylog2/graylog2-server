@@ -74,9 +74,9 @@ public abstract class MoreMediaTypes {
     /**
      * A {@code String} constant representing {@value #APPLICATION_NDGELF} media type.
      */
-    public final static String APPLICATION_NDGELF = "application/x-ndgelf";
+    public final static String APPLICATION_NDGELF = "application/gelf+x-ndjson";
     /**
      * A {@link MediaType} constant representing {@value #APPLICATION_NDGELF} media type.
      */
-    public final static MediaType APPLICATION_NDGELF_TYPE = new MediaType("application", "x-ndgelf");
+    public final static MediaType APPLICATION_NDGELF_TYPE = new MediaType("application", "gelf+x-ndjson");
 }

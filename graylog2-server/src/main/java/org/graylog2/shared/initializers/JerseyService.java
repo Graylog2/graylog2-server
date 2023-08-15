@@ -299,7 +299,7 @@ public class JerseyService extends AbstractIdleService {
             "ndjson", MoreMediaTypes.APPLICATION_NDJSON_TYPE,
             "csv", MoreMediaTypes.TEXT_CSV_TYPE,
             "log", MoreMediaTypes.TEXT_PLAIN_TYPE,
-            "ndgelf", MoreMediaTypes.APPLICATION_NDGELF_TYPE
+            "gelf-ndjson", MoreMediaTypes.APPLICATION_NDGELF_TYPE
         );
     }
 
