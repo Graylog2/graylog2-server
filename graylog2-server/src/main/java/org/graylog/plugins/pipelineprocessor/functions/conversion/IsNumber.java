@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
@@ -30,7 +31,7 @@ public class IsNumber extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsNumber() {
-        valueParam = object("value").description("Value to check").build();
+        valueParam = object("value").primary().description("Value to check").build();
     }
 
     @Override
@@ -46,6 +47,10 @@ public class IsNumber extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(valueParam)
                 .description("Checks whether a value is a number")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Check if number")
+                .ruleBuilderTitle("Check if '${value}' is a number")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
 }

@@ -51,6 +51,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -164,17 +165,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
-    private void initiateAutomaticRenewalForNode(Node node) {
-        // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
-        var config = dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
-        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
-    }
-
-    private void initiateManualRenewalForNode(Node node) {
-        // TODO: send notification - don't send one out, if there is one still open
-        notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, node);
-    }
-
     private Pair<Node, KeyStore> loadKeyStoreForNode(Node node) {
         try {
             return Pair.of(node, keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret).orElse(null));
@@ -193,22 +183,51 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
-    protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
+    @Override
+    public List<Pair<Node, X509Certificate>> findNodesAndCertificates() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        final var nextRenewal = getNextRenewal();
-        activeDataNodes.values().stream()
+        return activeDataNodes.values().stream()
                 .map(this::loadKeyStoreForNode)
                 .filter(Objects::nonNull)
                 .filter(p -> p.getRight() != null)
                 .map(this::getCertificateForNode)
                 .filter(Objects::nonNull)
+                .toList();
+    }
+
+    protected List<Node> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
+        final var nextRenewal = getNextRenewal();
+        return findNodesAndCertificates().stream()
                 .filter(p -> needsRenewal(nextRenewal, renewalPolicy, p.getRight()))
-                .forEach(pair -> {
-                    if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
-                        initiateAutomaticRenewalForNode(pair.getLeft());
-                    } else {
-                        initiateManualRenewalForNode(pair.getLeft());
-                    }
-                });
+                .map(Pair::getLeft).toList();
+    }
+
+    @Override
+    public void initiateRenewalForNode(final String nodeId) {
+        // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
+        var config = dataNodeProvisioningService.getPreflightConfigFor(nodeId);
+        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
+    }
+
+    private void notifyManualRenewalForNode(final List<Node> nodes) {
+        final var key = String.join(",", nodes.stream().map(Node::getNodeId).toList());
+        if(!notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {
+            notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL);
+        }
+        Notification notification = notificationService.buildNow()
+                    .addType(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)
+                    .addSeverity(Notification.Severity.URGENT)
+                    .addKey(key)
+                    .addDetail("nodes", key);
+        notificationService.publishIfFirst(notification);
+    }
+
+    protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
+        final var nodes = findNodesThatNeedCertificateRenewal(renewalPolicy);
+        if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
+            nodes.forEach(node -> initiateRenewalForNode(node.getNodeId()));
+        } else {
+            notifyManualRenewalForNode(nodes);
+        }
     }
 }

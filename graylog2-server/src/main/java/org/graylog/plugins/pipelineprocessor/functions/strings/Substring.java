@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -63,6 +64,10 @@ public class Substring extends AbstractFunction<String> {
                         endParam
                 ))
                 .description("Extract a substring from a string")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Substring")
+                .ruleBuilderTitle("Get substring from '${start}' to '${indexEnd!\"end\"}' of '${value}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }
