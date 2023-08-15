@@ -25,7 +25,6 @@ import org.graylog2.users.events.UserDeletedEvent;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class ContentStreamService {
@@ -41,19 +40,26 @@ public class ContentStreamService {
 
     public ContentStreamSettings getUserSettings(User user) {
         Optional<ContentStreamUserSettings> dto = dbContentStreamUserSettingsService.findByUserId(user.getId());
-        Boolean isEnabled = dto.isPresent() ? dto.get().contentStreamEnabled() : true;
-        List<String> topicList = dto.isPresent() && dto.get().topics() != null ? dto.get().topics() : new ArrayList<>();
+        if (dto.isPresent()) {
+            return ContentStreamSettings.builder()
+                    .contentStreamEnabled(dto.get().contentStreamEnabled())
+                    .releasesEnabled(dto.get().releasesEnabled())
+                    .topics(dto.get().topics())
+                    .build();
+        }
         return ContentStreamSettings.builder()
-                .contentStreamEnabled(isEnabled)
-                .topics(topicList)
+                .contentStreamEnabled(true)
+                .releasesEnabled(true)
+                .topics(new ArrayList<>())
                 .build();
     }
 
-    public void saveUserSettings(User user, ContentStreamSettings contentStreamSettings) {
+    public void saveUserSettings(User user, ContentStreamSettings settings) {
         ContentStreamUserSettings.Builder builder = ContentStreamUserSettings.builder()
                 .userId(user.getId())
-                .contentStreamEnabled(contentStreamSettings.contentStreamEnabled())
-                .topics(contentStreamSettings.topics());
+                .contentStreamEnabled(settings.contentStreamEnabled())
+                .releasesEnabled(settings.releasesEnabled())
+                .topics(settings.topics());
         dbContentStreamUserSettingsService.findByUserId(user.getId()).ifPresent(dto -> builder.id(dto.id()));
         dbContentStreamUserSettingsService.save(builder.build());
     }

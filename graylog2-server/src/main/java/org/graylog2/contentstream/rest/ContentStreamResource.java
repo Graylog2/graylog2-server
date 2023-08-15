@@ -37,7 +37,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -70,62 +69,25 @@ public class ContentStreamResource extends RestResource {
     }
 
     @PUT
-    @Path("enable/{username}")
-    @ApiOperation("Enable Content Stream for specified user")
+    @Path("settings/{username}")
+    @ApiOperation("Update Content Stream settings for specified user")
     @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
-    public ContentStreamSettings contentStreamEnable(
-            @ApiParam(name = "username") @PathParam("username") String username
-    ) throws NotFoundException {
-        if (isPermitted(USERS_EDIT, username)) {
-            return setStatus(username, true);
-        }
-        throw new ForbiddenException("Not allowed to edit user " + username);
-    }
-
-    @PUT
-    @Path("disable/{username}")
-    @ApiOperation("Disable Content Stream for specified user")
-    @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
-    public ContentStreamSettings contentStreamDisable(
-            @ApiParam(name = "username") @PathParam("username") String username
-    ) throws NotFoundException {
-        if (isPermitted(USERS_EDIT, username)) {
-            return setStatus(username, false);
-        }
-        throw new ForbiddenException("Not allowed to edit user " + username);
-    }
-
-    @PUT
-    @Path("topics/{username}")
-    @ApiOperation("Update Content Stream topic list for specified user")
-    @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
-    public ContentStreamSettings saveContentStreamUserTopics(
+    public ContentStreamSettings setContentStreamUserSettings(
             @ApiParam(name = "username") @PathParam("username") String username,
-            @ApiParam(name = "JSON body", value = "Content Stream topics for the specified user.", required = true)
-            @Valid @NotNull List<String> topicList
+            @ApiParam(name = "JSON body", value = "Content Stream settings for the specified user.", required = true)
+            @Valid @NotNull ContentStreamSettings settings
     ) throws NotFoundException {
         if (isPermitted(USERS_EDIT, username)) {
             final User user = loadUser(username);
-            ContentStreamSettings contentStreamSettings = contentStreamService.getUserSettings(user);
             ContentStreamSettings newSettings = ContentStreamSettings.builder()
-                    .contentStreamEnabled(contentStreamSettings.contentStreamEnabled())
-                    .topics(topicList)
+                    .contentStreamEnabled(settings.contentStreamEnabled())
+                    .releasesEnabled(settings.releasesEnabled())
+                    .topics(settings.topics())
                     .build();
             contentStreamService.saveUserSettings(user, newSettings);
             return newSettings;
         }
         throw new ForbiddenException("Not allowed to edit user " + username);
-    }
-
-    private ContentStreamSettings setStatus(String userName, boolean isEnabled) throws NotFoundException {
-        final User user = loadUser(userName);
-        ContentStreamSettings contentStreamSettings = contentStreamService.getUserSettings(user);
-        ContentStreamSettings newSettings = ContentStreamSettings.builder()
-                .contentStreamEnabled(isEnabled)
-                .topics(contentStreamSettings.topics())
-                .build();
-        contentStreamService.saveUserSettings(user, newSettings);
-        return newSettings;
     }
 
     private User loadUser(String userName) throws NotFoundException {

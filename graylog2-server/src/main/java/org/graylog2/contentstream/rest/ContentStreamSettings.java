@@ -22,13 +22,17 @@ import com.google.auto.value.AutoValue;
 
 import java.util.List;
 
+import static org.graylog2.contentstream.db.ContentStreamUserSettings.FIELD_CONTENT_ENABLED;
+import static org.graylog2.contentstream.db.ContentStreamUserSettings.FIELD_RELEASES_ENABLED;
+import static org.graylog2.contentstream.db.ContentStreamUserSettings.FIELD_TOPICS;
+
 @AutoValue
 public abstract class ContentStreamSettings {
-    private static final String FIELD_ENABLED = "content_stream_enabled";
-    private static final String FIELD_TOPICS = "content_stream_topics";
-
-    @JsonProperty(FIELD_ENABLED)
+    @JsonProperty(FIELD_CONTENT_ENABLED)
     public abstract Boolean contentStreamEnabled();
+
+    @JsonProperty(FIELD_RELEASES_ENABLED)
+    public abstract Boolean releasesEnabled();
 
     @JsonProperty(FIELD_TOPICS)
     public abstract List<String> topics();
@@ -39,11 +43,13 @@ public abstract class ContentStreamSettings {
 
     @JsonCreator
     public static ContentStreamSettings create(
-            @JsonProperty(FIELD_ENABLED) Boolean enabled,
+            @JsonProperty(FIELD_CONTENT_ENABLED) Boolean contentStreamEnabled,
+            @JsonProperty(FIELD_RELEASES_ENABLED) Boolean releasesEnabled,
             @JsonProperty(FIELD_TOPICS) List<String> topics
     ) {
         return builder()
-                .contentStreamEnabled(enabled)
+                .contentStreamEnabled(contentStreamEnabled)
+                .releasesEnabled(releasesEnabled)
                 .topics(topics)
                 .build();
     }
@@ -51,8 +57,11 @@ public abstract class ContentStreamSettings {
     @AutoValue.Builder
     public abstract static class Builder {
 
-        @JsonProperty(FIELD_ENABLED)
+        @JsonProperty(FIELD_CONTENT_ENABLED)
         public abstract Builder contentStreamEnabled(Boolean enabled);
+
+        @JsonProperty(FIELD_RELEASES_ENABLED)
+        public abstract Builder releasesEnabled(Boolean enabled);
 
         @JsonProperty(FIELD_TOPICS)
         public abstract Builder topics(List<String> topics);
