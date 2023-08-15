@@ -59,6 +59,8 @@
     "@react-bootstrap/pagination": "^1.0.0",
     "@react-hook/resize-observer": "^1.2.5",
     "@reduxjs/toolkit": "^1.9.1",
+    "@tanstack/query-sync-storage-persister": "^4.32.6",
+    "@tanstack/react-query-persist-client": "^4.32.6",
     "ace-builds": "1.17.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",

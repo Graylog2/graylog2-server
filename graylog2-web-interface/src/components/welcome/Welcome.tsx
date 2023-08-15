@@ -22,7 +22,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { StartPage } from 'logic/users/User';
-import ContentStreamSection from 'components/content-stream/ContentStreamSection';
+import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -35,7 +35,7 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
-type HelperProps = { readOnly: boolean, userId: string, startpage: StartPage}
+type HelperProps = { readOnly: boolean, userId: string, startpage: StartPage }
 
 const ChangeStartPageHelper = ({ readOnly, userId, startpage }: HelperProps) => {
   const defaultPageIsDefined = startpage !== null;
@@ -88,7 +88,7 @@ const Welcome = () => {
         </p>
         <RecentActivityList />
       </StyledSectionComponent>
-      <ContentStreamSection />
+      <ContentStreamContainer />
     </>
   );
 };
