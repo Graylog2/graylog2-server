@@ -21,18 +21,35 @@ import UserNotification from 'preflight/util/UserNotification';
 
 export type FeedITem = {
   title: string,
-  category: string,
-  'content:encoded': string,
-  description: string,
-  pubDate: string,
-  'dc:creator': string,
   link: string,
-  'post-id': {
-    '#text': string
+  comments: string,
+  'dc:creator': string,
+  pubDate: string,
+  category: Array<string>
+  guid: {
+    '#text': string,
+    attr_isPermaLink: string,
   },
-  guid: string
-  'media:thumbnail': {
+  description: string,
+  'content:encoded': string,
+  'wfw:commentRss': string,
+  'slash:comments': number,
+  'media:content': {
+    'media:title': {
+      '#text': string,
+      attr_type: string,
+    },
+    'media:thumbnail': {
+      attr_url: string,
+      attr_width: string,
+      attr_height: string,
+    },
+    'media:copyright': string,
     attr_url: string,
+    attr_type: string,
+    attr_medium: string,
+    attr_width: string,
+    attr_height: string,
   }
 }
 
@@ -72,10 +89,13 @@ const parseXML = (text: string): Array<FeedITem> => {
 export const fetchNewsFeed = (rssUrl: string) => window.fetch(rssUrl, { method: 'GET' })
   .then((response) => response.text())
   .then(parseXML);
-export const NEWS_FEED_QUERY_KEY = 'news_feed_query_key';
+export const CONTENT_STREAM_CONTENT_KEY = ['content-stream', 'content'];
 
 const useContentStream = (rssUrl: string): { isLoadingFeed: boolean, feedList: Array<FeedITem> } => {
-  const { data, isLoading } = useQuery<Array<FeedITem>, Error>([NEWS_FEED_QUERY_KEY], () => fetchNewsFeed(rssUrl), {
+  const {
+    data,
+    isLoading,
+  } = useQuery<Array<FeedITem>, Error>([CONTENT_STREAM_CONTENT_KEY], () => fetchNewsFeed(rssUrl), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading news feed failed with status: ${errorThrown}`,
         'Could not load news feed');

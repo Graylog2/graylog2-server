@@ -60,11 +60,11 @@ const ContentStreamNewsItem = ({ feed }: Props) => (
       <StyledImage src={feed?.['media:content']?.attr_url} alt={feed?.title} />
       <StyledPanelBody>
         {/* eslint-disable-next-line react/no-danger */}
-        <a href={feed.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed.title) }} />
+        <a href={feed.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
         </a>
       </StyledPanelBody>
       <StyledPanelFooter>
-        <Timestamp dateTime={_sanitizeText(feed.pubDate)} format="shortReadable" />
+        <Timestamp dateTime={_sanitizeText(feed?.pubDate)} format="shortReadable" />
       </StyledPanelFooter>
     </StyledPanel>
   </Carousel.Slide>

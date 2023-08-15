@@ -18,38 +18,105 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SectionGrid from 'components/common/Section/SectionGrid';
-import { ButtonGroup } from 'components/bootstrap';
+import { Button } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import ContentStreamNews from 'components/content-stream/ContentStreamNews';
 import ContentStreamNewsFooter from 'components/content-stream/news/ContentStreamNewsFooter';
 import AppConfig from 'util/AppConfig';
 import ContentStreamReleasesSection from 'components/content-stream/ContentStreamReleasesSection';
+import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
+import { Icon } from 'components/common';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 const StyledNewsSectionComponent = styled(SectionComponent)(({ theme }) => css`
   overflow: hidden;
   flex-grow: 3;
-
+  height: min-content;
   @media (max-width: ${theme.breakpoints.max.md}) {
     flex-grow: 1;
   }
 `);
 const StyledReleaseSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
+  height: min-content;
 `;
+const StyledButton = styled(Button)(({ theme }) => css`
+  border: 0;
+  font-size: ${theme.fonts.size.large};
+
+  &:hover {
+    text-decoration: none;
+  }
+`);
 
 const ContentStreamSection = () => {
   const { rss_url } = AppConfig.contentStream() || {};
+  const { username } = useCurrentUser();
+  const {
+    contentStreamSettings,
+    isLoadingContentStreamSettings,
+    onSaveContentStreamSetting,
+    refetchContentStream,
+  } = useContentStreamSettings();
+
+  if (isLoadingContentStreamSettings || !contentStreamSettings) {
+    return null;
+  }
+
+  const updateContentStreamSettings = async ({ enableContentStream, enableRelease }: {
+    enableContentStream?: boolean,
+    enableRelease?: boolean
+  }) => {
+    await onSaveContentStreamSetting({
+      settings: {
+        content_stream_enabled: enableContentStream,
+        releases_enabled: enableRelease,
+        content_stream_topics: contentStreamSettings.contentStreamTopics,
+      },
+      username,
+    });
+
+    refetchContentStream();
+  };
+
+  const { contentStreamEnabled, releasesSectionEnabled } = contentStreamSettings;
 
   return (
     rss_url && (
       <SectionGrid $columns="2fr 1fr">
-        <StyledNewsSectionComponent title="News">
-          <ButtonGroup />
-          <ContentStreamNews rssUrl={rss_url} />
-          <ContentStreamNewsFooter />
+        <StyledNewsSectionComponent title="News"
+                                    headerActions={(
+                                      <StyledButton bsStyle="link"
+                                                    onClick={() => updateContentStreamSettings({
+                                                      enableContentStream: !contentStreamEnabled,
+                                                      enableRelease: releasesSectionEnabled,
+                                                    })}
+                                                    type="button">Close
+                                        <Icon name={contentStreamEnabled ? 'angle-down' : 'angle-right'} fixedWidth />
+                                      </StyledButton>
+                                    )}>
+          {contentStreamEnabled && (
+            <>
+              <ContentStreamNews rssUrl={rss_url} />
+              <ContentStreamNewsFooter />
+            </>
+          )}
         </StyledNewsSectionComponent>
-        <StyledReleaseSectionComponent title="Releases">
-          <ContentStreamReleasesSection rssUrl={rss_url} />
+        <StyledReleaseSectionComponent title="Releases"
+                                       headerActions={(
+                                         <StyledButton bsStyle="link"
+                                                       onClick={() => updateContentStreamSettings({
+                                                         enableContentStream: contentStreamEnabled,
+                                                         enableRelease: !releasesSectionEnabled,
+                                                       })}
+                                                       type="button">Close
+                                           <Icon name={releasesSectionEnabled ? 'angle-down' : 'angle-right'}
+                                                 fixedWidth />
+                                         </StyledButton>
+                                       )}>
+          {releasesSectionEnabled && (
+            <ContentStreamReleasesSection rssUrl={rss_url} />
+          )}
         </StyledReleaseSectionComponent>
       </SectionGrid>
     )

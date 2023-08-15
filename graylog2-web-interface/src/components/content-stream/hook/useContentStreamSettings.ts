@@ -14,31 +14,76 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/*
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { ContentStream } from '@graylog/server-api';
 import UserNotification from 'preflight/util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { CONTENT_STREAM_CONTENT_KEY } from 'components/content-stream/hook/useContentStream';
 
-export const CONTENT_STREAM_SETTINGS_KEY = 'CONTENT_STREAM_SETTINGS';
+export const CONTENT_STREAM_SETTINGS_KEY = ['content-stream', 'settings'];
 
-const useContentStream = () => {
-  const { data, isLoading } = useQuery([CONTENT_STREAM_SETTINGS], () => {
-  }, {
+type ContentStreamSettingsApi = {
+  content_stream_topics: Array<string>;
+  releases_enabled: boolean;
+  content_stream_enabled: boolean;
+};
+
+type ContentStreamSettings = {
+  contentStreamTopics: Array<string>;
+  releasesSectionEnabled: boolean;
+  contentStreamEnabled: boolean;
+};
+
+const useContentStreamSettings = (): {
+  contentStreamSettings: ContentStreamSettings,
+  isLoadingContentStreamSettings: boolean,
+  onSaveContentStreamSetting: ({ settings, username }: {
+    settings: ContentStreamSettingsApi,
+    username: string,
+  }) => Promise<void>,
+  refetchContentStream: () => void,
+} => {
+  const queryClient = useQueryClient();
+  const currentUser = useCurrentUser();
+  const { getContentStreamUserSettings, setContentStreamUserSettings } = ContentStream;
+
+  const saveSettings = async ({ settings, username }: { settings: ContentStreamSettingsApi, username: string }) => {
+    await setContentStreamUserSettings(settings, username);
+  };
+
+  const {
+    data,
+    isLoading,
+    refetch: refetchContentStream,
+  } = useQuery<ContentStreamSettingsApi, Error>([CONTENT_STREAM_SETTINGS_KEY], () => getContentStreamUserSettings(currentUser.username), {
     onError: (errorThrown) => {
-      UserNotification.error(`Loading news feed failed with status: ${errorThrown}`,
-        'Could not load news feed');
+      UserNotification.error(`Loading content stream config failed with status: ${errorThrown}`,
+        'Could not load content stream.');
     },
-    initialData: [],
+  });
+
+  const { mutateAsync: onSaveContentStreamSetting } = useMutation(saveSettings, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(CONTENT_STREAM_SETTINGS_KEY);
+      queryClient.invalidateQueries(CONTENT_STREAM_CONTENT_KEY);
+    },
+    onError: (errorThrown) => {
+      UserNotification.error(`Enabling content stream failed with status: ${errorThrown}`,
+        'Could not cancel instant archiving jobs');
+    },
   });
 
   return {
-    newsList: data,
-    isLoadingFeed: isLoading,
+    contentStreamSettings: {
+      contentStreamTopics: data?.content_stream_topics,
+      releasesSectionEnabled: data?.releases_enabled,
+      contentStreamEnabled: data?.content_stream_enabled,
+    },
+    isLoadingContentStreamSettings: isLoading,
+    refetchContentStream,
+    onSaveContentStreamSetting,
   };
 };
 
-export default useContentStream;
-*/
+export default useContentStreamSettings;
