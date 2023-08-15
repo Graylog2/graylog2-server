@@ -41,6 +41,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { updateView } from 'views/logic/slices/viewSlice';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import useHistory from 'routing/useHistory';
+import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -111,11 +112,9 @@ const DashboardActionsMenu = () => {
   return (
     <ButtonGroup>
       {showSaveButton && (
-        <Button onClick={_onSaveView}
-                disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
-                title="Save dashboard">
-          <Icon name="save" /> Save
-        </Button>
+        <SaveViewButton title="Save dashboard"
+                        onClick={_onSaveView}
+                        disabled={isNewView || hasUndeclaredParameters || !allowedToEdit} />
       )}
       {showSaveNewButton && (
         <Button onClick={() => setSaveNewDashboardOpen(true)}

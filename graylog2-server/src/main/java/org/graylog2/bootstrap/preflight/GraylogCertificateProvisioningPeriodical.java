@@ -34,6 +34,8 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -58,7 +60,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
@@ -72,6 +73,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
     private final CsrSigner csrSigner;
+    private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
@@ -83,6 +85,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final Configuration configuration,
                                                     final NodeService nodeService,
                                                     final CsrSigner csrSigner,
+                                                    final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
@@ -92,6 +95,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.configuration = configuration;
         this.nodeService = nodeService;
         this.csrSigner = csrSigner;
+        this.clusterConfigService = clusterConfigService;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -113,6 +117,10 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         return Optional.empty();
     }
 
+    private RenewalPolicy getRenewalPolicy() {
+        return this.clusterConfigService.get(RenewalPolicy.class);
+    }
+
     @Override
     public void doRun() {
         LOG.debug("checking if there are configuration steps to take care of");
@@ -126,6 +134,12 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 Optional<KeyStore> optKey = caService.loadKeyStore();
                 if (optKey.isEmpty()) {
                     LOG.warn("No keystore available.");
+                    return;
+                }
+
+                final var renewalPolicy = getRenewalPolicy();
+                if(renewalPolicy == null) {
+                    LOG.warn("No renewal policy available.");
                     return;
                 }
 
@@ -151,7 +165,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                             .errorMsg("Node in CSR state, but no CSR present")
                                             .build());
                                 } else {
-                                    var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                                    var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
                                     //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
                                     final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
                                     certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());

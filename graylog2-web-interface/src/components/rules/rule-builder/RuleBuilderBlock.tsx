@@ -24,13 +24,11 @@ import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 
-import type { RuleBlock, BlockType, BlockDict } from './types';
-import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
+import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
+import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
 import { getDictForFunction } from './helpers';
 
-const BlockContainer = styled.div.attrs<{ $hasErrors: boolean }>(({ $hasErrors }) => ({
-  $hasErrors,
-}))(({ $hasErrors, theme }) => css`
+const BlockContainer = styled.div<{ $hasErrors: boolean }>(({ theme, $hasErrors }) => css`
   border-radius: 4px;
   border-color: ${$hasErrors ? theme.colors.variant.lighter.danger : theme.colors.variant.lighter.default};
   padding: ${theme.spacings.md};
@@ -42,7 +40,7 @@ type Props = {
   blockDict: Array<BlockDict>,
   block?: RuleBlock,
   order: number,
-  previousOutputPresent?: boolean,
+  outputVariableList?: OutputVariables,
   addBlock: (type: string, block: RuleBlock) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
   deleteBlock: (orderIndex: number, type: string) => void,
@@ -53,7 +51,7 @@ const RuleBuilderBlock = ({
   blockDict,
   block,
   order,
-  previousOutputPresent,
+  outputVariableList,
   addBlock,
   updateBlock,
   deleteBlock,
@@ -66,7 +64,7 @@ const RuleBuilderBlock = ({
 
   useEffect(() => {
     if (block) {
-      setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
+      setCurrentBlockDict(getDictForFunction(blockDict, block.function));
     }
   },
   [block, blockDict]);
@@ -153,10 +151,10 @@ const RuleBuilderBlock = ({
   };
 
   const isBlockNegatable = (): boolean => (
-    getDictForFunction(blockDict, block.function)?.return_type === RuleBuilderTypes.Boolean
+    currentBlockDict?.return_type === RuleBuilderTypes.Boolean
   );
 
-  const options = blockDict.map(({ name }) => ({ label: name, value: name }));
+  const options = blockDict.map(({ name, description, rule_builder_name }) => ({ label: rule_builder_name, value: name, description: description }));
 
   const showForm = !block || editMode;
 
@@ -170,7 +168,7 @@ const RuleBuilderBlock = ({
                        onSelect={onSelect}
                        order={order}
                        options={options}
-                       previousOutputPresent={previousOutputPresent}
+                       outputVariableList={outputVariableList}
                        selectedBlockDict={currentBlockDict}
                        type={type} />
       ) : (
@@ -178,6 +176,7 @@ const RuleBuilderBlock = ({
                           onDelete={onDelete}
                           onEdit={onEdit}
                           onNegate={onNegate}
+                          returnType={currentBlockDict?.return_type}
                           negatable={isBlockNegatable()} />
       )}
     </BlockContainer>
@@ -189,7 +188,7 @@ RuleBuilderBlock.propTypes = {
   blockDict: PropTypes.arrayOf(blockDictPropType).isRequired,
   block: ruleBlockPropType,
   order: PropTypes.number.isRequired,
-  previousOutputPresent: PropTypes.bool,
+  outputVariableList: outputVariablesPropType,
   addBlock: PropTypes.func.isRequired,
   updateBlock: PropTypes.func.isRequired,
   deleteBlock: PropTypes.func.isRequired,
@@ -197,7 +196,7 @@ RuleBuilderBlock.propTypes = {
 
 RuleBuilderBlock.defaultProps = {
   block: undefined,
-  previousOutputPresent: false,
+  outputVariableList: undefined,
 };
 
 export default RuleBuilderBlock;
