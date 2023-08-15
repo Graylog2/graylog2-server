@@ -54,7 +54,7 @@ const ContentStreamReleasesSection = ({ rssUrl }: Props) => {
   return (
     <ListGroup>
       {feedList.map((feed) => (
-        <StyledListGroupItem>
+        <StyledListGroupItem key={feed?.guid['#text'] || feed?.title}>
           <a href={feed?.link} target="_blank" rel="noreferrer">
             {/* eslint-disable-next-line react/no-danger */}
             <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed.title) }} />

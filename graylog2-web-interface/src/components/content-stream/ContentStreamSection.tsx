@@ -18,35 +18,26 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SectionGrid from 'components/common/Section/SectionGrid';
-import { Button } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import ContentStreamNews from 'components/content-stream/ContentStreamNews';
 import ContentStreamNewsFooter from 'components/content-stream/news/ContentStreamNewsFooter';
 import AppConfig from 'util/AppConfig';
 import ContentStreamReleasesSection from 'components/content-stream/ContentStreamReleasesSection';
 import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
-import { Icon } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
+import ToggleActionButton from 'components/content-stream/ToggleActionButton';
 
-const StyledNewsSectionComponent = styled(SectionComponent)(({ theme }) => css`
+const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled, theme }) => css`
   overflow: hidden;
   flex-grow: 3;
-  height: min-content;
+  height: ${$enabled ? 'initial' : 'min-content'};
   @media (max-width: ${theme.breakpoints.max.md}) {
     flex-grow: 1;
   }
 `);
-const StyledReleaseSectionComponent = styled(SectionComponent)`
+const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled }) => css`
   flex-grow: 1;
-  height: min-content;
-`;
-const StyledButton = styled(Button)(({ theme }) => css`
-  border: 0;
-  font-size: ${theme.fonts.size.large};
-
-  &:hover {
-    text-decoration: none;
-  }
+  height: ${$enabled ? 'initial' : 'min-content'};
 `);
 
 const ContentStreamSection = () => {
@@ -80,20 +71,23 @@ const ContentStreamSection = () => {
   };
 
   const { contentStreamEnabled, releasesSectionEnabled } = contentStreamSettings;
+  const toggleNews = () => updateContentStreamSettings({
+    enableContentStream: !contentStreamEnabled,
+    enableRelease: releasesSectionEnabled,
+  });
+  const toggleRelease = () => updateContentStreamSettings({
+    enableContentStream: contentStreamEnabled,
+    enableRelease: !releasesSectionEnabled,
+  });
 
   return (
     rss_url && (
       <SectionGrid $columns="2fr 1fr">
         <StyledNewsSectionComponent title="News"
+                                    $enabled={contentStreamEnabled}
                                     headerActions={(
-                                      <StyledButton bsStyle="link"
-                                                    onClick={() => updateContentStreamSettings({
-                                                      enableContentStream: !contentStreamEnabled,
-                                                      enableRelease: releasesSectionEnabled,
-                                                    })}
-                                                    type="button">Close
-                                        <Icon name={contentStreamEnabled ? 'angle-down' : 'angle-right'} fixedWidth />
-                                      </StyledButton>
+                                      <ToggleActionButton onClick={toggleNews}
+                                                          isOpen={contentStreamEnabled} />
                                     )}>
           {contentStreamEnabled && (
             <>
@@ -103,16 +97,10 @@ const ContentStreamSection = () => {
           )}
         </StyledNewsSectionComponent>
         <StyledReleaseSectionComponent title="Releases"
+                                       $enabled={releasesSectionEnabled}
                                        headerActions={(
-                                         <StyledButton bsStyle="link"
-                                                       onClick={() => updateContentStreamSettings({
-                                                         enableContentStream: contentStreamEnabled,
-                                                         enableRelease: !releasesSectionEnabled,
-                                                       })}
-                                                       type="button">Close
-                                           <Icon name={releasesSectionEnabled ? 'angle-down' : 'angle-right'}
-                                                 fixedWidth />
-                                         </StyledButton>
+                                         <ToggleActionButton onClick={toggleRelease}
+                                                             isOpen={releasesSectionEnabled} />
                                        )}>
           {releasesSectionEnabled && (
             <ContentStreamReleasesSection rssUrl={rss_url} />
