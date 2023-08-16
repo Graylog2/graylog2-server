@@ -299,7 +299,8 @@ const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChar
         <Overlay show={valueTargetCoordinates}
                  rootClose
                  onHide={(e) => {
-                   console.log(e);
+                   console.log({ e });
+                   console.log(popoverRef?.current?.contains(e.target));
                    _onCloseValuePopup();
                  }}>
           <StyledPopover id="value-config-popover"
@@ -309,7 +310,7 @@ const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChar
                          $left={valueTargetCoordinates?.left}>
             <ValueContainer ref={popoverRef}> {
               valueItems.map(({ label, field, type }) => (field
-                ? <Value key={`${field}:${label}`} type={type} value={label} field={field} interactiveActionCallback={_onCloseValuePopup} />
+                ? <Value key={`${field}:${label}`} type={type} value={label} field={field} interactiveActionCallback={_onCloseValuePopup} menuContainer={popoverRef.current} />
                 : label))
 }
             </ValueContainer>
