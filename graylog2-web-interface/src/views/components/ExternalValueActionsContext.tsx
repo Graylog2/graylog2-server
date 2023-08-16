@@ -19,10 +19,18 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
-const ExternalValueActionsContext = React.createContext<{
+export type ExternalValueActionsContextValue = {
     isLoading: boolean,
     externalValueActions: Array<ActionDefinition>,
     isError: boolean,
-} | undefined>(undefined);
+}
+
+export const DEFAULT_EXTERNAL_ACTIONS = {
+  isLoading: false,
+  externalValueActions: [],
+  isError: false,
+};
+
+const ExternalValueActionsContext = React.createContext<ExternalValueActionsContextValue>(DEFAULT_EXTERNAL_ACTIONS);
 
 export default singleton('contexts.ExternalValueActionsContext', () => ExternalValueActionsContext);

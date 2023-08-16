@@ -19,27 +19,17 @@ import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
-import ExternalValueActionsContext from './ExternalValueActionsContext';
-
-const DEFAULT_EXTERNAL_ACTIONS = {
-  isLoading: false,
-  externalValueActions: [],
-  isError: false,
-};
+import type { ExternalValueActionsContextValue } from './ExternalValueActionsContext';
+import ExternalValueActionsContext, { DEFAULT_EXTERNAL_ACTIONS } from './ExternalValueActionsContext';
 
 const usePluginExternalActions = () => {
   const useExternalActions = usePluginEntities('useExternalActions');
-  const useExternalAction = useMemo<()=>({
-    isLoading: boolean,
-    externalValueActions: Array<ActionDefinition>,
-    isError: boolean,
-  })>(() => {
-      if (useExternalActions && typeof useExternalActions[0] === 'function') return useExternalActions[0];
+  const useExternalAction = useMemo<()=>(ExternalValueActionsContextValue)>(() => {
+    if (useExternalActions && typeof useExternalActions[0] === 'function') return useExternalActions[0];
 
-      return () => DEFAULT_EXTERNAL_ACTIONS;
-    }, [useExternalActions]);
+    return () => DEFAULT_EXTERNAL_ACTIONS;
+  }, [useExternalActions]);
 
   const { isLoading, externalValueActions, isError } = useExternalAction();
 
