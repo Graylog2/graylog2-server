@@ -81,7 +81,7 @@ const ContentStreamSection = () => {
   });
 
   return (
-    rss_url && (
+    rss_url ? (
       <SectionGrid $columns="2fr 1fr">
         <StyledNewsSectionComponent title="News"
                                     $enabled={contentStreamEnabled}
@@ -107,8 +107,7 @@ const ContentStreamSection = () => {
           )}
         </StyledReleaseSectionComponent>
       </SectionGrid>
-    )
-  );
+    ) : null);
 };
 
 export default ContentStreamSection;
