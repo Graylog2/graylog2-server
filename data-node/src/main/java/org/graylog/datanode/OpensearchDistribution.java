@@ -57,6 +57,11 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
 
     private static OpensearchDistribution detectInSubdirectory(Path directory, String osArch) {
         final List<OpensearchDistribution> opensearchDistributions;
+
+        if(!Files.isDirectory(directory)) {
+            throw new IllegalArgumentException("Provided opensearch distribution directory does not exist! Please adapt the opensearch_location property");
+        }
+
         try (
                 var files = Files.list(directory);
         ) {
