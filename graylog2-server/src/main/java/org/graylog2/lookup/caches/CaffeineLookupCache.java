@@ -31,6 +31,7 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupCacheKey;
@@ -125,7 +126,11 @@ public class CaffeineLookupCache extends LookupCache {
     public LookupResult get(LookupCacheKey key, Callable<LookupResult> loader) {
         final Function<LookupCacheKey, LookupResult> mapFunction = unused -> {
             try {
-                return loader.call();
+                final LookupResult result = loader.call();
+                if (result == null && c.) {
+                    throw new NotFoundException("Lookup result is null");
+                }
+                return result;
             } catch (Exception e) {
                 LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
                 return LookupResult.withError(
@@ -133,7 +138,7 @@ public class CaffeineLookupCache extends LookupCache {
             }
         };
         try (final Timer.Context ignored = lookupTimer()) {
-            return cache.get(key, mapFunction);
+            return cache.get(key, mapFunction, );
         }
     }
 
@@ -186,6 +191,7 @@ public class CaffeineLookupCache extends LookupCache {
                     .expireAfterAccess(60)
                     .expireAfterAccessUnit(TimeUnit.SECONDS)
                     .expireAfterWrite(0)
+                    .ignoreNull(false)
                     .build();
         }
     }
@@ -217,6 +223,10 @@ public class CaffeineLookupCache extends LookupCache {
         @JsonProperty("expire_after_write_unit")
         public abstract TimeUnit expireAfterWriteUnit();
 
+        @Nullable
+        @JsonProperty("ignore_null")
+        public abstract boolean ignoreNull();
+
         public static Builder builder() {
             return new AutoValue_CaffeineLookupCache_Config.Builder();
         }
@@ -240,6 +250,9 @@ public class CaffeineLookupCache extends LookupCache {
 
             @JsonProperty("expire_after_write_unit")
             public abstract Builder expireAfterWriteUnit(@Nullable TimeUnit expireAfterWriteUnit);
+
+            @JsonProperty("ignore_null")
+            public abstract Builder ignoreNull(@Nullable boolean ignoreNull);
 
             public abstract Config build();
         }
