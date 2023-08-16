@@ -33,6 +33,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @AutoValue
@@ -124,12 +125,15 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                          @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
                                          @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                         @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate,
+                                         @JsonProperty("creation_date") @Nullable ZonedDateTime creationDate,
                                          @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
                                          @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                          @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
                                          @JsonProperty("index_template_type") @Nullable String templateType) {
+        if (Objects.isNull(creationDate)) {
+            creationDate = ZonedDateTime.now();
+        }
         return new AutoValue_IndexSetSummary(id, title, description, isDefault, canBeDefault,
                 isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
