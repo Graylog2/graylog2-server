@@ -1389,4 +1389,17 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(message.getField("k1")).isNull();
     }
+
+    @Test
+    public void removeField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("i1")).isNull();
+        assertThat(message.getField("i2")).isNull();
+        assertThat(message.getField("f2")).isEqualTo("f2");
+        assertThat(message.getField("f3")).isEqualTo("f3");
+    }
 }
