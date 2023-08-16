@@ -95,7 +95,7 @@ const useContentStream = (rssUrl: string): { isLoadingFeed: boolean, feedList: A
   const {
     data,
     isLoading,
-  } = useQuery<Array<FeedITem>, Error>([CONTENT_STREAM_CONTENT_KEY], () => fetchNewsFeed(rssUrl), {
+  } = useQuery<Array<FeedITem>, Error>([...CONTENT_STREAM_CONTENT_KEY, rssUrl], () => fetchNewsFeed(rssUrl), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading news feed failed with status: ${errorThrown}`,
         'Could not load news feed');

@@ -27,7 +27,8 @@ type Props = {
 }
 
 const ContentStreamNews = ({ rssUrl }: Props) => {
-  const { feedList, isLoadingFeed } = useContentStream(rssUrl);
+  const feedUrl = `${rssUrl}/tag/in-product/feed/`;
+  const { feedList, isLoadingFeed } = useContentStream(feedUrl);
 
   if (isLoadingFeed && !isEmpty(feedList)) {
     return <Spinner />;

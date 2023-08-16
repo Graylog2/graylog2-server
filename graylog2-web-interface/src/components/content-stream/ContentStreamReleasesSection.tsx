@@ -45,7 +45,8 @@ export const StyledLabel = styled(Label)`
 const _sanitizeText = (text) => DOMPurify.sanitize(text);
 
 const ContentStreamReleasesSection = ({ rssUrl }: Props) => {
-  const { feedList, isLoadingFeed } = useContentStream(rssUrl);
+  const feedUrl = `${rssUrl}/category/release-notices/feed/`;
+  const { feedList, isLoadingFeed } = useContentStream(feedUrl);
 
   if (isLoadingFeed && !isEmpty(feedList)) {
     return <Spinner />;
