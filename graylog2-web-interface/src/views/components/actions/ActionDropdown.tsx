@@ -95,6 +95,7 @@ const ActionDropdown = ({
   setOverflowingComponents,
   overflowingComponents,
   onMenuToggle,
+  interactiveActionCallback,
 }: Props) => {
   const internalActions = useInternalActions(type, handlerArgs);
   const { isLoading, externalActions } = useExternalActions(type, handlerArgs);
@@ -116,7 +117,8 @@ const ActionDropdown = ({
                         setOverflowingComponents={setOverflowingComponents}
                         overflowingComponents={overflowingComponents}
                         type={type}
-                        onMenuToggle={onMenuToggle} />
+                        onMenuToggle={onMenuToggle}
+                        interactiveActionCallback={interactiveActionCallback} />
       ))}
       {isLoading && (<><MenuItem divider /><MenuItem disabled><Spinner text="Loading" /></MenuItem></>)}
       {(!isLoading && externalActions && externalActions.length !== 0) && (

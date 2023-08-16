@@ -89,7 +89,7 @@ export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is 
   return 'linkTarget' in action;
 }
 
-export function createHandlerFor<T>(dispatch: AppDispatch, action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
+export function createHandlerFor<T>(dispatch: AppDispatch, action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents, interactiveActionCallback): ActionHandler<T> {
   if ('handler' in action) {
     return action.handler;
   }
@@ -104,7 +104,11 @@ export function createHandlerFor<T>(dispatch: AppDispatch, action: ActionDefinit
     return ({ queryId, field, value, type }) => {
       const id = generateId();
 
-      const onClose = () => setActionComponents(({ [id]: _, ...rest }) => rest);
+      const onClose = () => setActionComponents(({ [id]: _, ...rest }) => {
+        interactiveActionCallback();
+
+        return rest;
+      });
       const renderedComponent = (
         <ActionComponent key={action.title}
                          onClose={onClose}

@@ -39,14 +39,15 @@ const ValueActionTitle = styled.span`
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ field, value, render, type }: Props) => {
+const InteractiveValue = ({ field, value, render, type, menuContainer, interactiveActionCallback }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
+  console.log({ InteractiveValue: menuContainer });
 
   return (
-    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value} menuContainer={menuContainer} interactiveActionCallback={interactiveActionCallback}>
       <ValueActionTitle data-testid="value-actions-title">
         {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
       </ValueActionTitle>
@@ -58,13 +59,17 @@ InteractiveValue.defaultProps = {
   render: defaultRenderer,
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
-  <InteractiveContext.Consumer>
-    {(interactive) => ((interactive)
-      ? <InteractiveValue field={field} value={value} render={render} type={type} />
-      : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
-  </InteractiveContext.Consumer>
-);
+const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, menuContainer, interactiveActionCallback }: Props) => {
+  console.log({ Value: menuContainer });
+
+  return (
+    <InteractiveContext.Consumer>
+      {(interactive) => ((interactive)
+        ? <InteractiveValue field={field} value={value} render={render} type={type} menuContainer={menuContainer} interactiveActionCallback={interactiveActionCallback} />
+        : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
+    </InteractiveContext.Consumer>
+  );
+};
 
 Value.defaultProps = {
   render: defaultRenderer,

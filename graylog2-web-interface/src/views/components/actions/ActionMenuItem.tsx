@@ -124,7 +124,7 @@ type ActionHandlerItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'over
   field: string,
 };
 
-const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle }: ActionHandlerItemProps) => {
+const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle, interactiveActionCallback }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const dispatch = useAppDispatch();
 
@@ -132,7 +132,7 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
     setOverflowingComponents(fn(overflowingComponents));
   }, [overflowingComponents, setOverflowingComponents]);
 
-  const handler = useMemo(() => createHandlerFor(dispatch, action, setActionComponents), [action, dispatch, setActionComponents]);
+  const handler = useMemo(() => createHandlerFor(dispatch, action, setActionComponents, interactiveActionCallback), [action, dispatch, setActionComponents]);
 
   const onSelect = useCallback(() => {
     const { resetFocus = false } = action;
@@ -142,9 +142,9 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
     }
 
     onMenuToggle();
-
-    handler(handlerArgs);
-  }, [action, handler, handlerArgs, onMenuToggle, unsetWidgetFocusing]);
+    console.log('11111111 111111111', { interactiveActionCallback });
+    handler(handlerArgs).then(() => !action.component && interactiveActionCallback && interactiveActionCallback());
+  }, [action, handler, handlerArgs, interactiveActionCallback, onMenuToggle, unsetWidgetFocusing]);
 
   const { field } = handlerArgs;
 
@@ -157,7 +157,7 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
   );
 };
 
-const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle }: Props) => {
+const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle, interactiveActionCallback }: Props) => {
   const { isEnabled = () => true } = action;
   const dispatch = useAppDispatch();
   const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
@@ -167,6 +167,8 @@ const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflo
     return <ExternalLinkItem action={action} disabled={actionDisabled} field={field} handlerArgs={handlerArgs} onMenuToggle={onMenuToggle} type={type} />;
   }
 
+  console.log({ type, overflowingComponents, action });
+
   return (
     <ActionHandlerItem action={action}
                        disabled={actionDisabled}
@@ -175,7 +177,8 @@ const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflo
                        onMenuToggle={onMenuToggle}
                        overflowingComponents={overflowingComponents}
                        setOverflowingComponents={setOverflowingComponents}
-                       type={type} />
+                       type={type}
+                       interactiveActionCallback={interactiveActionCallback} />
   );
 };
 

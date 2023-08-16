@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Popover } from 'components/bootstrap';
 import ColorPicker from 'components/common/ColorPicker';
@@ -57,6 +57,11 @@ const StyledPlot = styled(Plot)(({ theme }) => css`
   }
 `);
 
+const StyledPopover = styled(Popover)<{ $top: number, $left: number}>(({ $top, $left }) => css`
+  left: ${$left}${'px'}!important;
+  top: ${$top}${'px'}!important;
+  z-index: 1000;
+`);
 const ValueContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -118,7 +123,7 @@ const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.
 
 const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChartColor, labelFields }: Props) => {
   const [legendConfig, setLegendConfig] = useState<LegendConfig>();
-  const [valueTarget, setValueTarget] = useState(null);
+  const [valueTargetCoordinates, setValueTargetCoordinates] = useState<{ top: number, left: number }>(null);
   const [valueItems, setValueItems] = useState<Array<{ label: string, field: string, type: FieldType }>>([]);
   const theme = useTheme();
   const activeQuery = useActiveQueryId();
@@ -126,6 +131,7 @@ const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChar
   const interactive = useContext(InteractiveContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
   const fieldTypes = useContext(FieldTypesContext);
+  const popoverRef = useRef();
 
   useEffect(() => {
     styles.use();
@@ -241,11 +247,12 @@ const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChar
   }), [chartData, colors, setChartColor, theme.colors.global.textDefault]);
 
   const _onCloseValuePopup = useCallback(() => {
-    setValueTarget(null);
+    // setTimeout(() => setValueTargetCoordinates(null), 400);
+    setValueTargetCoordinates(null);
   }, []);
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
-  const onPLotCLick = useCallback(({ event: { target }, points }) => {
-    setValueTarget(target);
+  const onPLotCLick = useCallback(({ event: { clientX, clientY }, points }) => {
+    setValueTargetCoordinates({ top: clientY, left: clientX });
     const { label: value } = points[0];
 
     const labelsWithField = value.split(humanSeparator).map((label: string, idx: number) => {
@@ -257,6 +264,8 @@ const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChar
 
     setValueItems(labelsWithField);
   }, [_labelFields, activeQuery, fieldTypes?.queryFields]);
+
+  console.log({ popoverRef });
 
   return (
     <>
@@ -286,25 +295,26 @@ const GenericPlot = ({ chartData, config, layout, setChartColor, onZoom, getChar
           </Overlay>
         </RootCloseWrapper>
       )}
-      {valueTarget && (
-      <RootCloseWrapper event="mousedown"
-                        onRootClose={_onCloseValuePopup}>
-        <Overlay show
-                 placement="bottom"
-                 target={valueTarget}>
-          <Popover id="value-config-popover"
-                   title="Value"
-                   className={styles.locals.customPopover}
-                   data-event-element="Generic Plot">
-            <ValueContainer> {
+      {valueTargetCoordinates && (
+        <Overlay show={valueTargetCoordinates}
+                 rootClose
+                 onHide={(e) => {
+                   console.log(e);
+                   _onCloseValuePopup();
+                 }}>
+          <StyledPopover id="value-config-popover"
+                         className={styles.locals.customPopover}
+                         data-event-element="Generic Plot"
+                         $top={valueTargetCoordinates?.top}
+                         $left={valueTargetCoordinates?.left}>
+            <ValueContainer ref={popoverRef}> {
               valueItems.map(({ label, field, type }) => (field
-                ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
+                ? <Value key={`${field}:${label}`} type={type} value={label} field={field} interactiveActionCallback={_onCloseValuePopup} />
                 : label))
 }
             </ValueContainer>
-          </Popover>
+          </StyledPopover>
         </Overlay>
-      </RootCloseWrapper>
       )}
     </>
   );

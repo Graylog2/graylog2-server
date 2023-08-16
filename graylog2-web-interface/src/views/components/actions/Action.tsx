@@ -30,13 +30,14 @@ type Props = {
   type: 'field' | 'value',
 };
 
-const Action = ({ type, handlerArgs, menuContainer, element: Element, children }: Props) => {
+const Action = ({ type, handlerArgs, menuContainer, element: Element, children, interactiveActionCallback }: Props) => {
   const [open, setOpen] = useState(false);
   const [overflowingComponents, setOverflowingComponents] = useState<ActionComponents>({});
 
   const _onMenuToggle = useCallback(() => setOpen(!open), [open]);
   const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
   const element = <><Element active={open} /><span className="caret" /></>;
+  console.log({ Action: menuContainer });
 
   return (
     <>
@@ -49,7 +50,8 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
                         type={type}
                         setOverflowingComponents={setOverflowingComponents}
                         onMenuToggle={_onMenuToggle}
-                        overflowingComponents={overflowingComponents}>
+                        overflowingComponents={overflowingComponents}
+                        interactiveActionCallback={interactiveActionCallback}>
           {children}
         </ActionDropdown>
       </OverlayDropdown>
