@@ -44,7 +44,9 @@ const conditionsBlockDict: BlockDict[] = [
     ],
     description: "Checks if the message has a field and if this field's numeric value is less than or equal to the given fieldValue",
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Field 'field' less than or equal 'fieldValue'",
+    rule_builder_name: 'has field less or equal',
   },
   {
     name: 'has_field',
@@ -72,7 +74,9 @@ const conditionsBlockDict: BlockDict[] = [
     ],
     description: 'Checks whether a message contains a value for a field',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Message has field 'field'",
+    rule_builder_name: 'has field',
   },
   {
     name: 'has_field_greater_or_equal',
@@ -100,7 +104,10 @@ const conditionsBlockDict: BlockDict[] = [
     ],
     description: "Checks if the message has a field and if this field's numeric value is greater than or equal to the given fieldValue",
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Field 'field' greater than or equal 'fieldValue'",
+    rule_builder_name: 'has field greater than or equal',
+
   },
   {
     name: 'has_field_equals',
@@ -128,7 +135,9 @@ const conditionsBlockDict: BlockDict[] = [
     ],
     description: "Checks if the message has a field and if this field's string value is equal to the given fieldValue",
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Field 'field' equals 'fieldValue'",
+    rule_builder_name: 'field equals',
   },
 ];
 
@@ -159,7 +168,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Checks whether a message contains a value for a field',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Message has field 'field'",
+    rule_builder_name: 'has field',
   },
   {
     name: 'to_long',
@@ -187,7 +198,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Converts a value to a long value using its string representation',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: 'Convert value to number',
+    rule_builder_name: 'to long',
   },
   {
     name: 'get_field',
@@ -215,7 +228,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Retrieves the value for a field',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Retrieve value for field 'field'",
+    rule_builder_name: 'get field',
   },
   {
     name: 'set_grok_to_fields',
@@ -270,7 +285,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Match grok pattern and set fields',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Match grok pattern on field 'field' and set fields",
+    rule_builder_name: 'match grok',
   },
   {
     name: 'substring',
@@ -307,7 +324,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Extract a substring from a string',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Get substring from 'start' to 'end!\"end\"' of value",
+    rule_builder_name: 'get substring',
   },
   {
     name: 'to_string',
@@ -335,7 +354,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Converts a value to its string representation',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: 'Convert value to string',
+    rule_builder_name: 'convert to string',
   },
   {
     name: 'set_field',
@@ -399,7 +420,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Sets a new field in a message',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Set value to field 'field'",
+    rule_builder_name: 'set value',
   },
   {
     name: 'format_date',
@@ -436,7 +459,9 @@ const actionsBlockDict: BlockDict[] = [
     ],
     description: 'Formats a date using the given format string',
     rule_builder_enabled: true,
+    rule_builder_function_group: 'g1',
     rule_builder_title: "Format date (format 'format')",
+    rule_builder_name: 'format date',
   },
 ];
 

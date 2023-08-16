@@ -101,8 +101,6 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
         withEnv("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
         withEnv("KAFKA_CFG_LISTENERS", "EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,INTERNAL://0.0.0.0:9094");
         withEnv("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT");
-        // The bitnami image uses the content of _FILE variables as file name to read the value from.
-        withEnv("KAFKA_CFG_ADVERTISED_LISTENERS_FILE", KAFKA_ADVERTISED_LISTENERS_FILE);
         withEnv("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "INTERNAL");
 
         // The following settings speed up group rebalancing. Without it, it can take several seconds before a
@@ -115,7 +113,12 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
         // Override the default entrypoint, so we only start Kafka once our listeners files is written.
         withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint("sh"));
-        withCommand("-c", "while [ ! -f " + KAFKA_ADVERTISED_LISTENERS_FILE + " ]; do sleep 0.1; done; /entrypoint.sh /run.sh");
+        withCommand("-c",
+                // The EXTERNAL listener must use the mapped host port for port 9092. We only know this once the
+                // container is started, so we have to set the advertised.listeners in the command script.
+                f("while [ ! -f %s ]; do sleep 0.1; done; export KAFKA_CFG_ADVERTISED_LISTENERS=\"$(cat %s)\"; /entrypoint.sh /run.sh",
+                        KAFKA_ADVERTISED_LISTENERS_FILE, KAFKA_ADVERTISED_LISTENERS_FILE)
+        );
 
         waitingFor(Wait.forLogMessage(".*Kafka Server started.*", 1).withStartupTimeout(Duration.ofSeconds(60)));
     }

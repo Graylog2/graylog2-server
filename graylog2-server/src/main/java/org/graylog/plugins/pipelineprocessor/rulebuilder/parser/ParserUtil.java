@@ -39,6 +39,10 @@ public class ParserUtil {
 
 
     static final String generateForFunction(RuleBuilderStep step, FunctionDescriptor<?> function) {
+        return generateForFunction(step, function, 1);
+    }
+
+    static final String generateForFunction(RuleBuilderStep step, FunctionDescriptor<?> function, int level) {
         String syntax = function.name() + "(";
         String params = function.params().stream()
                 .map(p -> addFunctionParameter(p, step))
@@ -47,7 +51,7 @@ public class ParserUtil {
         if (StringUtils.isEmpty(params)) {
             return syntax + ")";
         } else {
-            return syntax + ConditionParser.NL + params + ConditionParser.NL + "  )";
+            return syntax + ConditionParser.NL + params + ConditionParser.NL + StringUtils.repeat("  ", level) + ")";
         }
     }
 

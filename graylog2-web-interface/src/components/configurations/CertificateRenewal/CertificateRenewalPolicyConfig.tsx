@@ -101,7 +101,11 @@ const renewalModeExplanation = 'Setting the renewal policy to "Automatic" will '
   + 'notification when one or more certificates are about to expire, allowing you to confirm their renewal.';
 const lifetimeExplanation = 'The certificate lifetime will be used for the length of the validity of newly created certificates.';
 
-const CertificateRenewalPolicyConfig = () => {
+type Props = {
+  className?: string
+}
+
+const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const { data: currentConfig, isLoading } = useQuery(queryKey, fetchCurrentConfig);
 
@@ -164,7 +168,7 @@ const CertificateRenewalPolicyConfig = () => {
   };
 
   return (
-    <div>
+    <div className={className}>
       <h2>Certificate Renewal Policy Configuration</h2>
       <p>
         These settings will be used when detecting expiration of certificates and/or when renewing them.
@@ -255,6 +259,10 @@ const CertificateRenewalPolicyConfig = () => {
       </Modal>
     </div>
   );
+};
+
+CertificateRenewalPolicyConfig.defaultProps = {
+  className: undefined,
 };
 
 export default CertificateRenewalPolicyConfig;
