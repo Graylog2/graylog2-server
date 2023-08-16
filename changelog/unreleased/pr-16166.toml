@@ -1,4 +1,4 @@
-type = "a"
+type = "c"
 message = "Make `creation_date` optional when creating index sets via api. If none is provided, the current server time will be used."
 
 issues = ["4709"]
