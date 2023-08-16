@@ -91,7 +91,7 @@ public class RolesResource extends RestResource {
     @GET
     @RequiresPermissions(RestPermissions.ROLES_READ)
     @ApiOperation("List all roles")
-    public RolesResponse listAll() throws NotFoundException {
+    public RolesResponse listAll() {
         final Set<Role> roles = roleService.loadAll();
         Set<RoleResponse> roleResponses = Sets.newHashSetWithExpectedSize(roles.size());
         for (Role role : roles) {
