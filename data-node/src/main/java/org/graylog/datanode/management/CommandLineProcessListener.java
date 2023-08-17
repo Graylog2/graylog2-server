@@ -46,7 +46,7 @@ public class CommandLineProcessListener implements ProcessListener {
         if(listening) {
             delegate.onProcessComplete(exitValue);
         } else {
-            LOG.info("Ignoring onProcessComplete({}) call, pr", exitValue);
+            LOG.info("Ignoring onProcessComplete({}) call, this process is already stopped", exitValue);
         }
     }
 
@@ -55,7 +55,7 @@ public class CommandLineProcessListener implements ProcessListener {
         if(listening) {
             delegate.onProcessFailed(e);
         } else {
-            LOG.info("Ignoring onProcessFailed({}) call, handler not listening anymore", e.getMessage());
+            LOG.info("Ignoring onProcessFailed({}) call,  this process is already stopped", e.getMessage());
         }
     }
 
@@ -64,7 +64,7 @@ public class CommandLineProcessListener implements ProcessListener {
         if(listening) {
             delegate.onStart();
         } else {
-            LOG.info("Ignoring onStart() call, handler not listening anymore");
+            LOG.info("Ignoring onStart() call,  this process is already stopped");
         }
     }
 
