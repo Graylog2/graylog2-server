@@ -341,7 +341,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             collector = collectorService.findByNameAndOs(collectorName, nodeOperatingSystem);
             if (collector == null) {
                 final String msg = "Couldn't find collector '{} on {}' fixing it.";
-                LOG.error(msg, collectorName, nodeOperatingSystem);
+                LOG.debug(msg, collectorName, nodeOperatingSystem);
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException ignored) {
