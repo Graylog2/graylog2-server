@@ -2,7 +2,7 @@ rule "mapRemove"
 when
   true
 then
-  let newValue = to_map(parse_json("{\"k1\":\"v1\",\"k2\":\"v2\"}"));
+  let newValue = {k1: "v1", k2: "v2"};
   map_remove(newValue, "k1");
   map_remove(newValue, "k99");
   set_fields(newValue);

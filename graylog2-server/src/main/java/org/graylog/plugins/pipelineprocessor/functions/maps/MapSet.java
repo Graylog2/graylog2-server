@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.maps;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -33,7 +32,6 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class MapSet extends AbstractFunction<Map> {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     public static final String NAME = "map_set";
     private static final String MAPARG = "map";
     private static final String KEYARG = "key";
