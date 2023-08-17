@@ -226,7 +226,6 @@ public class AggregationEventProcessor implements EventProcessor {
         final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
             final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
 
-            boolean eventLimitReached = false;
             for (final ResultMessage resultMessage : messages) {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
@@ -246,15 +245,12 @@ public class AggregationEventProcessor implements EventProcessor {
                 eventsWithContext.add(EventWithContext.create(event, msg));
                 if (config.eventLimit() != 0) {
                     if (messageCount.incrementAndGet() >= config.eventLimit()) {
-                        eventLimitReached = true;
-                        break;
+                        eventsConsumer.accept(eventsWithContext.build());
+                        throw new EventLimitReachedException();
                     }
                 }
             }
             eventsConsumer.accept(eventsWithContext.build());
-            if (eventLimitReached) {
-                throw new EventLimitReachedException();
-            }
         };
 
         try {
@@ -264,11 +260,12 @@ public class AggregationEventProcessor implements EventProcessor {
                     .addType(EVENT_LIMIT_REACHED)
                     .addKey(eventDefinition.id())
                     .addDetail("event_definition_title", eventDefinition.title())
+                    .addDetail("event_definition_id", eventDefinition.id())
                     .addDetail("event_limit", config.eventLimit())
                     .addSeverity(Notification.Severity.NORMAL)
             );
 
-            LOG.debug("Event limit reached at {} for '{}' event definition.", config.eventLimit(), eventDefinition.title());
+            LOG.debug("Event limit reached at {} for '{}/{}' event definition.", config.eventLimit(), eventDefinition.title(), eventDefinition.id());
         }
     }
 

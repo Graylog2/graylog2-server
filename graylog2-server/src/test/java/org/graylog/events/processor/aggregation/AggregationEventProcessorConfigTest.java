@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
+import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.conditions.Expression;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
@@ -28,6 +29,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -61,6 +63,10 @@ import static org.mockito.Mockito.mock;
 public class AggregationEventProcessorConfigTest {
     public static final EventDefinitionConfiguration EVENT_DEFINITION_CONFIGURATION = new EventDefinitionConfiguration();
     public static final int MAX_EVENT_LIMIT = EVENT_DEFINITION_CONFIGURATION.getMaxEventLimit();
+    public static final TestEventProcessorConfig TEST_EVENT_CONFIG = TestEventProcessorConfig.builder()
+            .message("")
+            .searchWithinMs(1)
+            .executeEveryMs(1).build();
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -189,13 +195,14 @@ public class AggregationEventProcessorConfigTest {
         var eventLimitOne = configWithEventLimit(1);
         var eventLimitGreaterMax = configWithEventLimit(MAX_EVENT_LIMIT + 1);
 
-
         assertValidationError("greater than 0", eventLimitZero, null);
         assertValidationError("greater than 0", configWithEventLimit(-1), null);
         assertValidationError("greater than 0", eventLimitZero, eventLimitOne);
+        assertValidationError("greater than 0", eventLimitZero, TEST_EVENT_CONFIG);
         assertValidationError("less than " + MAX_EVENT_LIMIT, eventLimitGreaterMax, eventLimitZero);
         assertNoValidationErrors(eventLimitZero, eventLimitZero);
         assertNoValidationErrors(eventLimitOne, eventLimitZero);
+        assertNoValidationErrors(eventLimitOne, TEST_EVENT_CONFIG);
     }
 
     private AggregationEventProcessorConfig configWithEventLimit(int eventLimit) {
@@ -203,7 +210,7 @@ public class AggregationEventProcessorConfigTest {
     }
 
     private static void assertValidationError(String validationError, AggregationEventProcessorConfig config,
-                                              AggregationEventProcessorConfig oldConfig) {
+                                              EventProcessorConfig oldConfig) {
         List<String> validationErrors = config.validate(oldConfig, EVENT_DEFINITION_CONFIGURATION).getErrors().values()
                 .stream().flatMap(Collection::stream).toList();
         assertThat(validationErrors).hasSize(1);
@@ -211,7 +218,7 @@ public class AggregationEventProcessorConfigTest {
     }
 
     private static void assertNoValidationErrors(AggregationEventProcessorConfig config,
-                                                 AggregationEventProcessorConfig oldConfig) {
+                                                 EventProcessorConfig oldConfig) {
         List<String> validationErrors = config.validate(oldConfig, EVENT_DEFINITION_CONFIGURATION).getErrors().values()
                 .stream().flatMap(Collection::stream).toList();
         assertThat(validationErrors).isEmpty();

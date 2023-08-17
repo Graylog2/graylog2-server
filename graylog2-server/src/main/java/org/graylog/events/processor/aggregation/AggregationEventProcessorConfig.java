@@ -213,16 +213,22 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     public ValidationResult validate(@Nullable EventProcessorConfig oldEventProcessorConfig,
                                      EventDefinitionConfiguration eventDefinitionConfiguration) {
         final ValidationResult validationResult = new ValidationResult();
-        AggregationEventProcessorConfig oldConfig = (AggregationEventProcessorConfig) oldEventProcessorConfig;
+        if (!series().isEmpty()) {
+            return validationResult;
+        }
 
-        if (oldConfig == null) {
-            if (eventLimit() <= 0) {
-                validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
-            }
-        } else {
-            if (oldConfig.eventLimit() != 0 && eventLimit() <= 0) {
-                validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
-            }
+        if (oldEventProcessorConfig == null) {
+            // Enforce event limit on newly created event filter definition
+            checkEventLimitGreaterZero(validationResult);
+        } else if ( !(oldEventProcessorConfig instanceof final AggregationEventProcessorConfig oldConfig)) {
+            // Enforce event limit on event definition type change
+            checkEventLimitGreaterZero(validationResult);
+        } else if ( !oldConfig.series().isEmpty()) {
+            // Enforce event limit on aggregation to filter change
+            checkEventLimitGreaterZero(validationResult);
+        } else if (oldConfig.eventLimit() != 0) {
+            // Enforce event limit if event limit has already been changed
+            checkEventLimitGreaterZero(validationResult);
         }
 
         if (eventLimit() > eventDefinitionConfiguration.getMaxEventLimit()) {
@@ -230,6 +236,12 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         }
 
         return validationResult;
+    }
+
+    private void checkEventLimitGreaterZero(ValidationResult validationResult) {
+        if (eventLimit() <= 0) {
+            validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
+        }
     }
 
     @Override
