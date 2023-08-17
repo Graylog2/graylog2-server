@@ -28,11 +28,11 @@ type Props = {
   rssUrl: string,
 };
 
-const StyledListGroupItem = styled(ListGroupItem)`
+const StyledListGroupItem = styled(ListGroupItem)(({ theme }: { theme: DefaultTheme }) => css`
   display: flex;
-  gap: 16px;
+  gap: ${theme.spacings.md};
   align-items: flex-start;
-`;
+`);
 const LastOpenedTime = styled.i(({ theme }: { theme: DefaultTheme }) => css`
   color: ${theme.colors.gray[60]};
 `);
@@ -42,7 +42,7 @@ export const StyledLabel = styled(Label)`
   display: block;
 `;
 
-const _sanitizeText = (text) => DOMPurify.sanitize(text);
+const _sanitizeText = (text = '') => DOMPurify.sanitize(text);
 
 const ContentStreamReleasesSection = ({ rssUrl }: Props) => {
   const feedUrl = `${rssUrl}/category/release-notices/feed/`;
@@ -58,7 +58,7 @@ const ContentStreamReleasesSection = ({ rssUrl }: Props) => {
         <StyledListGroupItem key={feed?.guid['#text'] || feed?.title}>
           <a href={feed?.link} target="_blank" rel="noreferrer">
             {/* eslint-disable-next-line react/no-danger */}
-            <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed.title) }} />
+            <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
           </a>
           {feed?.pubDate ? <LastOpenedTime><RelativeTime dateTime={feed.pubDate} /></LastOpenedTime> : null}
         </StyledListGroupItem>

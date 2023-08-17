@@ -27,12 +27,12 @@ type Props = {
   feed: FeedITem
 }
 
-const StyledImage = styled.img`
+const StyledImage = styled.img(({ theme }: { theme: DefaultTheme }) => css`
   max-width: 100%;
   width: 100%;
   object-fit: contain;
-  border-radius: 4px 0;
-`;
+  border-radius: ${theme.spacings.xxs} ${theme.spacings.xxs} 0 0;
+`);
 const StyledPanelBody = styled(Panel.Body)(({ theme }: { theme: DefaultTheme }) => css`
   flex-grow: 1;
   background-color: ${theme.colors.table.backgroundAlt};
@@ -43,24 +43,27 @@ const StyledPanelBody = styled(Panel.Body)(({ theme }: { theme: DefaultTheme }) 
 `);
 const StyledPanelFooter = styled(Panel.Footer)(({ theme }: { theme: DefaultTheme }) => css`
   background-color: ${theme.colors.table.backgroundAlt};
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 ${theme.spacings.xxs} ${theme.spacings.xxs};
 `);
-const StyledPanel = styled(Panel)`
+const StyledPanel = styled(Panel)(({ theme }: { theme: DefaultTheme }) => css`
   display: flex;
   flex-direction: column;
   height: 100%;
   border: none;
-  border-radius: 4px;
-`;
+  border-radius: ${theme.spacings.xxs};
+`);
 const _sanitizeText = (text) => DOMPurify.sanitize(text);
 
 const ContentStreamNewsItem = ({ feed }: Props) => (
   <Carousel.Slide>
     <StyledPanel>
-      <StyledImage src={feed?.['media:content']?.attr_url} alt={feed?.title} />
+      <a href={feed?.link} target="_blank" rel="noreferrer">
+        <StyledImage src={feed?.['media:content']?.attr_url} alt={feed?.title} />
+      </a>
+
       <StyledPanelBody>
         {/* eslint-disable-next-line react/no-danger */}
-        <a href={feed.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
+        <a href={feed?.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
         </a>
       </StyledPanelBody>
       <StyledPanelFooter>

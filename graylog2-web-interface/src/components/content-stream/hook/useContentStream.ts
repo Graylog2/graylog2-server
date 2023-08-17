@@ -20,36 +20,36 @@ import { XMLParser } from 'fast-xml-parser';
 import UserNotification from 'preflight/util/UserNotification';
 
 export type FeedITem = {
-  title: string,
-  link: string,
-  comments: string,
-  'dc:creator': string,
-  pubDate: string,
-  category: Array<string>
-  guid: {
-    '#text': string,
-    attr_isPermaLink: string,
+  title?: string,
+  link?: string,
+  comments?: string,
+  'dc:creator'?: string,
+  pubDate?: string,
+  category?: Array<string>
+  guid?: {
+    '#text'?: string,
+    attr_isPermaLink?: string,
   },
-  description: string,
-  'content:encoded': string,
-  'wfw:commentRss': string,
-  'slash:comments': number,
-  'media:content': {
-    'media:title': {
-      '#text': string,
-      attr_type: string,
+  description?: string,
+  'content:encoded'?: string,
+  'wfw:commentRss'?: string,
+  'slash:comments'?: number,
+  'media:content'?: {
+    'media:title'?: {
+      '#text'?: string,
+      attr_type?: string,
     },
-    'media:thumbnail': {
-      attr_url: string,
-      attr_width: string,
-      attr_height: string,
+    'media:thumbnail'?: {
+      attr_url?: string,
+      attr_width?: string,
+      attr_height?: string,
     },
-    'media:copyright': string,
-    attr_url: string,
-    attr_type: string,
-    attr_medium: string,
-    attr_width: string,
-    attr_height: string,
+    'media:copyright'?: string,
+    attr_url?: string,
+    attr_type?: string,
+    attr_medium?: string,
+    attr_width?: string,
+    attr_height?: string,
   }
 }
 
