@@ -25,7 +25,6 @@ import { Tab, Tabs } from 'components/bootstrap';
 import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
-  TimeRange,
   RelativeTimeRange,
 } from 'views/logic/queries/Query';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -114,6 +113,30 @@ type Props = {
   setValidatingKeyword: (validating: boolean) => void,
 };
 
+const newTabTimeRange = ({
+  activeTab,
+  nextTab,
+  timeRangeTabs,
+  formatTime,
+  defaultRanges,
+} : {
+  activeTab: TimeRangePickerFormValues['activeTab'],
+  nextTab: TimeRangePickerFormValues['activeTab'],
+  timeRangeTabs: TimeRangePickerFormValues['timeRangeTabs'],
+  formatTime: (time: DateTime, format: DateTimeFormats) => string,
+  defaultRanges: ReturnType<typeof createDefaultRanges>,
+}) => {
+  if (timeRangeTabs[nextTab]) {
+    return timeRangeTabs[nextTab];
+  }
+
+  if (isTimeRange(timeRangeTabs[activeTab])) {
+    return migrateTimeRangeToNewType(timeRangeTabs[activeTab], nextTab, formatTime);
+  }
+
+  return defaultRanges[nextTab];
+};
+
 const TimeRangeTabs = ({
   limitDuration,
   validTypes,
@@ -121,16 +144,23 @@ const TimeRangeTabs = ({
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { formatTime } = useUserDateTime();
-  const { setFieldValue, values: { nextTimeRange } } = useFormikContext<TimeRangePickerFormValues>();
+  const { setValues, values: { activeTab, timeRangeTabs } } = useFormikContext<TimeRangePickerFormValues>();
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
-  const activeTab = isTimeRange(nextTimeRange) ? nextTimeRange.type : undefined;
 
   const onSelect = useCallback((nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
-    if ('type' in nextTimeRange) {
-      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, formatTime));
-    } else {
-      setFieldValue('nextTimeRange', defaultRanges[nextTab]);
-    }
+    setValues({
+      timeRangeTabs: {
+        ...timeRangeTabs,
+        [nextTab]: newTabTimeRange({
+          activeTab,
+          nextTab,
+          timeRangeTabs,
+          formatTime,
+          defaultRanges,
+        }),
+      },
+      activeTab: nextTab,
+    });
 
     sendTelemetry('click', {
       app_pathname: 'search',
@@ -140,7 +170,7 @@ const TimeRangeTabs = ({
         tab: nextTab,
       },
     });
-  }, [defaultRanges, formatTime, nextTimeRange, sendTelemetry, setFieldValue]);
+  }, [activeTab, defaultRanges, formatTime, sendTelemetry, setValues, timeRangeTabs]);
 
   const tabs = useMemo(() => timeRangeTypeTabs({
     activeTab,

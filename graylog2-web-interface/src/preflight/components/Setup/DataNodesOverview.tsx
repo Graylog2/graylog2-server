@@ -34,7 +34,6 @@ const DataNodesOverview = () => {
   const {
     data: dataNodes,
     isFetching: isFetchingDataNodes,
-    error: dataNodesFetchError,
     isInitialLoading: isInitialLoadingDataNodes,
   } = useDataNodes();
 
@@ -70,11 +69,6 @@ const DataNodesOverview = () => {
       {(!dataNodes.length && !isInitialLoadingDataNodes) && (
         <Alert type="info">
           No data nodes have been found.
-        </Alert>
-      )}
-      {dataNodesFetchError && (
-        <Alert type="danger">
-          There was an error fetching the data nodes: {dataNodesFetchError.message}
         </Alert>
       )}
       <Space h="md" />

@@ -24,6 +24,7 @@ import FormikInput from './FormikInput';
 type Props = {
   autoComplete?: string,
   buttonAfter?: React.ReactElement | string,
+  children?: React.ReactNode,
   disabled?: boolean,
   label: React.ReactElement | string,
   name: string,
@@ -59,6 +60,7 @@ FormikFormGroup.defaultProps = {
   autoComplete: undefined,
   bsSize: undefined,
   buttonAfter: undefined,
+  children: null,
   disabled: false,
   onChange: undefined,
   labelClassName: 'col-sm-3',
