@@ -68,12 +68,14 @@ export type Completer = {
   autoSelect: boolean,
   popup?: Popup,
   activated: boolean,
+  insertMatch: () => boolean,
+  detach: () => void,
+  goTo: (direction: string) => void,
   keyboardHandler: {
     commandKeyBinding: {
-      return: unknown,
-      'Shift-Return': unknown
+      tab: Command,
     },
-    removeCommands: (commands: Array<string>) => void
+    addCommand: (command: Command) => void
   }
 };
 
@@ -86,6 +88,7 @@ export type Editor = {
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
   getValue: () => string,
+  tabstopManager: unknown,
   setValue: (newValue: string) => void,
   isFocused: () => boolean,
 };
