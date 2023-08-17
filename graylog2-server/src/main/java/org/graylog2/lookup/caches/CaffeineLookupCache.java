@@ -55,6 +55,7 @@ public class CaffeineLookupCache extends LookupCache {
     // Use the old GuavaLookupCache name, so we don't have to deal with migrations
     public static final String NAME = "guava_cache";
     private final Cache<LookupCacheKey, LookupResult> cache;
+    private final Config config;
 
     @Inject
     public CaffeineLookupCache(@Assisted("id") String id,
@@ -63,7 +64,7 @@ public class CaffeineLookupCache extends LookupCache {
                                @Named("processbuffer_processors") int processorCount,
                                MetricRegistry metricRegistry) {
         super(id, name, c, metricRegistry);
-        Config config = (Config) c;
+        config = (Config) c;
         Caffeine<Object, Object> builder = Caffeine.newBuilder();
 
         builder.recordStats(() -> new MetricStatsCounter(this));
@@ -127,8 +128,8 @@ public class CaffeineLookupCache extends LookupCache {
         final Function<LookupCacheKey, LookupResult> mapFunction = unused -> {
             try {
                 final LookupResult result = loader.call();
-                if (result == null && c.) {
-                    throw new NotFoundException("Lookup result is null");
+                if (result == null && config.ignoreNull()) {
+                    throw new NotFoundException("Ignoring null value");
                 }
                 return result;
             } catch (Exception e) {
@@ -138,7 +139,7 @@ public class CaffeineLookupCache extends LookupCache {
             }
         };
         try (final Timer.Context ignored = lookupTimer()) {
-            return cache.get(key, mapFunction, );
+            return cache.get(key, mapFunction);
         }
     }
 
@@ -225,7 +226,7 @@ public class CaffeineLookupCache extends LookupCache {
 
         @Nullable
         @JsonProperty("ignore_null")
-        public abstract boolean ignoreNull();
+        public abstract Boolean ignoreNull();
 
         public static Builder builder() {
             return new AutoValue_CaffeineLookupCache_Config.Builder();
@@ -252,7 +253,7 @@ public class CaffeineLookupCache extends LookupCache {
             public abstract Builder expireAfterWriteUnit(@Nullable TimeUnit expireAfterWriteUnit);
 
             @JsonProperty("ignore_null")
-            public abstract Builder ignoreNull(@Nullable boolean ignoreNull);
+            public abstract Builder ignoreNull(@Nullable Boolean ignoreNull);
 
             public abstract Config build();
         }
