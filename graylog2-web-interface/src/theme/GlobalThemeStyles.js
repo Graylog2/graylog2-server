@@ -650,23 +650,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 6px;
     background-color: ${theme.colors.input.background};
     color: ${theme.colors.input.color};
-
-    .ace_marker-layer .ace_active-line {
-      background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
-      color: ${theme.colors.input.colorDisabled};
-
-      &::after {
-        content: "⇥";
-        right: 3px;
-        position: absolute;
-        font-size: 1.3rem;
-        font-family: ${theme.fonts.family.body};
-      }
-    }
-
-    .ace_text-layer .ace_completion-highlight {
-      color: ${theme.colors.variant.info};
-    }
   }
 
   code {
