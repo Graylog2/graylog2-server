@@ -4,6 +4,6 @@
 
 <#if _description>
     <span>
-Your DataNodes need new certificates. Please renew them.
-</span>
+        Some of your certificates need renewal, the affected nodes are: [${nodes}]
+    </span>
 </#if>
