@@ -131,7 +131,7 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
 
       const completerCommandKeyBinding = editor.completer?.keyboardHandler?.commandKeyBinding;
 
-      if (completerCommandKeyBinding?.tab && completerCommandKeyBinding?.tab?.name !== 'improved-tab') {
+      if (completerCommandKeyBinding?.tab && completerCommandKeyBinding.tab.name !== 'improved-tab') {
         editor.completer.keyboardHandler.addCommand({
           name: 'improved-tab',
           bindKey: { win: 'Tab', mac: 'Tab' },

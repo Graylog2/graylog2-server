@@ -652,6 +652,14 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.input.color};
   }
 
+  .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
+    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
+    color: ${theme.colors.input.colorDisabled};
+  }
+  .ace_editor.ace_autocomplete .ace_text-layer .ace_completion-highlight {
+    color: ${theme.colors.variant.info};
+  }
+
   code {
     color: ${theme.colors.variant.darker.danger};
     background-color: ${theme.colors.variant.lightest.danger};
