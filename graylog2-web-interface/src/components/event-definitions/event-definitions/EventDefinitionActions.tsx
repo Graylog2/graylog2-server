@@ -188,22 +188,24 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             </IfPermitted>
           )}
           {!isSystemEventDefinition() && (
-            <>
-              <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
-              <MenuItem divider />
-              <MenuItem onClick={() => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-                {isEnabled ? 'Disable' : 'Enable'}
-              </MenuItem>
+            <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
+          )}
+          <MenuItem divider />
+          <MenuItem disabled={isSystemEventDefinition()}
+                    title={isSystemEventDefinition() ? 'System Event Definition cannot be disabled' : undefined}
+                    onClick={isSystemEventDefinition() ? undefined : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+            {isEnabled ? 'Disable' : 'Enable'}
+          </MenuItem>
 
-              {showActions() && (
-                <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
-                  <MenuItem divider />
-                  <MenuItem onClick={() => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
-                            data-testid="delete-button">Delete
-                  </MenuItem>
-                </IfPermitted>
-              )}
-            </>
+          {showActions() && (
+            <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+              <MenuItem divider />
+              <MenuItem disabled={isSystemEventDefinition()}
+                        title={isSystemEventDefinition() ? 'System Event Definition cannot be deleted' : undefined}
+                        onClick={isSystemEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
+                        data-testid="delete-button">Delete
+              </MenuItem>
+            </IfPermitted>
           )}
           {
             isAggregationEventDefinition() && (

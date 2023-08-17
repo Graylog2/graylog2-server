@@ -272,8 +272,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                 output.logstash:
                                    hosts: ["${user.graylog_host}:5044"]
                                 path:
-                                  data: ${sidecar.spoolDir!"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\winlogbeat"}\\data
-                                  logs: ${sidecar.spoolDir!"C:\\\\Program Files\\\\Graylog\\\\sidecar"}\\logs
+                                  data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\winlogbeat\"}\\data
+                                  logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs
                                 tags:
                                  - windows
                                 winlogbeat:
@@ -329,9 +329,9 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         Group nxlog
 
                         Moduledir /usr/lib/nxlog/modules
-                        CacheDir ${sidecar.spoolDir!"/var/spool/nxlog"}/data
-                        PidFile ${sidecar.spoolDir!"/var/run/nxlog"}/nxlog.pid
-                        LogFile ${sidecar.spoolDir!"/var/log/nxlog"}/nxlog.log
+                        CacheDir ${sidecar.spoolDir!\"/var/spool/nxlog\"}/data
+                        PidFile ${sidecar.spoolDir!\"/var/run/nxlog\"}/nxlog.pid
+                        LogFile ${sidecar.spoolDir!\"/var/log/nxlog\"}/nxlog.log
                         LogLevel INFO
 
 
@@ -384,7 +384,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "-c \"%s\"",
                 "-v -f -c \"%s\"",
                 """
-                        define ROOT ${sidecar.spoolDir!"C:\\\\Program Files (x86)"}\\nxlog
+                        define ROOT ${sidecar.spoolDir!\"C:\\\\Program Files (x86)\"}\\nxlog
 
                         Moduledir %ROOT%\\modules
                         CacheDir %ROOT%\\data
@@ -499,7 +499,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         try {
             collector = collectorService.findByNameAndOs(collectorName, nodeOperatingSystem);
             if (collector == null) {
-                LOG.error("Couldn't find collector '{} on {}' fixing it.", collectorName, nodeOperatingSystem);
+                final String msg = "Couldn't find collector '{} on {}' fixing it.";
+                LOG.debug(msg, collectorName, nodeOperatingSystem);
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException ignored) {
@@ -533,7 +534,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         try {
             variable = configurationVariableService.findByName(name);
             if (variable == null) {
-                LOG.info("Couldn't find sidecar configuration variable '{}' fixing it.", name);
+                LOG.debug("Couldn't find sidecar configuration variable '{}' fixing it.", name);
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException ignored) {
@@ -555,7 +556,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         try {
             config = configurationService.findByName(name);
             if (config == null) {
-                LOG.error("Couldn't find sidecar default configuration'{}' fixing it.", name);
+                LOG.debug("Couldn't find sidecar default configuration'{}' fixing it.", name);
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException ignored) {

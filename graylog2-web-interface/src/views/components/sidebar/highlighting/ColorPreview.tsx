@@ -23,8 +23,8 @@ import type HighlightingColor from 'views/logic/views/formatting/highlighting/Hi
 import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 const ColorPreviewBase = styled.div`
-  height: 2rem;
-  width: 2rem;
+  height: 25px;
+  width: 25px;
   margin-right: 0.4rem;
 
   border-radius: 4px;
