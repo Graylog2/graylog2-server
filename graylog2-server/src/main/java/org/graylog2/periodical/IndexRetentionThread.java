@@ -62,8 +62,12 @@ public class IndexRetentionThread extends Periodical {
 
     @Override
     public void doRun() {
-        if (!cluster.isConnected() || !cluster.isHealthy()) {
-            LOG.info("Elasticsearch cluster not available, skipping index retention checks.");
+        if (!cluster.isConnected()) {
+            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unreachable");
+            return;
+        }
+        if (!cluster.isHealthy()) {
+            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}", cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
             return;
         }
 

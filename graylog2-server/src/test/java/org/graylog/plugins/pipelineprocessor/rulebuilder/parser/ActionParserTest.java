@@ -61,7 +61,7 @@ public class ActionParserTest {
         functions.put(FUNCTION2_NAME, FunctionUtil.testFunction(
                 FUNCTION2_NAME, ImmutableList.of(
                         integer("optional").optional().build()
-                ), Boolean.class
+                ), Integer.class
         ));
         functions.put(FUNCTION3_NAME, FunctionUtil.testFunction(
                 FUNCTION3_NAME, ImmutableList.of(

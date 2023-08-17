@@ -71,7 +71,9 @@ const PluginsConfig = () => {
 
   const onUpdate = (configType: string) => (config) => ConfigurationsActions.update(configType, config);
 
-  if (!isLoaded || !pluginSystemConfigs) { return <Spinner />; }
+  if (!isLoaded || !pluginSystemConfigs) {
+    return <Spinner />;
+  }
 
   return (
     <>
@@ -81,7 +83,8 @@ const PluginsConfig = () => {
              activeKey={activeSectionKey}
              onSelect={setActiveSectionKey}>
           {pluginSystemConfigs.map(({ configType }, index) => {
-            const { displayName } = pluginDisplayNames.find((entry) => entry.configType === configType);
+            const obj = pluginDisplayNames.find((entry) => entry.configType === configType);
+            const displayName = obj ? obj.displayName : configType;
 
             return (
               <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
@@ -95,11 +98,11 @@ const PluginsConfig = () => {
         {pluginSystemConfigs
           .map(({ component: SystemConfigComponent, configType }, index) => (
             (index + 1 === activeSectionKey) && (
-            <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
-              <SystemConfigComponent key={`system-configuration-${configType}`}
-                                     config={getConfig(configType, configuration) ?? undefined}
-                                     updateConfig={onUpdate(configType)} />
-            </ConfigletContainer>
+              <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
+                <SystemConfigComponent key={`system-configuration-${configType}`}
+                                       config={getConfig(configType, configuration) ?? undefined}
+                                       updateConfig={onUpdate(configType)} />
+              </ConfigletContainer>
             )
           ))}
       </Col>

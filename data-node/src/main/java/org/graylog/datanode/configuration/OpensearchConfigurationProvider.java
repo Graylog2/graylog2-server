@@ -117,7 +117,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         if (localConfiguration.isSingleNodeOnly()) {
             config.put("discovery.type", "single-node");
         } else {
-            config.put("cluster.initial_master_nodes", "node1");
+            config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
         }
 
         // listen on all interfaces
