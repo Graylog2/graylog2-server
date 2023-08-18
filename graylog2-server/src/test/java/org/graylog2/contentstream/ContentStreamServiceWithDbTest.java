@@ -19,7 +19,6 @@ package org.graylog2.contentstream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
-import org.graylog.enterprise.EnterpriseService;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentstream.db.DBContentStreamUserSettingsService;
@@ -53,9 +52,6 @@ public class ContentStreamServiceWithDbTest {
     UserService userService;
 
     @Mock
-    EnterpriseService enterpriseService;
-
-    @Mock
     User user1, user2;
 
     ContentStreamService contentStreamService;
@@ -65,8 +61,7 @@ public class ContentStreamServiceWithDbTest {
         MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
         contentStreamService = new ContentStreamService(
                 new DBContentStreamUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
-                eventBus,
-                enterpriseService
+                eventBus
         );
         lenient().when(user1.getId()).thenReturn("id1");
         lenient().when(user2.getId()).thenReturn("id2");

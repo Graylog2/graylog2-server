@@ -37,7 +37,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -55,13 +54,6 @@ public class ContentStreamResource extends RestResource {
                                     UserService userService) {
         this.contentStreamService = contentStreamService;
         this.userService = userService;
-    }
-
-    @GET
-    @Path("tags")
-    @ApiOperation("Retrieve valid feed tags based on license")
-    public List<String> getContentStreamTags() throws NotFoundException {
-        return contentStreamService.getTags();
     }
 
     @GET
