@@ -228,7 +228,7 @@ public class Server extends ServerBootstrap {
                 geoIpProcessorConfig,
                 telemetryConfiguration,
                 contentStreamConfiguration,
-                dnsLookupAdapterConfiguration);
+                dnsLookupAdapterConfiguration,
                 dnsLookupAdapterConfiguration,
                 eventDefinitionConfiguration);
     }
