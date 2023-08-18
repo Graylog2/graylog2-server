@@ -14,7 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  // eslint-disable-next-line global-require
-  presets: [require('babel-preset-graylog')],
-};
+import { useContext } from 'react';
+
+import ExternalValueActionsContext from 'views/components/ExternalValueActionsContext';
+
+const useExternalValueActions = () => useContext(ExternalValueActionsContext);
+
+export default useExternalValueActions;

@@ -51,6 +51,7 @@ export type EventDefinition = {
     type: string,
     execute_every_ms?: number,
     search_within_ms?: number,
+    event_limit?: number,
     sigma_rule_id?: string,
     streams?: Array<string>
   },

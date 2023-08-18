@@ -91,7 +91,8 @@ public interface Notification extends Persisted {
         ARCHIVING_SUMMARY,
         SEARCH_ERROR,
         SIDECAR_STATUS_UNKNOWN,
-        CERTIFICATE_NEEDS_RENEWAL
+        CERTIFICATE_NEEDS_RENEWAL,
+        EVENT_LIMIT_REACHED
     }
 
     enum Severity {
