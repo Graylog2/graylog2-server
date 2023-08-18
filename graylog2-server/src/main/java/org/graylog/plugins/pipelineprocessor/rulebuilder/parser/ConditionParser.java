@@ -52,34 +52,36 @@ public class ConditionParser {
     }
 
     public String generate(List<RuleBuilderStep> ruleConditions, RuleBuilderStep.Operator operator, int level) {
-        if (ruleConditions.isEmpty()) {
+        if (ruleConditions == null || ruleConditions.isEmpty()) {
             if (level == 1) {
                 return "  true";
             }
             return "";
         }
-        if (operator == null) {
-            operator = RuleBuilderStep.Operator.AND;
-        }
+
         StringBuilder syntax = new StringBuilder();
         if (level != 1) {
             syntax.append(StringUtils.repeat(INDENT, level)).append("(").append(NL);
         }
-        syntax.append(generateCondition(ruleConditions.get(0), level));
-        for (int i = 1; i < ruleConditions.size(); i++) {
-            syntax.append(NL).append(StringUtils.repeat(INDENT, level + 1)).append(operator).append(NL);
-            final RuleBuilderStep step = ruleConditions.get(i);
-            if (step.conditions() == null) {
-                syntax.append(generateCondition(step, level));
-            } else {
-                syntax.append(generate(step.conditions(), step.operator(), level + 1));
+        for (int i = 0; i < ruleConditions.size(); i++) {
+            RuleBuilderStep step = ruleConditions.get(i);
+            syntax.append(generateCondition(step, level)); // add condition
+            if (Objects.nonNull(step.conditions()) && !step.conditions().isEmpty() && Objects.nonNull(step.function())) { // add operator  and recurse for groups
+                syntax.append(NL)
+                        .append(StringUtils.repeat(INDENT, level))
+                        .append((Objects.nonNull(operator)) ? operator : RuleBuilderStep.Operator.AND).append(NL);
+            }
+            syntax.append(generate(step.conditions(), step.operator(), level + 1));
+            if (i != ruleConditions.size() - 1) { // add operator if not last step
+                syntax.append(NL)
+                        .append(StringUtils.repeat(INDENT, level))
+                        .append((Objects.nonNull(operator)) ? operator : RuleBuilderStep.Operator.AND).append(NL);
             }
         }
         if (level != 1) {
             syntax.append(NL).append(StringUtils.repeat(INDENT, level)).append(")");
         }
         return syntax.toString();
-
     }
 
     String generateCondition(RuleBuilderStep step, int level) {

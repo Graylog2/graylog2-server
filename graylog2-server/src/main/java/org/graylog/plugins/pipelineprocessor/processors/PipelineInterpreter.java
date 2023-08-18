@@ -285,11 +285,11 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     public void evaluateStage(Stage stage,
-                               Message message,
-                               String msgId,
-                               List<Message> result,
-                               Set<Pipeline> pipelinesToSkip,
-                               InterpreterListener interpreterListener) {
+                              Message message,
+                              String msgId,
+                              List<Message> result,
+                              Set<Pipeline> pipelinesToSkip,
+                              InterpreterListener interpreterListener) {
         final Pipeline pipeline = stage.getPipeline();
         if (pipelinesToSkip.contains(pipeline)) {
             log.debug("[{}] previous stage result prevents further processing of pipeline `{}`",
@@ -319,22 +319,22 @@ public class PipelineInterpreter implements MessageProcessor {
                 allRulesMatched &= ruleCondition;
 
                 if (context.hasEvaluationErrors()) {
-                    log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
-                            rule.name(), rule.id(), message, context.lastEvaluationError());
+                    log.warn("Error evaluating condition for rule <{}/{}> in pipeline <{}/stage {}> with message: {} (Error: {})",
+                            rule.name(), rule.id(), pipeline.name(), stage.stage(), message, context.lastEvaluationError());
                     break;
                 }
 
             } catch (Exception e) {
-                log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
-                        rule.name(), rule.id(), message, e.getMessage());
+                log.warn("Error evaluating condition for rule <{}/{}> in pipeline <{}/stage {}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), pipeline.name(), stage.stage(), message, e.getMessage());
                 throw e;
             }
         }
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
-                log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
-                        rule.name(), rule.id(), message, context.lastEvaluationError());
+                log.warn("Error evaluating action for rule <{}/{}> in pipeline <{}/stage {}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), pipeline.name(), stage.stage(), message, context.lastEvaluationError());
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }
