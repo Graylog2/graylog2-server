@@ -14,23 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable global-require */
-module.exports = (api) => {
-  const isEnvTest = api.env('test');
+import * as React from 'react';
 
-  if (!isEnvTest) {
-    throw Error('For transpiling the frontend assets we are no longer using Babel and it should only be used for tests.');
-  }
+import { singleton } from 'logic/singleton';
+import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
-  return {
-    presets: [
-      require('@babel/preset-env'),
-      require('@babel/preset-react'),
-      require('@babel/preset-typescript')],
-    plugins: [
-      require('@babel/plugin-syntax-dynamic-import'),
-      require('babel-plugin-styled-components'),
-      require('@babel/plugin-transform-runtime'),
-    ],
-  };
+export type ExternalValueActionsContextValue = {
+    isLoading: boolean,
+    externalValueActions: Array<ActionDefinition>,
+    isError: boolean,
+}
+
+export const DEFAULT_EXTERNAL_ACTIONS = {
+  isLoading: false,
+  externalValueActions: [],
+  isError: false,
 };
+
+const ExternalValueActionsContext = React.createContext<ExternalValueActionsContextValue>(DEFAULT_EXTERNAL_ACTIONS);
+
+export default singleton('contexts.ExternalValueActionsContext', () => ExternalValueActionsContext);

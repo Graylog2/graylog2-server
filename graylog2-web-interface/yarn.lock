@@ -2528,11 +2528,11 @@
     react-textarea-autosize "8.3.4"
 
 "@mantine/dropzone@^6.0.10":
-  version "6.0.10"
-  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-6.0.10.tgz#c8202b6faf54761fd93f8e01e76f5dfa45153307"
-  integrity sha512-GJW3aDIYaPz40/mjohqxvDaXp459ewPyIIlsb+bXGZbLNykG55+Fp40MKjE90mu3/VyP4zYuW5U32j1BOGb4VQ==
+  version "6.0.19"
+  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-6.0.19.tgz#84ae425161fcaf5cbcbdf98ee5e9f71a2c63e0cd"
+  integrity sha512-riftzhsXSe84oUHIzMsANtJSIINT08N8ycUuGFxGStf+ytVUZn7TommITnifEEokY6iu4yxjv27FK8maaB1BHA==
   dependencies:
-    "@mantine/utils" "6.0.10"
+    "@mantine/utils" "6.0.19"
     react-dropzone "14.2.3"
 
 "@mantine/hooks@^6.0.4":
@@ -2556,10 +2556,10 @@
     clsx "1.1.1"
     csstype "3.0.9"
 
-"@mantine/utils@6.0.10":
-  version "6.0.10"
-  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-6.0.10.tgz#a7e99d4d7368912696f40fe56e444ef4f5befeae"
-  integrity sha512-Lo4VUn3+/kqhdjSoPzUFbxXEjMxj5vS4pqRjKRGtJsTwHiMFNcm8u4cIESzMBAEsoaBrI1dGE4WttwOJhjUaSw==
+"@mantine/utils@6.0.19":
+  version "6.0.19"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-6.0.19.tgz#0197fccc5649259787d5468228139f8815909803"
+  integrity sha512-duvtnaW1gDR2gnvUqnWhl6DMW7sN0HEWqS8Z/BbwaMi75U+Xp17Q72R9JtiIrxQbzsq+KvH9L9B/pxMVwbLirg==
 
 "@mantine/utils@6.0.7":
   version "6.0.7"
@@ -4795,7 +4795,7 @@ babel-preset-current-node-syntax@^1.0.0:
     "@babel/plugin-syntax-optional-chaining" "^7.8.3"
     "@babel/plugin-syntax-top-level-await" "^7.8.3"
 
-"babel-preset-graylog-tests@file:packages/babel-preset-graylog-tests":
+"babel-preset-graylog@file:packages/babel-preset-graylog":
   version "1.0.0"
   dependencies:
     "@babel/core" "^7.18.2"
@@ -8394,6 +8394,7 @@ graphemer@^1.4.0:
     "@types/jquery" "3.5.16"
     "@types/react" "18.2.20"
     babel-preset-graylog-tests "file:packages/babel-preset-graylog-tests"
+    babel-preset-graylog "packages/babel-preset-graylog"
     create-react-class "15.7.0"
     eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.3"

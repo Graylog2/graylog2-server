@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
 import styled, { css } from 'styled-components';
+import type { IAnnotation } from 'react-ace';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -30,10 +31,14 @@ import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import ClipboardButton from './ClipboardButton';
 import Icon from './Icon';
+
 import './webpack-resolver';
 import './ace/theme-graylog';
 
-const SourceCodeContainer = styled.div(({ $resizable, theme }) => css`
+type ContainerProps = {
+  $resizable: boolean
+}
+const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) => css`
   .react-resizable-handle {
     z-index: 100; /* Ensure resize handle is over text editor */
     display: ${$resizable ? 'block' : 'none'};
@@ -78,6 +83,8 @@ const Toolbar = styled.div(({ theme }) => css`
   }
 `);
 
+const availableModes = ['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline'] as const;
+
 /**
  * Component that renders a source code editor input. This is what powers the pipeline rules and collector
  * editors.
@@ -85,7 +92,31 @@ const Toolbar = styled.div(({ theme }) => css`
  * **Note:** The component needs to be used in a [controlled way](https://reactjs.org/docs/forms.html#controlled-components).
  * Letting the component handle its own internal state may lead to weird errors while typing.
  */
-class SourceCodeEditor extends React.Component {
+type Props = {
+  annotations: Array<IAnnotation>,
+  focus?: boolean,
+  fontSize?: number,
+  height?: number,
+  width?: number,
+  id: string,
+  innerRef?: React.MutableRefObject<AceEditor>,
+  mode: typeof availableModes[number],
+  onLoad: () => void,
+  onChange: () => void,
+  onBlur: () => void,
+  readOnly?: boolean,
+  resizable?: boolean,
+  toolbar?: boolean,
+  value?: string,
+}
+
+type State = {
+  height?: number,
+  width?: number,
+  selectedText?: string,
+}
+
+class SourceCodeEditor extends React.Component<Props, State> {
   static propTypes = {
     /**
      * Annotations to show in the editor's gutter. The format should be:
@@ -107,7 +138,7 @@ class SourceCodeEditor extends React.Component {
       PropTypes.shape({ current: PropTypes.any }),
     ]),
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
-    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline']),
+    mode: PropTypes.oneOf(availableModes),
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the new value and an event as arguments. */
@@ -142,6 +173,10 @@ class SourceCodeEditor extends React.Component {
     value: undefined,
     width: Infinity,
   };
+
+  private reactAce: AceEditor;
+
+  private readonly overlayContainerRef: React.RefObject<React.ReactElement>;
 
   constructor(props) {
     super(props);
@@ -182,7 +217,7 @@ class SourceCodeEditor extends React.Component {
     }
   }
 
-  handleResize = (event, { size }) => {
+  handleResize = (_event: React.ChangeEvent<unknown>, { size }) => {
     const { height, width } = size;
 
     this.setState({ height: height, width: width }, this.reloadEditor);
@@ -300,8 +335,8 @@ class SourceCodeEditor extends React.Component {
               if (innerRef) { innerRef.current = c; }
             }}
                        annotations={annotations}
-                       editorProps={{ $blockScrolling: 'Infinity' }}
                        // Convert Windows line breaks to Unix. See issue #7889
+                       // @ts-expect-error
                        setOptions={{ newLineMode: 'unix' }}
                        focus={focus}
                        fontSize={fontSize}
