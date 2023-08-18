@@ -335,8 +335,6 @@ class SourceCodeEditor extends React.Component<Props, State> {
               if (innerRef) { innerRef.current = c; }
             }}
                        annotations={annotations}
-                       // @ts-expect-error
-                       editorProps={{ $blockScrolling: 'Infinity' }}
                        // Convert Windows line breaks to Unix. See issue #7889
                        // @ts-expect-error
                        setOptions={{ newLineMode: 'unix' }}
