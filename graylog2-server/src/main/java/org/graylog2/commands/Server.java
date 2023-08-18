@@ -27,6 +27,7 @@ import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
+import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.grn.GRNTypesModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
@@ -141,6 +142,7 @@ public class Server extends ServerBootstrap {
     private final TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
     private final ContentStreamConfiguration contentStreamConfiguration = new ContentStreamConfiguration();
     private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
+    private final EventDefinitionConfiguration eventDefinitionConfiguration = new EventDefinitionConfiguration();
 
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
@@ -227,6 +229,8 @@ public class Server extends ServerBootstrap {
                 telemetryConfiguration,
                 contentStreamConfiguration,
                 dnsLookupAdapterConfiguration);
+                dnsLookupAdapterConfiguration,
+                eventDefinitionConfiguration);
     }
 
     @Override
