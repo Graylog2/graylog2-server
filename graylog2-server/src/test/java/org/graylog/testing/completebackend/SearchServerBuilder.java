@@ -38,7 +38,7 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
         return version;
     }
 
-    public SearchServerBuilder network(final Network network){
+    public SearchServerBuilder<T> network(final Network network) {
         this.network = network;
         return this;
     }
@@ -47,7 +47,7 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
         return network;
     }
 
-    public SearchServerBuilder heapSize(final String heapSize) {
+    public SearchServerBuilder<T> heapSize(final String heapSize) {
         this.heapSize = heapSize;
         return this;
     }
@@ -56,7 +56,7 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
         return heapSize;
     }
 
-    public SearchServerBuilder featureFlags(final List<String> featureFlags) {
+    public SearchServerBuilder<T> featureFlags(final List<String> featureFlags) {
         this.featureFlags = new ArrayList<>(featureFlags);
         return this;
     }
