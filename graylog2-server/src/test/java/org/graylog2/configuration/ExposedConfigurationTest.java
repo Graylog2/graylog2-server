@@ -32,7 +32,7 @@ public class ExposedConfigurationTest {
 
     @Test
     public void testCreateWithConfiguration() throws Exception {
-        final Configuration configuration = new Configuration();
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration());
         final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         assertThat(c.inputBufferProcessors()).isEqualTo(configuration.getInputbufferProcessors());
@@ -58,7 +58,7 @@ public class ExposedConfigurationTest {
 
     @Test
     public void testSerialization() throws Exception {
-        final Configuration configuration = new Configuration();
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration());
         final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         final String json = objectMapper.writeValueAsString(c);
