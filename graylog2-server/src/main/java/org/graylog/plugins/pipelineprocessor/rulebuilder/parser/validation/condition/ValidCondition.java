@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Valid
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Objects;
 
 public class ValidCondition implements Validator {
 
@@ -36,7 +37,7 @@ public class ValidCondition implements Validator {
 
     @Override
     public ValidationResult validate(RuleBuilderStep step) {
-        if (!conditions.containsKey(step.function())) {
+        if (Objects.nonNull(step.function()) && !conditions.containsKey(step.function())) {
             return new ValidationResult(true, "Function " + step.function() + " not available as condition for rule builder.");
         }
 
