@@ -17,7 +17,6 @@
 package org.graylog.datanode.bootstrap;
 
 import com.github.rvesse.airline.annotations.Option;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
@@ -55,7 +54,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -163,7 +161,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
-        final Injector injector = Guice.createInjector(
+        return Guice.createInjector(
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
@@ -175,7 +173,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
                         preflightCheckModules.forEach(binder::install);
                     }
                 });
-        return injector;
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
@@ -192,10 +189,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
     @Override
     protected void startCommand() {
         final String systemInformation = Tools.getSystemInformation();
-        final Map<String, Object> auditEventContext = ImmutableMap.of(
-                "version", version.toString(),
-                "java", systemInformation
-        );
 
         final OS os = OS.getOs();
 

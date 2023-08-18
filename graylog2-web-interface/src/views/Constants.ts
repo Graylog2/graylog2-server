@@ -52,6 +52,8 @@ export const DEFAULT_RELATIVE_FROM = 300;
 export const DEFAULT_RELATIVE_TO = DEFAULT_RELATIVE_FROM - 60;
 export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE_TYPE, from: DEFAULT_RELATIVE_FROM };
 
+export const NO_TIMERANGE_OVERRIDE = {};
+
 export const DEFAULT_HIGHLIGHT_COLOR = StaticColor.create('#ffec3d');
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
   .mode('lch')
@@ -60,6 +62,12 @@ export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'ligh
 export const DEFAULT_INTERPOLATION = 'linear';
 export const interpolationTypes = ['linear', 'step-after', 'spline'] as const;
 export type InterpolationType = ArrayElement<typeof interpolationTypes>;
+
+export const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
+export const percentageStrategyOptions = [
+  { label: 'Document Count', value: 'COUNT' },
+  { label: 'Field Sum', value: 'SUM' },
+];
 
 export const TimeUnits = {
   seconds: 'Seconds',

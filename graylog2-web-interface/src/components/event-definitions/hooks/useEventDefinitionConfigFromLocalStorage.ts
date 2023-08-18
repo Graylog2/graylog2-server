@@ -47,9 +47,7 @@ type EventDefinitionConfigFromUrl = {
 }
 
 const useEventDefinitionConfigFromLocalStorage = (): { hasLocalStorageConfig: boolean; configFromLocalStorage: EventDefinitionConfigFromUrl } => {
-  const {
-    'session-id': sessionId,
-  } = useQuery();
+  const { 'session-id': sessionId } = useQuery();
 
   return useMemo(() => {
     const parsedLocalStorageConfig = Store.get(sessionId);

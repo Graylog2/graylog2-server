@@ -34,6 +34,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
@@ -55,14 +56,17 @@ public class ClusterResource extends RestResource {
     private final NodeService nodeService;
     private final NodeId nodeId;
     private final ClusterId clusterId;
+    private final TransportAddressSanitizer transportAddressSanitizer;
 
     @Inject
-    public ClusterResource(NodeService nodeService,
-                           ClusterConfigService clusterConfigService,
-                           NodeId nodeId) {
+    public ClusterResource(final NodeService nodeService,
+                           final ClusterConfigService clusterConfigService,
+                           final NodeId nodeId,
+                           final TransportAddressSanitizer transportAddressSanitizer) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
+        this.transportAddressSanitizer = transportAddressSanitizer;
     }
 
     @GET
@@ -108,7 +112,7 @@ public class ClusterResource extends RestResource {
                 node.getNodeId(),
                 node.getType().toString().toLowerCase(Locale.ENGLISH),
                 node.isLeader(),
-                node.getTransportAddress(),
+                transportAddressSanitizer.withRemovedCredentials(node.getTransportAddress()),
                 Tools.getISO8601String(node.getLastSeen()),
                 node.getShortNodeId(),
                 node.getHostname()

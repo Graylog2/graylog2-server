@@ -21,6 +21,7 @@ import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
+import Store from 'logic/local-storage/Store';
 import { Modal, Button } from 'components/bootstrap';
 import type {
   ItemKey,
@@ -54,6 +55,8 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
   const localStorageConfig = useLocalStorageConfigData({ mappedData, checked });
   const sessionId = useMemo(() => `cedfv-${generateId()}`, []);
+  const eventDefinitionCreationUrl = `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&session-id=${sessionId}`;
+
   const onCheckboxChange = useCallback((updates) => {
     dispatchWithData({ type: 'UPDATE_CHECKED_ITEMS', payload: updates });
   }, [dispatchWithData]);
@@ -78,8 +81,6 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
     <CheckboxLabel itemKey={key} value={value} />
   )), [modalData]);
 
-  const eventDefinitionCreationUrl = useMemo(() => `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&session-id=${sessionId}`, [sessionId]);
-
   const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => ({
     ALL: true,
     ROW: !!mappedData?.rowValuePath?.length,
@@ -89,7 +90,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   }), [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
 
   const onContinueConfigurationClick = useCallback(() => {
-    localStorage.setItem(sessionId, JSON.stringify(localStorageConfig));
+    Store.set(sessionId, localStorageConfig);
     onClose();
   }, [sessionId, localStorageConfig, onClose]);
 

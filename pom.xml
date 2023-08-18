@@ -161,7 +161,7 @@
         <retrofit.version>2.9.0</retrofit.version>
         <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>1.11.0</shiro.version>
+        <shiro.version>1.12.0</shiro.version>
         <oshi.version>5.3.7</oshi.version>
         <siv-mode.version>1.4.1</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -193,6 +193,7 @@
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.17.6</testcontainers.version>
+        <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v16.13.0</nodejs.version>

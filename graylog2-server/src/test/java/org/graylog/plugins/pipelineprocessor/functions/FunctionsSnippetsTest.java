@@ -1339,7 +1339,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("one_entropy")).isEqualTo(1.0D);
     }
 
-    @   Test
+    @Test
     public void notExpressionTypeCheck() {
         try {
             Rule rule = parser.parseRule(ruleForTest(), true);
@@ -1363,5 +1363,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         Long manilaHour = (Long) message.getField("manilaHour");
         assertThat(utcHour).isEqualTo(10);
         assertThat(manilaHour).isEqualTo(18);
+    }
+
+    @Test
+    public void removeField() {
+        Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("i1")).isNull();
+        assertThat(message.getField("i2")).isNull();
+        assertThat(message.getField("f2")).isEqualTo("f2");
+        assertThat(message.getField("f3")).isEqualTo("f3");
     }
 }

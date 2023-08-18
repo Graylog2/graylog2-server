@@ -19,16 +19,17 @@ package org.graylog.datanode.management;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.OpensearchInfo;
-import org.graylog.datanode.process.ProcessInformation;
+import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.graylog.security.certutil.CaService;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,16 +57,18 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private final Queue<String> stdout;
     private final Queue<String> stderr;
+    private final CustomCAX509TrustManager trustManager;
 
-    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize) {
+    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = ProcessStateMachine.createNew();
         this.stdout = new CircularFifoQueue<>(logsCacheSize);
         this.stderr = new CircularFifoQueue<>(logsCacheSize);
+        this.trustManager = trustManager;
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
-        return OpensearchRestClient.build(configuration);
+        return OpensearchRestClient.build(configuration, trustManager);
     }
 
     @Override
@@ -89,7 +92,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public URI getOpensearchBaseUrl() {
         final String baseUrl = configuration.map(OpensearchConfiguration::getRestBaseUrl)
-                .map(HttpHost::toURI)
+                .map(httpHost -> new URIBuilder()
+                        .setHost(httpHost.getHostName())
+                        .setPort(httpHost.getPort())
+                        .setScheme(httpHost.getSchemeName())
+                        .setUserInfo(configuration.get().authUsername(), configuration.get().authPassword()).toString())
                 .orElse(""); // TODO: will this cause problems in the nodeservice?
         return URI.create(baseUrl);
     }
@@ -121,7 +128,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     public void startWithConfig(OpensearchConfiguration configuration) {
         this.configuration = Optional.of(configuration);
         restart();
-        this.restClient = Optional.of(createRestClient(configuration));
     }
 
     @Override
@@ -129,8 +135,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         configuration.ifPresentOrElse(
                 (config -> {
                     stopProcess();
+                    // refresh TM if the SSL certs changed
+                    trustManager.refresh();
                     commandLineProcess = new OpensearchCommandLineProcess(config, this);
                     commandLineProcess.start();
+                    restClient = Optional.of(createRestClient(config));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );

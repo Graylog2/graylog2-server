@@ -66,7 +66,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
                 .items()
                 .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
                 .map(i -> startPageItemTitleRetriever
-                        .retrieveTitle(i)
+                        .retrieveTitle(i, searchUser)
                         .map(title -> new Favorite(i, title))
                 )
                 .flatMap(Optional::stream)
@@ -80,8 +80,10 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         final var favorites = this.findForUser(searchUser);
         if(favorites.isPresent()) {
             var fi = favorites.get();
-            fi.items().add(grn);
-            this.save(fi);
+            if (fi.items() != null && fi.items().stream().noneMatch(g -> g.toString().equalsIgnoreCase(in))) {
+                fi.items().add(0, grn);
+                this.save(fi);
+            }
         } else {
             var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn));
             this.create(items, searchUser);

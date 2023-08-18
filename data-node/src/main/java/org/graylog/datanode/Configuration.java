@@ -61,6 +61,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 
+    @Parameter(value = "insecure_startup")
+    private boolean insecureStartup = false;
+
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
@@ -95,6 +98,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "node_name")
     private String datanodeNodeName = "node1";
 
+    /**
+     * Comma separated list of opensearch nodes that are eligible as manager nodes.
+     */
+    @Parameter(value = "cluster_initial_manager_nodes")
+    private String initialManagerNodes = "node1";
+
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
 
@@ -128,6 +137,10 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
+
+    public boolean isInsecureStartup() {
+        return insecureStartup;
+    }
 
     public Integer getStaleLeaderTimeout() {
         return staleLeaderTimeout;
@@ -227,6 +240,10 @@ public class Configuration extends BaseConfiguration {
 
     public String getDatanodeNodeName() {
         return datanodeNodeName;
+    }
+
+    public String getInitialManagerNodes() {
+        return initialManagerNodes;
     }
 
     public int getOpensearchHttpPort() {
@@ -334,7 +351,10 @@ public class Configuration extends BaseConfiguration {
     public static final String PATH_API = "api/";
 
     @Parameter(value = "http_bind_address", required = true)
-    private HostAndPort httpBindAddress = HostAndPort.fromParts("127.0.0.1", GRAYLOG_DEFAULT_PORT);
+    private HostAndPort httpBindAddress = HostAndPort.fromParts("0.0.0.0", GRAYLOG_DEFAULT_PORT);
+
+    @Parameter(value = "hostname", required = true)
+    private String hostname = Tools.getLocalCanonicalHostname();
 
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
@@ -549,5 +569,9 @@ public class Configuration extends BaseConfiguration {
 
     private boolean isRegularFileAndReadable(Path path) {
         return path != null && Files.isRegularFile(path) && Files.isReadable(path);
+    }
+
+    public String getHostname() {
+        return hostname;
     }
 }

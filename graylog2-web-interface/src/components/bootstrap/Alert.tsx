@@ -15,18 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
 import type { ColorVariants } from 'theme/colors';
-
-interface AlertProps {
-  $bsStyle: ColorVariants,
-  theme: DefaultTheme
-}
 
 interface Props {
   bsStyle: ColorVariants,
@@ -34,12 +27,9 @@ interface Props {
   onDismiss?: () => void,
 }
 
-const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorVariants }) => ({
-  bsStyle: null,
-  $bsStyle: bsStyle || 'default',
-}))(({ $bsStyle, theme }: AlertProps) => {
-  const borderColor = theme.colors.variant.lighter[$bsStyle];
-  const backgroundColor = theme.colors.variant.lightest[$bsStyle];
+const StyledAlert = styled(BootstrapAlert)<{ bsStyle: ColorVariants }>(({ bsStyle = 'info', theme }) => {
+  const borderColor = theme.colors.variant.lighter[bsStyle];
+  const backgroundColor = theme.colors.variant.lightest[bsStyle];
 
   return css`
     background-color: ${backgroundColor};

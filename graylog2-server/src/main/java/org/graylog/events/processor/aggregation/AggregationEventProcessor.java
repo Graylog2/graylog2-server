@@ -44,9 +44,14 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.HasOptionalField;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -63,11 +68,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.graylog.events.search.MoreSearch.luceneEscape;
+import static org.graylog2.notifications.Notification.Type.EVENT_LIMIT_REACHED;
 
 public class AggregationEventProcessor implements EventProcessor {
     public interface Factory extends EventProcessor.Factory<AggregationEventProcessor> {
@@ -85,6 +92,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final MoreSearch moreSearch;
     private final EventStreamService eventStreamService;
     private final Messages messages;
+    private final NotificationService notificationService;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -93,7 +101,7 @@ public class AggregationEventProcessor implements EventProcessor {
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
-                                     Messages messages) {
+                                     Messages messages, NotificationService notificationService) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -102,6 +110,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.moreSearch = moreSearch;
         this.eventStreamService = eventStreamService;
         this.messages = messages;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -213,6 +222,7 @@ public class AggregationEventProcessor implements EventProcessor {
                               EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
         final Set<String> streams = getStreams(parameters);
 
+        final AtomicInteger messageCount = new AtomicInteger(0);
         final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
             final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
 
@@ -233,12 +243,30 @@ public class AggregationEventProcessor implements EventProcessor {
                         .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
+                if (config.eventLimit() != 0) {
+                    if (messageCount.incrementAndGet() >= config.eventLimit()) {
+                        eventsConsumer.accept(eventsWithContext.build());
+                        throw new EventLimitReachedException();
+                    }
+                }
             }
-
             eventsConsumer.accept(eventsWithContext.build());
         };
 
-        moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+        try {
+            moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+        } catch (EventLimitReachedException e) {
+            notificationService.publishIfFirst(notificationService.buildNow()
+                    .addType(EVENT_LIMIT_REACHED)
+                    .addKey(eventDefinition.id())
+                    .addDetail("event_definition_title", eventDefinition.title())
+                    .addDetail("event_definition_id", eventDefinition.id())
+                    .addDetail("event_limit", config.eventLimit())
+                    .addSeverity(Notification.Severity.NORMAL)
+            );
+
+            LOG.debug("Event limit reached at {} for '{}/{}' event definition.", config.eventLimit(), eventDefinition.title(), eventDefinition.id());
+        }
     }
 
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
@@ -341,15 +369,11 @@ public class AggregationEventProcessor implements EventProcessor {
             //   aggregation_value_count_source=42
             //   aggregation_value_card_anonid=23
             for (AggregationSeriesValue seriesValue : keyResult.seriesValues()) {
-                final String function = seriesValue.series().function().toString().toLowerCase(Locale.ROOT);
-                final Optional<String> field = seriesValue.series().field();
+                final String function = seriesValue.series().type().toLowerCase(Locale.ROOT);
+                final Optional<String> field = fieldFromSeries(seriesValue.series());
 
-                final String fieldName;
-                if (field.isPresent()) {
-                    fieldName = String.format(Locale.ROOT, "aggregation_value_%s_%s", function, field.get());
-                } else {
-                    fieldName = String.format(Locale.ROOT, "aggregation_value_%s", function);
-                }
+                final String fieldName = field.map(f -> String.format(Locale.ROOT, "aggregation_value_%s_%s", function, f))
+                        .orElseGet(() -> String.format(Locale.ROOT, "aggregation_value_%s", function));
 
                 fields.put(fieldName, seriesValue.value());
             }
@@ -368,6 +392,17 @@ public class AggregationEventProcessor implements EventProcessor {
         return eventsWithContext.build();
     }
 
+    private Optional<String> fieldFromSeries(SeriesSpec series) {
+        if (series instanceof HasField hasField) {
+            return Optional.ofNullable(hasField.field());
+        }
+        if (series instanceof HasOptionalField hasOptionalField) {
+            return hasOptionalField.field();
+        }
+
+        return Optional.empty();
+    }
+
     // Build a human readable event message string that contains somewhat useful information
     private String createEventMessageString(String keyString, AggregationKeyResult keyResult) {
         final StringBuilder builder = new StringBuilder(eventDefinition.title()).append(": ");
@@ -376,15 +411,7 @@ public class AggregationEventProcessor implements EventProcessor {
             builder.append(keyString).append(" - ");
         }
 
-        for (AggregationSeriesValue seriesValue : keyResult.seriesValues()) {
-            final AggregationSeries series = seriesValue.series();
-            final String functionName = series.function().toString().toLowerCase(Locale.ROOT);
-            final String functionField = series.field().orElse("");
-
-            builder.append(functionName).append("(").append(functionField).append(")");
-            builder.append("=").append(seriesValue.value());
-            builder.append(" ");
-        }
+        builder.append(seriesString(keyResult));
 
         return builder.toString().trim();
     }
@@ -392,7 +419,14 @@ public class AggregationEventProcessor implements EventProcessor {
     // Only used to create log messages
     private String seriesString(AggregationKeyResult keyResult) {
         return keyResult.seriesValues().stream()
-                .map(seriesValue -> String.format(Locale.ROOT, "%s(%s)=%s", seriesValue.series().function().toString().toLowerCase(Locale.ROOT), seriesValue.series().field().orElse(""), seriesValue.value()))
+                .map(this::formatSeriesValue)
                 .collect(Collectors.joining(" "));
+    }
+
+    private String formatSeriesValue(AggregationSeriesValue seriesValue) {
+        return String.format(Locale.ROOT, "%s=%s", seriesValue.series().literal(), seriesValue.value());
+    }
+
+    private static class EventLimitReachedException extends RuntimeException {
     }
 }

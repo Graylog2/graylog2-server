@@ -24,6 +24,8 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
@@ -56,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -65,10 +68,12 @@ import java.util.stream.Stream;
 public class ClientOS2 implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientOS2.class);
     private final OpenSearchClient client;
+    private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
 
-    public ClientOS2(OpenSearchClient client) {
+    public ClientOS2(final OpenSearchClient client, final List<String> featureFlags) {
         this.client = client;
+        this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
     }
 
@@ -331,5 +336,13 @@ public class ClientOS2 implements Client {
                 .path("blocks")
                 .fields()
                 .hasNext();
+    }
+
+
+    public String getClusterSetting(String setting) {
+        final ClusterGetSettingsRequest req = new ClusterGetSettingsRequest();
+        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(req, requestOptions),
+                "Unable to read OS cluster setting: " + setting);
+        return response.getSetting(setting);
     }
 }

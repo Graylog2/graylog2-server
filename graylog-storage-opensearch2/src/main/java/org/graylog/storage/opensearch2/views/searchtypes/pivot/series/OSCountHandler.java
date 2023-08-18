@@ -49,16 +49,15 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
     @Nonnull
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
-        final String field = count.field();
-        if (field == null) {
-            // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
-            return List.of();
-        } else {
-            // the request was for a field count, we have to add a value_count sub aggregation
-            final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
-            record(queryContext, pivot, count, name, ValueCount.class);
-            return List.of(SeriesAggregationBuilder.metric(value));
-        }
+        return count.field()
+                .map(field -> {
+                    // the request was for a field count, we have to add a value_count sub aggregation
+                    final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
+                    record(queryContext, pivot, count, name, ValueCount.class);
+                    return List.of(SeriesAggregationBuilder.metric(value));
+                })
+                // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
+                .orElse(List.of());
     }
 
     @Override

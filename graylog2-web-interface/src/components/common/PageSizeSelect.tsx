@@ -36,7 +36,7 @@ const Container = styled.div`
 type Props = {
   className?: string,
   pageSize: number,
-  pageSizes: Array<number>,
+  pageSizes?: Array<number>,
   onChange: (newPageSize: number) => void,
   showLabel?: boolean
 };

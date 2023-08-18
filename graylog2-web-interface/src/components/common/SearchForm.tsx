@@ -102,7 +102,7 @@ type Props = {
   onSearch?: (query: string, reset?: () => void) => void,
   wrapperClass?: string,
   topMargin?: number,
-  onQueryChange: (query: string) => void,
+  onQueryChange?: (query: string) => void,
   query?: string,
 }
 
@@ -202,7 +202,7 @@ const SearchForm = ({
               {label}
             </Label>
           )}
-          <InputContainer>
+          <InputContainer className="input-container">
             <StyledInput id="common-search-form-query-input"
                          autoFocus={focusAfterMount}
                          onChange={onChange}

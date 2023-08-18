@@ -70,11 +70,11 @@ export type RulesStoreState = {
 type RulesActionsType = {
   delete: (rule: RuleType) => Promise<unknown>,
   list: () => Promise<unknown>,
-  get: () => Promise<unknown>,
+  get: (ruleId: string) => Promise<unknown>,
   save: (rule: RuleType) => Promise<unknown>,
   update: (rule: RuleType) => Promise<unknown>,
   parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
-  simulate: (messageString: string, rule: RuleType, callback: () => void) => Promise<unknown>,
+  simulate: (messageString: string, rule: RuleType, callback: React.Dispatch<any> | (() => void)) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
@@ -182,7 +182,7 @@ export const RulesStore = singletonStore(
       return promise;
     },
 
-    get(ruleId) {
+    get(ruleId: string) {
       const failCallback = (error: Error) => {
         UserNotification.error(`Fetching rule "${ruleId}" failed with status: ${error.message}`,
           `Could not retrieve processing rule "${ruleId}"`);
@@ -258,7 +258,7 @@ export const RulesStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
       const promise = fetch('DELETE', url).then(() => {
-        this.rules = this.rules.filter((el) => el.id !== rule.id);
+        this.rules = this.rules?.filter((el) => el.id !== rule.id);
         this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
         UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
       }, failCallback);

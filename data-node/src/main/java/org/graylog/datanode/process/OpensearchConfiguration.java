@@ -17,6 +17,7 @@
 package org.graylog.datanode.process;
 
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
@@ -28,12 +29,16 @@ import java.util.Map;
 public record OpensearchConfiguration(
         Path opensearchDir,
         Path opensearchConfigDir,
+        String bindAddress,
+        String hostname,
         int httpPort,
         int transportPort,
         String authUsername,
         String authPassword,
         String clusterName, String nodeName, List<String> nodeRoles,
-        List<String> discoverySeedHosts, Map<String, String> additionalConfiguration
+        List<String> discoverySeedHosts,
+        OpensearchSecurityConfiguration opensearchSecurityConfiguration,
+        Map<String, String> additionalConfiguration
 ) {
     public Map<String, String> asMap() {
 
@@ -45,6 +50,9 @@ public record OpensearchConfiguration(
             config.put("bootstrap.system_call_filter", "false");
         }
 
+        if (bindAddress != null && !bindAddress.isBlank()) {
+            config.put("network.host", bindAddress);
+        }
         config.put("http.port", String.valueOf(httpPort));
         config.put("transport.port", String.valueOf(transportPort));
         if (clusterName != null && !clusterName.isBlank()) {
@@ -75,6 +83,10 @@ public record OpensearchConfiguration(
 
     public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
-        return new HttpHost("localhost", httpPort(), sslEnabled ? "https" : "http");
+        return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
+    }
+
+    public boolean securityConfigured() {
+        return opensearchSecurityConfiguration() != null;
     }
 }

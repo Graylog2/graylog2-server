@@ -95,9 +95,9 @@ describe('DashboardSearchBar', () => {
   it('should call trigger search execution and set global override on submit when there are changes', async () => {
     render(<DashboardSearchBar />);
 
-    const timeRangeInput = await screen.findByText(/no override/i);
+    const timeRangeFilter = await screen.findByText(/no override/i);
 
-    userEvent.click(timeRangeInput);
+    userEvent.click(timeRangeFilter);
     userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
     userEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
 

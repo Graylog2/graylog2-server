@@ -28,21 +28,21 @@ type Props = {
   sectionTitle: string,
 };
 
-export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
-  position: ${sidebarIsPinned ? 'relative' : 'fixed'};
+export const Container = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $sidebarIsPinned }) => css`
+  position: ${$sidebarIsPinned ? 'relative' : 'fixed'};
   width: 270px;
-  height: ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
-  top: ${sidebarIsPinned ? 0 : '50px'};
-  left: ${sidebarIsPinned ? 0 : '50px'};
+  height: ${$sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
+  top: ${$sidebarIsPinned ? 0 : '50px'};
+  left: ${$sidebarIsPinned ? 0 : '50px'};
 
   background: ${theme.colors.global.contentBackground};
-  border-right: ${sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
-  box-shadow: ${sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
+  border-right: ${$sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
+  box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
 
-  z-index: ${sidebarIsPinned ? 1030 : 6};
+  z-index: ${$sidebarIsPinned ? 1030 : 6};
 
-  ${sidebarIsPinned && css`
-    ::before {
+  ${$sidebarIsPinned && css`
+    &::before {
       content: '';
       position: absolute;
       top: 0;
@@ -105,10 +105,10 @@ const Title = styled.h1`
   cursor: pointer;
 `;
 
-const OverlayToggle = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
+const OverlayToggle = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $sidebarIsPinned }) => css`
   > * {
     font-size: ${theme.fonts.size.large};
-    color: ${sidebarIsPinned ? theme.colors.variant.info : theme.colors.gray[30]};
+    color: ${$sidebarIsPinned ? theme.colors.variant.info : theme.colors.gray[30]};
   }
 `);
 
@@ -153,8 +153,7 @@ const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout 
   const title = useViewTitle();
 
   return (
-    <Container sidebarIsPinned={sidebarIsPinned}>
-
+    <Container $sidebarIsPinned={sidebarIsPinned}>
       <ContentGrid>
         <Header>
           <SearchTitle title={title}>
@@ -162,7 +161,7 @@ const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout 
               <Title onClick={closeSidebar}>{title}</Title>
             </CenterVertical>
             <CenterVertical>
-              <OverlayToggle sidebarIsPinned={sidebarIsPinned}>
+              <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
                 <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
                             title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
                             name="thumbtack" />

@@ -44,12 +44,15 @@ public class DatanodeContainerizedBackend {
         this(new DatanodeDockerHooksAdapter());
     }
 
-
     public DatanodeContainerizedBackend(DatanodeDockerHooks hooks) {
+        this("node1", hooks);
+    }
+
+    public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
         this.network = Network.newNetwork();
         this.mongodbContainer = createMongodbContainer();
         this.datanodeContainer = createDatanodeContainer(
-                "node1",
+                nodeName,
                 hooks, createDockerImageFile(getOpensearchVersion()),
                 getDatanodeVersion());
     }
@@ -73,6 +76,7 @@ public class DatanodeContainerizedBackend {
                 .withNetwork(network)
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
+                .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")

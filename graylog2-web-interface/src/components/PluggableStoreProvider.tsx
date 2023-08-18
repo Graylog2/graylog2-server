@@ -25,15 +25,17 @@ import type View from 'views/logic/views/View';
 import type { QueryId } from 'views/logic/queries/Query';
 import type { QuerySet } from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 
 type Props = {
   initialQuery: QueryId,
   isNew: boolean,
   view: View,
   executionState: SearchExecutionState,
+  undoRedoState?: UndoRedoState,
 }
 
-const PluggableStoreProvider = ({ initialQuery, children, isNew, view, executionState }: React.PropsWithChildren<Props>) => {
+const PluggableStoreProvider = ({ initialQuery, children, isNew, view, executionState, undoRedoState }: React.PropsWithChildren<Props>) => {
   const reducers = usePluginEntities('views.reducers');
   const activeQuery = useMemo(() => {
     const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
@@ -44,16 +46,32 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
 
     return queries.first()?.id;
   }, [initialQuery, view?.search?.queries]);
-  const initialState = useMemo(() => ({
-    view: { view, isDirty: false, isNew, activeQuery },
-    searchExecution: {
-      widgetsToSearch: undefined,
-      executionState,
-      isLoading: false,
-      result: undefined,
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [executionState, isNew, view]);
+  const initialState = useMemo(() => {
+    const undoRedo = undoRedoState ? {
+      undoRedo: undoRedoState,
+    } : {};
+
+    return ({
+      view: {
+        view,
+        isDirty:
+            false,
+        isNew,
+        activeQuery,
+      },
+      searchExecution: {
+        widgetsToSearch: undefined,
+        executionState,
+        isLoading:
+            false,
+        result:
+          undefined,
+      },
+      ...undoRedo,
+    });
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [executionState, isNew, view]);
   const store = useMemo(() => createStore(reducers, initialState), [initialState, reducers]);
 
   return (
@@ -61,6 +79,10 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
       {children}
     </Provider>
   );
+};
+
+PluggableStoreProvider.defaultProps = {
+  undoRedoState: undefined,
 };
 
 export default PluggableStoreProvider;

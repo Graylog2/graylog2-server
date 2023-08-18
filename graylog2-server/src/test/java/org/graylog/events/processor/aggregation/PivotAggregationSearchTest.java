@@ -17,15 +17,25 @@
 package org.graylog.events.processor.aggregation;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import org.assertj.core.api.Assertions;
 import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -39,6 +49,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,8 +75,8 @@ public class PivotAggregationSearchTest {
     public void testExtractValuesWithGroupBy() throws Exception {
         final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
-        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
-        final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
+        final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
+        final SeriesSpec seriesCard = Cardinality.builder().id("abc123").field("source").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("")
                 .streams(Collections.emptySet())
@@ -91,7 +102,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
@@ -100,20 +113,20 @@ public class PivotAggregationSearchTest {
                 .total(1)
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(toString, "a", "b"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count(source)"), 42, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card(source)"), 1, true, "row-leaf"))
                         .source("leaf")
                         .build())
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(toString, "a"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 84, true, "row-inner"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-inner"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count(source)"), 84, true, "row-inner"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card(source)"), 1, true, "row-inner"))
                         .source("non-leaf")
                         .build())
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(toString, "a", "c"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count(source)"), 42, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card(source)"), 1, true, "row-leaf"))
                         .source("leaf")
                         .build())
                 .build();
@@ -161,9 +174,9 @@ public class PivotAggregationSearchTest {
     public void testExtractValuesWithoutGroupBy() throws Exception {
         final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
-        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
-        final AggregationSeries seriesCountNoField = AggregationSeries.create("abc123", AggregationFunction.COUNT, "");
-        final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
+        final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
+        final SeriesSpec seriesCountNoField = Count.builder().id("abc123").build();
+        final SeriesSpec seriesCard = Cardinality.builder().id("abc123").field("source").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("")
                 .streams(Collections.emptySet())
@@ -189,7 +202,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -197,9 +212,9 @@ public class PivotAggregationSearchTest {
                 .total(1)
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(timerange.getTo().toString()))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/<no-field>/abc123"), 23, true, "row-leaf"))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count(source)"), 42, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count()"), 23, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/card(source)"), 1, true, "row-leaf"))
                         .source("leaf")
                         .build())
                 .build();
@@ -235,8 +250,8 @@ public class PivotAggregationSearchTest {
     public void testExtractValuesWithNullValues() throws Exception {
         final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
-        final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
-        final AggregationSeries seriesAvg = AggregationSeries.create("abc123", AggregationFunction.AVG, "some_field");
+        final SeriesSpec seriesCount = Count.builder().id("abc123").field("source").build();
+        final SeriesSpec seriesAvg = Average.builder().id("abc123").field("some_field").build();
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("")
                 .streams(Collections.emptySet())
@@ -262,7 +277,9 @@ public class PivotAggregationSearchTest {
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
                 permittedStreams,
-                notificationService);
+                notificationService,
+                new QueryStringDecorators(Optional.empty())
+                );
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -270,9 +287,9 @@ public class PivotAggregationSearchTest {
                 .total(1)
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(timerange.getTo().toString()))
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count(source)"), 42, true, "row-leaf"))
                         // A "null" value can happen with some Elasticsearch aggregations (e.g. avg on a non-existent field)
-                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/avg/some_field/abc123"), null, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/avg(some_field)"), null, true, "row-leaf"))
                         .source("leaf")
                         .build())
                 .build();
@@ -363,5 +380,50 @@ public class PivotAggregationSearchTest {
                 DateRange.create(from.plusSeconds(processingHopSizeSec * 3), from.plusSeconds(processingHopSizeSec * 3).plusSeconds(processingWindowSizeSec)),
                 DateRange.create(from.plusSeconds(processingHopSizeSec * 4), to)
         );
+    }
+
+    @Test
+    public void testQueryParameterSubstitution() {
+        final long WINDOW_LENGTH = 30000;
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
+        var seriesCount = Count.builder().field("source").build();
+        var seriesCard = Cardinality.builder().field("source").build();
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
+                .query("source:$secret$")
+                .queryParameters(ImmutableSet.of(ValueParameter.builder().dataType("any").name("secret").build()))
+                .streams(Collections.emptySet())
+                .groupBy(Collections.emptyList())
+                .series(ImmutableList.of(seriesCount, seriesCard))
+                .conditions(null)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
+                .build();
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .streams(Collections.emptySet())
+                .timerange(timerange)
+                .batchSize(500)
+                .build();
+
+        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+                config,
+                parameters,
+                "test",
+                eventDefinition,
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                moreSearch,
+                new PermittedStreams(() -> Stream.of("00001")),
+                notificationService,
+                new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
+                    if (queryString.equals("source:$secret$") && parameterProvider.getParameter("secret").isPresent()) {
+                        return PositionTrackingQuery.of("source:example.org");
+                    } else {
+                        throw new IllegalArgumentException("Unexpected query decoration request!");
+                    }
+                }))
+        );
+        final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
+        Assertions.assertThat(query.query().queryString()).isEqualTo("source:example.org");
     }
 }

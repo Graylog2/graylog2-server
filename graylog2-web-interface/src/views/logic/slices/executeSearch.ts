@@ -27,7 +27,7 @@ const delay = (ms: number) => new Promise((resolve) => {
 });
 
 const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promise((resolve) => {
-  if (job?.execution?.done) {
+  if (job?.execution?.done || job?.execution?.completed_exceptionally) {
     resolve(job);
   } else {
     resolve(delay(250)
@@ -51,8 +51,9 @@ const executeSearch = (
   let executionStateBuilder = executionStateParam.toBuilder().globalOverride(globalOverride);
 
   if (widgetsToSearch) {
-    const keepSearchTypes = widgetsToSearch.map((widgetId) => widgetMapping.get(widgetId))
-      .reduce((acc, searchTypeSet) => [...acc, ...searchTypeSet.toArray()], globalOverride.keepSearchTypes || []);
+    const keepSearchTypes = widgetsToSearch
+      .map((widgetId) => widgetMapping.get(widgetId))
+      .reduce((acc, searchTypeSet) => (searchTypeSet ? [...acc, ...searchTypeSet.toArray()] : acc), globalOverride.keepSearchTypes || []);
     const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();
     executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
   }

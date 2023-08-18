@@ -17,7 +17,6 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
@@ -27,23 +26,22 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
-import org.graylog2.cluster.preflight.NodePreflightConfigService;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -54,32 +52,40 @@ import java.util.stream.Collectors;
 public class PreflightResource {
 
     private final NodeService nodeService;
-    private final NodePreflightConfigService nodePreflightConfigService;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final CaService caService;
+    private final TransportAddressSanitizer transportAddressSanitizer;
     private final String passwordSecret;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
-                             final NodePreflightConfigService nodePreflightConfigService,
+                             final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
+                             final TransportAddressSanitizer transportAddressSanitizer,
                              final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
-        this.nodePreflightConfigService = nodePreflightConfigService;
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
+        this.transportAddressSanitizer = transportAddressSanitizer;
         this.passwordSecret = passwordSecret;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, NodePreflightConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
+    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
 
     @GET
     @Path("/data_nodes")
     public List<DataNode> listDataNodes() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        final var preflightDataNodes = nodePreflightConfigService.streamAll().collect(Collectors.toMap(NodePreflightConfig::nodeId, Function.identity()));
+        final var preflightDataNodes = dataNodeProvisioningService.streamAll().collect(Collectors.toMap(DataNodeProvisioningConfig::nodeId, Function.identity()));
 
         return activeDataNodes.values().stream().map(n -> {
             final var preflight = preflightDataNodes.get(n.getNodeId());
-            return new DataNode(n.getNodeId(), n.getType(), n.getTransportAddress(), preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null, n.getHostname(), n.getShortNodeId());
+            return new DataNode(n.getNodeId(),
+                    n.getType(),
+                    transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
+                    preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
+                    n.getHostname(),
+                    n.getShortNodeId());
         }).collect(Collectors.toList());
     }
 
@@ -111,7 +117,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void startOver() {
         caService.startOver();
-        nodePreflightConfigService.deleteAll();
+        dataNodeProvisioningService.deleteAll();
     }
 
     @DELETE
@@ -119,7 +125,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void startOver(@PathParam("nodeID") String nodeID) {
         //TODO:  reset a specific datanode
-        nodePreflightConfigService.delete(nodeID);
+        dataNodeProvisioningService.delete(nodeID);
     }
 
     @POST
@@ -127,7 +133,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void generate() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        activeDataNodes.values().forEach(node -> nodePreflightConfigService.changeState(node.getNodeId(), NodePreflightConfig.State.CONFIGURED));
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 
     @POST
@@ -136,10 +142,10 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
-        var cfg = nodePreflightConfigService.getPreflightConfigFor(nodeID);
-        var builder = cfg != null ? cfg.toBuilder() : NodePreflightConfig.builder().nodeId(nodeID);
+        var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeID);
+        var builder = cfg != null ? cfg.toBuilder() : DataNodeProvisioningConfig.builder().nodeId(nodeID);
         builder.altNames(params.altNames()).validFor(params.validFor());
-        nodePreflightConfigService.save(builder.build());
+        dataNodeProvisioningService.save(builder.build());
 
     }
 }

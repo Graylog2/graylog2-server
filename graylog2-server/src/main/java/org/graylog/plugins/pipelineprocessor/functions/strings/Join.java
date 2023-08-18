@@ -18,13 +18,13 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
-import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +40,7 @@ public class Join extends AbstractFunction<String> {
 
     public Join() {
         elementsParam = ParameterDescriptor.type("elements", Object.class, List.class)
+                .primary()
                 .transform(Join::toList)
                 .description("The list of strings to join together, may be null")
                 .build();
@@ -50,7 +51,7 @@ public class Join extends AbstractFunction<String> {
                 .transform(Ints::saturatedCast)
                 .description("The first index to start joining from. It is an error to pass in an index larger than the number of elements")
                 .build();
-        endIndexParam = ParameterDescriptor.integer("end", Integer.class).optional()
+        endIndexParam = ParameterDescriptor.integer("indexEnd", Integer.class).optional()
                 .transform(Ints::saturatedCast)
                 .description("The index to stop joining from (exclusive). It is an error to pass in an index larger than the number of elements")
                 .build();
@@ -84,6 +85,10 @@ public class Join extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(ImmutableList.of(elementsParam, delimiterParam, startIndexParam, endIndexParam))
                 .description("Joins the elements of the provided array into a single String")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Join array to string")
+                .ruleBuilderTitle("Join '${elements}' into a single string, <#if start??>starting with ${start} </#if><#if indexEnd??>and ending with ${indexEnd} <#/if>using '${delimiter!' '} as separator.")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

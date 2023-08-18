@@ -33,6 +33,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 
 import StreamModal from '../StreamModal';
 
@@ -154,9 +155,9 @@ const StreamActions = ({
                    entityType="stream"
                    onClick={toggleEntityShareModal}
                    bsSize="xsmall" />
-      <OverlayDropdownButton title="More"
+      <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
                              bsSize="xsmall"
-                             buttonTitle="More actions"
+                             buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                              disabled={isNotEditable}
                              dropdownZIndex={1000}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>

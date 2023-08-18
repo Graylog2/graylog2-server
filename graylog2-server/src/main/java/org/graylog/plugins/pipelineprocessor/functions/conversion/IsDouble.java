@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
@@ -30,7 +31,7 @@ public class IsDouble extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsDouble() {
-        valueParam = object("value").description("Value to check").build();
+        valueParam = object("value").primary().description("Value to check").build();
     }
 
     @Override
@@ -45,7 +46,11 @@ public class IsDouble extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(valueParam)
-                .description("Checks whether a value is a double")
+                .description("Checks whether a value is a floating point value (of type double)")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Check if double")
+                .ruleBuilderTitle("Check if '${value}' is a double")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
 }

@@ -101,8 +101,6 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
     refetchEventDefinitions();
   };
 
-  const getErrorExplanation = (failures: Array<{ entity_id: string, failure_explanation: string }>) => failures?.reduce((acc, failure) => `${acc} ${failure?.failure_explanation}`, '');
-
   const onAction = useCallback(() => {
     fetch('POST',
       qualifyUrl(ACTION_TEXT[actionType].bulkActionUrl),
@@ -111,7 +109,6 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
       if (failures?.length) {
         const notUpdatedDefinitionIds = failures.map(({ entity_id }) => entity_id);
         setSelectedEventDefinitionsIds(notUpdatedDefinitionIds);
-        UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${getDescriptor(selectedItemsAmount)} could not be ${actionType}d. ${getErrorExplanation(failures)}`);
       } else {
         setSelectedEventDefinitionsIds([]);
         UserNotification.success(`${selectedItemsAmount} ${getDescriptor(selectedItemsAmount)} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionType}d successfully.`, 'Success');

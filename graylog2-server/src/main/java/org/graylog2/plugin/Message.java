@@ -65,6 +65,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ASSOCIATED_ASSETS;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -90,6 +91,8 @@ public class Message implements Messages, Indexable {
      *       breaks anything with regard to expectations in other code and existing data in Elasticsearch.
      */
     public static final String FIELD_ID = "_id";
+
+    public static final String FIELD_INDEX = "_index";
 
     public static final String FIELD_MESSAGE = "message";
     public static final String FIELD_FULL_MESSAGE = "full_message";
@@ -228,7 +231,8 @@ public class Message implements Messages, Indexable {
             FIELD_ILLUMINATE_GIM_EVENT_TYPE,
             FIELD_ILLUMINATE_GIM_EVENT_TYPE_CODE,
             FIELD_ILLUMINATE_GIM_TAGS,
-            FIELD_ILLUMINATE_GIM_VERSION
+            FIELD_ILLUMINATE_GIM_VERSION,
+            FIELD_ASSOCIATED_ASSETS
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -238,25 +242,27 @@ public class Message implements Messages, Indexable {
     );
 
     private static final ImmutableSet<String> ES_FIELDS = ImmutableSet.of(
-        // ElasticSearch fields.
-        FIELD_ID,
-        "_ttl",
-        "_source",
-        "_all",
-        "_index",
-        "_type",
-        "_score"
+            // ElasticSearch fields.
+            FIELD_ID,
+            "_ttl",
+            "_source",
+            "_all",
+            FIELD_INDEX,
+            "_type",
+            "_score"
     );
 
+    public static final Set<String> SEARCHABLE_ES_FIELDS = Set.of(FIELD_INDEX, FIELD_ID);
+
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(GRAYLOG_FIELDS)
-        .addAll(CORE_MESSAGE_FIELDS)
-        .build();
+            .addAll(GRAYLOG_FIELDS)
+            .addAll(CORE_MESSAGE_FIELDS)
+            .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(RESERVED_SETTABLE_FIELDS)
-        .addAll(ES_FIELDS)
-        .build();
+            .addAll(RESERVED_SETTABLE_FIELDS)
+            .addAll(ES_FIELDS)
+            .build();
 
     public static final ImmutableSet<String> FILTERED_FIELDS = new ImmutableSet.Builder<String>()
         .addAll(GRAYLOG_FIELDS)
@@ -780,7 +786,7 @@ public class Message implements Messages, Indexable {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<String> getStreamIds() {
+    public Set<String> getStreamIds() {
         Collection<String> streamField;
         try {
             streamField = getFieldAs(Collection.class, FIELD_STREAMS);

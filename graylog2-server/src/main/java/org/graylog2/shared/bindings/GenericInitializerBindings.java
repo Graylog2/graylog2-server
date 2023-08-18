@@ -19,6 +19,7 @@ package org.graylog2.shared.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.security.certutil.ConfigureCertRenewalJobOnStartupService;
 import org.graylog2.shared.initializers.InputSetupService;
 import org.graylog2.shared.initializers.JerseyService;
 import org.graylog2.shared.initializers.PeriodicalsService;
@@ -37,5 +38,6 @@ public class GenericInitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(JerseyService.class);
         serviceBinder.addBinding().to(GracefulShutdownService.class).asEagerSingleton();
         serviceBinder.addBinding().to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
+        serviceBinder.addBinding().to(ConfigureCertRenewalJobOnStartupService.class).asEagerSingleton();
     }
 }

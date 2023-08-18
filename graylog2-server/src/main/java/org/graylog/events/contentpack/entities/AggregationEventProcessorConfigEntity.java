@@ -26,7 +26,6 @@ import com.google.common.graph.MutableGraph;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
-import org.graylog.events.processor.aggregation.AggregationSeries;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -56,6 +55,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     private static final String FIELD_CONDITIONS = "conditions";
     private static final String FIELD_SEARCH_WITHIN_MS = "search_within_ms";
     private static final String FIELD_EXECUTE_EVERY_MS = "execute_every_ms";
+    private static final String FIELD_EVENT_LIMIT = "event_limit";
 
     @JsonProperty(FIELD_QUERY)
     public abstract ValueReference query();
@@ -67,7 +67,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     public abstract List<String> groupBy();
 
     @JsonProperty(FIELD_SERIES)
-    public abstract List<AggregationSeries> series();
+    public abstract List<SeriesSpecEntity> series();
 
     @JsonProperty(FIELD_CONDITIONS)
     public abstract Optional<AggregationConditions> conditions();
@@ -77,6 +77,9 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
 
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
     public abstract long executeEveryMs();
+
+    @JsonProperty(FIELD_EVENT_LIMIT)
+    public abstract int eventLimit();
 
     public static Builder builder() {
         return Builder.create();
@@ -90,7 +93,8 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         @JsonCreator
         public static Builder create() {
             return new AutoValue_AggregationEventProcessorConfigEntity.Builder()
-                    .type(TYPE_NAME);
+                    .type(TYPE_NAME)
+                    .eventLimit(0);
         }
 
         @JsonProperty(FIELD_QUERY)
@@ -103,7 +107,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         public abstract Builder groupBy(List<String> groupBy);
 
         @JsonProperty(FIELD_SERIES)
-        public abstract Builder series(List<AggregationSeries> series);
+        public abstract Builder series(List<SeriesSpecEntity> series);
 
         @JsonProperty(FIELD_CONDITIONS)
         public abstract Builder conditions(@Nullable AggregationConditions conditions);
@@ -113,6 +117,9 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
 
         @JsonProperty(FIELD_EXECUTE_EVERY_MS)
         public abstract Builder executeEveryMs(long executeEveryMs);
+
+        @JsonProperty(FIELD_EVENT_LIMIT)
+        public abstract Builder eventLimit(Integer eventLimit);
 
         public abstract AggregationEventProcessorConfigEntity build();
     }
@@ -141,17 +148,18 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .query(query().asString(parameters))
                 .streams(streamSet)
                 .groupBy(groupBy())
-                .series(series())
+                .series(series().stream().map(s -> s.toNativeEntity()).toList())
                 .conditions(conditions().orElse(null))
                 .executeEveryMs(executeEveryMs())
                 .searchWithinMs(searchWithinMs())
+                .eventLimit(eventLimit())
                 .build();
     }
 
     @Override
     public void resolveForInstallation(EntityV1 entity,
                                        Map<String, ValueReference> parameters,
-                                       Map<EntityDescriptor,Entity> entities,
+                                       Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
         streams().stream()
                 .map(ModelId::of)

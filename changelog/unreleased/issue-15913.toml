@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Disable offline detection for REST API client."
+
+issues = ["15913"]
+pulls = ["15914"]
+

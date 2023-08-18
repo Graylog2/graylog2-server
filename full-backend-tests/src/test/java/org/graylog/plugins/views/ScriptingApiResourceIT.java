@@ -20,6 +20,7 @@ import io.restassured.http.Header;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
+import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Sharing;
 import org.graylog.testing.completebackend.apis.SharingRequest;
@@ -128,6 +129,58 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, DEFAULT_STREAM, 3);
         validateRow(validatableResponse, stream2Id, 2);
         validateRow(validatableResponse, stream1Id, 1);
+    }
+
+    @ContainerMatrixTest
+    void testStdDevSorting() {
+        final GraylogApiResponse responseDesc =
+                new GraylogApiResponse(api.post("/search/aggregate","""
+                        {
+                        	"group_by": [
+                        		{
+                        			"field": "facility"
+                        		}
+                        	],
+                        	"metrics": [
+                        		{
+                        			"function": "stddev",
+                        			"field": "level",
+                        			"sort": "desc"
+                        		}
+                        	]
+                        }
+                         """, 200));
+
+        responseDesc.validatableResponse().log().ifValidationFails()
+                .assertThat().body("datarows", Matchers.hasSize(2));
+
+        List<Double> stddevDesc = responseDesc.properJSONPath().read("datarows.*[1]");
+        org.assertj.core.api.Assertions.assertThat(stddevDesc)
+                .hasSize(2)
+                .containsExactly(0.5, 0.0);
+
+        final GraylogApiResponse responseAsc =
+                new GraylogApiResponse(api.post("/search/aggregate","""
+                        {
+                        	"group_by": [
+                        		{
+                        			"field": "facility"
+                        		}
+                        	],
+                        	"metrics": [
+                        		{
+                        			"function": "stddev",
+                        			"field": "level",
+                        			"sort": "asc"
+                        		}
+                        	]
+                        }
+                         """, 200));
+
+        List<Double> stddevAsc = responseAsc.properJSONPath().read("datarows.*[1]");
+        org.assertj.core.api.Assertions.assertThat(stddevAsc)
+                .hasSize(2)
+                .containsExactly(0.0, 0.5);
     }
 
     @ContainerMatrixTest

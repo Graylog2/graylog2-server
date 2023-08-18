@@ -45,7 +45,9 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
     &.active {
       ${activeIndicatorStyles(theme)}
-      :hover, :focus {
+
+      &:hover,
+      :focus {
         ${activeIndicatorStyles(theme)}
       }
     }

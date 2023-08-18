@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class ElasticSearchOutput implements MessageOutput {
     private final Messages messages;
     private final Journal journal;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
-    private final MessageQueueAcknowledger acknowledger;
+    protected final MessageQueueAcknowledger acknowledger;
 
     @Inject
     public ElasticSearchOutput(MetricRegistry metricRegistry,
@@ -87,7 +88,7 @@ public class ElasticSearchOutput implements MessageOutput {
         throw new UnsupportedOperationException("Method not supported!");
     }
 
-    public void writeMessageEntries(List<Map.Entry<IndexSet, Message>> messageList) throws Exception {
+    public Set<String> writeMessageEntries(List<Map.Entry<IndexSet, Message>> messageList) throws Exception {
         if (LOG.isTraceEnabled()) {
             final String sortedIds = messageList.stream()
                     .map(Map.Entry::getValue)
@@ -98,14 +99,13 @@ public class ElasticSearchOutput implements MessageOutput {
         }
 
         writes.mark(messageList.size());
-        final List<String> failedMessageIds;
+        final Set<String> failedMessageIds;
         try (final Timer.Context ignored = processTime.time()) {
             failedMessageIds = messages.bulkIndex(messageList);
         }
         failures.mark(failedMessageIds.size());
 
-        // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
-        acknowledger.acknowledge(messageList.stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+        return failedMessageIds;
     }
 
     @Override

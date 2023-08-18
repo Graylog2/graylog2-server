@@ -46,6 +46,7 @@ public class EventProcessorEngine {
     private final EventStorageHandlerEngine storageHandlerEngine;
     private final Provider<EventProcessorEventFactory> eventFactoryProvider;
     private final EventProcessorExecutionMetrics metrics;
+    private final EventDefinitionHandler eventDefinitionHandler;
 
     @Inject
     public EventProcessorEngine(Map<String, EventProcessor.Factory> eventProcessorFactories,
@@ -54,7 +55,8 @@ public class EventProcessorEngine {
                                 EventNotificationHandler notificationHandler,
                                 EventStorageHandlerEngine storageHandlerEngine,
                                 Provider<EventProcessorEventFactory> eventFactoryProvider,
-                                EventProcessorExecutionMetrics metrics) {
+                                EventProcessorExecutionMetrics metrics,
+                                EventDefinitionHandler eventDefinitionHandler) {
         this.dbService = dbService;
         this.eventProcessorFactories = eventProcessorFactories;
         this.fieldSpecEngine = fieldSpecEngine;
@@ -62,6 +64,7 @@ public class EventProcessorEngine {
         this.storageHandlerEngine = storageHandlerEngine;
         this.eventFactoryProvider = eventFactoryProvider;
         this.metrics = metrics;
+        this.eventDefinitionHandler = eventDefinitionHandler;
     }
 
     private EventDefinition getEventDefinition(String id) throws EventProcessorException {
@@ -111,6 +114,8 @@ public class EventProcessorEngine {
             return;
         }
         metrics.recordCreatedEvents(eventProcessor, eventDefinition.id(), eventsWithContext.size());
+        eventDefinitionHandler.updateLastMatched(eventsWithContext);
+
         try {
             // Field spec needs to be executed first to make sure all fields are set before executing the handlers
             fieldSpecEngine.execute(eventsWithContext, eventDefinition.fieldSpec());

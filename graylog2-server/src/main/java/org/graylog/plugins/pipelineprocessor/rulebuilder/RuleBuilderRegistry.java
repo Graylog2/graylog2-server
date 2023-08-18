@@ -23,7 +23,6 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 
 import javax.inject.Inject;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +47,8 @@ public class RuleBuilderRegistry {
                         .descriptor(f.descriptor())
                         .build()
                 );
-        final Stream<RuleFragment> fragmentConditions = ruleFragmentService.all().stream().filter(RuleFragment::isCondition);
+        final Stream<RuleFragment> fragmentConditions = ruleFragmentService.all().stream()
+                .filter(f -> f.descriptor().ruleBuilderEnabled() && f.isCondition());
         return Streams.concat(functionConditions, fragmentConditions)
                 .collect(Collectors.toMap(f -> f.descriptor().name(), function -> function));
     }
@@ -56,13 +56,15 @@ public class RuleBuilderRegistry {
     public Map<String, RuleFragment> actions() {
         final Stream<RuleFragment> functions = functionRegistry.all()
                 .stream()
-                .filter(f -> f.descriptor().ruleBuilderEnabled())
+                .filter(f -> f.descriptor().ruleBuilderEnabled()
+                        && !f.descriptor().returnType().equals(Boolean.class))
                 .map(f -> RuleFragment.builder()
                         .descriptor(f.descriptor())
                         .build()
                 );
         final Stream<RuleFragment> fragmentActions =
-                ruleFragmentService.all().stream().filter(Predicate.not(RuleFragment::isCondition));
+                ruleFragmentService.all().stream()
+                        .filter(f -> f.descriptor().ruleBuilderEnabled() && !f.isCondition());
         return Streams.concat(functions, fragmentActions)
                 .collect(Collectors.toMap(f -> f.descriptor().name(), function -> function));
     }

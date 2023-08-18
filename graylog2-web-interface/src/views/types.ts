@@ -55,6 +55,7 @@ import type SearchResult from 'views/logic/SearchResult';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
+import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -260,8 +261,9 @@ type DashboardActionModalProps = {
   ref: React.Ref<unknown>,
 }
 
-type AssetActionComponentProps = {
-  identifier: unknown,
+type AssetInformationComponentProps = {
+  identifiers: unknown,
+  addToQuery: (id: string) => void;
 }
 
 type DashboardAction = {
@@ -270,9 +272,8 @@ type DashboardAction = {
   modal?: React.ComponentType<DashboardActionModalProps>,
 }
 
-type AssetAction = {
-  key: string,
-  component: React.ComponentType<AssetActionComponentProps>,
+type AssetInformation = {
+  component: React.ComponentType<AssetInformationComponentProps>,
 }
 
 type EventActionComponentProps = {
@@ -374,6 +375,7 @@ export interface RootState {
   view: ViewState;
   searchExecution: SearchExecution;
   searchMetadata: SearchMetadataState;
+  undoRedo: UndoRedoState
 }
 
 export type GetState = () => RootState;
@@ -405,7 +407,7 @@ declare module 'graylog-web-plugin/plugin' {
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
-    'views.components.assetValueActions'?: Array<AssetAction>;
+    'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.dashboardActions'?: Array<DashboardAction>;
     'views.components.eventActions'?: Array<{
       component: React.ComponentType<EventActionComponentProps>,

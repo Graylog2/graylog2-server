@@ -16,20 +16,23 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Formik } from 'formik';
+import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { FormSubmit, Select } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
+import { FormSubmit, Icon, OverlayTrigger, Select } from 'components/common';
+import { Button, Col, Popover, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import Errors from './Errors';
-import { paramValueIsVariable } from './helpers';
-import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
-import type { BlockType, RuleBlock, BlockDict, BlockFieldDict } from './types';
+import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
+import type { BlockType, RuleBlock, BlockDict, BlockFieldDict, OutputVariables } from './types';
+
+import RuleHelperTable from '../rule-helper/RulerHelperTable';
+
+type Option = { label: string, value: any, description?: string | null };
 
 type Props = {
   existingBlock?: RuleBlock,
@@ -37,9 +40,9 @@ type Props = {
   onCancel: () => void,
   onSelect: (option: string) => void,
   onUpdate: (values: { [key: string]: any }, functionName: string) => void,
-  previousOutputPresent: boolean,
-  options: Array<{ label: string, value: any }>,
+  options: Array<Option>,
   order: number,
+  outputVariableList?: OutputVariables,
   selectedBlockDict?: BlockDict,
   type: BlockType,
 }
@@ -67,6 +70,19 @@ const SelectedBlockInfo = styled(Row)(({ theme }) => css`
   margin-bottom: ${theme.spacings.md};
 `);
 
+const HelpPopover = styled(Popover)(() => css`
+  min-width: 700px;
+`);
+
+const OptionTitle = styled.p(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xxs};
+`);
+
+const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelected }) => css`
+  color: ${$isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
+  margin-bottom: ${theme.spacings.xxs};
+`);
+
 const RuleBlockForm = ({
   existingBlock,
   onAdd,
@@ -75,7 +91,7 @@ const RuleBlockForm = ({
   onUpdate,
   options,
   order,
-  previousOutputPresent,
+  outputVariableList,
   selectedBlockDict,
   type,
 }: Props) => {
@@ -97,8 +113,6 @@ const RuleBlockForm = ({
           } else {
             newInitialValues[param.name] = undefined;
           }
-        } else if (paramValueIsVariable(initialBlockValue)) {
-          newInitialValues[param.name] = undefined;
         } else {
           newInitialValues[param.name] = initialBlockValue;
         }
@@ -125,7 +139,7 @@ const RuleBlockForm = ({
     setFieldValue(fieldName, null);
   };
 
-  const handleSubmit = (values: { [key: string]: any }) => {
+  const onSubmit = (values: { [key: string]: any }) => {
     sendTelemetry('click', {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
@@ -139,19 +153,36 @@ const RuleBlockForm = ({
     }
   };
 
+  const buildHelpPopover = (blockDict: BlockDict) => (
+    <HelpPopover id="selected-block-Dict-help"
+                 title="Function Syntax Help"
+                 data-app-section="pipeline-rule-builder"
+                 data-event-element="Function Syntax Help">
+      <RuleHelperTable entries={[blockDict]} expanded={{ [blockDict.name]: true }} />
+    </HelpPopover>
+  );
+
+  const optionRenderer = (option: Option, isSelected: boolean) => (
+    <>
+      <OptionTitle>{option.label}</OptionTitle>
+      {option.description && (<OptionDescription $isSelected={isSelected}>{option.description}</OptionDescription>)}
+    </>
+  );
+
   return (
     <Row>
       <Col md={12}>
         <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
-        <Formik enableReinitialize onSubmit={handleSubmit} initialValues={initialValues}>
-          {({ resetForm, setFieldValue, values }) => (
-            <>
+        <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
+          {({ resetForm, setFieldValue, isValid }) => (
+            <Form>
               <Row>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
                           name={`existingBlock-select-${type}`}
                           placeholder={`Select ${type}`}
                           options={options}
+                          optionRenderer={optionRenderer}
                           clearable={false}
                           matchProp="label"
                           onChange={(option: string) => handleChange(option, resetForm)}
@@ -164,7 +195,12 @@ const RuleBlockForm = ({
                   <SelectedBlockInfo>
                     <Col md={12}>
                       <BlockTitle>
-                        {existingBlock?.step_title || selectedBlockDict.name}
+                        {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
+                        <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover(selectedBlockDict)}>
+                          <Button bsStyle="link">
+                            <Icon name="question-circle" fixedWidth title="Function Syntax Help" data-testid="funcSyntaxHelpIcon" />
+                          </Button>
+                        </OverlayTrigger>
                       </BlockTitle>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>
@@ -175,16 +211,17 @@ const RuleBlockForm = ({
                       <RuleBlockFormField param={param}
                                           functionName={selectedBlockDict.name}
                                           order={order}
-                                          previousOutputPresent={previousOutputPresent}
+                                          blockId={existingBlock?.id}
+                                          outputVariableList={outputVariableList}
                                           resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
                     </Row>
                   ),
                   )}
 
                   <FormSubmit bsSize="small"
-                              submitButtonText={`${existingBlock ? 'Update' : 'Add'}`}
-                              submitButtonType="button"
-                              onSubmit={() => handleSubmit(values)}
+                              disabledSubmit={!isValid}
+                              submitButtonText={existingBlock ? 'Update' : 'Add'}
+                              submitButtonType="submit"
                               onCancel={() => {
                                 resetForm();
                                 onCancel();
@@ -192,7 +229,7 @@ const RuleBlockForm = ({
 
                 </SelectedBlock>
               )}
-            </>
+            </Form>
           )}
         </Formik>
         <Errors objectWithErrors={existingBlock} />
@@ -214,13 +251,14 @@ RuleBlockForm.propTypes = {
     }),
   ).isRequired,
   order: PropTypes.number.isRequired,
-  previousOutputPresent: PropTypes.bool.isRequired,
+  outputVariableList: outputVariablesPropType,
   selectedBlockDict: blockDictPropType,
   type: PropTypes.oneOf(['action', 'condition']).isRequired,
 };
 
 RuleBlockForm.defaultProps = {
   existingBlock: undefined,
+  outputVariableList: undefined,
   selectedBlockDict: undefined,
 };
 

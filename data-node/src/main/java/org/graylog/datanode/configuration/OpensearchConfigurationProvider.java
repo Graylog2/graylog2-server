@@ -16,9 +16,11 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.configuration.variants.MongoCertSecureConfiguration;
+import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
@@ -32,7 +34,8 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
@@ -59,26 +62,35 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     @Override
     public OpensearchConfiguration get() {
-        final String opensearchConfigLocation = localConfiguration.getOpensearchConfigLocation();
+        final Path opensearchConfigLocation = Path.of(localConfiguration.getOpensearchConfigLocation());
 
         //TODO: at some point bind the whole list, for now there is too much experiments with order and prerequisites
         List<SecurityConfigurationVariant> securityConfigurationTypes = List.of(
+                inSecureConfiguration,
                 uploadedCertFilesSecureConfiguration,
-                mongoCertSecureConfiguration,
-                inSecureConfiguration //TODO: in final version, this configuration is tried first, not last
+                mongoCertSecureConfiguration
         );
 
-        SecurityConfigurationVariant chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
+        Optional<SecurityConfigurationVariant> chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
                 .filter(s -> s.checkPrerequisites(localConfiguration))
-                .findFirst()
-                .orElseThrow(() -> new OpensearchConfigurationException("No valid option to start up OpenSearch"));
+                .findFirst();
 
         try {
-            final Map<String, String> config = chosenSecurityConfigurationVariant.configure(localConfiguration);
+            ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
+            opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
+            OpensearchSecurityConfiguration securityConfiguration = null;
+            if (chosenSecurityConfigurationVariant.isPresent()) {
+                securityConfiguration = chosenSecurityConfigurationVariant.get()
+                        .build()
+                        .configure(localConfiguration);
+                opensearchProperties.putAll(securityConfiguration.getProperties());
+            }
 
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistribution().directory(),
-                    Path.of(opensearchConfigLocation),
+                    opensearchConfigLocation,
+                    localConfiguration.getHttpBindAddress().getHost(),
+                    localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getRestApiUsername(),
@@ -87,11 +99,31 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getDatanodeNodeName(),
                     Collections.emptyList(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
-                    config
+                    securityConfiguration,
+                    opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
             throw new OpensearchConfigurationException(e);
         }
+    }
+
+    private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
+        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
+        localConfiguration.getOpensearchNetworkHostHost().ifPresent(
+                networkHost -> config.put("network.host", networkHost));
+        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
+        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
+        if (localConfiguration.isSingleNodeOnly()) {
+            config.put("discovery.type", "single-node");
+        } else {
+            config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
+        }
+
+        // listen on all interfaces
+        config.put("network.bind_host", "0.0.0.0");
+
+        return config.build();
     }
 
 }
