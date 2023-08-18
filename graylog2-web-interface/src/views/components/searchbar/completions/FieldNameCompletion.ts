@@ -16,7 +16,16 @@
  */
 import * as Immutable from 'immutable';
 
-import type { CompletionResult, Token, Line } from '../queryinput/ace-types';
+import {
+  getFieldNameForFieldValueInBrackets,
+  hasValueWithSpecialCharacter,
+  isCompleteFieldName,
+  isFieldValue,
+  isProximityCondition, isSpace,
+  isString as isStringToken,
+} from 'views/components/searchbar/completions/token-helper';
+
+import type { CompletionResult, Token } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 type Suggestion = Readonly<{
@@ -57,7 +66,41 @@ const _matchesFieldName = (prefix) => (field) => {
 
 const isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
 
-const isFollowingFieldName = (lastToken: Token | undefined | null) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
+const shouldShowSuggestions = ({
+  tokens,
+  currentTokenIdx,
+  prefix,
+}) => {
+  console.log({ tokens });
+  const currentToken = tokens[currentTokenIdx];
+  const prevToken = tokens[currentTokenIdx - 1] ?? null;
+
+  console.log({
+    hasValueWithSpecialCharacter: hasValueWithSpecialCharacter(currentToken, prevToken),
+    isFieldValue: isFieldValue(currentToken, prevToken),
+    isProximityCondition: isProximityCondition(currentToken),
+    isCompleteFieldName: (isCompleteFieldName(currentToken) && !prefix),
+    isStringToken: isStringToken(currentToken),
+    isSpace: isSpace(currentToken),
+    getFieldNameForFieldValueInBrackets: getFieldNameForFieldValueInBrackets(tokens, currentToken),
+    isFollowingExistsOperator: isFollowingExistsOperator(prevToken),
+  });
+
+  if (
+    !currentToken
+    || hasValueWithSpecialCharacter(currentToken, prevToken)
+    || isFieldValue(currentToken, prevToken)
+    || isProximityCondition(currentToken)
+    || (isCompleteFieldName(currentToken) && !prefix)
+    || isStringToken(currentToken)
+    || isSpace(currentToken)
+    || !!getFieldNameForFieldValueInBrackets(tokens, currentToken)
+  ) {
+    return false;
+  }
+
+  return true;
+};
 
 class FieldNameCompletion implements Completer {
   private readonly staticSuggestions: Array<Suggestion>;
@@ -66,20 +109,17 @@ class FieldNameCompletion implements Completer {
     this.staticSuggestions = staticSuggestions;
   }
 
-  getCompletions = ({ currentToken, lastToken, prefix, fieldTypes }: CompleterContext) => {
-    if (isFollowingFieldName(lastToken) && !isFollowingExistsOperator(lastToken)) {
-      return [];
-    }
+  getCompletions = ({ tokens, currentTokenIdx, prevToken, prefix, fieldTypes }: CompleterContext) => {
+    const fieldNameShouldShowSuggestions = shouldShowSuggestions({ tokens, currentTokenIdx, prefix });
 
-    if (currentToken && (currentToken.type === 'string' || (currentToken.type === 'keyword' && !prefix))) {
+    if (!fieldNameShouldShowSuggestions) {
       return [];
     }
 
     const matchesFieldName = _matchesFieldName(prefix);
     const { all, query } = fieldTypes;
     const currentQueryFields = Immutable.List(Object.values(query));
-
-    const valuePosition = isFollowingExistsOperator(lastToken);
+    const valuePosition = isFollowingExistsOperator(prevToken);
 
     const allButInCurrent = Object.values(all).filter((field) => !query[field.name]);
     const fieldsToMatchIn = valuePosition
@@ -92,24 +132,6 @@ class FieldNameCompletion implements Completer {
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
 
     return [...currentQuery, ...allFields];
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
-    const currentLineTokens = lines[currentLine - 1];
-    const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
-    const currentToken = currentLineTokens[currentTokenIndex];
-
-    if (!currentToken) {
-      return false;
-    }
-
-    const previousToken = currentLineTokens[currentTokenIndex - 1];
-    const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
-    const currentTokenIsTerm = currentToken?.type === 'term';
-    const prevTokenIsKeyword = previousToken?.type === 'keyword';
-
-    return currentTokenIsFieldName || (currentTokenIsTerm && !prevTokenIsKeyword);
   };
 }
 

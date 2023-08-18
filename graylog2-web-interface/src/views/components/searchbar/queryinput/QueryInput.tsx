@@ -99,13 +99,9 @@ const _onLoadEditor = (editor: Editor, isInitialTokenizerUpdate: React.MutableRe
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
 
-    editor.session.on('tokenizerUpdate', (_input, { bgTokenizer: { currentLine, lines } }) => {
+    editor.session.on('tokenizerUpdate', (_input) => {
       if (editor.isFocused() && !editor.completer?.activated && !isInitialTokenizerUpdate.current) {
-        editor.completers.forEach((completer) => {
-          if (completer?.shouldShowCompletions(currentLine, lines)) {
-            editor.execCommand('startAutocomplete');
-          }
-        });
+        editor.execCommand('startAutocomplete');
       }
 
       if (isInitialTokenizerUpdate.current) {
