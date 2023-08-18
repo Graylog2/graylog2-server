@@ -83,7 +83,7 @@ const shouldShowSuggestions = ({
     || (isCompleteFieldName(currentToken) && !prefix)
     || isStringToken(currentToken)
     || isSpace(currentToken)
-    || !!getFieldNameForFieldValueInBrackets(tokens, currentToken)
+    || !!getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx)
   ) {
     return false;
   }

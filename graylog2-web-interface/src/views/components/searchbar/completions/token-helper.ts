@@ -34,7 +34,7 @@ export const isCompleteFieldName = (token: Token | undefined) => !!(token?.type 
 export const isProximityCondition = (currentToken: Token | undefined) => currentToken?.type === 'constant.character.proximity';
 
 export const isSpace = (currentToken: Token | undefined) => currentToken?.type === 'text' && currentToken?.value === ' ';
-export const isFieldValue = (currentToken: Token, previousToken: Token | undefined) => isTerm(currentToken) && isCompleteFieldName(previousToken);
+export const isFieldValue = (currentToken: Token | undefined, previousToken: Token | undefined) => isTerm(currentToken) && isCompleteFieldName(previousToken);
 
 export const getFieldNameForFieldValueInBrackets = (tokens: Array<Token>, currentTokenIndex: number) => {
   const currentToken = tokens[currentTokenIndex];
