@@ -25,6 +25,7 @@ import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
+import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.bootstrap.preflight.web.resources.CertificateRenewalPolicyResource;
@@ -35,6 +36,7 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -69,6 +71,8 @@ public class PreflightWebModule extends Graylog2Module {
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
         serviceBinder.addBinding().to(PreflightPeriodicalsService.class);
+
+        bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
 
         // needed for the ObjectMapperModule
         MapBinder.newMapBinder(binder(),
