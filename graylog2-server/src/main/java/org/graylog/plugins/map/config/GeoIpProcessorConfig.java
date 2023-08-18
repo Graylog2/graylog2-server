@@ -18,7 +18,7 @@ package org.graylog.plugins.map.config;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.validators.PathReadableValidator;
-import org.graylog2.bindings.ParameterNamedInjectOverride;
+import org.graylog2.bindings.NamedBindingOverride;
 import org.graylog2.configuration.PathConfiguration;
 
 import javax.inject.Singleton;
@@ -33,7 +33,7 @@ public class GeoIpProcessorConfig extends PathConfiguration {
     @Parameter(value = S3_DOWNLOAD_LOCATION, validators = PathReadableValidator.class)
     private Path s3DownloadLocation;
 
-    @ParameterNamedInjectOverride(value = S3_DOWNLOAD_LOCATION)
+    @NamedBindingOverride(value = S3_DOWNLOAD_LOCATION)
     public Path getS3DownloadLocation() {
         return Optional.ofNullable(s3DownloadLocation).orElse(getDataDir().resolve("geolocation"));
     }

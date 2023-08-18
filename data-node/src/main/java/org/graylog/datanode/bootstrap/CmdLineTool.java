@@ -51,7 +51,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog.datanode.bootstrap.commands.MigrateCmd;
-import org.graylog2.bindings.NamedInjectConfigParametersModule;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -288,7 +288,7 @@ public abstract class CmdLineTool implements CliCommand {
 
         injector = setupInjector(
                 new IsDevelopmentBindings(),
-                new NamedInjectConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)
         );
 
@@ -455,7 +455,7 @@ public abstract class CmdLineTool implements CliCommand {
      */
     protected Injector setupCoreConfigInjector() {
         final AbstractModule configModule =
-                new NamedInjectConfigParametersModule(jadConfig.getConfigurationBeans());
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans());
 
         Injector coreConfigInjector = null;
         try {

@@ -28,7 +28,7 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog.security.certutil.CaConfiguration;
-import org.graylog2.bindings.ParameterNamedInjectOverride;
+import org.graylog2.bindings.NamedBindingOverride;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -395,7 +395,7 @@ public class Configuration extends CaConfiguration {
         return contentPacksLoaderEnabled;
     }
 
-    @ParameterNamedInjectOverride(value = CONTENT_PACKS_DIR)
+    @NamedBindingOverride(value = CONTENT_PACKS_DIR)
     public Path getContentPacksDir() {
         return Optional.ofNullable(contentPacksDir).orElse(getDataDir().resolve("contentpacks"));
     }

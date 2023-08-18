@@ -18,7 +18,7 @@ package org.graylog2.plugin;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Size;
-import org.graylog2.bindings.ParameterNamedInjectOverride;
+import org.graylog2.bindings.NamedBindingOverride;
 import org.graylog2.configuration.PathConfiguration;
 import org.joda.time.Duration;
 
@@ -53,7 +53,7 @@ public class KafkaJournalConfiguration extends PathConfiguration {
     @Parameter("message_journal_flush_age")
     private Duration messageJournalFlushAge = Duration.standardMinutes(1L);
 
-    @ParameterNamedInjectOverride(value = MESSAGE_JOURNAL_DIR)
+    @NamedBindingOverride(value = MESSAGE_JOURNAL_DIR)
     public Path getMessageJournalDir() {
         return Optional.of(messageJournalDir).orElse(getDataDir().resolve("journal"));
     }

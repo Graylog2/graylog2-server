@@ -39,20 +39,27 @@ import static com.github.joschi.jadconfig.ReflectionUtils.getFieldValue;
 import static com.google.inject.name.Names.named;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class NamedInjectConfigParametersModule extends AbstractModule {
+/**
+ * A Guice module which registers all fields of the provided objects annotated with {@link Parameter}
+ * as named bindings and optionally also adds bindings of the object instances themselves.
+ * For more flexibility, getter methods can also be used, which must be annotated with {@link NamedBindingOverride}.
+ *
+ * @see com.google.inject.name.Named
+ */
+public class NamedConfigParametersOverrideModule extends AbstractModule {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NamedInjectConfigParametersModule.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NamedConfigParametersOverrideModule.class);
 
     private final Set<Object> beans;
     private final boolean registerBeans;
 
 
-    public NamedInjectConfigParametersModule(final Collection beans, final boolean registerBeans) {
-        this.beans = new HashSet<Object>(beans);
+    public NamedConfigParametersOverrideModule(final Collection<?> beans, final boolean registerBeans) {
+        this.beans = new HashSet<>(beans);
         this.registerBeans = registerBeans;
     }
 
-    public NamedInjectConfigParametersModule(final Collection beans) {
+    public NamedConfigParametersOverrideModule(final Collection<?> beans) {
         this(beans, true);
     }
 
@@ -67,12 +74,12 @@ public class NamedInjectConfigParametersModule extends AbstractModule {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerParameters(Object bean) {
         final Field[] fields = getAllFields(bean.getClass());
         Map<String, Method> methodOverrides = ReflectionUtils.getAllMethods(bean.getClass()).stream()
-                .filter(obj -> Objects.nonNull(obj.getAnnotation(ParameterNamedInjectOverride.class)))
-                .collect(Collectors.toMap(obj -> obj.getAnnotation(ParameterNamedInjectOverride.class).value(), Function.identity()));
+                .filter(obj -> Objects.nonNull(obj.getAnnotation(NamedBindingOverride.class)))
+                .collect(Collectors.toMap(obj -> obj.getAnnotation(NamedBindingOverride.class).value(), Function.identity()));
 
         for (Field field : fields) {
             final Parameter parameter = field.getAnnotation(Parameter.class);
@@ -88,7 +95,7 @@ public class NamedInjectConfigParametersModule extends AbstractModule {
                         if (!typeLiteral.equals(methodTypeLiteral)) {
                             throw new IllegalStateException(f("Parameter %s type mismatch @%s#%s <> @%s#%s",
                                     parameterName,
-                                    ParameterNamedInjectOverride.class.getSimpleName(),
+                                    NamedBindingOverride.class.getSimpleName(),
                                     methodTypeLiteral,
                                     Parameter.class.getSimpleName(),
                                     typeLiteral
@@ -111,7 +118,7 @@ public class NamedInjectConfigParametersModule extends AbstractModule {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerBeanInstances() {
         for (final Object bean : beans) {
             final TypeLiteral typeLiteral = TypeLiteral.get(bean.getClass());

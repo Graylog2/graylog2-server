@@ -20,9 +20,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
+/**
+ * Annotation to override named bindings of a configuration parameter in a configuration bean
+ * which is used in {@link NamedConfigParametersOverrideModule}
+ *
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface ParameterNamedInjectOverride {
+public @interface NamedBindingOverride {
     String value();
 }

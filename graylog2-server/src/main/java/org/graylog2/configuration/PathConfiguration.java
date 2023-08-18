@@ -35,7 +35,7 @@ public class PathConfiguration {
     @Parameter(value = "data_dir", required = true, validators = DirectoryPathWritableValidator.class)
     private Path dataDir;
 
-    @Parameter(value = "plugin_dir", required = true, validators = DirectoryPathReadableValidator.class)
+    @Parameter(value = "plugin_dir", required = true)
     private Path pluginDir;
 
     /**
