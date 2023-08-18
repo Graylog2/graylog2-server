@@ -55,6 +55,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     private static final String FIELD_CONDITIONS = "conditions";
     private static final String FIELD_SEARCH_WITHIN_MS = "search_within_ms";
     private static final String FIELD_EXECUTE_EVERY_MS = "execute_every_ms";
+    private static final String FIELD_EVENT_LIMIT = "event_limit";
 
     @JsonProperty(FIELD_QUERY)
     public abstract ValueReference query();
@@ -77,6 +78,9 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
     public abstract long executeEveryMs();
 
+    @JsonProperty(FIELD_EVENT_LIMIT)
+    public abstract int eventLimit();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -89,7 +93,8 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         @JsonCreator
         public static Builder create() {
             return new AutoValue_AggregationEventProcessorConfigEntity.Builder()
-                    .type(TYPE_NAME);
+                    .type(TYPE_NAME)
+                    .eventLimit(0);
         }
 
         @JsonProperty(FIELD_QUERY)
@@ -112,6 +117,9 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
 
         @JsonProperty(FIELD_EXECUTE_EVERY_MS)
         public abstract Builder executeEveryMs(long executeEveryMs);
+
+        @JsonProperty(FIELD_EVENT_LIMIT)
+        public abstract Builder eventLimit(Integer eventLimit);
 
         public abstract AggregationEventProcessorConfigEntity build();
     }
@@ -144,13 +152,14 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .conditions(conditions().orElse(null))
                 .executeEveryMs(executeEveryMs())
                 .searchWithinMs(searchWithinMs())
+                .eventLimit(eventLimit())
                 .build();
     }
 
     @Override
     public void resolveForInstallation(EntityV1 entity,
                                        Map<String, ValueReference> parameters,
-                                       Map<EntityDescriptor,Entity> entities,
+                                       Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
         streams().stream()
                 .map(ModelId::of)

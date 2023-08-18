@@ -31,8 +31,10 @@ import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
@@ -125,6 +127,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventDefinitionHandler eventDefinitionHandler;
     private final EventDefinitionContextService contextService;
     private final EventProcessorEngine engine;
+    private final EventDefinitionConfiguration eventDefinitionConfiguration;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkDeletionExecutor;
@@ -140,12 +143,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     RecentActivityService recentActivityService,
                                     AuditEventSender auditEventSender,
                                     ObjectMapper objectMapper,
-                                    EventResolver eventResolver
+                                    EventResolver eventResolver,
+                                    EventDefinitionConfiguration eventDefinitionConfiguration
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.contextService = contextService;
         this.engine = engine;
+        this.eventDefinitionConfiguration = eventDefinitionConfiguration;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
@@ -251,7 +256,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                            @ApiParam(name = "JSON Body") EventDefinitionDto dto, @Context UserContext userContext) {
         checkEventDefinitionPermissions(dto, "create");
 
-        final ValidationResult result = dto.validate();
+        final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -274,7 +279,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
         checkProcessorConfig(oldDto, dto);
 
-        final ValidationResult result = dto.validate();
+        final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -430,7 +435,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull EventDefinitionDto toValidate) {
-        return toValidate.config().validate();
+        EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(eventDefinitionDto -> eventDefinitionDto.config()).orElse(null);
+        ValidationResult validationResult = toValidate.config().validate();
+        validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
+        return validationResult;
     }
 
     private void checkEventDefinitionPermissions(EventDefinitionDto dto, String action) {
