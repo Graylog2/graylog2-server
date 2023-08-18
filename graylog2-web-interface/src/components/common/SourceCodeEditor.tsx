@@ -99,7 +99,7 @@ type Props = {
   height?: number,
   width?: number,
   id: string,
-  innerRef?: React.RefObject<AceEditor>,
+  innerRef?: React.MutableRefObject<AceEditor>,
   mode: typeof availableModes[number],
   onLoad: () => void,
   onChange: () => void,
@@ -332,7 +332,6 @@ class SourceCodeEditor extends React.Component<Props, State> {
                                $resizable={resizable}>
             <AceEditor ref={(c) => {
               this.reactAce = c;
-              // @ts-ignore
               if (innerRef) { innerRef.current = c; }
             }}
                        annotations={annotations}
