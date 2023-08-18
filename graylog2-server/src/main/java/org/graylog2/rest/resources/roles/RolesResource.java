@@ -24,6 +24,8 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.authservice.AuthServiceBackendDTO;
+import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -61,6 +63,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -77,16 +80,18 @@ public class RolesResource extends RestResource {
     private static final Logger log = LoggerFactory.getLogger(RolesResource.class);
 
     private final RoleService roleService;
+    private final GlobalAuthServiceConfig globalAuthServiceConfig;
 
     @Inject
-    public RolesResource(RoleService roleService) {
+    public RolesResource(RoleService roleService, GlobalAuthServiceConfig globalAuthServiceConfig) {
         this.roleService = roleService;
+        this.globalAuthServiceConfig = globalAuthServiceConfig;
     }
 
     @GET
     @RequiresPermissions(RestPermissions.ROLES_READ)
     @ApiOperation("List all roles")
-    public RolesResponse listAll() throws NotFoundException {
+    public RolesResponse listAll() {
         final Set<Role> roles = roleService.loadAll();
         Set<RoleResponse> roleResponses = Sets.newHashSetWithExpectedSize(roles.size());
         for (Role role : roles) {
@@ -192,6 +197,7 @@ public class RolesResource extends RestResource {
         final Collection<User> users = userService.loadAllForRole(role);
 
         Set<UserSummary> userSummaries = Sets.newHashSetWithExpectedSize(users.size());
+        final Optional<AuthServiceBackendDTO> activeAuthService = globalAuthServiceConfig.getActiveBackendConfig();
         for (User user : users) {
             final Set<String> roleNames = userService.getRoleNames(user);
 
@@ -204,6 +210,12 @@ public class RolesResource extends RestResource {
                 wildcardPermissions = ImmutableList.of();
                 grnPermissions = ImmutableList.of();
             }
+
+            boolean authServiceEnabled =
+                    Objects.isNull(user.getAuthServiceId()) ||
+                            (activeAuthService.isPresent() && user.getAuthServiceId().equals(activeAuthService.get().id())
+                            );
+
             userSummaries.add(UserSummary.create(
                     user.getId(),
                     user.getName(),
@@ -225,7 +237,8 @@ public class RolesResource extends RestResource {
                     null,
                     null,
                     user.getAccountStatus(),
-                    user.isServiceAccount()));
+                    user.isServiceAccount(),
+                    authServiceEnabled));
         }
 
         return RoleMembershipResponse.create(role.getName(), userSummaries);
