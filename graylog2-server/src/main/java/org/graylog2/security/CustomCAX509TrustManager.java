@@ -47,7 +47,6 @@ public class CustomCAX509TrustManager implements X509TrustManager {
     public CustomCAX509TrustManager(CaService caService, ClusterEventBus eventBus) {
         this.caService = caService;
         eventBus.registerClusterEventSubscriber(this);
-        LOG.info("created new custom trust manager");
         this.refresh();
     }
 

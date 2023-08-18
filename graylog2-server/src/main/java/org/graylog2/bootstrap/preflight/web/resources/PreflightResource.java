@@ -29,7 +29,6 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
-import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
@@ -60,20 +59,17 @@ public class PreflightResource {
     private final TransportAddressSanitizer transportAddressSanitizer;
     private final String passwordSecret;
 
-    private final CustomCAX509TrustManager trustManager;
-
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
                              final TransportAddressSanitizer transportAddressSanitizer,
-                             final @Named("password_secret") String passwordSecret, CustomCAX509TrustManager trustManager) {
+                             final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
         this.transportAddressSanitizer = transportAddressSanitizer;
         this.passwordSecret = passwordSecret;
-        this.trustManager = trustManager;
     }
 
     record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
@@ -107,9 +103,6 @@ public class PreflightResource {
     public void createCA() throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
         // TODO: get validity from preflight UI
         caService.create(CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
-        //TODO: this needs better solution. Probably an event in case of new CA available, that would be
-        // picked up by the trust manager?
-        trustManager.refresh();
     }
 
     @POST
