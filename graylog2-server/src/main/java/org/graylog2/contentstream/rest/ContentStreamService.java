@@ -71,7 +71,7 @@ public class ContentStreamService {
         List<String> result = new ArrayList<>();
         result.add(ContentStreamTags.ALL.toString());
 
-        if (enterpriseService.licenseInfo().licenseStatus() != EnterpriseLicenseInfo.Status.INSTALLED) {
+        if (enterpriseService.licenseInfo().licenseStatus() == EnterpriseLicenseInfo.Status.INSTALLED) {
             result.add(ContentStreamTags.ENTERPRISE.toString());
         } else {
             result.add(ContentStreamTags.OPEN.toString());
