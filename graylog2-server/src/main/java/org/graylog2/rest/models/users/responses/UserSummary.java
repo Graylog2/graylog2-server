@@ -111,6 +111,9 @@ public abstract class UserSummary {
     @JsonProperty("service_account")
     public abstract boolean isServiceAccount();
 
+    @JsonProperty("auth_service_enabled")
+    public abstract boolean authServiceEnabled();
+
     @JsonCreator
     public static UserSummary create(@JsonProperty("id") @Nullable String id,
                                      @JsonProperty("username") String username,
@@ -131,7 +134,8 @@ public abstract class UserSummary {
                                      @JsonProperty("last_activity") @Nullable Date lastActivity,
                                      @JsonProperty("client_address") @Nullable String clientAddress,
                                      @JsonProperty("account_status") User.AccountStatus accountStatus,
-                                     @JsonProperty("service_account") Boolean isServiceAccount) {
+                                     @JsonProperty("service_account") Boolean isServiceAccount,
+                                     @JsonProperty("auth_service_enabled") boolean authServiceEnabled) {
         return new AutoValue_UserSummary(id,
                 username,
                 email,
@@ -151,6 +155,7 @@ public abstract class UserSummary {
                 lastActivity,
                 clientAddress,
                 accountStatus,
-                isServiceAccount != null && isServiceAccount);
+                (isServiceAccount != null && isServiceAccount),
+                authServiceEnabled);
     }
 }
