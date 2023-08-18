@@ -24,8 +24,9 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { escape } from 'views/logic/queries/QueryHelper';
 import {
   getFieldNameForFieldValueInBrackets,
-  hasValueWithSpecialCharacter, isCompleteFieldName,
-  isFieldValue, isSpace,
+  isFieldValueWithSpecialCharacter,
+  isCompleteFieldName,
+  isFieldValue,
   isString,
   isTerm,
 } from 'views/components/searchbar/completions/token-helper';
@@ -72,7 +73,7 @@ const getFieldNameAndInput = ({
   if (
     !currentToken
     || isFieldValue(currentToken, prevToken)
-    || hasValueWithSpecialCharacter(currentToken, prevToken)
+    || isFieldValueWithSpecialCharacter(currentToken, prevToken)
     || (isTerm(currentToken) && !prevToken)
     || isString(currentToken)
   ) {

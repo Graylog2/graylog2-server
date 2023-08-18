@@ -20,13 +20,14 @@ import type { Token, Line } from 'views/components/searchbar/queryinput/ace-type
 export const isTerm = (token: Token | undefined) => !!(token && token.type === 'term');
 export const isString = (token: Token | undefined) => !!(token && token.type === 'string');
 
-export const hasValueWithSpecialCharacter = (currentToken: Token | undefined, previousToken: Token | undefined) => {
+export const isSpecialCharacter = (token: Token | undefined) => !!(token?.value === '.' || token?.type.startsWith('constant'));
+
+export const isFieldValueWithSpecialCharacter = (currentToken: Token | undefined, previousToken: Token | undefined) => {
   if (!isTerm(currentToken) || !previousToken) {
     return false;
   }
 
-  return previousToken.value === '.'
-    || previousToken.type.startsWith('constant');
+  return isSpecialCharacter(previousToken);
 };
 
 export const isCompleteFieldName = (token: Token | undefined) => !!(token?.type === 'keyword' && token?.value.endsWith(':'));

@@ -18,11 +18,11 @@ import * as Immutable from 'immutable';
 
 import {
   getFieldNameForFieldValueInBrackets,
-  hasValueWithSpecialCharacter,
+  isFieldValueWithSpecialCharacter,
   isCompleteFieldName,
   isFieldValue,
   isProximityCondition, isSpace,
-  isString as isStringToken,
+  isString as isStringToken, isSpecialCharacter,
 } from 'views/components/searchbar/completions/token-helper';
 
 import type { CompletionResult, Token } from '../queryinput/ace-types';
@@ -71,24 +71,13 @@ const shouldShowSuggestions = ({
   currentTokenIdx,
   prefix,
 }) => {
-  console.log({ tokens });
   const currentToken = tokens[currentTokenIdx];
   const prevToken = tokens[currentTokenIdx - 1] ?? null;
 
-  console.log({
-    hasValueWithSpecialCharacter: hasValueWithSpecialCharacter(currentToken, prevToken),
-    isFieldValue: isFieldValue(currentToken, prevToken),
-    isProximityCondition: isProximityCondition(currentToken),
-    isCompleteFieldName: (isCompleteFieldName(currentToken) && !prefix),
-    isStringToken: isStringToken(currentToken),
-    isSpace: isSpace(currentToken),
-    getFieldNameForFieldValueInBrackets: getFieldNameForFieldValueInBrackets(tokens, currentToken),
-    isFollowingExistsOperator: isFollowingExistsOperator(prevToken),
-  });
-
   if (
     !currentToken
-    || hasValueWithSpecialCharacter(currentToken, prevToken)
+    || isFieldValueWithSpecialCharacter(currentToken, prevToken)
+    || isSpecialCharacter(currentToken)
     || isFieldValue(currentToken, prevToken)
     || isProximityCondition(currentToken)
     || (isCompleteFieldName(currentToken) && !prefix)
