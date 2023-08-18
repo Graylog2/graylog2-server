@@ -126,16 +126,25 @@ public class CaffeineLookupCache extends LookupCache {
     @Override
     public LookupResult get(LookupCacheKey key, Callable<LookupResult> loader) {
         final Function<LookupCacheKey, LookupResult> mapFunction = unused -> {
+            boolean ignored = false;
             try {
                 final LookupResult result = loader.call();
-                if (result == null && config.ignoreNull()) {
-                    throw new NotFoundException("Ignoring null value");
+                if (result == null || (result.singleValue() == null && result.multiValue() == null)) {
+                    if (config.ignoreNull()) {
+                        ignored = true;
+                        throw new NotFoundException("Ignoring null value");
+                    }
                 }
                 return result;
             } catch (Exception e) {
-                LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
-                return LookupResult.withError(
-                        String.format(Locale.ENGLISH, "Loading value from data adapter failed for key <%s>: %s", key.toString(), e.getMessage()));
+                if (ignored) {
+                    LOG.info("Ignoring failed lookup for key {}", key);
+                    return LookupResult.empty();
+                } else {
+                    LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
+                    return LookupResult.withError(
+                            String.format(Locale.ENGLISH, "Loading value from data adapter failed for key <%s>: %s", key.toString(), e.getMessage()));
+                }
             }
         };
         try (final Timer.Context ignored = lookupTimer()) {
