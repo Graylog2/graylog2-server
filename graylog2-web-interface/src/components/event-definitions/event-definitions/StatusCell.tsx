@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import { Label } from 'components/bootstrap';
+import { Label, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 import type { EventDefinition } from '../event-definitions-types';
@@ -49,39 +49,53 @@ type Props ={
 }
 
 const StatusCell = ({ eventDefinition, refetchEventDefinitions } : Props) => {
+  const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
+
   const isEnabled = eventDefinition?.state === 'ENABLED';
   const disableChange = eventDefinition?.config?.type === 'system-notifications-v1';
   const description = isEnabled ? 'enabled' : 'disabled';
   const title = _title(!isEnabled, disableChange, description);
 
   const toggleEventDefinitionStatus = useCallback(async () => {
-    // eslint-disable-next-line no-alert
-    if (isEnabled && window.confirm(`Do you really want to disable event definition '${eventDefinition.title}'?`)) {
-      await EventDefinitionsActions.disable(eventDefinition);
-      await refetchEventDefinitions();
-    }
-
-    if (!isEnabled) {
+    if (isEnabled) {
+      setShowConfirmDisableModal(true);
+    } else {
       await EventDefinitionsActions.enable(eventDefinition);
       await refetchEventDefinitions();
     }
   }, [isEnabled, eventDefinition, refetchEventDefinitions]);
 
+  const handleConfirmDisable = useCallback(async () => {
+    await EventDefinitionsActions.disable(eventDefinition);
+    await refetchEventDefinitions();
+    setShowConfirmDisableModal(false);
+  }, [eventDefinition, refetchEventDefinitions]);
+
   return (
-    <StatusLabel bsStyle={isEnabled ? 'success' : 'warning'}
-                 onClick={disableChange ? undefined : toggleEventDefinitionStatus}
-                 title={title}
-                 aria-label={title}
-                 role="button"
-                 $clickable={!disableChange}>
-      {description}
-      {!disableChange && (
-        <>
-          <Spacer />
-          <Icon name={isEnabled ? 'pause' : 'play'} />
-        </>
+    <>
+      <StatusLabel bsStyle={isEnabled ? 'success' : 'warning'}
+                   onClick={disableChange ? undefined : toggleEventDefinitionStatus}
+                   title={title}
+                   aria-label={title}
+                   role="button"
+                   $clickable={!disableChange}>
+        {description}
+        {!disableChange && (
+          <>
+            <Spacer />
+            <Icon name={isEnabled ? 'pause' : 'play'} />
+          </>
+        )}
+      </StatusLabel>
+      {showConfirmDisableModal && (
+        <BootstrapModalConfirm showModal
+                               title="Disable event definition"
+                               onConfirm={handleConfirmDisable}
+                               onCancel={() => setShowConfirmDisableModal(false)}>
+          {`Do you really want to disable event definition '${eventDefinition.title}'?`}
+        </BootstrapModalConfirm>
       )}
-    </StatusLabel>
+    </>
   );
 };
 
