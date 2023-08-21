@@ -656,6 +656,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
     color: ${theme.colors.input.colorDisabled};
   }
+
   .ace_editor.ace_autocomplete .ace_text-layer .ace_completion-highlight {
     color: ${theme.colors.variant.info};
   }
