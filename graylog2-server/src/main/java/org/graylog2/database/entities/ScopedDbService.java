@@ -118,4 +118,12 @@ public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedD
         // Intentionally omit ensure mutability check.
         return super.delete(id);
     }
+
+    /**
+     * Saves an entity without checking for mutability. Do not call this method for API requests for the user interface.
+     */
+    public final E forceSave(E entity) {
+        // Intentionally omit ensure mutability check.
+        return super.save(entity);
+    }
 }
