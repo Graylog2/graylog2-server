@@ -78,7 +78,11 @@ const getCurrentTokenIdx = (session: Session, pos: Position) => {
 };
 
 const formatTokens = (session: Session, pos: Position) => {
-  const allTokens = [...session.bgTokenizer.lines].filter((line) => !!line?.length).flat();
+  const rowAmount = session.getLength();
+  const allTokens = [...Array(rowAmount).keys()]
+    .map((_, index) => session.getTokens(index))
+    .filter((line) => !!line?.length)
+    .flat();
   const currentTokenIdx = getCurrentTokenIdx(session, pos);
   const currentToken = allTokens[currentTokenIdx];
   const prevToken = allTokens[currentTokenIdx - 1] ?? null;

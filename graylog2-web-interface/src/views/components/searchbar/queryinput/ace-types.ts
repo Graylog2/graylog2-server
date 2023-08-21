@@ -33,6 +33,7 @@ type EventCallback = {
 };
 
 export type Session = {
+  getLength: () => number,
   getTokens: (no: number) => Array<Token>,
   getTokenAt: (no: number, idx: number) => Token | undefined | null,
   getValue: () => string,
