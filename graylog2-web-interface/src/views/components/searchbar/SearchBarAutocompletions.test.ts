@@ -51,6 +51,7 @@ class AsyncCompleter implements Completer {
 const EditorMock = {
   completer: {},
   session: {
+    getLength: () => 1,
     getTokens: () => ([{ type: 'term', value: 's', index: 0, start: 0 }]),
     getTokenAt: () => ({ type: 'term', value: 's', index: 0, start: 0 }),
   },
