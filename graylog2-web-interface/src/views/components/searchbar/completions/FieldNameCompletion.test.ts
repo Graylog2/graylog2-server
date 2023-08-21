@@ -54,27 +54,42 @@ describe('FieldNameCompletion', () => {
 
   it('returns matching fields if prefix is present in one field name', () => {
     const completer = new FieldNameCompletion();
+    const token = {
+      type: 'term',
+      value: 'mess',
+    };
 
     expect(completer.getCompletions({
       ...requestDefaults,
+      tokens: [token],
       prefix: 'mess',
     }).map((result) => result.name)).toEqual(['message']);
   });
 
   it('returns matching fields if prefix is present in at least one field name', () => {
     const completer = new FieldNameCompletion([]);
+    const token = {
+      type: 'term',
+      value: 'e',
+    };
 
     expect(completer.getCompletions({
       ...requestDefaults,
+      tokens: [token],
       prefix: 'e',
     }).map((result) => result.name)).toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
     const completer = new FieldNameCompletion([]);
+    const token = {
+      type: 'term',
+      value: 'e',
+    };
 
     expect(completer.getCompletions({
       ...requestDefaults,
+      tokens: [token],
       prefix: 'e',
     }).map((result) => result.value))
       .toEqual(['source:', 'message:', 'timestamp:']);
@@ -82,31 +97,50 @@ describe('FieldNameCompletion', () => {
 
   it('returns _exist_-operator if matching prefix', () => {
     const completer = new FieldNameCompletion();
+    const token = {
+      type: 'term',
+      value: '_e',
+    };
 
     expect(completer.getCompletions({
       ...requestDefaults,
       prefix: '_e',
+      tokens: [token],
+      currentToken: token,
     }).map((result) => result.value)).toEqual(['_exists_:']);
   });
 
   it('returns matching fields after _exists_-operator', () => {
     const completer = new FieldNameCompletion();
+    const prevToken = {
+      type: 'keyword',
+      value: '_exists_:',
+    };
+    const currentToken = {
+      type: 'term',
+      value: 'e',
+    };
 
     expect(completer.getCompletions({
       ...requestDefaults,
-      lastToken: {
-        type: 'keyword',
-        value: '_exists_:',
-      },
+      prevToken,
+      tokens: [prevToken, currentToken],
+      currentTokenIdx: 1,
       prefix: 'e',
     }).map((result) => result.name)).toEqual(['source', 'message', 'timestamp']);
   });
 
   it('returns exists operator together with matching fields', () => {
     const completer = new FieldNameCompletion();
+    const token = {
+      type: 'term',
+      value: 'e',
+    };
 
     expect(completer.getCompletions({
       ...requestDefaults,
+      tokens: [token],
+      currentToken: token,
       prefix: 'e',
     }).map((result) => result.name)).toEqual(['_exists_', 'source', 'message', 'timestamp']);
   });
@@ -127,7 +161,7 @@ describe('FieldNameCompletion', () => {
     const fieldTypes = {
       all: {
         foo: _createField('foo'),
-        bar: _createField('bar'),
+        foo2: _createField('foo2'),
       },
       query: {
         foo: _createField('foo'),
@@ -136,10 +170,17 @@ describe('FieldNameCompletion', () => {
 
     it('scores fields of current query higher', () => {
       const completer = new FieldNameCompletion([]);
+      const token = {
+        type: 'term',
+        value: 'fo',
+      };
 
       const completions = completer.getCompletions({
         ...requestDefaults,
         fieldTypes,
+        tokens: [token],
+        currentToken: token,
+        prefix: 'fo',
       });
 
       const completion = (fieldName: string) => completionByName(fieldName, completions);
@@ -147,8 +188,8 @@ describe('FieldNameCompletion', () => {
       expect(completion('foo')?.score).toEqual(12);
       expect(completion('foo')?.meta).not.toMatch('(not in streams)');
 
-      expect(completion('bar')?.score).toEqual(3);
-      expect(completion('bar')?.meta).toMatch('(not in streams)');
+      expect(completion('foo2')?.score).toEqual(3);
+      expect(completion('foo2')?.meta).toMatch('(not in streams)');
     });
   });
 });
