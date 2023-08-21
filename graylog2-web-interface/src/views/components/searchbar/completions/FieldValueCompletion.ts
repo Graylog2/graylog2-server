@@ -69,7 +69,9 @@ const getFieldNameAndInput = ({
   prevToken: Token | undefined | null,
   currentTokenIdx: number
 }) => {
-  if (isCompleteFieldName(currentToken)) {
+  const nextToken = tokens[currentTokenIdx + 1] ?? null;
+
+  if (isCompleteFieldName(currentToken) && !nextToken) {
     return {
       fieldName: removeFinalColon(currentToken.value),
       input: '',

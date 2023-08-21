@@ -24,7 +24,7 @@ import {
   isExistsOperator,
 } from 'views/components/searchbar/completions/token-helper';
 
-import type { CompletionResult } from '../queryinput/ace-types';
+import type { CompletionResult, Token } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 type Suggestion = Readonly<{
@@ -63,9 +63,13 @@ const _matchesFieldName = (prefix: string) => (field: Readonly<{ name: string, t
   return result === 0 ? 2 : 1;
 };
 
-const shouldShowSuggestions = ({ tokens, currentTokenIdx }) => {
+const shouldShowSuggestions = ({ tokens, currentTokenIdx, prefix }: { tokens: Array<Token>, currentTokenIdx: number, prefix: string }) => {
   const currentToken = tokens[currentTokenIdx];
   const prevToken = tokens[currentTokenIdx - 1] ?? null;
+
+  if (isCompleteFieldName(currentToken) && prefix) {
+    return true;
+  }
 
   if (isTypeTerm(currentToken)) {
     if (
@@ -95,7 +99,7 @@ class FieldNameCompletion implements Completer {
   }
 
   getCompletions = ({ tokens, currentTokenIdx, prevToken, prefix, fieldTypes }: CompleterContext) => {
-    const showSuggestions = shouldShowSuggestions({ tokens, currentTokenIdx });
+    const showSuggestions = shouldShowSuggestions({ tokens, currentTokenIdx, prefix });
 
     if (!showSuggestions) {
       return [];
