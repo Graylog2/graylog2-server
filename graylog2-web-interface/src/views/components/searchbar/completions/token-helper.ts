@@ -15,40 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Token, Line } from 'views/components/searchbar/queryinput/ace-types';
+import type { Token } from 'views/components/searchbar/queryinput/ace-types';
+import { existsOperator } from 'views/components/searchbar/completions/FieldNameCompletion';
 
-export const isTerm = (token: Token | undefined) => !!(token && token.type === 'term');
-export const isString = (token: Token | undefined) => !!(token && token.type === 'string');
+export const removeFinalColon = (tokenValue: string) => tokenValue.slice(0, -1);
 
-export const isSpecialCharacter = (token: Token | undefined) => !!(token?.value === '.' || token?.type.startsWith('constant'));
+export const isTypeTerm = (token: Token | undefined) => !!(token && token.type === 'term');
+export const isTypeString = (token: Token | undefined) => token?.type === 'string';
+export const isTypeText = (token: Token | undefined) => token?.type === 'text';
+export const isTypeNumber = (token: Token | undefined) => token?.type === 'constant.numeric';
 
-export const isFieldValueWithSpecialCharacter = (currentToken: Token | undefined, previousToken: Token | undefined) => {
-  if (!isTerm(currentToken) || !previousToken) {
-    return false;
-  }
+export const isTypeKeyword = (token: Token | undefined) => token?.type === 'keyword';
 
-  return isSpecialCharacter(previousToken);
-};
+export const isKeywordOperator = (token: Token | undefined) => token?.type === 'keyword.operator';
 
-export const isCompleteFieldName = (token: Token | undefined) => !!(token?.type === 'keyword' && token?.value.endsWith(':'));
-export const isProximityCondition = (currentToken: Token | undefined) => currentToken?.type === 'constant.character.proximity';
+export const isExistsOperator = (token: Token | undefined) => isTypeKeyword(token) && token.value === `${existsOperator.name}:`;
 
-export const isSpace = (currentToken: Token | undefined) => currentToken?.type === 'text' && currentToken?.value === ' ';
-export const isFieldValue = (currentToken: Token | undefined, previousToken: Token | undefined) => isTerm(currentToken) && isCompleteFieldName(previousToken);
+export const isCompleteFieldName = (token: Token | undefined) => !!(isTypeKeyword(token) && token?.value.endsWith(':'));
+
+export const isSpace = (currentToken: Token | undefined) => isTypeText(currentToken) && currentToken?.value === ' ';
 
 export const getFieldNameForFieldValueInBrackets = (tokens: Array<Token>, currentTokenIndex: number) => {
+  if (!tokens?.length) {
+    return null;
+  }
+
   const currentToken = tokens[currentTokenIndex];
   const prevToken = tokens[currentTokenIndex - 1] ?? null;
 
   if (prevToken?.type === 'keyword' && prevToken?.value.endsWith(':') && currentToken.type === 'paren.lparen') {
-    return prevToken.value.slice(0, -1);
+    return removeFinalColon(prevToken.value);
   }
 
   let fieldNameIndex = null;
   let openingBracketsCount = 0;
   let closingBracketsCount = 0;
 
-  for (let i = 0; i < currentTokenIndex; i++) {
+  for (let i = 0; i < currentTokenIndex; i += 1) {
     if (tokens[i].type === 'keyword' && tokens[i].value.endsWith(':') && tokens[i + 1].type === 'paren.lparen') {
       fieldNameIndex = i;
     }
@@ -69,7 +72,7 @@ export const getFieldNameForFieldValueInBrackets = (tokens: Array<Token>, curren
   }
 
   if (fieldNameIndex !== null) {
-    return tokens[fieldNameIndex].value.slice(0, -1);
+    return removeFinalColon(tokens[fieldNameIndex].value);
   }
 
   return null;

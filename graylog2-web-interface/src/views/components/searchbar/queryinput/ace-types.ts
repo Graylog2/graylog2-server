@@ -37,6 +37,7 @@ export type Session = {
   getTokenAt: (no: number, idx: number) => Token | undefined | null,
   getValue: () => string,
   on: <T extends EventName>(event: T, cb: EventCallback[T]) => void,
+  bgTokenizer: { lines: Array<Array<Line>> },
 };
 
 export type Renderer = {
@@ -116,6 +117,11 @@ export type Line = {
 }
 
 export interface AutoCompleter {
-  getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
-  shouldShowCompletions(currentLine: number, lines: Array<Array<Line>>): boolean;
+  getCompletions(
+    editor: Editor,
+    session: Session,
+    position: Position,
+    prefix: string,
+    callback: ResultsCallback
+  ): void;
 }

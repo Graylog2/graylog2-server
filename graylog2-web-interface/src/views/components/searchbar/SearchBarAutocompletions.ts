@@ -16,7 +16,6 @@
  */
 import sortBy from 'lodash/sortBy';
 import uniqBy from 'lodash/uniqBy';
-import { Ace } from 'ace-builds';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -63,7 +62,7 @@ const onCompleterError = (error: Error) => {
 const getCurrentTokenIdx = (session: Session, pos: Position) => {
   let idx = 0;
 
-  for (let rowIdx = 0; rowIdx <= pos.row; rowIdx++) {
+  for (let rowIdx = 0; rowIdx <= pos.row; rowIdx += 1) {
     const row = session.getTokens(rowIdx);
 
     if (rowIdx === pos.row) {

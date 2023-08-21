@@ -24,15 +24,13 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { escape } from 'views/logic/queries/QueryHelper';
 import {
   getFieldNameForFieldValueInBrackets,
-  isFieldValueWithSpecialCharacter,
   isCompleteFieldName,
-  isFieldValue,
-  isString,
-  isTerm,
+  isTypeString,
+  isTypeTerm, isKeywordOperator, isSpace, isTypeNumber, removeFinalColon,
 } from 'views/components/searchbar/completions/token-helper';
 
 import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
-import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
+import type { Token, CompletionResult } from '../queryinput/ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
 
@@ -44,6 +42,7 @@ const formatValue = (value: string, type: string) => {
   switch (type) {
     case 'constant.numeric': return Number(trimmedValue);
     case 'string': return unquote(trimmedValue);
+    case 'keyword.operator': return '';
     case 'paren.lparen': return '';
     default: return trimmedValue;
   }
@@ -70,35 +69,25 @@ const getFieldNameAndInput = ({
   prevToken: Token | undefined | null,
   currentTokenIdx: number
 }) => {
-  if (
-    !currentToken
-    || isFieldValue(currentToken, prevToken)
-    || isFieldValueWithSpecialCharacter(currentToken, prevToken)
-    || (isTerm(currentToken) && !prevToken)
-    || isString(currentToken)
-  ) {
-    return {};
-  }
-
   if (isCompleteFieldName(currentToken)) {
     return {
-      fieldName: currentToken.value.slice(0, -1),
+      fieldName: removeFinalColon(currentToken.value),
       input: '',
       isQuoted: false,
     };
   }
 
-  if ((isTerm(currentToken) || isString(currentToken)) && isCompleteFieldName(prevToken)) {
+  if ((isTypeTerm(currentToken) || isTypeString(currentToken) || isKeywordOperator(currentToken)) && isCompleteFieldName(prevToken)) {
     return {
-      fieldName: prevToken.value.slice(0, -1),
+      fieldName: removeFinalColon(prevToken.value),
       input: formatValue(currentToken.value, currentToken.type),
-      isQuoted: currentToken?.type === 'string',
+      isQuoted: isTypeString(currentToken),
     };
   }
 
   const fieldNameFromForValueInBrackets = getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx);
 
-  if (fieldNameFromForValueInBrackets && (currentToken.type === 'paren.lparen' || currentToken.type === 'term' || (currentToken.type === 'text' && prevToken.type === 'keyword.operator'))) {
+  if (fieldNameFromForValueInBrackets && !(isSpace(currentToken) && (isTypeTerm(prevToken) || isTypeNumber(prevToken)))) {
     return {
       fieldName: fieldNameFromForValueInBrackets,
       input: formatValue(currentToken.value, currentToken.type),

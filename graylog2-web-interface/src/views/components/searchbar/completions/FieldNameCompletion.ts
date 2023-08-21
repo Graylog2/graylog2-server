@@ -18,14 +18,13 @@ import * as Immutable from 'immutable';
 
 import {
   getFieldNameForFieldValueInBrackets,
-  isFieldValueWithSpecialCharacter,
   isCompleteFieldName,
-  isFieldValue,
-  isProximityCondition, isSpace,
-  isString as isStringToken, isSpecialCharacter,
+  isSpace,
+  isTypeTerm,
+  isExistsOperator,
 } from 'views/components/searchbar/completions/token-helper';
 
-import type { CompletionResult, Token } from '../queryinput/ace-types';
+import type { CompletionResult } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 type Suggestion = Readonly<{
@@ -53,7 +52,7 @@ export const existsOperator: Suggestion = {
   },
 };
 
-const _matchesFieldName = (prefix) => (field) => {
+const _matchesFieldName = (prefix: string) => (field: Readonly<{ name: string, type: Readonly<{type: string}> }>) => {
   const result = field.name.indexOf(prefix);
 
   if (result < 0) {
@@ -64,31 +63,28 @@ const _matchesFieldName = (prefix) => (field) => {
   return result === 0 ? 2 : 1;
 };
 
-const isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
-
-const shouldShowSuggestions = ({
-  tokens,
-  currentTokenIdx,
-  prefix,
-}) => {
+const shouldShowSuggestions = ({ tokens, currentTokenIdx }) => {
   const currentToken = tokens[currentTokenIdx];
   const prevToken = tokens[currentTokenIdx - 1] ?? null;
 
-  if (
-    !currentToken
-    || isFieldValueWithSpecialCharacter(currentToken, prevToken)
-    || isSpecialCharacter(currentToken)
-    || isFieldValue(currentToken, prevToken)
-    || isProximityCondition(currentToken)
-    || (isCompleteFieldName(currentToken) && !prefix)
-    || isStringToken(currentToken)
-    || isSpace(currentToken)
-    || !!getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx)
-  ) {
-    return false;
+  if (isTypeTerm(currentToken)) {
+    if (
+      (isCompleteFieldName(prevToken) && !isExistsOperator(prevToken))
+      || getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx)
+    ) {
+      return false;
+    }
+
+    if (
+      !prevToken
+      || isSpace(prevToken)
+      || isExistsOperator(prevToken)
+    ) {
+      return true;
+    }
   }
 
-  return true;
+  return false;
 };
 
 class FieldNameCompletion implements Completer {
@@ -99,16 +95,16 @@ class FieldNameCompletion implements Completer {
   }
 
   getCompletions = ({ tokens, currentTokenIdx, prevToken, prefix, fieldTypes }: CompleterContext) => {
-    const fieldNameShouldShowSuggestions = shouldShowSuggestions({ tokens, currentTokenIdx, prefix });
+    const showSuggestions = shouldShowSuggestions({ tokens, currentTokenIdx });
 
-    if (!fieldNameShouldShowSuggestions) {
+    if (!showSuggestions) {
       return [];
     }
 
     const matchesFieldName = _matchesFieldName(prefix);
     const { all, query } = fieldTypes;
     const currentQueryFields = Immutable.List(Object.values(query));
-    const valuePosition = isFollowingExistsOperator(prevToken);
+    const valuePosition = isExistsOperator(prevToken);
 
     const allButInCurrent = Object.values(all).filter((field) => !query[field.name]);
     const fieldsToMatchIn = valuePosition
