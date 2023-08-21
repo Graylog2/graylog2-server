@@ -43,7 +43,7 @@ const StepIcon = styled(Icon)<{ $color: string }>(({ $color, theme }) => css`
 
 const StyledListItem = styled(List.Item)<{ $isStepSkipped: boolean }>(({ $isStepSkipped }) => css`
   > * {
-    text-decoration: ${$isStepSkipped ? 'line-through' : 'none'}
+    text-decoration: ${$isStepSkipped ? 'line-through' : 'none'};
   }
 `);
 
