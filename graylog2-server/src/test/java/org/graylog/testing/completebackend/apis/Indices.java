@@ -16,7 +16,7 @@
  */
 package org.graylog.testing.completebackend.apis;
 
-import io.restassured.specification.RequestSpecification;
+import io.restassured.response.ValidatableResponse;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -88,5 +88,19 @@ public class Indices implements GraylogRestApi {
         );
 
         return createIndexSet(indexSetSummary);
+    }
+
+    public GraylogApiResponse listOpenIndices(String indexSetId) {
+        final ValidatableResponse response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/indices/" + indexSetId + "/open")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(200);
+        return new GraylogApiResponse(response);
     }
 }

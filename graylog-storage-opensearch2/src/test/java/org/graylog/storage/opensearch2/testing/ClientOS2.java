@@ -50,6 +50,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemp
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
@@ -344,5 +345,10 @@ public class ClientOS2 implements Client {
         final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(req, requestOptions),
                 "Unable to read OS cluster setting: " + setting);
         return response.getSetting(setting);
+    }
+
+    @Override
+    public void putFieldMapping(String index, String field, String type) {
+        updateMapping(index, Collections.singletonMap("properties", Collections.singletonMap(field, Collections.singletonMap("type", type))));
     }
 }
