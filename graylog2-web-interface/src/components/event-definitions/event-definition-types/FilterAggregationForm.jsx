@@ -18,6 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Col, ControlLabel, FormGroup, Input, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -25,7 +26,6 @@ import * as FormsUtils from 'util/FormsUtils';
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
 import AggregationForm from './AggregationForm';
-import cloneDeep from 'lodash/cloneDeep';
 
 const conditionTypes = {
   AGGREGATION: 0,
