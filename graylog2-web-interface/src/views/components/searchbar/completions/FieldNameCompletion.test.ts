@@ -32,7 +32,7 @@ const userTimezone = 'Europe/Berlin';
 describe('FieldNameCompletion', () => {
   const requestDefaults = {
     currentToken: null,
-    lastToken: null,
+    prevToken: null,
     prefix: '',
     tokens: [],
     currentTokenIdx: 0,
