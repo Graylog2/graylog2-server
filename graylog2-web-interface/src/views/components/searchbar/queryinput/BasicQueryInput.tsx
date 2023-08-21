@@ -147,7 +147,6 @@ const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
     return (
       <StyledAceEditor {...commonProps}
                        enableBasicAutocompletion={enableAutocompletion}
-                       enableLiveAutocompletion={enableAutocompletion}
                        onBlur={onBlur}
                        onChange={onChange} />
     );
