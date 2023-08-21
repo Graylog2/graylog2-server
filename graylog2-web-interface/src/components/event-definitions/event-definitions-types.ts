@@ -57,6 +57,7 @@ export type EventDefinition = {
   },
   title: string,
   description?: string,
+  matched_at?: string,
   priority?: number,
   key_spec?: Array<string>
   field_spec?: FieldSpec,
