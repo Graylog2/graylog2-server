@@ -16,5 +16,5 @@
  */
 module.exports = {
   // eslint-disable-next-line global-require
-  presets: [require('babel-preset-graylog-tests')],
+  presets: [require('babel-preset-graylog')],
 };
