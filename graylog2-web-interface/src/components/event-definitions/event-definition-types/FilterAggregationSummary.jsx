@@ -112,6 +112,7 @@ class FilterAggregationSummary extends React.Component {
       search_within_ms: searchWithinMs,
       execute_every_ms: executeEveryMs,
       _is_scheduled: isScheduled,
+      event_limit,
       group_by: groupBy,
       series,
       conditions,
@@ -142,6 +143,12 @@ class FilterAggregationSummary extends React.Component {
         <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
         <dt>Enable scheduling</dt>
         <dd>{isScheduled ? 'yes' : 'no'}</dd>
+        {conditionType === 'filter' && (
+          <>
+            <dt>Event limit</dt>
+            <dd>{event_limit}</dd>
+          </>
+        )}
         {conditionType === 'aggregation' && (
           <>
             <dt>Group by Field(s)</dt>

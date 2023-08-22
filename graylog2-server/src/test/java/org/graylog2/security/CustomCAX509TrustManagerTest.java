@@ -25,6 +25,7 @@ import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -119,8 +120,9 @@ public class CustomCAX509TrustManagerTest {
         final var noAdditionalKeystore = new DummyCaService(null);
         final var additionalKeystore = new DummyCaService(caKeyStore);
 
-        final var defaultTM = new CustomCAX509TrustManager(noAdditionalKeystore);
-        final var customTM = new CustomCAX509TrustManager(additionalKeystore);
+        final ClusterEventBus clusterEventBus = new ClusterEventBus();
+        final var defaultTM = new CustomCAX509TrustManager(noAdditionalKeystore, clusterEventBus);
+        final var customTM = new CustomCAX509TrustManager(additionalKeystore, clusterEventBus);
 
         final var default_issuers = defaultTM.getAcceptedIssuers().length;
         Assertions.assertThat(customTM.getAcceptedIssuers().length).isEqualTo(default_issuers + 2);
