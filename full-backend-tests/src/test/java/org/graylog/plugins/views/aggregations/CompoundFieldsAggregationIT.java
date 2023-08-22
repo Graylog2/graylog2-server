@@ -20,6 +20,7 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import org.graylog.testing.completebackend.apis.DefaultStreamMatches;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
@@ -54,8 +55,8 @@ public class CompoundFieldsAggregationIT {
         final String indexSetA = api.indices().createIndexSet("Compound field index A", "Compound field index A", "compound_a");
         final String indexSetB = api.indices().createIndexSet("Compound field index B", "Compound field index B", "compound_b");
 
-        final String streamA = api.streams().createStream("Stream A", indexSetA, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamA", "target_stream", false));
-        final String streamB = api.streams().createStream("Stream B", indexSetB, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamB", "target_stream", false));
+        final String streamA = api.streams().createStream("Stream A", indexSetA, DefaultStreamMatches.REMOVE, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamA", "target_stream", false));
+        final String streamB = api.streams().createStream("Stream B", indexSetB, DefaultStreamMatches.REMOVE, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "streamB", "target_stream", false));
 
         final List<String> indexNamesA = waitForIndexNames(indexSetA);
         final List<String> indexNamesB = waitForIndexNames(indexSetB);

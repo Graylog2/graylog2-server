@@ -48,14 +48,24 @@ public final class Streams implements GraylogRestApi {
                              @JsonProperty("inverted") boolean inverted) {}
     record CreateStreamRequest(@JsonProperty("title") String title,
                                @JsonProperty("rules") Collection<StreamRule> streamRules,
-                               @JsonProperty("index_set_id") String indexSetId) {}
+                               @JsonProperty("index_set_id") String indexSetId,
+                               @JsonProperty("remove_matches_from_default_stream") boolean removeMatchesFromDefaultStream) {}
 
-    public String createStream(String title, String indexSetId, StreamRule... streamRules) {
-        return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, streamRules));
+    public String createStream(String title, String indexSetId, boolean started) {
+        return createStream(title,indexSetId, started, DefaultStreamMatches.KEEP);
     }
 
-    public String createStream(String title, String indexSetId, boolean started, StreamRule... streamRules) {
-        final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId);
+    public String createStream(String title, String indexSetId, StreamRule... streamRules) {
+        return createStream(title,indexSetId, true, DefaultStreamMatches.KEEP, streamRules);
+    }
+
+    public String createStream(String title, String indexSetId, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
+        return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, defaultStreamMatches, streamRules));
+    }
+
+
+    public String createStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
+        final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId, defaultStreamMatches == DefaultStreamMatches.REMOVE);
         final String streamId = given()
                 .spec(api.requestSpecification())
                 .when()
