@@ -93,6 +93,10 @@ const AppConfig = {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 
+  pluginUISettings(key: string) : any {
+    return appConfig()?.pluginUISettings?.[key] ?? {};
+  },
+
 };
 
 export default AppConfig;
