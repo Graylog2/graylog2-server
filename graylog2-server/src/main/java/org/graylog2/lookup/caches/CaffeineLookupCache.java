@@ -31,7 +31,6 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupCacheKey;
@@ -126,25 +125,21 @@ public class CaffeineLookupCache extends LookupCache {
     @Override
     public LookupResult get(LookupCacheKey key, Callable<LookupResult> loader) {
         final Function<LookupCacheKey, LookupResult> mapFunction = unused -> {
-            boolean ignored = false;
             try {
                 final LookupResult result = loader.call();
                 if (result == null || (result.singleValue() == null && result.multiValue() == null)) {
                     if (config.ignoreNull()) {
-                        ignored = true;
-                        throw new NotFoundException("Ignoring null value");
+                        LOG.info("Ignoring failed lookup for key {}", key);
+                        return LookupResult.builder()
+                                .cacheTTL(0L)
+                                .build();
                     }
                 }
                 return result;
             } catch (Exception e) {
-                if (ignored) {
-                    LOG.info("Ignoring failed lookup for key {}", key);
-                    return LookupResult.empty();
-                } else {
-                    LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
-                    return LookupResult.withError(
-                            String.format(Locale.ENGLISH, "Loading value from data adapter failed for key <%s>: %s", key.toString(), e.getMessage()));
-                }
+                LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
+                return LookupResult.withError(
+                        String.format(Locale.ENGLISH, "Loading value from data adapter failed for key <%s>: %s", key.toString(), e.getMessage()));
             }
         };
         try (final Timer.Context ignored = lookupTimer()) {
