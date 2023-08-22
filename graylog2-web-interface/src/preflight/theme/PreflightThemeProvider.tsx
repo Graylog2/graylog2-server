@@ -35,7 +35,6 @@ const PreflightThemeProvider = ({ children }: Props) => {
   };
 
   const theme = new Sawmill(GraylogSawmill[mode], mode, handleModeChange);
-  console.log({ theme });
 
   return (
     <ThemeProvider theme={theme}>
