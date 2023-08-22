@@ -140,7 +140,7 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByTitle, getByText, getByRole } = renderWithDataRouter((
+    const { getByText, getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
@@ -150,9 +150,6 @@ describe('RuleBuilder', () => {
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
-
-    const showSimulatorSwitch = getByTitle('Show Simulator');
-    userEvent.click(showSimulatorSwitch);
 
     const ruleSimulationLabel = getByText('Rule Simulation');
     const runRuleSimulation = getByRole('button', { name: 'Run rule simulation' });
@@ -173,7 +170,7 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByTitle, getByText, getByTestId } = renderWithDataRouter((
+    const { getByText, getByTestId } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         ruleSimulationResult: {
           fields: { message: 'test' },
@@ -188,9 +185,6 @@ describe('RuleBuilder', () => {
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
-
-    const showSimulatorSwitch = getByTitle('Show Simulator');
-    userEvent.click(showSimulatorSwitch);
 
     const conditionOutputs = getByText('Conditions Output');
     const actionOutputs = getByText('Actions Output');

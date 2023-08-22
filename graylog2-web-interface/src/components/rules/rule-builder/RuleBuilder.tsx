@@ -22,7 +22,7 @@ import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
-import { ConfirmDialog, FormSubmit, Toggle } from 'components/common';
+import { ConfirmDialog, FormSubmit } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -39,34 +39,10 @@ import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 import ConfirmNavigateToSourceCodeEditorModal from './ConfirmNavigateToSourceCodeEditorModal';
 
 import RuleSimulation from '../RuleSimulation';
-import RuleHelper from '../rule-helper/RuleHelper';
-import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from '../RuleContext';
+import { PipelineRulesContext } from '../RuleContext';
 
 const ActionsCol = styled(Col)`
   margin-top: 50px;
-`;
-
-const ReferenceRuleCol = styled(Col)`
-  .ref-rule {
-    height: 100px;
-  }
-
-  .input-container {
-    display: flex;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .rule-ref-descriptions {
-    display: none;
-  }
-
-  .query {
-    flex: 1;
-  }
 `;
 
 const RuleBuilderCol = styled(Col)`
@@ -76,15 +52,6 @@ const RuleBuilderCol = styled(Col)`
 
 const SubTitle = styled.label`
   color: #aaa;
-`;
-
-const SimulatorSwitchContaner = styled.div`
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 4px;
-  right: 16px;
-  z-index: 1;
 `;
 
 const RuleBuilder = () => {
@@ -100,7 +67,6 @@ const RuleBuilder = () => {
   const {
     rawMessageToSimulate,
     simulateRule,
-    setRawMessageToSimulate,
   } = useContext(PipelineRulesContext);
 
   const [rule, setRule] = useState<RuleBuilderRule>({
@@ -110,7 +76,6 @@ const RuleBuilder = () => {
   });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
-  const [showSimulator, setShowSimulator] = useState<boolean>(false);
   const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
 
   useEffect(() => {
@@ -186,10 +151,7 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToAdd);
-
-    if (showSimulator) {
-      await simulateRule(rawMessageToSimulate, ruleToAdd);
-    }
+    await simulateRule(rawMessageToSimulate, ruleToAdd);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
@@ -220,10 +182,7 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToUpdate);
-
-    if (showSimulator) {
-      await simulateRule(rawMessageToSimulate, ruleToUpdate);
-    }
+    await simulateRule(rawMessageToSimulate, ruleToUpdate);
   };
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
@@ -252,10 +211,7 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToDelete);
-
-    if (showSimulator) {
-      await simulateRule(rawMessageToSimulate, ruleToDelete);
-    }
+    await simulateRule(rawMessageToSimulate, ruleToDelete);
   };
 
   const handleCancel = () => {
@@ -318,14 +274,11 @@ const RuleBuilder = () => {
   return (
     <form onSubmit={(e) => handleSave(e, true)}>
       <Row className="content">
-        <Col xs={6}>
+        <Col xs={12}>
           <RuleBuilderForm rule={rule}
                            onChange={setRule} />
         </Col>
-        <ReferenceRuleCol xs={6}>
-          <RuleHelper hideExampleTab />
-        </ReferenceRuleCol>
-        <RuleBuilderCol xs={showSimulator ? 4 : 6}>
+        <RuleBuilderCol xs={4}>
           <label htmlFor="rule_builder">Rule Builder</label>
           <Button bsStyle="info"
                   bsSize="small"
@@ -348,28 +301,9 @@ const RuleBuilder = () => {
             {initialRule ? 'Convert to Source Code' : 'Source Code Editor'}
           </Button>
         </RuleBuilderCol>
-        <Col xs={showSimulator ? 8 : 6}>
-          <SimulatorSwitchContaner>
-            <Toggle>
-              <input type="checkbox"
-                     onChange={() => {
-                       setShowSimulator(!showSimulator);
-
-                       if (!showSimulator) {
-                         setRawMessageToSimulate(DEFAULT_SIMULATOR_JSON_MESSAGE);
-                         simulateRule(DEFAULT_SIMULATOR_JSON_MESSAGE, rule);
-                       }
-                     }}
-                     title="Show Simulator"
-                     checked={showSimulator} />
-              <span className="slider" />
-            </Toggle>
-            Show Simulator
-          </SimulatorSwitchContaner>
-        </Col>
         <Col xs={12}>
           <Row>
-            <Col xs={showSimulator ? 4 : 6}>
+            <Col xs={4}>
               <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
               {rule.rule_builder.conditions.map((condition, index) => (
                 // eslint-disable-next-line react/no-array-index-key
@@ -392,7 +326,7 @@ const RuleBuilder = () => {
                                   type: 'condition',
                                 })} />
             </Col>
-            <Col xs={showSimulator ? 4 : 6}>
+            <Col xs={4}>
               <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
               {rule.rule_builder.actions.map((action, index) => (
                 // eslint-disable-next-line react/no-array-index-key
@@ -414,11 +348,9 @@ const RuleBuilder = () => {
                                 updateBlock={updateBlock}
                                 deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
             </Col>
-            {showSimulator && (
-              <Col xs={4}>
-                <RuleSimulation rule={rule} />
-              </Col>
-            )}
+            <Col xs={4}>
+              <RuleSimulation rule={rule} />
+            </Col>
           </Row>
         </Col>
         <Col xs={12}>
