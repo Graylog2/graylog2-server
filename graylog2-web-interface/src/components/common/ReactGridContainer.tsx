@@ -25,7 +25,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { layoutToPositionAdapter, positionToLayoutAdapter } from 'views/logic/widgets/normalizeWidgetPositions';
+import { layoutToPositions, positionsToLayout } from 'views/logic/widgets/normalizeWidgetPositions';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
@@ -108,7 +108,7 @@ const _onLayoutChange = (newLayout: Layout, callback: ((newPositions: Position[]
     return undefined;
   }
 
-  const newPositions: Position[] = layoutToPositionAdapter(newLayout.filter(({ i }) => !i.startsWith('gap')));
+  const newPositions: Position[] = layoutToPositions(newLayout.filter(({ i }) => !i.startsWith('gap')));
 
   return callback(newPositions);
 };
@@ -175,7 +175,7 @@ const ReactGridContainer = ({
   const onLayoutChange = useCallback<ItemCallback>((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
   const onSyncLayout = useCallback((layout: Layout) => _onLayoutChange(layout, _onSyncLayout), [_onSyncLayout]);
   const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
-  const layout = useMemo(() => positionToLayoutAdapter(positions), [positions]);
+  const layout = useMemo(() => positionsToLayout(positions), [positions]);
 
   // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
   // https://github.com/STRML/react-grid-layout/issues/371

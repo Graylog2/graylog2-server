@@ -25,17 +25,17 @@ import type { Layout, Position, LayoutItem } from 'components/common/ReactGridCo
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type Widget from 'views/logic/widgets/Widget';
 
-const layoutToPositionMapper = ({ i, x, y, w, h }: LayoutItem) => ({
+const layoutItemToPosition = ({ i, x, y, w, h }: LayoutItem) => ({
   id: i,
   col: x + 1,
   row: y + 1,
   height: h,
   width: w,
 });
-export const layoutToPositionAdapter = (layout: Layout): Position[] => layout
-  .map(layoutToPositionMapper);
+export const layoutToPositions = (layout: Layout): Position[] => layout
+  .map(layoutItemToPosition);
 
-const positionToLayoutMapper = ([id, position]: [string, WidgetPosition]) => {
+const positionItemToLayout = ([id, position]: [string, WidgetPosition]) => {
   const { col, row, height, width } = position;
 
   return ({
@@ -47,14 +47,14 @@ const positionToLayoutMapper = ([id, position]: [string, WidgetPosition]) => {
   });
 };
 
-export const positionToLayoutAdapter = (widgetPositions: { [key: string]: WidgetPosition }) => Object.entries(widgetPositions).map(positionToLayoutMapper);
+export const positionsToLayout = (widgetPositions: { [key: string]: WidgetPosition }) => Object.entries(widgetPositions).map(positionItemToLayout);
 
 export const normalizeWidgetPositions = (widgetPositions: { [key: string]: WidgetPosition }, widgetById: {[name: string]: Widget}): { [key: string]: WidgetPosition } => {
   const filtratedWidgetPositions = omitBy(widgetPositions, (_, id) => !widgetById[id]);
-  const layout = positionToLayoutAdapter(filtratedWidgetPositions);
+  const layout = positionsToLayout(filtratedWidgetPositions);
   const compactedLayout = utils.compact(layout, 'vertical', 12);
 
-  const positions = keyBy(layoutToPositionAdapter(compactedLayout), 'id');
+  const positions = keyBy(layoutToPositions(compactedLayout), 'id');
 
   return mapValues(positions, ({ col, row, width, height }) => WidgetPosition
     .builder()
