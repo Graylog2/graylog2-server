@@ -116,10 +116,12 @@ public class CaffeineLookupCache extends LookupCache {
 
     @Override
     protected void doStart() throws Exception {
+        // no action required
     }
 
     @Override
     protected void doStop() throws Exception {
+        // no action required
     }
 
     @Override
@@ -127,13 +129,11 @@ public class CaffeineLookupCache extends LookupCache {
         final Function<LookupCacheKey, LookupResult> mapFunction = unused -> {
             try {
                 final LookupResult result = loader.call();
-                if (result == null || (result.singleValue() == null && result.multiValue() == null)) {
-                    if (config.ignoreNull()) {
-                        LOG.info("Ignoring failed lookup for key {}", key);
+                if (ignoreResult(result, config.ignoreNull())) {
+                    LOG.debug("Ignoring failed lookup for key {}", key);
                         return LookupResult.builder()
                                 .cacheTTL(0L)
                                 .build();
-                    }
                 }
                 return result;
             } catch (Exception e) {
@@ -145,6 +145,14 @@ public class CaffeineLookupCache extends LookupCache {
         try (final Timer.Context ignored = lookupTimer()) {
             return cache.get(key, mapFunction);
         }
+    }
+
+    private boolean ignoreResult(LookupResult result, Boolean ignoreNull) {
+        if (ignoreNull == null || !ignoreNull) {
+            return false;
+        }
+        return (result == null ||
+                (result.singleValue() == null && result.multiValue() == null && result.stringListValue() == null));
     }
 
     @Override
@@ -283,13 +291,19 @@ public class CaffeineLookupCache extends LookupCache {
         }
 
         @Override
-        public void recordLoadSuccess(long loadTime) {}
+        public void recordLoadSuccess(long loadTime) {
+            // not tracking this metric
+        }
 
         @Override
-        public void recordLoadFailure(long loadTime) {}
+        public void recordLoadFailure(long loadTime) {
+            // not tracking this metric
+        }
 
         @Override
-        public void recordEviction() {}
+        public void recordEviction() {
+            // not tracking this metric
+        }
 
         @Override
         public @NonNull CacheStats snapshot() {

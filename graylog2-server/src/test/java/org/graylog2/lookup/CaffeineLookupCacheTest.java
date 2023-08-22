@@ -53,6 +53,9 @@ public class CaffeineLookupCacheTest {
     @Test
     public void ignoreEmpty() throws Exception {
         LookupCache cache = buildCache(true);
+        LookupResult lr1 = LookupResult.empty();
+        LookupResult lr2 = LookupResult.single("x");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
 
         LookupResult value1 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
         Assertions.assertThat(value1.singleValue()).isNull();
@@ -62,8 +65,25 @@ public class CaffeineLookupCacheTest {
     }
 
     @Test
+    public void cacheNonEmpty() throws Exception {
+        LookupCache cache = buildCache(true);
+        LookupResult lr1 = LookupResult.single("x1");
+        LookupResult lr2 = LookupResult.single("x2");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+
+        LookupResult value1 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
+        Assertions.assertThat(value1.singleValue()).isEqualTo("x1");
+
+        LookupResult value2 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
+        Assertions.assertThat(value2.singleValue()).isEqualTo("x1");
+    }
+
+    @Test
     public void cacheEmpty() throws Exception {
         LookupCache cache = buildCache(false);
+        LookupResult lr1 = LookupResult.empty();
+        LookupResult lr2 = LookupResult.single("x");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
 
         LookupResult value1 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
         Assertions.assertThat(value1.singleValue()).isNull();
@@ -75,10 +95,6 @@ public class CaffeineLookupCacheTest {
     private LookupCache buildCache(boolean ignoreNull) throws Exception {
         when(registry.timer(anyString())).thenReturn(lookupTimer);
         when(registry.meter(anyString())).thenReturn(meter);
-
-        LookupResult lr1 = LookupResult.empty();
-        LookupResult lr2 = LookupResult.single("x");
-        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
 
         LookupCacheConfiguration config = CaffeineLookupCache.Config.builder()
                 .type(CaffeineLookupCache.NAME)
