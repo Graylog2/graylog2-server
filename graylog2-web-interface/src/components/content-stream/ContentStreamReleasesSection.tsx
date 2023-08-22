@@ -24,10 +24,6 @@ import { ListGroup, ListGroupItem, Label } from 'components/bootstrap';
 import { RelativeTime, Spinner } from 'components/common';
 import useContentStream from 'components/content-stream/hook/useContentStream';
 
-type Props = {
-  rssUrl: string,
-};
-
 const StyledListGroupItem = styled(ListGroupItem)(({ theme }: { theme: DefaultTheme }) => css`
   display: flex;
   gap: ${theme.spacings.md};
@@ -44,9 +40,9 @@ export const StyledLabel = styled(Label)`
 
 const _sanitizeText = (text = '') => DOMPurify.sanitize(text);
 
-const ContentStreamReleasesSection = ({ rssUrl }: Props) => {
-  const feedUrl = `${rssUrl}/category/release-notices/feed/`;
-  const { feedList, isLoadingFeed } = useContentStream(feedUrl);
+const ContentStreamReleasesSection = () => {
+  const path = 'category/release-notices';
+  const { feedList, isLoadingFeed } = useContentStream(path);
 
   if (isLoadingFeed && !isEmpty(feedList)) {
     return <Spinner />;

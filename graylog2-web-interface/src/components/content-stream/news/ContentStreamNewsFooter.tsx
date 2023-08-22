@@ -19,6 +19,7 @@ import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import ContentStreamNewsContentActions from 'components/content-stream/news/ContentStreamNewsContentActions';
+import { ExternalLink } from 'components/common';
 
 const StyledDiv = styled.div(({ theme }: { theme: DefaultTheme }) => css`
   display: grid;
@@ -41,9 +42,9 @@ const StyledReadMoreDiv = styled.div`
 const ContentStreamNewsFooter = () => (
   <StyledDiv>
     <StyledReadMoreDiv>
-      <a href="https://www.graylog.org/blog/" target="_blank" rel="noreferrer">
+      <ExternalLink href="https://www.graylog.org/blog/">
         Read more
-      </a>
+      </ExternalLink>
     </StyledReadMoreDiv>
     <StyledActionDiv><ContentStreamNewsContentActions /></StyledActionDiv>
   </StyledDiv>

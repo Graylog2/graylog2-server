@@ -19,19 +19,32 @@ import isEmpty from 'lodash/isEmpty';
 
 import Carousel from 'components/common/carousel/Carousel';
 import useContentStream from 'components/content-stream/hook/useContentStream';
-import { Spinner } from 'components/common';
+import { Spinner, ExternalLink } from 'components/common';
 import ContentStreamNewsItem from 'components/content-stream/news/ContentStreamNewsItem';
+import { Alert } from 'components/bootstrap';
 
-type Props = {
-  rssUrl: string,
-}
+import Icon from '../common/Icon';
 
-const ContentStreamNews = ({ rssUrl }: Props) => {
-  const feedUrl = `${rssUrl}/tag/in-product/feed/`;
-  const { feedList, isLoadingFeed } = useContentStream(feedUrl);
+const ContentStreamNews = () => {
+  const { feedList, isLoadingFeed, error } = useContentStream();
 
-  if (isLoadingFeed && !isEmpty(feedList)) {
+  if (isLoadingFeed) {
     return <Spinner />;
+  }
+
+  if (error || isEmpty(feedList)) {
+    return (
+      <Alert bsStyle="info">
+        <p>
+          <Icon name="exclamation-triangle" /> Unable to load RSS feed at the moment ! You can read more
+          on {' '}
+          <ExternalLink href="https://www.graylog.org/blog/">
+            Graylog
+          </ExternalLink>
+          .
+        </p>
+      </Alert>
+    );
   }
 
   return (

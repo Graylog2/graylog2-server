@@ -21,7 +21,6 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import ContentStreamNews from 'components/content-stream/ContentStreamNews';
 import ContentStreamNewsFooter from 'components/content-stream/news/ContentStreamNewsFooter';
-import AppConfig from 'util/AppConfig';
 import ContentStreamReleasesSection from 'components/content-stream/ContentStreamReleasesSection';
 import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -41,7 +40,6 @@ const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boole
 `);
 
 const ContentStreamSection = () => {
-  const { rss_url } = AppConfig.contentStream() || {};
   const { username } = useCurrentUser();
   const {
     contentStreamSettings,
@@ -81,33 +79,32 @@ const ContentStreamSection = () => {
   });
 
   return (
-    rss_url ? (
-      <SectionGrid $columns="2fr 1fr">
-        <StyledNewsSectionComponent title="News"
-                                    $enabled={contentStreamEnabled}
-                                    headerActions={(
-                                      <ToggleActionButton onClick={toggleNews}
-                                                          isOpen={contentStreamEnabled} />
-                                    )}>
-          {contentStreamEnabled && (
-            <>
-              <ContentStreamNews rssUrl={rss_url} />
-              <ContentStreamNewsFooter />
-            </>
-          )}
-        </StyledNewsSectionComponent>
-        <StyledReleaseSectionComponent title="Releases"
-                                       $enabled={releasesSectionEnabled}
-                                       headerActions={(
-                                         <ToggleActionButton onClick={toggleRelease}
-                                                             isOpen={releasesSectionEnabled} />
-                                       )}>
-          {releasesSectionEnabled && (
-            <ContentStreamReleasesSection rssUrl={rss_url} />
-          )}
-        </StyledReleaseSectionComponent>
-      </SectionGrid>
-    ) : null);
+    <SectionGrid $columns="2fr 1fr">
+      <StyledNewsSectionComponent title="News"
+                                  $enabled={contentStreamEnabled}
+                                  headerActions={(
+                                    <ToggleActionButton onClick={toggleNews}
+                                                        isOpen={contentStreamEnabled} />
+                                  )}>
+        {contentStreamEnabled && (
+          <>
+            <ContentStreamNews />
+            <ContentStreamNewsFooter />
+          </>
+        )}
+      </StyledNewsSectionComponent>
+      <StyledReleaseSectionComponent title="Releases"
+                                     $enabled={releasesSectionEnabled}
+                                     headerActions={(
+                                       <ToggleActionButton onClick={toggleRelease}
+                                                           isOpen={releasesSectionEnabled} />
+                                     )}>
+        {releasesSectionEnabled && (
+          <ContentStreamReleasesSection />
+        )}
+      </StyledReleaseSectionComponent>
+    </SectionGrid>
+  );
 };
 
 export default ContentStreamSection;

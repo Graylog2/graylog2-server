@@ -17,7 +17,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { XMLParser } from 'fast-xml-parser';
 
-import UserNotification from 'preflight/util/UserNotification';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { DEFAULT_FEED } from 'components/content-stream/Constants';
+import AppConfig from 'util/AppConfig';
 
 export type FeedITem = {
   title?: string,
@@ -71,6 +73,7 @@ type RssFeed = {
     }
   }
 }
+const getDefaultTag = () => DEFAULT_FEED;
 
 const parseXML = (text: string): Array<FeedITem> => {
   const options = {
@@ -86,24 +89,27 @@ const parseXML = (text: string): Array<FeedITem> => {
   return items;
 };
 
-export const fetchNewsFeed = (rssUrl: string) => window.fetch(rssUrl, { method: 'GET' })
+export const fetchNewsFeed = (rssUrl: string) => rssUrl && window.fetch(rssUrl, { method: 'GET' })
   .then((response) => response.text())
-  .then(parseXML);
+  .then(parseXML).catch((error) => error);
 export const CONTENT_STREAM_CONTENT_KEY = ['content-stream', 'content'];
 
-const useContentStream = (rssUrl: string): { isLoadingFeed: boolean, feedList: Array<FeedITem> } => {
+const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Array<FeedITem>, error: Error } => {
+  const { rss_url } = AppConfig.contentStream() || {};
+  const contentStreamPlugin = usePluginEntities('content-stream')[0];
+  const getPath = contentStreamPlugin?.hooks?.useContentStreamTag || getDefaultTag;
+  const rssUrl = rss_url && `${rss_url}/${path || getPath()}/feed`;
+
   const {
     data,
     isLoading,
+    error,
   } = useQuery<Array<FeedITem>, Error>([...CONTENT_STREAM_CONTENT_KEY, rssUrl], () => fetchNewsFeed(rssUrl), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading news feed failed with status: ${errorThrown}`,
-        'Could not load news feed');
-    },
     initialData: [],
   });
 
   return {
+    error,
     feedList: data,
     isLoadingFeed: isLoading,
   };
