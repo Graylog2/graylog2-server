@@ -1,0 +1,5 @@
+type = "added"
+message = "Add event limit for filter event definition."
+
+issues = ["graylog-plugin-enterprise-integrations#5382"]
+pulls = ["16035"]

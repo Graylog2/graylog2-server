@@ -14,23 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable global-require */
-module.exports = (api) => {
-  const isEnvTest = api.env('test');
+import CertificateRenewal from './CertificateRenewal';
 
-  if (!isEnvTest) {
-    throw Error('For transpiling the frontend assets we are no longer using Babel and it should only be used for tests.');
-  }
-
-  return {
-    presets: [
-      require('@babel/preset-env'),
-      require('@babel/preset-react'),
-      require('@babel/preset-typescript')],
-    plugins: [
-      require('@babel/plugin-syntax-dynamic-import'),
-      require('babel-plugin-styled-components'),
-      require('@babel/plugin-transform-runtime'),
-    ],
-  };
-};
+export default CertificateRenewal;

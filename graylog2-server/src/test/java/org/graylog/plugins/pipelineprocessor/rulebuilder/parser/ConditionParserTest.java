@@ -150,7 +150,7 @@ public class ConditionParserTest {
                   function1(
                     required : "val1"
                   )
-                    AND
+                  AND
                   ! function2()
                 """.stripTrailing());
     }

@@ -34,6 +34,9 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -58,7 +61,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog.security.certutil.CaService.DEFAULT_VALIDITY;
 
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
@@ -72,7 +74,9 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final CertChainStorage certMongoStorage;
     private final CaService caService;
     private final CsrSigner csrSigner;
+    private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
+    private final ClusterEventBus clusterEventBus;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
     @Inject
@@ -83,7 +87,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final Configuration configuration,
                                                     final NodeService nodeService,
                                                     final CsrSigner csrSigner,
-                                                    final @Named("password_secret") String passwordSecret) {
+                                                    final ClusterConfigService clusterConfigService,
+                                                    final @Named("password_secret") String passwordSecret, ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -92,6 +97,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.configuration = configuration;
         this.nodeService = nodeService;
         this.csrSigner = csrSigner;
+        this.clusterConfigService = clusterConfigService;
+        this.clusterEventBus = clusterEventBus;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -100,7 +107,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
                 var sslContext = SSLContext.getInstance("TLS");
-                var tm = new CustomCAX509TrustManager(caService);
+                var tm = new CustomCAX509TrustManager(caService, clusterEventBus);
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
                 clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
             } catch (NoSuchAlgorithmException ex) {
@@ -111,6 +118,10 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             LOG.error("Could not create temporary okhttpclient " + ex.getMessage(), ex);
         }
         return Optional.empty();
+    }
+
+    private RenewalPolicy getRenewalPolicy() {
+        return this.clusterConfigService.get(RenewalPolicy.class);
     }
 
     @Override
@@ -126,6 +137,12 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 Optional<KeyStore> optKey = caService.loadKeyStore();
                 if (optKey.isEmpty()) {
                     LOG.warn("No keystore available.");
+                    return;
+                }
+
+                final var renewalPolicy = getRenewalPolicy();
+                if(renewalPolicy == null) {
+                    LOG.warn("No renewal policy available.");
                     return;
                 }
 
@@ -151,7 +168,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                             .errorMsg("Node in CSR state, but no CSR present")
                                             .build());
                                 } else {
-                                    var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), c.validFor() != null ? c.validFor() : DEFAULT_VALIDITY);
+                                    var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
                                     //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
                                     final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
                                     certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
