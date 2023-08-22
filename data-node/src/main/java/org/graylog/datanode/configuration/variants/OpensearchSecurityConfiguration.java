@@ -25,16 +25,28 @@ import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class OpensearchSecurityConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchSecurityConfiguration.class);
 
     private static final String KEYSTORE_FORMAT = "PKCS12";
     private static final String TRUSTSTORE_FORMAT = "PKCS12";
@@ -62,6 +74,10 @@ public class OpensearchSecurityConfiguration {
      */
     public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws GeneralSecurityException, IOException {
         if (securityEnabled()) {
+
+            logCertificateInformation("transport certificate", transportCertificate);
+            logCertificateInformation("HTTP certificate", httpCertificate);
+
             final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
 
             final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
@@ -93,6 +109,11 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILENAME);
             config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
+
+            // this disables hostname verification for transport. It's a workaround for localnode communication
+            // via SSL, where Opensearch still tries to communicate with 'localhost' and not the publish_host or other
+            // configured node names.
+            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
 
             config.put("plugins.security.ssl.http.enabled", "true");
@@ -133,6 +154,8 @@ public class OpensearchSecurityConfiguration {
 
         config.put("plugins.security.disabled", "false");
         //config.put(SSL_PREFIX + "http.enabled", "true");
+
+        config.put("plugins.security.nodes_dn", "CN=*");
         config.put("plugins.security.allow_default_init_securityindex", "true");
         //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
 
@@ -178,5 +201,22 @@ public class OpensearchSecurityConfiguration {
         mapper.writeValue(fos, map);
     }
 
-
+    private void logCertificateInformation(String certificateType, KeystoreInformation keystore) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
+        final KeyStore instance = KeyStore.getInstance(KEYSTORE_FORMAT);
+        try (final FileInputStream is = new FileInputStream(keystore.location().toFile())) {
+            instance.load(is, keystore.password());
+            final Enumeration<String> aliases = instance.aliases();
+            while(aliases.hasMoreElements()) {
+                final Certificate cert = instance.getCertificate(aliases.nextElement());
+                if(cert instanceof X509Certificate x509Certificate) {
+                    final String alternativeNames = x509Certificate.getSubjectAlternativeNames()
+                            .stream()
+                            .map(san -> san.get(1))
+                            .map(Object::toString)
+                            .collect(Collectors.joining(", "));
+                    LOG.info("Opensearch {} has following alternative names: {}", certificateType, alternativeNames);
+                }
+            }
+        }
+    }
 }

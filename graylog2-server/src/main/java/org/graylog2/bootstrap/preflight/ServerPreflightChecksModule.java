@@ -44,6 +44,9 @@ public class ServerPreflightChecksModule extends Graylog2Module {
                 .implement(TrustManager.class, CustomCAX509TrustManager.class)
                 .build(TrustManagerProvider.class));
 
+       bind(CustomCAX509TrustManager.class).asEagerSingleton();
+
+
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
         bind(ElasticsearchVersionProvider.class).asEagerSingleton();
