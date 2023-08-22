@@ -37,9 +37,10 @@ import java.util.concurrent.TimeUnit;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
+import static org.graylog.testing.containermatrix.SearchServer.OS2_4;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_LATEST})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_4, OS2_LATEST})
 public class CompoundFieldsAggregationIT {
 
     private final GraylogApis api;
