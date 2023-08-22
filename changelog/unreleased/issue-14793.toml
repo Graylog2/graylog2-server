@@ -1,0 +1,11 @@
+type = "fixed"
+message = "Adjust keybindings for query input autocompletion."
+
+issues = ["14793"]
+pulls = ["16162"]
+
+details.user = """
+With #6909 we received the feedback that it would be useful to only press `Tab` once to insert the first autocomplete suggestion (instead of pressing it twice). As result we implemented a change to automatically focus the first suggestion. This led to a problem in a different use case. When you search for a custom value like ssh login the autocomplete suggested field names for login and pressing Return did not execute the search but inserted the first suggestion.
+We are now no longer focusing the first suggestion and adjusting the behaviour for Tab key. When pressing Tab while no suggestion is focused we select and insert the first entry.
+This way it is possible to press Return when searching for a custom value and it still requires only one press to insert the first suggestion.
+"""

@@ -34,6 +34,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -75,6 +76,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
+    private final ClusterEventBus clusterEventBus;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
 
     @Inject
@@ -86,7 +88,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final NodeService nodeService,
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
-                                                    final @Named("password_secret") String passwordSecret) {
+                                                    final @Named("password_secret") String passwordSecret, ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -96,6 +98,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.nodeService = nodeService;
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
+        this.clusterEventBus = clusterEventBus;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -104,7 +107,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
                 var sslContext = SSLContext.getInstance("TLS");
-                var tm = new CustomCAX509TrustManager(caService);
+                var tm = new CustomCAX509TrustManager(caService, clusterEventBus);
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
                 clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
             } catch (NoSuchAlgorithmException ex) {

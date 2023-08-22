@@ -21,12 +21,15 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
+import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.conditions.Expression;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
+import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -49,13 +52,21 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class AggregationEventProcessorConfigTest {
+    public static final EventDefinitionConfiguration EVENT_DEFINITION_CONFIGURATION = new EventDefinitionConfiguration();
+    public static final int MAX_EVENT_LIMIT = EVENT_DEFINITION_CONFIGURATION.getMaxEventLimit();
+    public static final TestEventProcessorConfig TEST_EVENT_CONFIG = TestEventProcessorConfig.builder()
+            .message("")
+            .searchWithinMs(1)
+            .executeEveryMs(1).build();
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -115,13 +126,14 @@ public class AggregationEventProcessorConfigTest {
 
     private AggregationEventProcessorConfig getConfig() {
         return AggregationEventProcessorConfig.builder()
-            .query("")
-            .streams(new HashSet<>())
-            .groupBy(new ArrayList<>())
-            .series(new ArrayList<>())
-            .searchWithinMs(1)
-            .executeEveryMs(1)
-            .build();
+                .query("")
+                .streams(new HashSet<>())
+                .groupBy(new ArrayList<>())
+                .series(new ArrayList<>())
+                .searchWithinMs(1)
+                .executeEveryMs(1)
+                .eventLimit(1)
+                .build();
     }
 
     private AggregationConditions getConditions() {
@@ -150,8 +162,8 @@ public class AggregationEventProcessorConfigTest {
         assertThat(validationResult1.getErrors()).containsOnlyKeys("search_within_ms");
 
         final AggregationEventProcessorConfig invalidConfig2 = invalidConfig1.toBuilder()
-            .searchWithinMs(0)
-            .build();
+                .searchWithinMs(0)
+                .build();
 
         final ValidationResult validationResult2 = invalidConfig2.validate();
         assertThat(validationResult2.failed()).isTrue();
@@ -161,16 +173,16 @@ public class AggregationEventProcessorConfigTest {
     @Test
     public void testValidateWithInvalidExecutionTime() {
         final AggregationEventProcessorConfig invalidConfig1 = getConfig().toBuilder()
-            .executeEveryMs(-1)
-            .build();
+                .executeEveryMs(-1)
+                .build();
 
         final ValidationResult validationResult1 = invalidConfig1.validate();
         assertThat(validationResult1.failed()).isTrue();
         assertThat(validationResult1.getErrors()).containsOnlyKeys("execute_every_ms");
 
         final AggregationEventProcessorConfig invalidConfig2 = invalidConfig1.toBuilder()
-            .executeEveryMs(0)
-            .build();
+                .executeEveryMs(0)
+                .build();
 
         final ValidationResult validationResult2 = invalidConfig2.validate();
         assertThat(validationResult2.failed()).isTrue();
@@ -178,26 +190,75 @@ public class AggregationEventProcessorConfigTest {
     }
 
     @Test
+    public void testEventLimitValidation() {
+        var eventLimitZero = configWithEventLimit(0);
+        var eventLimitOne = configWithEventLimit(1);
+        var eventLimitGreaterMax = configWithEventLimit(MAX_EVENT_LIMIT + 1);
+
+        assertValidationError("greater than 0", eventLimitZero, null);
+        assertValidationError("greater than 0", configWithEventLimit(-1), null);
+        assertValidationError("greater than 0", eventLimitZero, eventLimitOne);
+        assertValidationError("greater than 0", eventLimitZero, TEST_EVENT_CONFIG);
+        assertValidationError("less than " + MAX_EVENT_LIMIT, eventLimitGreaterMax, eventLimitZero);
+        assertNoValidationErrors(eventLimitZero, eventLimitZero);
+        assertNoValidationErrors(eventLimitOne, eventLimitZero);
+        assertNoValidationErrors(eventLimitOne, TEST_EVENT_CONFIG);
+    }
+
+    private AggregationEventProcessorConfig configWithEventLimit(int eventLimit) {
+        return getConfig().toBuilder().eventLimit(eventLimit).build();
+    }
+
+    private static void assertValidationError(String validationError, AggregationEventProcessorConfig config,
+                                              EventProcessorConfig oldConfig) {
+        List<String> validationErrors = config.validate(oldConfig, EVENT_DEFINITION_CONFIGURATION).getErrors().values()
+                .stream().flatMap(Collection::stream).toList();
+        assertThat(validationErrors).hasSize(1);
+        assertThat(validationErrors).allMatch(strings -> strings.contains(validationError));
+    }
+
+    private static void assertNoValidationErrors(AggregationEventProcessorConfig config,
+                                                 EventProcessorConfig oldConfig) {
+        List<String> validationErrors = config.validate(oldConfig, EVENT_DEFINITION_CONFIGURATION).getErrors().values()
+                .stream().flatMap(Collection::stream).toList();
+        assertThat(validationErrors).isEmpty();
+    }
+
+    @Test
+    public void testEventLimitDefaultValue() {
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
+                .query("")
+                .streams(new HashSet<>())
+                .groupBy(new ArrayList<>())
+                .series(new ArrayList<>())
+                .searchWithinMs(1)
+                .executeEveryMs(1)
+                .build();
+
+        assertThat(config.eventLimit()).isEqualTo(0);
+    }
+
+    @Test
     public void testValidateWithIncompleteAggregationOptions() {
         AggregationEventProcessorConfig invalidConfig = getConfig().toBuilder()
-            .groupBy(ImmutableList.of("foo"))
-            .build();
+                .groupBy(ImmutableList.of("foo"))
+                .build();
 
         ValidationResult validationResult = invalidConfig.validate();
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("series", "conditions");
 
         invalidConfig = getConfig().toBuilder()
-            .series(ImmutableList.of(this.getSeries()))
-            .build();
+                .series(ImmutableList.of(this.getSeries()))
+                .build();
 
         validationResult = invalidConfig.validate();
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("conditions");
 
         invalidConfig = getConfig().toBuilder()
-            .conditions(this.getConditions())
-            .build();
+                .conditions(this.getConditions())
+                .build();
 
         validationResult = invalidConfig.validate();
         assertThat(validationResult.failed()).isTrue();
@@ -214,9 +275,9 @@ public class AggregationEventProcessorConfigTest {
     @Test
     public void testValidFilterConfiguration() {
         final AggregationEventProcessorConfig config = getConfig().toBuilder()
-            .query("foo")
-            .streams(ImmutableSet.of("1", "2"))
-            .build();
+                .query("foo")
+                .streams(ImmutableSet.of("1", "2"))
+                .build();
 
         final ValidationResult validationResult = config.validate();
         assertThat(validationResult.failed()).isFalse();
@@ -226,10 +287,10 @@ public class AggregationEventProcessorConfigTest {
     @Test
     public void testValidAggregationConfiguration() {
         final AggregationEventProcessorConfig config = getConfig().toBuilder()
-            .groupBy(ImmutableList.of("bar"))
-            .series(ImmutableList.of(this.getSeries()))
-            .conditions(this.getConditions())
-            .build();
+                .groupBy(ImmutableList.of("bar"))
+                .series(ImmutableList.of(this.getSeries()))
+                .conditions(this.getConditions())
+                .build();
 
         final ValidationResult validationResult = config.validate();
         assertThat(validationResult.failed()).isFalse();
@@ -239,16 +300,14 @@ public class AggregationEventProcessorConfigTest {
     @Test
     @MongoDBFixtures("aggregation-processors.json")
     public void requiredPermissions() {
-        assertThat(dbService.get("54e3deadbeefdeadbeefaffe")).get().satisfies(definition -> {
-            assertThat(definition.config().requiredPermissions()).containsOnly("streams:read:stream-a", "streams:read:stream-b");
-        });
+        assertThat(dbService.get("54e3deadbeefdeadbeefaffe")).get().satisfies(definition ->
+                assertThat(definition.config().requiredPermissions()).containsOnly("streams:read:stream-a", "streams:read:stream-b"));
     }
 
     @Test
     @MongoDBFixtures("aggregation-processors.json")
     public void requiredPermissionsWithEmptyStreams() {
-        assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition -> {
-            assertThat(definition.config().requiredPermissions()).containsOnly("streams:read");
-        });
+        assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition ->
+                assertThat(definition.config().requiredPermissions()).containsOnly("streams:read"));
     }
 }
