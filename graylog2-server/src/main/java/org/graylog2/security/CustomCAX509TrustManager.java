@@ -17,12 +17,16 @@
 package org.graylog2.security;
 
 import com.google.common.collect.Iterables;
+import com.google.common.eventbus.Subscribe;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CertificateAuthorityChangedEvent;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
@@ -40,9 +44,16 @@ public class CustomCAX509TrustManager implements X509TrustManager {
     private List<X509TrustManager> trustManagers = new ArrayList<>();
 
     @Inject
-    public CustomCAX509TrustManager(CaService caService) {
+    public CustomCAX509TrustManager(CaService caService, ClusterEventBus eventBus) {
         this.caService = caService;
+        eventBus.registerClusterEventSubscriber(this);
         this.refresh();
+    }
+
+    @Subscribe
+    public void handleCertificateAuthorityChange(CertificateAuthorityChangedEvent event) {
+        LOG.info("CA changed, refreshing trust manager");
+        refresh();
     }
 
     public void refresh() {

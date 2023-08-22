@@ -19,15 +19,10 @@ import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
 import RuleBlockDisplay from './RuleBlockDisplay';
 import { buildRuleBlock } from './fixtures';
+import { RuleBuilderTypes } from './types';
 
 const block = buildRuleBlock({
-  params:
-{
-  spell: 'wingardium leviosa',
-  wand_required: true,
-  cast_time: 20,
-  message: '$output_action_1',
-},
+  outputvariable: 'output_5',
 });
 
 const mockDelete = jest.fn();
@@ -45,20 +40,12 @@ describe('RuleBlockDisplay', () => {
     expect(screen.getByText(/to_long "foo"/i)).toBeInTheDocument();
   });
 
-  it('displays params properly', async () => {
-    render(<RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+  it('shows the outputvariable and its return type', async () => {
+    render(<RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} returnType={RuleBuilderTypes.Number} />);
 
-    expect(screen.getByText((content, _) => content.endsWith('wingardium leviosa')).textContent)
-      .toEqual('spell: wingardium leviosa');
+    expect(screen.getByText(/\$output_5/i)).toBeInTheDocument();
 
-    expect(screen.getByText((content, _) => content.endsWith('true')).textContent)
-      .toEqual('wand_required: true');
-
-    expect(screen.getByText((content, _) => content.endsWith('20')).textContent)
-      .toEqual('cast_time: 20');
-
-    expect(screen.getByText((content, _) => content.endsWith('Output of the previous step')).textContent)
-      .toEqual('message: Output of the previous step');
+    expect(screen.getByText(/number/i)).toBeInTheDocument();
   });
 
   it('calls deleteHandler when clicking the delete button', async () => {

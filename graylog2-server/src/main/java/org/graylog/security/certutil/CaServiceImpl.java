@@ -30,6 +30,7 @@ import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.cluster.certificates.CertificatesService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,14 +65,16 @@ public class CaServiceImpl implements CaService {
     private final CertificatesService certificatesService;
     private final String passwordSecret;
 
+    private final ClusterEventBus eventBus;
+
     @Inject
     public CaServiceImpl(final Configuration configuration,
-                     final SmartKeystoreStorage keystoreStorage,
-                     final NodeId nodeId,
-                     final CACreator caCreator,
-                     final PemCaReader pemCaReader,
-                     final CertificatesService certificatesService,
-                     final @Named("password_secret") String passwordSecret) {
+                         final SmartKeystoreStorage keystoreStorage,
+                         final NodeId nodeId,
+                         final CACreator caCreator,
+                         final PemCaReader pemCaReader,
+                         final CertificatesService certificatesService,
+                         final @Named("password_secret") String passwordSecret, ClusterEventBus eventBus) {
         this.keystoreStorage = keystoreStorage;
         this.nodeId = nodeId;
         this.caCreator = caCreator;
@@ -81,6 +84,7 @@ public class CaServiceImpl implements CaService {
         this.passwordSecret = configuration.getCaPassword() != null ? configuration.getCaPassword() : passwordSecret;
         this.mongoDbCaLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
         this.manuallyProvidedCALocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -94,11 +98,12 @@ public class CaServiceImpl implements CaService {
     }
 
     @Override
-    public void create(final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {
+    public void create(final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException {
         final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
         KeyStore keyStore = caCreator.createCA(passwordSecret.toCharArray(), certificateValidity);
         keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, passwordSecret.toCharArray(), password);
         LOG.debug("Generated a new CA.");
+        triggerCaChangedEvent();
     }
 
     @Override
@@ -121,6 +126,7 @@ public class CaServiceImpl implements CaService {
                 }
             }
             keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, password, passwordSecret.toCharArray());
+            triggerCaChangedEvent();
        } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
                 KeyStoreException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
@@ -133,8 +139,12 @@ public class CaServiceImpl implements CaService {
         certificatesService.removeCert(mongoDbCaLocation);
     }
 
+    private void triggerCaChangedEvent() {
+        eventBus.post(new CertificateAuthorityChangedEvent());
+    }
+
     @Override
-    public Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException {
+    public Optional<KeyStore> loadKeyStore() throws KeyStoreStorageException {
         if(configuration.configuredCaExists()) {
             return keystoreStorage.readKeyStore(manuallyProvidedCALocation, configuration.getCaPassword().toCharArray());
         } else {

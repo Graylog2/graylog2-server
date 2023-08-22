@@ -29,12 +29,14 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog2.plugin.certificates.RenewalPolicy;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -52,12 +54,24 @@ public class CsrSigner {
         };
     }
 
+    public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, RenewalPolicy renewalPolicy) throws Exception {
+        Instant validFrom = Instant.now();
+        final var lifetime = Duration.parse(renewalPolicy.certificateLifetime());
+        var validUntil = validFrom.plus(lifetime);
+
+        return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
+    }
+
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
+        Instant validFrom = Instant.now();
+        Instant validUntil = validFrom.plus(Duration.ofDays(validityDays));
+
+        return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
+    }
+
+    private X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, Instant validFrom, Instant validUntil) throws Exception {
         // TODO: cert serial number?
         BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
-        Instant validFrom = Instant.now();
-
-        Instant validUntil = validFrom.plus(Duration.ofDays(validityDays));
 
         var issuerName = X500Name.getInstance(caCertificate.getSubjectX500Principal().getEncoded());
         var issuerKey = caPrivateKey;

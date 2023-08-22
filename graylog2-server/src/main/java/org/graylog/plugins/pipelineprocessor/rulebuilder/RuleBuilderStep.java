@@ -36,6 +36,8 @@ public abstract class RuleBuilderStep {
     public static final String FIELD_OUTPUT = "outputvariable";
     public static final String FIELD_NEGATE = "negate";
     public static final String FIELD_TITLE = "step_title";
+    public static final String FIELD_OPERATOR = "operator";
+    public static final String FIELD_NESTED_CONDITIONS = "conditions";
 
     @JsonProperty(FIELD_ID)
     @Nullable
@@ -43,6 +45,7 @@ public abstract class RuleBuilderStep {
     public abstract String id();
 
     @JsonProperty(FIELD_FUNCTION)
+    @Nullable
     public abstract String function();
 
     @JsonProperty(FIELD_PARAMETERS)
@@ -60,17 +63,27 @@ public abstract class RuleBuilderStep {
     @Nullable
     public abstract String title();
 
+    @JsonProperty(FIELD_OPERATOR)
+    @Nullable
+    public abstract Operator operator();
+
+    @JsonProperty(FIELD_NESTED_CONDITIONS)
+    @Nullable
+    public abstract List<RuleBuilderStep> conditions();
+
     @JsonProperty(FIELD_ERRORS)
     @Nullable
     public abstract List<String> errors();
 
     @JsonCreator
     public static RuleBuilderStep create(@JsonProperty(FIELD_ID) @Nullable String id,
-                                         @JsonProperty(FIELD_FUNCTION) String function,
+                                         @JsonProperty(FIELD_FUNCTION) @Nullable String function,
                                          @JsonProperty(FIELD_PARAMETERS) @Nullable Map<String, Object> parameters,
                                          @JsonProperty(FIELD_OUTPUT) @Nullable String outputvariable,
                                          @JsonProperty(FIELD_NEGATE) @Nullable boolean negate,
                                          @JsonProperty(FIELD_TITLE) @Nullable String title,
+                                         @JsonProperty(FIELD_OPERATOR) @Nullable Operator operator,
+                                         @JsonProperty(FIELD_NESTED_CONDITIONS) @Nullable List<RuleBuilderStep> conditions,
                                          @JsonProperty(FIELD_ERRORS) @Nullable List<String> errors) {
         return builder()
                 .id(id)
@@ -79,6 +92,8 @@ public abstract class RuleBuilderStep {
                 .outputvariable(outputvariable)
                 .negate(negate)
                 .title(title)
+                .operator(operator)
+                .conditions(conditions)
                 .errors(errors)
                 .build();
     }
@@ -109,9 +124,18 @@ public abstract class RuleBuilderStep {
 
         public abstract Builder title(String title);
 
+        public abstract Builder operator(Operator operator);
+
+        public abstract Builder conditions(List<RuleBuilderStep> conditions);
+
         public abstract Builder errors(List<String> errors);
 
         public abstract RuleBuilderStep build();
 
     }
+
+    public enum Operator {
+        AND, OR
+    }
+
 }

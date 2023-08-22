@@ -23,6 +23,7 @@ import { OverlayTrigger, Icon } from 'components/common';
 import { Popover } from 'components/bootstrap';
 
 type Props = {
+  authServiceEnabled: $PropertyType<UserOverview, 'authServiceEnabled'>,
   accountStatus: $PropertyType<UserOverview, 'accountStatus'>,
 };
 
@@ -35,7 +36,7 @@ const Td = styled.td`
   text-align: center;
 `;
 
-const StatusCell = ({ accountStatus }: Props) => (
+const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
   <Td>
     <OverlayTrigger trigger={['hover', 'focus']}
                     placement="right"
@@ -43,11 +44,11 @@ const StatusCell = ({ accountStatus }: Props) => (
                       <Popover id="session-badge-details"
                                data-app-section="session_badge"
                                data-event-element="Status">
-                        {`User is ${accountStatus}`}
+                        {`User is ${accountStatus}`}{!authServiceEnabled ? ' (authentication service is disabled)' : ''}
                       </Popover>
                     )}
                     rootClose>
-      <Wrapper $enabled={accountStatus === 'enabled'}>
+      <Wrapper $enabled={authServiceEnabled && accountStatus === 'enabled'}>
         <Icon name={accountStatus === 'enabled' ? 'check-circle' : 'times-circle'} />
       </Wrapper>
     </OverlayTrigger>

@@ -90,8 +90,26 @@ export type BlockDict = {
   params: Array<BlockFieldDict>,
   description: string | null,
   rule_builder_enabled: boolean,
+  rule_builder_function_group: string,
+  rule_builder_name: string,
   rule_builder_title: string | null
 }
+
+export type OutputVariables = Array<{
+  variableName: string,
+  variableType?: RuleBuilderTypes,
+  stepOrder: number,
+  blockId: string
+}>
+
+export const outputVariablesPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    variableName: PropTypes.string.isRequired,
+    variableType: PropTypes.string,
+    stepOrder: PropTypes.number.isRequired,
+    blockId: PropTypes.string.isRequired,
+  }),
+);
 
 export const ruleBlockPropType = PropTypes.shape({
   function: PropTypes.string.isRequired,

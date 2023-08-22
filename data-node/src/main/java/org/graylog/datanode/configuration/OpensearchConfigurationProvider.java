@@ -117,11 +117,15 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         if (localConfiguration.isSingleNodeOnly()) {
             config.put("discovery.type", "single-node");
         } else {
-            config.put("cluster.initial_master_nodes", "node1");
+            config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
         }
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");
+        //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
+
+        // Uncomment the following line to get DEBUG logs for the underlying Opensearch
+        //config.put("logger.org.opensearch", "debug");
 
         return config.build();
     }

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
-import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
+import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, RelativeTime, SearchForm, Spinner } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import 'components/event-definitions/event-definition-types';
@@ -41,6 +41,11 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     title: {
       renderCell: (title: string, eventDefinition) => (
         <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{title}</Link>
+      ),
+    },
+    matched_at: {
+      renderCell: (_matched_at: string, eventDefinition) => (
+        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never'
       ),
     },
     scheduling: {

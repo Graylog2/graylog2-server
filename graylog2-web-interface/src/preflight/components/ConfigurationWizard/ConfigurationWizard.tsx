@@ -24,11 +24,12 @@ import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Consta
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-import { List, Grid, Space } from 'preflight/components/common';
+import { List, Grid, Space, Alert } from 'preflight/components/common';
 import RenewalPolicyConfiguration from 'preflight/components/ConfigurationWizard/RenewalPolicyConfiguration';
 import type { ConfigurationStep } from 'preflight/types';
 import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 import RestartConfigurationButton from 'preflight/components/RestartConfigurationButton';
+import type FetchError from 'logic/errors/FetchError';
 
 import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';
@@ -42,7 +43,7 @@ const StepIcon = styled(Icon)<{ $color: string }>(({ $color, theme }) => css`
 
 const StyledListItem = styled(List.Item)<{ $isStepSkipped: boolean }>(({ $isStepSkipped }) => css`
   > * {
-    text-decoration: ${$isStepSkipped ? 'line-through' : 'none'}
+    text-decoration: ${$isStepSkipped ? 'line-through' : 'none'};
   }
 `);
 
@@ -70,13 +71,27 @@ const stepIcon = (stepKey: ConfigurationStep, activeStepKey: ConfigurationStep, 
   };
 };
 
+type FetchErrorsOverviewProps = {
+  errors: Array<{ entityName: string, error: FetchError}> | null
+}
+
+const FetchErrorsOverview = ({ errors }: FetchErrorsOverviewProps) => (
+  <>
+    {errors.map(({ entityName, error }) => (
+      <Alert type="danger" key={entityName}>
+        There was an error fetching the {entityName}: {error.message}
+      </Alert>
+    ))}
+  </>
+);
+
 type Props = {
   setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
   const [isSkippingProvisioning, setIsSkippingProvisioning] = useState(false);
-  const { step: activeStepKey, isLoading: isLoadingConfigurationStep } = useConfigurationStep({ isSkippingProvisioning });
+  const { step: activeStepKey, isLoading: isLoadingConfigurationStep, errors } = useConfigurationStep({ isSkippingProvisioning });
   const theme = useTheme();
 
   const onSkipProvisioning = useCallback(() => {
@@ -85,6 +100,10 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
 
   if (isLoadingConfigurationStep) {
     return <Spinner />;
+  }
+
+  if (errors?.length) {
+    return <FetchErrorsOverview errors={errors} />;
   }
 
   return (
@@ -127,9 +146,9 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
         {activeStepKey === CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key && <RenewalPolicyConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning onSkipProvisioning={onSkipProvisioning} />}
         {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && (
-        <ConfigurationFinished setIsWaitingForStartup={setIsWaitingForStartup}
-                               isSkippingProvisioning={isSkippingProvisioning}
-                               setIsSkippingProvisioning={setIsSkippingProvisioning} />
+          <ConfigurationFinished setIsWaitingForStartup={setIsWaitingForStartup}
+                                 isSkippingProvisioning={isSkippingProvisioning}
+                                 setIsSkippingProvisioning={setIsSkippingProvisioning} />
         )}
       </Grid.Col>
     </Grid>

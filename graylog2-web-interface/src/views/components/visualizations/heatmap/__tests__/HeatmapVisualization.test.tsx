@@ -72,6 +72,7 @@ describe('HeatmapVisualization', () => {
         colorscale: 'Viridis',
         reversescale: false,
         originalName: 'Heatmap Chart',
+        colorbar: { tickfont: { color: '#3e434c' } },
       },
     ];
 
@@ -118,6 +119,7 @@ describe('HeatmapVisualization', () => {
         colorscale: 'Viridis',
         reversescale: false,
         originalName: 'Heatmap Chart',
+        colorbar: { tickfont: { color: '#3e434c' } },
       },
     ];
 

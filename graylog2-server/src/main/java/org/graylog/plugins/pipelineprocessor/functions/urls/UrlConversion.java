@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Optional;
 
@@ -61,6 +62,10 @@ public class UrlConversion extends AbstractFunction<URL> {
                 .params(urlParam,
                         defaultParam)
                 .description("Converts a value to a valid URL using its string representation")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Convert to URL")
+                .ruleBuilderTitle("Convert '${value}' to URL")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

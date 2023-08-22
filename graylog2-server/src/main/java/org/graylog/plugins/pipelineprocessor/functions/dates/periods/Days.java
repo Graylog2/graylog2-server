@@ -41,4 +41,16 @@ public class Days extends AbstractPeriodComponentFunction {
     protected String getDescription() {
         return "Create a period with a specified number of days.";
     }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Create period (days)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Create a time period of '${value}' days";
+    }
 }
