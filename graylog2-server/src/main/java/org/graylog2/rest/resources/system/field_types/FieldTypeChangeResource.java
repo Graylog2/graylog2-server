@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -72,6 +73,7 @@ public class FieldTypeChangeResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized")
     })
+    @NoAuditEvent("No audit for field type changes")
     public Response changeFieldType(@ApiParam(name = "index_sets_ids", required = true)
                                     @QueryParam("index_sets_ids") Set<String> indexSetsIds,
                                     @ApiParam(name = "field_name", required = true)
