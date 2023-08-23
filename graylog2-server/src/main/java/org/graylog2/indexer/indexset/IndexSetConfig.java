@@ -151,6 +151,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("field_type_refresh_interval")
     public abstract Duration fieldTypeRefreshInterval();
 
+    @JsonProperty("custom_field_mappings")
+    @Nullable
+    public abstract CustomFieldMappings customFieldMappings();
+
     @JsonIgnore
     public boolean isRegularIndex() {
         final String indexTemplate = indexTemplateType().orElse(null);
@@ -179,7 +183,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable String indexTemplateType,
                                         @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
-                                        @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval) {
+                                        @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
+                                        @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings
+    ) {
 
         final boolean writableValue = isWritable == null ? true : isWritable;
 
@@ -211,6 +217,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
                 .indexOptimizationDisabled(indexOptimizationDisabled == null ? false : indexOptimizationDisabled)
                 .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
+                .customFieldMappings(customFieldMappings)
                 .build();
     }
 
@@ -237,7 +244,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return create(id, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
     }
 
     // Compatibility creator after field type refresh interval has been introduced
@@ -261,7 +268,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return create(null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
     }
 
     @Override
@@ -329,6 +336,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder indexOptimizationDisabled(boolean indexOptimizationDisabled);
 
         public abstract Builder fieldTypeRefreshInterval(Duration fieldTypeRefreshInterval);
+
+        public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
 
         public abstract IndexSetConfig build();
     }

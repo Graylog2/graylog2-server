@@ -30,9 +30,12 @@ import javax.ws.rs.container.DynamicFeature;
 
 public class RestApiBindings extends PluginModule {
     private final Configuration configuration;
+    private final boolean fieldTypesChangeOn;
 
-    public RestApiBindings(Configuration configuration) {
+    public RestApiBindings(final Configuration configuration,
+                           final boolean fieldTypesChangeOn) {
         this.configuration = configuration;
+        this.fieldTypesChangeOn = fieldTypesChangeOn;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class RestApiBindings extends PluginModule {
 
         // Install all resource modules
         install(new WebResourcesModule());
-        install(new RestResourcesModule(configuration));
+        install(new RestResourcesModule(configuration, fieldTypesChangeOn));
         install(new RestResourcesSharedModule());
     }
 

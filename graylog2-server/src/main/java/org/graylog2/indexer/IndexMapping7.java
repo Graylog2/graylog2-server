@@ -17,14 +17,16 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
 
 public class IndexMapping7 extends IndexMapping {
     @Override
-    protected Template.Mappings mapping(String analyzer) {
-        return new Template.Mappings(messageMapping(analyzer));
+    protected Template.Mappings mapping(String analyzer,
+                                          final CustomFieldMappings customFieldMappings) {
+        return new Template.Mappings(messageMapping(analyzer, customFieldMappings));
     }
 
     @Override

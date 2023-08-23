@@ -71,6 +71,7 @@ import org.graylog2.rest.resources.system.debug.DebugEventsResource;
 import org.graylog2.rest.resources.system.debug.DebugStreamsResource;
 import org.graylog2.rest.resources.system.debug.bundle.SupportBundleClusterResource;
 import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
+import org.graylog2.rest.resources.system.field_types.FieldTypeChangeResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsMappingResource;
@@ -106,9 +107,12 @@ import org.graylog2.telemetry.rest.TelemetryResource;
 
 public class RestResourcesModule extends Graylog2Module {
     private final Configuration configuration;
+    private final boolean fieldTypesChangeOn;
 
-    public RestResourcesModule(Configuration configuration) {
+    public RestResourcesModule(final Configuration configuration,
+                               final boolean fieldTypesChangeOn) {
         this.configuration = configuration;
+        this.fieldTypesChangeOn = fieldTypesChangeOn;
     }
 
     @Override
@@ -195,6 +199,9 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(IndexRangesResource.class);
         addSystemRestResource(RetentionStrategyResource.class);
         addSystemRestResource(RotationStrategyResource.class);
+        if (fieldTypesChangeOn) {
+            addSystemRestResource(FieldTypeChangeResource.class);
+        }
     }
 
     private void addLegacySearchResources() {

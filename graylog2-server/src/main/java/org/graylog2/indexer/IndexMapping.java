@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
@@ -34,7 +35,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     @Override
     public Template toTemplate(IndexSetConfig indexSetConfig, String indexPattern, Long order) {
-        return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
+        return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order, indexSetConfig.customFieldMappings());
     }
 
     protected Map<String, Object> analyzerKeyword() {
@@ -43,13 +44,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "filter", "lowercase"));
     }
 
-    public Template messageTemplate(final String indexPattern, final String analyzer, final Long order) {
+    public Template messageTemplate(final String indexPattern,
+                                               final String analyzer,
+                                               final Long order,
+                                               final CustomFieldMappings customFieldMappings) {
         var settings = new Template.Settings(Map.of(
                 "index", Map.of(
                         "analysis", Map.of("analyzer", analyzerKeyword())
-                )
+        )
         ));
-        var mappings = mapping(analyzer);
+        var mappings = mapping(analyzer, customFieldMappings);
 
         return createTemplate(indexPattern, order, settings, mappings);
     }
@@ -58,13 +62,15 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         return Template.create(indexPattern, mappings, order, settings);
     }
 
-    protected Template.Mappings mapping(String analyzer) {
-        return new Template.Mappings(ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer)));
+    protected Template.Mappings mapping(final String analyzer,
+                                          final CustomFieldMappings customFieldMappings) {
+        return new Template.Mappings(ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer, customFieldMappings)));
     }
 
-    protected Map<String, Object> messageMapping(final String analyzer) {
+    protected Map<String, Object> messageMapping(final String analyzer,
+                                                 final CustomFieldMappings customFieldMappings) {
         return ImmutableMap.of(
-                "properties", fieldProperties(analyzer),
+                "properties", fieldProperties(analyzer, customFieldMappings),
                 "dynamic_templates", dynamicTemplate(),
                 "_source", enabled());
     }
@@ -88,8 +94,9 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     abstract Map<String, Object> dynamicStrings();
 
-    protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
-        return ImmutableMap.<String, Map<String, Object>>builder()
+    protected Map<String, Map<String, Object>> fieldProperties(final String analyzer,
+                                                               final CustomFieldMappings customFieldMappings) {
+        final ImmutableMap.Builder<String, Map<String, Object>> builder = ImmutableMap.<String, Map<String, Object>>builder()
                 .put("message", analyzedString(analyzer, false))
                 .put("full_message", analyzedString(analyzer, false))
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
@@ -101,8 +108,14 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_GL2_MESSAGE_ID, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
                 .put("source", analyzedString("analyzer_keyword", true))
-                .put("streams", notAnalyzedString())
-                .build();
+                .put("streams", notAnalyzedString());
+
+        if (customFieldMappings != null) {
+            customFieldMappings.mappings()
+                    .forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.physicalType())));
+        }
+
+        return builder.build();
     }
 
     Map<String, Object> notAnalyzedString() {
@@ -123,6 +136,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     protected Map<String, Object> typeLong() {
         return ImmutableMap.of("type", "long");
+    }
+
+    protected Map<String, Object> type(final String type) {
+        return ImmutableMap.of("type", type);
     }
 
     private Map<String, Boolean> enabled() {
