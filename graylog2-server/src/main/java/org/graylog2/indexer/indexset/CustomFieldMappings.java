@@ -18,13 +18,18 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public record CustomFieldMappings(@JsonProperty("mappings") Set<CustomFieldMapping> mappings) {
+public class CustomFieldMappings extends HashSet<CustomFieldMappings.CustomFieldMapping> {
 
     public CustomFieldMappings() {
-        this(Set.of());
+        super();
+    }
+
+    public CustomFieldMappings(final Collection<CustomFieldMapping> mappings) {
+        super(mappings);
     }
 
     public record CustomFieldMapping(@JsonProperty("field_name") String fieldName,
@@ -36,7 +41,7 @@ public record CustomFieldMappings(@JsonProperty("mappings") Set<CustomFieldMappi
     }
 
     public CustomFieldMappings modifiedWith(final Set<CustomFieldMapping> changedMappings) {
-        final Set<CustomFieldMapping> modifiedMappings = new HashSet<>(mappings());
+        final Set<CustomFieldMapping> modifiedMappings = new HashSet<>(this);
         modifiedMappings.removeIf(m -> changedMappings.stream().anyMatch(cm -> cm.fieldName().equals(m.fieldName())));
         modifiedMappings.addAll(changedMappings);
         return new CustomFieldMappings(modifiedMappings);
