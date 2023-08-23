@@ -17,6 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
 
@@ -26,15 +27,61 @@ type Props = {
   layoutExtension?: {},
 };
 
+const fileSizeUnits = ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+
+const fileSize = (bytes) => {
+  const thresh = 1024;
+
+  if (Math.abs(bytes) < thresh) {
+    return { value: bytes, unit: 'B' };
+  }
+
+  let u = -1;
+  const r = 10 ** 1;
+
+  do {
+    bytes /= thresh;
+    ++u;
+  } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < fileSizeUnits.length - 1);
+
+  return { value: +bytes.toFixed(1), unit: fileSizeUnits[u] };
+};
+
+console.log(fileSize(808071624));
+
 const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
   if (!traffic) {
     return <Spinner />;
   }
 
+  const customData = [808071624, 4534, 912308071624, 543824, 54382654, 237446, 59834, 299485662378523, 234];
+
+  const formattedTrafficData = customData.map(((bytes) => fileSize(bytes)));
+
+  console.log('===formattedTrafficData', formattedTrafficData);
+
+  console.log('===formattedTrafficData 3', formattedTrafficData.map((data) => data.value));
+
+  // traffic data
+
+  const trafficUnits = formattedTrafficData.map(((data) => data.unit));
+
+  console.log('===trafficUnits', trafficUnits);
+
+  const sortedTrafficUnits = trafficUnits.sort((a, b) => fileSizeUnits.indexOf(a) - fileSizeUnits.indexOf(b));
+
+  console.log('===sortedTrafficUnits', sortedTrafficUnits);
+
+  const biggestUnit = sortedTrafficUnits[sortedTrafficUnits.length - 1];
+
+  console.log('===biggestUnit', biggestUnit);
+
+  console.log('====traffic numbers', Object.keys(traffic).length);
+
   const chartData = [{
     type: 'bar',
     x: Object.keys(traffic),
-    y: Object.values(traffic),
+    y: customData,
   }];
   const layout = {
     showlegend: false,
@@ -56,7 +103,7 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
         text: 'Bytes',
       },
       rangemode: 'tozero',
-      hoverformat: '.4s',
+      hoverformat: '2B',
       tickformat: 's',
     },
     ...layoutExtension,
