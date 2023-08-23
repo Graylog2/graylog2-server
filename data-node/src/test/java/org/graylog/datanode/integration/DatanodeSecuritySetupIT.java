@@ -58,13 +58,13 @@ import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_
 
 public class DatanodeSecuritySetupIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
-    public static final String OPENSEARCH_REST_USERNAME = "admin";
-    public static final String OPENSEARCH_REST_PASSWORD = "admin";
 
     @TempDir
     static Path tempDir;
     private DatanodeContainerizedBackend backend;
     private Path httpCert;
+    private String httpUsername;
+    private String httpPassword;
 
     @BeforeEach
     void setUp() {
@@ -77,6 +77,9 @@ public class DatanodeSecuritySetupIT {
         final Path nodeCert = generateNodeCert(ca);
         // use the CA to generate HTTP certificate keystore
         httpCert = generateHttpCert(ca, containerHostname, Tools.getLocalCanonicalHostname());
+
+        httpUsername = RandomStringUtils.randomAlphabetic(10);
+        httpPassword = RandomStringUtils.randomAlphabetic(10);
 
         backend = new DatanodeContainerizedBackend(datanodeContainer -> {
             // provide the keystore files to the docker container
@@ -93,8 +96,8 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", "password");
 
             // configure initial admin username and password for Opensearch REST
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", OPENSEARCH_REST_USERNAME);
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", OPENSEARCH_REST_PASSWORD);
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", httpUsername);
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", httpPassword);
 
             // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
             // to be able to reach opensearch from outside the container and docker network (true?)
@@ -116,7 +119,7 @@ public class DatanodeSecuritySetupIT {
 
         try {
             given()
-                .auth().basic(OPENSEARCH_REST_USERNAME, OPENSEARCH_REST_PASSWORD)
+                .auth().basic(httpUsername, httpPassword)
                 .trustStore(trustStore)
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
@@ -183,11 +186,12 @@ public class DatanodeSecuritySetupIT {
         return certPath;
     }
 
-    private Path generateNodeCert(Path caPath) {
+    private Path generateNodeCert(Path caPath, String... containerHostname) {
         final Path nodePath = tempDir.resolve("test-node.p12");
         TestableConsole inputCert = TestableConsole.empty().silent()
                 .register("Enter CA password", "password")
-                .register("Enter datanode certificate password", "password");
+                .register("Enter datanode certificate password", "password")
+                .register("Enter alternative names (addresses) of this node [comma separated]", String.join(",", containerHostname));
         CertutilCert certutilCert = new CertutilCert(
                 caPath.toAbsolutePath().toString(),
                 nodePath.toAbsolutePath().toString(),
