@@ -86,7 +86,6 @@ const parseXML = (text: string): Array<FeedITem> => {
   const parsed = parser.parse(text);
 
   const { rss: { channel: { item: items = undefined } } } = parsed as RssFeed;
-  console.log(items);
 
   return Array.isArray(items) ? items : [items];
 };

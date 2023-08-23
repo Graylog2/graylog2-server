@@ -57,7 +57,7 @@ const ContentStreamReleasesSection = () => {
           <Icon name="exclamation-triangle" /> Unable to load RSS feed at the moment ! You can read more
           on {' '}
           <ExternalLink href="https://www.graylog.org/post/tag/release-info">
-            Graylog
+            Graylog.org
           </ExternalLink>
           .
         </p>
