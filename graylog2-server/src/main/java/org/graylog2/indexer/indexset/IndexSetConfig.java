@@ -244,7 +244,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return create(id, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, null);
     }
 
     // Compatibility creator after field type refresh interval has been introduced
@@ -268,7 +268,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return create(null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, null);
     }
 
     @Override
