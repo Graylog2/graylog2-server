@@ -148,19 +148,20 @@ const useContentMock = {
     },
   ],
   isLoadingFeed: true,
+  error: null,
 };
 jest.mock('components/content-stream/hook/useContentStream', () => jest.fn(() => useContentMock));
 
 describe('<ContentStreamNews/>', () => {
   it('Show loading spinner', () => {
-    render(<ContentStreamNews rssUrl="http://example.org/rss" />);
+    render(<ContentStreamNews />);
 
     expect(screen.queryByText(useContentMock.feedList[0].title)).not.toBeInTheDocument();
   });
 
   it('Render ContentStream', async () => {
     asMock(useContentStream).mockReturnValue({ ...useContentMock, isLoadingFeed: false });
-    render(<ContentStreamNews rssUrl="http://example.org/rss" />);
+    render(<ContentStreamNews />);
 
     await screen.findByText(useContentMock.feedList[0].title);
   });

@@ -21,7 +21,7 @@ import DOMPurify from 'dompurify';
 
 import { Carousel, Timestamp } from 'components/common';
 import { Panel } from 'components/bootstrap';
-import type { FeedITem } from 'components/content-stream/hook/useContentStream';
+import type { FeedITem, FeedMediaContent } from 'components/content-stream/hook/useContentStream';
 
 type Props = {
   feed: FeedITem
@@ -54,11 +54,13 @@ const StyledPanel = styled(Panel)(({ theme }: { theme: DefaultTheme }) => css`
 `);
 const _sanitizeText = (text) => DOMPurify.sanitize(text);
 
+const getImage = (media: FeedMediaContent | Array<FeedMediaContent>) => (Array.isArray(media) ? media?.[0]?.attr_url : media?.attr_url);
+
 const ContentStreamNewsItem = ({ feed }: Props) => (
   <Carousel.Slide>
     <StyledPanel>
       <a href={feed?.link} target="_blank" rel="noreferrer">
-        <StyledImage src={feed?.['media:content']?.attr_url} alt={feed?.title} />
+        <StyledImage src={getImage(feed?.['media:content'])} alt={feed?.title} />
       </a>
 
       <StyledPanelBody>

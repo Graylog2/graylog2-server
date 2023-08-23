@@ -20,9 +20,11 @@ import styled, { css } from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 import DOMPurify from 'dompurify';
 
-import { ListGroup, ListGroupItem, Label } from 'components/bootstrap';
-import { RelativeTime, Spinner } from 'components/common';
+import { ListGroup, ListGroupItem, Label, Alert } from 'components/bootstrap';
+import { RelativeTime, Spinner, ExternalLink } from 'components/common';
 import useContentStream from 'components/content-stream/hook/useContentStream';
+
+import Icon from '../common/Icon';
 
 const StyledListGroupItem = styled(ListGroupItem)(({ theme }: { theme: DefaultTheme }) => css`
   display: flex;
@@ -41,11 +43,26 @@ export const StyledLabel = styled(Label)`
 const _sanitizeText = (text = '') => DOMPurify.sanitize(text);
 
 const ContentStreamReleasesSection = () => {
-  const path = 'category/release-notices';
-  const { feedList, isLoadingFeed } = useContentStream(path);
+  const path = 'release-info';
+  const { feedList, isLoadingFeed, error } = useContentStream(path);
 
   if (isLoadingFeed && !isEmpty(feedList)) {
     return <Spinner />;
+  }
+
+  if (error || isEmpty(feedList)) {
+    return (
+      <Alert bsStyle="info">
+        <p>
+          <Icon name="exclamation-triangle" /> Unable to load RSS feed at the moment ! You can read more
+          on {' '}
+          <ExternalLink href="https://www.graylog.org/post/tag/release-info">
+            Graylog
+          </ExternalLink>
+          .
+        </p>
+      </Alert>
+    );
   }
 
   return (
