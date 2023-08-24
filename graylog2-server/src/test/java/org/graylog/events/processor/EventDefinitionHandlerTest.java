@@ -54,7 +54,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -69,7 +68,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 
 public class EventDefinitionHandlerTest {
-    public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
+    public final Set<EntityScope> ENTITY_SCOPES = Set.of(new DefaultEntityScope(), new TestEntityScope());
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -162,6 +161,36 @@ public class EventDefinitionHandlerTest {
             assertThat(schedule.interval()).isEqualTo(60001);
             assertThat(schedule.unit()).isEqualTo(TimeUnit.MILLISECONDS);
         });
+    }
+
+    @Test
+    public void duplicate() {
+        final EventDefinitionDto newDto = EventDefinitionDto.builder()
+                .title("Test")
+                .description("A test event definition")
+                .config(TestEventProcessorConfig.builder()
+                        .message("This is a test event processor")
+                        .searchWithinMs(300000)
+                        .executeEveryMs(60001)
+                        .build())
+                .priority(3)
+                .state(EventDefinition.State.ENABLED)
+                .scope(TestEntityScope.NAME)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .keySpec(ImmutableList.of("a", "b"))
+                .notifications(ImmutableList.of())
+                .build();
+
+        final var existingEvent = eventDefinitionService.save(newDto);
+        final var duplicated = handler.duplicate(existingEvent, Optional.empty());
+        final var saved = eventDefinitionService.get(duplicated.id()).get();
+
+        assertThat(saved.title()).startsWith("COPY-");
+        assertThat(saved.scope()).isEqualTo(DefaultEntityScope.NAME);
+        assertThat(saved.state()).isEqualTo(EventDefinition.State.DISABLED);
+
+        assertThat(jobDefinitionService.getByConfigField("event_definition_id", saved.id())).isNotPresent();
     }
 
     @Test
@@ -499,5 +528,22 @@ public class EventDefinitionHandlerTest {
 
         assertThat(jobTriggerService.get("61fbcca5b2507945cc120001")).isNotPresent();
         assertThat(jobTriggerService.get("61fbcca5b2507945cc120002")).isPresent();
+    }
+
+    static class TestEntityScope extends EntityScope {
+        public static final String NAME = "TESTSCOPE";
+
+        @Override
+        public String getName() {
+            return NAME;
+        }
+        @Override
+        public boolean isMutable() {
+            return false;
+        }
+        @Override
+        public boolean isDeletable() {
+            return false;
+        }
     }
 }

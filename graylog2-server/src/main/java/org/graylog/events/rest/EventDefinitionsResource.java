@@ -47,7 +47,6 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -443,15 +442,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");
 
-        var copy = eventDefinitionDto.toBuilder()
-                .id(null)
-                .title("COPY-" + eventDefinitionDto.title())
-                .scope(DefaultEntityScope.NAME)
-                .state(EventDefinition.State.DISABLED)
-                .build();
-
-        final EventDefinitionDto saved = eventDefinitionHandler.createWithoutSchedule(copy, Optional.of(userContext.getUser()));
-
+        final EventDefinitionDto saved = eventDefinitionHandler.duplicate(eventDefinitionDto, Optional.of(userContext.getUser()));
         return Response.ok().entity(saved).build();
     }
 
