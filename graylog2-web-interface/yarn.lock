@@ -13042,9 +13042,9 @@ react-sortable-hoc@^1.7.1:
     prop-types "^15.5.7"
 
 react-sticky-el@^2.0.9:
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/react-sticky-el/-/react-sticky-el-2.0.9.tgz#8cfd17f073c8c116d7c15d2a23156b5e8e372bd9"
-  integrity sha512-JFjFWlaB7gn5bszZlRQ/VKxK3zHiViJdn0EhQ/6WImun5Xbx3OMUX2rirr0QLSEo27dwvoSE4HkIFr30QAScfg==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-sticky-el/-/react-sticky-el-2.1.0.tgz#d58da1a333a9cabc264c11912338d986bbe31715"
+  integrity sha512-oo+a2GedF4QMfCfm20e9gD+RuuQp/ngvwGMUXAXpST+h4WnmKhuv7x6MQ4X/e3AHiLYgE0zDyJo1Pzo8m51KpA==
 
 react-style-singleton@^2.2.1:
   version "2.2.1"
