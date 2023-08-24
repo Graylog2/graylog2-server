@@ -98,6 +98,7 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
 import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
+import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -290,6 +291,13 @@ const exports: PluginExports = {
       handler: CopyFieldToClipboard,
       isEnabled: () => true,
       resetFocus: false,
+    },
+    {
+      type: 'change-field-type',
+      title: 'Change field type',
+      isEnabled: () => true,
+      resetFocus: false,
+      component: ChangeFieldType,
     },
   ],
   valueActions: filterCloudValueActions([
