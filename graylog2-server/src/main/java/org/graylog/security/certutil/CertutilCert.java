@@ -18,6 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import org.apache.logging.log4j.util.Strings;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog2.bootstrap.CliCommand;
@@ -37,6 +38,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Arrays;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -95,6 +97,12 @@ public class CertutilCert implements CliCommand {
                     .withSubjectAlternativeName("127.0.0.1")
                     .withSubjectAlternativeName("ip6-localhost")
                     .validity(Duration.ofDays(10 * 365));
+
+            final String alternativeNames = console.readLine("Enter alternative names (addresses) of this node [comma separated]: ");
+            Arrays.stream(alternativeNames.split(","))
+                    .filter(Strings::isNotBlank)
+                    .forEach(req::withSubjectAlternativeName);
+
             KeyPair nodePair = CertificateGenerator.generate(req);
 
             KeyStore nodeKeystore = KeyStore.getInstance(PKCS12);

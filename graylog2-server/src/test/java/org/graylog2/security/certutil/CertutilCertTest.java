@@ -61,7 +61,8 @@ class CertutilCertTest {
 
         TestableConsole inputCert = TestableConsole.empty()
                 .register("Enter CA password", "password")
-                .register("Enter datanode certificate password", "changeme");
+                .register("Enter datanode certificate password", "changeme")
+                .register("Enter alternative names (addresses) of this node [comma separated]", "");
 
         CertutilCert certutilCert = new CertutilCert(
                 caPath.toAbsolutePath().toString(),
