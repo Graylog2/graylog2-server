@@ -1,5 +1,5 @@
 type = "add"
-message = "New API group to support Content Stream feature."
+message = "New Content Stream section to welcome page to show Rss feed and Release notice."
 
 issues = ["Graylog2/graylog-plugin-enterprise#5404"]
 pulls = ["15843"]
