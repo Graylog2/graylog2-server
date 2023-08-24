@@ -16,9 +16,11 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import type { SetStateAction } from 'react';
 import { useMemo, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
+import isFunction from 'lodash/isFunction';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -243,15 +245,22 @@ const EntityDataTable = <Entity extends EntityBase>({
     fixedActionsCellWidth,
   });
 
+  const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
+    const newState = isFunction(setSelectedEntitiesArgument) ? setSelectedEntitiesArgument(selectedEntities) : setSelectedEntitiesArgument;
+
+    setSelectedEntities(newState);
+    if (onChangeSelection) onChangeSelection(newState);
+  }, [onChangeSelection, selectedEntities]);
+
   const onToggleEntitySelect = useCallback((itemId: string) => {
-    setSelectedEntities(((cur) => {
+    _setSelectedEntities(((cur) => {
       if (cur.includes(itemId)) {
         return cur.filter((id) => id !== itemId);
       }
 
       return [...cur, itemId];
     }));
-  }, [setSelectedEntities]);
+  }, [_setSelectedEntities]);
 
   return (
     <ExpandedSectionsProvider>
@@ -260,7 +269,7 @@ const EntityDataTable = <Entity extends EntityBase>({
           {displayBulkAction && (
             <BulkActionsRow bulkActions={actions}
                             selectedEntities={selectedEntities}
-                            setSelectedEntities={setSelectedEntities} />
+                            setSelectedEntities={_setSelectedEntities} />
           )}
         </div>
         <LayoutConfigRow>
@@ -282,7 +291,7 @@ const EntityDataTable = <Entity extends EntityBase>({
                      actionsColWidth={actionsColWidth}
                      columnsWidths={columnsWidths}
                      selectedEntities={selectedEntities}
-                     setSelectedEntities={setSelectedEntities}
+                     setSelectedEntities={_setSelectedEntities}
                      data={data}
                      columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
