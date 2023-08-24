@@ -71,7 +71,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
             GenericContainer<?> container = buildContainer(image, network);
             container.start();
             //if (LOG.isDebugEnabled()) {
-                container.followOutput(new Slf4jLogConsumer(LOG));
+                container.followOutput(new Slf4jLogConsumer(LOG).withPrefix(image));
             //}
             containersByVersion.put(cacheKey, container);
         }
