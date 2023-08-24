@@ -24,24 +24,19 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.MongoIndexSet;
-import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -51,80 +46,40 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/system/indices/mappings")
 @Produces(MediaType.APPLICATION_JSON)
 public class FieldTypeMappingsResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(FieldTypeMappingsResource.class);
 
-    private final IndexSetService indexSetService;
-    private final MongoIndexSet.Factory mongoIndexSetFactory;
-    private final MongoIndexSetService mongoIndexSetService;
+    private final FieldTypeMappingsService fieldTypeMappingsService;
 
     @Inject
-    public FieldTypeMappingsResource(final IndexSetService indexSetService,
-                                     final MongoIndexSet.Factory mongoIndexSetFactory,
-                                     final MongoIndexSetService mongoIndexSetService) {
-        this.indexSetService = indexSetService;
-        this.mongoIndexSetFactory = mongoIndexSetFactory;
-        this.mongoIndexSetService = mongoIndexSetService;
+    public FieldTypeMappingsResource(final FieldTypeMappingsService fieldTypeMappingsService) {
+        this.fieldTypeMappingsService = fieldTypeMappingsService;
     }
 
     @PUT
-    @Path("{field_name}")
     @Timed
     @ApiOperation(value = "Change field type for certain index sets")
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized")
     })
     @NoAuditEvent("No audit for field type changes")
-    public Response changeFieldType(@ApiParam(name = "index_sets_ids", required = true)
-                                    @QueryParam("index_sets_ids") Set<String> indexSetsIds,
-                                    @ApiParam(name = "field_name", required = true)
-                                    @PathParam("field_name") String fieldName,
-                                    @ApiParam(name = "new_type", required = true)
-                                    @QueryParam("new_type") String newType,
-                                    @ApiParam(name = "rotate_immediately", defaultValue = "false")
-                                    @QueryParam("rotate_immediately") boolean rotateImmediately
+    public Response changeFieldType(@ApiParam(name = "request")
+                                    @Valid
+                                    @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request
     ) {
-        checkPermissions(indexSetsIds);
+        checkPermissions(request.indexSetsIds());
 
-        //TODO: validation of fields
-
-        CustomFieldMappings.CustomFieldMapping customMapping = new CustomFieldMappings.CustomFieldMapping(fieldName, newType);
-
-        for (String indexSetId : indexSetsIds) {
-            try {
-                final Optional<IndexSetConfig> indexSetConfigOpt = indexSetService.get(indexSetId);
-                if (indexSetConfigOpt.isPresent()) {
-                    final IndexSetConfig indexSetConfig = indexSetConfigOpt.get();
-                    final IndexSetConfig updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
-
-                    if (rotateImmediately) {
-                        cycleIndexSet(updatedIndexSetConfig);
-                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
-            }
+        //TODO: more complex validation of request
+        if (!FieldTypeMapper.TYPE_MAP.containsKey(request.newType())) {
+            throw new IllegalArgumentException("Invalid type provided : " + request.newType());
         }
+
+
+        CustomFieldMapping customMapping = new CustomFieldMapping(request.fieldName(), request.newType());
+        fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
     }
 
-    private IndexSetConfig storeMapping(final CustomFieldMappings.CustomFieldMapping customMapping,
-                                        final IndexSetConfig indexSetConfig) {
-        final IndexSetConfig.Builder builder = indexSetConfig.toBuilder();
-        final CustomFieldMappings previousCustomFieldMappings = indexSetConfig.customFieldMappings();
-        if (previousCustomFieldMappings == null) {
-            builder.customFieldMappings(new CustomFieldMappings(customMapping.toSet()));
-        } else {
-            builder.customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping.toSet()));
-        }
 
-        return mongoIndexSetService.save(builder.build());
-    }
-
-    private void cycleIndexSet(IndexSetConfig indexSetConfig) {
-        final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(indexSetConfig);
-        mongoIndexSet.cycle();
-    }
 
     private void checkPermissions(final Set<String> indexSetsIds) {
 //        TODO:

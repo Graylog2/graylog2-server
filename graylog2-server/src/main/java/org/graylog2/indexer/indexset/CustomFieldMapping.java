@@ -16,24 +16,9 @@
  */
 package org.graylog2.indexer.indexset;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
+public record CustomFieldMapping(@JsonProperty("field_name") String fieldName,
+                                 @JsonProperty("type") String physicalType) {
 
-    public CustomFieldMappings() {
-        super();
-    }
-
-    public CustomFieldMappings(final Collection<CustomFieldMapping> mappings) {
-        super(mappings);
-    }
-
-    public CustomFieldMappings mergeWith(final CustomFieldMapping changedMapping) {
-        final Set<CustomFieldMapping> modifiedMappings = new HashSet<>(this);
-        modifiedMappings.removeIf(m -> changedMapping.fieldName().equals(m.fieldName()));
-        modifiedMappings.add(changedMapping);
-        return new CustomFieldMappings(modifiedMappings);
-    }
 }
