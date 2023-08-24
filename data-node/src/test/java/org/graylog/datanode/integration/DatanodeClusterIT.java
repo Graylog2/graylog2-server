@@ -27,10 +27,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
-import org.graylog.security.certutil.CertutilCa;
-import org.graylog.security.certutil.CertutilCert;
-import org.graylog.security.certutil.CertutilHttp;
-import org.graylog.security.certutil.console.TestableConsole;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,18 +35,13 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -73,9 +64,9 @@ public class DatanodeClusterIT {
     void setUp() throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException {
 
         // first generate a self-signed CA
-        final KeystoreInformation ca = generateCa();
+        final KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
 
-        trustStore = buildTruststore(ca);
+        trustStore = DatanodeSecurityTestUtils.buildTruststore(ca);
 
         usernameNodeA = RandomStringUtils.randomAlphabetic(10);
         passwordNodeA = RandomStringUtils.randomAlphabetic(10);
@@ -84,12 +75,12 @@ public class DatanodeClusterIT {
         final String passwordNodeB = RandomStringUtils.randomAlphabetic(10);
 
         hostnameNodeA = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeA = generateNodeCert(ca, "nodeA");
-        final KeystoreInformation httpNodeA = generateHttpCert(ca, "nodeA");
+        final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeA");
+        final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeA");
 
         final String hostnameNodeB = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeB = generateNodeCert(ca, "nodeB");
-        final KeystoreInformation httpNodeB = generateHttpCert(ca, "nodeB");
+        final KeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeB");
+        final KeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeB");
 
         nodeA = new DatanodeContainerizedBackend(hostnameNodeA, datanodeContainer -> {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", hostnameNodeA);
@@ -158,27 +149,6 @@ public class DatanodeClusterIT {
         nodeB.start();
     }
 
-    private KeyStore buildTruststore(KeystoreInformation ca) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
-        try (FileInputStream fis = new FileInputStream(ca.location().toFile())) {
-
-            KeyStore keyStore = KeyStore.getInstance("PKCS12");
-            keyStore.load(fis, ca.password());
-
-            KeyStore trustStore = KeyStore.getInstance("PKCS12");
-            trustStore.load(null, null);
-
-            final Enumeration<String> aliases = keyStore.aliases();
-            while (aliases.hasMoreElements()) {
-                final String alias = aliases.nextElement();
-                final Certificate cert = keyStore.getCertificate(alias);
-                if (cert instanceof final X509Certificate x509Certificate) {
-                    trustStore.setCertificateEntry(alias, x509Certificate);
-                }
-            }
-            return keyStore;
-        }
-    }
-
     @AfterEach
     void tearDown() {
         nodeB.stop();
@@ -217,48 +187,5 @@ public class DatanodeClusterIT {
                 .auth().basic(usernameNodeA, passwordNodeA)
                 .get("https://localhost:" + mappedPort + "/_cluster/health")
                 .then();
-    }
-
-
-    private KeystoreInformation generateCa() {
-        final Path certPath = tempDir.resolve("test-ca.p12");
-        final String password = RandomStringUtils.randomAlphabetic(10);
-        final TestableConsole input = TestableConsole.empty().silent()
-                .register("Enter CA password", password);
-        final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
-        command.run();
-        return new KeystoreInformation(certPath, password);
-    }
-
-    private KeystoreInformation generateNodeCert(KeystoreInformation ca, String containerHostname) {
-        final Path nodePath = tempDir.resolve("transport-" + containerHostname + ".p12");
-        final String password = RandomStringUtils.randomAlphabetic(10);
-        TestableConsole inputCert = TestableConsole.empty().silent()
-                .register("Enter CA password", ca.passwordAsString())
-                .register("Enter datanode certificate password", password)
-                .register("Enter alternative names (addresses) of this node [comma separated]", containerHostname);
-        CertutilCert certutilCert = new CertutilCert(
-                ca.location().toAbsolutePath().toString(),
-                nodePath.toAbsolutePath().toString(),
-                inputCert);
-        certutilCert.run();
-        return new KeystoreInformation(nodePath, password);
-    }
-
-    private KeystoreInformation generateHttpCert(KeystoreInformation ca, String containerHostname) {
-        final Path httpPath = tempDir.resolve("http-" + containerHostname + ".p12");
-        final String password = RandomStringUtils.randomAlphabetic(10);
-        TestableConsole inputHttp = TestableConsole.empty().silent()
-                .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
-                .register("Enter CA password", ca.passwordAsString())
-                .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", containerHostname)
-                .register("Enter HTTP certificate password", password);
-        CertutilHttp certutilCert = new CertutilHttp(
-                ca.location().toAbsolutePath().toString(),
-                httpPath.toAbsolutePath().toString(),
-                inputHttp);
-        certutilCert.run();
-        return new KeystoreInformation(httpPath, password);
     }
 }
