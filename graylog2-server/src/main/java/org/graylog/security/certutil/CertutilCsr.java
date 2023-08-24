@@ -45,6 +45,8 @@ public class CertutilCsr implements CliCommand {
     private final CsrStorage csrStorage;
     private final CsrGenerator csrGenerator;
 
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_PASSWORD_TO_PROTECT_YOUR_PRIVATE_KEY = CommandLineConsole.prompt("Enter password to protect your private key : ");
+
     public CertutilCsr() {
         this.console = new SystemConsole();
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(privateKeyFilename);
@@ -66,7 +68,7 @@ public class CertutilCsr implements CliCommand {
     @Override
     public void run() {
         console.printLine("This tool will generate a CSR for the datanode");
-        char[] privKeyPassword = this.console.readPassword("Enter password to protect your private key : ");
+        char[] privKeyPassword = this.console.readPassword(PROMPT_ENTER_PASSWORD_TO_PROTECT_YOUR_PRIVATE_KEY);
 
         try {
             console.printLine("Generating CSR for the datanode");

@@ -38,6 +38,7 @@ public class CertutilCa implements CliCommand {
     private final CommandLineConsole console;
     private final CACreator caCreator;
     private final KeystoreFileStorage caKeystoreStorage;
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CA_PASSWORD = CommandLineConsole.prompt("Enter CA password: ");
 
     public CertutilCa() {
         this.console = new SystemConsole();
@@ -57,7 +58,7 @@ public class CertutilCa implements CliCommand {
         try {
 
             console.printLine("This tool will generate a self-signed certificate authority for datanode");
-            char[] password = this.console.readPassword("Enter CA password: ");
+            char[] password = this.console.readPassword(PROMPT_ENTER_CA_PASSWORD);
             console.printLine("Generating datanode CA");
 
             final Duration certificateValidity = Duration.ofDays(10 * 365);

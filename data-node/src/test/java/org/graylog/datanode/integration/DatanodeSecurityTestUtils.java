@@ -58,7 +58,7 @@ public class DatanodeSecurityTestUtils {
         final Path certPath = dir.resolve("test-ca.p12");
         final String password = RandomStringUtils.randomAlphabetic(10);
         final TestableConsole input = TestableConsole.empty().silent()
-                .register("Enter CA password", password);
+                .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, password);
         final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
         command.run();
         return new KeystoreInformation(certPath, password);
@@ -68,9 +68,9 @@ public class DatanodeSecurityTestUtils {
         final Path transportPath = dir.resolve("transport-" + RandomStringUtils.randomAlphabetic(10) + ".p12");
         final String password = RandomStringUtils.randomAlphabetic(10);
         TestableConsole inputCert = TestableConsole.empty().silent()
-                .register("Enter CA password", ca.passwordAsString())
-                .register("Enter datanode certificate password", password)
-                .register("Enter alternative names (addresses) of this node [comma separated]", String.join(",", containerHostnames));
+                .register(CertutilCert.PROMPT_ENTER_CA_PASSWORD, ca.passwordAsString())
+                .register(CertutilCert.PROMPT_ENTER_CERTIFICATE_PASSWORD, password)
+                .register(CertutilCert.PROMPT_ENTER_CERT_ALTERNATIVE_NAMES, String.join(",", containerHostnames));
         CertutilCert certutilCert = new CertutilCert(
                 ca.location().toAbsolutePath().toString(),
                 transportPath.toAbsolutePath().toString(),
@@ -83,11 +83,11 @@ public class DatanodeSecurityTestUtils {
         final Path httpPath = dir.resolve("http-" + RandomStringUtils.randomAlphabetic(10) + ".p12");
         final String password = RandomStringUtils.randomAlphabetic(10);
         TestableConsole inputHttp = TestableConsole.empty().silent()
-                .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
-                .register("Enter CA password", ca.passwordAsString())
-                .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", String.join(",", containerHostnames))
-                .register("Enter HTTP certificate password", password);
+                .register(CertutilHttp.PROMPT_USE_OWN_CERTIFICATE_AUTHORITY, "n")
+                .register(CertutilHttp.PROMPT_ENTER_CA_PASSWORD, ca.passwordAsString())
+                .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_VALIDITY_IN_DAYS, "90")
+                .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_ALTERNATIVE_NAMES, String.join(",", containerHostnames))
+                .register(CertutilHttp.PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD, password);
         CertutilHttp certutilCert = new CertutilHttp(
                 ca.location().toAbsolutePath().toString(),
                 httpPath.toAbsolutePath().toString(),
