@@ -22,7 +22,6 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +44,9 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     }
 
     public Template messageTemplate(final String indexPattern, final String analyzer, final Long order) {
-        var settings = new Template.Settings(Collections.singletonMap(
-                "index", Collections.singletonMap(
-                        "analysis", Collections.singletonMap("analyzer", analyzerKeyword())
+        var settings = new Template.Settings(Map.of(
+                "index", Map.of(
+                        "analysis", Map.of("analyzer", analyzerKeyword())
                 )
         ));
         var mappings = mapping(analyzer);
