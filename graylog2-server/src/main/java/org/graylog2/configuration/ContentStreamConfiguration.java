@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class ContentStreamConfiguration {
     @Parameter(value = "content_stream_rss_url")
-    private URI contentStreamRssUri = URI.create("https://www.graylog.org/post");
+    private URI contentStreamRssUri = URI.create("https://graylog.org/post/tag");
 
     @Parameter(value = "content_stream_refresh_interval",
                converter = JavaDurationConverter.class)
