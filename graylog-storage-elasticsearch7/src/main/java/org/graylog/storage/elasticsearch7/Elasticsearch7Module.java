@@ -57,9 +57,9 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
         if (useComposableIndexTemplates) {
-            bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {
-            bindForSupportedVersion(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
 
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES7.class);
