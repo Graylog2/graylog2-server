@@ -40,7 +40,7 @@ public class CustomFieldMappings extends HashSet<CustomFieldMappings.CustomField
         }
     }
 
-    public CustomFieldMappings modifiedWith(final Set<CustomFieldMapping> changedMappings) {
+    public CustomFieldMappings mergeWith(final Set<CustomFieldMapping> changedMappings) {
         final Set<CustomFieldMapping> modifiedMappings = new HashSet<>(this);
         modifiedMappings.removeIf(m -> changedMappings.stream().anyMatch(cm -> cm.fieldName().equals(m.fieldName())));
         modifiedMappings.addAll(changedMappings);

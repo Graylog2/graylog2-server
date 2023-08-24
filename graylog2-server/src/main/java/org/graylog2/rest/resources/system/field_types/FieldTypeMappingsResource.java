@@ -48,19 +48,19 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 
 @RequiresAuthentication
 @Api(value = "System/FieldTypes", tags = {CLOUD_VISIBLE})
-@Path("/system/indices/field_types_change")
+@Path("/system/indices/mappings")
 @Produces(MediaType.APPLICATION_JSON)
-public class FieldTypeChangeResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(FieldTypeChangeResource.class);
+public class FieldTypeMappingsResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(FieldTypeMappingsResource.class);
 
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final MongoIndexSetService mongoIndexSetService;
 
     @Inject
-    public FieldTypeChangeResource(final IndexSetService indexSetService,
-                                   final MongoIndexSet.Factory mongoIndexSetFactory,
-                                   final MongoIndexSetService mongoIndexSetService) {
+    public FieldTypeMappingsResource(final IndexSetService indexSetService,
+                                     final MongoIndexSet.Factory mongoIndexSetFactory,
+                                     final MongoIndexSetService mongoIndexSetService) {
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.mongoIndexSetService = mongoIndexSetService;
@@ -115,7 +115,7 @@ public class FieldTypeChangeResource extends RestResource {
         if (previousCustomFieldMappings == null) {
             builder.customFieldMappings(new CustomFieldMappings(customMapping.toSet()));
         } else {
-            builder.customFieldMappings(previousCustomFieldMappings.modifiedWith(customMapping.toSet()));
+            builder.customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping.toSet()));
         }
 
         return mongoIndexSetService.save(builder.build());

@@ -71,7 +71,7 @@ import org.graylog2.rest.resources.system.debug.DebugEventsResource;
 import org.graylog2.rest.resources.system.debug.DebugStreamsResource;
 import org.graylog2.rest.resources.system.debug.bundle.SupportBundleClusterResource;
 import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
-import org.graylog2.rest.resources.system.field_types.FieldTypeChangeResource;
+import org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsMappingResource;
@@ -200,7 +200,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(RetentionStrategyResource.class);
         addSystemRestResource(RotationStrategyResource.class);
         if (fieldTypesChangeOn) {
-            addSystemRestResource(FieldTypeChangeResource.class);
+            addSystemRestResource(FieldTypeMappingsResource.class);
         }
     }
 

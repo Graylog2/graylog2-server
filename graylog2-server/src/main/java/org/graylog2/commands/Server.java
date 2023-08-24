@@ -179,7 +179,7 @@ public class Server extends ServerBootstrap {
                 new RetentionStrategyBindings(elasticsearchConfiguration),
                 new PeriodicalBindings(),
                 new ObjectMapperModule(chainingClassLoader),
-                new RestApiBindings(configuration, featureFlags.isOn("field_types_change")),
+                new RestApiBindings(configuration, featureFlags.isOn("field_types_management")),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
                 new AuditBindings(),
