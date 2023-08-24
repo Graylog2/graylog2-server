@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -32,6 +33,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -68,12 +70,13 @@ public class FieldTypeMappingsResource extends RestResource {
         checkPermissions(request.indexSetsIds());
 
         //TODO: more complex validation of request
-        if (!FieldTypeMapper.TYPE_MAP.containsKey(request.newType())) {
-            throw new IllegalArgumentException("Invalid type provided : " + request.newType());
+        final FieldTypes.Type type = FieldTypeMapper.TYPE_MAP.get(request.newType());
+        if (type == null) {
+            throw new BadRequestException("Invalid type provided : " + request.newType());
         }
 
 
-        CustomFieldMapping customMapping = new CustomFieldMapping(request.fieldName(), request.newType());
+        CustomFieldMapping customMapping = new CustomFieldMapping(request.fieldName(), type);
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
