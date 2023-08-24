@@ -26,16 +26,14 @@ import org.graylog.security.certutil.console.TestableConsole;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 public class DatanodeSecurityTestUtils {
-    public static KeyStore buildTruststore(KeystoreInformation ca) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
+    public static KeyStore buildTruststore(KeystoreInformation ca) throws IOException, GeneralSecurityException {
         try (FileInputStream fis = new FileInputStream(ca.location().toFile())) {
 
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");

@@ -39,10 +39,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -62,7 +60,7 @@ public class DatanodeSecuritySetupIT {
     private String containerHostname;
 
     @BeforeEach
-    void setUp() throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException {
+    void setUp() throws IOException, GeneralSecurityException {
 
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA

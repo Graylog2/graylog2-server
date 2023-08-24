@@ -38,10 +38,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +59,7 @@ public class DatanodeClusterIT {
     private String passwordNodeA;
 
     @BeforeEach
-    void setUp() throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException {
+    void setUp() throws GeneralSecurityException, IOException {
 
         // first generate a self-signed CA
         final KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
