@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
@@ -39,24 +38,16 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Requests;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.ComposableIndexTemplateExistRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteComposableIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutComposableIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.compress.CompressedXContent;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
@@ -90,7 +81,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -113,19 +103,20 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private final StatsApi statsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
-    private final ObjectMapper objectMapper;
+    private final IndexTemplateAdapter indexTemplateAdapter;
 
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
                              StatsApi statsApi,
                              CatApi catApi,
                              ClusterStateApi clusterStateApi,
-                             ObjectMapper objectMapper) {
+                             ObjectMapper objectMapper,
+                             IndexTemplateAdapter indexTemplateAdapter) {
         this.client = client;
         this.statsApi = statsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
-        this.objectMapper = objectMapper;
+        this.indexTemplateAdapter = indexTemplateAdapter;
     }
 
     @Override
@@ -216,40 +207,17 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public boolean ensureIndexTemplate(String templateName, Template template) {
-        var serializedMapping = serialize(template.mappings());
-        var settings = Settings.builder().loadFromSource(serializeJson(template.settings()), XContentType.JSON).build();
-        var esTemplate = new org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), esTemplate, null, template.order(), null, null);
-        var request = new PutComposableIndexTemplateRequest()
-                .name(templateName)
-                .indexTemplate(indexTemplate);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
-                "Unable to create index template " + templateName);
-
-        return result.isAcknowledged();
-    }
-
-    private String serializeJson(Object obj) {
-        try {
-            return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private CompressedXContent serialize(Object obj) {
-        try {
-            return new CompressedXContent(serializeJson(obj));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return indexTemplateAdapter.ensureIndexTemplate(templateName, template);
     }
 
     @Override
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsIndexTemplate(new ComposableIndexTemplateExistRequest(templateName),
-                requestOptions), "Unable to verify index template existence " + templateName);
+        return indexTemplateAdapter.indexTemplateExists(templateName);
+    }
+
+    @Override
+    public boolean deleteIndexTemplate(String templateName) {
+        return indexTemplateAdapter.deleteIndexTemplate(templateName);
     }
 
     @Override
@@ -371,15 +339,6 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                         Map.Entry::getKey,
                         entry -> entry.getValue().stream().map(AliasMetadata::alias).collect(Collectors.toSet())
                 ));
-    }
-
-    @Override
-    public boolean deleteIndexTemplate(String templateName) {
-        var request = new DeleteComposableIndexTemplateRequest(templateName);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteIndexTemplate(request, requestOptions),
-                "Unable to delete index template " + templateName);
-        return result.isAcknowledged();
     }
 
     @Override
