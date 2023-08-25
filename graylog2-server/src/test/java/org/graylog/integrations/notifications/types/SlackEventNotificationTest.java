@@ -49,6 +49,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +160,7 @@ public class SlackEventNotificationTest {
         assertThat(message).isNotEmpty();
         assertThat(message).isNotNull();
         assertThat(message).contains("@channel");
-        assertThat(message.getBytes().length).isEqualTo(95);
+        assertThat(message.getBytes(StandardCharsets.UTF_8).length).isEqualTo(95);
     }
 
     @Test

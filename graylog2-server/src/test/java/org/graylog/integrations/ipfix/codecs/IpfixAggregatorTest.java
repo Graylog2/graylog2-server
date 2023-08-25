@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -99,7 +100,7 @@ public class IpfixAggregatorTest {
     }
 
     @Test
-    public void dataAndDataTemplate() throws IOException {
+    public void dataAndDataTemplate() throws IOException, URISyntaxException {
 
         final IpfixAggregator ipfixAggregator = new IpfixAggregator();
         final Map<String, Object> configMap = getIxiaConfigmap();
@@ -138,7 +139,7 @@ public class IpfixAggregatorTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void ixFlowTest() throws IOException {
+    public void ixFlowTest() throws IOException, URISyntaxException {
         final IpfixAggregator ipfixAggregator = new IpfixAggregator();
         final Map<String, Object> configMap = getIxiaConfigmap();
         final IpfixCodec codec = new IpfixCodec(new Configuration(configMap), ipfixAggregator);
@@ -186,8 +187,8 @@ public class IpfixAggregatorTest {
 
     }
 
-    private Map<String, Object> getIxiaConfigmap() {
-        final File filePath = new File(Resources.getResource("ixia-ied.json").getFile());
+    private Map<String, Object> getIxiaConfigmap() throws URISyntaxException {
+        final File filePath = new File(Resources.getResource("ixia-ied.json").toURI());
         final Map<String, Object> configMap = Maps.newHashMap();
         configMap.put(IpfixCodec.CK_IPFIX_DEFINITION_PATH, Collections.singletonList(filePath.getAbsolutePath()));
         return configMap;

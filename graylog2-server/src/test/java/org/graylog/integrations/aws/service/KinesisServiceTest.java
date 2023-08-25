@@ -60,6 +60,7 @@ import software.amazon.awssdk.services.kinesis.model.StreamDescription;
 import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +163,7 @@ public class KinesisServiceTest {
         // Use a specific log arrival time to ensure correct timezone is set on resulting message.
         // 2000-01-01T01:01:01Z
         Instant logArrivalTime = Instant.ofEpochMilli(new DateTime(2000, 1, 1, 1, 1, 1, DateTimeZone.UTC).getMillis());
-        KinesisHealthCheckResponse response = executeHealthCheckTest("This is a test raw log".getBytes(), logArrivalTime);
+        KinesisHealthCheckResponse response = executeHealthCheckTest("This is a test raw log".getBytes(StandardCharsets.UTF_8), logArrivalTime);
         assertEquals(AWSMessageType.KINESIS_RAW, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(new DateTime("2000-01-01T01:01:01.000Z", DateTimeZone.UTC), fields.get("timestamp"));

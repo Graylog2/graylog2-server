@@ -43,6 +43,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -72,7 +73,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyConfigurationMessageParsing() {
         String log = "1,2020/05/26 04:11:09,007000000018919,CONFIG,0,0,2020/05/26 04:11:09,86.181.133.251,,multi-clone,aduncan@paloaltonetworks.com,Web,Succeeded,vsys  vsys1 profiles virus,,default-1  { decoder { http  { action default; wildfire-action default; } http2  { action default; wildfire-action default; } smtp  { action default; wildfire-action default; } imap  { action default; wildfire-action default; } pop3  { action default; wildfire-action default; } ftp  { action default; wildfire-action default; } smb  { action default; wildfire-action default; } } } ,5481,0x8000000000000000,0,0,0,0,,uk1,0,";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -108,7 +109,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyCorrelationMessageParsing() {
         String log = "1,2020/05/31 17:19:44,0007SE00209,CORRELATION,,,2020/05/31 17:19:44,10.154.8.125,pancademo\\david.mccoy,,compromised-host,medium,31,40,0,0,,uk1rama,,beacon-heuristics,6005,\"Host has made use of Internet Relay Chat (IRC), a protocol popular with command-and-control activity.\"";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -143,7 +144,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyGlobalProtectMessageParsing() {
         String log = "1,2020/04/01 10:49:35,015351000040055,11,0x0,GLOBALPROTECT,0,2305,2020/04/01 10:49:35,vsys1,portal-prelogin,before-login,,,,192.168.0.0-192.168.255.255,,192.168.45.33,0.0.0.0,0.0.0.0,0.0.0.0,2c2ec970-de09-444c-b84f-2c0be75e13cd,,Browser,Windows,\"Microsoft Windows 7  Service Pack 1, 64-bit\",1,,,\"\",success,,0,,0,gp-portal";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -190,7 +191,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyGlobalProtect913MessageParsing() {
         String log = "1,2020/04/01 10:49:35,015351000040055,GLOBALPROTECT,0,2305,2020/04/01 10:49:35,vsys1,portal-prelogin,before-login,,,,192.168.0.0-192.168.255.255,,192.168.45.33,0.0.0.0,0.0.0.0,0.0.0.0,2c2ec970-de09-444c-b84f-2c0be75e13cd,,Browser,Windows,\"Microsoft Windows 7  Service Pack 1, 64-bit\",1,,,\"\",success,,0,,0,gp-portal,11,0x0";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -243,7 +244,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyHipMatchMessageParsing() {
         String log = "0,2020/03/18 04:03:19,,HIPMATCH,0,0,2020/03/18 04:02:55,user1@prismaissase.com,vsys1,DFWMACW12KG8WL,Mac,172.1.19.3,test-Object,1,object,0,0,28,0x8600000000000000,15,18,0,0,,GP cloud service,1,0.0.0.0,4c:32:75:9a:5f:ed,hostId,MAC Address,YYYY-MM-DDThh:ss:sssTZD";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -285,7 +286,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifySystemMessageParsing() {
         String log = "1,2020/03/19 10:12:57,007000016479,SYSTEM,general,0,2020/03/19 10:12:57,,general,,0,0,general,informational,\"Failed to connect to address: (null) port: 3978, conn id: triallr-(null)-2-192.168.1.232\",21682381,0x8000000000000000,0,0,0,0,,sg2,YYYY-MM-DDThh:ss:sssTZD";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -320,7 +321,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyThreatMessageParsing() {
         String log = "1,2020/05/19 07:37:27,007200002536,THREAT,spyware,2305,2020/05/19 07:37:27,10.154.229.167,190.253.254.254,,,General Business Apps,pancademo\\andy.miller,,unknown-udp,vsys1,L3-TAP,L3-TAP,ethernet1/2,ethernet1/2,,2020/05/19 07:37:27,70860,1,1111,16471,0,0,0x80002000,udp,drop,\"\",ZeroAccess.Gen Command and Control Traffic(13235),any,critical,client-to-server,6241468001,0x2000000000000000,10.0.0.0-10.255.255.255,Colombia,0,,1206236073597030482,,,0,,,,,,,,0,31,12,0,0,,us1,,,,,0,,0,,N/A,botnet,AppThreat-8270-6076,0x0,0,4294967295,,,f0724261-cf8b-479b-8208-fd3c7ac3af0b,0,";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -472,7 +473,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyThreatMessageParsing_withRepeatedSameXFF() {
         String log = "1,2020/05/19 07:37:27,007200002536,THREAT,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FOO,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FOO,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -488,7 +489,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyThreatMessageParsing_withDifferentXFF() {
         String log = "1,2020/05/19 07:37:27,007200002536,THREAT,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FOO,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,BAR,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -507,7 +508,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyTrafficMessageParsing() {
         String log = "1,2020/05/19 07:34:54,007200002536,TRAFFIC,end,2305,2020/05/19 07:34:54,10.154.172.134,151.151.88.132,,,IT Sanctioned SaaS Apps-443,pancademo\\steven.reid,,ssl,vsys1,L3-TAP,L3-TAP,ethernet1/2,ethernet1/2,,2020/05/19 07:34:54,33903,1,57090,443,0,0,0x6c,tcp,allow,6802,3876,2926,26,2020/05/19 07:32:48,97,financial-services,0,18621234943,0x0,10.0.0.0-10.255.255.255,United States,0,17,9,tcp-rst-from-server,31,12,0,0,,us1,from-policy,,,0,,0,,N/A,0,0,0,0,30468339-a760-46b2-b80b-ee873e6d11e4,0,0,,,,,,,";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 
@@ -647,7 +648,7 @@ public class PaloAlto9xTemplatesTest {
     public void verifyUserIdMessageParsing() {
         String log = "1,2021/01/20 08:55:02,012801190281,USERID,login,2304,2021/01/20 08:55:02,vsys1,172.16.100.1,graylog-user1,,0,1,2592000,0,0,vpn-client,globalprotect,1,0x0,0,0,0,0,,PA-220,1,,2021/01/20 08:55:02,1,0x0,graylog-user1";
         String rawMessage = SYSLOG_PREFIX + log;
-        RawMessage in = new RawMessage(rawMessage.getBytes());
+        RawMessage in = new RawMessage(rawMessage.getBytes(StandardCharsets.UTF_8));
 
         Message out = cut.decode(in);
 

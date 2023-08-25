@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -163,7 +164,7 @@ public class GreyNoiseCommunityIpLookupAdapterTest extends TestWithResources {
         Assert.assertNotNull("Invalid result values map (NULL)", map);
 
         for (Object key : expectedKeys) {
-            String error = String.format("Key [%s] not found in values map", key);
+            String error = String.format(Locale.ROOT, "Key [%s] not found in values map", key);
             Assert.assertTrue(error, map.containsKey(key));
         }
     }

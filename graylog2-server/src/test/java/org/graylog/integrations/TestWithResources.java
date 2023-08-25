@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 /**
  * A base class to provide helper methods needed by tests that need to access resources (i.e. files).
@@ -58,7 +59,7 @@ public abstract class TestWithResources {
             }
         } catch (IOException e) {
 
-            String error = String.format("Unable to read resource file '%s'. %s", name, e.getMessage());
+            String error = String.format(Locale.ROOT, "Unable to read resource file '%s'. %s", name, e.getMessage());
             throw new IllegalArgumentException(error, e);
         }
 
@@ -76,14 +77,14 @@ public abstract class TestWithResources {
             URL resource = getClass().getResource(name);
             if (resource == null) {
                 URL path = getClass().getResource("");
-                String error = String.format("Error.  Resource '%s' does not exist at '%s'", name, path);
+                String error = String.format(Locale.ROOT, "Error.  Resource '%s' does not exist at '%s'", name, path);
                 throw new IllegalArgumentException(error);
             }
 
             return Paths.get(resource.toURI());
 
         } catch (URISyntaxException e) {
-            String error = String.format("Error getting resource '%s'. %s", name, e.getMessage());
+            String error = String.format(Locale.ROOT, "Error getting resource '%s'. %s", name, e.getMessage());
             throw new IllegalArgumentException(error, e);
         }
     }

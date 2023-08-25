@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 
@@ -94,7 +95,7 @@ public class KinesisPayloadDecoderTest {
         final String textLogMessage = "a text log message";
         final Instant now = Instant.now();
         final List<KinesisLogEntry> logEntries =
-                rawDecoder.processMessages(textLogMessage.getBytes(), now);
+                rawDecoder.processMessages(textLogMessage.getBytes(StandardCharsets.UTF_8), now);
 
         Assert.assertEquals(1, logEntries.size());
         // Verify that there are two flow logs present in the parsed result.

@@ -27,6 +27,7 @@ import org.joda.time.DateTimeZone;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
@@ -148,9 +149,9 @@ public class AWSTestingUtils {
     }
 
     private static byte[] compressPayload(String messageData) throws IOException {
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream(messageData.getBytes().length);
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream(messageData.getBytes(StandardCharsets.UTF_8).length);
         final GZIPOutputStream gzip = new GZIPOutputStream(bos);
-        gzip.write(messageData.getBytes());
+        gzip.write(messageData.getBytes(StandardCharsets.UTF_8));
         gzip.close();
         final byte[] compressed = bos.toByteArray();
         bos.close();

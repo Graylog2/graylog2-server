@@ -33,6 +33,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -47,7 +49,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class PaloAlto9xCodecTest {
     private static final String TEST_SOURCE = "Test Source";
-    private static final DateTime TEST_DATE_TIME = DateTime.now();
+    private static final DateTime TEST_DATE_TIME = DateTime.now(DateTimeZone.UTC);
     private static final String TEST_RAW_MESSAGE = "Foo,Bar,Baz,This,That,GLOBALPROTECT";
     private static final ImmutableList<String> TEST_FIELD_LIST = ImmutableList.of("Foo", "Bar", "Baz", "Three", "Four", "GLOBALPROTECT");
     private static final ImmutableMap<String,Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
@@ -209,7 +211,7 @@ public class PaloAlto9xCodecTest {
 
     // GIVENs
     private void givenGoodInputRawMessage() {
-        in = new RawMessage(TEST_RAW_MESSAGE.getBytes());
+        in = new RawMessage(TEST_RAW_MESSAGE.getBytes(StandardCharsets.UTF_8));
     }
 
     private void givenRawParserReturnsNull() {
