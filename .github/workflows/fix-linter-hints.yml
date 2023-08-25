@@ -51,24 +51,7 @@ jobs:
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: |
-          PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
-          PROBLEM_COUNT_STYLELINT=`jq '. | map(.warnings | length)|add' /tmp/report-stylelint.json`
-          CURRENT_REF=`git rev-parse HEAD`
-          TIMESTAMP=`git show --format=%at $CURRENT_REF|head -1`
-          PAYLOAD=$(cat <<- EOF
-            {
-              "version": "1.1",
-              "host": "developermetrics",
-              "job": "fix-linter-hints",
-              "short_message": "Found ${PROBLEM_COUNT} ESLint and ${PROBLEM_COUNT_STYLELINT} Stylelint problems in commit ${CURRENT_REF}",
-              "_problems": ${PROBLEM_COUNT},
-              "_problems_stylelint": ${PROBLEM_COUNT_STYLELINT},
-              "_current_ref": "${CURRENT_REF}",
-              "timestamp": ${TIMESTAMP}
-             }
-          EOF
-          )
-          curl -X POST -H 'Content-Type: application/json' -d "$PAYLOAD" ${{ secrets.DEV_METRICS_URL }}
+          /bin/sh ../.github/scripts/web-code-quality.sh | curl -X POST -H 'Content-Type: application/json' -d @- ${{ secrets.DEV_METRICS_URL }}
       - name: Create/Update Pull Request
         uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
         with:

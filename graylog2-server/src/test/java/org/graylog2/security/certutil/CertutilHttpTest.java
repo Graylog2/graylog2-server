@@ -56,18 +56,18 @@ class CertutilHttpTest {
         final Path nodePath = tempDir.resolve("test-node.p12");
 
         final TestableConsole inputCa = TestableConsole.empty()
-                .register("Enter CA password", "password");
+                .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, "password");
         final CertutilCa certutilCa = new CertutilCa(caPath.toAbsolutePath().toString(), inputCa);
         certutilCa.run();
 
         // now we have a ROOT + CA keypair in the keystore, let's use it to generate node keypair
 
         TestableConsole inputHttp = TestableConsole.empty()
-                .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
-                .register("Enter CA password", "password")
-                .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", "example.com")
-                .register("Enter HTTP certificate password", "changeme");
+                .register(CertutilHttp.PROMPT_USE_OWN_CERTIFICATE_AUTHORITY, "n")
+                .register(CertutilHttp.PROMPT_ENTER_CA_PASSWORD, "password")
+                .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_VALIDITY_IN_DAYS, "90")
+                .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_ALTERNATIVE_NAMES, "example.com")
+                .register(CertutilHttp.PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD, "changeme");
 
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),

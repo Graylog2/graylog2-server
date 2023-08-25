@@ -18,6 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import org.apache.logging.log4j.util.Strings;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog2.bootstrap.CliCommand;
@@ -37,6 +38,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Arrays;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -53,6 +55,10 @@ public class CertutilCert implements CliCommand {
     protected String nodeKeystoreFilename = "datanode-transport-certificates.p12";
 
     private final CommandLineConsole console;
+
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CA_PASSWORD = CommandLineConsole.prompt("Enter CA password: ");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CERT_ALTERNATIVE_NAMES = CommandLineConsole.prompt("Enter alternative names (addresses) of this node [comma separated]: ");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CERTIFICATE_PASSWORD = CommandLineConsole.prompt("Enter datanode certificate password: ");
 
     public CertutilCert() {
         this.console = new SystemConsole();
@@ -73,7 +79,7 @@ public class CertutilCert implements CliCommand {
         console.printLine("Using certificate authority " + caKeystorePath.toAbsolutePath());
 
         try {
-            char[] password = console.readPassword("Enter CA password: ");
+            char[] password = console.readPassword(PROMPT_ENTER_CA_PASSWORD);
             KeyStore caKeystore = KeyStore.getInstance(PKCS12);
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
@@ -95,12 +101,18 @@ public class CertutilCert implements CliCommand {
                     .withSubjectAlternativeName("127.0.0.1")
                     .withSubjectAlternativeName("ip6-localhost")
                     .validity(Duration.ofDays(10 * 365));
+
+            final String alternativeNames = console.readLine(PROMPT_ENTER_CERT_ALTERNATIVE_NAMES);
+            Arrays.stream(alternativeNames.split(","))
+                    .filter(Strings::isNotBlank)
+                    .forEach(req::withSubjectAlternativeName);
+
             KeyPair nodePair = CertificateGenerator.generate(req);
 
             KeyStore nodeKeystore = KeyStore.getInstance(PKCS12);
             nodeKeystore.load(null, null);
 
-            char[] nodeKeystorePassword = console.readPassword("Enter datanode certificate password: ");
+            char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_CERTIFICATE_PASSWORD);
 
             nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
                     new X509Certificate[]{nodePair.certificate(), intermediateCA.certificate(), rootCertificate});

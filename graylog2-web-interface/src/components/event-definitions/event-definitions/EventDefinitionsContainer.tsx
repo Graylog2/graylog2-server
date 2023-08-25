@@ -36,7 +36,7 @@ import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
 import { ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
 
-const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
+const customColumnRenderers = (refetchEventDefinitions: () => void): ColumnRenderers<EventDefinition> => ({
   attributes: {
     title: {
       renderCell: (title: string, eventDefinition) => (
@@ -55,7 +55,7 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     },
     status: {
       renderCell: (_status: string, eventDefinition) => (
-        <StatusCell status={eventDefinition?.state} />
+        <StatusCell eventDefinition={eventDefinition} refetchEventDefinitions={refetchEventDefinitions} />
       ),
       staticWidth: 100,
     },
@@ -81,7 +81,7 @@ const EventDefinitionsContainer = () => {
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
   });
-  const columnRenderers = customColumnRenderers();
+  const columnRenderers = customColumnRenderers(refetchEventDefinitions);
   const columnDefinitions = useMemo(
     () => ([...(paginatedEventDefinitions?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedEventDefinitions?.attributes],

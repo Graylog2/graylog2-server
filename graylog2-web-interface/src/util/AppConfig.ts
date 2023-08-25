@@ -30,11 +30,12 @@ export type AppConfigs = {
   pluginUISettings: { [key: string]: {} },
   featureFlags: { [key: string]: string },
   telemetry: { api_key: string, host: string, enabled: boolean },
+  contentStream: { refresh_interval: string, rss_url: string },
 };
 
 declare global {
   interface Window {
-    appConfig: AppConfigs
+    appConfig: AppConfigs;
   }
 }
 
@@ -46,6 +47,9 @@ const getEnabledFeatures = () => Immutable.Map(appConfig().featureFlags)
   .filter((s) => typeof s === 'string');
 
 const AppConfig = {
+  contentStream() {
+    return appConfig()?.contentStream;
+  },
   features: getEnabledFeatures(),
   gl2ServerUrl() {
     return appConfig().gl2ServerUrl;
@@ -91,6 +95,10 @@ const AppConfig = {
 
   publicNotifications() {
     return appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
+  },
+
+  pluginUISettings(key: string) : any {
+    return appConfig()?.pluginUISettings?.[key] ?? {};
   },
 
 };
