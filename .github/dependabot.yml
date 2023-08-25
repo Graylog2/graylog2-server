@@ -42,6 +42,10 @@ updates:
           - ">= 4.a"
           - "< 5"
     rebase-strategy: "disabled"
+    groups:
+      fontawesome:
+        patterns:
+          - "@fortawesome/*"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/babel-preset-graylog"

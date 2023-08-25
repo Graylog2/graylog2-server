@@ -53,16 +53,16 @@ class CertutilCertTest {
         final Path nodePath = tempDir.resolve("test-node.p12");
 
         final TestableConsole inputCa = TestableConsole.empty()
-                .register("Enter CA password", "password");
+                .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, "password");
         final CertutilCa certutilCa = new CertutilCa(caPath.toAbsolutePath().toString(), inputCa);
         certutilCa.run();
 
         // now we have a ROOT + CA keypair in the keystore, let's use it to generate node keypair
 
         TestableConsole inputCert = TestableConsole.empty()
-                .register("Enter CA password", "password")
-                .register("Enter datanode certificate password", "changeme")
-                .register("Enter alternative names (addresses) of this node [comma separated]", "");
+                .register(CertutilCert.PROMPT_ENTER_CA_PASSWORD, "password")
+                .register(CertutilCert.PROMPT_ENTER_CERTIFICATE_PASSWORD, "changeme")
+                .register(CertutilCert.PROMPT_ENTER_CERT_ALTERNATIVE_NAMES, "");
 
         CertutilCert certutilCert = new CertutilCert(
                 caPath.toAbsolutePath().toString(),

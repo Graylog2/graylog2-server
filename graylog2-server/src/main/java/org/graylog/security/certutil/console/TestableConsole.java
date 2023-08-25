@@ -16,21 +16,18 @@
  */
 package org.graylog.security.certutil.console;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 
 public class TestableConsole implements CommandLineConsole {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestableConsole.class);
 
-    private final List<Pair<String, String>> providedResponses = new LinkedList<>();
+    private final List<Pair<Prompt, String>> providedResponses = new LinkedList<>();
     private final List<String> output = new LinkedList<>();
     private boolean silent = false;
 
@@ -43,21 +40,21 @@ public class TestableConsole implements CommandLineConsole {
         return this;
     }
 
-    public TestableConsole register(String question, String response) {
-        this.providedResponses.add(Pair.of(cleanQuestion(question), response));
+    public TestableConsole register(Prompt prompt, String response) {
+        this.providedResponses.add(Pair.of(prompt, response));
         return this;
     }
 
     @Override
-    public String readLine(String format, Object... args) {
-        final Pair<String, String> response = consumeResponse(format, args);
-        return response.getValue();
+    public String readLine(Prompt prompt) {
+        final String response = consumeResponse(prompt);
+        return response;
     }
 
     @Override
-    public char[] readPassword(String format, Object... args) {
-        final Pair<String, String> response = consumeResponse(format, args);
-        return response.getValue().toCharArray();
+    public char[] readPassword(Prompt prompt) {
+        final String response = consumeResponse(prompt);
+        return response.toCharArray();
     }
 
     @Override
@@ -72,19 +69,10 @@ public class TestableConsole implements CommandLineConsole {
         return output;
     }
 
-    private Pair<String, String> consumeResponse(String format, Object[] args) {
-        final String question = cleanQuestion(String.format(Locale.ROOT, format, args));
-        final Pair<String, String> response = providedResponses.stream().filter(r -> r.getKey().equals(question)).findFirst()
-                .orElseThrow(() -> new ConsoleException("Unexpected input question:" + question));
+    private String consumeResponse(Prompt prompt) {
+        final Pair<Prompt, String> response = providedResponses.stream().filter(r -> r.getKey().equals(prompt)).findFirst()
+                .orElseThrow(() -> new ConsoleException("Unexpected input question:" + prompt.question()));
         providedResponses.remove(response);
-        return response;
-    }
-
-    private String cleanQuestion(String input) {
-        return Optional.of(input)
-                .map(String::trim)
-                .map(s -> StringUtils.removeEnd(s, ":"))
-                .map(String::trim)
-                .get();
+        return response.getValue();
     }
 }

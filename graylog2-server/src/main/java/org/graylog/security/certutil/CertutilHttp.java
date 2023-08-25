@@ -65,6 +65,12 @@ public class CertutilHttp implements CliCommand {
 
     private final CommandLineConsole console;
 
+    public static final CommandLineConsole.Prompt PROMPT_USE_OWN_CERTIFICATE_AUTHORITY = CommandLineConsole.prompt("Do you want to use your own certificate authority? Respond with y/n?");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CA_PASSWORD = CommandLineConsole.prompt("Enter CA password: ");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CERTIFICATE_VALIDITY_IN_DAYS = CommandLineConsole.prompt("Enter certificate validity in days: ");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CERTIFICATE_ALTERNATIVE_NAMES = CommandLineConsole.prompt("Enter alternative names (addresses) of this node [comma separated]: ");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD = CommandLineConsole.prompt("Enter HTTP certificate password: ");
+
     public CertutilHttp() {
         this.console = new SystemConsole();
     }
@@ -80,7 +86,7 @@ public class CertutilHttp implements CliCommand {
     public void run() {
         console.printLine("This tool will generate a data-node certificate for HTTP communication (REST API)");
 
-        final boolean useOwnCertificateEntity = console.readBoolean("Do you want to use your own certificate authority? Respond with y/n?");
+        final boolean useOwnCertificateEntity = console.readBoolean(PROMPT_USE_OWN_CERTIFICATE_AUTHORITY);
 
         if (useOwnCertificateEntity) {
             try {
@@ -111,7 +117,7 @@ public class CertutilHttp implements CliCommand {
 
             try {
 
-                char[] password = console.readPassword("Enter CA password: ");
+                char[] password = console.readPassword(PROMPT_ENTER_CA_PASSWORD);
                 KeyStore caKeystore = KeyStore.getInstance("PKCS12");
                 caKeystore.load(new FileInputStream(caKeystoreFilename), password);
 
@@ -121,7 +127,7 @@ public class CertutilHttp implements CliCommand {
 
                 final KeyPair caKeyPair = new KeyPair(caPrivateKey, null, caCertificate);
 
-                final int validityDays = console.readInt("Enter certificate validity in days: ");
+                final int validityDays = console.readInt(PROMPT_ENTER_CERTIFICATE_VALIDITY_IN_DAYS);
 
                 final String cnName = Tools.getLocalCanonicalHostname();
 
@@ -133,7 +139,7 @@ public class CertutilHttp implements CliCommand {
                         .withSubjectAlternativeName("ip6-localhost")
                         .validity(Duration.ofDays(validityDays));
 
-                final String alternativeNames = console.readLine("Enter alternative names (addresses) of this node [comma separated]: ");
+                final String alternativeNames = console.readLine(PROMPT_ENTER_CERTIFICATE_ALTERNATIVE_NAMES);
                 Arrays.stream(alternativeNames.split(","))
                         .filter(Strings::isNotBlank)
                         .forEach(certificateRequest::withSubjectAlternativeName);
@@ -145,7 +151,7 @@ public class CertutilHttp implements CliCommand {
                 KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
                 nodeKeystore.load(null, null);
 
-                char[] nodeKeystorePassword = console.readPassword("Enter HTTP certificate password: ");
+                char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD);
 
                 nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
                         new X509Certificate[]{nodePair.certificate(), caKeyPair.certificate(), rootCertificate});
