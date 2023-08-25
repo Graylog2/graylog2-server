@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { exampleFormDataWithAutomaticAuth, exampleFormDataWithKeySecretAuth } from 'aws/FormData.fixtures';
+import { exampleFormDataWithAutomaticAuth, exampleFormDataWithKeySecretAuth } from 'fixtures/aws/FormData.fixtures';
 
 import { toAWSRequest, toGenericInputCreateRequest } from './formDataAdapter';
 import { AWS_AUTH_TYPES } from './constants';

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // eslint-disable-next-line import/prefer-default-export
-import { AWS_AUTH_TYPES, DEFAULT_KINESIS_LOG_TYPE } from 'aws/common/constants';
+import { AWS_AUTH_TYPES, DEFAULT_KINESIS_LOG_TYPE } from 'integrations/aws/common/constants';
 
 export const exampleFormDataWithKeySecretAuth = {
   awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
