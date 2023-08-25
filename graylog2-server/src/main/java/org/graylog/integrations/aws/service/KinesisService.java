@@ -72,8 +72,10 @@ import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -143,7 +145,7 @@ public class KinesisService {
         final boolean streamExists = kinesisStreamNames.streams().stream()
                                                        .anyMatch(streamName -> streamName.equals(request.streamName()));
         if (!streamExists) {
-            throw new BadRequestException(String.format("The requested stream [%s] was not found.", request.streamName()));
+            throw new BadRequestException(String.format(Locale.ROOT, "The requested stream [%s] was not found.", request.streamName()));
         }
 
         LOG.debug("The stream [{}] exists", request.streamName());
@@ -152,7 +154,7 @@ public class KinesisService {
 
         final List<Record> records = retrieveRecords(request.streamName(), kinesisClient);
         if (records.size() == 0) {
-            throw new BadRequestException(String.format("The Kinesis stream [%s] does not contain any messages.", request.streamName()));
+            throw new BadRequestException(String.format(Locale.ROOT, "The Kinesis stream [%s] does not contain any messages.", request.streamName()));
         }
 
         Record record = selectRandomRecord(records);
@@ -163,7 +165,7 @@ public class KinesisService {
         }
 
         DateTime timestamp = new DateTime(record.approximateArrivalTimestamp().toEpochMilli(), DateTimeZone.UTC);
-        return detectAndParseMessage(new String(payloadBytes), timestamp, request.streamName(), "", "", compressed);
+        return detectAndParseMessage(new String(payloadBytes, StandardCharsets.UTF_8), timestamp, request.streamName(), "", "", compressed);
     }
 
     public StreamsResponse getKinesisStreamNames(AWSRequest request) throws ExecutionException {
@@ -203,7 +205,7 @@ public class KinesisService {
         LOG.debug("Kinesis streams queried: [{}]", streamNames);
 
         if (streamNames.isEmpty()) {
-            throw new BadRequestException(String.format("No Kinesis streams were found in the [%s] region.", request.region()));
+            throw new BadRequestException(String.format(Locale.ROOT, "No Kinesis streams were found in the [%s] region.", request.region()));
         }
 
         return StreamsResponse.create(streamNames, streamNames.size());
@@ -335,14 +337,14 @@ public class KinesisService {
 
         LOG.debug("The message is type [{}]", awsMessageType);
 
-        final String responseMessage = String.format("Success. The message is a %s message.", awsMessageType.getLabel());
+        final String responseMessage = String.format(Locale.ROOT, "Success. The message is a %s message.", awsMessageType.getLabel());
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create(kinesisStreamName, logGroupName, logStreamName,
                                                                 timestamp, logMessage);
 
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
-            throw new BadRequestException(String.format("A codec with name [%s] could not be found.", awsMessageType.getCodecName()));
+            throw new BadRequestException(String.format(Locale.ROOT, "A codec with name [%s] could not be found.", awsMessageType.getCodecName()));
         }
 
         // TODO: Do we need to provide a valid configuration here?
@@ -357,8 +359,8 @@ public class KinesisService {
 
         final Message fullyParsedMessage = codec.decode(new RawMessage(payload));
         if (fullyParsedMessage == null) {
-            throw new BadRequestException(String.format("Message decoding failed. More information might be " +
-                                                        "available by enabling Debug logging. message [%s]", logMessage));
+            throw new BadRequestException(String.format(Locale.ROOT, "Message decoding failed. More information might be " +
+                    "available by enabling Debug logging. message [%s]", logMessage));
         }
 
         LOG.debug("Successfully parsed message type [{}] with codec [{}].", awsMessageType, awsMessageType.getCodecName());
@@ -426,25 +428,25 @@ public class KinesisService {
                         .describeStream(DescribeStreamRequest.builder().streamName(request.streamName()).build())
                         .streamDescription();
                 if (seconds > 300) {
-                    final String responseMessage = String.format("Fail. Stream [%s] has failed to become active " +
-                                                                 "within 60 seconds.", request.streamName());
+                    final String responseMessage = String.format(Locale.ROOT, "Fail. Stream [%s] has failed to become active " +
+                            "within 60 seconds.", request.streamName());
                     throw new BadRequestException(responseMessage);
                 }
                 seconds++;
             } while (streamDescription.streamStatus() != StreamStatus.ACTIVE);
             String streamArn = streamDescription.streamARN();
-            final String responseMessage = String.format("Success. The new stream [%s/%s] was created with [%d] shard.",
-                                                         request.streamName(), streamArn, SHARD_COUNT);
+            final String responseMessage = String.format(Locale.ROOT, "Success. The new stream [%s/%s] was created with [%d] shard.",
+                    request.streamName(), streamArn, SHARD_COUNT);
 
             return KinesisNewStreamResponse.create(createStreamRequest.streamName(),
                                                    streamArn,
                                                    responseMessage);
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
-            final String responseMessage = String.format("Attempt to create [%s] new Kinesis stream " +
-                                                         "with [%d] shards failed due to the following exception: [%s]",
-                                                         request.streamName(), SHARD_COUNT,
-                                                         specificError);
+            final String responseMessage = String.format(Locale.ROOT, "Attempt to create [%s] new Kinesis stream " +
+                            "with [%d] shards failed due to the following exception: [%s]",
+                    request.streamName(), SHARD_COUNT,
+                    specificError);
             LOG.error(responseMessage, e);
             throw new BadRequestException(responseMessage, e);
         }
@@ -458,7 +460,7 @@ public class KinesisService {
      */
     public CreateRolePermissionResponse autoKinesisPermissions(CreateRolePermissionRequest request) {
 
-        String roleName = String.format(ROLE_NAME_FORMAT, DateTime.now().toString(UNIQUE_ROLE_DATE_FORMAT));
+        String roleName = String.format(Locale.ROOT, ROLE_NAME_FORMAT, DateTime.now(DateTimeZone.UTC).toString(UNIQUE_ROLE_DATE_FORMAT));
         try {
             final IamClient iamClient = awsClientBuilderUtil.buildClient(iamClientBuilder, request);
             String createRoleResponse = createRoleForKinesisAutoSetup(iamClient, request.region(), roleName);
@@ -466,14 +468,14 @@ public class KinesisService {
             setPermissionsForKinesisAutoSetupRole(iamClient, roleName, request.streamArn());
 
             final String roleArn = getRolePermissionsArn(iamClient, roleName);
-            final String explanation = String.format("Success! The role [%s/%s] has been created.", roleName, roleArn);
+            final String explanation = String.format(Locale.ROOT, "Success! The role [%s/%s] has been created.", roleName, roleArn);
             return CreateRolePermissionResponse.create(explanation, roleArn, roleName);
 
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
-            final String responseMessage = String.format("Unable to automatically set up Kinesis role [%s] due to the " +
-                                                         "following error [%s]", roleName,
-                                                         specificError);
+            final String responseMessage = String.format(Locale.ROOT, "Unable to automatically set up Kinesis role [%s] due to the " +
+                            "following error [%s]", roleName,
+                    specificError);
             throw new BadRequestException(responseMessage);
         }
     }
@@ -490,15 +492,15 @@ public class KinesisService {
                 "  ]\n" +
                 "}";
 
-        final String rolePolicyName = String.format(ROLE_POLICY_NAME_FORMAT, DateTime.now().toString(UNIQUE_ROLE_DATE_FORMAT));
+        final String rolePolicyName = String.format(Locale.ROOT, ROLE_POLICY_NAME_FORMAT, DateTime.now(DateTimeZone.UTC).toString(UNIQUE_ROLE_DATE_FORMAT));
         LOG.debug("Attaching [{}] policy to [{}] role", rolePolicyName, roleName);
         try {
             iam.putRolePolicy(r -> r.roleName(roleName).policyName(rolePolicyName).policyDocument(rolePolicy));
             LOG.debug("Success! The role policy [{}] was assigned.", rolePolicyName);
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
-            final String responseMessage = String.format("Unable to create role [%s] due to the " +
-                                                         "following error [%s]", roleName, specificError);
+            final String responseMessage = String.format(Locale.ROOT, "Unable to create role [%s] due to the " +
+                    "following error [%s]", roleName, specificError);
             throw new BadRequestException(responseMessage);
         }
     }
@@ -521,11 +523,11 @@ public class KinesisService {
         LOG.debug("Role [{}] was created.", roleName);
         try {
             iam.createRole(r -> r.roleName(roleName).assumeRolePolicyDocument(assumeRolePolicy));
-            return String.format("Success! The role [%s] was created.", roleName);
+            return String.format(Locale.ROOT, "Success! The role [%s] was created.", roleName);
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
-            final String responseMessage = String.format("The role [%s] was not created due to the " +
-                                                         "following reason [%s]", roleName, specificError);
+            final String responseMessage = String.format(Locale.ROOT, "The role [%s] was not created due to the " +
+                    "following reason [%s]", roleName, specificError);
             throw new BadRequestException(responseMessage);
         }
     }

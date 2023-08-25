@@ -35,6 +35,7 @@ import org.joda.time.DateTimeZone;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.net.URI;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 @AutoValue
@@ -100,7 +101,7 @@ public abstract class TeamsEventNotificationConfig implements EventNotificationC
         URI webhookUri;
         try {
             webhookUri = new URI(webhookUrl());
-            if (webhookUri.getHost().toLowerCase().contains("office")) {
+            if (webhookUri.getHost().toLowerCase(Locale.ROOT).contains("office")) {
                 if (!TEAMS_PATTERN.matcher(webhookUrl()).find()) {
                     validation.addError(FIELD_WEBHOOK_URL, INVALID_TEAMS_URL_ERROR_MESSAGE);
                 }

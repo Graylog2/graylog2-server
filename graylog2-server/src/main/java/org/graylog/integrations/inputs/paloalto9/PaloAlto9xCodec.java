@@ -77,7 +77,7 @@ public class PaloAlto9xCodec implements Codec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
-        String s = new String(rawMessage.getPayload());
+        String s = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         LOG.trace("Received raw message: {}", s);
 
         PaloAltoMessageBase p = rawMessageParser.parse(s, timezone);

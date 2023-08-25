@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -93,10 +94,10 @@ public class AWSAuthFactory {
         // to help with auditing and debugging.
         final String roleSessionName;
         if (accessKey != null) {
-            roleSessionName = String.format("ACCESS_KEY_%s@ACCOUNT_%s", accessKey,
+            roleSessionName = String.format(Locale.ROOT, "ACCESS_KEY_%s@ACCOUNT_%s", accessKey,
                     stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
         } else {
-            roleSessionName = String.format("ACCOUNT_%s",
+            roleSessionName = String.format(Locale.ROOT, "ACCOUNT_%s",
                     stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
         }
 

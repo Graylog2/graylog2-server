@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,8 +92,8 @@ public class KinesisPayloadDecoder {
             // The best timestamp available is the approximate arrival time of the message to the Kinesis stream.
             final DateTime timestamp = new DateTime(approximateArrivalTimestamp.toEpochMilli(), DateTimeZone.UTC);
             final KinesisLogEntry kinesisLogEntry = KinesisLogEntry.create(kinesisStream,
-                                                                           "", "",
-                                                                           timestamp, new String(payloadBytes));
+                    "", "",
+                    timestamp, new String(payloadBytes, StandardCharsets.UTF_8));
             return Collections.singletonList(kinesisLogEntry);
         } else {
             LOG.error("The AWSMessageType [{}] is not supported by the KinesisTransport", awsMessageType);
@@ -113,7 +114,7 @@ public class KinesisPayloadDecoder {
 
         LOG.debug("The supplied payload is GZip compressed. Proceeding to decompress and parse as a CloudWatch log message.");
 
-        final byte[] bytes = Tools.decompressGzip(payloadBytes).getBytes();
+        final byte[] bytes = Tools.decompressGzip(payloadBytes).getBytes(StandardCharsets.UTF_8);
         LOG.debug("They payload was decompressed successfully. size [{}]", bytes.length);
 
         final CloudWatchLogSubscriptionData logSubscriptionData = objectMapper.readValue(bytes, CloudWatchLogSubscriptionData.class);

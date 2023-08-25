@@ -36,6 +36,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -81,7 +82,7 @@ public class MessageFactory {
 
         String dedupKey = "";
         if (config.customIncident()) {
-            dedupKey = String.format(
+            dedupKey = String.format(Locale.ROOT,
                     "%s/%s/%s", config.keyPrefix(), modelData.event().sourceStreams(), eventTitle);
         }
 

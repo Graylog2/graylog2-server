@@ -47,7 +47,7 @@ public class PaloAltoParser {
 
     private static final DateTimeFormatter SYSLOG_TIMESTAMP_FORMATTER = DateTimeFormat.forPattern("MMM d HH:mm:ss YYYY").withLocale(Locale.US);
 
-    // <14>1 2018-09-19T11:50:32-05:00 Panorama--2 - - - - 1,2018/09/19... 
+    // <14>1 2018-09-19T11:50:32-05:00 Panorama--2 - - - - 1,2018/09/19...
     private static final Pattern PANORAMA_SYSLOG_PARSER = Pattern.compile("<\\d+>[0-9] (.+?) (.+?)\\s[-]\\s[-]\\s[-]\\s[-]\\s(\\d,.*)");
 
     // Syslog with host name.
@@ -112,7 +112,7 @@ public class PaloAltoParser {
                     // Remove two spaces in one digit day number "Apr  8 01:47:32"
                     // This solution feels terrible. Sorry.
                     String dateWithoutYear = matcher.group(1).replaceFirst(DOUBLE_SPACE, SINGLE_SPACE);
-                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.withZone(timezone).parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear());
+                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.withZone(timezone).parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now(DateTimeZone.UTC).getYear());
                     String source = matcher.group(2);
                     String panData = matcher.group(3);
 
@@ -129,7 +129,7 @@ public class PaloAltoParser {
                     // Attempt to parse date in format: Aug 22 11:21:04
                     // TODO This needs work.
                     String dateWithoutYear = matcher.group(1).replaceFirst(DOUBLE_SPACE, SINGLE_SPACE);
-                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear()).withZone(timezone);
+                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now(DateTimeZone.UTC).getYear()).withZone(timezone);
                     String panData = matcher.group(2);
 
                     // No source is supplied, so use a blank one

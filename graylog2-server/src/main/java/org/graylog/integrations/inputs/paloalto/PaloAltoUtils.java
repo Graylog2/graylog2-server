@@ -21,6 +21,7 @@ import org.apache.commons.codec.binary.Hex;
 
 import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class PaloAltoUtils {
                          .collect(Collectors.toList());
 
 
-        FileWriter writer = new FileWriter("capture-clean.txt");
+        FileWriter writer = new FileWriter("capture-clean.txt", StandardCharsets.UTF_8);
         for (String str : hexVals) {
             writer.write(str + "\n");
         }
@@ -81,7 +82,7 @@ public class PaloAltoUtils {
 
     private static List<String> getTextLines() throws Exception {
 
-        String s = new String(Files.readAllBytes(Paths.get("capture")));
+        String s = new String(Files.readAllBytes(Paths.get("capture")), StandardCharsets.UTF_8);
         return Arrays.asList(s.replace("\t", "").split("\\n")).stream().map(v -> {
                                                                                 String withoutPrefix = v.length() > 7 ? v.substring(7, v.length()) : v;
 

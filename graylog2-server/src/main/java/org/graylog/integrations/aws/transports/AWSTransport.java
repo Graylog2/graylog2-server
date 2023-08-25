@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Map;
 
 public class AWSTransport extends ThrottleableTransport2 {
@@ -89,7 +90,7 @@ public class AWSTransport extends ThrottleableTransport2 {
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
         final Transport.Factory<? extends Transport> transportFactory = this.availableTransports.get(awsMessageType.getTransportName());
         if (transportFactory == null) {
-            throw new MisfireException(String.format("A transport with name [%s] could not be found.",
+            throw new MisfireException(String.format(Locale.ROOT, "A transport with name [%s] could not be found.",
                     awsMessageType.getTransportName()));
         }
 

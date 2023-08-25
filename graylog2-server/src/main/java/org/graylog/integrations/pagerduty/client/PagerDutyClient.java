@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Locale;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -87,12 +88,12 @@ public class PagerDutyClient {
             if (!response.isSuccessful()) {
                 if (400 == response.code()) {
                     // HTTP 400 - Bad Request
-                    throw new PermanentPagerDutyClientException(String.format("Invalid request sent to PagerDuty [%s]",
+                    throw new PermanentPagerDutyClientException(String.format(Locale.ROOT, "Invalid request sent to PagerDuty [%s]",
                             response.body().string()));
                 } else if (429 == response.code()) {
                     throw new TemporaryPagerDutyClientException("Too many PagerDuty API calls at one time");
                 } else {
-                    throw new TemporaryPagerDutyClientException(String.format(
+                    throw new TemporaryPagerDutyClientException(String.format(Locale.ROOT,
                             "HTTP %d - PagerDuty server encountered an internal error", response.code()));
                 }
             }

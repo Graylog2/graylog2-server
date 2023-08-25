@@ -43,6 +43,7 @@ import software.amazon.awssdk.services.cloudwatchlogs.paginators.DescribeLogGrou
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class CloudWatchService {
@@ -77,7 +78,7 @@ public class CloudWatchService {
         LOG.debug("Log groups queried: [{}]", groupNameList);
 
         if (groupNameList.isEmpty()) {
-            throw new BadRequestException(String.format("No CloudWatch log groups were found in the [%s] region.", request.region()));
+            throw new BadRequestException(String.format(Locale.ROOT, "No CloudWatch log groups were found in the [%s] region.", request.region()));
         }
 
         return LogGroupsResponse.create(groupNameList, groupNameList.size());
@@ -121,16 +122,16 @@ public class CloudWatchService {
                     return null;
                 });
 
-                String explanation = String.format("Success. The subscription filter [%s] was added for the CloudWatch log group [%s].",
+                String explanation = String.format(Locale.ROOT, "Success. The subscription filter [%s] was added for the CloudWatch log group [%s].",
                         request.filterName(), request.logGroupName());
                 return CreateLogSubscriptionResponse.create(explanation);
             } catch (RetryException e) {
-                throw new RuntimeException(String.format("Failed to create the CloudWatch subscription after [%d] attempts. Exception [%s]",
+                throw new RuntimeException(String.format(Locale.ROOT, "Failed to create the CloudWatch subscription after [%d] attempts. Exception [%s]",
                         e.getNumberOfFailedAttempts(), e.getCause()), e.getCause()); // e.getCause() returns the actual AWS exception to the UI.
             }
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
-            final String responseMessage = String.format("Attempt to add subscription [%s] to Cloudwatch log group " +
+            final String responseMessage = String.format(Locale.ROOT, "Attempt to add subscription [%s] to Cloudwatch log group " +
                             "[%s] failed due to the following exception: [%s]",
                     request.filterName(),
                     request.logGroupName(), specificError);

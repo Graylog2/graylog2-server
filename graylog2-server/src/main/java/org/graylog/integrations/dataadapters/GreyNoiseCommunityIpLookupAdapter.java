@@ -49,6 +49,7 @@ import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -154,7 +155,7 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
         }
         String apiToken = encryptedValueService.decrypt(config.apiToken());
         if (apiToken == null || apiToken.trim().isEmpty()) {
-            String error = String.format("[%s] requires a non-null API Token", ADAPTER_NAME);
+            String error = String.format(Locale.ROOT, "[%s] requires a non-null API Token", ADAPTER_NAME);
             throw new IllegalArgumentException(error);
         }
 
@@ -172,7 +173,7 @@ public class GreyNoiseCommunityIpLookupAdapter extends LookupDataAdapter {
     private Optional<String> getValidIpString(Object ipAddress) {
         final String ipString = ipAddress == null ? "" : ipAddress.toString();
         if (ipString.trim().isEmpty()) {
-            String error = String.format("'%s' requires an IP address to perform Lookup", ADAPTER_NAME);
+            String error = String.format(Locale.ROOT, "'%s' requires an IP address to perform Lookup", ADAPTER_NAME);
             throw new IllegalArgumentException(error);
         }
 

@@ -54,6 +54,7 @@ import software.amazon.awssdk.regions.Region;
 
 import javax.inject.Inject;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -164,8 +165,8 @@ public class KinesisTransport extends ThrottleableTransport2 {
                 new URL(endpoint).toURI();
             } catch (Exception e) {
                 // Re-throw the exception to fail the input start attempt
-                throw new MisfireException(String.format("The specified [%s] Override Endpoint [%s] is invalid.",
-                                                         endpointName, endpoint), e);
+                throw new MisfireException(String.format(Locale.ROOT, "The specified [%s] Override Endpoint [%s] is invalid.",
+                        endpointName, endpoint), e);
             }
         }
     }

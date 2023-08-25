@@ -32,6 +32,7 @@ import org.graylog2.plugin.system.NodeId;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Main class that focuses on event notifications that should be sent to PagerDuty.
@@ -77,10 +78,10 @@ public class PagerDutyNotification implements EventNotification
             }
         } catch (PagerDutyClient.TemporaryPagerDutyClientException e) {
             throw new TemporaryEventNotificationException(
-                    String.format("Error enqueueing the PagerDuty event :: %s", e.getMessage()),
+                    String.format(Locale.ROOT, "Error enqueueing the PagerDuty event :: %s", e.getMessage()),
                     null != e.getCause() ? e.getCause() : e);
         } catch (PagerDutyClient.PermanentPagerDutyClientException e) {
-            String errorMessage = String.format("Error enqueueing the PagerDuty event :: %s", e.getMessage());
+            String errorMessage = String.format(Locale.ROOT, "Error enqueueing the PagerDuty event :: %s", e.getMessage());
             Notification systemNotification = notificationService.buildNow()
                     .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)

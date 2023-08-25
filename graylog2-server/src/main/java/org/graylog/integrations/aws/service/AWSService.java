@@ -19,7 +19,6 @@ package org.graylog.integrations.aws.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.AWSPolicy;
 import org.graylog.integrations.aws.AWSPolicyStatement;
@@ -48,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.RegionMetadata;
 
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -98,7 +99,7 @@ public class AWSService {
                       .map(r -> {
                           // Build a single AWSRegionResponse with id, description, and displayValue.
                           RegionMetadata regionMetadata = r.metadata();
-                          String label = String.format("%s: %s", regionMetadata.description(), regionMetadata.id());
+                          String label = String.format(Locale.ROOT, "%s: %s", regionMetadata.description(), regionMetadata.id());
                           return AWSRegion.create(regionMetadata.id(), label);
                       })
                       .sorted(Comparator.comparing(AWSRegion::regionId))
@@ -124,7 +125,7 @@ public class AWSService {
             }
 
             RegionMetadata regionMetadata = RegionMetadata.of(region);
-            String displayValue = String.format("%s: %s", regionMetadata.description(), region.id());
+            String displayValue = String.format(Locale.ROOT, "%s: %s", regionMetadata.description(), region.id());
             regions.put(region.id(), displayValue);
         }
         return regions;

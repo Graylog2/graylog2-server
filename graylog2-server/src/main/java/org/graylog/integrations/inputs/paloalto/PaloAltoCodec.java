@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
 
 public class PaloAltoCodec implements Codec {
 
@@ -63,7 +64,7 @@ public class PaloAltoCodec implements Codec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
-        String s = new String(rawMessage.getPayload());
+        String s = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         LOG.trace("Received raw message: {}", s);
 
         String timezoneID = configuration.getString(CK_TIMEZONE);

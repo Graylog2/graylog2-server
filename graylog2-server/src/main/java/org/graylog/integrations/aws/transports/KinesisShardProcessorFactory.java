@@ -27,6 +27,7 @@ import com.github.rholder.retry.WaitStrategies;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.kinesis.exceptions.InvalidStateException;
@@ -83,7 +84,7 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
 
     public class KinesisShardProcessor implements ShardRecordProcessor {
 
-        private DateTime lastCheckpoint = DateTime.now();
+        private DateTime lastCheckpoint = DateTime.now(DateTimeZone.UTC);
 
         @Override
         public void initialize(InitializationInput initializationInput) {
@@ -122,7 +123,7 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
             }
 
             if (lastCheckpoint.plusMinutes(1).isBeforeNow()) {
-                lastCheckpoint = DateTime.now();
+                lastCheckpoint = DateTime.now(DateTimeZone.UTC);
                 checkpoint(processRecordsInput.checkpointer(), null);
             }
         }

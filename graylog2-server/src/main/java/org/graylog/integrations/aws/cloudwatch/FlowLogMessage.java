@@ -95,8 +95,8 @@ public class FlowLogMessage {
                 safeInteger(parts[7]),
                 safeLong(parts[8]),
                 safeLong(parts[9]),
-                new DateTime(Long.valueOf(parts[10]) * 1000),
-                new DateTime(Long.valueOf(parts[11]) * 1000),
+                new DateTime(Long.valueOf(parts[10]) * 1000, DateTimeZone.UTC),
+                new DateTime(Long.valueOf(parts[11]) * 1000, DateTimeZone.UTC),
                 parts[12],
                 parts[13]
         );

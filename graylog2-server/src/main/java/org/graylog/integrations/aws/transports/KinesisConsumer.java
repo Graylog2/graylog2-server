@@ -149,7 +149,7 @@ public class KinesisConsumer implements Runnable {
             public void onAllInitializationAttemptsFailed(Throwable e) {
                 inputFailureRecorder.setFailing(
                         KinesisConsumer.class,
-                        "Initialization for Kinesis stream <%s> failed.".formatted(kinesisStreamName), e);
+                        String.format(Locale.ROOT, "Initialization for Kinesis stream <%s> failed.", kinesisStreamName), e);
             }
         };
 
@@ -158,7 +158,7 @@ public class KinesisConsumer implements Runnable {
             public void afterTaskExecution(TaskExecutionListenerInput input) {
                 if (TaskOutcome.FAILURE.equals(input.taskOutcome())) {
                     inputFailureRecorder.setFailing(KinesisConsumer.class,
-                            "Errors for Kinesis stream <%s>!".formatted(kinesisStreamName));
+                            String.format(Locale.ROOT, "Errors for Kinesis stream <%s>!", kinesisStreamName));
                 } else if (TaskOutcome.SUCCESSFUL.equals(input.taskOutcome()) && TaskType.PROCESS.equals(input.taskType())) {
                     inputFailureRecorder.setRunning();
                 }

@@ -92,7 +92,7 @@ public class TeamsEventNotification implements EventNotification {
             //scheduler needs to retry a TemporaryEventNotificationException
             throw exp;
         } catch (PermanentEventNotificationException exp) {
-            String errorMessage = String.format("Error sending the TeamsEventNotification :: %s", exp.getMessage());
+            String errorMessage = String.format(Locale.ROOT, "Error sending the TeamsEventNotification :: %s", exp.getMessage());
             final Notification systemNotification = notificationService.buildNow()
                     .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
