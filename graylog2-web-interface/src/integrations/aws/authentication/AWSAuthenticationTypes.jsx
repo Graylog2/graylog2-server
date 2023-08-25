@@ -19,8 +19,8 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
-import { FormDataContext } from 'aws/context/FormData';
-import { AWS_AUTH_TYPES } from 'aws/common/constants';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 import AppConfig from 'util/AppConfig';
 
 import KeySecret from './KeySecret';
@@ -57,9 +57,7 @@ const AWSAuthenticationTypes = ({ onChange }) => {
     onChange({ target: { name: 'awsAuthenticationType', value: defaultAuthTypeValue } });
   }, []);
 
-  const isType = (type) => {
-    return currentType === type;
-  };
+  const isType = (type) => currentType === type;
 
   const handleTypeChange = (e) => {
     setCurrenType(e.target.value);

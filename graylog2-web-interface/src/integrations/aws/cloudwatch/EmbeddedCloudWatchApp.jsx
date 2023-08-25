@@ -17,12 +17,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { SidebarProvider } from 'aws/context/Sidebar';
-import { FormDataProvider } from 'aws/context/FormData';
-import { StepsProvider } from 'aws/context/Steps';
-import { ApiProvider } from 'aws/context/Api';
-import { AdvancedOptionsProvider } from 'aws/context/AdvancedOptions';
-import { toGenericInputCreateRequest } from 'aws/common/formDataAdapter';
+import { SidebarProvider } from 'integrations/aws/context/Sidebar';
+import { FormDataProvider } from 'integrations/aws/context/FormData';
+import { StepsProvider } from 'integrations/aws/context/Steps';
+import { ApiProvider } from 'integrations/aws/context/Api';
+import { AdvancedOptionsProvider } from 'integrations/aws/context/AdvancedOptions';
+import { toGenericInputCreateRequest } from 'integrations/aws/common/formDataAdapter';
 
 import CloudWatch from './CloudWatch';
 import INITIAL_FORMDATA from './_initialFormData';

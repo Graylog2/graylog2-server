@@ -22,11 +22,11 @@ import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
 import { getValueFromInput } from 'util/FormsUtils.js';
 import Routes from 'routing/Routes';
-import StepAuthorize from 'aws/StepAuthorize';
-import { StepsContext } from 'aws/context/Steps';
-import { FormDataContext } from 'aws/context/FormData';
-import { ApiContext } from 'aws/context/Api';
-import { SidebarContext } from 'aws/context/Sidebar';
+import StepAuthorize from 'integrations/aws/StepAuthorize';
+import { StepsContext } from 'integrations/aws/context/Steps';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { ApiContext } from 'integrations/aws/context/Api';
+import { SidebarContext } from 'integrations/aws/context/Sidebar';
 // import useHistory from 'routing/useHistory';
 
 import StepKinesis from './StepKinesis';

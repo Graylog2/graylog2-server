@@ -18,18 +18,18 @@ import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { FormDataContext } from 'aws/context/FormData';
-import { ApiContext } from 'aws/context/Api';
-import { SidebarContext } from 'aws/context/Sidebar';
-import ValidatedInput from 'aws/common/ValidatedInput';
-import FormWrap from 'aws/common/FormWrap';
-import { renderOptions } from 'aws/common/Options';
-import { ApiRoutes } from 'aws/common/Routes';
-import { AWS_AUTH_TYPES } from 'aws/common/constants';
-import useFetch from 'aws/common/hooks/useFetch';
-import formValidation from 'aws/utils/formValidation';
-import AWSAuthenticationTypes from 'aws/authentication/AWSAuthenticationTypes';
-import AWSCustomEndpoints from 'aws/authentication/AWSCustomEndpoints';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { ApiContext } from 'integrations/aws/context/Api';
+import { SidebarContext } from 'integrations/aws/context/Sidebar';
+import ValidatedInput from 'integrations/aws/common/ValidatedInput';
+import FormWrap from 'integrations/aws/common/FormWrap';
+import { renderOptions } from 'integrations/aws/common/Options';
+import { ApiRoutes } from 'integrations/aws/common/Routes';
+import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
+import useFetch from 'integrations/aws/common/hooks/useFetch';
+import formValidation from 'integrations/aws/utils/formValidation';
+import AWSAuthenticationTypes from 'integrations/aws/authentication/AWSAuthenticationTypes';
+import AWSCustomEndpoints from 'integrations/aws/authentication/AWSCustomEndpoints';
 
 const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
   const { formData } = useContext(FormDataContext);

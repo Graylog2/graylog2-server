@@ -17,10 +17,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Panel } from 'components/bootstrap';
 
-import useFetch from 'aws/common/hooks/useFetch';
-import { ApiRoutes } from 'aws/common/Routes';
+import { Panel } from 'components/bootstrap';
+import useFetch from 'integrations/aws/common/hooks/useFetch';
+import { ApiRoutes } from 'integrations/aws/common/Routes';
 
 function Policies({ title, note, policy }) {
   const [opened, setOpened] = useState(false);

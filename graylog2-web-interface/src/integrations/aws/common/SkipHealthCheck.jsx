@@ -18,12 +18,12 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import FormWrap from 'aws/common/FormWrap';
-import AdditionalFields from 'aws/common/AdditionalFields';
-import { renderOptions } from 'aws/common/Options';
-import ValidatedInput from 'aws/common/ValidatedInput';
-import { KINESIS_LOG_TYPES } from 'aws/common/constants';
-import { FormDataContext } from 'aws/context/FormData';
+import FormWrap from 'integrations/aws/common/FormWrap';
+import AdditionalFields from 'integrations/aws/common/AdditionalFields';
+import { renderOptions } from 'integrations/aws/common/Options';
+import ValidatedInput from 'integrations/aws/common/ValidatedInput';
+import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
+import { FormDataContext } from 'integrations/aws/context/FormData';
 
 const SkipHealthCheck = ({ onChange, onSubmit }) => {
   const { formData } = useContext(FormDataContext);

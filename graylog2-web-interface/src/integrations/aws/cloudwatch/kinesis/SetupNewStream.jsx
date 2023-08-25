@@ -17,16 +17,16 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button } from 'components/bootstrap';
 
-import ValidatedInput from 'aws/common/ValidatedInput';
-import FormWrap from 'aws/common/FormWrap';
-import { ApiRoutes } from 'aws/common/Routes';
-import { renderOptions } from 'aws/common/Options';
-import useFetch from 'aws/common/hooks/useFetch';
-import formValidation from 'aws/utils/formValidation';
-import { FormDataContext } from 'aws/context/FormData';
-import { ApiContext } from 'aws/context/Api';
+import { Button } from 'components/bootstrap';
+import ValidatedInput from 'integrations/aws/common/ValidatedInput';
+import FormWrap from 'integrations/aws/common/FormWrap';
+import { ApiRoutes } from 'integrations/aws/common/Routes';
+import { renderOptions } from 'integrations/aws/common/Options';
+import useFetch from 'integrations/aws/common/hooks/useFetch';
+import formValidation from 'integrations/aws/utils/formValidation';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { ApiContext } from 'integrations/aws/context/Api';
 
 import SetupModal from './setup-steps/SetupModal';
 

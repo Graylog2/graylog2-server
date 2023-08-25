@@ -17,18 +17,18 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
 import { Button, Modal, Panel } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
-
-import { FormDataContext } from 'aws/context/FormData';
-import { ApiContext } from 'aws/context/Api';
-import { SidebarContext } from 'aws/context/Sidebar';
-import useFetch from 'aws/common/hooks/useFetch';
-import FormWrap from 'aws/common/FormWrap';
-import ValidatedInput from 'aws/common/ValidatedInput';
-import { ApiRoutes, DocsRoutes } from 'aws/common/Routes';
-import { renderOptions } from 'aws/common/Options';
-import formValidation from 'aws/utils/formValidation';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { ApiContext } from 'integrations/aws/context/Api';
+import { SidebarContext } from 'integrations/aws/context/Sidebar';
+import useFetch from 'integrations/aws/common/hooks/useFetch';
+import FormWrap from 'integrations/aws/common/FormWrap';
+import ValidatedInput from 'integrations/aws/common/ValidatedInput';
+import { ApiRoutes, DocsRoutes } from 'integrations/aws/common/Routes';
+import { renderOptions } from 'integrations/aws/common/Options';
+import formValidation from 'integrations/aws/utils/formValidation';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 

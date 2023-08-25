@@ -17,12 +17,12 @@
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { exampleFormDataWithKeySecretAuth } from 'aws/FormData.fixtures';
+import { exampleFormDataWithKeySecretAuth } from 'integrations/aws/FormData.fixtures';
 
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import fetch from 'logic/rest/FetchProvider';
-import { FormDataProvider } from 'aws/context/FormData';
-import { ApiContext } from 'aws/context/Api';
+import { FormDataProvider } from 'integrations/aws/context/FormData';
+import { ApiContext } from 'integrations/aws/context/Api';
 
 import StepReview from './StepReview';
 
@@ -53,7 +53,7 @@ describe('<StepReview>', () => {
 
     expect(submitButton).toBeInTheDocument();
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(submitFunction).toHaveBeenCalledTimes(1));
@@ -77,7 +77,7 @@ describe('<StepReview>', () => {
 
     expect(submitButton).toBeInTheDocument();
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitFunction).toHaveBeenCalledTimes(1));
 

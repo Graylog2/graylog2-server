@@ -19,11 +19,11 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { ExternalLink } from 'components/common';
-import { FormDataContext } from 'aws/context/FormData';
-import { AdvancedOptionsContext } from 'aws/context/AdvancedOptions';
-import AdditionalFields from 'aws/common/AdditionalFields';
-import ValidatedInput from 'aws/common/ValidatedInput';
-import { SectionTitle, SectionNote } from 'aws/common/sharedStyles';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions';
+import AdditionalFields from 'integrations/aws/common/AdditionalFields';
+import ValidatedInput from 'integrations/aws/common/ValidatedInput';
+import { SectionTitle, SectionNote } from 'integrations/aws/common/sharedStyles';
 
 const INPUT_PATTERN = 'https://(.*)';
 const INPUT_MESSAGE = "Domain should begin with 'https://'";

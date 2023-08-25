@@ -17,16 +17,16 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button, Panel, Input } from 'components/bootstrap';
 
-import FormWrap from 'aws/common/FormWrap';
-import SkipHealthCheck from 'aws/common/SkipHealthCheck';
-import useFetch from 'aws/common/hooks/useFetch';
-import { ApiRoutes } from 'aws/common/Routes';
-import Countdown from 'aws/common/Countdown';
-import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'aws/common/constants';
-import { ApiContext } from 'aws/context/Api';
-import { FormDataContext } from 'aws/context/FormData';
+import { Button, Panel, Input } from 'components/bootstrap';
+import FormWrap from 'integrations/aws/common/FormWrap';
+import SkipHealthCheck from 'integrations/aws/common/SkipHealthCheck';
+import useFetch from 'integrations/aws/common/hooks/useFetch';
+import { ApiRoutes } from 'integrations/aws/common/Routes';
+import Countdown from 'integrations/aws/common/Countdown';
+import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
+import { ApiContext } from 'integrations/aws/context/Api';
+import { FormDataContext } from 'integrations/aws/context/FormData';
 
 const StepHealthCheck = ({ onChange, onSubmit }) => {
   const { logData, setLogData } = useContext(ApiContext);

@@ -17,12 +17,12 @@
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { exampleFormDataWithKeySecretAuth } from 'aws/FormData.fixtures';
+import { exampleFormDataWithKeySecretAuth } from 'integrations/aws/FormData.fixtures';
 
-import { FormDataProvider } from 'aws/context/FormData';
-import { ApiContext } from 'aws/context/Api';
-import { StepsContext } from 'aws/context/Steps';
-import { SidebarContext } from 'aws/context/Sidebar';
+import { FormDataProvider } from 'integrations/aws/context/FormData';
+import { ApiContext } from 'integrations/aws/context/Api';
+import { StepsContext } from 'integrations/aws/context/Steps';
+import { SidebarContext } from 'integrations/aws/context/Sidebar';
 import Routes from 'routing/Routes';
 
 import CloudWatch from './CloudWatch';
@@ -73,7 +73,7 @@ describe('<CloudWatch>', () => {
 
     expect(submitButton).toBeInTheDocument();
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1));
 
@@ -93,7 +93,7 @@ describe('<CloudWatch>', () => {
 
     expect(submitButton).toBeInTheDocument();
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitFunction).toHaveBeenCalledTimes(1));
 

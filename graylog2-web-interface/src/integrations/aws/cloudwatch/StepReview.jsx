@@ -22,12 +22,12 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import { FormDataContext } from 'aws/context/FormData';
-import { ApiContext } from 'aws/context/Api';
-import useFetch from 'aws/common/hooks/useFetch';
-import FormWrap from 'aws/common/FormWrap';
-import { ApiRoutes } from 'aws/common/Routes';
-import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'aws/common/constants';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { ApiContext } from 'integrations/aws/context/Api';
+import useFetch from 'integrations/aws/common/hooks/useFetch';
+import FormWrap from 'integrations/aws/common/FormWrap';
+import { ApiRoutes } from 'integrations/aws/common/Routes';
+import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 
 const Default = ({ value }) => (
   <>{value} <small>(default)</small></>

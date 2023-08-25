@@ -19,9 +19,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Input } from 'components/bootstrap';
-import { FormDataContext } from 'aws/context/FormData';
-import { AdvancedOptionsContext } from 'aws/context/AdvancedOptions';
-import AdditionalFields from 'aws/common/AdditionalFields';
+import { FormDataContext } from 'integrations/aws/context/FormData';
+import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions';
+import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 
 const FormAdvancedOptions = ({ onChange }) => {
   const { formData } = useContext(FormDataContext);
