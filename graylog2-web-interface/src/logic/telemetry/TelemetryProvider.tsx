@@ -60,7 +60,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
   const theme = useTheme();
 
-  const isPosthogLoaded = useCallback(() => !!(posthog && posthog.__loaded), [posthog]);
+  const isPosthogLoaded = useCallback(() => (posthog?.__loaded === true), [posthog]);
 
   const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
   const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
